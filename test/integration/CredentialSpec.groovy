@@ -42,6 +42,17 @@ class CredentialSpec extends IntegrationSpec {
 			am.HEADER			| 'a@header:b'	| 'status code equal 200'| 'http://b.ic' | ''			| chm.POST		| null				| false		// Missing requestmode
 	}
 
+	void 'Test validation of Credential with the project being of a different provider'() {
+		expect:
+			createBadTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
+		where:
+			method        | sessionName | valExp  | authUrl       | renewUrl      | httpMethod | requestMode | result
+			am.BASIC_AUTH | ''          | ''      | ''            | ''            | null       | null        | false        // HAPPY PATH, fails validation, because of provider
+			am.BASIC_AUTH | 'bogus'     | 'bogus' | ''            | ''            | null       | null        | false        // Still happy, fails validation, because of provider, with bogus values that are unnecessary
+			am.JWT        | ''          | ''      | 'http://b.ic' | 'http://p.ic' | null       | null        | false        // HAPPY PATH, fails validation, because of provider
+			am.JWT        | 'bogus'     | 'bogus' | 'http://b.ic' | 'http://p.ic' | null       | null        | false        // Still happy, fails validation, because of provider, with bogus values that are unnecessary
+	}
+
 	/**
 	 * Create a Credential domain object with the given parameters
 	 * @param  authMethod
@@ -58,5 +69,36 @@ class CredentialSpec extends IntegrationSpec {
 		Provider provider = providerTestHelper.createProvider(project)
 		return credentialTestHelper.createCredential(project, provider, authMethod,
 				sessionName, validationExp, authUrl, renewUrl, httpMethod, requestMode)
+	}
+
+	/**
+	 * Create a Credential domain object with the given parameters that has a project, that is different from
+	 * the one the provider has.
+	 *
+	 * @param authMethod
+	 * @param sessionName
+	 * @param validationExp
+	 * @param authUrl
+	 * @param renewUrl
+	 * @param httpMethod
+	 * @param requestMode
+	 *
+	 * @return The bad Credential domain object
+	 */
+	private Credential createBadTestCredential(authMethod, sessionName, validationExp, authUrl, renewUrl, httpMethod, requestMode) {
+		Project project = projectTestHelper.createProject()
+		Project otherProject = projectTestHelper.createProject()
+		Provider provider = providerTestHelper.createProvider(project)
+		return credentialTestHelper.createCredential(
+			otherProject,
+			provider,
+			authMethod,
+			sessionName,
+			validationExp,
+			authUrl,
+			renewUrl,
+			httpMethod,
+			requestMode
+		)
 	}
 }
