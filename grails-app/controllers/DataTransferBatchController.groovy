@@ -210,28 +210,34 @@ class DataTransferBatchController implements ControllerMethods {
 	@HasPermission(Permission.DataTransferBatchView)
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
-		
-		List<Map<String, Object>> dataTransferErrorList = 
-			jdbcTemplate.queryForList("select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.error_text"
-				+ " FROM data_transfer_value d left join eav_attribute a"
+
+		List<Map<String, Object>> dataTransferErrorList =
+			jdbcTemplate.queryForList("select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.field_name, d.error_text"
+				+ " FROM data_transfer_value d left outer join eav_attribute a"
 				+ " on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ?"
 				+ " and has_error = 1", dataTransferBatchId)
 
 		def completeDataTransferErrorList = []
 		def currentValues
+
 		dataTransferErrorList.each {
-			AssetEntity assetEntity = AssetEntity.get(it.asset_entity_id)
-			if (AssetEntityService.bundleMoveAndClientTeams.contains(it.attribute_code) ) {
-				currentValues = assetEntity?.(it.attribute_code).name
-			} else {
-				currentValues = assetEntity?.(it.attribute_code)
-			}
-			completeDataTransferErrorList << [assetName: assetEntity.assetName, assetTag: assetEntity.assetTag, attribute: it.attribute_code,
-			                                  error: it.error_text, currentValue: currentValues,
-			                                  importValue: it.import_value]
+			println it.inspect()
+			println "*** it.asset_entity_id = ${it.asset_entity_id}"
+			AssetEntity assetEntity = AssetEntity.read( it.asset_entity_id )
+			println "*** assetEntity=$assetEntity, it.field_name=${it.field_name}"
+			currentValues = assetEntity?.(it.field_name)
+
+			completeDataTransferErrorList << [
+				assetName: assetEntity.assetName,
+				assetTag: assetEntity.assetTag ?: '',
+				attribute: it.field_name,
+				error: it.error_text,
+				currentValue: currentValues,
+				importValue: it.import_value
+			]
 		}
 
-		[completeDataTransferErrorList: completeDataTransferErrorList.sort { it.assetTag + it.attribute }]
+		[completeDataTransferErrorList: completeDataTransferErrorList.sort { it.assetTag + it.field_name }]
 	}
 
 	/**
