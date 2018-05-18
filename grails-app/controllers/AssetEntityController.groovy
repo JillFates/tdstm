@@ -1534,28 +1534,30 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			// Note changes to this list must also be updated in the /views/assetEntity/listTasks.gsp
 			[ cell: [
-					'',
-					it.taskNumber,
-					it.comment,
-					userSelectedCols[0], // taskManagerValues(taskPref["1"],it),
-					userSelectedCols[1], // taskManagerValues(taskPref["2"],it),
-					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
-					dueDate,
-					status ?: '',
-					userSelectedCols[2], // taskManagerValues(taskPref["3"],it),
-					userSelectedCols[3], // taskManagerValues(taskPref["4"],it),
-					userSelectedCols[4], // taskManagerValues(taskPref["5"],it),
-					nGraphUrl,
-					it.score ?: 0,
-					status ? 'task_' + it.status.toLowerCase() : 'task_na',
-					dueClass,
-					it.assetEntity?.id, // 16
-					it.assetEntity?.assetType, // 17
-					it.assetEntity?.assetClass?.toString(), // 18
-					instructionsLinkURL, // 19
-					estStartClass,	// 20
-					estFinishClass	// 21
+					'',	// 0
+					it.taskNumber,	// 1
+					it.comment, // 2
+					userSelectedCols[0], // taskManagerValues(taskPref["1"],it), // 3
+					userSelectedCols[1], // taskManagerValues(taskPref["2"],it), // 4
+					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '', // 5
+					dueDate, // 6
+					status ?: '', // 7
+					userSelectedCols[2], // taskManagerValues(taskPref["3"],it), // 8
+					userSelectedCols[3], // taskManagerValues(taskPref["4"],it), // 9
+					userSelectedCols[4], // taskManagerValues(taskPref["5"],it), // 10
+					nGraphUrl, // 11
+					it.score ?: 0, // 12
+					status ? 'task_' + it.status.toLowerCase() : 'task_na', // 13
+					dueClass, // 14
+					it.assetEntity?.id, // 15
+					it.assetEntity?.assetType , // 16
+					it.assetEntity?.assetClass?.toString(), // 17
+					instructionsLinkURL, // 18
+					estStartClass,	// 19
+					estFinishClass,	// 20
+					it.isPublished // 21
 			],
 			  id:it.id
 			]
