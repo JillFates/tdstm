@@ -125,7 +125,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
         when: "User goes to Asset View Manager and filter the views by name"
             waitFor { menuModule.goToAssetViewManager() }
             at AssetViewsPage
-            filterViewByName(randStr)
+            allViewsModule.filterViewByName(randStr)
         then: "The newly created view is filtered and displayed"
             vwGrid.find("tr")[1].find("a")[1].displayed
     }
