@@ -69,7 +69,8 @@
 											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
-											[data]="${personList as JSON}">
+											(valueChange)="addPerson($event, ${partyGroupList as JSON} )"
+											[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
 									</kendo-dropdownlist>
 								%{--	<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -112,7 +113,8 @@
 									[defaultItem]="defaultItem"
 									[textField]="'fullName'"
 									[valueField]="'personId'"
-									[data]="${personList as JSON}">
+									(valueChange)="addPerson($event, ${partyGroupList as JSON})"
+									[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
 								</kendo-dropdownlist>
 							%{--		<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -164,7 +166,8 @@
 											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
-											[data]="${personList as JSON}">
+											(valueChange)="addPerson($event, ${partyGroupList as JSON})"
+											[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
 									</kendo-dropdownlist>
 %{--
 									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"

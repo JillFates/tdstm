@@ -5,11 +5,13 @@
  *  Use angular/views/TheAssetType as reference
  */
 import { Component, ViewChild, Inject, OnInit } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
+import {Person} from '../../../../shared/components/add-person/model/person.model';
+import {AddPersonComponent} from '../../../../shared/components/add-person/add-person.component';
 
 interface SelectedItem {
 	class: string;
@@ -28,9 +30,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
 		private dateFormat: string;
-
-		constructor( @Inject('model') private model: any, private activeDialog: UIActiveDialogService, private preference: PreferenceService) {}
-
+		constructor(@Inject('model') private model: any, private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private preference: PreferenceService) {}
 		ngOnInit(): void {
 			console.log('Loading application-edit.component');
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
@@ -88,6 +88,26 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				this.model.asset[source].id = targetId;
 				this.model.asset[target].id = backSource;
 			}
+		}
+
+		addPerson(event, partyGroupList) {
+
+			let person: Person = {
+				name: 'the name',
+				partyGroupList
+			};
+
+			this.dialogService.extra(AddPersonComponent,
+				[UIDialogService,
+					{
+						provide: Person,
+						useValue: person
+					}
+				], true, false)
+				.then((result) => {
+					console.log(result);
+					// dataItem.comment = result.comment;
+				}).catch((error) => console.log(error));
 		}
 
 	}
