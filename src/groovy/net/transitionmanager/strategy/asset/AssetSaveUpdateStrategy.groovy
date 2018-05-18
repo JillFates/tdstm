@@ -112,7 +112,7 @@ abstract class AssetSaveUpdateStrategy {
 		Long assetId = NumberUtil.toLong(command.asset.id)
 		AssetEntity assetEntity
 		if (assetId) {
-			assetEntity = GormUtil.findInProject(project, AssetEntity, assetId)
+			assetEntity = GormUtil.findInProject(project, AssetEntity, assetId, true)
 		} else {
 			throw new InvalidParamException('The requested Asset ID is invalid')
 		}
@@ -207,13 +207,13 @@ abstract class AssetSaveUpdateStrategy {
 	private void createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
 		AssetDependency dependency = null
 		if (depMap.id) {
-			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id)
+			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id, true)
 		} else {
 			dependency = new AssetDependency()
 			dependency.createdBy = currentPerson
 		}
 
-		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.targetAsset.id)
+		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.targetAsset.id, true)
 
 		dependency.dependent = isDependent? assetEntity : targetAsset
 		dependency.asset = isDependent ? targetAsset : assetEntity
@@ -222,7 +222,7 @@ abstract class AssetSaveUpdateStrategy {
 		dependency.type = depMap.type
 		dependency.comment = depMap.comment
 
-		MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, depMap.moveBundleId)
+		MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, depMap.moveBundleId, true)
 		// If the selected bundle doesn't match the selected asset's, assign it to that bundle.
 		if (targetAsset.moveBundle.id != moveBundle.id) {
 			assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
@@ -260,10 +260,8 @@ abstract class AssetSaveUpdateStrategy {
 	private void deleteDependencies(AssetEntity assetEntity, boolean isDependent) {
 		// Determine those dependencies no longer valid.
 		List<Long> dependents = collectDependencies(isDependent)
-		if (dependents) {
-			// Delete the dependencies calculated in the previous step.
-			deleteDependencies(dependents, assetEntity, isDependent)
-		}
+		// Delete the dependencies for the asset not included in the dependents list.
+		deleteDependencies(dependents, assetEntity, isDependent)
 	}
 
 	/**
@@ -332,8 +330,14 @@ abstract class AssetSaveUpdateStrategy {
 		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
 		* given their id, but also takes the asset being edited into account.*/
 		String side = isDependent ? 'dependent' : 'asset'
-		String hql = "DELETE FROM AssetDependency ad WHERE id NOT IN (:ids) AND $side = :asset"
-		AssetDependency.executeUpdate(hql, [ids: ids, asset: assetEntity])
+		String hql = "DELETE FROM AssetDependency ad WHERE $side = :asset"
+		Map params = [asset: assetEntity]
+		// Add the NOT IN condition only if the dependents list is not empty
+		if (ids) {
+			hql += " AND id NOT IN (:ids)"
+			params['ids'] = ids
+		}
+		AssetDependency.executeUpdate(hql, params)
 	}
 
 
