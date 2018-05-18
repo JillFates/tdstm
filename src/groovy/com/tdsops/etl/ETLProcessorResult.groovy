@@ -149,6 +149,35 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Return current row using resultIndex value
+	 * @return an instance of RowResult
+	 * @see RowResult
+	 * @see ETLProcessorResult#resultIndex
+	 */
+	private RowResult currentRow(){
+		return reference.data[resultIndex]
+	}
+
+	/**
+	 * Return the value for a field name using the current row in the JSON results
+	 * @param field
+	 * @return an object with value content
+	 *
+	 */
+	Object getFieldValue(String fieldName){
+		if(resultIndex >= 0){
+			RowResult row = currentRow()
+			if(!row.fields.containsKey(fieldName)) {
+				throw ETLProcessorException.unknownDomainProperty(fieldName)
+			}
+			return row.fields[fieldName].value
+
+		} else {
+			throw ETLProcessorException.domainOnlyAllowOnNewRows()
+		}
+	}
+
+	/**
 	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
 	 * 		ETLInfo <Map>
 	 * 		domains <List><Map>

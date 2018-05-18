@@ -305,6 +305,31 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can throw an exception if sheet name case is incorrect for a spreadSheet DataSet'(){
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						sheet 'applications'
+						read labels
+						""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Sheet 'applications' is not found in workbook"
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'(){
 
 		given:
@@ -602,7 +627,6 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can read labels skipping more than one row before for a spreadSheet DataSet'(){
 

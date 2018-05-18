@@ -1,5 +1,9 @@
 package net.transitionmanager.service
 
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -90,6 +94,24 @@ class MetricReportingServiceSpec extends Specification {
 			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function)
 		then: 'gatherMetric throw and InvalidParameterException'
 			thrown InvalidParamException
+	}
+
+	void 'Test processAggregation count'() {
+		setup: 'Given an aggregation string'
+			String aggregation = 'count(*)'
+		when: 'processAggregation is called with the aggregation'
+			String processedAggregation = service.processAggregation(aggregation)
+		then: 'processAggregation returns a process aggregation string'
+			processedAggregation == 'count(*)'
+	}
+
+	void 'Test processAggregation sum'() {
+		setup: 'Given an aggregation string'
+			String aggregation = 'sum(project.id)'
+		when: 'processAggregation is called with the aggregation'
+			String processedAggregation = service.processAggregation(aggregation)
+		then: 'processAggregation returns a process aggregation string'
+			processedAggregation == "SUM (COALESCE( project.id, 0 ) )"
 	}
 
 	void 'Test getLabel'() {
@@ -220,6 +242,68 @@ class MetricReportingServiceSpec extends Specification {
 			expected == hql
 	}
 
+	void 'test getQuery dependency'() {
+
+		setup: 'Given a query JSON structure'
+			JSONObject query = [
+					"groupBy"    : [
+							"type"
+					],
+					"domain"     : "Dependency",
+					"aggregation": "count(*)",
+					"where"      : [
+							[
+									"column"    : "type",
+									"expression": "in ('Validated')"
+							]
+					]
+			] as JSONObject
+			String expected = """
+				select asset.project.id,
+						concat(COALESCE(type, 'Unknown')) as label,
+						count(*) as value
+				from AssetDependency
+				where asset.project.id in (:projectIds) and type in ('Validated') and asset.moveBundle.useForPlanning = 1 and dependent.moveBundle.useForPlanning = 1
+				group by type, asset.project.id
+				""".stripIndent()
+
+		when: 'getQuery is called with the JSON query'
+			String hql = service.getQuery(query).stripIndent()
+		then: 'getQuery returns an HQL string'
+			expected == hql
+	}
+
+	void 'test getQuery task'() {
+
+		setup: 'Given a query JSON structure'
+			JSONObject query = [
+				"groupBy"    : [
+					"status"
+				],
+				"domain"     : "Task",
+				"aggregation": "count(*)",
+				"where"      : [
+					[
+						"column"    : "status",
+						"expression": "in ('Complete')"
+					]
+				]
+			] as JSONObject
+			String expected = """
+					select project.id,
+							concat(COALESCE(status, 'Unknown')) as label,
+							count(*) as value
+					from AssetComment
+					where project.id in (:projectIds) and status in ('Complete') and isPublished = 1 and commentType = 'issue'
+					group by status, project.id
+					""".stripIndent()
+
+		when: 'getQuery is called with the JSON query'
+			String hql = service.getQuery(query).stripIndent()
+		then: 'getQuery returns an HQL string'
+			expected == hql
+	}
+
 	void 'test getQuery no where'() {
 
 		setup: 'Given a query JSON structure no where'
@@ -309,6 +393,52 @@ class MetricReportingServiceSpec extends Specification {
 				where project.id in (:projectIds) and moveBundle.useForPlanning = 1
 				group by project.id
 				""".stripIndent()
+	}
+
+	void 'test processWheres'() {
+		setup: 'Given a list of where definitions and a domainClass'
+			List<Map> whereDefinitions = []
+			Class domainClass = Application
+		when: 'processWheres is called on the definitions and the domain class'
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+		then: 'the resulting map will have'
+			processedWhereDefinitions == [[column: 'moveBundle.useForPlanning', expression: '= 1']]
+	}
+
+	void 'test processWheres AssetEntity'() {
+		setup: 'Given a list of where definitions and a domainClass'
+			List<Map> whereDefinitions = []
+			Class domainClass = AssetEntity
+		when: 'processWheres is called on the definitions and the domain class'
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+		then: 'the resulting map will have'
+			processedWhereDefinitions == [[column: 'moveBundle.useForPlanning', expression: '= 1']]
+	}
+
+	void 'test processWheres AssetDependency'() {
+		setup: 'Given a list of where definitions and a domainClass'
+			List<Map> whereDefinitions = []
+			Class domainClass = AssetDependency
+		when: 'processWheres is called on the definitions and the domain class'
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+		then: 'the resulting map will have'
+			processedWhereDefinitions == [
+				[column: 'asset.moveBundle.useForPlanning', expression: '= 1'],
+				[column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
+			]
+	}
+
+	void 'test processWheres AssetComment'() {
+		setup: 'Given a list of where definitions and a domainClass'
+			List<Map> whereDefinitions = []
+			Class domainClass = AssetComment
+		when: 'processWheres is called on the definitions and the domain class'
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+		then: 'the resulting map will have'
+			processedWhereDefinitions == [
+				[column: 'isPublished', expression: '= 1'],
+				[column: 'commentType', expression: "= 'issue'"]
+			]
 	}
 
 	void 'test saveDefinitions sql definition'() {

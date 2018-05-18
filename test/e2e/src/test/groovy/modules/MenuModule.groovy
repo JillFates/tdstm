@@ -157,6 +157,11 @@ class MenuModule extends Module {
         selectItem(assetsViewManagerItem)
     }
 
+    def goToAssetExport() {
+        selectMenu assetsItem
+        selectItem assetsExportItem
+    }
+
     def assertProjectName(name){
         projectName.text().contains(name)
     }

@@ -620,7 +620,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using DOMAIN.property'() {
+	void 'test can load a field using DOMAINproperty'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(

@@ -185,5 +185,9 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Ignore only allow on new rows")
     }
 
+    static ETLProcessorException domainOnlyAllowOnNewRows() {
+        new ETLProcessorException("DOMAIN only after the first row")
+    }
+
 }
 

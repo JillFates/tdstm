@@ -341,12 +341,12 @@ class AssetEntity extends EavEntity {
 	}
 
 	// Legacy accessor methods to support referencing the pre-normalized loc/room/rack information
-	String getSourceLocation() { roomSource?.location }
-	String getSourceRack()     { rackSource?.tag }
-	String getSourceRoom()     { roomSource?.roomName }
-	String getTargetLocation() { roomTarget?.location }
-	String getTargetRack()     { rackTarget?.tag }
-	String getTargetRoom()     { roomTarget?.roomName }
+	String getSourceLocationName() { roomSource?.location ?: ''}
+	String getSourceRackName()     { rackSource?.tag ?: ''}
+	String getSourceRoomName()     { roomSource?.roomName ?: ''}
+	String getTargetLocationName() { roomTarget?.location ?: ''}
+	String getTargetRackName()     { rackTarget?.tag ?: ''}
+	String getTargetRoomName()     { roomTarget?.roomName ?: ''}
 
 	/**
 	 * The usize is now coming from the model vs the asset directly
