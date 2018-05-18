@@ -9,6 +9,8 @@ class ViewsModule extends Module {
         viewsContainer    { $( "div", class:"content body")}
         viewModuleContainer {viewsContainer.find(".asset-explorer-index-container")}
 
+        filter            {$("input",placeholder: "Enter view name to filter")}
+        clearFilterX      {$(".form-control-feedback")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
         viewsListed       {$("[uisref]")}
@@ -16,7 +18,6 @@ class ViewsModule extends Module {
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
-
 
         deleteButtons     {viewList.find("title": "Click to delete this view")}
         createViewButton  {viewsContainer.find("button", text:containsWord("Create"))}
@@ -26,7 +27,7 @@ class ViewsModule extends Module {
         voidStars         (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star-o")}
         yellowStars       (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star")}
         createdBy         {viewList.find("td:nth-child(4)")}
-        sharedViews       {viewList.find("tr span.glyphicon")}// unchecked views will not have a span
+        ticks              {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
 
     }
     def clickCreateView(){
@@ -61,25 +62,27 @@ class ViewsModule extends Module {
         !voidStars.displayed
     }
     /**
-     * Shared views willhave a tick on the "Shared" column
+     * Shared views will have a tick on the "Shared" column
      * In This section the number of rows should be the same as number of ticks.
-     * This method validates the the condition of equal number of ticks and rows is met
-     * and it assumes that there will always be at least one shared view,which is the all assets view.
+     * This method validates the the condition of equal number of ticks and rows is met.
      *
      */
     def validateIsShared(){
-        sharedViews.size()==vwGridRows.size()
+        ticks.size()==vwGridRows.size()
     }
     /**
-     * System Views will have no author (created by field empty)
+     * System Views views will have a tick on the "System" column
+     * In This section the number of rows should be the same as number of ticks.
+     * This method validates the the condition of equal number of ticks and rows is met.
      */
     def systemViewsOnly(){
-        createdBy.text()==""
+       // createdBy.text()==""
+        ticks.size()==viewsListed.size()
     }
     /**
      * This method validates how the mame of a view is listed in a grid.
      * If the parameter isListed receives TRUE the method will check whether
-     * a view name is LISTED at lest once in the grid, while receiving FALSE will have the
+     * a view name is LISTED at least once in the grid, while receiving FALSE will have the
      * method to check whether each view name CONTAINS the text in the viewName parameter.
      * @param viewName
      * @param isListed
@@ -105,5 +108,25 @@ class ViewsModule extends Module {
      */
     def clickFirstViewOfTheList(){
         vwGrid.find("tr")[1].find("a")[1].click()
+    }
+    def filterViewByName(String name){
+        filter=name
+    }
+
+    def clearFilterViewByName(){
+        clearFilterX.click()
+    }
+    /**
+     * Receives a number of ros that had been saved before in the spec and compares it ti the
+     * curren number of rows
+     * @param numberOfRows
+     * @return
+     */
+    def allRowsAreBack(int numberOfRows){
+        getNumberOfRows()==numberOfRows
+    }
+
+    def getNumberOfRows(){
+        viewsListed.size()
     }
 }

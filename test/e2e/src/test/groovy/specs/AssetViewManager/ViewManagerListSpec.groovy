@@ -14,7 +14,7 @@ class ViewManagerListSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-
+    static numberOfRows
     //Define the names of the Application you will Create and Edit
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "TM8501"
@@ -30,7 +30,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         at MenuPage
         waitFor { menuModule.goToAssetViewManager() }
     }
-    def "1. validates user can reach 'my views' "() {
+    def "1. Validate section title and presence of 'All Views'"() {
         testKey = "TM-8501"
         given: "I am in Asset Views Page"
             at AssetViewsPage
@@ -74,28 +74,39 @@ class ViewManagerListSpec extends GebReportingSpec {
         and: "The title on the section is correct"
             allViewsModule.moduleTitleIsCorrect("Shared Views")
     }
-    def "5. Validate views can be filtered"(){
+    def "5. Validate views can be filtered by name"(){
         testKey = "TM-8501"
-        given: "I am in shared views"
-            at AssetViewsPage
-        when : "I filter views by name"
-            filterViewByName "All Assets"
+        given: "User goes to All views and there is a certain number of rows"
+            waitFor {viewMgrAllViews.click()}
+            numberOfRows=allViewsModule.getNumberOfRows()
+        when : "User filters views by name"
+            allViewsModule.filterViewByName "All Assets"
         then: "Only views with names containing the text are listed"
             allViewsModule.validateRowNames("All Assets", false)
-
     }
-    def "6. Validates the listed views in System Views are correct"(){
+    def "6. Validate filter is correctly removed"(){
+        testKey = "TM-8501"
+        given: "User had previously filtered views by name"
+            allViewsModule.filterViewByName "All Assets"
+        when : "User clears the filter"
+            allViewsModule.clearFilterViewByName()
+        then: "The original number of rows is displayed again"
+            allViewsModule.allRowsAreBack(numberOfRows)
+    }
+
+
+    def "7. Validates the listed views in System Views are correct"(){
         testKey = "TM-8501"
         given: "I am in the Shared Views section"
             at AssetViewsPage
         when : "I go to System Views"
             waitFor {viewMgrSystemViews.click()}
-        then: "Only the Sytem views are displayed"
+        then: "Only the System views are displayed"
             allViewsModule.systemViewsOnly()
         and: "The title on the section is correct"
             allViewsModule.moduleTitleIsCorrect("System Views")
     }
-    def "7. Erase icon is reactive"(){
+    def "8. Erase icon is reactive"(){
         testKey = "TM-8501"
         given: "I am in the System Views section"
             at AssetViewsPage
@@ -105,7 +116,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         then: "I am prompted to confirm the deletion"
             allViewsModule.confirmationRequiredIsDisplayed()
     }
-    def "8. Validate user can click on a view and then go back to the list"(){
+    def "9. Validate user can click on a view and then go back to the list"(){
         testKey = "TM-8501"
         given: "I am in the System Views section"
             at AssetViewsPage
