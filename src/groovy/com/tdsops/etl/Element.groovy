@@ -444,4 +444,9 @@ class Element implements RangeChecker {
 	int hashCode() {
 		return value.hashCode()
 	}
+
+	@Override
+	String toString() {
+		return value
+	}
 }

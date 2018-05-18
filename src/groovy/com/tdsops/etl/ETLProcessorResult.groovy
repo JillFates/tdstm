@@ -456,6 +456,7 @@ class ETLProcessorResult {
 	 * @param value - the value that the field should have
 	 * @return true if the data row was found otherwise false
 	 */
+
 	boolean lookupInReference(String fieldName, String value) {
 		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
 		rowFoundInLookup = reference.data.find { Map<String, ?> dataRow ->
