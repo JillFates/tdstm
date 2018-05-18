@@ -234,23 +234,49 @@ class DataImportHelper {
 		Long id = null
 		String msg
 
-		// TODO : JPM 2/2018 : CRITICAL - this method is not working properly at this point
-		if (idField?.value) {
-			id = NumberUtil.toPositiveLong(idField.value)
+		if (idField) {
 
-			if (id < 1) {
-				msg = "The $ID_FIELD must be a numeric value"
-				importContext.errors << msg + " on row ${importContext.rowNumber}"
-				rowData.errors << msg
+			// Check for an error in the import
+			if (idField.errors) {
+				msg = idField.errors.join(', ')
+				importContext.errors << "$msg on row ${importContext.rowNumber}"
+				// rowData.errors << msg
 				return -1
 			}
 
-			// Now check to see that the object exists and belongs to the current project
-			String error = validDomainId(id, importContext.project)
-			if (error) {
-				importContext.errors << error + " on row ${importContext.rowNumber}"
-				rowData.errors << error
-				return -1
+			// First check if there are any results from find/elseFind
+			int resultsFound = idField?.find?.results?.size()
+			if (resultsFound > 0) {
+				if (resultsFound == 1) {
+					id = idField.find.results[0]
+				} else {
+					msg = "Multiple entities found"
+					importContext.errors << msg + " on row ${importContext.rowNumber}"
+					rowData.errors << msg
+					id = -1
+				}
+			} else {
+				// Check if the idField is populated directly from the ETL script
+				// TODO : JPM 2/2018 : CRITICAL - this method is not working properly at this point
+				if (idField?.value) {
+					id = NumberUtil.toPositiveLong(idField.value)
+
+					if (id < 1) {
+						msg = "The $ID_FIELD must be a numeric value"
+						importContext.errors << msg + " on row ${importContext.rowNumber}"
+						rowData.errors << msg
+						return -1
+					}
+
+					// Now check to see that the object exists and belongs to the current project
+					// This is necessary because no find/elseFind was performed by the ETL script
+					String error = validDomainId(id, importContext.project)
+					if (error) {
+						importContext.errors << error + " on row ${importContext.rowNumber}"
+						rowData.errors << error
+						return -1
+					}
+				}
 			}
 		}
 
