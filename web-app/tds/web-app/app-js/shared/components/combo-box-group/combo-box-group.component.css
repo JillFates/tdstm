@@ -1,0 +1,28 @@
+.team-group, .person-group, .sme-group {
+	width: 100%;
+}
+
+div[class='team-group'] > span,
+div[class='person-group'] > span,
+div[class='sme-group'] > span {
+	background-color: lightgrey;
+	float: right;
+	font-weight: bold;
+}
+
+div[class='team-group'] > span,
+div[class='person-group'] > span,
+div[class='sme-group'] > span {
+	visibility: hidden;
+}
+
+
+div[class='person-group'] > span.is-first,
+div[class='team-group'] > span.is-first,
+div[class='sme-group'] > span.is-first {
+	visibility: visible;
+}
+
+.group-combo {
+	width: 300px;
+}

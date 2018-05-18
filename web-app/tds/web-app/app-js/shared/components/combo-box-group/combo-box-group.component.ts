@@ -4,7 +4,8 @@ import {setTimeout} from 'timers';
 
 @Component({
 	selector: 'tds-combobox-group',
-	styleUrls: ['../tds/web-app/app-js/shared/components/combo-box-group/combo-box-group.component.css']
+	styleUrls: ['../tds/web-app/app-js/shared/components/combo-box-group/combo-box-group.component.css'],
+	templateUrl: '../tds/web-app/app-js/shared/components/combo-box-group/combo-box-group.component.html'
 })
 export class TDSComboBoxGroupComponent implements OnInit {
 	@ViewChild('innerComboBoxGroup') innerComboBoxGroup: ComboBoxComponent;

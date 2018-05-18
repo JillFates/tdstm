@@ -38,6 +38,7 @@ import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
 import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
+import { AddPersonComponent } from './components/add-person/add-person.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -82,7 +83,8 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,
-		UIModalDecoratorDirective
+		UIModalDecoratorDirective,
+		AddPersonComponent
 	],
 	providers: [
 		AuthService,
@@ -120,11 +122,13 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,
-		UIModalDecoratorDirective
+		UIModalDecoratorDirective,
+		AddPersonComponent
 	],
 	entryComponents: [
 		DynamicComponent,
-		DependentCommentComponent]
+		DependentCommentComponent,
+		AddPersonComponent]
 })
 export class SharedModule {
 	constructor(private notifier: NotifierService) {
