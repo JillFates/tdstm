@@ -130,7 +130,7 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             task2Test.assetEntity == null
     }
 
-	@Ignore
+	//@Ignore
 	@See('TM-10261')
 	void '05. Test Dependency Analyzer grouping' () {
 		setup: 'create a project'
@@ -175,16 +175,16 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 			String statusTypes = "'Unknown', 'Validated', 'Questioned', 'Future'"
 			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 		then: 'test that there is a group 0 composed of assets 1, 2, 3 and 4'
-			List groupZero = AssetDependencyBundle.findAllByDependencyBundle(0)
-			assert [asset1.id, asset2.id, asset3.id, asset4.id] == groupZero.collect { it.asset.id }
+			List groupOne = AssetDependencyBundle.findAllByDependencyBundleAndProject(1, project)
+			assert [asset1.id, asset2.id, asset3.id, asset4.id].sort() == groupOne.collect { it.asset.id }.sort()
 		and: 'test that there is a group 1 composed of assets 5 and 6'
-			List groupOne = AssetDependencyBundle.findAllByDependencyBundle(1)
-			assert [asset5.id, asset6.id] == groupOne.collect { it.asset.id }
+			List groupTwo = AssetDependencyBundle.findAllByDependencyBundleAndProject(2, project)
+			assert [asset9.id, asset10.id].sort() == groupTwo.collect { it.asset.id }.sort()
 		and: 'test that there is a group 2 composed of assets 9 and 10'
-			List groupTwo = AssetDependencyBundle.findAllByDependencyBundle(2)
-			assert [asset9.id, asset10.id] == groupTwo.collect { it.asset.id }
+			List groupThree = AssetDependencyBundle.findAllByDependencyBundleAndProject(3, project)
+			assert [asset5.id, asset6.id].sort() == groupThree.collect { it.asset.id }.sort()
 		and: 'test that the Straggler group contains assets 7 and 8'
-			List groupStraggler = AssetDependencyBundle.findAllByDependencySource('Straggler')
-			assert [asset7.id, asset8.id] == groupStraggler.collect { it.asset.id }
+			List groupZero = AssetDependencyBundle.findAllByDependencyBundleAndProject(0, project)
+			assert [asset7.id, asset8.id].sort() == groupZero.collect { it.asset.id }.sort()
 	}
 }
