@@ -98,7 +98,11 @@ class ETLProcessor implements RangeChecker {
 	 * when an ETL script is being executing.
 	 */
 	ETLProcessorResult result
-
+	/**
+	 * Iteration index to control the realtion between current position
+	 * and the total amount of rows in an iteration.<br>
+	 * It defines if the ETLProcessor instance is in a loop using iterate command.
+	 */
 	IterateIndex iterateIndex
 
 	Integer currentRowIndex = 0
@@ -111,11 +115,6 @@ class ETLProcessor implements RangeChecker {
 	 * A debug output assignable in the ETLProcessor creation
 	 */
 	DebugConsole debugConsole
-	/**
-	 * This boolean value defines if the ETLProcessor instance is in a loop using iterate command
-	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
-	 */
-	Boolean isIterating = false
 
 	List<Column> columns = []
 	Map<String, Column> columnsMap = [:]
@@ -125,7 +124,9 @@ class ETLProcessor implements RangeChecker {
 	SelectedDomain selectedDomain
 	ETLFindElement currentFindElement
 
-	// List of command that needs to be completed
+	/**
+	 * List of command that needs to be completed.
+	 */
 	private Stack<ETLStackableCommand> commandStack = []
 
 	/**
@@ -208,7 +209,7 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Read Labels from source of data
 	 * @param reservedWord
-	 * @return
+	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor read (ReservedWord reservedWord) {
 		validateStack()
@@ -301,13 +302,20 @@ class ETLProcessor implements RangeChecker {
 		return this
 	}
 
+	/**
+	 * Method invoked at the begin of the iterate command
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 */
 	void topOfIterate(){
 		result.startRow()
 	}
 
+	/**
+	 * Method invoked at the end of the iterate command
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 */
 	void bottomOfIterate(){
 	}
-
 
 
 	/**
@@ -325,7 +333,6 @@ class ETLProcessor implements RangeChecker {
 		currentRowIndex = 1
 		rows.each { def row ->
 			topOfIterate()
-			isIterating = true
 			currentColumnIndex = 0
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
@@ -334,15 +341,12 @@ class ETLProcessor implements RangeChecker {
 
 			closure(addCrudRowData(row))
 
-			//result.removeIgnoredRows()
-
 			currentRowIndex++
 			iterateIndex.next()
 			binding.removeAllDynamicVariables()
 			bottomOfIterate()
 		}
 
-		isIterating = false
 		iterateIndex = null
 		currentRowIndex--
 		return this
@@ -569,7 +573,7 @@ class ETLProcessor implements RangeChecker {
 		return [
 			with: { value ->
 				Object localVariable = ETLValueHelper.valueOf(value)
-				if(isIterating){
+				if(iterateIndex){
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
 					addGlobalVariableInBinding(variableName, localVariable)

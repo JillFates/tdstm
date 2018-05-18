@@ -28,7 +28,7 @@ abstract class FoundElement {
 	 * Map that collects properties to be added in the ETLProcessorResult
 	 * @see FoundElement#result
 	 */
-	private Map<String, ?> propertiesMap
+	private Map<String, Object> propertiesMap
 
 	/**
 	 * Result add the result of this ETL command invocation
@@ -142,7 +142,7 @@ abstract class FoundElement {
 		return result
 	}
 
-	Map<String, ?> getPropertiesMap() {
+	Map<String, Object> getPropertiesMap() {
 		return propertiesMap
 	}
 }
