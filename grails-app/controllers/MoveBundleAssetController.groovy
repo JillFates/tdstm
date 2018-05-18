@@ -1,10 +1,7 @@
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
-import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
@@ -226,7 +223,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	@HasPermission(Permission.BundleView)
 	def retrieveRacksForBundles() {
 		def assetEntityList = AssetEntity.findAllByMoveBundle(MoveBundle.load(params.bundleId))
-		renderAsJson(assetEntityList.collect { [id: it.sourceRack, name: it.sourceRack] })
+		renderAsJson(assetEntityList.collect { [id: it.sourceRackName, name: it.sourceRackName] })
 	}
 
 	@HasPermission(Permission.RackView)
@@ -296,7 +293,7 @@ class MoveBundleAssetController implements ControllerMethods {
 				if (it.type == "Blade") {
 					def chassisAsset = AssetEntity.findWhere(assetTag: it.chassis, moveBundle: MoveBundle.get(it.bundle))
 					def pos = it.bladePos ? "-" + it.bladePos : ""
-					it.rack = chassisAsset?.sourceRack + pos
+					it.rack = chassisAsset?.sourceRackName + pos
 					it.assetName = chassisAsset?.assetName
 				}
 				else {

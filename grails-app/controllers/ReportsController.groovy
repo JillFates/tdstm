@@ -18,7 +18,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
@@ -29,7 +28,6 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectTeam
@@ -38,7 +36,6 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MetricReportingService
@@ -51,10 +48,7 @@ import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
-import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
-import java.text.DateFormat
-import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
 import java.text.DateFormat
 
@@ -185,21 +179,21 @@ class ReportsController implements ControllerMethods {
 					}
 
 					// sort options for reportFields
-					String roomTagSort = (asset.sourceRoom ?: "") + " " + (asset.sourceRack ?: "") + " " + (asset?.model?.usize ?: "")
+					String roomTagSort = (asset.sourceRoomName ?: "") + " " + (asset.sourceRackName ?: "") + " " + (asset?.model?.usize ?: "")
 					String truckTagSort = (asset.truck ?: "") + " " + (asset.cart ?: "") + " " + (asset.shelf ?: "")
 
 					def teamMembers = []
 					if(teamPartyGroup){
 						teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup)
 					}
-					reportFields << [assetName: asset.assetName , model: asset.model?.toString(),
+					reportFields << [assetName: asset.assetName, model: asset.model?.toString(),
 					                 sourceTargetPos: (teamPartyGroup?.currentLocation ?: "") + "(source/ unracking)",
 					                 cart: cartShelf, shelf: asset.shelf, source_team_id: teamPartyGroup?.id,
 					                 move_bundle_id: asset?.moveBundle?.id, dlocation: asset.rackSource?.location ?: '',
 					                 projectName: partyGroupInstance?.name, startAt: project.startDate,
 					                 completedAt: project.completionDate, bundleName: moveBundle?.name,
 					                 teamName: teamPartyGroup?.teamCode ? teamPartyGroup?.name + " - " + teamMembers : "",
-					                 location: "Source Team", truck: asset.truck,  room: asset.sourceRoom,
+					                 location: "Source Team", truck: asset.truck,  room: asset.sourceRoomName,
 					                 instructions: assetCommentString, roomTagSort: roomTagSort, truckTagSort: truckTagSort,
 					                 assetTagSort: asset.assetTag ?: "", sourcetargetLoc: "s", usize: asset?.model?.usize,
 					                 timezone: tzId, rptTime: currDate, userDateFormatter: userDateFormatter]
@@ -287,11 +281,11 @@ class ReportsController implements ControllerMethods {
 		def currDate = new Date()
 		DateFormat userDateFormatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 		assetCommentList.each { ac ->
-			def sourceTargetRoom = (ac?.assetEntity?.sourceRoom ?: "--")+
-								"/"+(ac?.assetEntity?.sourceRack ?: "--")+
+			def sourceTargetRoom = (ac?.assetEntity?.sourceRoomName ?: "--")+
+								"/"+(ac?.assetEntity?.sourceRackName ?: "--")+
 								"/"+(ac?.assetEntity?.sourceRackPosition ?: "--")+"\n"+
-								(ac?.assetEntity?.targetRoom ?: "--")+"/"+
-								(ac?.assetEntity?.targetRack ?: "--")+"/"+
+								(ac?.assetEntity?.targetRoomName ?: "--")+"/"+
+								(ac?.assetEntity?.targetRackName ?: "--")+"/"+
 								(ac?.assetEntity?.targetRackPosition ?: "--")
 			if( params.reportResolveInfo == "true" || ac.isResolved != 1 ) {
 				reportFields <<['assetName':ac?.assetEntity?.assetName,
