@@ -191,6 +191,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				label     : 'Unassigned:Server',
 				value     : 2
 			]
+
 			results[1] == [
 				projectId : otherProject.id,
 				metricCode: 'APP-VPS',
@@ -198,6 +199,39 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				label     : 'Unassigned:Server',
 				value     : 1
 			]
+	}
+
+	void "test gatherMetric for query mode filtering applications  TM-10727"() {
+			setup: 'giving a metric definition for a query, that will have results'
+				String date = (new Date() - 1).format('yyyy-MM-dd')
+				JSONObject metricDefinition = [
+					"metricCode" : "APP-VPS",
+					"description": "Application counts metrics for Validation/PlanStatus",
+					"enabled"    : true,
+					"mode"       : "query",
+					"query"      : [
+						"domain"     : "Device",
+						"aggregation": "count(*)"
+					]
+				] as JSONObject
+			when: 'running gatherMetrics on query mode'
+				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+			then: 'We get a list of map results'
+				results[0] == [
+					projectId : project.id,
+					metricCode: 'APP-VPS',
+					date      : date,
+					label     : 'count',
+					value     : 2
+				]
+
+				results[1] == [
+					projectId : otherProject.id,
+					metricCode: 'APP-VPS',
+					date      : date,
+					label     : 'count',
+					value     : 1
+				]
 	}
 
 	void "test gatherMetric for TM-10662 filtering out non-planning assets"() {
