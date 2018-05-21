@@ -5,6 +5,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 
 @Component({
 	selector: 'manual-import',
@@ -34,6 +35,10 @@ export class ManualImportComponent implements OnInit {
 		buttonColSize: 1,
 		urlColSize: 2
 	};
+	protected CHECK_ACTION = CHECK_ACTION;
+	protected operationStatus = {
+		test: new OperationStatusModel(),
+	};
 
 	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
 		this.file.fileUID = null;
@@ -51,28 +56,29 @@ export class ManualImportComponent implements OnInit {
 	 * Calls the process of fetch.
 	 */
 	private onFetch(): void {
-		this.fetchInProcess = true;
-		this.fetchResult = null;
-		this.fetchFileContent = null;
-		this.transformResult = null;
-		this.transformFileContent = null;
-		this.importResult = null;
-		// this.selectedScriptOption = null;
-		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
-			this.fetchResult = {
-				status: result.status
-			};
-			this.fetchInputUsed = 'action';
-			if (result.status === 'error') {
-				this.notifier.broadcast({
-					name: AlertType.DANGER,
-					message: result.errors[0]
-				});
-			} else {
-				this.fetchResult.filename = result.data.filename;
-			}
-			this.fetchInProcess = false;
-		} );
+		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
+		// this.fetchInProcess = true;
+		// this.fetchResult = null;
+		// this.fetchFileContent = null;
+		// this.transformResult = null;
+		// this.transformFileContent = null;
+		// this.importResult = null;
+		// // this.selectedScriptOption = null;
+		// this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
+		// 	this.fetchResult = {
+		// 		status: result.status
+		// 	};
+		// 	this.fetchInputUsed = 'action';
+		// 	if (result.status === 'error') {
+		// 		this.notifier.broadcast({
+		// 			name: AlertType.DANGER,
+		// 			message: result.errors[0]
+		// 		});
+		// 	} else {
+		// 		this.fetchResult.filename = result.data.filename;
+		// 	}
+		// 	this.fetchInProcess = false;
+		// } );
 	}
 
 	/**
