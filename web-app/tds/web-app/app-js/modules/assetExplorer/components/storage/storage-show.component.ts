@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
-import { DOMAIN, DIALOG_SIZE } from '../../../../shared/model/constants';
+import {DOMAIN, DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -17,7 +17,12 @@ export function StorageShowComponent(template, modelId: number) {
 		mainAsset = modelId;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		}
 
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
+			}
 		}
 
 		/**
@@ -35,7 +40,7 @@ export function StorageShowComponent(template, modelId: number) {
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
+				DIALOG_SIZE.XLG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {

@@ -17,6 +17,7 @@ import {DOMAIN} from '../../../shared/model/constants';
 import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 
 const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
 const UNITS_SIZE_SEPARATOR = 'x';
@@ -68,35 +69,50 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
-				dataScriptModels.forEach((r) => {
-					r.agentMethod = {id: r.agentMethod};
-					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
-					r.producesData = (r.producesData === 1);
-					r.polling = {
-						frequency: {
-							value: r.pollingInterval,
-							interval: INTERVAL.SECONDS
-						},
-						lapsedAfter: {
-							value: DateUtils.convertInterval({ value: r.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
-							interval: INTERVAL.MINUTES
-						},
-						stalledAfter: {
-							value: DateUtils.convertInterval({ value: r.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
-							interval: INTERVAL.MINUTES
-						}
-					};
-					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
-						APIActionModel.createReactions(r, r.reactionScripts);
-					} else {
-						APIActionModel.createBasicReactions(r);
-					}
+				dataScriptModels.forEach((model) => {
+					this.transformApiActionModel(model);
 				});
 				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	getAPIAction(id: number): Observable<APIActionModel> {
+		return this.http.get(`${this.dataDefaultUrl}/apiAction/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let model = result && result.status === 'success' && result.data;
+				this.transformApiActionModel(model);
+				return model;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	private transformApiActionModel(model: any): void {
+		model.agentMethod = {id: model.agentMethod};
+		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
+		model.lastUpdated = ((model.lastUpdated) ? new Date(model.lastUpdated) : '');
+		model.producesData = (model.producesData === 1);
+		model.polling = {
+			frequency: {
+				value: model.pollingInterval,
+				interval: INTERVAL.SECONDS
+			},
+			lapsedAfter: {
+				value: DateUtils.convertInterval({ value: model.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
+				interval: INTERVAL.MINUTES
+			},
+			stalledAfter: {
+				value: DateUtils.convertInterval({ value: model.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
+				interval: INTERVAL.MINUTES
+			}
+		};
+		model.defaultDataScript = (model.defaultDataScript) ? model.defaultDataScript : {id: 0, name: ''};
+		if (model.reactionScripts && model.reactionScripts !== null && model.reactionScripts !== 'null') {
+			APIActionModel.createReactions(model, model.reactionScripts);
+		} else {
+			APIActionModel.createBasicReactions(model);
+		}
 	}
 
 	getAgents(): Observable<AgentModel[]> {
@@ -115,15 +131,38 @@ export class DataIngestionService {
 				let result = res.json();
 				let credentialModels = result && result.status === 'success' && result.data;
 
-				credentialModels.forEach((r) => {
-					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.environment = ENVIRONMENT[r.environment];
-					r.authMethod = AUTH_METHODS[r.authenticationMethod];
-					r.status = CREDENTIAL_STATUS[r.status];
+				credentialModels.forEach((model) => {
+					// r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					// r.environment = ENVIRONMENT[r.environment];
+					// r.authMethod = AUTH_METHODS[r.authenticationMethod];
+					// r.status = CREDENTIAL_STATUS[r.status];
+					this.processCredentialModel(model);
 				});
 				return credentialModels;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET Credential by id.
+	 * @returns {Observable<CredentialModel[]>}
+	 */
+	getCredential(id: number): Observable<CredentialModel> {
+		return this.http.get(`${this.credentialUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let model = result && result.status === 'success' && result.data;
+				this.processCredentialModel(model);
+				return model;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	private processCredentialModel(model): void {
+		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
+		model.environment = ENVIRONMENT[model.environment];
+		model.authMethod = AUTH_METHODS[model.authenticationMethod];
+		model.status = CREDENTIAL_STATUS[model.status];
 	}
 
 	/**
@@ -636,4 +675,90 @@ export class DataIngestionService {
 	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
 		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
+
+	/**
+	 * Based on provided column, update the structure which holds the current selected filters
+	 * @param {any} column: Column to filter
+	 * @param {any} state: Current filters state
+	 * @returns {any} Filter structure updated
+	 */
+	filterColumn(column: any, state: any): any {
+		let root = state.filter || { logic: 'and', filters: [] };
+
+		let [filter] = Flatten(root).filter(item => item.field === column.property);
+
+		if (!column.filter) {
+			column.filter = '';
+		}
+
+		if (column.type === 'text') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'contains',
+					value: column.filter,
+					ignoreCase: true
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
+		}
+
+		if (column.type === 'date') {
+			const {init, end} = DateUtils.getInitEndFromDate(column.filter);
+
+			if (filter) {
+				state.filter.filters = this.getFiltersExcluding(column.property, state);
+			}
+			root.filters.push({ field: column.property, operator: 'gte', value: init, });
+			root.filters.push({ field: column.property, operator: 'lte', value: end });
+		}
+
+		if (column.type === 'boolean') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: (column.filter === 'True')
+				});
+			} else {
+				if (column.filter === DefaultBooleanFilterData) {
+					this.clearFilter(column, state);
+				} else {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = (column.filter === 'True');
+				}
+			}
+		}
+
+		return root;
+	}
+
+	/**
+	 * Update the filters state structure removing the column filter provided
+	 * @param {any} column: Column to exclude from filters
+	 * @param {any} state: Current filters state
+	 * @returns void
+	 */
+	clearFilter(column: any, state: any): void {
+		column.filter = '';
+		state.filter.filters = this.getFiltersExcluding(column.property, state);
+	}
+
+	/**
+	 * Get the filters state structure excluding the column filter name provided
+	 * @param {string} excludeFilterName:  Name of the filter column to exclude
+	 * @param {any} state: Current filters state
+	 * @returns void
+	 */
+	getFiltersExcluding(excludeFilterName: string, state: any): any {
+		const filters = (state.filter && state.filter.filters) || [];
+		return  filters.filter((r) => r['field'] !== excludeFilterName);
+	}
+
 }

@@ -1,5 +1,7 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.SettingType
@@ -164,29 +166,72 @@ class MetricReportingService {
 	 * @return and hql string that can be run to get metric data.
 	 */
 	String getQuery(JSONObject query) {
-		String domain = ETLDomain.lookup((String) query.domain).clazz.simpleName
-		String aggregation = query.aggregation
+		Class domainClass = ETLDomain.lookup((String) query.domain).clazz
+		String domain = domainClass.simpleName
+		String aggregation = processAggregation((String) query.aggregation)
 		List groupBys = query?.groupBy?.clone() ?: []
 		String label = getLabel(groupBys, aggregation)
-		groupBys << 'project.id'
+		String projectReference = getProjectReference(domainClass)
+
+		groupBys << projectReference
 		String groupBy = getGroupBy(groupBys)
-		groupBys << 'project.id'
+
 		List wheres = query?.where?.clone() ?: []
-
-		if (domain == AssetEntity.class.simpleName) {
-			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
-		}
-
+		processWheres(wheres, domainClass)
 		String where = getWhere(wheres)
 
 		return """
-			select project.id,
+			select $projectReference,
 					$label as label,
 					$aggregation as value
 			from $domain
-			where project.id in (:projectIds) $where
+			where $projectReference in (:projectIds) $where
 			$groupBy
 		""".stripIndent()
+	}
+
+	/**
+	 * Adds additional where definitions, based on the domainClass used.
+	 *
+	 * @param whereDefinitions The list of where definitions.
+	 * @param domainClass the domain class being used.
+	 *
+	 * @return The list of where definitions.
+	 */
+	List<Map> processWheres(List<Map> whereDefinitions, Class domainClass) {
+		switch (domainClass) {
+			case {it in AssetEntity}:
+				whereDefinitions << [column: 'moveBundle.useForPlanning', expression: '= 1']
+				break
+			case {it in AssetDependency}:
+				whereDefinitions << [column: 'asset.moveBundle.useForPlanning', expression: '= 1']
+				whereDefinitions << [column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
+				break
+			case {it in AssetComment}:
+				whereDefinitions << [column: 'isPublished', expression: '= 1']
+				whereDefinitions << [column: 'commentType', expression: "= 'issue'"]
+				break
+		}
+
+		return whereDefinitions
+	}
+
+	/**
+	 * Applies rules to the aggregation, making them more useful. For now we just have the one rule for sum, that wraps the
+	 * domain with a COALESCE ( domain, 0), so that nulls don't screw up the sum. If the aggregation is not a sum it just
+	 * returns the aggregation, as is.
+	 *
+	 * @param aggregation The aggregation string to process.
+	 *
+	 * @return An updated aggregation string.
+	 */
+	String processAggregation(String aggregation){
+		if(aggregation.toLowerCase().contains('sum')){
+			String domain = aggregation.substring(aggregation.indexOf('(') + 1, aggregation.indexOf(')'))
+			return("SUM (COALESCE( $domain, 0 ) )")
+		}
+
+		return aggregation
 	}
 
 	/**
@@ -210,6 +255,14 @@ class MetricReportingService {
 		}
 
 		return "'${aggregation.split(/\(/)[0]}'"
+	}
+
+	String getProjectReference(Class domain) {
+		if (domain in AssetDependency) {
+			return 'asset.project.id'
+		}
+
+		return 'project.id'
 	}
 
 	/**
@@ -403,11 +456,18 @@ class MetricReportingService {
 	 */
 	List<Long> projectIdsForMetrics() {
 		Date collectionDate = metricCollectionDate
-		return Project.where {
+
+		List<Long> projectIds = Project.where {
 			collectMetrics == 1 && startDate <= collectionDate && completionDate >= collectionDate
 		}.projections {
 			property 'id'
 		}.list()
+
+		if (!projectIds) {
+			throw new EmptyResultException('No projects found with collect metrics enabled that are currently active.')
+		}
+
+		return projectIds
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
@@ -12,11 +13,16 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
 import org.apache.commons.lang3.BooleanUtils
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 @Slf4j
 class ImportBatchService implements ServiceMethods {
 
 	DataImportService dataImportService
+	Scheduler quartzScheduler
+	SecurityService securityService
 
 	/**
 	 * Find a all batches and include the records summary information. If a batchId is given,
@@ -316,16 +322,17 @@ class ImportBatchService implements ServiceMethods {
 	 * @return the count of batches that were queued
 	 */
 	Integer ejectBatchesFromQueue(Project project, List<Long> batchIds) {
-		// Transform the boolean flag to 0: false, 1: true
-		Integer idCount = batchIds.size()
 
-		// Query that archives or unarchives a list of batches.
-		String hql = 'UPDATE ImportBatch SET status = :status WHERE project = :project AND status=:currentStatus AND id in (:batches)'
+		String hql = '''UPDATE ImportBatch
+			SET status = :status, queuedBy = NULL, queuedAt = NULL
+			WHERE project = :project AND status=:currentStatus AND id in (:batches)'''
+
 		Map params = [
 			currentStatus: ImportBatchStatusEnum.QUEUED,
 			status: ImportBatchStatusEnum.PENDING,
 			project: project,
 			batches: batchIds ]
+
 		Integer updated = ImportBatch.executeUpdate(hql, params)
 
 		return updated
@@ -454,5 +461,47 @@ class ImportBatchService implements ServiceMethods {
 	 */
 	ImportBatch fetchBatch(Project project, Long batchId) {
 		return GormUtil.findInProject(project, ImportBatch, batchId, true)
+	}
+
+	/**
+	 * Schedule a quartz job for the batch import process
+	 * @param project - user current project
+	 * @param batchId - the id of the batch to be queued
+	 */
+	void scheduleJob(Long projectId, Long batchId) {
+		// fetch project
+		Project project = Project.get(projectId)
+		// fetch batch
+		ImportBatch importBatch = fetchBatch(project, batchId)
+
+		// Set batch to queued if this is the first time the user tries to schedule the import batch
+		if (importBatch.status == ImportBatchStatusEnum.PENDING) {
+			dataImportService.setBatchToQueued(importBatch.id)
+			importBatch.refresh()
+		}
+
+		// Setup the Quartz job that will execute the actual posting process
+
+		// The triggerName/Group will allow us to controller on import
+		Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
+
+		// making import batch trigger name this way to let quartz to fail if there are multiple scheduled jobs going to run at the same time
+		String triggerName = 'TM-ImportBatch-' + project.id
+		Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
+
+		trigger.jobDataMap.batchId = importBatch.id
+		trigger.jobDataMap.username = importBatch.queuedBy
+		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
+		trigger.jobDataMap.projectId = project.id
+		trigger.setJobName('ImportBatchJob') 			// Please note that the JobName must match the class file name
+		trigger.setJobGroup('tdstm-import-batch') 		// and that the group should be specified in the Job
+
+		try {
+			quartzScheduler.scheduleJob(trigger)
+		} catch (Exception e) {
+			log.info('Could not schedule import batch. {}\\n{}', e.message, ExceptionUtil.stackTraceToString(e))
+		}
+
+		log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 	}
 }

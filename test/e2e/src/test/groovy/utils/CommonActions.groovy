@@ -24,4 +24,45 @@ class CommonActions {
         def random = new Random()
         options.getAt(random.nextInt(options.size()))
     }
+
+    /*
+    * Note: returns random list of elements based on the count passed from a given elements list
+    * Parameter: options must be a list
+    * Parameter: count is number of elements to be returned, if not set it returns a random number of elements
+    * based on the given list of elements.
+     */
+    def getRandomOptions(options, count) {
+        def randomSelectionCount = count != null ? count : getRandomNumberFromList(options)
+        def option = getRandomOption options
+        def finalOptionsList = []
+        finalOptionsList.add option // first addition
+        def found
+        while (finalOptionsList.size() != randomSelectionCount) { // iterate adding to get random quantity size
+            found = false
+            option = getRandomOption options
+            found = finalOptionsList.contains option
+            if (!found) {
+                finalOptionsList.add option
+            }
+        }
+        finalOptionsList
+    }
+
+    /*
+    * Note: returns random number from given list of elements
+    * Parameter: elementsList must be a list
+     */
+    def getRandomNumberFromList(elementsList) {
+        new Random().nextInt(elementsList.size()) + 1 // prevent getting zero
+    }
+
+    /*
+    * Note: cleans checkboxes checked from a given elements list
+    * Parameter: checkboxes must be a list
+     */
+    def uncheckCheckboxes(checkboxes) {
+        checkboxes?.each { checkbox ->
+            checkbox.click()
+        }
+    }
 }

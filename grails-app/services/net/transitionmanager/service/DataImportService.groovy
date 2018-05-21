@@ -524,6 +524,79 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to update the ImportBatch to the Queued status
+	 * @param batchId - the ID of the batch to be updated
+	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
+	 */
+	@NotTransactional()
+	void setBatchToQueued(Long batchId) {
+		ImportBatch.withNewTransaction { session ->
+			ImportBatch batch = ImportBatch.get(batchId)
+
+			// if batch is already queued then return
+			if (ImportBatchStatusEnum.QUEUED == batch.status) {
+				log.debug 'setBatchToQueued() batch {}, status {}', batchId, batch.status
+				return
+			}
+
+			// Let's lock the batch for a moment so we can check out if it is okay to start
+			// processing this batch.
+			batch.project.lock()
+			batch = batch.refresh()
+
+			// Now make sure nobody altered the batch in the meantime
+			// Can only enqueue a batch if it was PENDING
+			if (ImportBatchStatusEnum.PENDING != batch.status) {
+				log.debug 'setBatchToQueued() batch {}, status {}', batchId, batch.status
+				throw new DomainUpdateException('Unable to enqueue batch due to change in status')
+			}
+
+			Date queuedAtTime = new Date()
+
+			// Update the batch to the QUEUED state
+			batch.with {
+				status = ImportBatchStatusEnum.QUEUED
+				processProgress = 0
+				processLastUpdated = queuedAtTime
+				queuedAt = queuedAtTime
+				queuedBy = securityService.currentUsername
+				processStopFlag = 0
+			}
+			log.debug 'setBatchToQueued() dirtyProperties {}', batch.dirtyPropertyNames
+			batch.save(failOnError:true, flush:true)
+		}
+	}
+
+	/**
+	 * Used to get the next ImportBatch to be processed withing the provided project
+	 * @param projectId - the ID of the project where to look for import batches
+	 */
+	@NotTransactional()
+	Map<String, ?> getNextBatchToProcess(Long projectId) {
+		ImportBatch.withNewTransaction { session ->
+
+			// Get the list of the ImportBatch IDs that can be processed
+			List<?> batchIds = ImportBatch.where {
+				project.id == projectId
+				status == ImportBatchStatusEnum.QUEUED
+			}
+			.projections {
+				property('id')
+				property('queuedBy')
+			}
+			.sort('queuedAt')
+			.list(max: 1)
+
+			if (batchIds) {
+				return [batchId: batchIds.get(0)[0], queuedBy: batchIds.get(0)[1]]
+			} else {
+				// there are no import batches in Queued status
+				return null
+			}
+		}
+	}
+
+	/**
 	 * Used to update the ImportBatch to the Running status
 	 * @param id - the ID of the batch to be updated
 	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
@@ -568,6 +641,7 @@ class DataImportService implements ServiceMethods {
 				processProgress = 0
 				processLastUpdated = new Date()
 				processStopFlag = 0
+
 			}
 			log.debug 'setBatchToRunning() dirtyProperties {}', batch.dirtyPropertyNames
 			batch.save(failOnError:true, flush:true)
@@ -589,13 +663,14 @@ class DataImportService implements ServiceMethods {
 			ImportBatch batch = ImportBatch.get(batchId)
 			if (!batch) {
 				log.error "ImportBatch($batchId) disappeared during batch processing process"
-				throw DomainUpdateException('The import batch was deleted while being processed')
+				throw new DomainUpdateException('The import batch was deleted while being processed')
 			}
 
 			// Calculate the % completed and update the batch appropriately
 			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
 			batch.processProgress = percComplete
 			batch.processLastUpdated = new Date()
+
 			if (status) {
 				batch.status = status
 			}
@@ -693,7 +768,6 @@ class DataImportService implements ServiceMethods {
 
 				ImportBatchRecord.withNewTransaction { status ->
 					for (record in records) {
-						log.debug '\n\nprocessBatch() processing row {}', rowsProcessed
 						context.record = record
 						processBatchRecord(batch, record, context)
 						rowsProcessed++
@@ -1556,7 +1630,7 @@ class DataImportService implements ServiceMethods {
 
 						// If not found then try by looking up the alias of the model
 						if (!entities) {
-							Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()
+							Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()?.model
 							if (model) {
 								entities = [model]
 							}
@@ -1791,7 +1865,7 @@ class DataImportService implements ServiceMethods {
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
 		result.filename = outputFilename
 		try {
-			os << (etlProcessor.result.toMap() as JSON)
+			os << (etlProcessor.resultsMap() as JSON)
 			os.close()
 		}
 		catch(e) {

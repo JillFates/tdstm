@@ -10,7 +10,6 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
-import { DateUtils } from '../../../../shared/utils/date.utils';
 import {
 	COLUMN_MIN_WIDTH,
 	Flatten,
@@ -83,83 +82,13 @@ export class APIActionListComponent {
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(x => x.field === column.property);
-
-		if (!column.filter) {
-			column.filter = '';
-		}
-
-		if (column.type === 'text') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'date') {
-			if (!filter) {
-				const {init, end} = DateUtils.getInitEndFromDate(column.filter);
-
-				root.filters.push({
-					field: column.property,
-					operator: 'gte',
-					value: init
-				});
-
-				root.filters.push({
-					field: column.property,
-					operator: 'lte',
-					value: end
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'boolean') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'eq',
-					value: (column.filter === 'True')
-				});
-			} else {
-				if (column.filter === this.defaultBooleanFilterData) {
-					this.clearValue(column);
-				} else {
-					filter = root.filters.find((r) => {
-						return r['field'] === column.property;
-					});
-					filter.value = (column.filter === 'True');
-				}
-			}
-		}
-
+		const root = this.dataIngestionService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		column.filter = '';
-		const filters = (this.state.filter && this.state.filter.filters) || [];
-
-		if (filters.length > 0) {
-			this.state.filter.filters =  filters.filter((r) => r['field'] !== column.property );
-			this.filterChange(this.state.filter);
-		}
+		this.dataIngestionService.clearFilter(column, this.state);
+		this.filterChange(this.state.filter);
 	}
 
 	/**
@@ -176,7 +105,10 @@ export class APIActionListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openAPIActionDialogViewEdit(dataItem, ActionType.EDIT);
+		let apiAction: APIActionModel = dataItem as APIActionModel;
+		this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+			this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -202,8 +134,11 @@ export class APIActionListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openAPIActionDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
+			this.selectRow(apiAction.id);
+			this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+			}, error => console.log(error));
 		}
 	}
 
@@ -218,11 +153,17 @@ export class APIActionListComponent {
 						this.selectRow(this.openLastItemId);
 						let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === this.openLastItemId);
 						this.openLastItemId = 0;
-						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
+						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW, lastApiActionModel);
 					}, 700);
 				}
 			},
 			(err) => console.log(err));
+	}
+
+	private reloadItem(originalModel: APIActionModel): void {
+		this.dataIngestionService.getAPIAction(originalModel.id).subscribe((response: APIActionModel) => {
+			Object.assign(originalModel, response);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -230,15 +171,18 @@ export class APIActionListComponent {
 	 * @param {APIActionModel} apiActionModel
 	 * @param {number} actionType
 	 */
-	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number): void {
+	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number, originalModel?: APIActionModel): void {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
 		], DIALOG_SIZE.XLG, false).then(result => {
-			if (actionType === ActionType.CREATE) {
-				this.openLastItemId = result.id;
+			if (result) {
+				if (actionType === ActionType.CREATE) {
+					this.reloadData();
+				} else {
+					this.reloadItem(originalModel);
+				}
 			}
-			this.reloadData();
 		}).catch(result => {
 			this.reloadData();
 			console.log('Dismissed Dialog');

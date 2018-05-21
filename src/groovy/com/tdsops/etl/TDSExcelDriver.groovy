@@ -206,7 +206,10 @@ class TDSExcelDriver extends ExcelDriver {
 	 * @return
 	 */
 	boolean hasSheet(Dataset dataset, String listName) {
-		return WorkbookUtil.getSheetFromWorkbook(readWorkbookAndSheets(dataset), listName) != null
+		if(!sheetsMap){
+			readWorkbookAndSheets(dataset)
+		}
+		return  sheetsMap.containsKey(listName)
 	}
 
 	/**
@@ -216,7 +219,10 @@ class TDSExcelDriver extends ExcelDriver {
 	 * @return
 	 */
 	boolean hasSheet(Dataset dataset, int sheetNumber) {
-		return WorkbookUtil.getSheetFromWorkbookAt(readWorkbookAndSheets(dataset), sheetNumber) != null
+		if(!sheetsMap){
+			readWorkbookAndSheets(dataset)
+		}
+		return  sheetsMap.containsKey(sheetNumber)
 	}
 
 	/**

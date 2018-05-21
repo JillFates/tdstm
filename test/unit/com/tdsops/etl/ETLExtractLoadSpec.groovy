@@ -179,13 +179,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			 """.stripIndent())
 
 		then: 'A domain is selected'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data[0].fields == [:]
+			with (etlProcessor.resultsMap()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data[0].fields == [:]
+				}
 			}
 	}
 
@@ -208,10 +211,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			 """.stripIndent())
 
 		then: 'A domain is selected'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.result) {
+			with (etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -251,26 +255,28 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
-			etlProcessor.selectedDomain == ETLDomain.Storage
+			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
-			etlProcessor.result.domains.size() == 3
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 1
-				data[0].fields == [:]
-			}
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 3
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					data[0].fields == [:]
+				}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				data.size() == 1
-				data[0].fields == [:]
-			}
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					data[0].fields == [:]
+				}
 
-			with(etlProcessor.result.domains[2]) {
-				domain == ETLDomain.Storage.name()
-				data.size() == 1
-				data[0].fields == [:]
+				with(domains[2]) {
+					domain == ETLDomain.Storage.name()
+					data.size() == 1
+					data[0].fields == [:]
+				}
 			}
 	}
 
@@ -288,20 +294,23 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 1
-				data[0].fields == [:]
-			}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				data.size() == 1
-				data[0].fields == [:]
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					data[0].fields == [:]
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					data[0].fields == [:]
+				}
 			}
 	}
 
@@ -495,24 +504,25 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
 					}
 				}
 			}
@@ -542,24 +552,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['assetName', 'environment'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						value == 'This is a Microsoft Application'
-						originalValue == 'This is a Microsoft Application'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'environment'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'This is a Microsoft Application'
+							originalValue == 'This is a Microsoft Application'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'This is not a Microsoft Application'
-						originalValue == 'This is not a Microsoft Application'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							value == 'This is not a Microsoft Application'
+							originalValue == 'This is not a Microsoft Application'
+						}
 					}
 				}
 			}
@@ -589,24 +601,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['appVendor', 'environment'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
 					}
 				}
 			}
@@ -638,40 +652,42 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
+						with(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						with(fields.assetName) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
 					}
-					with(fields.environment) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
-					}
-					with(fields.assetName) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
-					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-					}
-					with(fields.environment) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
-					}
-					with(fields.assetName) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
+						with(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						with(fields.assetName) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
 					}
 				}
 			}
@@ -703,40 +719,42 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
+						with(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						with(fields.assetName) {
+							value == '152254'
+							originalValue == '152254'
+						}
 					}
-					with(fields.environment) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
-					}
-					with(fields.assetName) {
-						value == '152254'
-						originalValue == '152254'
-					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-					}
-					with(fields.environment) {
-						value == 'ACME Data Center'
-						originalValue == 'ACME Data Center'
-					}
-					with(fields.assetName) {
-						value == '152255'
-						originalValue == '152255'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
+						with(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						with(fields.assetName) {
+							value == '152255'
+							originalValue == '152255'
+						}
 					}
 				}
 			}
@@ -768,23 +786,25 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
 					}
 				}
 			}
@@ -809,39 +829,41 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						originalValue == "Microsoft"
-						value == "Microsoft"
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							originalValue == "Microsoft"
+							value == "Microsoft"
+						}
 					}
-				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.description) {
-						originalValue == "Microsoft"
-						value == "Microsoft"
+					with(data[0]) {
+						rowNum == 1
+						with(fields.description) {
+							originalValue == "Microsoft"
+							value == "Microsoft"
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						originalValue == "Mozilla"
-						value == "Mozilla"
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							originalValue == "Mozilla"
+							value == "Mozilla"
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.description) {
-						originalValue == "Mozilla"
-						value == "Mozilla"
+					with(data[1]) {
+						rowNum == 2
+						with(fields.description) {
+							originalValue == "Mozilla"
+							value == "Mozilla"
+						}
 					}
 				}
 			}
@@ -924,22 +946,24 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						originalValue == "Microsoft"
-						value == "Microsoft"
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							originalValue == "Microsoft"
+							value == "Microsoft"
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						originalValue == "Mozilla"
-						value == "Mozilla"
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							originalValue == "Mozilla"
+							value == "Mozilla"
+						}
 					}
 				}
 			}
@@ -974,57 +998,60 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						originalValue == "xraysrv01"
-						value == "xraysrv01"
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == "xraysrv01"
+							value == "xraysrv01"
+						}
+						with(fields.manufacturer) {
+							originalValue == "Dell"
+							value == "Dell"
+						}
+						with(fields.model) {
+							originalValue == "PE2950"
+							value == "PE2950"
+						}
 					}
-					with(fields.manufacturer) {
-						originalValue == "Dell"
-						value == "Dell"
-					}
-					with(fields.model) {
-						originalValue == "PE2950"
-						value == "PE2950"
-					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						originalValue == "oradbsrv02"
-						value == "oradbsrv02"
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == "oradbsrv02"
+							value == "oradbsrv02"
+						}
+						with(fields.manufacturer) {
+							originalValue == "HP"
+							value == "HP"
+						}
+						with(fields.model) {
+							originalValue == "DL8150"
+							value == "DL8150"
+						}
 					}
-					with(fields.manufacturer) {
-						originalValue == "HP"
-						value == "HP"
-					}
-					with(fields.model) {
-						originalValue == "DL8150"
-						value == "DL8150"
-					}
-				}
 
-				with(data[2]) {
-					rowNum == 3
-					with(fields.assetName) {
-						originalValue == "oradbsrv03"
-						value == "oradbsrv03"
-					}
-					with(fields.manufacturer) {
-						originalValue == "HP"
-						value == "HP"
-					}
-					with(fields.model) {
-						originalValue == "DL8155"
-						value == "DL8155"
+					with(data[2]) {
+						rowNum == 3
+						with(fields.assetName) {
+							originalValue == "oradbsrv03"
+							value == "oradbsrv03"
+						}
+						with(fields.manufacturer) {
+							originalValue == "HP"
+							value == "HP"
+						}
+						with(fields.model) {
+							originalValue == "DL8155"
+							value == "DL8155"
+						}
 					}
 				}
 			}
+
 		cleanup:
 			if(fileName){
 				service.deleteTemporaryFile(fileName)
@@ -1057,94 +1084,96 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Production'
+							value == 'Production'
+						}
+					}
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '152254'
+							value == '152254'
+						}
+					}
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							originalValue == 'Microsoft'
+							value == 'Microsoft'
+						}
+					}
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Production'
+							value == 'Production'
+						}
+					}
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '152254'
+							value == '152254'
+						}
+					}
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							originalValue == 'Microsoft'
+							value == 'Microsoft'
+						}
 					}
 				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						originalValue == '152254'
-						value == '152254'
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '152254'
+							value == '152254'
+						}
 					}
-				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						originalValue == 'Microsoft'
-						value == 'Microsoft'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.description) {
+							originalValue == 'Development'
+							value == 'Development'
+						}
 					}
-				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '152254'
+							value == '152254'
+						}
 					}
-				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						originalValue == '152254'
-						value == '152254'
-					}
-				}
-
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						originalValue == 'Microsoft'
-						value == 'Microsoft'
-					}
-				}
-			}
-
-		and: 'Results should contain Device domain results associated'
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				data.size() == 2
-
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						originalValue == '152254'
-						value == '152254'
-					}
-				}
-
-				with(data[0]) {
-					rowNum == 1
-					with(fields.description) {
-						originalValue == 'Development'
-						value == 'Development'
-					}
-				}
-
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						originalValue == '152254'
-						value == '152254'
-					}
-				}
-
-				with(data[0]) {
-					rowNum == 1
-					with(fields.description) {
-						originalValue == 'Development'
-						value == 'Development'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.description) {
+							originalValue == 'Development'
+							value == 'Development'
+						}
 					}
 				}
 			}
@@ -1188,8 +1217,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Room domain results associated'
-			etlProcessor.result.domains.size() == 1
-
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+			}
 
 		cleanup:
 			service.deleteTemporaryFile(fileName)
@@ -1242,7 +1272,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		cleanup:
 			if(fileName){
@@ -1274,40 +1304,41 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['appVendor', 'environment'] as Set
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment'] as Set
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							value == 'Production'
+							originalValue == 'Production'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Development'
-						originalValue == 'Development'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							value == 'Development'
+							originalValue == 'Development'
+						}
 					}
 				}
 			}
@@ -1407,30 +1438,31 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['appVendor', 'environment'] as Set
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment'] as Set
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 
-				with(data[0].fields.environment) {
-					value == 'Production'
-					originalValue == 'Production'
-				}
+					with(data[0].fields.environment) {
+						value == 'Production'
+						originalValue == 'Production'
+					}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
-				}
+					with(data[1].fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 
-				with(data[1].fields.environment) {
-					value == 'Development'
-					originalValue == 'Development'
+					with(data[1].fields.environment) {
+						value == 'Development'
+						originalValue == 'Development'
+					}
 				}
 			}
 	}
@@ -1495,40 +1527,41 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id', 'appVendor'] as Set
-				data.size() == 1
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						value == '152254'
-						originalValue == '152254'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id', 'appVendor'] as Set
+					data.size() == 1
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							value == '152254'
+							originalValue == '152254'
+						}
+					}
+
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
 					}
 				}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
-			}
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id', 'assetName'] as Set
+					data.size() == 1
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							value == '152254'
+							originalValue == '152254'
+						}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['id', 'assetName'] as Set
-				data.size() == 1
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						value == '152254'
-						originalValue == '152254'
-					}
-
-					with(fields.assetName) {
-						value == '(xlsx updated)'
-						originalValue == '(xlsx updated)'
+						with(fields.assetName) {
+							value == '(xlsx updated)'
+							originalValue == '(xlsx updated)'
+						}
 					}
 				}
 			}
@@ -1569,30 +1602,31 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id', 'appVendor'] as Set
-				data.size() == 1
-				with(data[0]) {
-					rowNum == 1
-					with(fields.id) {
-						value == '152254'
-						originalValue == '152254'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id', 'appVendor'] as Set
+					data.size() == 1
+					with(data[0]) {
+						rowNum == 1
+						with(fields.id) {
+							value == '152254'
+							originalValue == '152254'
+						}
+					}
+
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
 					}
 				}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id', 'assetName'] as Set
+					data.isEmpty()
 				}
-			}
-
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['id', 'assetName'] as Set
-				data.isEmpty()
 			}
 	}
 
@@ -1648,11 +1682,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 1
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 1
+				}
 			}
 	}
 
@@ -1680,11 +1716,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 1
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 1
+				}
 			}
 	}
 
@@ -1715,22 +1753,24 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Third row was removed from the domain results'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['id', 'assetName'] as Set
-				data.size() == 5
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id', 'assetName'] as Set
+					data.size() == 5
 
-				data*.rowNum == [1, 2, 4, 5, 6]
-				data.collect { it.fields.id.value } == [
-					'152251', '152252', '152254', '152255', '152256'
-				]
-				data.collect { it.fields.assetName.value } == [
-					'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
-				]
-				data.collect { it.fields.assetName.originalValue } == [
-					'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
-				]
+					data*.rowNum == [1, 2, 4, 5, 6]
+					data.collect { it.fields.id.value } == [
+						'152251', '152252', '152254', '152255', '152256'
+					]
+					data.collect { it.fields.assetName.value } == [
+						'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
+					]
+					data.collect { it.fields.assetName.originalValue } == [
+						'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
+					]
+				}
 			}
 	}
 
@@ -1761,24 +1801,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						value == 'Custom Name'
-						originalValue == 'Custom Name'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'Custom Name'
+							originalValue == 'Custom Name'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						value == 'Custom Name'
-						originalValue == 'Custom Name'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							value == 'Custom Name'
+							originalValue == 'Custom Name'
+						}
 					}
 				}
 			}
@@ -1817,24 +1859,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						value == 'xraysrv01'
-						originalValue == 'xraysrv01'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'xraysrv01'
+							originalValue == 'xraysrv01'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						value == 'zuludb01'
-						originalValue == 'zuludb01'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							value == 'zuludb01'
+							originalValue == 'zuludb01'
+						}
 					}
 				}
 			}
@@ -1874,32 +1918,34 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['environment', 'assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.environment) {
-						value == 'Server'
-						originalValue == 'Server'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['environment', 'assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							value == 'Server'
+							originalValue == 'Server'
+						}
+						with(fields.assetName) {
+							value == 'Server'
+							originalValue == 'Server'
+						}
 					}
-					with(fields.assetName) {
-						value == 'Server'
-						originalValue == 'Server'
-					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Blade'
-						originalValue == 'Blade'
-					}
-					with(fields.assetName) {
-						value == 'Blade'
-						originalValue == 'Blade'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							value == 'Blade'
+							originalValue == 'Blade'
+						}
+						with(fields.assetName) {
+							value == 'Blade'
+							originalValue == 'Blade'
+						}
 					}
 				}
 			}
@@ -1944,48 +1990,50 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						value == 'xraysrv01'
-						originalValue == 'xraysrv01'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'xraysrv01'
+							originalValue == 'xraysrv01'
+						}
+						with(fields.custom1) {
+							value == 'abc'
+							originalValue == 'abc'
+						}
+						with(fields.manufacturer) {
+							value == 'Dell (Server)'
+							originalValue == 'Dell (Server)'
+						}
+						with(fields.custom2) {
+							value == 'xyzzy'
+							originalValue == 'xyzzy'
+						}
 					}
-					with(fields.custom1) {
-						value == 'abc'
-						originalValue == 'abc'
-					}
-					with(fields.manufacturer) {
-						value == 'Dell (Server)'
-						originalValue == 'Dell (Server)'
-					}
-					with(fields.custom2) {
-						value == 'xyzzy'
-						originalValue == 'xyzzy'
-					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						value == 'zuludb01'
-						originalValue == 'zuludb01'
-					}
-					with(fields.custom1) {
-						value == 'abc'
-						originalValue == 'abc'
-					}
-					with(fields.manufacturer) {
-						value == 'HP (Blade)'
-						originalValue == 'HP (Blade)'
-					}
-					with(fields.custom2) {
-						value == 'xyzzy'
-						originalValue == 'xyzzy'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							value == 'zuludb01'
+							originalValue == 'zuludb01'
+						}
+						with(fields.custom1) {
+							value == 'abc'
+							originalValue == 'abc'
+						}
+						with(fields.manufacturer) {
+							value == 'HP (Blade)'
+							originalValue == 'HP (Blade)'
+						}
+						with(fields.custom2) {
+							value == 'xyzzy'
+							originalValue == 'xyzzy'
+						}
 					}
 				}
 			}
@@ -2029,17 +2077,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate(scriptContent)
 
 		then:
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				with(data[0]) {
-					with(fields.assetName) {
-						value == 'fubar'
-						originalValue == 'fubar'
-					}
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'fubar'
+							originalValue == 'fubar'
+						}
 
-					with(fields.custom1) {
-						Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-						assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+						with(fields.custom1) {
+							Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+							assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+						}
 					}
 				}
 			}
@@ -2079,24 +2129,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						value == 'Custom Name'
-						originalValue == 'Custom Name'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'Custom Name'
+							originalValue == 'Custom Name'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						value == 'Custom Name'
-						originalValue == 'Custom Name'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							value == 'Custom Name'
+							originalValue == 'Custom Name'
+						}
 					}
 				}
 			}
@@ -2175,6 +2227,68 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "Invalid variable name: Custom Name. Valid ETL variable names must end with 'Var'".toString()
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-10678')
+	void 'test can load a new row using twice the domain command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load 'Name'
+					domain Device
+					extract 'model' load 'model'
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							value == 'xraysrv01'
+							originalValue == 'xraysrv01'
+							init == null
+						}
+					}
+
+					with(data[1]) {
+						rowNum == 1
+						with(fields.model) {
+							value == 'PE2950'
+							originalValue == 'PE2950'
+							init == null
+						}
+					}
+				}
+
+			}
 
 		cleanup:
 			if(fileName){

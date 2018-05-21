@@ -7,12 +7,14 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+
 /**
  * Handles WS calls of the ApplicationService.
  *
@@ -71,12 +73,12 @@ class WsAssetImportController implements ControllerMethods {
 		ApiAction action = fetchDomain(ApiAction, params)
 
 		// Invoke action and eval the result
-		Map actionInvocationResult = apiActionService.invoke(action)
+		ApiActionResponse actionInvocationResult = apiActionService.invoke(action)
 
-		if (actionInvocationResult.status == 'error') {
-			renderErrorJson(actionInvocationResult.cause)
-		} else {
+		if (actionInvocationResult.successful) {
 			renderSuccessJson( [ filename: actionInvocationResult.filename ] )
+		} else {
+			renderErrorJson(actionInvocationResult.error)
 		}
 	}
 

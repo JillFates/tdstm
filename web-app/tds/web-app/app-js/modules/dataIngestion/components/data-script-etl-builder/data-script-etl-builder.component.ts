@@ -12,6 +12,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -29,6 +30,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private script: string;
 	private filename: string;
+	private isWindowMaximized = false;
+	private initialWindowStyle = null;
+	private modalOptions: DecoratorOptions;
 	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
 
 	private operationStatus = {
@@ -62,6 +66,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private preferenceService: PreferenceService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
+		this.modalOptions = { isFullScreen: true, isResizable: true };
 	}
 
 	/**
@@ -132,7 +137,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	private saveSizeDataScriptDesigner(): Observable<any> {
-		const { width, height } = this.resizableForm.nativeElement.style;
+		const { width, height } = this.isWindowMaximized ? this.initialWindowStyle : this.resizableForm.nativeElement.style;
 
 		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
 			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
@@ -257,6 +262,16 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected isTestDisabled(): boolean {
 		return !this.script || !this.filename || this.isRunningTestingScript;
+	}
+
+	protected maximizeWindow() {
+		const { width, height } = this.resizableForm.nativeElement.style;
+		this.initialWindowStyle = { width, height };
+		this.isWindowMaximized = true;
+	}
+
+	protected restoreWindow() {
+		this.isWindowMaximized = false;
 	}
 
 }
