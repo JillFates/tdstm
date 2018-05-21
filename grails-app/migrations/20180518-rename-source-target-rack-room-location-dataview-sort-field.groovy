@@ -8,7 +8,7 @@ databaseChangeLog = {
 		comment("Correct the name in the dataviews' when the sorting field is location, rack or room.")
 		grailsChange {
 			change {
-				List<Dataview> dataviews = Dataview.where{}.list()
+				List<Dataview> dataviews = Dataview.list()
 
 				// Map where the keys are the incorrect field names and the values are the corrected names.
 				Map<String, String> renameMap = [
