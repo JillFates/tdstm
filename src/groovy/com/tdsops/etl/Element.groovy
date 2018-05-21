@@ -157,15 +157,17 @@ class Element implements RangeChecker {
 	 * <code>
 	 * This method also validate the range that is trying to be taken.
 	 * @param take
-	 * @param position
+	 * @param position starting in 1
 	 * @return the element instance that received this command
 	 */
 	Element middle(int position, int take) {
 
 		int start = (position - 1)
 		int to = (start + take - 1)
-		subListRangeCheck(start, start + to, value.size())
-		value = value[start..to]
+		subListRangeCheck(start, to, value.size())
+		value = transformStringObject('middle', value) {
+			it[start..to]
+		}
 		return this
 	}
 
@@ -221,7 +223,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element sanitize() {
-		value = StringUtil.sanitizeAndStripSpaces(value)
+		value = transformStringObject('sanitize', value) {
+			StringUtil.sanitizeAndStripSpaces(it)
+		}
 		return this
 	}
 
@@ -233,7 +237,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element trim() {
-		value = value.trim()
+		value = transformStringObject('trim', value) {
+			it.trim()
+		}
 		return this
 	}
 
@@ -246,7 +252,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element replaceFirst(String content) {
-		value = value.replaceFirst(content, '')
+		value = transformStringObject('replaceFirst', value) {
+			it.replaceFirst(content, '')
+		}
 		return this
 	}
 
@@ -259,7 +267,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element replaceAll(String content) {
-		value = value.replaceAll(content, '')
+		value = transformStringObject('replaceAll', value) {
+			it.replaceAll(content, '')
+		}
 		return this
 	}
 
@@ -272,7 +282,10 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element replaceLast(String content) {
-		value = value.reverse().replaceFirst(content, '').reverse()
+		value = transformStringObject('replaceLast', value) {
+			it.reverse().replaceFirst(content, '').reverse()
+		}
+
 		return this
 	}
 
@@ -285,7 +298,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element uppercase() {
-		value = value.toUpperCase()
+		value = transformStringObject('uppercase', value) {
+			it.toUpperCase()
+		}
 		return this
 	}
 
@@ -298,7 +313,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element lowercase() {
-		value = value.toLowerCase()
+		value = transformStringObject('lowercase', value) {
+			it.toLowerCase()
+		}
 		return this
 	}
 
@@ -312,7 +329,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element left(Integer amount) {
-		value = value.take(amount)
+		value = transformStringObject('left', value) {
+			it.take(amount)
+		}
 		return this
 	}
 
@@ -326,7 +345,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element right(Integer amount) {
-		value = value?.reverse().take(amount).reverse()
+		value = transformStringObject('right', value) {
+			it.reverse()?.take(amount)?.reverse()
+		}
 		return this
 	}
 
@@ -342,7 +363,9 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element replace(String regex, String replacement) {
-		value = value?.replaceAll(regex, replacement)
+		value = transformStringObject('replace', value) {
+			it.replaceAll(regex, replacement)
+		}
 		return this
 	}
 
@@ -443,6 +466,28 @@ class Element implements RangeChecker {
 
 	int hashCode() {
 		return value.hashCode()
+	}
+
+	/**
+	 * Applies a TransformationFunction to a String Object only if the passed object IS a string
+	 * or throws a ETLProcessorException
+	 * @param methodName reference to the method name of the closure (Objective)
+	 * @param value value to be checked against Null and String
+	 * @param transformation Transformation closure to apply
+	 * @return result String transformed
+	 */
+	private static String transformStringObject(String methodName, Object value, Closure transformation) {
+		String retVal
+
+		if (value == null) {
+			retVal = ''
+		} else if (value instanceof CharSequence) {
+			retVal = transformation.call(value)
+		} else {
+			throw ETLProcessorException.invalidUseOfMethod(methodName)
+		}
+
+		return retVal
 	}
 
 	@Override
