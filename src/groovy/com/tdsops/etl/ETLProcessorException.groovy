@@ -181,8 +181,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Use 'replace on/off' command")
     }
 
-    static ETLProcessorException invalidUseOfMethod( String methodName ) {
-        new ETLProcessorException("${methodName} function only supported for String values")
+    static ETLProcessorException invalidUseOfMethod( String methodName, Object value ) {
+        new ETLProcessorException("${methodName} function only supported for String values (${value} : ${value.class})")
     }
 }
 

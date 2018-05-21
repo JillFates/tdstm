@@ -1045,8 +1045,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
-			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: java.lang.Integer.toUpperCase() is applicable for argument types: () values: []'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'uppercase function only supported for String values (152254 : class java.lang.Integer)'
 
 	}
 }

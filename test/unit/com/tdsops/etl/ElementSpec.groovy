@@ -28,14 +28,15 @@ class ElementSpec extends Specification {
 
 	void 'test Exception if String function applied to Non String Element' () {
 		given:
-			Element element = new Element(value: 100)
+			int value = 100
+			Element element = new Element(value: value)
 
 		when:
 			element.left(4)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "left function only supported for String values"
+			e.message == "left function only supported for String values (${value} : ${value.class})"
 	}
 
 

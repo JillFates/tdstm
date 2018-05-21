@@ -161,11 +161,10 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element middle(int position, int take) {
-
-		int start = (position - 1)
-		int to = (start + take - 1)
-		subListRangeCheck(start, to, value.size())
 		value = transformStringObject('middle', value) {
+			int start = (position - 1)
+			int to = (start + take - 1)
+			subListRangeCheck(start, to, value.size())
 			it[start..to]
 		}
 		return this
@@ -484,7 +483,7 @@ class Element implements RangeChecker {
 		} else if (value instanceof CharSequence) {
 			retVal = transformation.call(value)
 		} else {
-			throw ETLProcessorException.invalidUseOfMethod(methodName)
+			throw ETLProcessorException.invalidUseOfMethod(methodName, value)
 		}
 
 		return retVal
