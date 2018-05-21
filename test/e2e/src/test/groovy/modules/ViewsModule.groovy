@@ -129,4 +129,12 @@ class ViewsModule extends Module {
     def getNumberOfRows(){
         viewsListed.size()
     }
+    def openViewByName(name){
+        filterViewByName name
+        // verify exact match and no other was found with same name
+        // otherwise we can click in other view than is required
+        def links = viewsListed.findAll { it.text() == name }
+        links.size() == 1
+        waitFor{ links[0].click() }
+    }
 }

@@ -54,12 +54,4 @@ class AssetViewsPage extends Page{
         viewMgrSystemViews.click()
     }
 
-    def openViewByName(name){
-        filterViewByName name
-        // verify exact match and no other was found with same name
-        // otherwise we can click in other view than is required
-        def links = vwGridRowsLink.findAll { it.text() == name }
-        links.size() == 1
-        waitFor{ links[0].click() }
-    }
 }

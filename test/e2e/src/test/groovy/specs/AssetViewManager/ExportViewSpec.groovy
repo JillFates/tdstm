@@ -34,7 +34,7 @@ class ExportViewSpec extends GebReportingSpec {
         when: "The user clicks on System Views"
             goToSystemViews()
         and: "The User opens 'All Assets' view"
-            openViewByName "All Assets"
+            allViewsModule.openViewByName "All Assets"
         then: "'All Assets' view should be displayed"
             at ViewPage
             verifyViewTitle "All Assets"
