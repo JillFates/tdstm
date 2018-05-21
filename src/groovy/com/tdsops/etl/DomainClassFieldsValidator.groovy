@@ -9,7 +9,7 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	Map<String, ETLFieldDefinition> fieldsDefinitionCache = [:]
 
 	private String cacheKey(ETLDomain domain, String field){
-		return new StringBuffer(domain.name()).append('.').append(field).toString()
+		return domain.name().concat('.').concat(field)
 	}
 
 	/**
