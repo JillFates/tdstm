@@ -4,10 +4,6 @@ import geb.Module
 
 class CreateViewModule extends Module {
 
-    static at = {
-        waitFor {crtViewPageWindow.displayed}
-    }
-
     static content = {
         crtViewPageWindow            (wait:true) { $("section", 	class:"content-header").find("h1")}
         crtViewTitle                 { $("section", 	class:"content-header").find("h1") }
