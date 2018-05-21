@@ -46,7 +46,7 @@ import static org.codehaus.groovy.syntax.Types.POWER
  * @see com.tdsops.etl.ETLProcessor#set
  * @see com.tdsops.etl.ETLProcessor#iterate
  */
-class ETLProcessor implements RangeChecker {
+class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	/**
 	 * Static variable name definition for CE script variable
@@ -98,6 +98,10 @@ class ETLProcessor implements RangeChecker {
 	 * when an ETL script is being executing.
 	 */
 	ETLProcessorResult result
+	/**
+	 *
+	 */
+	ProgressIndicator progressIndicator
 
 	Integer currentRowIndex = 0
 	Integer currentColumnIndex = 0
@@ -312,6 +316,7 @@ class ETLProcessor implements RangeChecker {
 
 		currentRowIndex = 1
 		rows.each { def row ->
+			scriptIterating(currentRowIndex - 1, rows.size())
 			isIterating = true
 			currentColumnIndex = 0
 			cleanUpBindingAndReleaseLookup()
@@ -326,7 +331,7 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
-
+		iterationFinished()
 		isIterating = false
 		currentRowIndex--
 		return this
@@ -1136,8 +1141,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script){
-		return evaluate(script, defaultCompilerConfiguration())
+	Object evaluate(String script, ProgressCallback progressCallback = null){
+		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
 	/**
@@ -1152,9 +1157,12 @@ class ETLProcessor implements RangeChecker {
 
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script, CompilerConfiguration configuration){
-		return new GroovyShell(this.class.classLoader, this.binding, configuration)
+	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
+		prepareProgressIndicator(script, progressCallback)
+		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
 			.evaluate(script,ETLProcessor.class.name)
+		scriptFinished(this.dataSetFacade.fileName())
+		return result
 	}
 
 	/**
