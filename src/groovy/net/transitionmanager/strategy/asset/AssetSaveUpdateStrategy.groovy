@@ -181,15 +181,32 @@ abstract class AssetSaveUpdateStrategy {
 		// Delete those dependencies not present in the command
 		deleteDependencies(assetEntity)
 		// Create and/or update supporting assets
-		createOrUpdateDependencies(assetEntity, true)
+		createOrUpdateSupportingAssets(assetEntity)
 		// Create and/or update dependents
+		createOrUpdateDependentAssets(assetEntity)
+
+	}
+
+	/**
+	 * Create or Update the corresponding supporting assets for the given asset instance.
+	 * @param assetEntity
+	 */
+	private void createOrUpdateSupportingAssets(AssetEntity assetEntity) {
+		createOrUpdateDependencies(assetEntity, true)
+	}
+
+	/**
+	 * Create or Update the corresponding dependent assets for the given asset instance.
+	 * @param assetEntity
+	 */
+	private void createOrUpdateDependentAssets(AssetEntity assetEntity) {
 		createOrUpdateDependencies(assetEntity, false)
 	}
 
 	/**
 	 * Create or update all the corresponding dependent or supporting assets.
 	 * @param assetEntity
-	 * @param isDependent
+	 * @param isDependent - true: the given asset is the dependent side, false: it's the supporting side.
 	 */
 	private void createOrUpdateDependencies(AssetEntity assetEntity, boolean isDependent) {
 		List depMaps = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
@@ -225,7 +242,7 @@ abstract class AssetSaveUpdateStrategy {
 		MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, depMap.moveBundleId, true)
 		// If the selected bundle doesn't match the selected asset's, assign it to that bundle.
 		if (targetAsset.moveBundle.id != moveBundle.id) {
-			assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
+			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
 		dependency.updatedBy = currentPerson
 		dependency.save(failOnError: true)
