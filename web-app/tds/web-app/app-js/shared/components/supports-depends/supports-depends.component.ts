@@ -2,7 +2,7 @@
  * Structure does not allows to introduce other base Modules
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
 import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset-explorer.service';
@@ -24,6 +24,7 @@ declare var jQuery: any;
 
 export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
+	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
 	private dataGridDependsOnHelper: DataGridOperationsHelper;
@@ -122,6 +123,7 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 		dataGrid.addDataItem(dependencySupportModel);
+		this.onChangeInternalModel();
 	}
 
 	/**
@@ -134,26 +136,39 @@ export class SupportsDependsComponent implements OnInit {
 			text: '',
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
+		this.onChangeInternalModel();
 	}
 
 	/**
-	 * Detects whe
+	 * Detects when the value of the dependency has change, then attach it to the model
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
-		let changeParams = {
-			assetId: dependency.id,
-			dependentId: dataItem.id,
-			type: dataItem.dependencyType
-		};
-		this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res: any) => {
-			if (res.id && res.id !== dataItem.assetDepend.moveBundle.id) {
-				let mb = this.moveBundleList.find((mbi) => mbi.id === res.id);
-				if (mb) {
-					dataItem.assetDepend.moveBundle = mb;
+		if (dependency) {
+			let changeParams = {
+				assetId: dependency.id,
+				dependentId: dataItem.id,
+				type: dataItem.dependencyType
+			};
+			dataItem.assetDepend.id = dependency.id;
+			dataItem.assetDepend.text = dependency.text;
+			this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res: any) => {
+				if (res.id && res.id !== dataItem.assetDepend.moveBundle.id) {
+					let mb = this.moveBundleList.find((mbi) => mbi.id === res.id);
+					if (mb) {
+						dataItem.assetDepend.moveBundle = mb;
+						this.onChangeInternalModel();
+					}
 				}
-			}
-		});
+			});
+		} else {
+			dataItem.assetDepend = {
+				id: '',
+				text: '',
+				moveBundle: dataItem.assetDepend.moveBundle
+			};
+		}
+		this.onChangeInternalModel();
 	}
 
 	/**
@@ -179,6 +194,7 @@ export class SupportsDependsComponent implements OnInit {
 	 */
 	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
 		dataGrid.removeDataItem(dataItem);
+		this.onChangeInternalModel();
 	}
 
 	/**
@@ -221,5 +237,35 @@ export class SupportsDependsComponent implements OnInit {
 				jQuery('.k-list-container ul.k-list li').addClass('move-bundle-item');
 			});
 		}
+	}
+
+	/**
+	 * Run a validation to ensure the Asset Name and the Bundle is selected on any change
+	 * Emits True when the Form is Valid
+	 * Emits False if at least one Asset Name or Bundle is missing
+	 * And update the Object Model
+	 */
+	private onChangeInternalModel(): void {
+		let validForm = true;
+		// Validate the Supports Table
+		this.dataGridSupportsOnHelper.gridData.data.forEach((dataItem: any) => {
+			if (validForm) {
+				validForm = !(dataItem.assetDepend.moveBundle.id === 0 || dataItem.assetDepend.id === '');
+			}
+		});
+
+		// Validate the Depends Table
+		this.dataGridDependsOnHelper.gridData.data.forEach((dataItem: any) => {
+			if (validForm) {
+				validForm = !(dataItem.assetDepend.moveBundle.id === 0 || dataItem.assetDepend.id === '');
+			}
+		});
+
+		if (validForm) {
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+		}
+
+		this.isValidForm.emit(validForm);
 	}
 }

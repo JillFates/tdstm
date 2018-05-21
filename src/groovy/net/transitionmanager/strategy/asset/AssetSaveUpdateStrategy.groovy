@@ -1,5 +1,6 @@
 package net.transitionmanager.strategy.asset
 
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
@@ -8,10 +9,12 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.util.Holders
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.SecurityService
 
 import java.text.DateFormat
@@ -64,7 +67,7 @@ abstract class AssetSaveUpdateStrategy {
 		assetEntityService.assignAssetToBundle(project, assetEntity, command.asset['moveBundleId'].toString())
 
 		// Create/Update dependencies as needed.
-		//assetEntityService.createOrUpdateAssetEntityAndDependencies(project, assetEntity, command.dependencyMap)
+		createOrUpdateDependencies(assetEntity)
 
 		return assetEntity
 
@@ -109,7 +112,7 @@ abstract class AssetSaveUpdateStrategy {
 		Long assetId = NumberUtil.toLong(command.asset.id)
 		AssetEntity assetEntity
 		if (assetId) {
-			assetEntity = GormUtil.findInProject(project, AssetEntity, assetId)
+			assetEntity = GormUtil.findInProject(project, AssetEntity, assetId, true)
 		} else {
 			throw new InvalidParamException('The requested Asset ID is invalid')
 		}
@@ -165,6 +168,196 @@ abstract class AssetSaveUpdateStrategy {
 		initializeInstance(assetEntity)
 		return assetEntity
 	}
+
+	/**
+	 * Create, update or delete dependencies for the given asset based
+	 * on the information provided in the command object.
+	 *
+	 * @param assetEntity
+	 */
+	private void createOrUpdateDependencies(AssetEntity assetEntity) {
+		// Validate that all dependent/supporting assets belong to the same project.
+		validateRelatedAssets()
+		// Delete those dependencies not present in the command
+		deleteDependencies(assetEntity)
+		// Create and/or update supporting assets
+		createOrUpdateSupportingAssets(assetEntity)
+		// Create and/or update dependents
+		createOrUpdateDependentAssets(assetEntity)
+
+	}
+
+	/**
+	 * Create or Update the corresponding supporting assets for the given asset instance.
+	 * @param assetEntity
+	 */
+	private void createOrUpdateSupportingAssets(AssetEntity assetEntity) {
+		createOrUpdateDependencies(assetEntity, true)
+	}
+
+	/**
+	 * Create or Update the corresponding dependent assets for the given asset instance.
+	 * @param assetEntity
+	 */
+	private void createOrUpdateDependentAssets(AssetEntity assetEntity) {
+		createOrUpdateDependencies(assetEntity, false)
+	}
+
+	/**
+	 * Create or update all the corresponding dependent or supporting assets.
+	 * @param assetEntity
+	 * @param isDependent - true: the given asset is the dependent side, false: it's the supporting side.
+	 */
+	private void createOrUpdateDependencies(AssetEntity assetEntity, boolean isDependent) {
+		List depMaps = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
+		for (depMap in depMaps) {
+			createOrUpdateDependency(assetEntity, depMap, isDependent)
+		}
+	}
+
+	/**
+	 * Create or Update a dependency for this asset.
+	 * @param assetEntity
+	 * @param depMap
+	 * @param isDependent
+	 */
+	private void createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
+		AssetDependency dependency = null
+		if (depMap.id) {
+			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id, true)
+		} else {
+			dependency = new AssetDependency()
+			dependency.createdBy = currentPerson
+		}
+
+		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.targetAsset.id, true)
+
+		dependency.dependent = isDependent? assetEntity : targetAsset
+		dependency.asset = isDependent ? targetAsset : assetEntity
+		dependency.dataFlowFreq = depMap.dataFlowFreq
+		dependency.status = depMap.status
+		dependency.type = depMap.type
+		dependency.comment = depMap.comment
+
+		MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, depMap.moveBundleId, true)
+		// If the selected bundle doesn't match the selected asset's, assign it to that bundle.
+		if (targetAsset.moveBundle.id != moveBundle.id) {
+			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
+		}
+		dependency.updatedBy = currentPerson
+		dependency.save(failOnError: true)
+	}
+
+	/**
+	 * As part of the process of updating an asset's dependencies, we need to remove those
+	 * dependencies that the user deleted from the UI.
+	 *
+	 * In the past, the request contained a list of dependencies to be deleted. This is no longer
+	 * the case and we need to infer those ids by comparing existing ids with the ids received
+	 * in the request.
+	 *
+	 * @param assetEntity
+	 */
+	private void deleteDependencies(AssetEntity assetEntity) {
+		// Delete missing supporting dependencies
+		deleteDependencies(assetEntity, false)
+		// Delete missing dependents
+		deleteDependencies(assetEntity, true)
+	}
+
+	/**
+	 * Determine which dependencies are no longer require and delete them.
+	 *
+	 * This method works with only one side (dependent or supporting), which is controlled
+	 * by the isDependent flag.
+	 *
+	 * @param assetEntity
+	 * @param isDependent - true: the given asset is the dependent side; false: it's the supporting one.
+	 */
+	private void deleteDependencies(AssetEntity assetEntity, boolean isDependent) {
+		// Determine those dependencies no longer valid.
+		List<Long> dependents = collectDependencies(isDependent)
+		// Delete the dependencies for the asset not included in the dependents list.
+		deleteDependencies(dependents, assetEntity, isDependent)
+	}
+
+	/**
+	 * Collect a list of Dependency IDs (dependent or supporting dependencies)
+	 */
+	private List<Long> collectDependencies(boolean isDependent) {
+		List<Long> dependencies = []
+		List depList = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
+		for (depMap in depList) {
+			Long id = NumberUtil.toLong(depMap.id)
+			if (id) {
+				dependencies << id
+			}
+		}
+
+		return dependencies
+	}
+
+	/**
+	 * Validate that all assets associated in the dependencies section (dependent or supporting)
+	 * belong to the same project.
+	 *
+	 */
+	private void validateRelatedAssets() {
+		// Validate dependent assets.
+		List<Long> dependentIds = collectRelatedAssets(true)
+		assetEntityService.validateAssetsAssocToProject(dependentIds, project)
+		// Validate supporting assets.
+		List<Long> supportingIds = collectRelatedAssets(false)
+		assetEntityService.validateAssetsAssocToProject(supportingIds, project)
+	}
+
+	/**
+	 * Collect the list of dependent/supporting assets from the command object.
+	 * An exception will be thrown if a duplicate asset is found.
+	 *
+	 * @param dependents
+	 * @return
+	 */
+	private List<Long> collectRelatedAssets(boolean dependents) {
+		List<Long> ids = []
+		String label = dependents ? "dependent" : "supporting"
+		List<Map> depList = dependents ? command.dependencyMap.dependentAssets : command.dependencyMap.supportAssets
+		for (depMap in depList) {
+			Long id = depMap.targetAsset.id
+			if (id) {
+				if (id in ids) {
+					throw new InvalidRequestException("Duplicate $label found for asset ${depMap.targetAsset.name}")
+				}else {
+					ids << id
+				}
+			}
+
+		}
+		return ids
+	}
+
+	/**
+	 * Delete of the dependencies using a list of ids and an asset, which can be the supporting or the dependent.
+	 *
+	 * @param ids - dependency ids.
+	 * @param assetEntity
+	 * @param isDependent - true: the target asset is the dependent side, false if it's the supporting side.
+	 */
+	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity, boolean isDependent) {
+		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
+		* given their id, but also takes the asset being edited into account.*/
+		String side = isDependent ? 'dependent' : 'asset'
+		String hql = "DELETE FROM AssetDependency ad WHERE $side = :asset"
+		Map params = [asset: assetEntity]
+		// Add the NOT IN condition only if the dependents list is not empty
+		if (ids) {
+			hql += " AND id NOT IN (:ids)"
+			params['ids'] = ids
+		}
+		AssetDependency.executeUpdate(hql, params)
+	}
+
+
 
 
 	/**
