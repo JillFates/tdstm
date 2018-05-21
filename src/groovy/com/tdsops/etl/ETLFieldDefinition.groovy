@@ -4,14 +4,14 @@ import com.tdsops.tm.enums.ControlType
 import net.transitionmanager.domain.Person
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 
-class ETLFieldSpec {
+class ETLFieldDefinition {
 
 	private String name
 	private String label
 	private Class<?> type
 
 	/**
-	 * Creates an instance of ETLFieldSpec base on this structure:
+	 * Creates an instance of ETLFieldDefinition base on this structure:
 	 * <pre>
 	 * [
 	 *  constraints: [
@@ -32,18 +32,18 @@ class ETLFieldSpec {
 	 * @param fieldSpec
 	 * @see DomainClassFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
-	ETLFieldSpec(Map<String, ?> fieldSpec) {
+	ETLFieldDefinition(Map<String, ?> fieldSpec) {
 		this.name = fieldSpec.field
 		this.label = fieldSpec.label
 		this.type = classForControlType(fieldSpec.control)
 	}
 
 	/**
-	 * Creates an instance of ETLFieldSpec using GrailsDomainClassProperty definition.
+	 * Creates an instance of ETLFieldDefinition using GrailsDomainClassProperty definition.
 	 * @param domainProperty an instance of GrailsDomainClassProperty
 	 * @see DomainClassFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
-	ETLFieldSpec(GrailsDomainClassProperty domainProperty) {
+	ETLFieldDefinition(GrailsDomainClassProperty domainProperty) {
 		this.name = domainProperty.getName()
 		this.label = domainProperty.getFieldName()
 		this.type = domainProperty.getType()

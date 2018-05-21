@@ -509,16 +509,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.appVendor) {
-					originalValue.contains('Microsoft\b\nInc')
-					value == 'Microsoft\b\nIncorporated'
-				}
+			with(etlProcessor.resultsMap()){
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.appVendor) {
+						originalValue.contains('Microsoft\b\nInc')
+						value == 'Microsoft\b\nIncorporated'
+					}
 
-				with(data[1].fields.appVendor) {
-					originalValue.contains('Mozilla\t\t\0Inc')
-					value == 'Mozilla\t\t\0Incorporated'
+					with(data[1].fields.appVendor) {
+						originalValue.contains('Mozilla\t\t\0Inc')
+						value == 'Mozilla\t\t\0Incorporated'
+					}
 				}
 			}
 	}
@@ -538,16 +541,18 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.appVendor) {
-					originalValue.contains('Microsoft\b\nInc')
-					value == "Mirosoft\b\nIn"
-				}
+			with(etlProcessor.resultsMap()) {
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.appVendor) {
+						originalValue.contains('Microsoft\b\nInc')
+						value == "Mirosoft\b\nIn"
+					}
 
-				with(data[1].fields.appVendor) {
-					originalValue.contains('Mozilla\t\t\0Inc')
-					value == "Mozill\t\t\0In"
+					with(data[1].fields.appVendor) {
+						originalValue.contains('Mozilla\t\t\0Inc')
+						value == "Mozill\t\t\0In"
+					}
 				}
 			}
 	}
@@ -593,17 +598,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					value == 'ACME Data Center - microsoft'
-					originalValue == 'ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						value == 'ACME Data Center - microsoft'
+						originalValue == 'ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					value == 'ACME Data Center - mozilla'
-					originalValue == 'ACME Data Center'
+					with(data[1].fields.description) {
+						value == 'ACME Data Center - mozilla'
+						originalValue == 'ACME Data Center'
+					}
 				}
 			}
 	}
@@ -671,17 +678,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Centermicrosoft - ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Centermicrosoft - ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Centermozilla - ACME Data Center'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Centermozilla - ACME Data Center'
+					}
 				}
 			}
 	}
@@ -705,19 +714,22 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center-microsoft-ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center-microsoft-ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center-mozilla-ACME Data Center'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center-mozilla-ACME Data Center'
+					}
 				}
 			}
+
 	}
 
 	void 'test can append strings and elements in a transformation using local variables'() {
@@ -740,17 +752,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - microsoft - '
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - microsoft - '
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - mozilla - '
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - mozilla - '
+					}
 				}
 			}
 	}
@@ -775,17 +789,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - microsoft'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - microsoft'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - mozilla'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - mozilla'
+					}
 				}
 			}
 	}
@@ -812,17 +828,19 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'acme data center**'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'acme data center**'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'acme data center**'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'acme data center**'
+					}
 				}
 			}
 	}
@@ -843,10 +861,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -866,10 +884,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -891,10 +909,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can transform globally a field value using replace command using a range in the iteration'() {
@@ -915,7 +933,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
@@ -935,10 +953,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -959,10 +977,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -983,10 +1001,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 

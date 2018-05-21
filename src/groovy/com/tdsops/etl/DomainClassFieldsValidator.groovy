@@ -38,19 +38,19 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	 * @param field
 	 * @return
 	 */
-	ETLFieldSpec lookup(ETLDomain domain, String field) {
+	ETLFieldDefinition lookup(ETLDomain domain, String field) {
 
 		if(domain.isAsset()){
 			if(hasSpecs(domain, field)){
 				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
 					it.field == field || it.label == field
 				}
-				return new ETLFieldSpec(fieldSpec)
+				return new ETLFieldDefinition(fieldSpec)
 			}
 		} else{
 			Class<?> domainClass = domain.clazz
 			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
-			return new ETLFieldSpec(domainProperty)
+			return new ETLFieldDefinition(domainProperty)
 		}
 	}
 }

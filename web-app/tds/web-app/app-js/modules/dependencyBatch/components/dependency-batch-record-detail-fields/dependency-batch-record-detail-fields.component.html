@@ -43,9 +43,7 @@
     </kendo-grid>
 
     <style>
-        .footer button {
-            margin-right: 5px;
-        }
+
     </style>
     <div class="row footer" style="margin-top: 30px;">
         <button *ngIf="showActionButtons()"
@@ -55,13 +53,15 @@
             <i class="glyphicon glyphicon-floppy-disk"></i>
             Save
         </button>
-        <button *ngIf="showActionButtons()"
+        <tds-check-action
+                *ngIf="showActionButtons()"
                 [disabled]="areOverrideValuesDirty()"
-                (click)="onProcess()"
-                class="btn btn-default btn-sm col-sm-1" type="button">
-            <i class="glyphicon glyphicon-retweet"></i>
-            Process
-        </button>
+                [name]="'Process'"
+                (onClick)="onProcess()"
+                [noneStateIcon]="'glyphicon glyphicon-retweet'"
+                [class]="'btn-sm col-sm-1'"
+                [(model)]="processStatus">
+        </tds-check-action>
         <button *ngIf="showIncludeButton()"
                 (click)="onInclude()"
                 class="btn btn-default btn-sm col-sm-1" type="button">

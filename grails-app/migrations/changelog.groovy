@@ -234,5 +234,6 @@ databaseChangeLog = {
 	include file: '20180403-purge-import-batch-and-records.groovy'
 	include file: '20180404-purge-test-apis-credentials-datascripts.groovy'
 	include file: '20180423-fix-room-rack-location-user-preferences.groovy'
+	include file: '20180430-add-queued-at-to-import-batch.groovy'
 	include file: '20180508-migrate-and-remove-eav.groovy'
 }

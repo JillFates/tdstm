@@ -2,7 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.common.security.spring.CamelHostnameIdentifier
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -48,7 +48,6 @@ class ApiActionService implements ServiceMethods {
 			ActionThreadLocalVariable.ASSET_FACADE,
 			ActionThreadLocalVariable.REACTION_SCRIPTS
 	]
-	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
 	SecurityService securityService
@@ -327,7 +326,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @return
 	 */
-	Map invoke (ApiAction action) {
+	ApiActionResponse invoke (ApiAction action) {
 		if (!action) {
 			throw InvalidRequestException('No action was provided to the invoke command')
 		}
@@ -337,13 +336,6 @@ class ApiActionService implements ServiceMethods {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
-		// TODO : JPM 3/2018 : TM-9936 Move these vars to new property in ActionRequest
-		remoteMethodParams << [
-			actionId: action.id,
-			producesData: action.producesData,
-			credentials: action.credential?.toMap()
-		]
-
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
 		Map optionalRequestParams = [
 			actionId: action.id,
@@ -351,13 +343,35 @@ class ApiActionService implements ServiceMethods {
 			credentials: action.credential?.toMap(),
 			apiAction: apiActionToMap(action)
 		]
-
 		actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
+
+		// check pre script : set required request configurations
+		JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
+		String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
+		// execute PRE script if present
+		if (preScript) {
+			try {
+				invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
+						new ApiActionResponse(),
+						new TaskFacade(),
+						new AssetFacade(null, null, true),
+						new ApiActionJob()
+				)
+			} catch (ApiActionException preScriptException) {
+				log.error('Error invoking PRE script from DataScript: {}', ExceptionUtil.stackTraceToString(preScriptException))
+				throw preScriptException
+			}
+		}
 
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
 		// execute action and return any result that were returned
-		return agent.invoke(action.agentMethod, actionRequest)
+		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
+		try {
+			return agent.invoke(action.agentMethod, actionRequest)
+		} finally {
+			ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+		}
 	}
 
 	/**
@@ -460,6 +474,16 @@ class ApiActionService implements ServiceMethods {
 	 */
 	void delete (Long id, Project project, boolean flush = false) {
 		ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
+
+		// TM-10541 - Check if the ApiAction is referenced by any Tasks and prevent deleting
+		int count = AssetComment.where {
+			apiAction == apiAction
+		}.count()
+
+		if (count > 0) {
+			throw new DomainUpdateException("Unable to delete Api Action since it is being referenced by Tasks")
+		}
+
 		apiAction.delete(flush: flush)
 	}
 

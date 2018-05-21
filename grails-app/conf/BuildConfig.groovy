@@ -24,9 +24,6 @@ grails.project.dependency.resolution = {
 		mavenCentral()
 	}
 
-//	String camelVersion = '2.15.0'
-	String camelVersion = '2.13.2'
-
 	dependencies {
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'net.sf.jasperreports:jasperreports:4.5.1'
@@ -40,8 +37,9 @@ grails.project.dependency.resolution = {
 		runtime 'mysql:mysql-connector-java:5.1.40'
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
-		runtime "org.apache.camel:camel-aws:${camelVersion}"
-		runtime "org.apache.camel:camel-http4:${camelVersion}"
+		// HTTP Client used on integration agents e.g. HttpAgent, ServiceNow, VMware
+		runtime 'org.apache.httpcomponents:httpclient:4.5.5'
+		runtime 'commons-httpclient:commons-httpclient:3.1'
 
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
@@ -51,14 +49,6 @@ grails.project.dependency.resolution = {
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
-
-		/*
-		//testRuntime ("org.apache.camel:camel-test:${camelVersion}") {
-		test ("org.apache.camel:camel-test:${camelVersion}") {
-			excludes( [name: 'junit'] )//
-
-		*/
-
 	}
 
 	plugins {
@@ -68,9 +58,6 @@ grails.project.dependency.resolution = {
 //			excludes 'asset-pipeline'
 //		}
 
-//		compile 'org.grails.plugins:routing:1.4.1'
-		compile 'org.grails.plugins:routing:1.4.0'
-
 		compile ':jasper:1.11.0'
 		compile ':quartz:1.0.2'
 		compile ':plugin-config:0.2.0'
@@ -78,6 +65,7 @@ grails.project.dependency.resolution = {
 		compile ':scaffolding:2.1.2'
 		compile ':spring-security-core:2.0.0'
 		compile ':spring-security-ldap:2.0.1'
+		compile ':spring-events:1.2'
 		// Added the acl for some testing JPM 12/2016
 		compile ':spring-security-acl:2.0.0'
 		compile ':greenmail:1.3.4'

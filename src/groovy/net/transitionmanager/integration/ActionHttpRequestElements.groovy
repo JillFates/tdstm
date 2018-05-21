@@ -61,6 +61,10 @@ class ActionHttpRequestElements {
 		parse(uri, actionRequest)
 	}
 
+	ActionHttpRequestElements(ActionRequest actionRequest) {
+		parse(actionRequest.options.apiAction.endpointUrl, actionRequest)
+	}
+
 	/**
 	 * Used to retrieve the parameters as a URI query string based on the HTTP Method. For the GET method
 	 * all parameters (excluding those that were used as placeholders in the baseUrl & urlPath) will be
@@ -86,9 +90,19 @@ class ActionHttpRequestElements {
 		return queryStringMap(HttpMethod.GET)
 	}
 
+	/**
+	 * Used to retrieve all of the query string parameters as a map. The values should for all intended
+	 * @param method - the HTTP method
+	 * @return a string containing all query string parameters
+	 */
 	String queryString(HttpMethod method) {
 		if (HttpMethod.GET == method) {
-			return [queryString, buildQueryStringParams()].join('&')
+			String queryStringParams = buildQueryStringParams()
+			if (queryStringParams) {
+				return [queryString, queryStringParams].join('&')
+			} else {
+				return queryString
+			}
 		} else {
 			return queryString
 		}
@@ -105,7 +119,7 @@ class ActionHttpRequestElements {
 			// These parameters are injected into the Params but should be moved to something else
 			// TODO :JPM 3/2018 : TM-9963
 			if (! paramsToIgnored.contains(k)) {
-				k + '=' + UrlUtil.encode(v.toString())
+				k + '=' + v.toString()
 			}
 		}.join('&')
 		return qs
@@ -120,8 +134,7 @@ class ActionHttpRequestElements {
 	 * @return the appropriate parameters and values URL encoded
 	 */
 	String uri(HttpMethod method) {
-		String qs = queryString(method)
-		return baseUrl + urlPath + (qs ? '?' + qs : '')
+		return baseUrl + getUrlPathWithQueryString(method)
 	}
 
 	/**
@@ -183,7 +196,7 @@ class ActionHttpRequestElements {
 		// Get the unique list of the placeholders
 		// TODO : SL 03/2018 : Move methods from StringUtil to UrlUtil since this is URL stuff related
 		Set<String> placeholderNames = StringUtil.extractPlaceholders(urlParts[0])
-		Set<String> queryPlaceholderNames = (urlParts.size() > 1 ? StringUtil.extractPlaceholders(urlParts[1]) : null)
+		Set<String> queryPlaceholderNames = (urlParts.size() > 1 ? StringUtil.extractPlaceholders(urlParts[1]) : [])
 		placeholderNames += queryPlaceholderNames
 
 		// Replace all placeholders within the URI with the encoded named values
@@ -192,7 +205,7 @@ class ActionHttpRequestElements {
 			// Grab the values for the placeholders and encode them
 			for (String name in placeholderNames) {
 				if (actionRequest.params.hasProperty(name)) {
-					uriParamValues.put(name, UrlUtil.encode( actionRequest.params.getProperty(name) ) )
+					uriParamValues.put(name, actionRequest.params.getProperty(name) )
 				}
 			}
 
@@ -205,7 +218,7 @@ class ActionHttpRequestElements {
 			urlParts = baseUrl.split(/\?/)
 			Map qsMap = UrlUtil.queryStringToMap(urlParts[1])
 			for (pv in qsMap) {
-				queryParams.put(pv.key, UrlUtil.decode( pv.value ))
+				queryParams.put(pv.key,  pv.value )
 			}
 		}
 
