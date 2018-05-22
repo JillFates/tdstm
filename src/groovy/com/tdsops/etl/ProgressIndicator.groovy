@@ -12,7 +12,7 @@ trait ProgressIndicator {
 
 	ProgressCallback progressCallback
 	Integer numberOfIterateLoops
-
+	Integer iterateCounter = 0
 	/**
 	 * Prepare script progress indicator using a closure
 	 * and an ETL script content
@@ -22,6 +22,8 @@ trait ProgressIndicator {
 	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
 		progressCallback = aProgressCallback
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
+		numberOfIterateLoops = 0
+		iterateCounter = 0
 	}
 
 	/**
@@ -44,12 +46,8 @@ trait ProgressIndicator {
 		String detail = '') {
 
 		if (progressCallback){
-			progressCallback.reportProgress(
-				(100 * currentRow/ totalRows * numberOfIterateLoops ).intValue(),
-				forceReport,
-				status,
-				detail
-			)
+			Integer percentage = (100 * currentRow / totalRows * numberOfIterateLoops).intValue()
+			progressCallback.reportProgress(percentage, forceReport, status, detail)
 		}
 	}
 
@@ -57,7 +55,7 @@ trait ProgressIndicator {
 	 * <ol>
 	 * <li>Parse the script to count the # of <em>iterate {...}</em> blocks
 	 * <ol>
-	 * <li>Retain&nbsp;<em>Integer numberOfIterateLoops</em> to be used by reportProgress function</li>
+	 * <li>Retain <em>Integer numberOfIterateLoops</em> to be used by reportProgress function</li>
 	 * </ol>
 	 * </li>
 	 * <li>Each iterate block will responsible for reporting it's percentage of completion
@@ -66,7 +64,8 @@ trait ProgressIndicator {
 	 * </ul>
 	 * </li>
 	 * <li>At the beginning of each iterate - the number of source rows will be determined</li>
-	 * <li>A factor will be determined as to what the frequency (every n rows) that percentage complete should be reported back to the Progress Service</li>
+	 * <li>A factor will be determined as to what the frequency (every n rows) that percentage complete
+	 * should be reported back to the Progress Service</li>
 	 * </ol>
 	 * @param scriptContent
 	 * @return
@@ -80,15 +79,29 @@ trait ProgressIndicator {
 	 * @param currentRow
 	 * @param totalRows
 	 */
-	void scriptIterating(Integer currentRow, Integer totalRows) {
+	void bottomOfIterate(Integer currentRow, Integer totalRows) {
 		reportProgress(currentRow, totalRows, true, ProgressCallback.ProgressStatus.RUNNING, '')
+	}
+
+	/**
+	 * This method will be a call to reportProgress with the current row # and total rows for the dataset.
+	 * @param currentRow
+	 * @param totalRows
+	 */
+	void startIterate(Integer totalRows) {
+		iterateCounter += 1
+		Integer current = numberOfIterateLoops * iterateCounter
+		Integer total = totalRows * numberOfIterateLoops * iterateCounter
+		reportProgress(current, total, true, ProgressCallback.ProgressStatus.RUNNING, '')
 	}
 
 	/**
 	 *
 	 */
-	void iterationFinished() {
-		reportProgress(1, 1, true, ProgressCallback.ProgressStatus.RUNNING, '')
+	void iterationFinished(Integer totalRows) {
+		Integer current = totalRows
+		Integer total = totalRows * numberOfIterateLoops * iterateCounter
+		reportProgress(current, total, true, ProgressCallback.ProgressStatus.RUNNING, '')
 	}
 	/**
 	 * Reporting Success.

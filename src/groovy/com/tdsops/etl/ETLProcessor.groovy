@@ -315,8 +315,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	ETLProcessor doIterate (List rows, Closure closure) {
 
 		currentRowIndex = 1
+
+		startIterate(rows.size())
 		rows.each { def row ->
-			scriptIterating(currentRowIndex - 1, rows.size())
 			isIterating = true
 			currentColumnIndex = 0
 			cleanUpBindingAndReleaseLookup()
@@ -328,10 +329,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 			result.removeIgnoredRows()
 
-			currentRowIndex++
+			bottomOfIterate(currentRowIndex, rows.size())
 			binding.removeAllDynamicVariables()
+			currentRowIndex++
 		}
-		iterationFinished()
+		iterationFinished(rows.size())
 		isIterating = false
 		currentRowIndex--
 		return this
