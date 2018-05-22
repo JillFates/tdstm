@@ -29,7 +29,7 @@ export class ManualImportComponent implements OnInit {
 	private fetchFileContent: any;
 	private transformFileContent: any;
 	private viewDataType: string;
-	private uiConfig: any = {
+	protected uiConfig: any = {
 		labelColSize: 3,
 		inputColSize: 3,
 		buttonColSize: 1,
@@ -37,7 +37,11 @@ export class ManualImportComponent implements OnInit {
 	};
 	protected CHECK_ACTION = CHECK_ACTION;
 	protected operationStatus = {
-		test: new OperationStatusModel(),
+		transform: new OperationStatusModel(),
+	};
+	protected transformProgress = {
+		progressKey: null,
+		currentProgress: 0,
 	};
 
 	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
@@ -56,29 +60,28 @@ export class ManualImportComponent implements OnInit {
 	 * Calls the process of fetch.
 	 */
 	private onFetch(): void {
-		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
-		// this.fetchInProcess = true;
-		// this.fetchResult = null;
-		// this.fetchFileContent = null;
-		// this.transformResult = null;
-		// this.transformFileContent = null;
-		// this.importResult = null;
-		// // this.selectedScriptOption = null;
-		// this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
-		// 	this.fetchResult = {
-		// 		status: result.status
-		// 	};
-		// 	this.fetchInputUsed = 'action';
-		// 	if (result.status === 'error') {
-		// 		this.notifier.broadcast({
-		// 			name: AlertType.DANGER,
-		// 			message: result.errors[0]
-		// 		});
-		// 	} else {
-		// 		this.fetchResult.filename = result.data.filename;
-		// 	}
-		// 	this.fetchInProcess = false;
-		// } );
+		this.fetchInProcess = true;
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.importResult = null;
+		// this.selectedScriptOption = null;
+		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
+			this.fetchResult = {
+				status: result.status
+			};
+			this.fetchInputUsed = 'action';
+			if (result.status === 'error') {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: result.errors[0]
+				});
+			} else {
+				this.fetchResult.filename = result.data.filename;
+			}
+			this.fetchInProcess = false;
+		} );
 	}
 
 	/**
@@ -97,20 +100,21 @@ export class ManualImportComponent implements OnInit {
 	 * Calls Transform process on endpoint.
 	 */
 	private onTransform(): void {
-		this.transformInProcess = true;
-		this.transformResult = null;
-		this.transformFileContent = null;
-		this.importResult = null;
-		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
-			this.transformResult = result;
-			if (this.transformResult.status === 'error') {
-				this.notifier.broadcast({
-					name: AlertType.DANGER,
-					message: this.transformResult.errors[0]
-				});
-			}
-			this.transformInProcess = false;
-		} );
+		this.operationStatus.transform.state = CHECK_ACTION.IN_PROGRESS;
+		// this.transformInProcess = true;
+		// this.transformResult = null;
+		// this.transformFileContent = null;
+		// this.importResult = null;
+		// this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
+		// 	this.transformResult = result;
+		// 	if (this.transformResult.status === 'error') {
+		// 		this.notifier.broadcast({
+		// 			name: AlertType.DANGER,
+		// 			message: this.transformResult.errors[0]
+		// 		});
+		// 	}
+		// 	this.transformInProcess = false;
+		// } );
 	}
 
 	/**
