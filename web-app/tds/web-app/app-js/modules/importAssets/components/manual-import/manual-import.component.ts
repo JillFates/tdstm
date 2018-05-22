@@ -5,7 +5,8 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+import {OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+import {DataIngestionService} from '../../../dataIngestion/service/data-ingestion.service';
 
 @Component({
 	selector: 'manual-import',
@@ -22,8 +23,8 @@ export class ManualImportComponent implements OnInit {
 	private fetchResult: any;
 	private fetchInProcess = false;
 	private fetchInputUsed: 'action' | 'file' = 'action';
-	private transformResult: ApiResponseModel;
-	private transformInProcess = false;
+	protected transformResult: ApiResponseModel;
+	protected transformInProcess = false;
 	private importResult: any;
 	private importInProcess = false;
 	private fetchFileContent: any;
@@ -35,17 +36,17 @@ export class ManualImportComponent implements OnInit {
 		buttonColSize: 1,
 		urlColSize: 2
 	};
-	protected CHECK_ACTION = CHECK_ACTION;
-	protected operationStatus = {
-		transform: new OperationStatusModel(),
-	};
 	protected transformProgress = {
 		progressKey: null,
 		currentProgress: 0,
 	};
+	private transformInterval: any;
 
-	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
-		this.file.fileUID = null;
+	constructor(
+		private importAssetsService: ImportAssetsService,
+		private notifier: NotifierService,
+		private dataIngestionService: DataIngestionService) {
+			this.file.fileUID = null;
 	}
 
 	ngOnInit(): void {
@@ -99,22 +100,76 @@ export class ManualImportComponent implements OnInit {
 	 * Transform button clicked event.
 	 * Calls Transform process on endpoint.
 	 */
-	private onTransform(): void {
-		this.operationStatus.transform.state = CHECK_ACTION.IN_PROGRESS;
-		// this.transformInProcess = true;
-		// this.transformResult = null;
-		// this.transformFileContent = null;
-		// this.importResult = null;
-		// this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
-		// 	this.transformResult = result;
-		// 	if (this.transformResult.status === 'error') {
-		// 		this.notifier.broadcast({
-		// 			name: AlertType.DANGER,
-		// 			message: this.transformResult.errors[0]
-		// 		});
-		// 	}
-		// 	this.transformInProcess = false;
-		// } );
+	protected onTransform(): void {
+		this.transformInProcess = true;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.importResult = null;
+		// ------------------------- DUMMY CODE ---------------------------------
+		this.setTransformProgressInterval();
+		// ----------------------------------------------------------------------
+		// TODO: (real code) uncomment below code when endpoints ready!
+		/*
+		this.importAssetsService.initiateTransform(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
+				this.transformProgress.progressKey = result.data.progressKey;
+				this.setTransformProgressInterval();
+			} else {
+				this.transformResult = { status: 'error', data: {}};
+			}
+		}, error => this.transformResult = { status: 'error', data: {}} );
+		*/
+	}
+
+	/**
+	 * Clears out the Transform interval loop.
+	 */
+	private clearTestScriptProgressInterval(): void {
+		clearInterval(this.transformInterval);
+		this.transformInProcess = false;
+	}
+
+	/**
+	 * Creates an interval loop to retreive Transform current progress.
+	 */
+	private setTransformProgressInterval(): void {
+		this.transformProgress.currentProgress = 1;
+		this.transformInterval = setInterval(() => {
+			this.getTransformProgress();
+		}, .5 * 1000); // 5 seconds.
+	}
+
+	/**
+	 * Operation of the Test Script interval that will be executed n times in a loop.
+	 */
+	private getTransformProgress(): void {
+		// ---------------------- DUMMY CODE -------------------------------
+		let currentProgress = this.transformProgress.currentProgress + 10;
+		this.transformProgress.currentProgress = currentProgress;
+		if (currentProgress >= 100) {
+			this.transformResult = { status: 'success', data: {}};
+			this.clearTestScriptProgressInterval();
+		}
+		// -----------------------------------------------------------------
+
+		// TODO: (real code) uncomment below code when endpoints ready!
+		/*
+		this.dataIngestionService.getJobProgress(this.transformProgress.progressKey)
+			.subscribe( (response: ApiResponseModel) => {
+				let currentProgress = response.data.percentComp;
+				this.transformProgress.currentProgress = currentProgress;
+				if (currentProgress === 100) {
+					this.transformResult = response.data.detail;
+					if (this.transformResult.status === 'error') {
+						this.notifier.broadcast({
+							name: AlertType.DANGER,
+							message: this.transformResult.errors[0]
+						});
+					}
+					this.clearTestScriptProgressInterval();
+				}
+			});
+			*/
 	}
 
 	/**
