@@ -242,7 +242,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Initial position starts with 1'
+			e.message == 'From To initial position must be >= 1'
 
 
 		when: 'The ETL script with iterate with a bigger to parameter is evaluated'
@@ -256,7 +256,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			e = thrown ETLProcessorException
-			e.message == "Invalid to parameter = 9"
+			e.message == 'From To range exceeds the overall size of list'
 
 	}
 

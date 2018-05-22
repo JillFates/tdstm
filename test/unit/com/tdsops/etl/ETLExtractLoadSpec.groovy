@@ -1368,7 +1368,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown()
-			e.message == 'A domain must be specified'
+			e.message == 'A \'domain Class\' must be specified before any load or find commands'
 
 		cleanup:
 			if(fileName){
@@ -1649,7 +1649,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'A domain must be specified'
+			e.message == 'A \'domain Class\' must be specified before any load or find commands'
 	}
 
 	void 'test can ignore even if results are empty'() {
@@ -2223,7 +2223,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid variable name: Custom Name. Valid ETL variable names must end with 'Var'".toString()
+			e.message == "Invalid variable name: Custom Name. Variable names must end with 'Var'"
 
 		cleanup:
 			if(fileName){

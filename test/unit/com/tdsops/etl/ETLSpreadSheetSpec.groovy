@@ -274,7 +274,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Sheet 10 is not found in workbook"
+			e.message == 'Sheet number 10 not found in workbook'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -299,7 +299,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Sheet 'Active Applications' is not found in workbook"
+			e.message == "Sheet 'Active Applications' not found in workbook"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -324,7 +324,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Sheet 'applications' is not found in workbook"
+			e.message == "Sheet 'applications' not found in workbook"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)

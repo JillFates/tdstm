@@ -12,7 +12,7 @@ trait RangeChecker {
         if (fromIndex < 0)
             throw ETLProcessorException.invalidRange('From To initial position must be >= 1')
         if (toIndex > size)
-            throw ETLProcessorException.invalidRange('From To range exceeds the overal size of list')
+            throw ETLProcessorException.invalidRange('From To range exceeds the overall size of list')
         if (fromIndex > toIndex)
             throw ETLProcessorException.invalidRange('From To range requires that To be >= to From')
     }
