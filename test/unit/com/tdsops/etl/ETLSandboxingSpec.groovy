@@ -121,8 +121,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 			}
 	}
