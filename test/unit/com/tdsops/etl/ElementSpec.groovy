@@ -15,15 +15,27 @@ class ElementSpec extends Specification {
 			new Element(value: strValue).left(4).value == 'Test'
 			new Element(value: strValue).right(4).value == 'ring'
 			new Element(value: strValue).middle(6, 3).value == 'Str'
+			// new Element(value: strValue).middle(16, 3).value == ''
 			new Element(value: strValue).uppercase().value == 'TEST STRING'
 			new Element(value: strValue).lowercase().value == 'test string'
 			new Element(value: strValue).replace('Test', 'Prueba').value == 'Prueba String'
-			new Element(value: strValue).replaceAll('Test ').value == 'String'
-			new Element(value: strValue).replaceFirst('t').value == 'Tes String'
-			new Element(value: strValue).replaceLast('t').value == 'Test Sring'
+			new Element(value: strValue).replaceAll('t', 'X').value == 'TesX SXring'
+			new Element(value: strValue).replaceFirst('t', 'X').value == 'TesX String'
+			new Element(value: strValue).replaceLast('t', 'X').value == 'Test SXring'
 			new Element(value: trimableStr).trim().value == 'TRIM ME'
+	}
 
-
+	void 'test Element String functions with null values' () {
+		expect:
+			new Element(value: null).left(4).value == ''
+			new Element(value: null).lowercase().value == ''
+			new Element(value: null).middle(3,5).value == ''
+			new Element(value: null).replaceAll('x','y').value == ''
+			new Element(value: null).replaceFirst('x','y').value == ''
+			new Element(value: null).replaceLast('x','y').value == ''
+			new Element(value: null).sanitize().value == ''
+			new Element(value: null).trim().value == ''
+			new Element(value: null).uppercase().value == ''
 	}
 
 	void 'test Exception if String function applied to Non String Element' () {

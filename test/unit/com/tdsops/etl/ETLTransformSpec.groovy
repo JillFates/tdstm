@@ -138,7 +138,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
 		applicationFieldsValidator = new DomainClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, 
+		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application,
 			buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
@@ -166,7 +166,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						iterate {
-							extract 'model name' transform with uppercase() 
+							extract 'model name' transform with uppercase()
 						}
 					""".stripIndent())
 
@@ -186,7 +186,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 						domain Device
 						read labels
-						iterate 
+						iterate
 							extract 'MODEL NAME' transform with unknown()
 						}
 					""".stripIndent())
@@ -206,8 +206,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						iterate {
-							extract 'model name' transform { 
-								uppercase() 
+							extract 'model name' transform {
+								uppercase()
 							}
 						}
 					""".stripIndent())
@@ -250,9 +250,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						iterate {
-							extract 'model name' transform { 
+							extract 'model name' transform {
 								lowercase()
-							}    
+							}
 						}
 					""".stripIndent())
 
@@ -297,7 +297,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					extract 'model name' transform {
 							left(4)
 						}
-					}   
+					}
 				""".stripIndent())
 
 		then: 'Every column for every row is transformed to left 4 transformation'
@@ -344,7 +344,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Initial position starts with 1'
+			e.message == 'From To initial position must be >= 1'
 	}
 
 	void 'test can transform a field value with taking middle 2 characters inside a closure'() {
@@ -358,7 +358,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with middle(3, 2) lowercase()  
+						extract 'model name' transform with middle(3, 2) lowercase()
 					}
 				""".stripIndent())
 
@@ -368,8 +368,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 1).value == "id"
 	}
 
-	void 'test can transform a field value striping first A characters'() {
-
+	void 'test can transform a field value replacing first A characters'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
@@ -379,18 +378,17 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() replaceFirst('A')
+						extract 'model name' transform with uppercase() replaceFirst('A', 'X')
 					}
 				""".stripIndent())
 
-		then: 'Every column for every row striping first "A" character'
+		then: 'The first column for every row should be uppercase and swap first "A" character with "X"'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
-			etlProcessor.getElement(1, 1).value == "ZPH MODULE"
-			etlProcessor.getElement(2, 1).value == "SLIDEWAY"
+			etlProcessor.getElement(1, 1).value == "ZPHX MODULE"
+			etlProcessor.getElement(2, 1).value == "SLIDEXWAY"
 	}
 
-	void 'test can transform a field value striping last A characters'() {
-
+	void 'test can transform a field value replacing last A characters'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
@@ -400,18 +398,17 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() replaceLast('A')
+						extract 'model name' transform with uppercase() replaceLast('A', 'X')
 					}
 				""".stripIndent())
 
-		then: 'Every column for every row striping last "A" character'
+		then: 'the first column for every row should be uppercase and last "A" character replaced with "X"'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
-			etlProcessor.getElement(1, 1).value == "ZPH MODULE"
-			etlProcessor.getElement(2, 1).value == "SLIDEAWY"
+			etlProcessor.getElement(1, 1).value == "ZPHX MODULE"
+			etlProcessor.getElement(2, 1).value == "SLIDEAWXY"
 	}
 
-	void 'test can transform a field value striping all A characters'() {
-
+	void 'test can transform a field value replacing all A characters'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
@@ -421,17 +418,17 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() replaceAll('A')
+						extract 'model name' transform with uppercase() replaceAll('A', 'X')
 					}
 				""".stripIndent())
 
 		then: 'Every column for every row striping all "A" characters'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
-			etlProcessor.getElement(1, 1).value == "ZPH MODULE"
-			etlProcessor.getElement(2, 1).value == "SLIDEWY"
+			etlProcessor.getElement(1, 1).value == "ZPHX MODULE"
+			etlProcessor.getElement(2, 1).value == "SLIDEXWXY"
 	}
 
-	void 'test can apply another transformation for a field value after striping all A characters'() {
+	void 'test can apply another transformation for a field value after replacing all A characters'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
@@ -442,14 +439,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() replaceAll('A') lowercase()
+						extract 'model name' transform with uppercase() replaceAll('A', 'X') lowercase()
 					}
 				""".stripIndent())
 
 		then: 'Every column for every row striping all "A" characters'
 			etlProcessor.getElement(0, 1).value == "srw24g1"
-			etlProcessor.getElement(2, 1).value == "slidewy"
-			etlProcessor.getElement(1, 1).value == "zph module"
+			etlProcessor.getElement(1, 1).value == "zphx module"
+			etlProcessor.getElement(2, 1).value == "slidexwxy"
 	}
 
 	void 'test can transform a field value with taking right 4 characters'() {
@@ -670,7 +667,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					read labels
 					domain Application
-								
+
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
 						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
@@ -820,10 +817,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'location' transform { 
-							lowercase() append('**') 
+						extract 'location' transform {
+							lowercase() append('**')
 						} load 'description'
-								  
+
 					}
 				""".stripIndent())
 

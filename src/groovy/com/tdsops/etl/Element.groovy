@@ -245,14 +245,14 @@ class Element implements RangeChecker {
 	/**
 	 * Replace the first string content in the element value
 	 * <code>
-	 *      load ... transformation with replaceFirst(content)
+	 *      load ... transformation with replaceFirst(content, with)
 	 * <code>
 	 * @param content
 	 * @return the element instance that received this command
 	 */
-	Element replaceFirst(String content) {
+	Element replaceFirst(String content, String with) {
 		value = transformStringObject('replaceFirst', value) {
-			it.replaceFirst(content, '')
+			it.replaceFirst(content, with)
 		}
 		return this
 	}
@@ -265,9 +265,9 @@ class Element implements RangeChecker {
 	 * @param content
 	 * @return the element instance that received this command
 	 */
-	Element replaceAll(String content) {
+	Element replaceAll(String content, String with) {
 		value = transformStringObject('replaceAll', value) {
-			it.replaceAll(content, '')
+			it.replaceAll(content, with)
 		}
 		return this
 	}
@@ -280,9 +280,9 @@ class Element implements RangeChecker {
 	 * @param content
 	 * @return the element instance that received this command
 	 */
-	Element replaceLast(String content) {
+	Element replaceLast(String content, String with) {
 		value = transformStringObject('replaceLast', value) {
-			it.reverse().replaceFirst(content, '').reverse()
+			it.reverse().replaceFirst(content, with).reverse()
 		}
 
 		return this

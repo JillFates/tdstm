@@ -10,11 +10,11 @@ trait RangeChecker {
      */
     def subListRangeCheck (int fromIndex, int toIndex, int size) {
         if (fromIndex < 0)
-            throw ETLProcessorException.invalidRange('Initial position starts with 1')
+            throw ETLProcessorException.invalidRange('From To initial position must be >= 1')
         if (toIndex > size)
-            throw ETLProcessorException.invalidRange('Invalid to parameter = ' + (toIndex + 1))
+            throw ETLProcessorException.invalidRange('From To range exceeds the overal size of list')
         if (fromIndex > toIndex)
-            throw ETLProcessorException.invalidRange('Invalid range of parameter, from ' + (fromIndex + 1) + " > to " + (toIndex + 1) + "")
+            throw ETLProcessorException.invalidRange('From To range requires that To be >= to From')
     }
 
     /**
