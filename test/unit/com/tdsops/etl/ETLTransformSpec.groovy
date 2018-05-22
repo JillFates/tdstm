@@ -17,11 +17,9 @@ import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import spock.lang.Shared
-
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -652,10 +650,110 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 				""".stripIndent())
 
-		then: 'The column is trsanlated for every row'
+		then: 'The column is translated for every row'
 			etlProcessor.getElement(0, 3).value == "Production"
 			etlProcessor.getElement(1, 3).value == "Production"
 			etlProcessor.getElement(2, 3).value == "Development"
+	}
+
+	void 'test can translate an extracted value using a dictionary and a default value'() {
+		given: 'A simple CSV DataSet  '
+			String sampleData = """
+				name,model
+				xraysrv01,ProLiant BL460c Gen8
+				zulu,A Unknown Model
+			""".stripIndent()
+
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(sampleData)
+
+		and: "A DataScript using 'substitute' with and without a default value"
+			String dataScript = """
+				domain Device
+				Map modelsAssetTypes = [
+					'ProLiant BL460c Gen8': 'Blade',
+					'ProLiant BL460c Gen9': 'Blade',
+					'ProLiant DL380 Gen9': 'Server',
+					'UCSB-B200-M3': 'Blade',
+					'PowerEdge R710': 'Server'
+				]
+				read labels
+				iterate {
+					extract 'name' load 'Name'
+					extract 'model' transform with substitute(modelsAssetTypes) load 'custom1'
+					extract 'model' transform with substitute(modelsAssetTypes, 'VM') load 'custom2'
+				}
+				""".stripIndent()
+		and: 'A new ETLProcessor instantiated appropriately configured'
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+		when: 'Evaluating a DataScript with having substitute with default value'
+			etlProcessor.evaluate(dataScript)
+		then: 'The evaluate process completed successfully replacing using the default value for custom2 where applicable.'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					with(data[0]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'xraysrv01'
+							value == 'xraysrv01'
+							init == null
+							errors == []
+							warn == false
+						}
+						with(fields.custom1) {
+							originalValue == 'ProLiant BL460c Gen8'
+							value == 'Blade'
+							init == null
+							errors == []
+							warn == false
+						}
+						with(fields.custom2) {
+							originalValue == 'ProLiant BL460c Gen8'
+							value == 'Blade'
+							init == null
+							errors == []
+							warn == false
+						}
+					}
+
+					with(data[1]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == 'zulu'
+							init == null
+							errors == []
+							warn == false
+						}
+						with(fields.custom1) {
+							originalValue == 'A Unknown Model'
+							value == 'A Unknown Model'
+							init == null
+							errors == []
+							warn == false
+						}
+						with(fields.custom2) {
+							originalValue == 'A Unknown Model'
+							value == 'VM'
+							init == null
+							errors == []
+							warn == false
+						}
+					}
+				}
+			}
 	}
 
 	void 'test can plus strings, current element and a defined variable in a transformation using local variables'() {

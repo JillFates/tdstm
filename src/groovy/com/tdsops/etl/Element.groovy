@@ -187,6 +187,26 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Translate an element value using dictionary Map and a default value in case the requested key is not found.
+	 * <code>
+	 *      dictionary = [prod: 'Production', dev: 'Development']
+	 *      load ... transformation with substitute(dictionary, 'someDefaultValue')
+	 * <code>
+	 *
+	 * @param dictionary
+	 * @param defaultValue
+	 * @return the element instance that received this command
+	 */
+	Element substitute(def dictionary, defaultValue) {
+		if (dictionary.containsKey(value)) {
+			value = dictionary[value]
+		} else {
+			value = defaultValue
+		}
+		return this
+	}
+
+	/**
 	 * Transform current value in this Element instance to a Long number
 	 * <code>
 	 *      load ... transformation with toLong()
