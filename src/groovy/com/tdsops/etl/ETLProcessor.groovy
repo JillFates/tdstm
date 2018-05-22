@@ -207,6 +207,13 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
+	 * Traps invalid domain command when a String parameter is passed
+	 */
+	ETLProcessor domain (String anything) {
+		throw ETLProcessorException.invalidDomainComand()
+	}
+
+	/**
 	 * Read Labels from source of data
 	 * @param reservedWord
 	 * @return the current instance of ETLProcessor

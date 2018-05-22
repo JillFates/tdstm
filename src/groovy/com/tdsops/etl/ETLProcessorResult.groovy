@@ -165,7 +165,7 @@ class ETLProcessorResult {
 	 *
 	 */
 	Object getFieldValue(String fieldName){
-		if(resultIndex >= 0){
+		if (resultIndex >= 0) {
 			RowResult row = currentRow()
 			if(!row.fields.containsKey(fieldName)) {
 				throw ETLProcessorException.unknownDomainProperty(fieldName)

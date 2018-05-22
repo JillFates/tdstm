@@ -56,7 +56,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException unknownTransformation (String name) {
-        new ETLProcessorException("Unknown transformation: $name".toString())
+        new ETLProcessorException("Invalid transformation method '$name'".toString())
     }
 
     static ETLProcessorException invalidConsoleStatus (String status) {
@@ -68,11 +68,11 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException incorrectAmountOfParameters (List<String> fields, List values) {
-        new ETLProcessorException("Incorrect amount of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]".toString())
+        new ETLProcessorException("Incorrect number of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]".toString())
     }
 
     static ETLProcessorException nonProjectDefined () {
-        new ETLProcessorException('Project not defined.')
+        new ETLProcessorException('No project selected in the user context')
     }
 
     static ETLProcessorException invalidRange (String message) {
@@ -136,11 +136,11 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidSheetName (String sheetName) {
-        new ETLProcessorException("Sheet '$sheetName' is not found in workbook".toString())
+        new ETLProcessorException("Sheet '$sheetName' not found in workbook".toString())
     }
 
     static ETLProcessorException invalidSheetNumber (Integer sheetNumber) {
-        new ETLProcessorException("Sheet $sheetNumber is not found in workbook".toString())
+        new ETLProcessorException("Sheet number $sheetNumber not found in workbook".toString())
     }
 
     static ETLProcessorException invalidExcelDriver () {
@@ -148,7 +148,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidETLVariableName (String variableName) {
-        new ETLProcessorException("Invalid variable name: ${variableName}. Valid ETL variable names must end with 'Var'".toString())
+        new ETLProcessorException("Invalid variable name: ${variableName}. Variable names must end with 'Var'".toString())
     }
 
     static final String missingPropertyExceptionMessage = "No such property: variableName"
@@ -166,7 +166,7 @@ class ETLProcessorException extends GroovyRuntimeException {
      * @return
      */
     static ETLProcessorException domainMustBeSpecified () {
-        new ETLProcessorException('A domain must be specified')
+        new ETLProcessorException('A \'domain Class\' must be specified before any load or find commands')
     }
 
     /**
@@ -174,7 +174,7 @@ class ETLProcessorException extends GroovyRuntimeException {
      * @return
      */
     static ETLProcessorException invalidDomainComand() {
-        new ETLProcessorException('Incorrect use of "domain" command. Use: "domain Application" or "domain Application as newer"')
+        new ETLProcessorException('Invalid class specified for domain command. Usage: domain Classname')
     }
 
     static ETLProcessorException invalidReplaceCommand() {
@@ -182,11 +182,11 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException ignoreOnlyAllowOnNewRows() {
-        new ETLProcessorException("Ignore only allow on new rows")
+        new ETLProcessorException('ignore command only when processing new rows')
     }
 
     static ETLProcessorException domainOnlyAllowOnNewRows() {
-        new ETLProcessorException("DOMAIN only after the first row")
+        new ETLProcessorException('DOMAIN variable only available after load commands')
     }
 
 }
