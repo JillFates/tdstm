@@ -345,13 +345,16 @@
 								</td>
 								<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 									<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
+										<tds-combobox-group
+												[people]="${personList as JSON}"
+												[team]="${availableRoles as JSON}"></tds-combobox-group>
 
 								   %{--<g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>--}%
-
-									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
+								%{--	<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
-										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
+										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed--}%
+
 									</tdsAngular:tooltipSpan>
 								</td>
 
@@ -372,11 +375,12 @@
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
 
 								   %{--<g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>--}%
-
+%{--
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
 										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
+									--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -387,13 +391,17 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.testingBy}">
+									<tds-combobox-group
+											[people]="${personList as JSON}"
+											[team]="${availableRoles as JSON}"></tds-combobox-group>
 
 								  %{--<g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>--}%
 
-									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
+									%{--<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
-										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
+										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed--}%
+
 								</tdsAngular:tooltipSpan>
 								</td>
 

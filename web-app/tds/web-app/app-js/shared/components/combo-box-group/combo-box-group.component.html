@@ -1,56 +1,30 @@
-<!--<div>-->
-
-<kendo-combobox #innerComboBoxGroup
-                [data]="data"
-                [(ngModel)]="model"
-                [textField]="'text'"
-                [valueField]="'id'"
-                [filterable]="true"
-                (filterChange)="handleFilter($event)"
-                [popupSettings]="{popupClass: 'group-combo'}"
-                name="comboGroup"
-                style="width: 100%;">
-    <ng-template kendoComboBoxItemTemplate let-dataItem>
-        <div class="sme-group" *ngIf="dataItem.category === CATEGORY_BY_REFERENCE">
-            {{dataItem.text}}
-            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 0 }">{{ dataItem.category }}</span>
-        </div>
-
-        <div class="team-group" *ngIf="dataItem.category === CATEGORY_BY_TEAM" >
-            {{dataItem.text}}
-            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 0 }">{{ dataItem.category }}</span>
-        </div>
-
-        <div class="person-group" *ngIf="dataItem.category === CATEGORY_BY_NAMED_STAFF" >
-            {{dataItem.text}}
-            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 0 }">{{ dataItem.category }}</span>
-        </div>
-    </ng-template>
-</kendo-combobox>
-
-<!--</div>-->
-
-<!--
-<kendo-combobox #innerComboBoxGroup
-                [data]="datasource"
-                [(ngModel)]="model"
-                [textField]="'text'"
-                [valueField]="'id'"
-                [filterable]="true"
-                name="testName"
-                style="width: 100%;">
-</kendo-combobox>
--->
-
-
-<!--(valueChange)="onValueChange($event)"-->
-<!--(selectionChange)="onSelectionChange($event)"-->
-<!--(filterChange)="onFilterChange($event)"-->
-<!--(open)="onOpen()"-->
-<!--(close)="onClose()"-->
-<!--(focus)="onFocus()"-->
-<!--(blur)="onBlur()"-->
-<!--[suggest]="true"-->
-<!--[disabled]="disabled"-->
-<!--required="required"-->
-<!--[placeholder]="placeholder"-->
+<div style="width: 100%;display:flex;">
+    <kendo-combobox #innerComboBoxGroup
+                        [data]="data"
+                        style="width: 70%"
+                        [(ngModel)]="model"
+                        [textField]="'text'"
+                        [valueField]="'id'"
+                        [filterable]="true"
+                        (filterChange)="handleFilter($event)"
+                        [popupSettings]="{popupClass: 'combo-group-open'}"
+                        name="comboGroup">
+            <ng-template kendoComboBoxItemTemplate let-dataItem>
+                <div *ngIf="dataItem.category === CATEGORY_BY_REFERENCE" >
+                    <div class="combo-group-category" *ngIf="dataItem.index === 0">{{ dataItem.category }}</div>
+                    <div class="combo-group-item">{{dataItem.text}}</div>
+                </div>
+                <div *ngIf="dataItem.category === CATEGORY_BY_TEAM" >
+                    <div class="combo-group-category" *ngIf="dataItem.index === 0">{{ dataItem.category }}</div>
+                    <div class="combo-group-item">{{dataItem.text}}</div>
+                </div>
+                <div *ngIf="dataItem.category === CATEGORY_BY_NAMED_STAFF" >
+                    <div class="combo-group-category" *ngIf="dataItem.index === 0">{{ dataItem.category }}</div>
+                    <div class="combo-group-item">{{dataItem.text}}</div>
+                </div>
+            </ng-template>
+    </kendo-combobox>
+    <div>
+        <label><input type="checkbox" /> Fixed</label>
+    </div>
+</div>
