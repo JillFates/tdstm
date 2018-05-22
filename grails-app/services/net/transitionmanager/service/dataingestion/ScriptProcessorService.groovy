@@ -88,7 +88,7 @@ class ScriptProcessorService {
      * using a project as a reference and a file as an input of the ETL content data
      * @param project
      * @param scriptContent
-     * @param fileName
+     * @param filename
      * @return a map with isValid boolean result, the console output log and ETLProcessor data results
      */
     Map<String, ?> testScript(Project project, String scriptContent, String filename, String progressKey = null) {
@@ -168,12 +168,12 @@ class ScriptProcessorService {
      *}* </code>
      * @param project
      * @param scriptContent
-     * @param fileName
+     * @param filename
      * @return a map with validSyntax boolean result and a list with map erros
      */
-    Map<String, ?> checkSyntax (Project project, String scriptContent, String fileName) {
+    Map<String, ?> checkSyntax (Project project, String scriptContent, String filename) {
 
-	    Dataset dataset = FileSystemService.buildDataset(fileName)
+	    Dataset dataset = FileSystemService.buildDataset(filename)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
@@ -212,7 +212,7 @@ class ScriptProcessorService {
 	 * Schedule a quartz job for the test ETL transform data process
 	 * @param project - user's current project
 	 * @param command - test ETL script and temporary data file name
-	 * @return
+	 * @return Map - containing the progress key created to monitor the job execution progress
 	 */
 	Map<String, String> scheduleTestScript(Project project, DataScriptValidateScriptCommand command) {
 
@@ -228,18 +228,14 @@ class ScriptProcessorService {
 		os.close()
 
 		// create progress key
-		String key = 'ETL-Transform-Data-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
+		String key = 'ETL-Transform-Data-' + scriptFilename + '-' + StringUtil.generateGuid()
 		progressService.create(key, ProgressService.PENDING)
 
 		// Kickoff the background job to generate the tasks
-		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + scriptFilename
+		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
 
 		// The triggerName/Group will allow us to controller on import
-		Date startTime = new Date(System.currentTimeMillis() + 2000)
-		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-
-		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-		Trigger trigger = new SimpleTriggerImpl(jobTriggerName, null, startTime)
+		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
 		trigger.jobDataMap.projectId = project.id
 		trigger.jobDataMap.scriptFilename = scriptFilename
 		trigger.jobDataMap.filename = command.filename
