@@ -11,12 +11,12 @@ class ProvidersDetailPage extends Page{
     }
 
     static content = {
-        providerDetailHeader(required:false , wait:true) { $('div.modal-header h4[_ngcontent-c6]')}
-        providerName  { $("div" ,  class:"col-sm-9").find("label" , class:"control-label label-detail")[0]}
-        providerDesc  { $("div" ,  class:"col-sm-9").find("label" , class:"control-label label-detail")[1]}
-        editBtn       {$("button", class:"btn btn-primary pull-left" , type:"button")}
-        deleteBtn     {$("button", class:"btn btn-danger")}
-        closeXIcon     {$("button", "aria-label":"Close" , class:"close" , type:"button").find("span", "aria-hidden":"true")[0]}
+        providerDetailHeader(required:false , wait:true) { $('div.modal-header h4[_ngcontent-c7]')}
+        providerName { $("div" ,  class:"col-sm-9").find("label" , class:"control-label label-detail")[0]}
+        providerDesc { $("div" ,  class:"col-sm-9").find("label" , class:"control-label label-detail")[1]}
+        editBtn {$("button", class:"btn btn-primary pull-left" , type:"button")}
+        deleteBtn {$("button", class:"btn btn-danger")}
+        closeXIcon {$("button", "aria-label":"Close" , class:"close" , type:"button").find("span", "aria-hidden":"true")[0]}
     }
 
 }

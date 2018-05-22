@@ -21,6 +21,7 @@ class ProviderCreationSpec extends GebReportingSpec{
     static provName = randStr + E2E + " Name"
     static provDescription = randStr + E2E + " Description"
     static provComment = randStr + E2E + " Comment"
+    static provDate = ""
 
 
     def setupSpec() {
@@ -86,18 +87,20 @@ class ProviderCreationSpec extends GebReportingSpec{
         //This is to make sure that if 2 different providers start with the same characters,
         //we get exactly the one we just created.
             waitFor {nameFilter == provName}
+            provDate = firstProviderDate.text()
 
         then: 'The provider is displayed and we verify that it is the same we just created'
             firstProviderName.text() == provName
-
     }
 
-    def "5. Search the Provider by description"(){
+    def "5. Filter providers by date and description"(){
         testKey = "TM-XXXX"
         given: 'The user is still on the Providers page'
             at ProvidersPage
-        when: 'The user cleans the name filter'
-            nameFilter = ""
+        when: 'The user filters by the date of the last created provider'
+            //This is necessary to handle Kendo date format
+            provDate = provDate.replace("/",".")
+            dateFilter.value(provDate)
         and: 'The user clicks the Description filter'
             waitFor{descriptionFilter.click()}
         and: 'Filters by the Description'
@@ -106,7 +109,6 @@ class ProviderCreationSpec extends GebReportingSpec{
 
         then: 'The provider is displayed and we verify that it is the same we just created'
             firstProviderDesc.text() == provDescription
-
     }
 
     def "6. Refresh the table and verify the element we just created is still present"(){
@@ -118,7 +120,6 @@ class ProviderCreationSpec extends GebReportingSpec{
 
         then: 'We verify that the latest provider is still displayed'
             waitFor{firstProviderDesc.text() == provDescription}
-
     }
 
     def "7. Verify the opened provider is the one we created"(){
@@ -133,7 +134,6 @@ class ProviderCreationSpec extends GebReportingSpec{
         and: 'We verify that the details match with the element we created'
             providerDesc.text() == provDescription
             providerName.text() == provName
-
     }
 
     def "8. We close the pop up and verify we land on the Providers Page"(){
@@ -145,7 +145,6 @@ class ProviderCreationSpec extends GebReportingSpec{
 
         then:'We are back to the Providers Page'
             at ProvidersPage
-
     }
 
     def "9. We click the Asc/Desc option for any column and verify the provider is still displayed"(){
@@ -157,7 +156,6 @@ class ProviderCreationSpec extends GebReportingSpec{
 
         then: 'The provider is displayed and we verify that it is the same we just created'
             firstProviderName.text() == provName
-
     }
 
 }

@@ -18,10 +18,10 @@ class CreateProviderPage extends Page{
         providerName { $("label", for:"providerName")}
         providerDesc { $("label", for:"providerDescription")}
         providerComment { $("label", for:"providerComment")}
-        providerNameField   { $('input#providerName')}
-        providerDescField   { $('input#providerDescription')}
-        providerCommentField   { $('textarea#providerComment')}
-        provSaveBtn  { $("button", class:"btn btn-primary pull-left", type:"button")}
+        providerNameField { $('input#providerName')}
+        providerDescField { $('input#providerDescription')}
+        providerCommentField { $('textarea#providerComment')}
+        provSaveBtn { $("button", class:"btn btn-primary pull-left", type:"button")}
     }
 
 }
