@@ -15,6 +15,7 @@ import net.transitionmanager.service.MetricReportingService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared
+import spock.lang.See
 import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
 
@@ -191,6 +192,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				label     : 'Unassigned:Server',
 				value     : 2
 			]
+
 			results[1] == [
 				projectId : otherProject.id,
 				metricCode: 'APP-VPS',
@@ -200,7 +202,42 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			]
 	}
 
-	void "test gatherMetric for TM-10662 filtering out non-planning assets"() {
+	@See('TM-10727')
+	void 'test gatherMetric for query mode filtering of Device'() {
+			setup: 'giving a metric definition for a query, that will have results'
+				String date = (new Date() - 1).format('yyyy-MM-dd')
+				JSONObject metricDefinition = [
+					"metricCode" : "DEV-COUNT",
+					"description": "Device counts metrics",
+					"enabled"    : true,
+					"mode"       : "query",
+					"query"      : [
+						"domain"     : "Device",
+						"aggregation": "count(*)"
+					]
+				] as JSONObject
+			when: 'running gatherMetrics using query mode definition'
+				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+			then: 'two map results with expect counts of JUST devices and no applications'
+				results[0] == [
+					projectId : project.id,
+					metricCode: 'DEV-COUNT',
+					date      : date,
+					label     : 'count',
+					value     : 2
+				]
+
+				results[1] == [
+					projectId : otherProject.id,
+					metricCode: 'DEV-COUNT',
+					date      : date,
+					label     : 'count',
+					value     : 1
+				]
+	}
+
+	@See('TM-10662')
+	void "test gatherMetric for filtering out non-planning assets"() {
 		setup: 'giving a metric definition for a query, that will have results'
 			String date = (new Date() - 1).format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
@@ -227,7 +264,8 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			]
 	}
 
-	void "test gatherMetric for TM-10647 query Dependency"() {
+	@See('TM-10647')
+	void "test gatherMetric for query Dependency"() {
 		setup: 'giving a metric definition for a query, that will have results'
 			String date = (new Date() - 1).format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
@@ -298,14 +336,14 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				enabled    : true,
 				mode       : "sql",
 				sql        : """
-						select a.project_id as projectId,
-								'APP-VPS' as metricCode,
-								DATE_FORMAT(SUBDATE(NOW(), 1), "%Y-%m-%d") as date,
-								concat(a.plan_status, ':', a.asset_type) as label,
-								count(*) as value
-						from asset_entity a
-						join move_bundle m on m.move_bundle_id=a.move_bundle_id
-						where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+					select a.project_id as projectId,
+						'APP-VPS' as metricCode,
+						DATE_FORMAT(SUBDATE(NOW(), 1), "%Y-%m-%d") as date,
+						concat(a.plan_status, ':', a.asset_type) as label,
+						count(*) as value
+					from asset_entity a
+					join move_bundle m on m.move_bundle_id=a.move_bundle_id
+					where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
 					group by a.plan_status, a.asset_type, a.project_id
 					order by a.project_id, a.plan_status, a.asset_type;
 					""".stripIndent().toString()

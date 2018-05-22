@@ -61,12 +61,12 @@
                                     </td>
                                     <td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}">
                                         <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationSource}">
-                                            ${assetEntity.sourceLocation}
+                                            ${assetEntity.sourceLocationName}
                                         </tdsAngular:tooltipSpan>
                                     </td>
                                     <td class="valueNW nonVMLabel ${standardFieldSpecs.locationTarget.imp?:''}">
                                         <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationTarget}">
-                                            ${assetEntity.targetLocation}
+                                            ${assetEntity.targetLocationName}
                                         </tdsAngular:tooltipSpan>
                                     </td>
 

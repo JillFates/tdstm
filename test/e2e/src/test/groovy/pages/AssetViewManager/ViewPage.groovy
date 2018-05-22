@@ -17,6 +17,7 @@ class ViewPage extends Page{
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
         commonsModule { module CommonsModule }
+        viewMgrBreadCrumb {$('a.font-weight-bold')}
     }
 
     def verifyViewTitle(title) {
@@ -27,6 +28,10 @@ class ViewPage extends Page{
         waitFor{exportModalContainer.isDisplayed()}
     }
 
+
+    def clickViewManagerBreadCrumb(){
+        viewMgrBreadCrumb.click()
+    }
     def waitForHiddenModalContainer(){
         waitFor{!exportModalContainer.isDisplayed()}
     }
