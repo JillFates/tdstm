@@ -12,6 +12,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	@Input('model') model: any;
 	@Input('people') people: any;
 	@Input('team') team: any;
+	@Input('isFixed') isFixed: number;
 
 	readonly CATEGORY_BY_REFERENCE = 'By Reference';
 	readonly CATEGORY_BY_TEAM = 'Team';

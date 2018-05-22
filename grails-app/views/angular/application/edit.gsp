@@ -346,6 +346,7 @@
 								<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 									<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 										<tds-combobox-group
+											    [isFixed]="${asset.shutdownFixed}"
 												[people]="${personList as JSON}"
 												[team]="${availableRoles as JSON}"></tds-combobox-group>
 
@@ -371,6 +372,7 @@
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupBy}">
 									<tds-combobox-group
+											[isFixed]="${asset.startupFixed}"
 											[people]="${personList as JSON}"
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
 
@@ -392,6 +394,7 @@
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.testingBy}">
 									<tds-combobox-group
+											[isFixed]="${asset.testingFixed}"
 											[people]="${personList as JSON}"
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
 
