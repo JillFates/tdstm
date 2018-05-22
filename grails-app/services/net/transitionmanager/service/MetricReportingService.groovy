@@ -201,7 +201,8 @@ class MetricReportingService {
 	 * @return The list of where definitions.
 	 */
 	List<Map> processWheres(List<Map> whereDefinitions, Class domainClass, ETLDomain originalDomain) {
-		if(originalDomain == ETLDomain.Device){
+		if (originalDomain == ETLDomain.Device) {
+			// Need to exclude Application, Database and Storage (aka Files)
 			whereDefinitions << [column: 'assetClass', expression: "= '${AssetClass.DEVICE.name()}'"]
 		}
 
