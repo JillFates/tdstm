@@ -309,14 +309,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *
 	 * @param rows
 	 * @param closure
-	 * @return the ETLProcesor instance
+	 * @return the ETLProcessor instance
 	 * @see ETLBinding#getVariable(java.lang.String)
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
 		currentRowIndex = 1
-
-		startIterate(rows.size())
 		rows.each { def row ->
 			isIterating = true
 			currentColumnIndex = 0
@@ -328,12 +326,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			closure(addCrudRowData(row))
 
 			result.removeIgnoredRows()
-
 			bottomOfIterate(currentRowIndex, rows.size())
 			binding.removeAllDynamicVariables()
 			currentRowIndex++
 		}
-		iterationFinished(rows.size())
+		finishIterate()
 		isIterating = false
 		currentRowIndex--
 		return this
@@ -1161,6 +1158,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		prepareProgressIndicator(script, progressCallback)
+		scriptStarted(this.dataSetFacade.fileName())
 		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
 			.evaluate(script,ETLProcessor.class.name)
 		scriptFinished(this.dataSetFacade.fileName())

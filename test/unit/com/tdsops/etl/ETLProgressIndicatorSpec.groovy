@@ -16,13 +16,14 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
-import static com.tdsops.etl.ProgressCallback.ProgressStatus.ERROR
-import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
+import spock.lang.See
 
+import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
+import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
 @TestFor (FileSystemService)
 @Mock ([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
+@See ('TM-10744')
 class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	Project GMDEMO
@@ -116,13 +117,13 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 1
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
+			1 * callback.reportProgress(0, true, RUNNING, fileName)
 
 		and:
-			1 * callback.reportProgress(50, true, RUNNING, '')
+			1 * callback.reportProgress(50, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			1 * callback.reportProgress(100, false, RUNNING, '')
 
 		and:
 			1 * callback.reportProgress(100, true, COMPLETED, fileName)
@@ -159,6 +160,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 				iterate {
 					extract 'name' load 'assetName'
 				}
+				
 				domain Application
 				iterate {
 					extract 'name' load 'assetName'
@@ -167,22 +169,22 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 				callback)
 
 		then: 'It calculates correctly the total amount of iterate commands'
-			etlProcessor.numberOfIterateLoops == 1
+			etlProcessor.numberOfIterateLoops == 2
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
+			1 * callback.reportProgress(0, true, RUNNING, fileName)
 
 		and:
-			1 * callback.reportProgress(25, true, RUNNING, '')
+			1 * callback.reportProgress(25, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(50, true, RUNNING, '')
+			1 * callback.reportProgress(50, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(75, true, RUNNING, '')
+			1 * callback.reportProgress(75, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			1 * callback.reportProgress(100, false, RUNNING, '')
 
 		and:
 			1 * callback.reportProgress(100, true, COMPLETED, fileName)

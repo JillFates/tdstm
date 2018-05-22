@@ -1,18 +1,29 @@
 package com.tdsops.etl
 
 /**
- * @see ( ' T M - 1 0 7 4 4 ' )
- *
  * ETLProcessor Reporting Percentage Complete.
- * <p>Perhaps the most complicated will be to determine the % complete. An accurate determination of % complete is impossible because a script can have multiple iterations; can switch between sheets; and not all is known at the start of the process. Therefore the logic is going to perform a simplistic approach which is:</p>
- *
- *
+ * <p>Perhaps the most complicated will be to determine the % complete.
+ * An accurate determination of % complete is impossible because a script can have multiple iterations;
+ * can switch between sheets; and not all is known at the start of the process.
+ * Therefore the logic is going to perform a simplistic approach which is:</p>
  */
 trait ProgressIndicator {
 
+	/**
+	 * Interface implementation used to report progress.
+	 * It is loaded first in prepareProgressIndicator method
+	 * @see ProgressIndicator#prepareProgressIndicator(java.lang.String, com.tdsops.etl.ProgressCallback)
+	 * @see ProgressCallback
+	 */
 	ProgressCallback progressCallback
+	/**
+	 * The total number of iterations loops used in an ETL Script
+	 */
 	Integer numberOfIterateLoops
-	Integer iterateCounter = 0
+	/**
+	 * Counter incremented each iteration complete
+	 */
+	Integer iterateCounter
 	/**
 	 * Prepare script progress indicator using a closure
 	 * and an ETL script content
@@ -22,7 +33,6 @@ trait ProgressIndicator {
 	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
 		progressCallback = aProgressCallback
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
-		numberOfIterateLoops = 0
 		iterateCounter = 0
 	}
 
@@ -46,7 +56,7 @@ trait ProgressIndicator {
 		String detail = '') {
 
 		if (progressCallback){
-			Integer percentage = (100 * currentRow / totalRows * numberOfIterateLoops).intValue()
+			Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
 			progressCallback.reportProgress(percentage, forceReport, status, detail)
 		}
 	}
@@ -80,29 +90,28 @@ trait ProgressIndicator {
 	 * @param totalRows
 	 */
 	void bottomOfIterate(Integer currentRow, Integer totalRows) {
-		reportProgress(currentRow, totalRows, true, ProgressCallback.ProgressStatus.RUNNING, '')
+		reportProgress(currentRow, totalRows, false, ProgressCallback.ProgressStatus.RUNNING, '')
 	}
 
 	/**
 	 * This method will be a call to reportProgress with the current row # and total rows for the dataset.
-	 * @param currentRow
-	 * @param totalRows
 	 */
-	void startIterate(Integer totalRows) {
+	void finishIterate() {
 		iterateCounter += 1
-		Integer current = numberOfIterateLoops * iterateCounter
-		Integer total = totalRows * numberOfIterateLoops * iterateCounter
-		reportProgress(current, total, true, ProgressCallback.ProgressStatus.RUNNING, '')
 	}
 
 	/**
-	 *
+	 * Reporting Success.
+	 *  In this method the following call should be made to indicate to the Progress Service
+	 *  that the ETL process has completed
+	 * @param filename
 	 */
-	void iterationFinished(Integer totalRows) {
-		Integer current = totalRows
-		Integer total = totalRows * numberOfIterateLoops * iterateCounter
-		reportProgress(current, total, true, ProgressCallback.ProgressStatus.RUNNING, '')
+	void scriptStarted(String filename) {
+		if (progressCallback){
+			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, filename)
+		}
 	}
+
 	/**
 	 * Reporting Success.
 	 *  In this method the following call should be made to indicate to the Progress Service
@@ -110,7 +119,9 @@ trait ProgressIndicator {
 	 * @param filename
 	 */
 	void scriptFinished(String filename) {
-		reportProgress(1, 1, true, ProgressCallback.ProgressStatus.COMPLETED, filename)
+		if (progressCallback){
+			progressCallback.reportProgress(100, true, ProgressCallback.ProgressStatus.COMPLETED, filename)
+		}
 	}
 
 	/**
