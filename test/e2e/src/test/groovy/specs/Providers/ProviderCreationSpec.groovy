@@ -97,7 +97,10 @@ class ProviderCreationSpec extends GebReportingSpec{
         testKey = "TM-XXXX"
         given: 'The user is still on the Providers page'
             at ProvidersPage
-        when: 'The user filters by the date of the last created provider'
+        when: 'The user clears the Name filter'
+            nameFilter = ""
+            waitFor {nameFilter == ""}
+        and: 'The user filters by the date of the last created provider'
             //This is necessary to handle Kendo date format
             provDate = provDate.replace("/",".")
             dateFilter.value(provDate)
