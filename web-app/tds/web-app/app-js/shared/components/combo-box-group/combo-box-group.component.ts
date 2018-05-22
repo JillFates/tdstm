@@ -27,7 +27,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 				{ id: '##Owner', text: 'Owner' }
 			];
 		const people = this.people.map( (item) => ({ id: item.personId, text: item.fullName }));
-		const team = this.team.map( (item) => ({ id: item.id, text: item.description }));
+		const team = this.team.map( (item) => ({ id: `@${item.id}`, text: item.description }));
 
 		this.source = this.source.concat( this.addCategoryToArray(sme, this.CATEGORY_BY_REFERENCE) );
 		this.source = this.source.concat( this.addCategoryToArray(people, this.CATEGORY_BY_TEAM) );
@@ -50,5 +50,9 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	setIndex(data: any[], key: string): any[] {
 		return data.filter((item) => item.category === key)
 			.map((item, index) => ({...item, index}) );
+	}
+
+	isTeamItemSelected(): boolean {
+		return this.model && this.model.toString().startsWith('@');
 	}
 }
