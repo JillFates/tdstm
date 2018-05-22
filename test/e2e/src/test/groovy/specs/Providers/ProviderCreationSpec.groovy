@@ -111,7 +111,7 @@ class ProviderCreationSpec extends GebReportingSpec{
             waitFor {descriptionFilter == provDescription}
 
         then: 'The provider is displayed and we verify that it is the same we just created'
-            firstProviderDesc.text() == provDescription
+            firstProviderDesc.text() == provDescription 
     }
 
     def "6. Refresh the table and verify the element we just created is still present"(){
