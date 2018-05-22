@@ -10,7 +10,7 @@
 	#select2-drop{ width: 200px !important; }
 </style>
 
-<div class="modal-content tds-angular-component-content">
+<div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
 				aria-hidden="true">×</span></button>

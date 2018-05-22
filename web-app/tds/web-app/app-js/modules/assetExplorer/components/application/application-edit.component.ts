@@ -110,6 +110,13 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				}).catch((error) => console.log(error));
 		}
 
+		/***
+		 * Close the Active Dialog
+		 */
+		cancelCloseDialog(): void {
+			this.activeDialog.close();
+		}
+
 	}
 
 	return ApplicationShowComponent;
