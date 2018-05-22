@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
@@ -76,7 +76,7 @@ export class AssetExplorerService {
 					throw new Error(result.errors.join(';'));
 				}
 			})
-			.do(null, err => console.log(err));
+			.catch((error: any) => error.json());
 	}
 
 	saveReport(model: ViewModel): Observable<ViewModel> {

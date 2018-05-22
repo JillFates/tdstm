@@ -6,7 +6,8 @@ const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
 const pkg = require('./package.json');  //loads npm config file
 const helpers = require('./server-utils/helpers');
-// let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
 
@@ -18,7 +19,7 @@ module.exports = function (env) {
 		mode: 'production',
 		entry: {
 			app: './web-app/app-js/main.ts',
-			vendor: Object.keys(pkg.dependencies) //get npm vendors deps from config
+			polyfills: './web-app/app-js/polyfills.ts',
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
@@ -29,7 +30,7 @@ module.exports = function (env) {
 				{test: /\.tsx?$/, loader: 'ts-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
-				{ test: /[\/\\]@angular[\/\\].+\.js$/, parser: { system: true } },
+				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
 		resolve: {
@@ -43,18 +44,30 @@ module.exports = function (env) {
 			new webpack.ContextReplacementPlugin(
 				/\@angular(\\|\/)core(\\|\/)esm5/,
 				path.resolve(__dirname, "app-js")
-			)
+			),
 			// Uncomment if you want to take a peek to the structure of dependencies
 			// new BundleAnalyzerPlugin()
 		],
 		optimization: {
+			minimizer: [
+				new UglifyJSPlugin({
+					sourceMap: true,
+					uglifyOptions: {
+						compress: {
+							inline: false
+						}
+					}
+				})
+			],
+			runtimeChunk: false,
 			splitChunks: {
-				name: true,
 				cacheGroups: {
+					default: false,
 					commons: {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
-						chunks: "all"
+						chunks: 'all',
+						minChunks: 2
 					}
 				}
 			}
