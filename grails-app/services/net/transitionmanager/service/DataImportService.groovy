@@ -1905,7 +1905,7 @@ class DataImportService implements ServiceMethods {
 	 * @param project
 	 * @param dataScriptId
 	 * @param filename
-	 * @return
+	 * @return Map - containing the progress key created to monitor the job execution progress
 	 */
 	@NotTransactional()
 	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename) {
@@ -1941,14 +1941,10 @@ class DataImportService implements ServiceMethods {
 		progressService.create(key, ProgressService.PENDING)
 
 		// Kickoff the background job to generate the tasks
-		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + dataScriptId
+		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + dataScriptId + '-' + StringUtil.generateGuid()
 
 		// The triggerName/Group will allow us to controller on import
-		Date startTime = new Date(System.currentTimeMillis() + 2000)
-		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-
-		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-		Trigger trigger = new SimpleTriggerImpl(jobTriggerName, null, startTime)
+		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
 		trigger.jobDataMap.projectId = project.id
 		trigger.jobDataMap.dataScriptId = dataScriptId
 		trigger.jobDataMap.filename = filename
@@ -1957,7 +1953,7 @@ class DataImportService implements ServiceMethods {
 		trigger.setJobGroup('tdstm-etl-transform-data')
 		quartzScheduler.scheduleJob(trigger)
 
-		log.info('scheduleJob() {} kicked of an ETLC transform data process for script and filename ({},{})',
+		log.info('scheduleJob() {} kicked of an ETL transform data process for script and filename ({},{})',
 				securityService.currentUsername, dataScriptId, filename)
 
 		// return progress key
