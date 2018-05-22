@@ -3,6 +3,7 @@ import com.tdssrc.grails.GormUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.ProgressService
+import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 
@@ -16,6 +17,7 @@ class ETLTransformDataJob {
 
 	ProgressService progressService
 	DataImportService dataImportService
+	ScriptProcessorService scriptProcessorService
 
 	/**
 	 * Launch a ETL transform data process with given job execution context parameters
@@ -24,16 +26,26 @@ class ETLTransformDataJob {
 	void execute(JobExecutionContext context) {
 
 		JobDataMap dataMap = context.mergedJobDataMap
-		long dataScriptId = dataMap.getLongValue('dataScriptId')
 		long projectId = dataMap.getLongValue('projectId')
 		String filename = dataMap.getString('filename')
 		String progressKey = dataMap.getString('progressKey')
 
 		try {
-			log.info "ETLTransformDataJob started for dataScriptId $dataScriptId"
-			Map result = dataImportService.transformEtlData(projectId, dataScriptId, filename, progressKey)
+			if (dataMap.containsKey('scriptFilename')) {
+				// test script temporary filename
+				String scriptFilename = dataMap.getString('scriptFilename')
 
-			log.info('ETL transform data execution result: {}', result)
+				log.info('ETLTransformDataJob started for test script: {}', scriptFilename)
+				Map result = scriptProcessorService.testScript(projectId, scriptFilename, filename, progressKey)
+				log.info('ETL transform data execution result: {}', result)
+			} else {
+				// data script id
+				long dataScriptId = dataMap.getLongValue('dataScriptId')
+
+				log.info('ETLTransformDataJob started for dataScriptId: {}', dataScriptId)
+				Map result = dataImportService.transformEtlData(projectId, dataScriptId, filename, progressKey)
+				log.info('ETL transform data execution result: {}', result)
+			}
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage())

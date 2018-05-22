@@ -130,21 +130,15 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @return
      */
     @HasPermission(Permission.DataScriptUpdate)
-    def testScript (DataScriptValidateScriptCommand command) {
+    def initiateTestScript(DataScriptValidateScriptCommand command) {
 
         if (!command.validate()) {
             throw new InvalidParamException('Invalid parameters')
         }
 
-        String fullName = fileSystemService.getTemporaryFullFilename(command.fileName)
-
-        if (!fullName) {
-            throw new InvalidParamException('Invalid file name')
-        }
-
         Project project = securityService.getUserCurrentProjectOrException()
 
-        Map<String, ?> result = scriptProcessorService.testScript(project, command.script, fullName)
+        Map<String, ?> result = scriptProcessorService.scheduleTestScript(project, command)
 
         renderSuccessJson(result)
     }
@@ -160,7 +154,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
             throw new InvalidParamException('Invalid parameters')
         }
 
-        String fullName = fileSystemService.getTemporaryFullFilename(command.fileName)
+        String fullName = fileSystemService.getTemporaryFullFilename(command.filename)
 
         if (!fullName) {
             throw new InvalidParamException('Invalid file name')

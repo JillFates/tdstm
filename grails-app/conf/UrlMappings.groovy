@@ -798,10 +798,10 @@ class UrlMappings {
 		//
 		// DataScript
 		//
-		"/ws/dataScript/testScript" {
+		"/ws/dataScript/initiateTestScript" {
 			controller = "wsDataScript"
 			action = [
-					POST: "testScript"
+					POST: "initiateTestScript"
 			]
 		}
 
