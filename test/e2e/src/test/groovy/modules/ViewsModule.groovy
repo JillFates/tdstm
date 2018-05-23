@@ -20,6 +20,7 @@ class ViewsModule extends Module {
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
 
         deleteButtons     {viewList.find("title": "Click to delete this view")}
+        editButtons       {viewList.find("title": "Click to edit this view")}
         createViewButton  {viewsContainer.find("button", text:containsWord("Create"))}
         closeDeleteModal  {$("button.close")}
         createViewButton  {viewsContainer.find("button", text:containsWord("Create"))}
@@ -137,4 +138,15 @@ class ViewsModule extends Module {
         links.size() == 1
         waitFor{ links[0].click() }
     }
+
+    def numberViewNamesEqualsNumberRows(){
+        vwGridRows.size()==viewsListed.size()
+    }
+    def numberEditButtonsEqualsNumberRows(){
+        editButtons.size()==vwGridRows.size()
+    }
+    def createdDateNotEmpty(){
+        vwGridRows.findAll { it.find{"td[4]"}.text()!="" }
+    }
+
 }

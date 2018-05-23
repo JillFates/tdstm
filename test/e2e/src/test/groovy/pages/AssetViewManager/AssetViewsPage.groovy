@@ -54,4 +54,5 @@ class AssetViewsPage extends Page{
         viewMgrSystemViews.click()
     }
 
+
 }
