@@ -22,7 +22,8 @@ module.exports = function (env) {
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
-			filename: '[name].js'
+			filename: '[name].js',
+			chunkFilename: '[name].js'
 		},
 		module: {
 			rules: [
@@ -37,6 +38,9 @@ module.exports = function (env) {
 			unsafeCache: true
 		},
 		plugins: [
+			new webpack.DefinePlugin({
+				'process.env.NODE_ENV': '"production"'
+			}),
 			new webpack.SourceMapDevToolPlugin({
 				filename: '[name].js.map'
 			}),
