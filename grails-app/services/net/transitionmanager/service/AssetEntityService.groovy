@@ -308,8 +308,8 @@ class AssetEntityService implements ServiceMethods {
 		} else {
 			// This should handle all rackable devices
 			// Set the source/target rack appropriate and create the rack appropriately
-			assignAssetToRack(project, device, params.rackSourceId, params.sourceRack, true)
-			assignAssetToRack(project, device, params.rackTargetId, params.targetRack, false)
+			assignAssetToRack(project, device, params.rackSourceId, params.rackSource, true)
+			assignAssetToRack(project, device, params.rackTargetId, params.rackTarget, false)
 		}
 	}
 
