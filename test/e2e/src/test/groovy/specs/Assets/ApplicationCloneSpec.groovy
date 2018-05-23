@@ -220,7 +220,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
         then: 'App Name and Button to closed should be displayed'
             // TODO Some Application Detail items can't be reached because cannot be identified by itself.
             // TODO Will change this feature after FE code will be changed
-            waitFor{adModalAppName[1].text().trim() == appName}
+            waitFor{adModalAppName.text().trim() == appName}
             waitFor{adModalCloseBtn.click()}
     }
 
