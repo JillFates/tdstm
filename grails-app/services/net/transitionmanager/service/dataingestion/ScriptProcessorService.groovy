@@ -1,25 +1,38 @@
 package net.transitionmanager.service.dataingestion
 
+import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainClassFieldsValidator
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ProgressService
+import net.transitionmanager.service.SecurityService
+import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 @Transactional
 @Slf4j
 class ScriptProcessorService {
 
     CustomDomainService customDomainService
+	FileSystemService fileSystemService
+	SecurityService securityService
+	ProgressService progressService
+	Scheduler quartzScheduler
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -71,28 +84,37 @@ class ScriptProcessorService {
     }
 
     /**
-     * Test a a DSL script using an instance of ETLProcessor
+     * Test a DSL script using an instance of ETLProcessor
      * using a project as a reference and a file as an input of the ETL content data
      * @param project
      * @param scriptContent
-     * @param fileName
+     * @param filename
      * @return a map with isValid boolean result, the console output log and ETLProcessor data results
      */
-    Map<String, ?> testScript (Project project, String scriptContent, String fileName) {
+    Map<String, ?> testScript(Project project, String scriptContent, String filename, String progressKey = null) {
 
         ETLProcessor etlProcessor
         Map<String, ?> result = [isValid: false]
 
         try {
 
-	        Dataset dataset = FileSystemService.buildDataset(fileName)
+	        Dataset dataset = FileSystemService.buildDataset(filename)
 
             etlProcessor = new ETLProcessor(project,
                     new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
-	        etlProcessor.evaluate(scriptContent?.trim())
+			// update progress closure
+			def updateProgressClosure = { Integer percentComp, String status, String detail ->
+				// if progress key is not provided, then just skip updating progress service
+				// this is useful during integration test invocation
+				if (progressKey) {
+					progressService.update(progressKey, percentComp, status, detail)
+				}
+			}
+
+			etlProcessor.evaluate(scriptContent?.trim()/*, updateProgressClosure*/)
 
             result.isValid = true
         } catch (all) {
@@ -108,6 +130,27 @@ class ScriptProcessorService {
         return result
     }
 
+	/**
+	 * Method called by quartz job to test an ETL script
+	 * @param projectId - user's current project
+	 * @param scriptFilename - temporary test script filename
+	 * @param filename - temporary data filename
+	 * @param progressKey - progress key used for this ETL test interaction
+	 * @return
+	 */
+	Map<String, ?> testScript(Long projectId, String scriptFilename, String filename, String progressKey = null) {
+		// obtain test ETL script from temporary script file
+		String scriptContent = fileSystemService.openTemporaryFile(scriptFilename).text
+
+		// build test data dataset from temporary file
+		String sampleDataFullFilename = fileSystemService.getTemporaryFullFilename(filename)
+
+		// obtain project
+		Project project = Project.get(projectId)
+
+		// invoke test script with parameters passed by quartz job and return resulting data
+		return testScript(project, scriptContent, sampleDataFullFilename, progressKey)
+	}
 
     /**
      * Checks if the syntax for a script content is correct using GrooyShell.parse method.
@@ -125,12 +168,12 @@ class ScriptProcessorService {
      *}* </code>
      * @param project
      * @param scriptContent
-     * @param fileName
+     * @param filename
      * @return a map with validSyntax boolean result and a list with map erros
      */
-    Map<String, ?> checkSyntax (Project project, String scriptContent, String fileName) {
+    Map<String, ?> checkSyntax (Project project, String scriptContent, String filename) {
 
-	    Dataset dataset = FileSystemService.buildDataset(fileName)
+	    Dataset dataset = FileSystemService.buildDataset(filename)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
@@ -165,4 +208,46 @@ class ScriptProcessorService {
         ]
     }
 
+	/**
+	 * Schedule a quartz job for the test ETL transform data process
+	 * @param project - user's current project
+	 * @param command - test ETL script and temporary data file name
+	 * @return Map - containing the progress key created to monitor the job execution progress
+	 */
+	Map<String, String> scheduleTestScript(Project project, DataScriptValidateScriptCommand command) {
+
+		// check if temporary data file still exists
+		if (!fileSystemService.getTemporaryFullFilename(command.filename)) {
+			throw new InvalidParamException('Invalid temporary data file name')
+		}
+
+		// create test script temporary file
+		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile('testETLScript')
+		IOUtils.write(command.script, os)
+		os.flush()
+		os.close()
+
+		// create progress key
+		String key = 'ETL-Transform-Data-' + scriptFilename + '-' + StringUtil.generateGuid()
+		progressService.create(key, ProgressService.PENDING)
+
+		// Kickoff the background job to generate the tasks
+		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
+
+		// The triggerName/Group will allow us to controller on import
+		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
+		trigger.jobDataMap.projectId = project.id
+		trigger.jobDataMap.scriptFilename = scriptFilename
+		trigger.jobDataMap.filename = command.filename
+		trigger.jobDataMap.progressKey = key
+		trigger.setJobName('ETLTransformDataJob')
+		trigger.setJobGroup('tdstm-etl-transform-data')
+		quartzScheduler.scheduleJob(trigger)
+
+		log.info('scheduleJob() {} kicked of an test ETL transform data process for script and filename ({},{})',
+				securityService.currentUsername, scriptFilename, command.filename)
+
+		// return progress key
+		return ['progressKey': key]
+	}
 }

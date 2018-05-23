@@ -10,10 +10,10 @@ import net.transitionmanager.command.CommandObject
 class DataScriptValidateScriptCommand implements CommandObject {
 
     String script
-    String fileName
+    String filename
 
     static constraints = {
         script blank: false
-        fileName blank: false
+        filename blank: false
     }
 }
