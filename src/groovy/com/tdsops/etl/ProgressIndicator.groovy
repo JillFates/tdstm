@@ -5,7 +5,20 @@ package com.tdsops.etl
  * <p>Perhaps the most complicated will be to determine the % complete.
  * An accurate determination of % complete is impossible because a script can have multiple iterations;
  * can switch between sheets; and not all is known at the start of the process.
- * Therefore the logic is going to perform a simplistic approach which is:</p>
+ * Therefore the logic is going to perform a simplistic approach</p>
+ * <br>
+ * <pre>
+ *   new ProgressCallback(){
+ *      @Override
+ *      void reportProgress(
+ *          Integer progress,
+ *          Boolean forceReport, ProgressCallback.ProgressStatus status,
+ *          String detail) {
+ *
+ *          }
+ *   }
+ * </pre>
+ * @see ProgressCallback.ProgressStatus
  */
 trait ProgressIndicator {
 
@@ -24,16 +37,23 @@ trait ProgressIndicator {
 	 * Counter incremented each iteration complete
 	 */
 	Integer iterateCounter
+
+	Integer factorStepFrequency = 0
+	Integer frequencyCounter = 0
+
 	/**
-	 * Prepare script progress indicator using a closure
+	 * Prepare script progress indicator using a instance of ProgressCallback
 	 * and an ETL script content
 	 * @param aCallback callback closure used to report progress
 	 * @param script an ETL script content
+	 * @see ProgressCallback
 	 */
 	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
 		progressCallback = aProgressCallback
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
 		iterateCounter = 0
+		factorStepFrequency = 1
+		frequencyCounter = 0
 	}
 
 	/**
@@ -47,6 +67,7 @@ trait ProgressIndicator {
 	 * @param percentComplete
 	 * @param status (RUNNING, COMPLETE, or ERROR)
 	 * @param detail (RUNNING: blank, COMPLETE: filename, ERROR: error message)
+	 * @see ProgressCallback#reportProgress(java.lang.Integer, java.lang.Boolean, com.tdsops.etl.ProgressCallback.ProgressStatus, java.lang.String)
 	 */
 	void reportProgress(
 		Integer currentRow,
@@ -55,9 +76,11 @@ trait ProgressIndicator {
 		ProgressCallback.ProgressStatus status = ProgressCallback.ProgressStatus.RUNNING,
 		String detail = '') {
 
-		if (progressCallback){
+		frequencyCounter += 1
+		if (progressCallback && factorStepFrequency == frequencyCounter){
 			Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
 			progressCallback.reportProgress(percentage, forceReport, status, detail)
+			frequencyCounter
 		}
 	}
 
@@ -97,7 +120,9 @@ trait ProgressIndicator {
 	 * This method will be a call to reportProgress with the current row # and total rows for the dataset.
 	 */
 	void finishIterate() {
-		iterateCounter += 1
+		if (progressCallback){
+			iterateCounter += 1
+		}
 	}
 
 	/**
@@ -132,4 +157,3 @@ trait ProgressIndicator {
 		reportProgress(1, 1, true, ProgressCallback.ProgressStatus.ERROR, errorMessage)
 	}
 }
-

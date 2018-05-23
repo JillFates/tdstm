@@ -84,6 +84,49 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			}
 	}
 
+	void 'test can count create a ProgressCallback usinga simple closure'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ProgressCallback callback = {
+				Integer progress,
+				Boolean forceReport,
+				ProgressCallback.ProgressStatus status,
+				String detail ->
+
+			} as ProgressCallback
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				iterate {
+					extract 'name' load 'assetName'
+				}
+			""".stripIndent(),
+				callback)
+
+		then: 'It calculates correctly the total amount of iterate commands'
+			etlProcessor.numberOfIterateLoops == 1
+
+		cleanup:
+			if (fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
 	void 'test can report progress using one iterator'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
