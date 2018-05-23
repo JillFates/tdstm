@@ -28,6 +28,7 @@
         <ui-view><div id="main-loader"><div id="loader-icon"><div class="loader"></div></div></div></ui-view>
 
         <script src="${resource(dir: 'tds/web-app/dist', file: 'polyfills.js')}?_b=${buildHash}"></script>
+        <script src="${resource(dir: 'tds/web-app/dist', file: 'vendor.js')}?_b=${buildHash}"></script>
         <script src="${resource(dir: 'tds/web-app/dist', file: 'app.js')}?_b=${buildHash}"></script>
 
     </body>
