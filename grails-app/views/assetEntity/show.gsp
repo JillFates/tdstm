@@ -53,12 +53,12 @@
 						</td>
 												<td class="valueNW ${standardFieldSpecs.locationSource.imp?:''}" >
 														<tds:tooltipSpan field="${standardFieldSpecs.locationSource}" >
-																${assetEntity.sourceLocation}
+																${assetEntity.sourceLocationName}
 														</tds:tooltipSpan>
 												</td>
 												<td class="valueNW ${standardFieldSpecs.locationTarget.imp?:''}" >
 														<tds:tooltipSpan field="${standardFieldSpecs.locationTarget}" >
-																${assetEntity.targetLocation}
+																${assetEntity.targetLocationName}
 														</tds:tooltipSpan>
 												</td>
 

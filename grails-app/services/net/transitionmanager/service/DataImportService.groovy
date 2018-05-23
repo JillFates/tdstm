@@ -6,6 +6,7 @@ import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
@@ -252,7 +253,10 @@ class DataImportService implements ServiceMethods {
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
 				eavEntityType: eavEntityType,
-				dataTransferSet: dts
+				dataTransferSet: dts,
+
+				// Make an assumption that the export time was now...
+				exportDatetime: new Date()
 			)
 
 		// Check if the transfer batch is valid, report the error if not.
@@ -343,34 +347,22 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - additional parameters required for logging
 	 */
 	private void importRow(session, Object batch, JSONObject rowData, Map importContext ) {
-		boolean canImportRow=false
-
+		boolean importOfRowOkay = false
 		Long domainId = getAndValidateDomainId(rowData, importContext)
-
-		// TODO : JPM 3/2018 : Need to review this code further to see if we can clean this up
-		// Process the row as long as there wasn't an error with the ID reference
-		// if (domainId == null || domainId > 0) {
-
-			// Validate that the row can be processed, any errors will be captured in importContext.errors
-			// TODO : JPM 2/2018 : MINOR - Review and fix the canRowDataBeImported logic, wait for Dependency imports
-			// canImportRow = canRowDataBeImported(rowData, domainId, importContext)
-			canImportRow=true
-
-			if (canImportRow) {
-				if (importContext.isLegacy) {
-					canImportRow = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext )
-				} else {
-					canImportRow = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
-				}
+		log.debug "importRow() id={}", domainId
+		if (importContext.isLegacy) {
+			if (domainId == null || domainId > 0) {
+				importOfRowOkay = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext)
 			}
-		// }
+		} else {
+			importOfRowOkay = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
+		}
 
-		if (canImportRow) {
+		if (importOfRowOkay) {
 			importContext.rowsCreated++
 		} else {
 			importContext.rowsSkipped++
 		}
-
 	}
 
 	/**
@@ -1873,29 +1865,24 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// update progress closure
-		def updateProgressClosure = { Integer percentComp, String status, String detail ->
+		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
 			// if progress key is not provided, then just skip updating progress service
 			// this is useful during integration test invocation
 			if (progressKey) {
-				progressService.update(progressKey, percentComp, status, detail)
+				progressService.update(progressKey, percentComp, status.name(), detail)
 			}
-		}
+		} as ProgressCallback
 
 		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 
-		// TODO : SL 05/2018 : scriptProcessorService.execute() to accept a closure to update progress service
-		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename/*, updateProgressClosure*/)
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
+		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
+			project,
+			dataScript.etlSourceCode,
+			inputFilename,
+			updateProgressClosure)
+
 		result.filename = outputFilename
-		try {
-			os << (etlProcessor.resultsMap() as JSON)
-			os.close()
-		}
-		catch(e) {
-			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
-			throw new RuntimeException('Unable to write output file : ' + e.message)
-		}
 
 		return result
 	}

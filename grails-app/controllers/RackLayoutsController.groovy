@@ -418,13 +418,13 @@ class RackLayoutsController implements ControllerMethods {
 				def srcTrg = 'Source'
 				def queryParams = [project: assetEntity.project, assetClass: AssetClass.DEVICE]
 				if (location == 1) {
-					queryParams.roomName = assetEntity.sourceRoom
-					queryParams.rackName = assetEntity.sourceRack
+					queryParams.roomName = assetEntity.getSourceRoomName
+					queryParams.rackName = assetEntity.getSourceRackName
 				}
 				else {
 					srcTrg = 'Target'
-					queryParams.roomName = assetEntity.targetRoom
-					queryParams.rackName = assetEntity.targetRack
+					queryParams.roomName = assetEntity.getTargetRoomName
+					queryParams.rackName = assetEntity.getTargetRackName
 				}
 				def query = "FROM AssetEntity AS a \
 					JOIN a.room$srcTrg AS room \
@@ -783,11 +783,11 @@ class RackLayoutsController implements ControllerMethods {
 					if (!printView) {
 						if (assetDetails.asset.source == 1) {
 							assetRoom = assetEntity.roomSource?.id
-							assetLocation = assetEntity.sourceLocation
+							assetLocation = assetEntity.getSourceLocationName
 						}
 						else {
 							assetRoom = assetEntity.roomTarget?.id
-							assetLocation = assetEntity.targetLocation
+							assetLocation = assetEntity.getTargetLocationName
 						}
 
 						def rackAdd2ImgUrl = HtmlUtil.resource([dir: "i", file: "rack_add2.png"])
@@ -888,11 +888,11 @@ class RackLayoutsController implements ControllerMethods {
 				toTitle = it.assetTo.assetName + " ( " + it.assetTo.model?.manufacturer + " / " + it.assetTo.model + " )"
 			}
 			if (it.assetLoc == 'S') {
-				def sourceRack = it.assetFrom?.sourceRack
+				def sourceRack = it.assetFrom?.getSourceRackName
 				title += sourceRack ? " ( " + sourceRack + " / " + it.assetFrom?.sourceRackPosition + " )" : ""
 			}
 			else {
-				title += " ( " + it.assetFrom?.targetRack + " / " + it.assetFrom?.targetRackPosition + " )"
+				title += " ( " + it.assetFrom?.getTargetRackName + " / " + it.assetFrom?.targetRackPosition + " )"
 			}
 			assetCablingDetails << [
 					color        : it.cableColor ? it.cableColor : "",

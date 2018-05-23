@@ -6,9 +6,11 @@ import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainClassFieldsValidator
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
+import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
@@ -39,23 +41,58 @@ class ScriptProcessorService {
      * and a file as an input of the ETL content data
      * @param project
      * @param scriptContent
-     * @param fileName
+     * @param filename
      * @return and instance of ETLProcessor used to execute the scriptContent
      */
-    ETLProcessor execute (Project project, String scriptContent, String fileName) {
+    ETLProcessor execute (Project project, String scriptContent, String filename, ProgressCallback progressCallback = null) {
 
-        Dataset dataset = FileSystemService.buildDataset(fileName)
-
+        Dataset dataset = FileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
         DomainClassFieldsValidator validator = createFieldsSpecValidator(project)
-
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
-
-	    etlProcessor.evaluate(scriptContent?.trim())
-
+	    etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
         return etlProcessor
     }
+
+	/**
+	 * Execute a DSL script using an instance of ETLProcessor using a project as a reference
+	 * and a file as an input of the ETL content data
+	 * It also uses an instance of ProgressCallback to notify progress.
+	 * After execute the scriptContent, it creates an output file with the content of the ETLProcessorResult
+	 * @param project an instance of Project to use in ETLProcessor instance execution
+	 * @param scriptContent an ETLScript content to be executed
+	 * @param filename is the input filename to be used for loading a DataSet
+	 * @return a pair result with the instance of ETLProcessor used to execute the scriptContent
+	 *         and the filename for the output ETLProcessorResult
+	 * @throws an Exception in case of error in the ETL script content or
+	 *         in case of it could save the
+	 */
+	def executeAndSaveResultsInFile(
+		Project project,
+		String scriptContent,
+		String filename,
+		ProgressCallback progressCallback = null) {
+
+		ETLProcessor etlProcessor = new ETLProcessor(
+			project,
+			new DataSetFacade(FileSystemService.buildDataset(filename)),
+			new DebugConsole(buffer: new StringBuffer()),
+			createFieldsSpecValidator(project))
+
+		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
+
+		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
+		os << (etlProcessor.resultsMap() as JSON)
+		os.close()
+
+		progressCallback.reportProgress(
+			100,
+			true,
+			ProgressCallback.ProgressStatus.COMPLETED,
+			outputFilename)
+
+		return [etlProcessor, outputFilename]
+	}
 
     /**
      * Base on a project it creates a DomainClassFieldsValidator instance tha implements ETLFieldsValidator.
@@ -91,31 +128,19 @@ class ScriptProcessorService {
      * @param filename
      * @return a map with isValid boolean result, the console output log and ETLProcessor data results
      */
-    Map<String, ?> testScript(Project project, String scriptContent, String filename, String progressKey = null) {
+    Map<String, ?> testScript(Project project, String scriptContent, String filename) {
 
         ETLProcessor etlProcessor
         Map<String, ?> result = [isValid: false]
 
         try {
-
 	        Dataset dataset = FileSystemService.buildDataset(filename)
-
             etlProcessor = new ETLProcessor(project,
                     new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
-			// update progress closure
-			def updateProgressClosure = { Integer percentComp, String status, String detail ->
-				// if progress key is not provided, then just skip updating progress service
-				// this is useful during integration test invocation
-				if (progressKey) {
-					progressService.update(progressKey, percentComp, status, detail)
-				}
-			}
-
-			etlProcessor.evaluate(scriptContent?.trim()/*, updateProgressClosure*/)
-
+			etlProcessor.evaluate(scriptContent?.trim())
             result.isValid = true
         } catch (all) {
             log.warn('Error testing script: ' + all.getMessage(), all)
@@ -138,18 +163,31 @@ class ScriptProcessorService {
 	 * @param progressKey - progress key used for this ETL test interaction
 	 * @return
 	 */
-	Map<String, ?> testScript(Long projectId, String scriptFilename, String filename, String progressKey = null) {
+	Map<String, ?> testScript(Long projectId, String scriptFilename, String filename, String progressKey) {
 		// obtain test ETL script from temporary script file
 		String scriptContent = fileSystemService.openTemporaryFile(scriptFilename).text
 
 		// build test data dataset from temporary file
 		String sampleDataFullFilename = fileSystemService.getTemporaryFullFilename(filename)
-
 		// obtain project
 		Project project = Project.get(projectId)
 
-		// invoke test script with parameters passed by quartz job and return resulting data
-		return testScript(project, scriptContent, sampleDataFullFilename, progressKey)
+		// update progress closure
+		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
+			// if progress key is not provided, then just skip updating progress service
+			// this is useful during integration test invocation
+			if (progressKey) {
+				progressService.update(progressKey, percentComp, status, detail)
+			}
+		} as ProgressCallback
+
+		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
+			project,
+			scriptContent,
+			sampleDataFullFilename,
+			updateProgressClosure)
+
+		return [filename: outputFilename]
 	}
 
     /**

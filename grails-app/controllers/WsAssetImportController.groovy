@@ -13,6 +13,8 @@ import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import com.tdssrc.grails.StopWatch
+
 /**
  * Handles WS calls of the ApplicationService.
  *
@@ -142,9 +144,14 @@ class WsAssetImportController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetImport)
 	def initiateTransformData(Long dataScriptId, String filename) {
+
+		def stopwatch = new StopWatch()
+		stopwatch.start()
+
 		Project project = getProjectForWs()
 		Map result = dataImportService.scheduleETLTransformDataJob(project, dataScriptId, filename)
 		renderSuccessJson(result)
+		log.info 'transformData() ETL Transformation took {}', stopwatch.endDuration()
 	}
 
 	/**

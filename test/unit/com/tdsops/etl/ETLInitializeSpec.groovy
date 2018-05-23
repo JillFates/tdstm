@@ -307,8 +307,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
-							value == ''
-							originalValue == ''
+							value == null
+							originalValue == null
 							init == 'Microsoft'
 						}
 					}
@@ -316,8 +316,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 					with(data[1]) {
 						rowNum == 2
 						with(fields.appVendor) {
-							value == ''
-							originalValue == ''
+							value == null
+							originalValue == null
 							init == 'Mozilla'
 						}
 					}
