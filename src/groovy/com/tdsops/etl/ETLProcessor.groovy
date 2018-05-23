@@ -330,7 +330,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			binding.removeAllDynamicVariables()
 			currentRowIndex++
 		}
-		finishIterate()
+		finishIterate(rows.size())
 		isIterating = false
 		currentRowIndex--
 		return this
@@ -1158,10 +1158,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		prepareProgressIndicator(script, progressCallback)
-		scriptStarted(this.dataSetFacade.fileName())
+		scriptStarted()
 		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
 			.evaluate(script,ETLProcessor.class.name)
-		scriptFinished(this.dataSetFacade.fileName())
 		return result
 	}
 

@@ -53,7 +53,7 @@ trait ProgressIndicator {
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
 		iterateCounter = 0
 		factorStepFrequency = 1
-		frequencyCounter = 0
+		frequencyCounter = 1
 	}
 
 	/**
@@ -77,7 +77,7 @@ trait ProgressIndicator {
 		String detail = '') {
 
 		frequencyCounter += 1
-		if (progressCallback && factorStepFrequency == frequencyCounter){
+		if (progressCallback && factorStepFrequency < frequencyCounter){
 			Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
 			progressCallback.reportProgress(percentage, forceReport, status, detail)
 			frequencyCounter
@@ -119,9 +119,11 @@ trait ProgressIndicator {
 	/**
 	 * This method will be a call to reportProgress with the current row # and total rows for the dataset.
 	 */
-	void finishIterate() {
+	void finishIterate(Integer totalRows) {
 		if (progressCallback){
 			iterateCounter += 1
+			Integer percentage = ((totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
+			progressCallback.reportProgress(percentage, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 	}
 
@@ -131,9 +133,9 @@ trait ProgressIndicator {
 	 *  that the ETL process has completed
 	 * @param filename
 	 */
-	void scriptStarted(String filename) {
+	void scriptStarted() {
 		if (progressCallback){
-			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, filename)
+			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 	}
 
@@ -143,9 +145,9 @@ trait ProgressIndicator {
 	 *  that the ETL process has completed
 	 * @param filename
 	 */
-	void scriptFinished(String filename) {
+	void scriptFinished() {
 		if (progressCallback){
-			progressCallback.reportProgress(100, true, ProgressCallback.ProgressStatus.COMPLETED, filename)
+			progressCallback.reportProgress(100, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 	}
 

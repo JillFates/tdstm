@@ -18,7 +18,6 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
 
-import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
 @TestFor (FileSystemService)
@@ -160,7 +159,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 1
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, fileName)
+			1 * callback.reportProgress(0, true, RUNNING, '')
 
 		and:
 			1 * callback.reportProgress(50, false, RUNNING, '')
@@ -169,7 +168,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			1 * callback.reportProgress(100, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(100, true, COMPLETED, fileName)
+			1 * callback.reportProgress(100, true, RUNNING, '')
 
 		cleanup:
 			if (fileName){
@@ -215,7 +214,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 2
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, fileName)
+			1 * callback.reportProgress(0, true, RUNNING, '')
 
 		and:
 			1 * callback.reportProgress(25, false, RUNNING, '')
@@ -224,13 +223,17 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			1 * callback.reportProgress(50, false, RUNNING, '')
 
 		and:
+			1 * callback.reportProgress(50, true, RUNNING, '')
+
+		and:
 			1 * callback.reportProgress(75, false, RUNNING, '')
 
 		and:
 			1 * callback.reportProgress(100, false, RUNNING, '')
 
 		and:
-			1 * callback.reportProgress(100, true, COMPLETED, fileName)
+			1 * callback.reportProgress(100, true, RUNNING, '')
+
 
 		cleanup:
 			if (fileName){
