@@ -19,50 +19,29 @@ class ApplicationCloneSpec extends GebReportingSpec {
     //Define the names of the app you will Create and Edit
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "QAE2E"
-    static filterpattern = "App For E2E Created"
-    static appName
+    static appName = baseName + " " + randStr + " App For E2E Created"
+    static appDesc = baseName + " " + randStr + " App Description Created"
+    static appBundle = "Buildout"
+    static appStatus = "Assigned"
+    static appDataMap = [
+            appName: appName,
+            appDesc: appDesc,
+            appBundle: appBundle,
+            appStatus: appStatus
+    ]
     static appCountBefore
-    static appNameCloned = baseName +" "+ randStr + " App For E2E Cloned"
 
     def setupSpec() {
         testCount = 0
         to LoginPage
         login()
-
-        // Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
-        // NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         at MenuPage
         waitFor { menuModule.goToApplications() }
         at ApplicationListPage
-        waitFor {alNameFilter.click()}
-        alNameFilter = filterpattern
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-
-        if (alGridRows.size() > 0) {
-            appName = alFirstAppName.text().trim()
-            alNameFilter = appName
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
-            appCountBefore = alGridRows.size()
-            waitFor{alFirstAppName.click()}
-        } else {
-            def appNameCreate = baseName + " " + randStr + " App For E2E Created"
-            def appDescCreate = baseName + " " + randStr + " App Description Created"
-            def appBundleCreate = "Buildout"
-            def appStatusCreate = "Assigned"
-            appName = appNameCreate
-            waitFor { alCreateAppBtn.click() }
-            at ApplicationCreationPage
-            acModalAppName = appNameCreate
-            acModalDescription = appDescCreate
-            acModalBundleSelector.click()
-            acModalBundleSelector.find("option", text: appBundleCreate).click()
-            acModalPlanStatusSelector.click()
-            acModalPlanStatusSelector.find("option", text: appStatusCreate).click()
-            acModalSaveBtn.click()
-            appCountBefore = 1
-        }
+        clickOnCreateButton()
+        at ApplicationCreationPage
+        createApplication appDataMap
+        appCountBefore = 1
         at ApplicationDetailsPage
     }
 

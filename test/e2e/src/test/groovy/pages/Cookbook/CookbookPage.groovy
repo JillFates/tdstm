@@ -5,6 +5,7 @@ import geb.Page
 class CookbookPage extends Page {
 
     static at = {
+        waitFor {createRecipeButton.displayed}
         contextSelectorLabel == "Context:"
         contextSelectorDefault.text() == "All"
         createRecipeButton.text() == "Create Recipe..."
@@ -45,7 +46,25 @@ class CookbookPage extends Page {
         recipeGridRowsActions       { recipeGridRows.find("a", class:"actions")}
         gridSize                    { recipeGridRows.size()}
         rowSize                     { recipeGridHeaderCols.size()}
-        gebRecipes                  (required: false) { recipeGridRows.find("span.ng-binding", text:contains("Geb Recipe"))}
-        gebRecipesWithTasks         (required: false) { recipeGridRows.find("span.ng-binding", text:contains("Geb Recipe With Tasks Test"))}
+        gebRecipes                  (required: false) { recipeGridRows.find("div.col0 span.ng-binding")}
+    }
+
+    def clickOnCreateButton(){
+        waitFor { createRecipeButton.click()}
+    }
+
+    def waitForSuccessBanner(){
+        waitFor { successMessage.present}
+        waitFor { !successMessage.present}
+        waitForLoadingIndicator()
+    }
+
+    def waitForLoadingIndicator(){
+        waitFor { loadingIndicator.hasClass("ng-hide")}
+    }
+
+    def openEditTab(){
+        editorTab.click()
+        waitFor { editorTab.parent(".active") }
     }
 }
