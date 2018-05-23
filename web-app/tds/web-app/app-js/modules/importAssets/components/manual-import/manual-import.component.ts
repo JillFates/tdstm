@@ -105,20 +105,17 @@ export class ManualImportComponent implements OnInit {
 		this.transformResult = null;
 		this.transformFileContent = null;
 		this.importResult = null;
-		// ------------------------- DUMMY CODE ---------------------------------
-		this.setTransformProgressInterval();
-		// ----------------------------------------------------------------------
-		// TODO: (real code) uncomment below code when endpoints ready!
-		/*
-		this.importAssetsService.initiateTransform(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
+		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.transformProgress.progressKey = result.data.progressKey;
 				this.setTransformProgressInterval();
 			} else {
 				this.transformResult = { status: 'error', data: {}};
 			}
-		}, error => this.transformResult = { status: 'error', data: {}} );
-		*/
+		}, error => {
+			this.transformResult = { status: 'error', data: {}}
+			this.transformInProcess = false;
+		});
 	}
 
 	/**

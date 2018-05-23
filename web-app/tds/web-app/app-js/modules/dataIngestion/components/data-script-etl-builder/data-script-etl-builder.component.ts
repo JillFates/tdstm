@@ -88,11 +88,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private onTestScript(): void {
 		this.clearLogVariables('test');
 		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
-		// ------------------------- DUMMY CODE ---------------------------------
-		// this.setTestScriptProgressInterval();
-		// ----------------------------------------------------------------------
-		// TODO: (real code) uncomment below code when endpoints ready!
-		/**/
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.testScriptProgress.progressKey = result.data.progressKey;
