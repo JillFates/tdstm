@@ -83,7 +83,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can count create a ProgressCallback usinga simple closure'() {
+	void 'test can count create a ProgressCallback using a simple closure'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
@@ -126,7 +126,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can report progress using one iterator'() {
+	void 'test can report progress using an iterator'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
@@ -240,4 +240,44 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
+	void 'test can report progress without using an iterator'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				xraysrv02,Dell,PE2951,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		and:
+			ProgressCallback callback = Mock(ProgressCallback)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+			""".stripIndent(),
+				callback)
+
+		then: 'It calculates correctly the total amount of iterate commands'
+			etlProcessor.numberOfIterateLoops == 0
+
+		and:
+			1 * callback.reportProgress(0, true, RUNNING, '')
+
+		cleanup:
+			if (fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+
 }
