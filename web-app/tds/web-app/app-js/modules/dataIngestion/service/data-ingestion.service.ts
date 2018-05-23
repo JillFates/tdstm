@@ -605,7 +605,7 @@ export class DataIngestionService {
 			script: script,
 			filename: filename
 		};
-		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataScriptUrl}/initiateTestScript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let response = res.json();
 				return response;
@@ -616,7 +616,7 @@ export class DataIngestionService {
 	checkSyntax(script: string, filename: string): Observable<any> {
 		let postRequest = {
 			script: script,
-			fileName: filename
+			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
 			.map((res: Response) => {

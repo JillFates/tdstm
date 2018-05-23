@@ -141,9 +141,9 @@ class WsAssetImportController implements ControllerMethods {
 	 * 			]
 	 */
 	@HasPermission(Permission.AssetImport)
-	def transformData(Long dataScriptId, String filename) {
+	def initiateTransformData(Long dataScriptId, String filename) {
 		Project project = getProjectForWs()
-		Map result = dataImportService.transformEtlData(project, dataScriptId, filename)
+		Map result = dataImportService.scheduleETLTransformDataJob(project, dataScriptId, filename)
 		renderSuccessJson(result)
 	}
 
