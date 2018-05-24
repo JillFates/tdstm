@@ -14,6 +14,7 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -67,6 +68,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dialogService: UIDialogService,
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
+		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService,
 		private preferenceService: PreferenceService) {
@@ -109,7 +111,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * Creates an interval loop to retreive Test Script current progress.
 	 */
 	private setTestScriptProgressInterval(): void {
-		this.testScriptProgress.currentProgress = 1;
+		this.testScriptProgress.currentProgress = 0;
 		this.testScripInterval = setInterval(() => {
 			this.getTestScriptProgress();
 		}, 1 * 1000); // N seconds.
@@ -119,24 +121,25 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * Operation of the Test Script interval that will be executed n times in a loop.
 	 */
 	private getTestScriptProgress(): void {
-		// ---------------------- DUMMY CODE -------------------------------
-		// let currentProgress = this.testScriptProgress.currentProgress + 10;
-		// this.testScriptProgress.currentProgress = currentProgress;
-		// if (currentProgress >= 100) {
-		// 	this.operationStatus.test.state = CHECK_ACTION.VALID;
-		// 	this.clearTestScriptProgressInterval();
-		// }
-		// -----------------------------------------------------------------
-
-		// TODO: (real code) uncomment below code when endpoints ready!
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
 				this.testScriptProgress.currentProgress = currentProgress;
-				if (currentProgress === 100) {
+				if (response.data.status === 'Failed') {
+					this.scriptTestResult = new ScriptTestResultModel();
+					this.operationStatus.test.state = CHECK_ACTION.INVALID;
+					this.scriptTestResult.isValid = false;
+					this.scriptTestResult.error = response.data.detail;
+					this.clearTestScriptProgressInterval();
+				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
 					let scripTestFilename = response.data.detail;
-					// this.scriptTestResult = response.data.detail;
-					this.operationStatus.test.state = response.data.status === 'COMPLETED' ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
+					this.operationStatus.test.state = CHECK_ACTION.VALID;
+					this.scriptTestResult = new ScriptTestResultModel();
+					this.scriptTestResult.isValid = true;
+					this.importAssetsService.getFileContent(scripTestFilename)
+						.subscribe(result => {
+							this.scriptTestResult.domains = result.domains;
+					});
 					this.clearTestScriptProgressInterval();
 				}
 		});

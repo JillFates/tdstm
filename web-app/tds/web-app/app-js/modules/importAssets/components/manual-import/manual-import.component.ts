@@ -110,10 +110,14 @@ export class ManualImportComponent implements OnInit {
 				this.transformProgress.progressKey = result.data.progressKey;
 				this.setTransformProgressInterval();
 			} else {
-				this.transformResult = { status: 'error', data: {}};
+				this.transformResult = new ApiResponseModel();
+				this.transformResult.status = ApiResponseModel.API_ERROR;
+				this.transformResult.data = {};
 			}
 		}, error => {
-			this.transformResult = { status: 'error', data: {}}
+			this.transformResult = new ApiResponseModel();
+			this.transformResult.status = ApiResponseModel.API_ERROR;
+			this.transformResult.data = {};
 			this.transformInProcess = false;
 		});
 	}
@@ -130,43 +134,35 @@ export class ManualImportComponent implements OnInit {
 	 * Creates an interval loop to retreive Transform current progress.
 	 */
 	private setTransformProgressInterval(): void {
-		this.transformProgress.currentProgress = 1;
+		this.transformProgress.currentProgress = 0;
 		this.transformInterval = setInterval(() => {
 			this.getTransformProgress();
-		}, .5 * 1000); // 5 seconds.
+		}, 1 * 1000); // N seconds.
 	}
 
 	/**
 	 * Operation of the Test Script interval that will be executed n times in a loop.
 	 */
 	private getTransformProgress(): void {
-		// ---------------------- DUMMY CODE -------------------------------
-		let currentProgress = this.transformProgress.currentProgress + 10;
-		this.transformProgress.currentProgress = currentProgress;
-		if (currentProgress >= 100) {
-			this.transformResult = { status: 'success', data: {}};
-			this.clearTestScriptProgressInterval();
-		}
-		// -----------------------------------------------------------------
-
-		// TODO: (real code) uncomment below code when endpoints ready!
-		/*
 		this.dataIngestionService.getJobProgress(this.transformProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
 				this.transformProgress.currentProgress = currentProgress;
-				if (currentProgress === 100) {
-					this.transformResult = response.data.detail;
-					if (this.transformResult.status === 'error') {
-						this.notifier.broadcast({
-							name: AlertType.DANGER,
-							message: this.transformResult.errors[0]
-						});
-					}
+				if (response.data.status === 'Failed') {
+					this.transformResult = new ApiResponseModel();
+					this.transformResult.status = ApiResponseModel.API_ERROR;
+					this.notifier.broadcast({
+						name: AlertType.DANGER,
+						message: response.data.detail
+					});
+					this.clearTestScriptProgressInterval();
+				} else if (currentProgress === 100) {
+					this.transformResult = new ApiResponseModel();
+					this.transformResult.status = ApiResponseModel.API_SUCCESS;
+					this.transformResult.data = {filename: response.data.detail};
 					this.clearTestScriptProgressInterval();
 				}
 			});
-			*/
 	}
 
 	/**
@@ -252,7 +248,7 @@ export class ManualImportComponent implements OnInit {
 
 	private disableTransformButton() {
 		return !this.selectedScriptOption || this.selectedScriptOption === -1
-			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === 'error';
+			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === ApiResponseModel.API_ERROR;
 	}
 
 	private clearFilename(e?: any) {
