@@ -4,8 +4,6 @@
 
 const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
-const pkg = require('./package.json');  //loads npm config file
-const helpers = require('./server-utils/helpers');
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
@@ -50,7 +48,7 @@ module.exports = function (env) {
 				path.resolve(__dirname, "app-js")
 			),
 			// Uncomment if you want to take a peek to the structure of dependencies
-			new BundleAnalyzerPlugin()
+			// new BundleAnalyzerPlugin()
 		],
 		optimization: {
 			splitChunks: {
