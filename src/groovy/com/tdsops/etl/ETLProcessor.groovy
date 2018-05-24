@@ -310,11 +310,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Method invoked at the begin of the iterate command
+	 * Method invoked at the begin within the iterate loop
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 */
 	void topOfIterate(){
 		result.startRow()
+	}
+
+	/**
+	 * Method invoked at the begin within the iterate loop
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @param rowNum the current number de the rows
+	 * @param totalNumRows total number of rows for the current iterate loop
+	 */
+	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
+		reportRowProgress(rowNum, totalNumRows)
 	}
 
 	/**

@@ -34,11 +34,6 @@ trait ProgressIndicator {
 	 */
 	Integer numberOfIterateLoops
 	/**
-	 * Counter incremented each iteration complete
-	 */
-	Integer iterateCounter
-
-	/**
 	 * Used to determine after n rows actually report progress for current iterate loop
 	 */
 	Integer factorStepFrequency = 0
@@ -63,7 +58,11 @@ trait ProgressIndicator {
 	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
 		progressCallback = aProgressCallback
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
-		iterateRatio = 1 / numberOfIterateLoops
+		if(numberOfIterateLoops > 0){
+			iterateRatio = 1 / numberOfIterateLoops
+		} else {
+			iterateRatio = 0
+		}
 	}
 
 	/**
@@ -86,21 +85,22 @@ trait ProgressIndicator {
 	 * @return
 	 */
 	Integer calculateNumberOfIterateLoops(String scriptContent) {
-		// TODO : need to improve this so that it only finds ^\witerate\w{
-		return scriptContent.count('iterate')
+		def matcher = scriptContent =~ /(?m)^\s*(iterate\s*\{)/
+		return matcher.getCount()
 	}
 
 	/**
 	 * Used to report row level progress back to progress service
 	 * @param currentRow
-	 * @param totalRows - number of rows in the dataset for the current iterate loop
+	 * @param totalRows - number of rows in the dataSet for the current iterate loop
 	 */
 	void reportRowProgress(Integer currentRow, Integer totalRows) {
 		if (progressCallback) {
+
 			if (frequencyCounter == -1) {
 				frequencyCounter = 0
 				// Calculate how many rows to process before actually reporting the progress back for the current iterate loop
-				factorStepFrequency = totalRows / 100
+				factorStepFrequency = (totalRows / 100).intValue()
 			}
 			frequencyCounter += 1
 			if (factorStepFrequency < frequencyCounter) {
@@ -117,8 +117,7 @@ trait ProgressIndicator {
 	 */
 	void finishIterate() {
 		if (progressCallback){
-			iterateCounter += 1
-			Integer percentage = Math.roundUp(frequencyCounter * iterateRatio * 100)
+			Integer percentage = Math.round(frequencyCounter * iterateRatio * 100)
 			progressCallback.reportProgress(percentage, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 		frequencyCounter = -1
@@ -134,25 +133,5 @@ trait ProgressIndicator {
 		if (progressCallback){
 			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
-	}
-
-	/**
-	 * Reporting Success.
-	 *  In this method the following call should be made to indicate to the Progress Service
-	 *  that the ETL process has completed
-	 * @param filename
-	 */
-	void scriptFinished() {
-		if (progressCallback){
-			progressCallback.reportProgress(100, true, ProgressCallback.ProgressStatus.RUNNING, '')
-		}
-	}
-
-	/**
-	 * In the event that any exception occures then the progress should be reported with the following call
-	 * @param errorMessage
-	 */
-	void scriptFailed(String errorMessage) {
-		reportProgress(1, 1, true, ProgressCallback.ProgressStatus.ERROR, errorMessage)
 	}
 }
