@@ -27,7 +27,7 @@ const UNITS_SIZE_SEPARATOR = 'x';
 export class DataIngestionService {
 
 	private dataDefaultUrl = '../ws';
-	private jobProgressUrl = '../ws/progress/';
+	private jobProgressUrl = '../ws/progress';
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';

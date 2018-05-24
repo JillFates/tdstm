@@ -177,7 +177,7 @@ class ScriptProcessorService {
 			// if progress key is not provided, then just skip updating progress service
 			// this is useful during integration test invocation
 			if (progressKey) {
-				progressService.update(progressKey, percentComp, status, detail)
+				progressService.update(progressKey, percentComp, status.name(), detail)
 			}
 		} as ProgressCallback
 

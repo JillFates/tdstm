@@ -112,7 +112,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.testScriptProgress.currentProgress = 1;
 		this.testScripInterval = setInterval(() => {
 			this.getTestScriptProgress();
-		}, 1 * 1000); // 5 seconds.
+		}, 5 * 1000); // 5 seconds.
 	}
 
 	/**
@@ -120,16 +120,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private getTestScriptProgress(): void {
 		// ---------------------- DUMMY CODE -------------------------------
-		let currentProgress = this.testScriptProgress.currentProgress + 10;
-		this.testScriptProgress.currentProgress = currentProgress;
-		if (currentProgress >= 100) {
-			this.operationStatus.test.state = CHECK_ACTION.VALID;
-			this.clearTestScriptProgressInterval();
-		}
+		// let currentProgress = this.testScriptProgress.currentProgress + 10;
+		// this.testScriptProgress.currentProgress = currentProgress;
+		// if (currentProgress >= 100) {
+		// 	this.operationStatus.test.state = CHECK_ACTION.VALID;
+		// 	this.clearTestScriptProgressInterval();
+		// }
 		// -----------------------------------------------------------------
 
 		// TODO: (real code) uncomment below code when endpoints ready!
-		/*
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
@@ -140,7 +139,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.clearTestScriptProgressInterval();
 				}
 		});
-		*/
 	}
 
 	/**
