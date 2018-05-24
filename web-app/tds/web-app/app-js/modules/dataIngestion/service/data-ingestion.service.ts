@@ -775,7 +775,7 @@ export class DataIngestionService {
 	 * @returns {Observable<ApiResponseModel>}
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
-		return this.http.get(`${this.jobProgressUrl}/PROGRESS-KEY?_=${progressKey}`)
+		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());

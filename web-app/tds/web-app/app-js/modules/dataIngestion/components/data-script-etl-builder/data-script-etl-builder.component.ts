@@ -112,7 +112,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.testScriptProgress.currentProgress = 1;
 		this.testScripInterval = setInterval(() => {
 			this.getTestScriptProgress();
-		}, 5 * 1000); // 5 seconds.
+		}, 1 * 1000); // N seconds.
 	}
 
 	/**
@@ -134,8 +134,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				let currentProgress = response.data.percentComp;
 				this.testScriptProgress.currentProgress = currentProgress;
 				if (currentProgress === 100) {
-					this.scriptTestResult = response.data.detail;
-					this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
+					let scripTestFilename = response.data.detail;
+					// this.scriptTestResult = response.data.detail;
+					this.operationStatus.test.state = response.data.status === 'COMPLETED' ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
 					this.clearTestScriptProgressInterval();
 				}
 		});
