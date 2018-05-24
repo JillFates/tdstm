@@ -23,7 +23,8 @@ module.exports = function (env) {
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
 			filename: '[name].js',
-			chunkFilename: '[name].js'
+			chunkFilename: '[name].js',
+			publicPath: '../'
 		},
 		module: {
 			rules: [
@@ -53,11 +54,29 @@ module.exports = function (env) {
 		],
 		optimization: {
 			splitChunks: {
+				automaticNameDelimiter: '-',
 				cacheGroups: {
 					commons: {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
-						chunks: 'all'
+						chunks: 'all',
+						test(module, chunks) {
+							const name = module.nameForCondition && module.nameForCondition();
+							return chunks.some(chunk => {
+								return (chunk.name === 'app' || chunk.name === 'polyfills') && /[\\/]node_modules[\\/]/.test(name);
+							});
+						}
+					},
+					codemirror: {
+						name: 'codemirror',
+						chunks: chunk => chunk.name == 'codemirror',
+						priority: 1,
+						enforce: true,
+						test(module, chunks) {
+							return chunks.some((chunk) =>  {
+								return chunk.name === 'codemirror'
+							});
+						}
 					}
 				}
 			}

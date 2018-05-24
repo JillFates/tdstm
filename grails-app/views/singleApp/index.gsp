@@ -31,6 +31,8 @@
         <script src="${resource(dir: 'tds/web-app/dist', file: 'vendor.js')}?_b=${buildHash}"></script>
         <script src="${resource(dir: 'tds/web-app/dist', file: 'app.js')}?_b=${buildHash}"></script>
 
+        <script rel="prefetch" src="${resource(dir: 'tds/web-app/dist', file: 'vendors-codemirror.js')}?_b=${buildHash}"></script>
+
     </body>
 
 </html>
