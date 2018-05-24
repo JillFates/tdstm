@@ -317,7 +317,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		result.startRow()
 	}
 
-
 	/**
 	 * Iterates a list of rows applying a closure
 	 * It initialize context variables in the ETL Binding context
@@ -346,7 +345,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			iterateIndex.next()
 			binding.removeAllDynamicVariables()
 		}
-		finishIterate(rows.size())
+		finishIterate()
 		iterateIndex = null
 		currentRowIndex--
 		return this

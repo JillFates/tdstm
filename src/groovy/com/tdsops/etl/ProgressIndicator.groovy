@@ -38,8 +38,20 @@ trait ProgressIndicator {
 	 */
 	Integer iterateCounter
 
+	/**
+	 * Used to determine after n rows actually report progress for current iterate loop
+	 */
 	Integer factorStepFrequency = 0
-	Integer frequencyCounter = 0
+
+	/**
+	 * Will contain the percentage of overall % complete for each iterate loop
+	 */
+	BigDecimal iterateRatio
+
+	/**
+	 * Used to track # of rows processed in a iterate loop before actually reporting progress, -1 signifies first row in iterate
+	 */
+	Integer frequencyCounter = -1
 
 	/**
 	 * Prepare script progress indicator using a instance of ProgressCallback
@@ -51,37 +63,7 @@ trait ProgressIndicator {
 	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
 		progressCallback = aProgressCallback
 		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
-		iterateCounter = 0
-		factorStepFrequency = 1
-		frequencyCounter = 1
-	}
-
-	/**
-	 * To keep the implementation loosely coupled instead of injecting the ProgressService into the ETLProcessor logic,
-	 * a closure will be passed in that the ETL code can call in order to report back:
-	 * <ul>
-	 *     <li>Percentage complete</li>
-	 *     <li>Success (with resulting filename)</li>
-	 *     <li>Fatal Error</li>
-	 * </ul>
-	 * @param percentComplete
-	 * @param status (RUNNING, COMPLETE, or ERROR)
-	 * @param detail (RUNNING: blank, COMPLETE: filename, ERROR: error message)
-	 * @see ProgressCallback#reportProgress(java.lang.Integer, java.lang.Boolean, com.tdsops.etl.ProgressCallback.ProgressStatus, java.lang.String)
-	 */
-	void reportProgress(
-		Integer currentRow,
-		Integer totalRows,
-		Boolean forceReport = false,
-		ProgressCallback.ProgressStatus status = ProgressCallback.ProgressStatus.RUNNING,
-		String detail = '') {
-
-		frequencyCounter += 1
-		if (progressCallback && factorStepFrequency < frequencyCounter){
-			Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
-			progressCallback.reportProgress(percentage, forceReport, status, detail)
-			frequencyCounter
-		}
+		iterateRatio = 1 / numberOfIterateLoops
 	}
 
 	/**
@@ -104,27 +86,42 @@ trait ProgressIndicator {
 	 * @return
 	 */
 	Integer calculateNumberOfIterateLoops(String scriptContent) {
+		// TODO : need to improve this so that it only finds ^\witerate\w{
 		return scriptContent.count('iterate')
 	}
 
 	/**
-	 *
+	 * Used to report row level progress back to progress service
 	 * @param currentRow
-	 * @param totalRows
+	 * @param totalRows - number of rows in the dataset for the current iterate loop
 	 */
-	void bottomOfIterate(Integer currentRow, Integer totalRows) {
-		reportProgress(currentRow, totalRows, false, ProgressCallback.ProgressStatus.RUNNING, '')
+	void reportRowProgress(Integer currentRow, Integer totalRows) {
+		if (progressCallback) {
+			if (frequencyCounter == -1) {
+				frequencyCounter = 0
+				// Calculate how many rows to process before actually reporting the progress back for the current iterate loop
+				factorStepFrequency = totalRows / 100
+			}
+			frequencyCounter += 1
+			if (factorStepFrequency < frequencyCounter) {
+				// Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
+				Integer percentage = (((frequencyCounter * iterateRatio) + (currentRow / totalRows / iterateRatio)) * 100).intValue()
+				progressCallback.reportProgress(percentage, false, ProgressCallback.ProgressStatus.RUNNING, '')
+				frequencyCounter = 0
+			}
+		}
 	}
 
 	/**
 	 * This method will be a call to reportProgress with the current row # and total rows for the dataset.
 	 */
-	void finishIterate(Integer totalRows) {
+	void finishIterate() {
 		if (progressCallback){
 			iterateCounter += 1
-			Integer percentage = ((totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
+			Integer percentage = Math.roundUp(frequencyCounter * iterateRatio * 100)
 			progressCallback.reportProgress(percentage, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
+		frequencyCounter = -1
 	}
 
 	/**
