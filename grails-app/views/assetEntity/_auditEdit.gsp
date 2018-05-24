@@ -28,8 +28,8 @@
 	<tr class="prop rackLabel" >
 		<td class="label ">Location</td>
 		<td class="label" nowrap="nowrap">
-			<input readonly="true" type="text" ${source=='1' ? 'name="sourceLocation11" value="'+assetEntityInstance.sourceLocation+'"' : 'name="targetLocation11" value="'+assetEntityInstance.targetLocation+'"'} size="8" /> / 
-			<input readonly="true" type="text" ${source=='1' ? 'name="sourceRoom11" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom11" value="'+assetEntityInstance.targetRoom+'"'} size="8" />
+			<input readonly="true" type="text" ${source=='1' ? 'name="sourceLocation11" value="'+assetEntityInstance.sourceLocationName+'"' : 'name="targetLocation11" value="'+assetEntityInstance.targetLocationName+'"'} size="8" /> /
+			<input readonly="true" type="text" ${source=='1' ? 'name="sourceRoom11" value="'+assetEntityInstance.sourceRoomName+'"' : 'name="targetRoom11" value="'+assetEntityInstance.targetRoomName+'"'} size="8" />
 		</td>
 	</tr>
 	<tr class="prop bladeLabel">

@@ -25,10 +25,10 @@
 						<th nowrap="nowrap"><input id="selectId" type="checkbox" onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetName')">Name</th>
 						<th class="Arrowcursor ${sortBy == 'model' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','model')">Model</th>
-						<th class="Arrowcursor ${sortBy == 'sourceLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceLocation')">Loc/Room</th>
-						<th class="Arrowcursor ${sortBy == 'sourceRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceRack')">Rack</th>
-						<th class="Arrowcursor ${sortBy == 'targetLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetLocation')">Target Location</th>
-						<th class="Arrowcursor ${sortBy == 'targetRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetRack')">Target rack</th>
+						<th class="Arrowcursor ${sortBy == 'sourceLocationName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceLocationName')">Loc/Room</th>
+						<th class="Arrowcursor ${sortBy == 'sourceRackName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceRackName')">Rack</th>
+						<th class="Arrowcursor ${sortBy == 'targetLocationName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetLocationName')">Target Location</th>
+						<th class="Arrowcursor ${sortBy == 'targetRackName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetRackName')">Target rack</th>
 						<th class="Arrowcursor ${sortBy == 'assetType' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetType')">Device Type</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','moveBundle')">Bundle</th>
@@ -61,13 +61,13 @@
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.locRoom}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.sourceRackName}</span>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.targetRack}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.targetRackName}</span>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetType}</span>
