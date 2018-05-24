@@ -34,4 +34,34 @@ class ApplicationCreationPage extends Page {
         acModalCancelBtn                { acModalWindow.find("button", "onclick":"EntityCrud.closeCreateModal();")}
         acModalCloseBtn                 { acModalWindow.find("button", class:"ui-dialog-titlebar-close")}
     }
+
+    def createApplication(dataMap){
+        waitFor {acModalAppName.displayed}
+
+        acModalAppName = dataMap.appName
+
+        acModalDescription = dataMap.appDesc
+
+        acModalSME1Selector.click()
+        def appSME1 = acModalSelectorValues[2].text()
+        acModalSelectorValues.find("div", role:"option", text: appSME1).first().click()
+
+        acModalSME2Selector.click()
+        waitFor { acModalSelectorValues.size() > 2 }
+        def appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-2,2)].text()
+        acModalSelectorValues.find("div", role:"option", text: appSME2).first().click()
+
+        acModalAppOwnerSelector.click()
+        waitFor { acModalSelectorValues.size() > 2 }
+        def appOwner = acModalSelectorValues.last().text()
+        acModalSelectorValues.find("div", role:"option", text: appOwner).first().click()
+
+        acModalBundleSelector.click()
+        acModalBundleSelector.find("option", text: dataMap.appBundle).click()
+
+        acModalPlanStatusSelector.click()
+        acModalPlanStatusSelector.find("option", text: dataMap.appStatus).click()
+
+        acModalSaveBtn.click()
+    }
 }

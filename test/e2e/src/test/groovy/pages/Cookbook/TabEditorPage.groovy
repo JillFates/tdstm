@@ -33,4 +33,9 @@ class TabEditorPage extends Page {
         edTabChangeLogsTab              { $("li", heading: "Change Logs").find("a")}
         edTabGroupsTab                  { $("li", heading: "Groups").find("a")}
     }
+
+    def clickOnEditButton(){
+        waitFor { edTabEditorBtn.present }
+        edTabEditorBtn.click()
+    }
 }

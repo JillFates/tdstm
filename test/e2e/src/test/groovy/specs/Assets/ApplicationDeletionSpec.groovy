@@ -4,22 +4,42 @@ import geb.spock.GebReportingSpec
 import pages.Assets.ApplicationDetailsPage
 import pages.Assets.ApplicationEditionPage
 import pages.Assets.ApplicationListPage
+import pages.Assets.ApplicationCreationPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import jodd.util.RandomString
 
 @Stepwise
 class ApplicationDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static filterPattern = "App For E2E"
-    static appName
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static baseName = "QAE2E"
+    static appName = baseName + " " + randStr + " App For E2E Created"
+    static appDesc = baseName + " " + randStr + " App Description Created"
+    static appBundle = "Buildout"
+    static appStatus = "Assigned"
+    static appDataMap = [
+            appName: appName,
+            appDesc: appDesc,
+            appBundle: appBundle,
+            appStatus: appStatus
+    ]
 
     def setupSpec() {
         testCount = 0
         to LoginPage
         login()
+        at MenuPage
+        waitFor { menuModule.goToApplications() }
+        at ApplicationListPage
+        clickOnCreateButton()
+        at ApplicationCreationPage
+        createApplication appDataMap
+        at ApplicationDetailsPage
+        closeDetailsModal()
     }
 
     def setup() {
@@ -48,9 +68,9 @@ class ApplicationDeletionSpec extends GebReportingSpec {
             at ApplicationListPage
         when: 'The User Click in The Filter Name Column'
             waitFor {alNameFilter.click()}
-            alNameFilter = filterPattern
+            alNameFilter = appName
         and: 'Adds the AppName in the Filter'
-            waitFor{alFirstAppName.text().trim().contains(filterPattern)}
+            waitFor{alFirstAppName.text().trim().contains(appName)}
             appName = alFirstAppName.text().trim()
         and: 'Clicks to Filter out'
             waitFor{alFirstAppName.click()}

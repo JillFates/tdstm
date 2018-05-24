@@ -37,4 +37,9 @@ class ApplicationDetailsPage extends Page{
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
         adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}
     }
+
+    def closeDetailsModal(){
+        waitFor {adModalCloseBtn.click()}
+        waitFor {!adModalWindow.displayed}
+    }
 }

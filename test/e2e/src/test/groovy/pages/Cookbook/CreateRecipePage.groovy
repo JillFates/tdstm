@@ -28,4 +28,12 @@ class CreateRecipePage extends Page {
         descriptionLabel        { $("label", for:"textareaDescription").text()}
         descriptionContents     { $("textarea#textareaDescription")}
     }
+
+    def createRecipe(recipeDataMap){
+        nameFieldContents = recipeDataMap.name
+        nameFieldContents == recipeDataMap.name
+        contextSelector2 = recipeDataMap.context
+        descriptionContents = recipeDataMap.description
+        saveButton.click()
+    }
 }
