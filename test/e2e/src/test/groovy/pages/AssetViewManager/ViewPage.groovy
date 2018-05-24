@@ -18,6 +18,8 @@ class ViewPage extends Page{
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
         commonsModule { module CommonsModule }
         viewMgrBreadCrumb {$('a.font-weight-bold')}
+        //starOn {$("fa text-yellow fa-star")}
+        starOff {$(".fa.text-yellow.fa-star-o")}
     }
 
     def verifyViewTitle(title) {
@@ -51,4 +53,15 @@ class ViewPage extends Page{
     def setExportFileName(name) {
         fileNameField = name
     }
+
+    def validateStarIsOff(){
+        starOff.displayed
+    }
+
+    def setViewAsFavorite() {
+        starOff.click()
+    }
+
+
+
 }

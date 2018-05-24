@@ -15,7 +15,7 @@ class ApplicationDetailsPage extends Page{
         adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title")}
 
         // TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
-        adModalAppName                  { adModalWindow.find("span","data-content":"Asset Name *")}
+        adModalAppName                  { adModalWindow.find("tr:nth-child(1) td:nth-child(2).C span")[0]}
         adModalDescription              { adModalWindow.find("span","data-content":"Description")}
         adModalSME1                     { adModalWindow.find("span","data-content":"SME1")}
         adModalSME2                     { adModalWindow.find("span","data-content":"SME2")}
@@ -36,5 +36,10 @@ class ApplicationDetailsPage extends Page{
         adModalAddCommentBtn            { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}','comment'"))}
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
         adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}
+    }
+
+    def closeDetailsModal(){
+        waitFor {adModalCloseBtn.click()}
+        waitFor {!adModalWindow.displayed}
     }
 }

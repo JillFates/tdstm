@@ -144,10 +144,8 @@ class WsAssetImportController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetImport)
 	def initiateTransformData(Long dataScriptId, String filename) {
-
 		def stopwatch = new StopWatch()
 		stopwatch.start()
-
 		Project project = getProjectForWs()
 		Map result = dataImportService.scheduleETLTransformDataJob(project, dataScriptId, filename)
 		renderSuccessJson(result)

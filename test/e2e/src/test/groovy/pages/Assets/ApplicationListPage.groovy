@@ -65,4 +65,8 @@ class ApplicationListPage extends Page {
         alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
         alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}
     }
+
+    def clickOnCreateButton(){
+        waitFor { alCreateAppBtn.click() }
+    }
 }

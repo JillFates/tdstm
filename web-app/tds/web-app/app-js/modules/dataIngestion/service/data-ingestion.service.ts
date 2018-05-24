@@ -600,7 +600,7 @@ export class DataIngestionService {
 	 * @param {string} filename
 	 * @returns {Observable<any>}
 	 */
-	testScript(script: string, filename: string): Observable<any> {
+	testScript(script: string, filename: string): Observable<ApiResponseModel> {
 		let postRequest = {
 			script: script,
 			filename: filename
@@ -775,7 +775,7 @@ export class DataIngestionService {
 	 * @returns {Observable<ApiResponseModel>}
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
-		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
+		return this.http.get(`${this.jobProgressUrl}/PROGRESS-KEY?_=${progressKey}`)
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());

@@ -87,21 +87,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private onTestScript(): void {
 		this.clearLogVariables('test');
-		// ------------------------- DUMMY CODE ---------------------------------
 		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
-		this.setTestScriptProgressInterval();
-		// ----------------------------------------------------------------------
-		// TODO: (real code) uncomment below code when endpoints ready!
-		/*
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
-				this.operationStatus.testProgress.progressKey = result.data.progressKey;
+				this.testScriptProgress.progressKey = result.data.progressKey;
 				this.setTestScriptProgressInterval();
 			} else {
 				this.operationStatus.test.state = CHECK_ACTION.INVALID;
 			}
 		}, error => this.operationStatus.test.state = CHECK_ACTION.INVALID);
-		*/
 	}
 
 	/**
@@ -136,10 +130,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 		// TODO: (real code) uncomment below code when endpoints ready!
 		/*
-		this.dataIngestionService.getJobProgress(this.operationStatus.testProgress.progressKey)
+		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
-				this.operationStatus.testProgress.currentProgress = currentProgress;
+				this.testScriptProgress.currentProgress = currentProgress;
 				if (currentProgress === 100) {
 					this.scriptTestResult = response.data.detail;
 					this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
