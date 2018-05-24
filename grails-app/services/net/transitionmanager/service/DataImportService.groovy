@@ -6,6 +6,7 @@ import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
@@ -1864,29 +1865,24 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// update progress closure
-		def updateProgressClosure = { Integer percentComp, String status, String detail ->
+		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
 			// if progress key is not provided, then just skip updating progress service
 			// this is useful during integration test invocation
 			if (progressKey) {
-				progressService.update(progressKey, percentComp, status, detail)
+				progressService.update(progressKey, percentComp, status.name(), detail)
 			}
-		}
+		} as ProgressCallback
 
 		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 
-		// TODO : SL 05/2018 : scriptProcessorService.execute() to accept a closure to update progress service
-		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename/*, updateProgressClosure*/)
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
+		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
+			project,
+			dataScript.etlSourceCode,
+			inputFilename,
+			updateProgressClosure)
+
 		result.filename = outputFilename
-		try {
-			os << (etlProcessor.resultsMap() as JSON)
-			os.close()
-		}
-		catch(e) {
-			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
-			throw new RuntimeException('Unable to write output file : ' + e.message)
-		}
 
 		return result
 	}

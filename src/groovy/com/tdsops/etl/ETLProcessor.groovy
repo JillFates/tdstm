@@ -46,7 +46,7 @@ import static org.codehaus.groovy.syntax.Types.POWER
  * @see com.tdsops.etl.ETLProcessor#set
  * @see com.tdsops.etl.ETLProcessor#iterate
  */
-class ETLProcessor implements RangeChecker {
+class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	/**
 	 * Static variable name definition for CE script variable
@@ -310,7 +310,7 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * Method invoked at the begin of the iterate command
+	 * Method invoked at the begin within the iterate loop
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 */
 	void topOfIterate(){
@@ -318,12 +318,14 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * Method invoked at the end of the iterate command
+	 * Method invoked at the begin within the iterate loop
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @param rowNum the current number de the rows
+	 * @param totalNumRows total number of rows for the current iterate loop
 	 */
-	void bottomOfIterate(){
+	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
+		reportRowProgress(rowNum, totalNumRows)
 	}
-
 
 	/**
 	 * Iterates a list of rows applying a closure
@@ -348,12 +350,12 @@ class ETLProcessor implements RangeChecker {
 
 			closure(addCrudRowData(row))
 
+			bottomOfIterate(currentRowIndex, rows.size())
 			currentRowIndex++
 			iterateIndex.next()
 			binding.removeAllDynamicVariables()
-			bottomOfIterate()
 		}
-
+		finishIterate()
 		iterateIndex = null
 		currentRowIndex--
 		return this
@@ -1164,11 +1166,12 @@ class ETLProcessor implements RangeChecker {
 	 * using this instance of the ETLProcessor.
 	 * @see GroovyShell#evaluate(java.lang.String)
 	 * @param script an ETL script content
+	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @return
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script){
-		return evaluate(script, defaultCompilerConfiguration())
+	Object evaluate(String script, ProgressCallback progressCallback = null){
+		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
 	/**
@@ -1179,13 +1182,16 @@ class ETLProcessor implements RangeChecker {
 	 * @param script an ETL script content
 	 * @params configuration
 	 * @return the result of evaluate ETL script param
+	 * @param progressCallback callback to report ETL script evaluation progress
 	 * @see TimedInterrupt
-
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script, CompilerConfiguration configuration){
-		return new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script,ETLProcessor.class.name)
+	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
+		prepareProgressIndicator(script, progressCallback)
+		scriptStarted()
+		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
+			.evaluate(script, ETLProcessor.class.name)
+		return result
 	}
 
 	/**
