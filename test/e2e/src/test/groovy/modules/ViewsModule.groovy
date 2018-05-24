@@ -1,6 +1,7 @@
 package modules
 
 import geb.Module
+import org.openqa.selenium.Keys
 
 class ViewsModule extends Module {
 
@@ -110,6 +111,7 @@ class ViewsModule extends Module {
     def clickFirstViewOfTheList(){
         vwGrid.find("tr")[1].find("a")[1].click()
     }
+
     def filterViewByName(String name){
         filter=name
     }
@@ -130,6 +132,7 @@ class ViewsModule extends Module {
     def getNumberOfRows(){
         viewsListed.size()
     }
+
     def openViewByName(name){
         filterViewByName name
         // verify exact match and no other was found with same name
@@ -142,11 +145,25 @@ class ViewsModule extends Module {
     def numberViewNamesEqualsNumberRows(){
         vwGridRows.size()==viewsListed.size()
     }
+
     def numberEditButtonsEqualsNumberRows(){
         editButtons.size()==vwGridRows.size()
     }
+
     def createdDateNotEmpty(){
         vwGridRows.findAll { it.find{"td[4]"}.text()!="" }
+    }
+
+    def setFirstNonFavViewAsFav(){
+        voidStars[0].click()
+    }
+
+    def goToFirstNonFavView(){
+        voidStars[0].parent().parent().next().find("[uisref]").click()
+    }
+
+    def getNameOfFirstNonFavView(){
+        voidStars[0].parent().parent().next().text()
     }
 
 }

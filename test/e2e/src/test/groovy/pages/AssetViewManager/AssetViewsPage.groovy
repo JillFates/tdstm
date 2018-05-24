@@ -20,6 +20,7 @@ class AssetViewsPage extends Page{
         viewMgrMyViews              {viewOptions[2]}
         viewMgrSharedViews          {viewOptions[3]}
         viewMgrSystemViews          {viewOptions[4]}
+        favViewsCounter             (required: false, wait:true){viewOptions[1].find("span")}
 
         //>>>>>>>>> MODULES
         allViewsModule              { module ViewsModule}
@@ -54,5 +55,11 @@ class AssetViewsPage extends Page{
         viewMgrSystemViews.click()
     }
 
+    def getFavCounter(){
+        favViewsCounter.text().toInteger()
+    }
+    def validateValueIncrement(int initial, int incremented){
+        initial+1==incremented
+    }
 
 }

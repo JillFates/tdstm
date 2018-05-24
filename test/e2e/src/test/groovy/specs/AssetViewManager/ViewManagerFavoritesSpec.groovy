@@ -15,13 +15,12 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     def testKey
     static testCount
     static numberOfRows
+    static favView
     //Define the names of the Application you will Create and Edit
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
-    def filteredName=""
-    static listAll=["All Assets"]
-    def listValidation=true
+
 
     def setupSpec() {
         testCount = 0
@@ -30,6 +29,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
         at MenuPage
         waitFor { menuModule.goToAssetViewManager() }
     }
+
     def "1. Validate User can reach Favorite Views"() {
         testKey = "TM-8503"
         given: "I am in Asset Views Page"
@@ -38,55 +38,50 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             waitFor {goToFavourites()}
         then: "I see at least the Favorites section"
             allViewsModule.moduleTitleIsCorrect("Favorites")
-        and: "The list is propely populated"
+        and: "The list is properly populated"
             allViewsModule.numberViewNamesEqualsNumberRows()
             allViewsModule.numberEditButtonsEqualsNumberRows()
             allViewsModule.createdDateNotEmpty()
-        and: "The all Star icons are ON"
+        and: "All Star icons are ON"
             allViewsModule.noVoidStarsAreDisplayed()
     }
-    /*
+
     def "2. Validates adding Favorites increases the counter on the left"(){
         testKey = "TM-8503"
-        given: "a"
+        given: "The user is in the View Manager Page"
+            waitFor {goToAllViews()}
             at AssetViewsPage
-        when : "I go to favorites"
-            waitFor {goToFavourites()}
-        then: "a"
-            allViewsModule.noVoidStarsAreDisplayed()
-        and: "a"
-            allViewsModule.moduleTitleIsCorrect("Favorites")
+        when : "Ths user sets a view as favorite"
+            def initialFavAmount= getFavCounter()
+            waitFor {allViewsModule.setFirstNonFavViewAsFav()}
+        then: "The counter is incremented"
+            waitFor{validateValueIncrement(initialFavAmount,getFavCounter())}
     }
+
     def "3. Validate star is off in non-fav view"(){
         testKey = "TM-8503"
-        given: "a"
+        given: "The user is in the View Manager Page"
             at AssetViewsPage
-        when : "a"
-            waitFor {viewMgrMyViews.click()}
-        then: "a"
-            allViewsModule.validateAuthor()
-        and: "a"
-            allViewsModule.moduleTitleIsCorrect("My Views")
+        when : "The user clicks on a non favorited view"
+            favView=allViewsModule.getNameOfFirstNonFavView()
+            allViewsModule.goToFirstNonFavView()
+            at ViewPage
+        then: "The view's star is disabled"
+            validateStarIsOff()
     }
-    def "4. Validates view just dded as fav is listed in all"(){
-        testKey = "TM-8503"
-        given: "n"
-            at AssetViewsPage
-        when : "qs"
-            waitFor {viewMgrSharedViews.click()}
-        then: "q"
-            allViewsModule.validateIsShared()
 
-    }
-    def "5. Validate views just fav´d is liste din favs"(){
+    def "4. Validates that the view just added as fav is listed in all"(){
         testKey = "TM-8503"
-        given: "s"
-            waitFor {viewMgrAllViews.click()}
-            numberOfRows=allViewsModule.getNumberOfRows()
-        when : "Ume"
-            allViewsModule.filterViewByName "All Assets"
-        then: "d"
-            allViewsModule.validateRowNames("All Assets", false)
+        given: "The user is in the View page"
+            at ViewPage
+        when : "The user clicks on the star"
+            setViewAsFavorite()
+        then: "The view is still listed in All views"
+            waitFor{clickViewManagerBreadCrumb()}
+            at AssetViewsPage
+            waitFor{allViewsModule.validateRowNames(favView,true)}
+        and: "The view is also listed in Favorite views"
+            waitFor {goToFavourites()}
+            waitFor{allViewsModule.validateRowNames(favView, true)}
     }
-    */
 }
