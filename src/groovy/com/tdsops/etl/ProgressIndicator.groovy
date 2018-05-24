@@ -47,6 +47,10 @@ trait ProgressIndicator {
 	 * Used to track # of rows processed in a iterate loop before actually reporting progress, -1 signifies first row in iterate
 	 */
 	Integer frequencyCounter = -1
+	/**
+	 * Counter incremented each iteration complete
+	 */
+	Integer iterateCounter
 
 	/**
 	 * Prepare script progress indicator using a instance of ProgressCallback
@@ -63,6 +67,7 @@ trait ProgressIndicator {
 		} else {
 			iterateRatio = 0
 		}
+		iterateCounter = 0
 	}
 
 	/**
@@ -105,7 +110,7 @@ trait ProgressIndicator {
 			frequencyCounter += 1
 			if (factorStepFrequency < frequencyCounter) {
 				// Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
-				Integer percentage = (((frequencyCounter * iterateRatio) + (currentRow / totalRows / iterateRatio)) * 100).intValue()
+				Integer percentage = (((iterateCounter * iterateRatio) + (currentRow / totalRows / iterateRatio)) * 100).intValue()
 				progressCallback.reportProgress(percentage, false, ProgressCallback.ProgressStatus.RUNNING, '')
 				frequencyCounter = 0
 			}
@@ -117,7 +122,8 @@ trait ProgressIndicator {
 	 */
 	void finishIterate() {
 		if (progressCallback){
-			Integer percentage = Math.round(frequencyCounter * iterateRatio * 100)
+			iterateCounter += 1
+			Integer percentage = Math.round(iterateCounter * iterateRatio * 100)
 			progressCallback.reportProgress(percentage, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 		frequencyCounter = -1
