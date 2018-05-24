@@ -396,6 +396,28 @@ class MetricReportingServiceSpec extends Specification {
 				""".stripIndent()
 	}
 
+
+	void 'TM-10850 test getQuery invalid domain in query'() {
+
+		setup: 'Given a query JSON structure no where'
+			JSONObject query = [
+				"domain"     : "device",//invalid for ETLDomain
+				"join"       : [
+					[
+						"domain": "Dependency",
+						"on"    : "Dependency.asset.id = Application.id"
+					]
+				],
+				"aggregation": "count(*)"
+			] as JSONObject
+
+		when: 'getQuery is called with the JSON query'
+			service.getQuery(query)
+
+		then: 'getQuery returns an HQL string'
+			thrown InvalidParamException
+	}
+
 	void 'test processWheres'() {
 		setup: 'Given a list of where definitions and a domainClass'
 			List<Map> whereDefinitions = []

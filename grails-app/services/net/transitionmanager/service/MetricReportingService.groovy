@@ -168,6 +168,11 @@ class MetricReportingService {
 	 */
 	String getQuery(JSONObject query) {
 		ETLDomain etlDomain = ETLDomain.lookup((String) query.domain)
+
+		if(!etlDomain){
+			throw new InvalidParamException("$query.domain is not a valid domain to run a query on.")
+		}
+
 		Class domainClass = etlDomain.clazz
 		String domain = domainClass.simpleName
 		String aggregation = processAggregation((String) query.aggregation)
