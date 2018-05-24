@@ -59,6 +59,19 @@
 
         var progressTimer;
 
+		// Ordinal position of various properties in the rowObject
+		var TASK_NUM=1;
+		var STATUS=7;
+		var TASK_STATUS_CLASS = 13;
+		var DUE_CLASS = 14;
+		var ASSET_ID = 15;
+		var ASSET_TYPE = 16;
+		var ASSET_CLASS = 17;
+		var INST_LINK = 18;
+		var EST_START_CLASS=19;
+		var EST_FINISH_CLASS=20;
+		var IS_PUBLISHED=21;
+
 		$(document).ready(function() {
 
             progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.TASKMGR_REFRESH}', function () {
@@ -99,16 +112,17 @@
 			var sizePref = '${sizePref}'
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
-			var taskManagerUrl = "/assetEntity/listTasks"
+			var taskManagerUrl = "/assetEntity/listTasks";
             /*
              * If the filteredRequest is set, then the user landed here via a task link from another page
              * with some filters. Therefore, the Clear Filters button should be enabled.
              */
             var clearFiltersDisableText = filteredRequest? '' : " disabled = 'disabled' "
-			var listCaption ="<label for='lbl-task-list-title'>Tasks</label>: \
+			var listCaption = "<label for='lbl-task-list-title'>Tasks</label>: \
 				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
-				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>\
-				<span class=\"capBtn task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary action-button\"><input style=\"border: 0px; color: #2C61AA; padding:3px; font-weight: bold;\" type=\"button\" class=\"clearFilterId\" value=\"Clear Filters\" " + clearFiltersDisableText + " onclick=\"clearFilter('taskListId')\"></span>";
+				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton> \
+				<span class=\"capBtn task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary action-button\"> \
+				<input style=\"border: 0px; color: #2C61AA; padding:3px; font-weight: bold;\" type=\"button\" class=\"clearFilterId\" value=\"Clear Filters\" " + clearFiltersDisableText + " onclick=\"clearFilter('taskListId')\"></span>";
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due Date', 'Status',
@@ -169,34 +183,50 @@
 		};
 
 		function myCustomFormatter (cellVal, options, rowObject) {
-			var value = rowObject && rowObject[1] ? _.escape(rowObject[1]) : '';
+			var value = rowObject && rowObject[TASK_NUM] ? _.escape(rowObject[TASK_NUM]) : '';
 			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task ' + value + '">'+
 				"<img src='${resource(dir:'icons',file:'table_edit.png')}' border='0px'/>"+"</a>"
 			return editButton
 		}
+
 		function isPublishedFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[IS_PUBLISHED] ? rowObject[IS_PUBLISHED] : "false") + '</span>';
 		}
 
 		function taskViewFormatter(cellVal,options,rowObject) {
-			return '<span title="View Task '+ (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +'" class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
+			return '<span title="View Task ' +
+				(cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +
+				'" class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId +
+				'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[ASSET_ID] +
+				'" status="'+rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' +
+				(cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +
+				'</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId +
+				'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[ASSET_ID] +
+				'" status="'+rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' +
+				(cellVal || cellVal == 0 ? (cellVal && isNaN(cellVal) && cellVal.indexOf('href=') > 0 ? cellVal : _.escape(cellVal)) :"") +
+				'</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[TASK_STATUS_CLASS] +
+				' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[ASSET_ID]+'" status="' +
+				rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' + cellVal + '</span>';
 		 }
 
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+			 return '<span id="span_'+options.rowId +
+			 	'" class="cellWithoutBackground" action-bar-cell config-table="config.table" comment-id="'+options.rowId +
+				 '" asset-id="'+rowObject[ASSET_ID]+'" status="'+rowObject[STATUS] + '" instructions-link="'+rowObject[INST_LINK] +
+				 '">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
 			return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
-				rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
+				rowObject[ASSET_ID] + '" master="true" action-bar-cell config-table="config.table" comment-id="'+
 				options.rowId+
 				'" asset-id="'+
-				rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+				rowObject[ASSET_ID]+'" status="'+rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' + cellVal + '</span>';
 		}
 
         /**
@@ -207,10 +237,9 @@
          */
         function estStartFormatter(cellVal,options,rowObject){
             return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
-                rowObject[20] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
-                options.rowId+
-                '" asset-id="'+
-                rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+                rowObject[EST_START_CLASS] +'" master="true" action-bar-cell config-table="config.table" comment-id="' + options.rowId+
+                '" asset-id="'+ rowObject[ASSET_ID] + '" status="'+rowObject[STATUS] +
+				'" instructions-link="'+rowObject[INST_LINK]+'">' + cellVal + '</span>';
         }
 
         /**
@@ -221,20 +250,23 @@
          */
         function estFinishFormatter(cellVal,options,rowObject){
             return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
-                rowObject[21] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
+                rowObject[EST_FINISH_CLASS] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+
                 options.rowId+
                 '" asset-id="'+
-                rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+                rowObject[ASSET_ID]+'" status="'+rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' + cellVal + '</span>';
         }
-		function assetFormatter(cellVal,options,rowObject){
-			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[17]+'\', '+rowObject[15]+')\" >' + _.escape(cellVal) + '</span>' :
-				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
+		function assetFormatter(cellVal,options,rowObject) {
+			return ( options.colModel.name == "assetName" && cellVal
+				? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[ASSET_CLASS]+'\', '+rowObject[ASSET_ID]+')\" >' + _.escape(cellVal) + '</span>'
+				: (cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
+			);
 		}
 
 		function instructionsLinkFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground ' + rowObject[TASK_STATUS_CLASS] +
+			' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[ASSET_ID ] +
+			'" status="'+rowObject[STATUS]+'" instructions-link="'+rowObject[INST_LINK]+'">' + cellVal + '</span>';
 		}
-
 
 		function myLinkFormatter (cellvalue, options, rowObject) {
 				var value = cellvalue ? _.escape(cellvalue) : ''
@@ -339,7 +371,7 @@
 						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
 							${taskPref[key]==attribute.key ? 'checked' : '' }
 							onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Task_Columns}')"
-							/> 
+							/>
 							${attribute.value}
 						</label>
 						<br>

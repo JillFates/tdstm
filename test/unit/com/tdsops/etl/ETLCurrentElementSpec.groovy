@@ -6,7 +6,6 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -25,8 +24,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import org.apache.http.client.utils.DateUtils
-import spock.lang.See
 import spock.lang.Shared
 
 /**
@@ -200,17 +197,10 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			with (etlProcessor.resultsMap()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == [] as Set
-					with(data[0]){
-						op == 'I'
-						errorCount == 0
-						warn == false
-						duplicate == false
-						errors == []
-						fields == [:]
-					}
+					data.isEmpty()
 				}
 			}
 
@@ -411,7 +401,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 		and: 'Results contains the following values'
 			with(etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					with(data[0]) {

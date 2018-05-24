@@ -185,9 +185,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			with (etlProcessor.resultsMap()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					data[0].fields == [:]
+					data.size() == 0
 				}
 			}
 	}
@@ -217,10 +217,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			with (etlProcessor.resultsMap()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 			}
 	}
@@ -260,22 +259,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		and: 'A new result was added in the result'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 3
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 
-				with(domains[1]) {
+				with(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 
-				with(domains[2]) {
+				with(domains[2], DomainResult) {
 					domain == ETLDomain.Storage.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 			}
 	}
@@ -300,16 +296,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 
-				with(domains[1]) {
+				with(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
-					data.size() == 1
-					data[0].fields == [:]
+					data.size() == 0
 				}
 			}
 	}
@@ -506,7 +500,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					with(data[0]) {
@@ -554,7 +548,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'environment'] as Set
 					data.size() == 2
@@ -603,7 +597,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
 					data.size() == 2
@@ -626,7 +620,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using DOMAIN.property'() {
+	void 'test can load a field using DOMAINproperty'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -654,7 +648,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
 					data.size() == 2
@@ -721,7 +715,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
 					data.size() == 2
@@ -788,7 +782,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					with(data[0]) {
@@ -831,7 +825,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 					with(data[0]) {
@@ -948,7 +942,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Every field property is assigned to the correct element'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					with(data[0]) {
 						rowNum == 1
@@ -1000,7 +994,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Every field property is assigned to the correct element'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					with(data[0]) {
 						rowNum == 1
@@ -1086,7 +1080,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain Application domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
@@ -1140,7 +1134,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 
 
-				with(domains[1]) {
+				with(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
@@ -1306,7 +1300,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
 					with(data[0]) {
@@ -1374,7 +1368,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown()
-			e.message == 'A domain must be specified'
+			e.message == 'A \'domain Class\' must be specified before any load or find commands'
 
 		cleanup:
 			if(fileName){
@@ -1440,7 +1434,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
 
@@ -1529,7 +1523,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
@@ -1547,7 +1541,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1]) {
+				with(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.size() == 1
@@ -1604,7 +1598,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
@@ -1622,7 +1616,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 				}
 
-				with(domains[1]) {
+				with(domains[1], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.isEmpty()
@@ -1655,7 +1649,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'A domain must be specified'
+			e.message == 'A \'domain Class\' must be specified before any load or find commands'
 	}
 
 	void 'test can ignore even if results are empty'() {
@@ -1684,7 +1678,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results will ignore a row'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 1
@@ -1718,7 +1712,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results will ignore a row'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 1
@@ -1755,7 +1749,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Third row was removed from the domain results'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.size() == 5
@@ -1803,7 +1797,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain values from the local variable'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
@@ -1861,7 +1855,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain values from the local variable'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
@@ -1920,7 +1914,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain values from the local variable'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['environment', 'assetName'] as Set
 					data.size() == 2
@@ -1992,7 +1986,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain values from the local variable'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
 					data.size() == 2
@@ -2079,16 +2073,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then:
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
-					with(data[0]) {
-						with(fields.assetName) {
-							value == 'fubar'
-							originalValue == 'fubar'
-						}
+				with(domains[0], DomainResult) {
+					with(data[0], RowResult) {
+						with(fields, Map){
 
-						with(fields.custom1) {
-							Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-							assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+							with(assetName, FieldResult) {
+								value == 'fubar'
+								originalValue == 'fubar'
+							}
+
+							with(custom1, FieldResult) {
+								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+								assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+							}
 						}
 					}
 				}
@@ -2131,7 +2128,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'Results should contain values from the local variable'
 			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
@@ -2226,7 +2223,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid variable name: Custom Name. Valid ETL variable names must end with 'Var'".toString()
+			e.message == "Invalid variable name: Custom Name. Variable names must end with 'Var'"
 
 		cleanup:
 			if(fileName){
@@ -2266,7 +2263,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 					with(data[0]) {

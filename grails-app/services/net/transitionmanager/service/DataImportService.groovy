@@ -252,7 +252,10 @@ class DataImportService implements ServiceMethods {
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
 				eavEntityType: eavEntityType,
-				dataTransferSet: dts
+				dataTransferSet: dts,
+
+				// Make an assumption that the export time was now...
+				exportDatetime: new Date()
 			)
 
 		// Check if the transfer batch is valid, report the error if not.
@@ -343,34 +346,22 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - additional parameters required for logging
 	 */
 	private void importRow(session, Object batch, JSONObject rowData, Map importContext ) {
-		boolean canImportRow=false
-
+		boolean importOfRowOkay = false
 		Long domainId = getAndValidateDomainId(rowData, importContext)
-
-		// TODO : JPM 3/2018 : Need to review this code further to see if we can clean this up
-		// Process the row as long as there wasn't an error with the ID reference
-		// if (domainId == null || domainId > 0) {
-
-			// Validate that the row can be processed, any errors will be captured in importContext.errors
-			// TODO : JPM 2/2018 : MINOR - Review and fix the canRowDataBeImported logic, wait for Dependency imports
-			// canImportRow = canRowDataBeImported(rowData, domainId, importContext)
-			canImportRow=true
-
-			if (canImportRow) {
-				if (importContext.isLegacy) {
-					canImportRow = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext )
-				} else {
-					canImportRow = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
-				}
+		log.debug "importRow() id={}", domainId
+		if (importContext.isLegacy) {
+			if (domainId == null || domainId > 0) {
+				importOfRowOkay = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext)
 			}
-		// }
+		} else {
+			importOfRowOkay = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
+		}
 
-		if (canImportRow) {
+		if (importOfRowOkay) {
 			importContext.rowsCreated++
 		} else {
 			importContext.rowsSkipped++
 		}
-
 	}
 
 	/**

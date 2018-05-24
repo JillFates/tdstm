@@ -2,6 +2,7 @@ package specs.Cookbook
 
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
+import pages.Cookbook.CreateRecipePage
 import pages.Cookbook.TabHistoryPage
 import pages.Cookbook.TabHistoryTabActionsPage
 import pages.Cookbook.TabHistoryTabGenLogPage
@@ -10,22 +11,31 @@ import pages.Cookbook.TaskDetailsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import jodd.util.RandomString
 
 @Stepwise
 class RecipeHistorySpec extends GebReportingSpec {
     def testKey
     static testCount
-    static recipeText
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static baseName = "QAE2E"
+    static recipeName = baseName + " " + randStr + " Geb Recipe Test"
+    static recipeDataMap = [
+            name: recipeName,
+            context: "Event",
+            description: "This is a Geb created recipe for an Event context"
+    ]
 
     def setupSpec() {
         testCount = 0
         to LoginPage
         login()
-        
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
-        waitFor { recipeGridRows.size() > 0 }
+        clickOnCreateButton()
+        at CreateRecipePage
+        createRecipe recipeDataMap
     }
 
     def setup() {
@@ -45,7 +55,7 @@ class RecipeHistorySpec extends GebReportingSpec {
             waitFor { gebRecipes.getAt(0).click()}
 
         then: 'Text containing the Recipe Name should be displayed'
-            gebRecipes.getAt(0).text().trim() == "Geb Recipe Test"
+            gebRecipes.getAt(0).text().trim() == recipeName
     }
 
     // History Tab (empty)

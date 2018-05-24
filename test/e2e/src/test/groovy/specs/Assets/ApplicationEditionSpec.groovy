@@ -42,40 +42,25 @@ class ApplicationEditionSpec extends GebReportingSpec {
     static isDepType = "Batch"
     static isDepStatus = "Confirmed"
 
+    static appDataMap = [
+            appName: appNameOld,
+            appDesc: appDescOld,
+            appBundle: appBundleOld,
+            appStatus: appStatusOld
+    ]
+
     def setupSpec() {
         testCount = 0
         to LoginPage
         login()
         at MenuPage
-
-        // Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
-        // NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         waitFor { menuModule.goToApplications() }
         at ApplicationListPage
-        waitFor { alCreateAppBtn.click() }
+        clickOnCreateButton()
         at ApplicationCreationPage
-        acModalAppName = appNameOld
-        acModalDescription = appDescOld
-        acModalSME1Selector.click()
-        waitFor { acModalSelectorValues.size() > 2 }
-        appSME1 = acModalSelectorValues[2].text()
-        acModalSelectorValues.find("div", role:"option", text: appSME1).first().click()
-        acModalSME2Selector.click()
-        waitFor { acModalSelectorValues.size() > 2 }
-        appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-2,2)].text()
-        acModalSelectorValues.find("div", role:"option", text: appSME2).first().click()
-        acModalAppOwnerSelector.click()
-        waitFor { acModalSelectorValues.size() > 2 }
-        appOwner = acModalSelectorValues.last().text()
-        acModalSelectorValues.find("div", role:"option", text: appOwner).first().click()
-        acModalBundleSelector.click()
-        acModalBundleSelector.find("option", text: appBundleOld).first().click()
-        acModalPlanStatusSelector.click()
-        acModalPlanStatusSelector.find("option", text: appStatusOld).first().click()
-        acModalSaveBtn.click()
+        createApplication appDataMap
         at ApplicationDetailsPage
-        waitFor { adModalCloseBtn.click() }
-        at ApplicationListPage
+        closeDetailsModal()
     }
 
     def setup() {

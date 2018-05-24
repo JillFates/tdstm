@@ -4,6 +4,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
@@ -166,7 +167,8 @@ class MetricReportingService {
 	 * @return and hql string that can be run to get metric data.
 	 */
 	String getQuery(JSONObject query) {
-		Class domainClass = ETLDomain.lookup((String) query.domain).clazz
+		ETLDomain etlDomain = ETLDomain.lookup((String) query.domain)
+		Class domainClass = etlDomain.clazz
 		String domain = domainClass.simpleName
 		String aggregation = processAggregation((String) query.aggregation)
 		List groupBys = query?.groupBy?.clone() ?: []
@@ -177,7 +179,7 @@ class MetricReportingService {
 		String groupBy = getGroupBy(groupBys)
 
 		List wheres = query?.where?.clone() ?: []
-		processWheres(wheres, domainClass)
+		processWheres(wheres, domainClass, etlDomain)
 		String where = getWhere(wheres)
 
 		return """
@@ -198,7 +200,12 @@ class MetricReportingService {
 	 *
 	 * @return The list of where definitions.
 	 */
-	List<Map> processWheres(List<Map> whereDefinitions, Class domainClass) {
+	List<Map> processWheres(List<Map> whereDefinitions, Class domainClass, ETLDomain originalDomain) {
+		if (originalDomain == ETLDomain.Device) {
+			// Need to exclude Application, Database and Storage (aka Files)
+			whereDefinitions << [column: 'assetClass', expression: "= '${AssetClass.DEVICE.name()}'"]
+		}
+
 		switch (domainClass) {
 			case {it in AssetEntity}:
 				whereDefinitions << [column: 'moveBundle.useForPlanning', expression: '= 1']
