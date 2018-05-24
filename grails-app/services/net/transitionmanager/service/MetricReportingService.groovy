@@ -170,7 +170,7 @@ class MetricReportingService {
 		ETLDomain etlDomain = ETLDomain.lookup((String) query.domain)
 
 		if(!etlDomain){
-			throw new InvalidParamException("$query.domain is not a valid domain to run a query on.")
+			throw new InvalidParamException("Invalid domain (${query.domain}) specified in Metric definition (code ${query.metricCode})")
 		}
 
 		Class domainClass = etlDomain.clazz
