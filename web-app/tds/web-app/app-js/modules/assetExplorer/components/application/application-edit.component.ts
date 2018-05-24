@@ -10,8 +10,9 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
-import {Person} from '../../../../shared/components/add-person/model/person.model';
-import {AddPersonComponent} from '../../../../shared/components/add-person/add-person.component';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
 
 interface SelectedItem {
 	class: string;
@@ -30,7 +31,13 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
 		private dateFormat: string;
-		constructor(@Inject('model') private model: any, private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private preference: PreferenceService) {}
+		constructor(
+			@Inject('model') private model: any,
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetExplorerService: AssetExplorerService,
+			private notifierService: NotifierService,
+			private preference: PreferenceService) {}
 		ngOnInit(): void {
 			console.log('Loading application-edit.component');
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
@@ -57,21 +64,8 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
-				// this.model.asset.startUpBySelectedValue.text = 'Temp value';
 			}
 
-			/*
-			this.model.asset.assetTypeSelectValue = {id: null};
-			if (this.model.asset.assetType) {
-				this.model.asset.assetTypeSelectValue.id = this.model.asset.assetType;
-				this.model.asset.assetTypeSelectValue.text = this.model.asset.assetType;
-			}
-			this.model.asset.manufacturerSelectValue = {id: null};
-			if (this.model.asset.manufacturer) {
-				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
-				this.model.asset.manufacturerSelectValue.text = this.model.asset.manufacturer.text;
-			}
-			*/
 		}
 
 		getCurrentValue(control: string) {
@@ -90,31 +84,59 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 			}
 		}
 
-		addPerson(event, partyGroupList) {
-
-			let person: Person = {
-				name: 'the name',
-				partyGroupList
-			};
-
-			this.dialogService.extra(AddPersonComponent,
-				[UIDialogService,
-					{
-						provide: Person,
-						useValue: person
-					}
-				], true, false)
-				.then((result) => {
-					console.log(result);
-					// dataItem.comment = result.comment;
-				}).catch((error) => console.log(error));
-		}
-
 		/***
 		 * Close the Active Dialog
 		 */
 		cancelCloseDialog(): void {
 			this.activeDialog.close();
+		}
+
+		private showAssetDetailView(assetClass: string, id: number) {
+			this.dialogService.replace(AssetShowComponent, [
+					{ provide: 'ID', useValue: id },
+					{ provide: 'ASSET', useValue: assetClass }],
+				'lg');
+		}
+
+		onUpdate(): void {
+			const modelRequest   = R.clone(this.model);
+
+			if (modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId ) {
+				modelRequest.asset.appOwner.id = modelRequest.asset.appOwner.id.personId;
+			}
+
+			if (modelRequest.asset.sme && modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId ) {
+				modelRequest.asset.sme.id = modelRequest.asset.sme.id.personId;
+			}
+
+			if (modelRequest.asset.sme2 && modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId ) {
+				modelRequest.asset.sme2.id = modelRequest.asset.sme2.id.personId;
+			}
+
+			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+			delete modelRequest.asset.moveBundle;
+
+			// Scale Format
+			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+
+			// Custom Fields
+			this.model.customs.forEach((custom: any) => {
+				let customValue = modelRequest.asset[custom.field.toString()];
+				if (customValue && customValue.value) {
+					modelRequest.asset[custom.field.toString()] = customValue.value;
+				}
+			});
+
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+				this.notifierService.broadcast({
+					name: 'reloadCurrentAssetList'
+				});
+				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+			});
+
+			console.log('Model request 9:');
+			console.log(modelRequest);
+			console.log('-----------');
 		}
 
 	}

@@ -69,8 +69,7 @@
 											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
-											(valueChange)="addPerson($event, ${partyGroupList as JSON} )"
-											[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
+											[data]="${personList as JSON}">
 									</kendo-dropdownlist>
 								%{--	<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -113,8 +112,7 @@
 									[defaultItem]="defaultItem"
 									[textField]="'fullName'"
 									[valueField]="'personId'"
-									(valueChange)="addPerson($event, ${partyGroupList as JSON})"
-									[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
+									[data]="${personList as JSON}">
 								</kendo-dropdownlist>
 							%{--		<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
@@ -166,8 +164,7 @@
 											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
-											(valueChange)="addPerson($event, ${partyGroupList as JSON})"
-											[data]="[{personId: '-1', fullName:'Add person'}].concat(${personList as JSON})">
+											[data]="${personList as JSON}">
 									</kendo-dropdownlist>
 %{--
 									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
@@ -363,8 +360,9 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownDuration}" tooltipDataPlacement="bottom">
-									<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}"
-										value="${applicationInstance.shutdownDuration}" tabindex="48" size="7"/>m
+									<input type="text" id="shutdownDuration" name="shutdownDuration"
+										   class="${standardFieldSpecs.shutdownDuration.imp?:''}"
+										   [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
 								</tdsAngular:tooltipSpan>
 								</td>
 							</tr>
@@ -373,7 +371,7 @@
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupBy}">
 									<tds-combobox-group
-											[model]="model.asset.startupFixed"
+											[model]="model.asset.startupBy"
 											[isFixed]="${asset.startupFixed}"
 											[people]="${personList as JSON}"
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
@@ -415,7 +413,8 @@
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.testingDuration}" tooltipDataPlacement="bottom">
 									<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration"
-											value="${applicationInstance.testingDuration}" tabindex="49"  size="7"/>m
+										   [(ngModel)]="model.asset.testingDuration"
+										   tabindex="49"  size="7"/>m
 								</tdsAngular:tooltipSpan>
 								</td>
 							</tr>
