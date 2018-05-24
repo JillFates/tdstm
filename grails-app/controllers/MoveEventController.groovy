@@ -1,10 +1,9 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
@@ -12,7 +11,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventSnapshot
@@ -35,10 +33,6 @@ import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.sql.Timestamp
-
-import static net.transitionmanager.domain.Permissions.Roles.ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
-import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 @Slf4j(value='logger', category='grails.app.controllers.MoveEventController')
@@ -80,9 +74,9 @@ class MoveEventController implements ControllerMethods {
 
 	private static final List<String> otherCols = ['id', 'application', 'assetName', 'shortName', 'serialNumber',
 	                                               'assetTag', 'manufacturer', 'model', 'assetType', 'ipAddress', 'os',
-	                                               'sourceLocation', 'sourceLocation', 'sourceRack', 'sourceRackPosition',
-	                                               'sourceChassis', 'sourceBladePosition', 'targetLocation', 'targetRoom',
-	                                               'targetRack', 'targetRackPosition', 'targetChassis',
+	                                               'sourceLocationName', 'sourceRoomName', 'sourceRackName', 'sourceRackPosition',
+	                                               'sourceChassis', 'sourceBladePosition', 'targetLocationName', 'targetRoomName',
+	                                               'targetRackName', 'targetRackPosition', 'targetChassis',
 	                                               'targetBladePosition', 'custom1', 'custom2', 'custom3', 'custom4',
 	                                               'custom5', 'custom6', 'custom7', 'custom8', 'moveBundle', 'truck',
 	                                               'cart', 'shelf', 'railType', 'priority', 'planStatus', 'usize']

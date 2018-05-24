@@ -217,16 +217,16 @@
 				<dt>Model:</dt><dd>&nbsp;${projMap?.asset?.model}</dd>
 				<dt>Serial #:</dt><dd>&nbsp;${projMap?.asset?.serialNumber}</dd>
 				<g:if test="${location == 's'}">			   	
-			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocation}</dd>
-			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoom}</dd>
-			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.sourceRack}/${projMap?.asset?.sourceRackPosition}</dd>
+			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.sourceLocationName}</dd>
+			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.sourceRoomName}</dd>
+			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.sourceRackName}/${projMap?.asset?.sourceRackPosition}</dd>
 			   		<dt>Plan Status:</dt><dd>&nbsp;${projMap?.asset?.planStatus}</dd>
 					<dt>Rail Type:</dt><dd>&nbsp;${projMap?.asset?.railType}</dd>  			   	
 				</g:if>
 				<g:else>				
-			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.targetLocation}</dd>
-			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.targetRoom}</dd>
-			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.targetRack}/${projMap?.asset?.targetRackPosition}</dd>
+			   		<dt>Location:</dt><dd>&nbsp;${projMap?.asset?.targetLocationName}</dd>
+			   		<dt>Room:</dt><dd>&nbsp;${projMap?.asset?.targetRoomName}</dd>
+			   		<dt>Rack/Pos:</dt><dd>&nbsp;${projMap?.asset?.targetRackName}/${projMap?.asset?.targetRackPosition}</dd>
 			   		<dt>Truck:</dt><dd>&nbsp;${projMap?.asset?.truck}</dd>
 			   		<dt>Cart/Shelf:</dt><dd>&nbsp;${projMap?.asset?.cart}/${projMap?.asset?.shelf}</dd>
 			   		<dt>Plan Status:</dt><dd>&nbsp;${projMap?.asset?.planStatus}</dd>

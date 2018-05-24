@@ -305,7 +305,7 @@ function checkComments(type) {
 		<input type="hidden" name="hasRemoteMgmt" value="${assetEntity.hasRemoteMgmt}">
 		<input type="hidden" name="generalComment" id="generalCommentId" value="Asset changed: ">
 		<input type="hidden" id="mustSaveId" name="mustSave" value=""/>
-		<g:if test="${location != assetEntity.sourceLocation}">
+		<g:if test="${location != assetEntity.sourceLocationName}">
 			<input type="hidden" id="sourceLocation" name="sourceLocation" value="${location}"/>
 		</g:if>
 		<div style="FLOAT: left"><a class=button href="startMenu">Start Over</a></div>
@@ -444,11 +444,11 @@ function checkComments(type) {
 			<table>
 			<tr>
 				<td class="label">Room:</td>
-				<td class="field"><input type="text" name="sourceRoom" value="${assetEntity?.sourceRoom}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRoom}','front2', this.name)"/></td>
+				<td class="field"><input type="text" name="sourceRoom" value="${assetEntity?.sourceRoomName}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRoomName}','front2', this.name)"/></td>
 			</tr>
 			<tr>
 				<td class="label">Rack:</td>
-				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRack}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRack}','front2', this.name)"/></td>
+				<td class="field"><input type="text" name="sourceRack" value="${assetEntity?.sourceRackName}" size="8" maxlength="50" onchange="setMustSave(this.value,'${assetEntity?.sourceRackName}','front2', this.name)"/></td>
 			</tr>
 
 			<tr>
@@ -583,7 +583,7 @@ function checkComments(type) {
 		</tr>
 		<tr>
 			<td class="label">Rack:</td>
-			<td class="field">${assetEntity?.sourceRack}</td>
+			<td class="field">${assetEntity?.sourceRackName}</td>
 		</tr>
 		<tr>
 			<td class="label">U-Position:</td>
@@ -629,7 +629,7 @@ function checkComments(type) {
 		   	jobdata.AddNewRecord();
 		   	jobdata.SetDataField('assetName', "${assetEntity?.assetName}");
 		   	jobdata.SetDataField('assetTag', "${assetEntity?.assetTag}");
-		   	jobdata.SetDataField('rack', "${assetEntity?.sourceRack}");
+		   	jobdata.SetDataField('rack', "${assetEntity?.sourceRackName}");
 		   	jobdata.SetDataField('upos', "${assetEntity?.sourceRackPosition}");
 
 		    // now we print one copy of the label with default settings
@@ -851,8 +851,8 @@ function checkComments(type) {
 		getObject("hasObstructionNo").checked = false
 	}
 
-	if("${location}" != "${assetEntity.sourceLocation}"){
-		setMustSave( "${location}", "${assetEntity.sourceLocation}", "", "sourceLocation");
+	if("${location}" != "${assetEntity.sourceLocationName}"){
+		setMustSave( "${location}", "${assetEntity.sourceLocationName}", "", "sourceLocation");
 	}
 	/*
 	* Script for Manufacturer and Model.

@@ -76,10 +76,10 @@
 				var assetType = '${assetType}';
 				var model = '${model}';
 				var manufacturer = '${manufacturer}';
-				var sourceLocation = '${sourceLocation}';
-				var sourceRack = '${sourceRack}';
-				var targetLocation = '${targetLocation}';
-				var targetRack = '${targetRack}';
+				var sourceLocationName = '${sourceLocationName}';
+				var sourceRackName = '${sourceRackName}';
+				var targetLocationName = '${targetLocationName}';
+				var targetRackName = '${targetRackName}';
 				var assetTag = '${assetTag}';
 				var serialNumber = '${serialNumber}';
 				var sortIndex = '${sortIndex}';
@@ -113,7 +113,7 @@
 						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter}, 
-						{name:'sourceLocation', formatter:tdsCommon.jqgridTextCellFormatter},
+						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
@@ -134,8 +134,8 @@
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
-						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
-						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
+						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocationName: sourceLocationName , sourceRackName:sourceRackName,
+						targetLocationName:targetLocationName, targetRackName :targetRackName,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="assetListId" />
@@ -192,10 +192,10 @@
 					$("#gs_assetName").val('${assetName}')
 					$("#gs_assetType").val('${assetType}')
 					$("#gs_model").val('${model}')
-					$("#gs_sourceLocation").val('${sourceLocation}')
-					$("#gs_sourceRack").val('${sourceRack}')
-					$("#gs_targetLocation").val('${targetLocation}')
-					$("#gs_targetRack").val('${targetRack}')
+					$("#gs_sourceLocationName").val('${sourceLocationName}')
+					$("#gs_sourceRackName").val('${sourceRackName}')
+					$("#gs_targetLocationName").val('${targetLocationName}')
+					$("#gs_targetRackName").val('${targetRackName}')
 					$("#gs_serialNumber").val('${serialNumber}')
 					if(planStatus) {
 						$("#gs_planStatus").val(planStatus)
