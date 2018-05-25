@@ -7,6 +7,7 @@
                         [valueField]="'id'"
                         [filterable]="true"
                         (filterChange)="handleFilter($event)"
+                        (valueChange)="onChangeFilter($event)"
                         [popupSettings]="{popupClass: 'combo-group-open'}"
                         name="comboGroup">
             <ng-template kendoComboBoxItemTemplate let-dataItem>
@@ -25,6 +26,6 @@
             </ng-template>
     </kendo-combobox>
     <div>
-        <label class="fixed"><input type="checkbox" [disabled]="!model || isTeamItemSelected()" />Fixed</label>
+        <label class="fixed"><input type="checkbox" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
     </div>
 </div>

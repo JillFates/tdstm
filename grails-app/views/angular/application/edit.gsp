@@ -58,7 +58,7 @@
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme}">
 									<kendo-dropdownlist #controlSme
-											class="select"
+											class="person-list"
 											name="modelAssetSme"
 											[(ngModel)]="model.asset.sme.id"
 											[defaultItem]="defaultItem"
@@ -66,12 +66,6 @@
 											[valueField]="'personId'"
 											[data]="${personList as JSON}">
 									</kendo-dropdownlist>
-								%{--	<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
-										optionValue="${{it.fullName}}"
-										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"
-										tabindex="23"
-										noSelection="${['null':' Please Select']}"
-									/>--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -79,7 +73,7 @@
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.environment}">
 									<kendo-dropdownlist
-											class="select"
+											class="person-list"
 											name="modelAssetEnvironment"
 											[(ngModel)]="model.asset.environment"
 											[defaultItem]="'Please Select'"
@@ -101,7 +95,7 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme2}">
 									<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 								<kendo-dropdownlist  #controlSme2
-									class="select"
+									class="person-list"
 									name="modelAssetSme2"
 									[(ngModel)]="model.asset.sme2.id"
 									[defaultItem]="defaultItem"
@@ -109,34 +103,18 @@
 									[valueField]="'personId'"
 									[data]="${personList as JSON}">
 								</kendo-dropdownlist>
-							%{--		<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
-										optionValue="${{it.fullName}}"
-										onchange="openPersonDiv(this.value, this.id)"
-										value="${applicationInstance.sme2?.id}"
-										tabindex="24"
-										noSelection="${['null':' Please Select']}"
-									/>--}%
-
 								</tdsAngular:tooltipSpan>
 								</td>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.criticality}">
-									%{--// TODO add data--}%
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetCriticality"
 											[(ngModel)]="model.asset.criticality"
 											[defaultItem]="'Please Select'"
 											[data]="${asset.constraints.criticality.inList as JSON}">
 									</kendo-dropdownlist>
-
-								%{--	<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
-										from="${applicationInstance.constraints.criticality.inList}" value="${applicationInstance.criticality}"
-										noSelection="${['':'Please select']}"
-										tabindex="34">
-									</g:select>--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -153,7 +131,7 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.appOwner}">
 									<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 									<kendo-dropdownlist
-											class="select"
+											class=""
 											name="modelAssetappOwner"
 											[(ngModel)]="model.asset.appOwner.id"
 											[defaultItem]="defaultItem"
@@ -161,24 +139,12 @@
 											[valueField]="'personId'"
 											[data]="${personList as JSON}">
 									</kendo-dropdownlist>
-%{--
-									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
-										optionValue="${{it.fullName}}"
-										onchange="openPersonDiv(this.value, this.id)"
-										value="${applicationInstance.appOwner?.id}"
-										tabindex="25"
-										noSelection="${['null':' Please Select']}"/>
---}%
-
 								</tdsAngular:tooltipSpan>
-
 								</td>
-
 								<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetMoveBundle"
 											[data]="model.moveBundleList"
 											[(ngModel)]="model.asset.moveBundle"
@@ -204,7 +170,6 @@
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetPlanStatus"
 											[(ngModel)]="model.asset.planStatus"
 											[data]="model.planStatusOptions">
@@ -239,7 +204,6 @@
 								%{--// TODO add data--}%
 
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetValidation"
 											[data]="${asset.constraints.validation.inList as JSON}"
 											[(ngModel)]="model.asset.validation">
@@ -257,7 +221,6 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.testProc}">
 								%{--// TODO add data--}%
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetTestProc"
 											[(ngModel)]="model.asset.testProc"
 											[defaultItem]="'?'"
@@ -288,17 +251,12 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.latency}">
-								%{--// TODO add data --}%
 									<kendo-dropdownlist
-											class="select"
 											name="modelAssetLatency"
 											[(ngModel)]="model.asset.latency"
 											[defaultItem]="'?'"
 											[data]="yesNoList">
 									</kendo-dropdownlist>
-
-								%{--	<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
-		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.latency}" tabindex="38" />--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -306,17 +264,11 @@
 								<td>
 									<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupProc}">
 										<kendo-dropdownlist
-												class="select"
 												name="modelAssetStartupProc"
 												[(ngModel)]="model.asset.startupProc"
 												[defaultItem]="'?'"
 												[data]="yesNoList">
 										</kendo-dropdownlist>
-
-
-									%{--	<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
-											 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="48"/>--}%
-
 									</tdsAngular:tooltipSpan>
 								</td>
 
@@ -339,16 +291,11 @@
 									<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 										<tds-combobox-group
 												[model]="model.asset.shutdownBy"
+												(modelChange)="model.asset.shutdownBy = $event"
+												(isFixedChange)="model.asset.shutdownFixed = $event"
 											    [isFixed]="${asset.shutdownFixed}"
 												[people]="${personList as JSON}"
 												[team]="${availableRoles as JSON}"></tds-combobox-group>
-
-								   %{--<g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>--}%
-								%{--	<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
-										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
-										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed--}%
-
 									</tdsAngular:tooltipSpan>
 								</td>
 
@@ -367,17 +314,11 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupBy}">
 									<tds-combobox-group
 											[model]="model.asset.startupBy"
+											(modelChange)="model.asset.startupBy = $event"
+											(isFixedChange)="model.asset.startupFixed = $event"
 											[isFixed]="${asset.startupFixed}"
 											[people]="${personList as JSON}"
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
-
-								   %{--<g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>--}%
-%{--
-									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
-										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
-										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
-									--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -390,17 +331,11 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.testingBy}">
 									<tds-combobox-group
 											[model]="model.asset.testingBy"
+											(modelChange)="model.asset.testingBy = $event"
+											(isFixedChange)="model.asset.testingFixed = $event"
 											[isFixed]="${asset.testingFixed}"
 											[people]="${personList as JSON}"
 											[team]="${availableRoles as JSON}"></tds-combobox-group>
-
-								  %{--<g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>--}%
-
-									%{--<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
-										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
-										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
-										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed--}%
-
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -413,15 +348,6 @@
 								</tdsAngular:tooltipSpan>
 								</td>
 							</tr>
-
-							<%-- Custom User Defined Fields Section --%>
-		%{--
-							<tbody class="customTemplate">
-								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
-							</tbody>--}%
-
-
-
 						</tbody>
 					</table>
 				</div></td>
@@ -432,19 +358,12 @@
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
 		</tr>
 
-								<!-- Dependencies -->
+		<!-- Dependencies -->
 		<tr id="deps">
 			<tds-supports-depends [(model)]="model"></tds-supports-depends>
 		</tr>
 
-		<%-- Action Buttons --%>
-		<tr>
-			<td colspan="2">
-				<div class="buttons">
-					%{--<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>--}%
-				</div>
-			</td>
-		</tr>
+
 	</table>
 			</form>
 		</div>

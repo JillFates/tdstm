@@ -9,6 +9,7 @@ import {setTimeout} from 'timers';
 export class TDSComboBoxGroupComponent implements OnInit {
 	@ViewChild('innerComboBoxGroup') innerComboBoxGroup: ComboBoxComponent;
 	@Output() modelChange = new EventEmitter<string>();
+	@Output() isFixedChange = new EventEmitter<number>();
 	@Input('model') model: any;
 	@Input('people') people: any;
 	@Input('team') team: any;
@@ -19,6 +20,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	readonly CATEGORY_BY_NAMED_STAFF = 'Named Staff';
 	protected source: any[] ;
 	protected data: any;
+
 	ngOnInit() {
 		this.source = [];
 		const sme = [
@@ -34,6 +36,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 		this.source = this.source.concat( this.addCategoryToArray(team, this.CATEGORY_BY_NAMED_STAFF) );
 		this.data = [...this.source];
 	}
+
 	addCategoryToArray(items: any[], category: string): any[] {
 		return items.map((item, index) => Object.assign({},  item, { category, index } ))
 	}
@@ -45,6 +48,14 @@ export class TDSComboBoxGroupComponent implements OnInit {
 		const team = this.setIndex(this.data, this.CATEGORY_BY_TEAM);
 		const people = this.setIndex(this.data, this.CATEGORY_BY_NAMED_STAFF);
 		this.data = [...sme, ...team, ...people];
+	}
+
+	onChangeFilter(event: any): void {
+		this.modelChange.next(event.id || null);
+	}
+
+	onChangeFixed(event: any): void {
+		this.isFixedChange.next(event.target.checked ? 1 : 0);
 	}
 
 	setIndex(data: any[], key: string): any[] {

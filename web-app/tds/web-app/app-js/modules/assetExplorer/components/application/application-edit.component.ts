@@ -14,11 +14,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 
-interface SelectedItem {
-	class: string;
-	id: number;
-}
-
 export function ApplicationEditComponent(template: string, editModel: any): any {
 	@Component({
 		selector: 'application-edit',
@@ -66,10 +61,6 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
 
-		}
-
-		getCurrentValue(control: string) {
-			console.log('get current value');
 		}
 
 		shufflePerson(source: string, target: string) {
@@ -136,7 +127,6 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 
 			console.log(modelRequest);
 		}
-
 	}
 
 	return ApplicationShowComponent;
