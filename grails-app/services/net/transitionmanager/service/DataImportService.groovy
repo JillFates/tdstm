@@ -1864,11 +1864,12 @@ class DataImportService implements ServiceMethods {
 			throw new InvalidParamException(errorMsg)
 		}
 
-		// update progress closure
+		// The progress closure that will be used by the ETL process to report back to this service the overall progress
 		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
 			// if progress key is not provided, then just skip updating progress service
 			// this is useful during integration test invocation
 			if (progressKey) {
+				// log.debug "updateProgressClosure() ${percentComp}%, forceReport=$forceReport, status=$status, detail=$detail"
 				progressService.update(progressKey, percentComp, status.name(), detail)
 			}
 		} as ProgressCallback
