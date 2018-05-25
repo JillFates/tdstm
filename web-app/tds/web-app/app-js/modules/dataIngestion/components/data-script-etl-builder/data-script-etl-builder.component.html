@@ -3,6 +3,7 @@
 		<div #resizableForm class="modal-content resizable"
              tds-ui-modal-decorator=""
              [isWindowMaximized]="isWindowMaximized"
+             (resizeEvent)="onResizeEvent($event)"
              [options]="modalOptions"
              [style.width.px]="width"
              [style.height.px]="height">
