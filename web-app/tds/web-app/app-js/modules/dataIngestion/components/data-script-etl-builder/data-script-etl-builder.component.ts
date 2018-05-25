@@ -5,7 +5,9 @@ import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-d
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
 import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {
+	DataIngestionService, PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
+} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
@@ -15,6 +17,7 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -115,7 +118,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 		this.testScripInterval = setInterval(() => {
 			this.getTestScriptProgress();
-		}, 4 * 1000); // N seconds.
+		}, PROGRESSBAR_INTERVAL_TIME);
 	}
 
 	/**
@@ -127,14 +130,14 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				let currentProgress = response.data.percentComp;
 				this.testScriptProgress.currentProgress = currentProgress;
 				// On Fail
-				if (response.data.status === 'Failed') {
+				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
 					this.scriptTestResult = new ScriptTestResultModel();
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.detail;
 					this.clearTestScriptProgressInterval();
 				// On Success
-				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
+				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
 						let scripTestFilename = response.data.detail;
 						this.operationStatus.test.state = CHECK_ACTION.VALID;
