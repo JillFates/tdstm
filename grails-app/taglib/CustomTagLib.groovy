@@ -554,6 +554,24 @@ class CustomTagLib implements InitializingBean {
 		}
 	}
 
+	/**
+	 * Used to render label Enabled/Disabled on true/false value passed
+	 * Example:
+	 * <tds:enabledDisabled value="true"/>  ==> Returns: Enabled
+	 * <tds:enabledDisabled value="false"/> ==> Returns: Disabled
+	 */
+	def enabledDisabled = { attrs ->
+		if (attrs.value != null) {
+			if (attrs.value == true) {
+				out << "Enabled"
+			} else {
+				out << "Disabled"
+			}
+		} else {
+			out << ""
+		}
+	}
+
 	def currentProjectMoveEvents = { attrs ->
 		MoveEvent.findAllByProject(securityService.loadUserCurrentProject())
 	}

@@ -68,6 +68,18 @@
 				            <td  class="name">Estimated Start:</td>
 				            <td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estStartTime}" /></td>
 						</tr>
+						<tr class="prop">
+							<td  class="name">API Action "By-Pass":</td>
+							<td class="valueNW">
+								%{--<g:if test="${moveEventInstance.apiActionBypass == true}">--}%
+									%{--Enabled--}%
+								%{--</g:if>--}%
+								%{--<g:else>--}%
+									%{--Disabled--}%
+								%{--</g:else>--}%
+								<tds:enabledDisabled value="${moveEventInstance.apiActionBypass}"/>
+							</td>
+						</tr>
                     </tbody>
                 </table>
             </div>

@@ -149,7 +149,7 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-			              </tr>
+			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
@@ -167,7 +167,16 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-                            </tr> 
+                            </tr>
+							<tr class="prop">
+								<td class="name">
+									<label for="apiActionBypass">API Action "By-Pass":</label>
+								</td>
+								<td class="valueNW ${hasErrors(bean:moveEventInstance,field:'apiActionBypass','errors')}">
+									<g:select id="apiActionBypass" optionKey="key" optionValue="value" from="${['true': 'Enabled', 'false': 'Disabled']}" name="apiActionBypass" value="${moveEventInstance.apiActionBypass}" >
+									</g:select>
+								</td>
+							</tr>
                         </tbody>
                     </table>
                 </div>
