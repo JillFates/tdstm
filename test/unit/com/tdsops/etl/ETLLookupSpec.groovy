@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.Issue
 
 /**
  * Test about ETLProcessor commands:
@@ -177,6 +178,65 @@ class ETLLookupSpec extends ETLBaseSpec {
 				}
 			}
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@Issue("https://support.transitionmanager.com/browse/TM-10625")
+	void 'test group data using LOOKUP as a String list in a custom field'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Device
+						
+						iterate {
+							extract 'server' set nameVar
+							extract 'model' set modelVar
+							extract 'dependsOn' set dependsOnVar
+	
+							lookup 'model' with modelVar
+							if ( LOOKUP.notFound() ) {
+								load 'model' with modelVar
+								load 'custom1' with nameVar
+							} else {
+								load 'custom1' with DOMAIN.custom1 + ', ' + nameVar
+							}
+						}
+
+						""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with (etlProcessor.result.toMap()){
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['model', 'custom1'] as Set
+					data.size() == 1
+					with(data[0]){
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1){
+							value == 'xray01, deltasrv03, alpha'
+							originalValue == 'xray01, deltasrv03, alpha'
+						}
+					}
+				}
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
