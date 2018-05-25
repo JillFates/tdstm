@@ -5,16 +5,14 @@
  *  Use angular/views/TheAssetType as reference
  */
 import { Component, ViewChild, Inject, OnInit } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
-
-interface SelectedItem {
-	class: string;
-	id: number;
-}
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
 
 export function ApplicationEditComponent(template: string, editModel: any): any {
 	@Component({
@@ -28,68 +26,120 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
 		private dateFormat: string;
-
-		constructor( @Inject('model') private model: any, private activeDialog: UIActiveDialogService, private preference: PreferenceService) {}
+		private isDependenciesValidForm = true;
+		constructor(
+			@Inject('model') private model: any,
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetExplorerService: AssetExplorerService,
+			private notifierService: NotifierService,
+			private preference: PreferenceService) {}
 
 		ngOnInit(): void {
-			console.log('Loading application-edit.component');
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 			this.initModel();
 		}
 
+		/**
+		 * Init model with necessary changes to support UI components.
+		 */
 		private initModel(): void {
-
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
 			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
-
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
 				};
 			}
-
 			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
-				// this.model.asset.startUpBySelectedValue.text = 'Temp value';
 			}
-
-			/*
-			this.model.asset.assetTypeSelectValue = {id: null};
-			if (this.model.asset.assetType) {
-				this.model.asset.assetTypeSelectValue.id = this.model.asset.assetType;
-				this.model.asset.assetTypeSelectValue.text = this.model.asset.assetType;
-			}
-			this.model.asset.manufacturerSelectValue = {id: null};
-			if (this.model.asset.manufacturer) {
-				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
-				this.model.asset.manufacturerSelectValue.text = this.model.asset.manufacturer.text;
-			}
-			*/
 		}
 
-		getCurrentValue(control: string) {
-			console.log('get current value');
-		}
-
-		shufflePerson(source: string, target: string) {
+		/**
+		 * Swap values among two persons
+		 * @param {source}  name of the source asset
+		 * @param {target}  name of the target asset
+		 */
+		public shufflePerson(source: string, target: string): void {
 			const sourceId = this.model.asset && this.model.asset[source] && this.model.asset[source].id || null;
 			const targetId = this.model.asset && this.model.asset[target] && this.model.asset[target].id || null;
 
 			if (sourceId && targetId) {
 				const backSource = sourceId;
-
 				this.model.asset[source].id = targetId;
 				this.model.asset[target].id = backSource;
 			}
 		}
 
+		/***
+		 * Close the Active Dialog
+		 */
+		public cancelCloseDialog(): void {
+			this.activeDialog.close();
+		}
+
+		private showAssetDetailView(assetClass: string, id: number): void {
+			this.dialogService.replace(AssetShowComponent, [
+					{ provide: 'ID', useValue: id },
+					{ provide: 'ASSET', useValue: assetClass }],
+				'lg');
+		}
+		/**
+		 * On Update button click save the current model form.
+		 * Method makes proper model modification to send the correct information to
+		 * the endpoint.
+		 */
+		public onUpdate(): void {
+			const modelRequest   = R.clone(this.model);
+
+			if (modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId ) {
+				modelRequest.asset.appOwner.id = modelRequest.asset.appOwner.id.personId;
+			}
+
+			if (modelRequest.asset.sme && modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId ) {
+				modelRequest.asset.sme.id = modelRequest.asset.sme.id.personId;
+			}
+
+			if (modelRequest.asset.sme2 && modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId ) {
+				modelRequest.asset.sme2.id = modelRequest.asset.sme2.id.personId;
+			}
+
+			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+			delete modelRequest.asset.moveBundle;
+
+			// Scale Format
+			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+
+			// Custom Fields
+			this.model.customs.forEach((custom: any) => {
+				let customValue = modelRequest.asset[custom.field.toString()];
+				if (customValue && customValue.value) {
+					modelRequest.asset[custom.field.toString()] = customValue.value;
+				}
+			});
+
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+				this.notifierService.broadcast({
+					name: 'reloadCurrentAssetList'
+				});
+				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+			});
+		}
+
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
+		}
 	}
 
 	return ApplicationShowComponent;
