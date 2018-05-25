@@ -127,8 +127,7 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	entryComponents: [
 		DynamicComponent,
-		DependentCommentComponent,
-		AddPersonComponent]
+		DependentCommentComponent]
 })
 export class SharedModule {
 	constructor(private notifier: NotifierService) {

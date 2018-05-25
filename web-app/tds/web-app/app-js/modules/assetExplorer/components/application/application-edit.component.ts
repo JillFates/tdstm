@@ -67,7 +67,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		 * @param {source}  name of the source asset
 		 * @param {target}  name of the target asset
 		 */
-		shufflePerson(source: string, target: string): void {
+		public shufflePerson(source: string, target: string): void {
 			const sourceId = this.model.asset && this.model.asset[source] && this.model.asset[source].id || null;
 			const targetId = this.model.asset && this.model.asset[target] && this.model.asset[target].id || null;
 
