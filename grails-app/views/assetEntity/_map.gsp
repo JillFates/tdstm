@@ -2,9 +2,9 @@
 <div id="toolsContainerId">
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">
-		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
-		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('dependencies')"><h4>Dependencies</h4></div>
-		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
+		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
+		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)"><h4>Dependencies</h4></div>
+		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div>
 		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
@@ -21,28 +21,12 @@
 						Options for highlighting in the graph
 					</td>
 				</tr>
-				<tr>
-					<td colspan="3">
-						App Owner or SME:
-					</td>
-				</tr>
 				<tr title="Highlights assets by SME or app owner" class="optionRow">
 					<td colspan="3">
 						<span id="highlightPersonId" class="noPadding">
 							<select kendo-drop-down-list id="personHighlightSelectId"></select>
 							<span id="clearPersonFilterId" class="clearFilterIcon pointer disabled" onclick="GraphUtil.clearFilter('person')" title="Clears the current person filter"></span>
 						</span>
-					</td>
-				</tr>
-				<!-- -->
-				<tr>
-					<td colspan="3">
-						Asset Tag:
-					</td>
-				</tr>
-				<tr title="Highlights assets by Tag" class="optionRow">
-					<td colspan="3">
-						<tm-asset-tag-selector id="tmHighlighttAssetSelector" asset-selector="internal.assetSelector" pre-selected-operator="'ANY'" on-change="onDependencyAnalyzerTagSelectionChange()"></tm-asset-tag-selector>
 					</td>
 				</tr>
 			</table>
@@ -257,7 +241,7 @@
 			height: 33px;
 		}
 		div.fullscreen div.dependency_panel_action_buttons {
-			bottom: 7px !important;
+			bottom: 1px !important;
 		}
 		td.groupingControl {
 			background-color: #dddddd;

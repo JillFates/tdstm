@@ -26,6 +26,13 @@ var GraphUtil = (function ($) {
 	// public constants
 	public.NO_TRANSFORM = 'translate(0 0)scale(1)';
 	public.NO_TRANSFORM_CSS = 'translate(0px 0px) scale(1)';
+	var PANELS = {
+		CONTROL: 1,
+		DEPENDENCY: 2,
+		LEGEND: 3,
+		NONE: 4
+	}
+	public.PANELS = PANELS;
 
 	// public member variables
 	public.force = null;
@@ -144,7 +151,7 @@ var GraphUtil = (function ($) {
 		public.resetGraphSize();
 	}
 
-
+	
 	// sets the size of the legend so that it can scroll when longer than the user's window
 	public.correctLegendSize = function () {
 		public.correctPanelSize('legendDivId');
@@ -171,7 +178,7 @@ var GraphUtil = (function ($) {
 	public.correctPanelSize = function (panelId) {
 		var panel = $('#' + panelId);
 		panel.css('height', '');
-		panel.css('overflow-y', '');
+		panel.css('overflow-y', 'scroll');
 		var svgContainer = $('#svgContainerId');
 		if (panel.size() == 0 || svgContainer.size() == 0 || svgContainer.children().size() == 0)
 			return false;
@@ -182,7 +189,6 @@ var GraphUtil = (function ($) {
 		if (bottom >= newBottom) {
 			var newHeight = newBottom - panel.offset().top;
 			panel.css('height', newHeight);
-			panel.css('overflow-y', 'scroll');
 		} else {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
@@ -192,6 +198,8 @@ var GraphUtil = (function ($) {
 	}
 
 	public.correctActionButtons = function() {
+		if($('#dependenciesPanelId').size() == 0)
+			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
 			$('.dependency_panel_action_buttons').css('position', 'fixed');
 			$('.dependency_panel_action_buttons').css('bottom', '45px');
@@ -204,32 +212,31 @@ var GraphUtil = (function ($) {
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
-
-        // update the legend twistie preference if applicable
-        var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
-        if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
-            var prefValue = public.serializeLegendTwistiePrefs();
-            setUserPreference('legendTwistieState', prefValue);
-        }
+		
+		// update the legend twistie preference if applicable
+		var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
+		if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
+			var prefValue = public.serializeLegendTwistiePrefs();
+			setUserPreference('legendTwistieState', prefValue);
+		}
 
 		if (twistieSpan.hasClass('closed')) {
 			twistieSpan.removeClass('closed').addClass('open');
 			container.slideDown(300, function () {
 				if (isCalledFromLegendPanel) {
-				    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
-
+					public.correctLegendSize();
+				} else {
+					public.correctControlPanelSize();
+				}
 			});
 		} else {
 			twistieSpan.removeClass('open').addClass('closed');
 			container.slideUp(300, function () {
-                if (isCalledFromLegendPanel) {
-                    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
+				if (isCalledFromLegendPanel) {
+					public.correctLegendSize();
+				} else {
+					public.correctControlPanelSize();
+				}
 			});
 		}
 	}
@@ -306,63 +313,78 @@ var GraphUtil = (function ($) {
 		}
 	}
 
+	
+	// gets the currently open panel (using the PANELS enum)
+	public.getOpenPanel = function () {
+		if ($('#controlPanelId').css('display') == 'block')
+			return PANELS.CONTROL;
+		if ($('#dependenciesPanelId').css('display') == 'block')
+			return PANELS.DEPENDENCY;
+		if ($('#legendDivId').css('display') == 'block')
+			return PANELS.LEGEND;
+		return PANELS.NONE;
+	}
 
-	// hides the specified panel ('control' or 'legend')
+	// hides the specified panel (takes a value from the PANELS enum as a parameter)
 	public.hidePanel = function (panel) {
-		if (panel == 'control') {
+		if (panel == PANELS.CONTROL) {
 			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
-		} else if (panel == 'dependencies') {
+		} else if (panel == PANELS.DEPENDENCY) {
 			$('#dependenciesPanelId').removeClass('openPanel');
 			$('#dependenciesPanelTabId').removeClass('activeTab');
-		} else if (panel == 'legend') {
+		} else if (panel == PANELS.LEGEND) {
 			$('#legendDivId').removeClass('openPanel');
 			$('#legendTabId').removeClass('activeTab');
 		}
 	}
 
-	// opens the specified panel ('control' or 'legend')
+	// opens the specified panel (takes a value from the PANELS enum as a parameter)
 	public.openPanel = function (panel) {
-		if (panel == 'control') {
+		if (panel == PANELS.CONTROL) {
 			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
-		} else if (panel == 'dependencies') {
+		} else if (panel == PANELS.DEPENDENCY) {
 			$('#dependenciesPanelId').addClass('openPanel');
 			$('#dependenciesPanelTabId').addClass('activeTab');
-		} else if (panel == 'legend') {
+		} else if (panel == PANELS.LEGEND) {
 			$('#legendDivId').addClass('openPanel');
 			$('#legendTabId').addClass('activeTab');
 		}
 	}
 
-	// handles switching between the control panel and the legend
+	// handles switching between the various panels in PANELS
 	public.togglePanel = function (panel) {
-		if (panel == 'control') {
+		// control panel
+		if (panel == PANELS.CONTROL) {
 			if ($('#controlPanelTabId.activeTab').size() > 0)
-				public.hidePanel('control');
+				public.hidePanel(PANELS.CONTROL);
 			else
-				public.openPanel('control');
-			public.hidePanel('legend');
-			public.hidePanel('dependencies');
-		} else if (panel == 'dependencies') {
+				public.openPanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.DEPENDENCY);
+		// dependency panel
+		} else if (panel == PANELS.DEPENDENCY) {
 			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
-				public.hidePanel('dependencies');
+				public.hidePanel(PANELS.DEPENDENCY);
 			else {
-				public.openPanel('dependencies');
+				public.openPanel(PANELS.DEPENDENCY);
 			}
-			public.hidePanel('legend');
-			public.hidePanel('control');
-		} else if (panel == 'legend') {
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.CONTROL);
+		// legend panel
+		} else if (panel == PANELS.LEGEND) {
 			if ($('#legendTabId.activeTab').size() > 0)
-				public.hidePanel('legend');
+				public.hidePanel(PANELS.LEGEND);
 			else
-				public.openPanel('legend');
-			public.hidePanel('control');
-			public.hidePanel('dependencies');
-		} else if (panel == 'hide') {
-			public.hidePanel('control');
-			public.hidePanel('legend');
-			public.hidePanel('dependencies');
+				public.openPanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.DEPENDENCY);
+		// hide all panels
+		} else if (panel == 'hide' || panel == PANELS.NONE) {
+			public.hidePanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.DEPENDENCY);
 		}
 		public.correctPanelSizes();
 	}

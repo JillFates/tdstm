@@ -82,6 +82,7 @@ $(window).resize( function(a, b) {
 	GraphUtil.resetGraphSize()
 })
 
+// initialize edge cutting variables and listeners
 var maxCutAttempts = serverParams.maxCutAttempts
 var maxEdgeCountInput = $('#maxEdgeCountId')
 var maxEdgeCount = maxEdgeCountInput.val()

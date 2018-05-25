@@ -12,15 +12,13 @@ $(document).ready(function() {
 
 	// List of the dependency types and statuses used for the dependency group generation
 	GraphUtil.dependencyPanelConfig.dependencyStatus.groupingControl = ${raw(statusTypes)};
+	
 	GraphUtil.dependencyPanelConfig.dependencyType.groupingControl = ${raw(connectionTypes)};
-
+	
 	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
 	GraphUtil.togglePanel('hide');
-	if (showControls == 'controls')
-		GraphUtil.togglePanel('control');
-	else if (showControls == 'legend')
-		GraphUtil.togglePanel('legend');
+	GraphUtil.togglePanel(showControls);
 
 	// if the browser doesn't support svg display a message instead of the graph
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
@@ -67,7 +65,7 @@ $(document).ready(function() {
 		dataSource: {
 			transport: {
 				read: {
-					url: "${createLink(mapping: 'wsDepAnalyzer')}",
+					url: "${createLink(mapping: 'wsDepAnalyzer', action: 'peopleAssociatedToDepGroup')}",
 					dataType: "json",
 					data: {
 						depGroup: '${depGroup}'

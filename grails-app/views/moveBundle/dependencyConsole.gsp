@@ -1,4 +1,3 @@
-<%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
 		<meta name="layout" content="topNav" />
@@ -18,7 +17,6 @@
 		<g:javascript src="progressBar.js" />
 
 		<g:javascript src="asset.comment.js" />
-		<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="svg.js"/>
@@ -74,45 +72,6 @@
 			<div style="clear: both;"></div>
 
 			<div id = "dependencyBundleDetailsId" >
-				<div style="margin-top: 10px;">
-					<div class="compactClass">
-						<div class="dependency-filters-container">
-							<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
-							<div class="message" id="messageId" style="display:none">${flash.message}</div>
-							<div class="row dependencyConsoleForm">
-								<div class="f-grid" id="angular-compiler">
-									<div class="f-column-1">
-										<label>Dependency Groups</label>
-										<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-											<input type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
-										</tds:hasPermission>
-									</div>
-									<div class="f-column-2">
-										<label>Bundle:</label>
-										<g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
-									</div>
-									<div class="f-column-3">
-										<label>Tags:</label>
-										<tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyFiltersChange()"></tm-asset-tag-selector>
-									</div>
-									<div class="f-column-4">
-										<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()" />
-										<label for="assignedGroupCB" class="pointer">Show ONLY Work In Progress</label>
-										<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-											<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
-										</g:link>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
-						</div>
-						<div id="processDiv" style="display: none;">
-							<img src="${resource(dir:'images',file:'processing.gif')}" />
-						</div>
-					</div>
-				</div>
 				<g:render template="dependencyBundleDetails" />
 			</div>
 
@@ -247,7 +206,7 @@
 				$('#refreshButtonId').addClass('warning-change');
 			});
 
-			function getList(value,dependencyBundle, force, distance, labels) {
+			function getList(value, dependencyBundle, force, distance, labels) {
 				$('#refreshButtonId').removeClass('warning-change');
 				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
@@ -295,11 +254,7 @@
 					case "graph" :
 						var labelsList = "Application"
 						var bundle = $("#planningBundleSelectId").val()
-						var showControls = 'hide'
-						if ($('#controlPanelId').css('display') == 'block')
-							showControls = 'controls'
-						if ($('#legendDivId').css('display') == 'block')
-							showControls = 'legend'
+						var showControls = GraphUtil.getOpenPanel();
 						compressList();
 						ajaxRequest = ${remoteFunction(
 							controller:'assetEntity',
@@ -370,9 +325,6 @@
 				$('#items1').html(resp);
 				$('#items1').css('display','block');
 				ajaxRequest = null;
-				setTimeout( function () {
-					recompileDOM('tmHighlighttAssetSelector');
-				});
 			}
 			function fillView(e){
 				var data = e.responseText
@@ -399,7 +351,10 @@
 				}
 				return objectString
 			}
-
+			function assignedCheckbox(chkbox) {
+				$('#assinedGroup').val(chkbox.checked ? '1' : '0')
+				chkbox.form.submit()
+			}
 			function getListBySort(value,dependencyBundle,sort){
 				var bundle = $("#planningBundleSelectId").val()
 				var sortBy = $("#sortBy").val()
