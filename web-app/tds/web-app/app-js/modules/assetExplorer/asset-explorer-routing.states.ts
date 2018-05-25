@@ -1,5 +1,6 @@
 import { Ng2StateDeclaration, Transition } from '@uirouter/angular';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { AssetExplorerViewConfigComponent } from './components/view-config/asset-explorer-view-config.component';

@@ -6,7 +6,7 @@ import { EmptyComponent } from '../testing/empty.component';
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { HttpModule } from '@angular/http';
 import { SharedModule } from '../shared/shared.module';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 describe('PermissionService:', () => {
 	let fixture: ComponentFixture<EmptyComponent>;

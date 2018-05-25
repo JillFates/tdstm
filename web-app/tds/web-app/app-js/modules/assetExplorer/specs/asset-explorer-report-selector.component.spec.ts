@@ -4,7 +4,6 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs/Rx';
 import { HttpModule } from '@angular/http';
 import { UIRouterModule, RootModule } from '@uirouter/angular';
 
