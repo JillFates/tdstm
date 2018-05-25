@@ -101,7 +101,10 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		const element = jQuery(this.el.nativeElement);
 
 		if (enable) {
-			element.draggable({ containment: '#tdsUiDialog' });
+			element.draggable({
+				containment: '#tdsUiDialog',
+				handle: '.modal-header'
+			});
 		} else {
 			element.draggable('destroy');
 		}
