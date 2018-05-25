@@ -134,9 +134,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 			});
 
-			console.log('Model request 9:');
 			console.log(modelRequest);
-			console.log('-----------');
 		}
 
 	}

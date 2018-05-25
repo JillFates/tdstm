@@ -2,13 +2,8 @@
 <%@page import="com.tds.asset.AssetType"%>
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
-<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
-
-<style>
-	#select2-drop{ width: 200px !important; }
-</style>
 
 <div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">

@@ -42,8 +42,8 @@ class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 	protected void populateAsset(AssetEntity assetEntity) {
 		super.populateAsset(assetEntity)
 		Application application = (Application) assetEntity
-		application.shutdownFixed = command.data.shutdownFixed ?  1 : 0
-		application.startupFixed = command.data.startupFixed ?  1 : 0
-		application.testingFixed = command.data.testingFixed ?  1 : 0
+		application.shutdownFixed = command.asset.shutdownFixed ?  1 : 0
+		application.startupFixed = command.asset.startupFixed ?  1 : 0
+		application.testingFixed = command.asset.testingFixed ?  1 : 0
 	}
 }
