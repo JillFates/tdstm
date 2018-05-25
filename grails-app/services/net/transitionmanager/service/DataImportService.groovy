@@ -6,6 +6,7 @@ import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
@@ -34,6 +35,9 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.transaction.annotation.Propagation
 // LEGACY
 /**
@@ -54,6 +58,8 @@ class DataImportService implements ServiceMethods {
 	FileSystemService fileSystemService
 	ScriptProcessorService scriptProcessorService
 	SecurityService securityService
+	ProgressService progressService
+	Scheduler quartzScheduler
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String SEARCH_BY_ID_NOT_FOUND_MSG = 'Record not found searching by id'
@@ -1824,8 +1830,12 @@ class DataImportService implements ServiceMethods {
 	 * @return
 	 */
 	@NotTransactional()
-	Map transformEtlData(Project project, Long dataScriptId, String filename) {
-		Map result = [filename:'']
+	Map transformEtlData(Long projectId, Long dataScriptId, String filename, String progressKey = null) {
+		Map result = [filename: '']
+		Project project = Project.get(projectId)
+
+		// TODO : SL - 05/2018 : Find if we still need to keep this validation since it was already done
+		// when scheduled a transformation job
 		DataScript dataScript = null
 		String errorMsg = null
 
@@ -1833,21 +1843,20 @@ class DataImportService implements ServiceMethods {
 			errorMsg = 'Missing required dataScriptId parameter'
 		} else if (!filename) {
 			errorMsg = 'Missing filename parameter'
-		} else if (! fileSystemService.temporaryFileExists(filename)) {
+		} else if (!fileSystemService.temporaryFileExists(filename)) {
 			errorMsg = 'Specified input file not found'
 		} else {
 			List<String> allowedExtensions = fileSystemService.getAllowedExtensions()
-			if (! FileSystemUtil.validateExtension(filename, allowedExtensions)) {
+			if (!FileSystemUtil.validateExtension(filename, allowedExtensions)) {
 				errorMsg = i18nMessage(Message.FileSystemInvalidFileExtension)
 			} else {
 				// See if we can find a DataScript.
 				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
 
-				if (! dataScript.etlSourceCode) {
+				if (!dataScript.etlSourceCode) {
 					errorMsg = 'DataScript has no source specified'
 				}
 			}
-
 		}
 
 		// If there was an error in the previous validations, throw an exception.
@@ -1855,20 +1864,87 @@ class DataImportService implements ServiceMethods {
 			throw new InvalidParamException(errorMsg)
 		}
 
+		// update progress closure
+		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
+			// if progress key is not provided, then just skip updating progress service
+			// this is useful during integration test invocation
+			if (progressKey) {
+				progressService.update(progressKey, percentComp, status.name(), detail)
+			}
+		} as ProgressCallback
+
+		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
-		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename)
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
+
+		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
+			project,
+			dataScript.etlSourceCode,
+			inputFilename,
+			updateProgressClosure)
+
 		result.filename = outputFilename
-		try {
-			os << (etlProcessor.resultsMap() as JSON)
-			os.close()
-		}
-		catch(e) {
-			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
-			throw new RuntimeException('Unable to write output file : ' + e.message)
-		}
 
 		return result
+	}
+
+	/**
+	 * Schedule a quartz job for the ETL transform data process
+	 * @param project
+	 * @param dataScriptId
+	 * @param filename
+	 * @return Map - containing the progress key created to monitor the job execution progress
+	 */
+	@NotTransactional()
+	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename) {
+		DataScript dataScript = null
+		String errorMsg = null
+
+		if (!dataScriptId) {
+			errorMsg = 'Missing required dataScriptId parameter'
+		} else if (!filename) {
+			errorMsg = 'Missing filename parameter'
+		} else if (!fileSystemService.temporaryFileExists(filename)) {
+			errorMsg = 'Specified input file not found'
+		} else {
+			List<String> allowedExtensions = fileSystemService.getAllowedExtensions()
+			if (!FileSystemUtil.validateExtension(filename, allowedExtensions)) {
+				errorMsg = i18nMessage(Message.FileSystemInvalidFileExtension)
+			} else {
+				// See if we can find a DataScript and it belongs to current user project.
+				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
+
+				if (!dataScript.etlSourceCode) {
+					errorMsg = 'DataScript has no source specified'
+				}
+			}
+		}
+
+		// If there was an error in the previous validations, throw an exception.
+		if (errorMsg) {
+			throw new InvalidParamException(errorMsg)
+		}
+
+		String key = 'ETL-Transform-Data-' + dataScriptId + '-' + StringUtil.generateGuid()
+		progressService.create(key, ProgressService.PENDING)
+
+		// Kickoff the background job to generate the tasks
+		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + dataScriptId + '-' + StringUtil.generateGuid()
+
+		// The triggerName/Group will allow us to controller on import
+		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
+		trigger.jobDataMap.projectId = project.id
+		trigger.jobDataMap.dataScriptId = dataScriptId
+		trigger.jobDataMap.filename = filename
+		trigger.jobDataMap.progressKey = key
+		trigger.setJobName('ETLTransformDataJob')
+		trigger.setJobGroup('tdstm-etl-transform-data')
+		quartzScheduler.scheduleJob(trigger)
+
+		log.info('scheduleJob() {} kicked of an ETL transform data process for script and filename ({},{})',
+				securityService.currentUsername, dataScriptId, filename)
+
+		// return progress key
+		return ['progressKey': key]
 	}
 }
 

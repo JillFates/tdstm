@@ -13,6 +13,8 @@ import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxRes
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -34,7 +36,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private initialWindowStyle = null;
 	private modalOptions: DecoratorOptions;
 	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
-
 	private operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
@@ -43,7 +44,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
-	private isRunningTestingScript  = false;
+	private closeErrorsSection = false;
+	protected CHECK_ACTION = CHECK_ACTION;
+	protected testScriptProgress = {
+		progressKey: null,
+		currentProgress: 0,
+	};
+	private testScripInterval: any;
 
 	ngAfterViewInit(): void {
 		setTimeout(() => {
@@ -61,6 +68,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dialogService: UIDialogService,
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
+		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService,
 		private preferenceService: PreferenceService) {
@@ -81,19 +89,60 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private onTestScript(): void {
 		this.clearLogVariables('test');
-		this.isRunningTestingScript = true;
+		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
+		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
+				this.testScriptProgress.progressKey = result.data.progressKey;
+				this.setTestScriptProgressInterval();
+			} else {
+				this.operationStatus.test.state = CHECK_ACTION.INVALID;
+			}
+		}, error => this.operationStatus.test.state = CHECK_ACTION.INVALID);
+	}
 
-		this.dataIngestionService.testScript(this.script, this.filename)
-			.finally(() => this.isRunningTestingScript = false)
-			.subscribe( result => {
-				this.scriptTestResult = result.data;
-				this.scriptTestResult.domains = result.data.data.domains;
-				this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
-				for (let domain of this.scriptTestResult.domains) {
-					this.collapsed[domain.domain] = false;
+	/**
+	 * Clears out the Test Script interval loop.
+	 */
+	private clearTestScriptProgressInterval(): void {
+		clearInterval(this.testScripInterval);
+	}
+
+	/**
+	 * Creates an interval loop to retreive Test Script current progress.
+	 */
+	private setTestScriptProgressInterval(): void {
+		this.testScriptProgress.currentProgress = 0;
+		this.testScripInterval = setInterval(() => {
+			this.getTestScriptProgress();
+		}, 1 * 1000); // N seconds.
+	}
+
+	/**
+	 * Operation of the Test Script interval that will be executed n times in a loop.
+	 */
+	private getTestScriptProgress(): void {
+		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
+			.subscribe( (response: ApiResponseModel) => {
+				let currentProgress = response.data.percentComp;
+				this.testScriptProgress.currentProgress = currentProgress;
+				if (response.data.status === 'Failed') {
+					this.scriptTestResult = new ScriptTestResultModel();
+					this.operationStatus.test.state = CHECK_ACTION.INVALID;
+					this.scriptTestResult.isValid = false;
+					this.scriptTestResult.error = response.data.detail;
+					this.clearTestScriptProgressInterval();
+				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
+					let scripTestFilename = response.data.detail;
+					this.operationStatus.test.state = CHECK_ACTION.VALID;
+					this.scriptTestResult = new ScriptTestResultModel();
+					this.scriptTestResult.isValid = true;
+					this.importAssetsService.getFileContent(scripTestFilename)
+						.subscribe(result => {
+							this.scriptTestResult.domains = result.domains;
+					});
+					this.clearTestScriptProgressInterval();
 				}
-				this.consoleSettings.scriptTestResult = this.scriptTestResult;
-			});
+		});
 	}
 
 	/**
@@ -224,7 +273,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		return !this.scriptValidSyntaxResult.validSyntax && this.scriptValidSyntaxResult.errors && this.scriptValidSyntaxResult.errors.length > 0;
 	}
 
-	private closeErrorsSection = false;
 	private closeErrors(): void {
 		this.closeErrorsSection = true;
 	}
@@ -261,7 +309,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected isTestDisabled(): boolean {
-		return !this.script || !this.filename || this.isRunningTestingScript;
+		return !this.script || !this.filename || this.operationStatus.test.state === CHECK_ACTION.IN_PROGRESS;
 	}
 
 	protected maximizeWindow() {

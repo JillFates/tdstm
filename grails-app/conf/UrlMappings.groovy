@@ -239,9 +239,9 @@ class UrlMappings {
 			action = [GET: 'manualFormOptions']
 		}
 
-		"/ws/assetImport/transformData" {
+		"/ws/assetImport/initiateTransformData" {
 			controller = 'wsAssetImport'
-			action = [POST: 'transformData']
+			action = [POST: 'initiateTransformData']
 		}
 
 		"/ws/assetImport/viewData" {
@@ -798,10 +798,10 @@ class UrlMappings {
 		//
 		// DataScript
 		//
-		"/ws/dataScript/testScript" {
+		"/ws/dataScript/initiateTestScript" {
 			controller = "wsDataScript"
 			action = [
-					POST: "testScript"
+					POST: "initiateTestScript"
 			]
 		}
 
