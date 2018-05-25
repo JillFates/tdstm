@@ -22,6 +22,8 @@ import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
 const UNITS_SIZE_SEPARATOR = 'x';
+export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
+export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 
 @Injectable()
 export class DataIngestionService {

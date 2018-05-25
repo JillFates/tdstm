@@ -6,7 +6,11 @@ import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angula
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
-import {DataIngestionService} from '../../../dataIngestion/service/data-ingestion.service';
+import {
+	DataIngestionService,
+	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
+} from '../../../dataIngestion/service/data-ingestion.service';
+import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'manual-import',
@@ -136,7 +140,7 @@ export class ManualImportComponent implements OnInit {
 		this.transformProgress.currentProgress = 1;
 		this.transformInterval = setInterval(() => {
 			this.getTransformProgress();
-		}, 4 * 1000); // 4 seconds.
+		}, PROGRESSBAR_INTERVAL_TIME);
 	}
 
 	/**
@@ -148,11 +152,11 @@ export class ManualImportComponent implements OnInit {
 				let currentProgress = response.data.percentComp;
 				this.transformProgress.currentProgress = currentProgress;
 				// On Fail
-				if (response.data.status === 'Failed') {
+				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
 					this.handleTransformResultError(response.data.detail);
 					this.transformInProcess = false;
 					this.clearTestScriptProgressInterval();
-				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
+				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					// On finish without filename output (Fail)
 					if (!response.data.detail) {
 						this.handleTransformResultError('The generated intermediate ETL data file could not be accessed.');
