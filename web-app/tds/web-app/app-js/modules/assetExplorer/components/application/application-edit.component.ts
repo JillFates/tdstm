@@ -26,6 +26,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
 		private dateFormat: string;
+		private isDependenciesValidForm = true;
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService,
@@ -33,43 +34,45 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 			private assetExplorerService: AssetExplorerService,
 			private notifierService: NotifierService,
 			private preference: PreferenceService) {}
+
 		ngOnInit(): void {
-			console.log('Loading application-edit.component');
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 			this.initModel();
 		}
 
+		/**
+		 * Init model with necessary changes to support UI components.
+		 */
 		private initModel(): void {
-
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
 			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
-
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
 				};
 			}
-
 			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
-
 		}
 
-		shufflePerson(source: string, target: string) {
+		/**
+		 * Swap values among two persons
+		 * @param {source}  name of the source asset
+		 * @param {target}  name of the target asset
+		 */
+		shufflePerson(source: string, target: string): void {
 			const sourceId = this.model.asset && this.model.asset[source] && this.model.asset[source].id || null;
 			const targetId = this.model.asset && this.model.asset[target] && this.model.asset[target].id || null;
 
 			if (sourceId && targetId) {
 				const backSource = sourceId;
-
 				this.model.asset[source].id = targetId;
 				this.model.asset[target].id = backSource;
 			}
@@ -78,18 +81,22 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		/***
 		 * Close the Active Dialog
 		 */
-		cancelCloseDialog(): void {
+		public cancelCloseDialog(): void {
 			this.activeDialog.close();
 		}
 
-		private showAssetDetailView(assetClass: string, id: number) {
+		private showAssetDetailView(assetClass: string, id: number): void {
 			this.dialogService.replace(AssetShowComponent, [
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }],
 				'lg');
 		}
-
-		onUpdate(): void {
+		/**
+		 * On Update button click save the current model form.
+		 * Method makes proper model modification to send the correct information to
+		 * the endpoint.
+		 */
+		public onUpdate(): void {
 			const modelRequest   = R.clone(this.model);
 
 			if (modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId ) {
@@ -124,8 +131,14 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				});
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 			});
+		}
 
-			console.log(modelRequest);
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
 		}
 	}
 

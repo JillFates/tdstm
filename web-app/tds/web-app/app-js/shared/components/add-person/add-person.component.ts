@@ -5,20 +5,7 @@ import { Person } from './model/person.model';
 
 @Component({
 	selector: 'add-person',
-	templateUrl: '../tds/web-app/app-js/shared/components/add-person/add-person.component.html',
-	styles: [`
-			div.modal-body,
-			div.box-body
-			{
-				padding-bottom: 0px;
-            }
-			div.modal-title {
-                width: 453px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-			}
-	`]
+	templateUrl: '../tds/web-app/app-js/shared/components/add-person/add-person.component.html'
 })
 export class AddPersonComponent extends UIExtraDialog {
 	constructor(
@@ -26,20 +13,11 @@ export class AddPersonComponent extends UIExtraDialog {
 		super('#add-person-component');
 	}
 
-	/**
-	 * On EscKey Pressed close the dialog.
+	/***
+	 * Close the Active Dialog
 	 */
-	onEscKeyPressed(): void {
-
-		this.cancelCloseDialog();
-	}
-
 	protected cancelCloseDialog(): void {
 		this.dismiss();
-	}
-
-	protected onUpdateComment(): void {
-		this.close(this.personModel);
 	}
 
 }
