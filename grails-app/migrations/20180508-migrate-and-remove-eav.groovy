@@ -15,13 +15,13 @@ databaseChangeLog = {
 
 		addColumn(tableName: 'asset_entity') {
 			column(name: 'last_updated', type: 'DATETIME') {
-				constraints(nullable: 'false')
+				constraints(nullable: 'true')
 			}
 		}
 
 		addColumn(tableName: 'asset_entity') {
 			column(name: 'date_created', type: 'DATETIME') {
-				constraints(nullable: 'false')
+				constraints(nullable: 'true')
 			}
 		}
 	}
@@ -44,6 +44,18 @@ databaseChangeLog = {
 		}
 
 		sql('DROP TABLE eav_entity')
+	}
+
+	changeSet(author: 'tpelletier', id: '20180508 TM-6778-3b') {
+		comment('Make LastUpdated and date created not nullable')
+
+		preConditions(onFail: 'MARK_RAN') {
+			not {
+				tableExists(tableName: 'eav_entity')
+			}
+		}
+
+		addNotNullConstraint(tableName: 'asset_entity', columnName: 'date_created', columnDataType: 'DATETIME', "defaultNullValue": 'now()')
 	}
 
 	changeSet(author: 'tpelletier', id: '20180508 TM-6778-4') {
