@@ -90,7 +90,12 @@ trait ProgressIndicator {
 	 * @return
 	 */
 	Integer calculateNumberOfIterateLoops(String scriptContent) {
-		def matcher = scriptContent =~ /(?m)^\s*(iterate\s*\{)/
+		// Match on the following commands with any sort of whitespace:
+		//		iterate {...}
+		//		iterate
+		//		   { ... }
+		//		from 1 to 10 iterate {...}
+		def matcher = scriptContent =~ /(?m)^((\s*from\s*\d+\s*to\s*\d+\s*|\s*)iterate\s*\{)/
 		return matcher.getCount()
 	}
 
@@ -110,7 +115,7 @@ trait ProgressIndicator {
 			frequencyCounter += 1
 			if (factorStepFrequency < frequencyCounter) {
 				// Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
-				Integer percentage = (((iterateCounter * iterateRatio) + (currentRow / totalRows / iterateRatio)) * 100).intValue()
+				Integer percentage = (((iterateCounter * iterateRatio) + (currentRow / totalRows * iterateRatio)) * 100).intValue()
 				progressCallback.reportProgress(percentage, false, ProgressCallback.ProgressStatus.RUNNING, '')
 				frequencyCounter = 0
 			}
