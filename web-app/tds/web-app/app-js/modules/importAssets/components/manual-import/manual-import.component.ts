@@ -127,17 +127,16 @@ export class ManualImportComponent implements OnInit {
 	 */
 	private clearTestScriptProgressInterval(): void {
 		clearInterval(this.transformInterval);
-		this.transformInProcess = false;
 	}
 
 	/**
 	 * Creates an interval loop to retreive Transform current progress.
 	 */
 	private setTransformProgressInterval(): void {
-		this.transformProgress.currentProgress = 0;
+		this.transformProgress.currentProgress = 1;
 		this.transformInterval = setInterval(() => {
 			this.getTransformProgress();
-		}, 1 * 1000); // N seconds.
+		}, 4 * 1000); // 4 seconds.
 	}
 
 	/**
@@ -148,21 +147,37 @@ export class ManualImportComponent implements OnInit {
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
 				this.transformProgress.currentProgress = currentProgress;
+				// On Fail
 				if (response.data.status === 'Failed') {
-					this.transformResult = new ApiResponseModel();
-					this.transformResult.status = ApiResponseModel.API_ERROR;
-					this.notifier.broadcast({
-						name: AlertType.DANGER,
-						message: response.data.detail
-					});
+					this.handleTransformResultError(response.data.detail);
+					this.transformInProcess = false;
 					this.clearTestScriptProgressInterval();
-				} else if (currentProgress === 100) {
-					this.transformResult = new ApiResponseModel();
-					this.transformResult.status = ApiResponseModel.API_SUCCESS;
-					this.transformResult.data = {filename: response.data.detail};
+				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
+					// On finish without filename output (Fail)
+					if (!response.data.detail) {
+						this.handleTransformResultError('The generated intermediate ETL data file could not be accessed.');
+						this.transformInProcess = false;
+					} else {
+						// On Success
+						setTimeout( () => {
+							this.transformResult = new ApiResponseModel();
+							this.transformResult.status = ApiResponseModel.API_SUCCESS;
+							this.transformResult.data = {filename: response.data.detail};
+							this.transformInProcess = false;
+						}, 500);
+					}
 					this.clearTestScriptProgressInterval();
 				}
 			});
+	}
+
+	private handleTransformResultError(errorMessage: string): void {
+		this.transformResult = new ApiResponseModel();
+		this.transformResult.status = ApiResponseModel.API_ERROR;
+		this.notifier.broadcast({
+			name: AlertType.DANGER,
+			message: errorMessage
+		});
 	}
 
 	/**

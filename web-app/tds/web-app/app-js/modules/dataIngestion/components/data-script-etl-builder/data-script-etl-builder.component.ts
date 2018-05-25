@@ -111,10 +111,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * Creates an interval loop to retreive Test Script current progress.
 	 */
 	private setTestScriptProgressInterval(): void {
-		this.testScriptProgress.currentProgress = 0;
+		this.testScriptProgress.currentProgress = 1;
+
 		this.testScripInterval = setInterval(() => {
 			this.getTestScriptProgress();
-		}, 1 * 1000); // N seconds.
+		}, 4 * 1000); // N seconds.
 	}
 
 	/**
@@ -125,21 +126,25 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
 				this.testScriptProgress.currentProgress = currentProgress;
+				// On Fail
 				if (response.data.status === 'Failed') {
 					this.scriptTestResult = new ScriptTestResultModel();
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.detail;
 					this.clearTestScriptProgressInterval();
+				// On Success
 				} else if (currentProgress === 100 && response.data.status === 'COMPLETED') {
-					let scripTestFilename = response.data.detail;
-					this.operationStatus.test.state = CHECK_ACTION.VALID;
-					this.scriptTestResult = new ScriptTestResultModel();
-					this.scriptTestResult.isValid = true;
-					this.importAssetsService.getFileContent(scripTestFilename)
-						.subscribe(result => {
-							this.scriptTestResult.domains = result.domains;
-					});
+					setTimeout( () => {
+						let scripTestFilename = response.data.detail;
+						this.operationStatus.test.state = CHECK_ACTION.VALID;
+						this.scriptTestResult = new ScriptTestResultModel();
+						this.scriptTestResult.isValid = true;
+						this.importAssetsService.getFileContent(scripTestFilename)
+							.subscribe(result => {
+								this.scriptTestResult.domains = result.domains;
+							});
+					}, 500);
 					this.clearTestScriptProgressInterval();
 				}
 		});
