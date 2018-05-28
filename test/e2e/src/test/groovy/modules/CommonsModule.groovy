@@ -18,6 +18,20 @@ class CommonsModule extends Module {
         } catch (WaitTimeoutException e) {
             // nothing to do here, in case server manage fast the page information
             // and the loader icon is not detected, just prevent test fails
+            true
+        }
+    }
+
+    def waitForLoadingMessage() {
+        try {
+            // try to wait loading message in grid is displayed then gone loading page content
+            // there are big pages where lot of information is loaded
+            waitFor { $('div#load_applicationIdGrid').displayed }
+            waitFor { !$('div#load_applicationIdGrid').displayed }
+        } catch (WaitTimeoutException e) {
+            // nothing to do here, in case server manage fast the page information
+            // and the loading message in grid is not detected, just prevent test fails
+            true
         }
     }
 
