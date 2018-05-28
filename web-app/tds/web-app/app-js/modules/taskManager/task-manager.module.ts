@@ -7,8 +7,8 @@ import {NgModule} from '@angular/core';
 // import {CommonModule} from '@angular/common';
 // import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 // Routing Logic
-import {UIRouterModule} from '@uirouter/angular';
-import {TASK_MANAGER_STATES} from './task-manager-routing.states';
+// import {UIRouterModule} from '@uirouter/angular';
+// import {TASK_MANAGER_STATES} from './task-manager-routing.states';
 // Components
 // import {TaskListComponent} from './components/list/task-list.component';
 // import {TaskCreateComponent} from './components/create/task-create.component';
