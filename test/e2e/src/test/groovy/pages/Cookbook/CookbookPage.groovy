@@ -67,4 +67,10 @@ class CookbookPage extends Page {
         editorTab.click()
         waitFor { editorTab.parent(".active") }
     }
+
+    def filterByContext(context){
+        def options = contextSelector.find("option")
+        def option = options.find {it.text() == context}
+        option.click()
+    }
 }
