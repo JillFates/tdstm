@@ -21,6 +21,8 @@ import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
+const DATA_SCRIPT_SIZE_DEFAULT_WIDTH = 580;
+const DATA_SCRIPT_SIZE_DEFAULT_HEIGHT = 680;
 const UNITS_SIZE_SEPARATOR = 'x';
 export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
 export const PROGRESSBAR_FAIL_STATUS = 'Failed';
@@ -672,11 +674,10 @@ export class DataIngestionService {
 	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
 		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
 			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
-			.filter((size: string) => Boolean(size))
 			.map((size: string) => {
-				let measure: string[] = size.split(UNITS_SIZE_SEPARATOR);
-				let	width = Number(measure.length &&  measure.shift()) || null;
-				let height = Number(measure.length &&  measure.shift()) || null;
+				let measure: string[] = (size || '').split(UNITS_SIZE_SEPARATOR);
+				let	width = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_WIDTH;
+				let height = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_HEIGHT;
 				return { width, height };
 			})
 			.filter((size: any) =>  size.width !== null && size.height !== null);
