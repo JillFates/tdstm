@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {process, CompositeFilterDescriptor, SortDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
@@ -28,7 +28,7 @@ import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 		.action-header { width:100%; text-align:center; }
 	`]
 })
-export class APIActionListComponent {
+export class APIActionListComponent implements OnInit {
 
 	private state: State = {
 		sort: [{
@@ -44,7 +44,7 @@ export class APIActionListComponent {
 	public skip = 0;
 	public pageSize = MAX_DEFAULT;
 	public defaultPageOptions = MAX_OPTIONS;
-	public apiActionColumnModel = new APIActionColumnModel();
+	public apiActionColumnModel: APIActionColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
@@ -54,6 +54,7 @@ export class APIActionListComponent {
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	private interval = INTERVAL;
 	private openLastItemId = 0;
+	public dateFormat = '';
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -69,6 +70,14 @@ export class APIActionListComponent {
 					this.gridData = process(this.resultSet, this.state);
 				},
 				(err) => console.log(err));
+	}
+
+	ngOnInit() {
+		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.apiActionColumnModel = new APIActionColumnModel(`{0:${dateFormat}}`);
+			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {

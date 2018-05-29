@@ -5,7 +5,8 @@ import {AgentMethodModel} from './agent.model';
 export class APIActionColumnModel {
 	columns: any[];
 
-	constructor() {
+	constructor(dateFormat = '{0:d}') {
+
 		this.columns = [
 			{
 				label: 'Action',
@@ -48,13 +49,13 @@ export class APIActionColumnModel {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
-				format: '{0:d}',
+				format: dateFormat,
 				width: 160
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'date',
-				format: '{0:d}',
+				format: dateFormat,
 				width: 160
 			}
 		];

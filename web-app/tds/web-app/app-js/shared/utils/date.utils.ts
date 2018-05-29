@@ -124,4 +124,8 @@ export class DateUtils {
 
 		return {init, end};
 	}
+
+	public static getKendoDateFormat(userDateFormatPreference: string) {
+		return (userDateFormatPreference === 'DD/MM/YYYY') ? 'dd/MMM/yyyy' : 'MMM/dd/yyy';
+	}
 }

@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PreferenceService} from '../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
@@ -781,5 +781,11 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());
+	}
+
+	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
+		return this.preferenceService.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
+			.map((dateFormat) => DateUtils.getKendoDateFormat(dateFormat))
 	}
 }
