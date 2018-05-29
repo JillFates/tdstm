@@ -19,7 +19,7 @@
 		<tbody id="listCommentsTbodyIds">
 			<tr *ngFor="let comment of getCommentsWithFilter()">
 				<td style="text-align: center;">{{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:''}}</td>
-				<td>{{comment.commentInstance.comment}}</td>
+				<td (click)="openCommentDetail()">{{comment.commentInstance.comment}}</td>
 				<td>{{(comment.commentInstance.commentType == 'issue')?comment.commentInstance.status:((comment.commentInstance.isResolved?'Archived':''))}}</td>
 				<td>{{comment.commentInstance.category}}</td>
 				<td>{{getAssignedTo(comment)}}</td>

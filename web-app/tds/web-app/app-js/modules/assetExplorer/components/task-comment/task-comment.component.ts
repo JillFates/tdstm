@@ -1,33 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { TaskCommentService } from '../../service/task-comment.service';
+// import {ProviderViewEditComponent} from "../../../dataIngestion/components/provider-view-edit/provider-view-edit.component";
+// import {ProviderModel} from "../../../dataIngestion/model/provider.model";
+import {DialogService} from "@progress/kendo-angular-dialog";
 
 @Component({
 	selector: `task-comment`,
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/task-comment.component.html',
-	styles: [`
-	.headerwidth3 {
-		width: 30px;
-	}
-	.headerwidth4 {
-		width: 40px;
-	}
-	.headerwidth6 {
-		width: 60px;
-	}
-	.headerwidth10 {
-		width: 100px;
-	}
-	.headerwidth12 {
-		width: 120px;
-	}
-	.headerwidth13 {
-		width: 130px;
-	}
-	.headerwidth20 {
-		width: 200px;
-	}
-	`]
+	styles: []
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
@@ -40,7 +21,7 @@ export class TaskCommentComponent implements OnInit {
 	showAll: boolean;
 	comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService) { }
+	constructor(private taskService: TaskCommentService, private dialogService: DialogService) { }
 
 	ngOnInit(): void {
 		this.showAll = this.prefValue;
@@ -50,7 +31,7 @@ export class TaskCommentComponent implements OnInit {
 			}, (err) => console.log(err));
 	}
 
-	getCommentsWithFilter() {
+	public getCommentsWithFilter(): any {
 		return this.comments
 			.filter(comment => this.viewUnpublishedValue || comment.commentInstance.isPublished)
 			.filter(comment => this.showAll
@@ -58,8 +39,19 @@ export class TaskCommentComponent implements OnInit {
 				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
 	}
 
-	getAssignedTo(comment) {
+	public getAssignedTo(comment): any {
 		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : `/${comment.role}`);
 	}
 
+	public openCommentDetail(): void {
+		/* this.dialogService.open(ProviderViewEditComponent, [
+			{ provide: ProviderModel, useValue: providerModel },
+			{ provide: Number, useValue: actionType}
+		]).then(result => {
+			// update the list to reflect changes, it keeps the filter
+			this.reloadData();
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		}); */
+	}
 }
