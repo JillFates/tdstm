@@ -16,9 +16,9 @@ import { AssetExplorerIndexComponent } from './components/index/asset-explorer-i
 import { AssetShowComponent } from './components/asset/asset-show.component';
 import { AssetEditComponent } from './components/asset/asset-edit.component';
 import { SharedModule } from '../../shared/shared.module';
-import { Permission } from '../../shared/model/permission.model';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
+import { SingleCommentComponent } from './components/single-comment/single-comment.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -55,7 +55,8 @@ import { DependecyService } from './service/dependecy.service';
 		AssetShowComponent,
 		AssetEditComponent,
 		TaskCommentComponent,
-		AssetDependencyComponent
+		AssetDependencyComponent,
+		SingleCommentComponent
 	],
 	providers: [AssetExplorerService, TaskCommentService, DependecyService],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
@@ -64,7 +65,8 @@ import { DependecyService } from './service/dependecy.service';
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
 		AssetEditComponent,
-		AssetDependencyComponent
+		AssetDependencyComponent,
+		SingleCommentComponent
 	],
 })
 

@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
-import { TaskCommentService } from '../../service/task-comment.service';
-// import {ProviderViewEditComponent} from "../../../dataIngestion/components/provider-view-edit/provider-view-edit.component";
-// import {ProviderModel} from "../../../dataIngestion/model/provider.model";
-import {DialogService} from "@progress/kendo-angular-dialog";
+import {TaskCommentService} from '../../service/task-comment.service';
+import {SingleCommentComponent} from '../single-comment/single-comment.component';
+import {SingleCommentModel} from '../single-comment/single-comment.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ModalType} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `task-comment`,
@@ -21,7 +22,8 @@ export class TaskCommentComponent implements OnInit {
 	showAll: boolean;
 	comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService, private dialogService: DialogService) { }
+	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService) {
+	}
 
 	ngOnInit(): void {
 		this.showAll = this.prefValue;
@@ -43,15 +45,27 @@ export class TaskCommentComponent implements OnInit {
 		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : `/${comment.role}`);
 	}
 
-	public openCommentDetail(): void {
-		/* this.dialogService.open(ProviderViewEditComponent, [
-			{ provide: ProviderModel, useValue: providerModel },
-			{ provide: Number, useValue: actionType}
-		]).then(result => {
-			// update the list to reflect changes, it keeps the filter
-			this.reloadData();
+	public openCommentDetail(comment: any): void {
+		let singleCommentModel: SingleCommentModel = {
+			modal: {
+				title: 'Comment Detail',
+				type: ModalType.VIEW
+			},
+			archive: comment.commentInstance.isResolved !== 0,
+			comment: comment.commentInstance.comment,
+			category: comment.commentInstance.category,
+			assetType: comment.assetType,
+			assetName: comment.assetName,
+			lastUpdated: comment.commentInstance.lastUpdated,
+			dateCreated: comment.commentInstance.dateCreated
+		};
+
+		this.dialogService.extra(SingleCommentComponent, [
+			{provide: SingleCommentModel, useValue: singleCommentModel}
+		], true, false).then(result => {
+			console.log('Success');
 		}).catch(result => {
 			console.log('Dismissed Dialog');
-		}); */
+		});
 	}
 }
