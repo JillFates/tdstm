@@ -14,8 +14,8 @@ import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-fil
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
-	private OPTIONS: any = {
+	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
+	protected OPTIONS: any = {
 		FILE: 'file',
 		SERVICE: 'service',
 		CSV: 'csv',
