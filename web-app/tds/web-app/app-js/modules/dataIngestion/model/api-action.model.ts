@@ -5,7 +5,7 @@ import {AgentMethodModel} from './agent.model';
 export class APIActionColumnModel {
 	columns: any[];
 
-	constructor(dateFormat = '{0:d}') {
+	constructor(dateFormat: string) {
 
 		this.columns = [
 			{

@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
@@ -20,7 +20,7 @@ import {PageChangeEvent} from '@progress/kendo-angular-grid';
         #btnCreateProvider { margin-left: 16px; }
 	`]
 })
-export class ProviderListComponent {
+export class ProviderListComponent implements OnInit {
 
 	private state: State = {
 		sort: [{
@@ -35,12 +35,13 @@ export class ProviderListComponent {
 	public skip = 0;
 	public pageSize = MAX_DEFAULT;
 	public defaultPageOptions = MAX_OPTIONS;
-	public providerColumnModel = new ProviderColumnModel();
+	public providerColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
+	public dateFormat = '';
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -56,6 +57,14 @@ export class ProviderListComponent {
 				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
+	}
+
+	ngOnInit() {
+		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.providerColumnModel = new ProviderColumnModel(`{0:${dateFormat}}`);
+			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {

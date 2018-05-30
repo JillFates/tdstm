@@ -3,7 +3,7 @@ export const COLUMN_MIN_WIDTH = 360;
 export class DataScriptColumnModel {
 	columns: any[];
 
-	constructor(format = '{0:d}') {
+	constructor(dateFormat: string) {
 		this.columns = [
 			{
 				label: 'Action',
@@ -34,13 +34,13 @@ export class DataScriptColumnModel {
 				label: 'Date Create',
 				property: 'dateCreated',
 				type: 'date',
-				format: format,
+				format: dateFormat,
 				width: 170
 			}, {
 				label: 'Last Modified',
 				property: 'lastUpdated',
 				type: 'date',
-				format: format,
+				format: dateFormat,
 				width: 170
 			}
 		];
