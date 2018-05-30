@@ -54,10 +54,10 @@
 								</div>
 								<div class="col-md-12 single-comment-date-container">
 									<div class="col-md-6">
-										<label class="control-label label-detail text-capitalize">Created By at {{singleCommentModel.dateCreated}}</label>
+										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | date: dateFormatTime}}</label>
 									</div>
 									<div class="col-md-6">
-										<label class="control-label label-detail text-capitalize">Last Updated: {{singleCommentModel.lastUpdated}}</label>
+										<label class="control-label label-detail text-capitalize">Last updated: {{singleCommentModel.lastUpdated | date: dateFormatTime}}</label>
 									</div>
 								</div>
 							</div>
