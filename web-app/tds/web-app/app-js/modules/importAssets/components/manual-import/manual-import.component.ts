@@ -5,6 +5,12 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+import {
+	DataIngestionService,
+	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
+} from '../../../dataIngestion/service/data-ingestion.service';
+import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'manual-import',
@@ -21,22 +27,30 @@ export class ManualImportComponent implements OnInit {
 	private fetchResult: any;
 	private fetchInProcess = false;
 	private fetchInputUsed: 'action' | 'file' = 'action';
-	private transformResult: ApiResponseModel;
-	private transformInProcess = false;
+	protected transformResult: ApiResponseModel;
+	protected transformInProcess = false;
 	private importResult: any;
 	private importInProcess = false;
 	private fetchFileContent: any;
 	private transformFileContent: any;
 	private viewDataType: string;
-	private uiConfig: any = {
+	protected uiConfig: any = {
 		labelColSize: 3,
 		inputColSize: 3,
 		buttonColSize: 1,
 		urlColSize: 2
 	};
+	protected transformProgress = {
+		progressKey: null,
+		currentProgress: 0,
+	};
+	private transformInterval: any;
 
-	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
-		this.file.fileUID = null;
+	constructor(
+		private importAssetsService: ImportAssetsService,
+		private notifier: NotifierService,
+		private dataIngestionService: DataIngestionService) {
+			this.file.fileUID = null;
 	}
 
 	ngOnInit(): void {
@@ -90,21 +104,84 @@ export class ManualImportComponent implements OnInit {
 	 * Transform button clicked event.
 	 * Calls Transform process on endpoint.
 	 */
-	private onTransform(): void {
+	protected onTransform(): void {
 		this.transformInProcess = true;
 		this.transformResult = null;
 		this.transformFileContent = null;
 		this.importResult = null;
-		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
-			this.transformResult = result;
-			if (this.transformResult.status === 'error') {
-				this.notifier.broadcast({
-					name: AlertType.DANGER,
-					message: this.transformResult.errors[0]
-				});
+		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
+				this.transformProgress.progressKey = result.data.progressKey;
+				this.setTransformProgressInterval();
+			} else {
+				this.transformResult = new ApiResponseModel();
+				this.transformResult.status = ApiResponseModel.API_ERROR;
+				this.transformResult.data = {};
 			}
+		}, error => {
+			this.transformResult = new ApiResponseModel();
+			this.transformResult.status = ApiResponseModel.API_ERROR;
+			this.transformResult.data = {};
 			this.transformInProcess = false;
-		} );
+		});
+	}
+
+	/**
+	 * Clears out the Transform interval loop.
+	 */
+	private clearTestScriptProgressInterval(): void {
+		clearInterval(this.transformInterval);
+	}
+
+	/**
+	 * Creates an interval loop to retreive Transform current progress.
+	 */
+	private setTransformProgressInterval(): void {
+		this.transformProgress.currentProgress = 1;
+		this.transformInterval = setInterval(() => {
+			this.getTransformProgress();
+		}, PROGRESSBAR_INTERVAL_TIME);
+	}
+
+	/**
+	 * Operation of the Test Script interval that will be executed n times in a loop.
+	 */
+	private getTransformProgress(): void {
+		this.dataIngestionService.getJobProgress(this.transformProgress.progressKey)
+			.subscribe( (response: ApiResponseModel) => {
+				let currentProgress = response.data.percentComp;
+				this.transformProgress.currentProgress = currentProgress;
+				// On Fail
+				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
+					this.handleTransformResultError(response.data.detail);
+					this.transformInProcess = false;
+					this.clearTestScriptProgressInterval();
+				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
+					// On finish without filename output (Fail)
+					if (!response.data.detail) {
+						this.handleTransformResultError('The generated intermediate ETL data file could not be accessed.');
+						this.transformInProcess = false;
+					} else {
+						// On Success
+						setTimeout( () => {
+							this.transformResult = new ApiResponseModel();
+							this.transformResult.status = ApiResponseModel.API_SUCCESS;
+							this.transformResult.data = {filename: response.data.detail};
+							this.transformInProcess = false;
+						}, 500);
+					}
+					this.clearTestScriptProgressInterval();
+				}
+			});
+	}
+
+	private handleTransformResultError(errorMessage: string): void {
+		this.transformResult = new ApiResponseModel();
+		this.transformResult.status = ApiResponseModel.API_ERROR;
+		this.notifier.broadcast({
+			name: AlertType.DANGER,
+			message: errorMessage
+		});
 	}
 
 	/**
@@ -190,7 +267,7 @@ export class ManualImportComponent implements OnInit {
 
 	private disableTransformButton() {
 		return !this.selectedScriptOption || this.selectedScriptOption === -1
-			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === 'error';
+			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === ApiResponseModel.API_ERROR;
 	}
 
 	private clearFilename(e?: any) {

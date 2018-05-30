@@ -9,12 +9,20 @@ import pages.Cookbook.TabEditorTabSyntaxErrorsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import jodd.util.RandomString
 
 @Stepwise
 class RecipeEditionSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static recipeText
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static baseName = "QAE2E"
+    static recipeName = baseName + " " + randStr + " Geb Recipe Test"
+    static recipeDataMap = [
+        name: recipeName,
+        context: "Event",
+        description: "This is a Geb created recipe for an Event context"
+    ]
 
     def setupSpec() {
         testCount = 0
@@ -23,14 +31,9 @@ class RecipeEditionSpec extends GebReportingSpec {
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
-        waitFor { recipeGridRows.size() > 0 }
-        waitFor { createRecipeButton.click()}
+        clickOnCreateButton()
         at CreateRecipePage
-        nameFieldContents = "Geb Recipe Test"
-        nameFieldContents == "Geb Recipe Test"
-        contextSelector2 = "Event"
-        descriptionContents = "This is a Geb created recipe for an Event context"
-        saveButton.click()
+        createRecipe recipeDataMap
     }
 
     def setup() {
@@ -50,7 +53,7 @@ class RecipeEditionSpec extends GebReportingSpec {
             waitFor { gebRecipes.getAt(0).click()}
 
         then: 'Recipe should be shown'
-            gebRecipes.getAt(0).text().trim() == "Geb Recipe Test"
+            gebRecipes.getAt(0).text().trim() == recipeName
     }
 
     def "2. Selecting 'Editor' tab"() {

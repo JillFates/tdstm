@@ -12,14 +12,6 @@ import {CHECK_ACTION} from './model/check-action.model';
         i.fa {
             padding-right: 0px;
         }
-        i.red {
-            color: #d33724;
-            font-weight: bold;
-        }
-        i.green {
-            color: green;
-            font-weight: bold;
-        }
 	`]
 })
 

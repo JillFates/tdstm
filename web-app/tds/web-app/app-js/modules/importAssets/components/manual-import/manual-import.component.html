@@ -1,4 +1,4 @@
-<div class="content body manual-import-component">
+<div class="content body">
     <section>
         <div>
             <form class="formly form-horizontal" role="form" novalidate >
@@ -22,10 +22,11 @@
                                 </select>
                             </div>
                             <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}
-                                <i *ngIf="fetchInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action' " class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="fetchResult?.status === 'error' && fetchInputUsed === 'action' " class="glyphicon glyphicon-remove"></i>
+                                <i aria-hidden="true" class="fa"
+                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
+                                               'fa-check green': fetchResult?.status === 'success' && fetchInputUsed === 'action',
+                                               'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
+                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
                             </button>
                             <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
                                   class="control-label col-md-{{uiConfig.urlColSize}}">
@@ -41,6 +42,7 @@
                         <div class="form-group row" style="margin-bottom: 5px;">
                             <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.OR' | translate}}</label>
                         </div>
+
                         <!-- Fetch(File Upload) Row -->
                         <div class="form-group row">
                             <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_FILE_UPLOAD' | translate}}</label>
@@ -75,7 +77,7 @@
                         </div>
 
                         <!-- Transform Datascript Row -->
-                        <div class="form-group row">
+                        <div class="form-group row" style="margin-bottom: 0px;">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="transform">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
                            </label>
@@ -86,19 +88,31 @@
                                            [ngValue]="option">{{option.name}}</option>
                                </select>
                             </div>
-                            <button [disabled]="disableTransformButton()"
+                            <button [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onTransform()"
                                     class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM' | translate}}
-                                <i *ngIf="transformInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="transformResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="transformResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
+                                <i aria-hidden="true" class="fa"
+                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+                                               'fa-check green': transformResult?.status === 'success',
+                                               'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
+                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM' | translate}}</span>
                             </button>
                             <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);"
                                (click)="onViewData('TRANSFORM')"
                                class="control-label col-sm-{{uiConfig.urlColSize}}">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
                             </a>
+                        </div>
+
+                        <!-- Progress bar-->
+                        <div class="form-group row progressBar-row">
+                            <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
+                                        col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
+                                <div *ngIf="transformInProcess" class="progress">
+                                    <div class="progress-bar progress-bar-striped active"
+                                         [style.width.%]="transformProgress.currentProgress"></div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Load Data Row -->
@@ -109,10 +123,11 @@
                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
                                    class="btn btn-default col-md-offset-{{uiConfig.inputColSize}} col-sm-{{uiConfig.buttonColSize}}">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}
-                               <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
-                               <i *ngIf="importResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
-                               <i *ngIf="importResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
+                               <i aria-hidden="true" class="fa"
+                                  [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importInProcess,
+                                               'fa-check green': importResult?.status === 'success',
+                                               'fa-thumbs-down red': importResult?.status === 'error'}"></i>
+                               <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
                            </button>
                            <a href="../dataTransferBatch/list" class="control-label col-sm-{{uiConfig.urlColSize}}">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}

@@ -690,22 +690,37 @@ class MoveBundleService implements ServiceMethods {
 
 	/**
 	 * Performs a search for all the assets and dependencies that match the parameters.
-	 * @param connectionTypes : filter for asset types on connection
-	 * @param statusTypes : filter for status tyoes
 	 * @param moveBundleText : bundle ids to analyze
+	 * @param connectionTypes : filter for asset types on connection
+	 * @param statusTypes : filter for status types
 	 * @return List of records
 	 */
 	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
-		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		String  queryForAssets = "SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, " +
-				" a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType " +
-				" FROM asset_entity a, asset_dependency ad " +
-				" WHERE a.move_bundle_id in ( ${moveBundleText} ) " +
-				" AND (a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id)"
+		// First we need the list of assets that belongs to planning bundles - See TM-10261
+		String assetIdsSubQuery = "select a.asset_entity_id from asset_entity a where a.move_bundle_id in ( ${moveBundleText} )";
 
-		queryForAssets += connectionTypes ? " AND ad.type in (${connectionTypes}) " : ""
-		queryForAssets += statusTypes ? " AND ad.status in (${statusTypes}) " : ""
-		queryForAssets += " ORDER BY a.asset_entity_id DESC  "
+		String filterOptionsCriteria  = " AND ad.asset_id != ad.dependent_id "
+		filterOptionsCriteria  += connectionTypes ? "AND ad.type in (${connectionTypes}) " : ""
+		filterOptionsCriteria  += statusTypes ? "AND ad.status in (${statusTypes}) " : ""
+
+
+		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
+		String  queryForAssets = "SELECT pa.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, " +
+				"pa.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, pa.asset_type as assetType " +
+				"FROM asset_dependency ad " +
+				"JOIN asset_entity pa ON pa.asset_entity_id=ad.asset_id " +
+				"WHERE ad.asset_id in ( " + assetIdsSubQuery + "  ) " +
+				"AND ad.dependent_id IN ( " + assetIdsSubQuery + " ) " +  // < TM-10261
+				filterOptionsCriteria  +
+				"UNION " +
+				"SELECT sa.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, " +
+				"sa.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, sa.asset_type as assetType " +
+				"FROM asset_dependency ad " +
+				"JOIN asset_entity sa ON sa.asset_entity_id=ad.dependent_id " +
+				"WHERE ad.asset_id in ( " + assetIdsSubQuery + "  ) " +
+				"AND ad.dependent_id IN ( " + assetIdsSubQuery + " ) " +  // < TM-10261
+				filterOptionsCriteria  +
+				"ORDER BY assetId DESC  "
 
 		logger.info 'SQL used to find assets: {}', queryForAssets
 		return jdbcTemplate.queryForList(queryForAssets)

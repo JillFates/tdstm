@@ -14,15 +14,14 @@ class DomainFacade {
 	DomainFacade(ETLProcessorResult result) {
 		this.result = result
 	}
-
+	/**
+	 * Return property value
+	 * @param name a property name
+	 * @return 
+	 */
 	Object getProperty(String name) {
-
-		Map<String,?> currentDataFields = result.reference.data.last().fields
-
-		if(!currentDataFields.containsKey(name)) {
-			throw ETLProcessorException.unknownDomainProperty(name)
-		}
-		return new DomainField(currentDataFields[name].value)
+		Object value = result.getFieldValue(name)
+		return new DomainField(value)
 	}
 
 }

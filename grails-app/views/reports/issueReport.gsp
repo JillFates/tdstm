@@ -69,8 +69,8 @@
 				<select id="sortOrder" name="sortOrder" onchange="return populateSelect('reportSort', this.value);">
 					<option value="id" selected="selected">Asset Id </option>
 					<option value="assetName">Asset Name</option>
-					<option value="sourceLocation">Source Location</option>
-					<option value="targetLocation">Target Location</option>
+					<option value="sourceLocationName">Source Location</option>
+					<option value="targetLocationName">Target Location</option>
 				</select>
 			</td>
 		</tr>

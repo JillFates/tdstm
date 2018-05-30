@@ -34,7 +34,7 @@ class UserPreferenceService implements ServiceMethods {
 	private static final List<String> depGraphCheckboxLabels = [
 		'bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	private static final List<String> depGraphColorBy = [
-		'group', 'bundle', 'event', 'environment', 'sourceLocation', 'targetLocation']
+		'group', 'bundle', 'event', 'environment', 'sourceLocationName', 'targetLocationName']
 	private static final List<String> archGraphCheckboxLabels = [
 		'showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
 	// ac:Asset Classes, de: Dependencies, hb: Highlight By
