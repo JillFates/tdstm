@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
@@ -12,6 +12,7 @@ import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'provider-list',
@@ -20,7 +21,7 @@ import {PageChangeEvent} from '@progress/kendo-angular-grid';
         #btnCreateProvider { margin-left: 16px; }
 	`]
 })
-export class ProviderListComponent {
+export class ProviderListComponent implements OnInit {
 
 	private state: State = {
 		sort: [{
@@ -35,19 +36,21 @@ export class ProviderListComponent {
 	public skip = 0;
 	public pageSize = MAX_DEFAULT;
 	public defaultPageOptions = MAX_OPTIONS;
-	public providerColumnModel = new ProviderColumnModel();
+	public providerColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
+	public dateFormat = '';
 
 	constructor(
 		private dialogService: UIDialogService,
 		@Inject('providers') providers: Observable<ProviderModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		providers.subscribe(
@@ -56,6 +59,14 @@ export class ProviderListComponent {
 				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
+	}
+
+	ngOnInit() {
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.providerColumnModel = new ProviderColumnModel(`{0:${dateFormat}}`);
+			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
