@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
 import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
@@ -19,7 +19,7 @@ import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 		.action-header { width:100%; text-align:center; }
 	`]
 })
-export class DataScriptListComponent {
+export class DataScriptListComponent implements OnInit {
 
 	private state: State = {
 		sort: [{
@@ -35,13 +35,14 @@ export class DataScriptListComponent {
 	public pageSize = MAX_DEFAULT;
 	public skip = 0;
 	public defaultPageOptions = MAX_OPTIONS;
-	public dataScriptColumnModel = new DataScriptColumnModel();
+	public dataScriptColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: DataScriptModel[];
 	public selectedRows = [];
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
+	public dateFormat = '';
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -60,6 +61,14 @@ export class DataScriptListComponent {
 				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
+	}
+
+	ngOnInit() {
+		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${dateFormat}}`);
+			});
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
