@@ -1,7 +1,7 @@
 export class CredentialColumnModel {
 	columns: any[];
 
-	constructor() {
+	constructor(format = '{0:d}') {
 		this.columns = [
 			{
 				label: 'Action',
@@ -42,7 +42,7 @@ export class CredentialColumnModel {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
-				format: '{0:d}',
+				format: format,
 				width: 170
 			}
 		];
