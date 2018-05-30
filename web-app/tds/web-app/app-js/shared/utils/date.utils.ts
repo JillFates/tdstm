@@ -130,7 +130,7 @@ export class DateUtils {
 	 * if format provided doesn't exists returns default date format
 	 * @returns {string}
 	 */
-	public static translateDateFormatToKendoFormat(userDateFormatPreference: string) {
+	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
 		const defaultFormat = 'MMM/dd/yyy';
 
 		const dateFormats = {
