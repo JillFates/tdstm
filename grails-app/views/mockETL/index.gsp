@@ -129,8 +129,12 @@
                                 <tr>
                                     <g:each in="${resultsRow.fieldNames}" var="fieldName">
                                         <td>${row.fields[fieldName]?.value} <br>
-                                            ${row.fields[fieldName]?.find?.query?:''} <br>
 
+                                            <g:if test="${row.fields[fieldName]?.find?.query}">
+                                                <b>Query:</b>
+                                                ${row.fields[fieldName]?.find?.query}
+                                            </g:if>
+                                            <br>
                                             <g:if test="${(row.fields[fieldName]?.find?.results)}">
                                                 <b>Results:</b>
                                                 ${row.fields[fieldName]?.find?.results}

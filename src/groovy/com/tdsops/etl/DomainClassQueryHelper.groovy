@@ -58,7 +58,7 @@ class DomainClassQueryHelper {
 		String hqlJoins = hqlJoins(clazz, paramsMap)
 
 		String hql = """
-            select $DOMAIN_ALIAS
+            select ${DOMAIN_ALIAS}.id
               from AssetEntity $DOMAIN_ALIAS
 				   $hqlJoins
 			 where ${DOMAIN_ALIAS}.project = :project
@@ -87,7 +87,7 @@ class DomainClassQueryHelper {
 		}
 
 		String hql = """
-			  select $DOMAIN_ALIAS
+			  select ${DOMAIN_ALIAS}.id
               from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
              where $hqlWhere
