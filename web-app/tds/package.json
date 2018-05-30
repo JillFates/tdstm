@@ -19,8 +19,6 @@
     "@angular/platform-browser": "5.2.10",
     "@angular/platform-browser-dynamic": "5.2.10",
     "@angular/router": "5.2.10",
-    "@ng-dynamic-forms/core": "5.4.6",
-    "@ng-dynamic-forms/ui-kendo": "5.4.6",
     "@progress/kendo-angular-buttons": "4.0.0",
     "@progress/kendo-angular-dateinputs": "3.0.0",
     "@progress/kendo-angular-dialog": "3.4.0",
@@ -85,7 +83,7 @@
     "tslint-loader": "3.6.0",
     "typescript": "2.8.3",
     "watchify": "3.11.0",
-    "webpack": "4.6.0",
+    "webpack": "4.8.3",
     "webpack-bundle-analyzer": "2.11.1",
     "webpack-dev-middleware": "3.1.3",
     "webpack-cli": "2.0.15"

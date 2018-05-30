@@ -1,33 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
-import { TaskCommentService } from '../../service/task-comment.service';
+import {TaskCommentService} from '../../service/task-comment.service';
+import {SingleCommentComponent} from '../single-comment/single-comment.component';
+import {SingleCommentModel} from '../single-comment/single-comment.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ModalType} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `task-comment`,
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/task-comment.component.html',
-	styles: [`
-	.headerwidth3 {
-		width: 30px;
-	}
-	.headerwidth4 {
-		width: 40px;
-	}
-	.headerwidth6 {
-		width: 60px;
-	}
-	.headerwidth10 {
-		width: 100px;
-	}
-	.headerwidth12 {
-		width: 120px;
-	}
-	.headerwidth13 {
-		width: 130px;
-	}
-	.headerwidth20 {
-		width: 200px;
-	}
-	`]
+	styles: []
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
@@ -40,7 +22,8 @@ export class TaskCommentComponent implements OnInit {
 	showAll: boolean;
 	comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService) { }
+	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService) {
+	}
 
 	ngOnInit(): void {
 		this.showAll = this.prefValue;
@@ -50,7 +33,7 @@ export class TaskCommentComponent implements OnInit {
 			}, (err) => console.log(err));
 	}
 
-	getCommentsWithFilter() {
+	public getCommentsWithFilter(): any {
 		return this.comments
 			.filter(comment => this.viewUnpublishedValue || comment.commentInstance.isPublished)
 			.filter(comment => this.showAll
@@ -58,8 +41,31 @@ export class TaskCommentComponent implements OnInit {
 				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
 	}
 
-	getAssignedTo(comment) {
+	public getAssignedTo(comment): any {
 		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : `/${comment.role}`);
 	}
 
+	public openCommentDetail(comment: any): void {
+		let singleCommentModel: SingleCommentModel = {
+			modal: {
+				title: 'Comment Detail',
+				type: ModalType.VIEW
+			},
+			archive: comment.commentInstance.isResolved !== 0,
+			comment: comment.commentInstance.comment,
+			category: comment.commentInstance.category,
+			assetType: comment.assetType,
+			assetName: comment.assetName,
+			lastUpdated: comment.commentInstance.lastUpdated,
+			dateCreated: comment.commentInstance.dateCreated
+		};
+
+		this.dialogService.extra(SingleCommentComponent, [
+			{provide: SingleCommentModel, useValue: singleCommentModel}
+		], true, false).then(result => {
+			console.log('Success');
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
 }

@@ -1,7 +1,4 @@
-import com.tdsops.camel.CustomHttpClientConfigurer
-import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
 import com.tdsops.common.security.spring.TdsPasswordEncoder
 import com.tdsops.common.security.spring.TdsPermissionEvaluator
@@ -178,7 +175,6 @@ beans = {
 		}
 	}
 
-	camelHostnameIdentifier(CamelHostnameIdentifier)
 	taskFacade(TaskFacade) { bean ->
 		bean.scope = 'prototype'
 		taskService = ref('taskService')
@@ -190,9 +186,4 @@ beans = {
 		messageSourceService = ref('messageSourceService')
 	}
 
-	httpRouteBuilder(HttpRouteBuilder) {
-		credentialService = ref('credentialService')
-	}
-
-	customHttpClientConfigurer(CustomHttpClientConfigurer)
 }

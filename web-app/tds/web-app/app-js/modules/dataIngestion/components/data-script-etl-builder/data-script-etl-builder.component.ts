@@ -1,5 +1,6 @@
-import {Component, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import {Component, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/finally';
 
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';

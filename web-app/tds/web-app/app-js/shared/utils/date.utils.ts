@@ -3,6 +3,7 @@ import {INTERVAL} from '../model/constants';
 export class DateUtils {
 
 	public static readonly DEFAULT_TIMEZONE_FORMAT = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
 
 	/**
 	 * Create a Date Object
