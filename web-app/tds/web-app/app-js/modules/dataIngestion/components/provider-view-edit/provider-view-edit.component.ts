@@ -167,7 +167,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 * @param {ActionType} modalType
 	 * @returns {string}
 	 */
-	private getModalTitle(modalType: ActionType) {
+	private getModalTitle(modalType: ActionType): string {
 		if (modalType === ActionType.CREATE) {
 			return 'Create Provider';
 		}
