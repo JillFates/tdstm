@@ -28,6 +28,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	@ViewChild('resizableForm') resizableForm: ElementRef;
 	private width = 0;
 	private height = 0;
+	private GRID_HEIGHT = 532;
 	private collapsed = {
 		code: true,
 		sample: false,
@@ -261,6 +262,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private extractSampleDataFromFile() {
 		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
 			this.sampleDataModel = result;
+			this.setGridHeight();
 		});
 	}
 
@@ -328,6 +330,22 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected restoreWindow() {
 		this.isWindowMaximized = false;
+	}
+
+	/**
+	 * Based on data rows of sample data set the grid height
+	 */
+	private setGridHeight() {
+		if (this.sampleDataModel.data && this.sampleDataModel.data.length) {
+			this.sampleDataModel.gridHeight = parseInt(this.resizableForm.nativeElement.style.height, 10)  - this.GRID_HEIGHT;
+			this.resizableForm.nativeElement.style.minHeight = this.resizableForm.nativeElement.style.height
+		} else {
+			this.resizableForm.nativeElement.style.minHeight = '';
+		}
+	}
+
+	public onResizeEvent(eventName: string) {
+		this.setGridHeight();
 	}
 
 }
