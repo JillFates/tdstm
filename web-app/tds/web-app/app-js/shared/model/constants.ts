@@ -45,4 +45,10 @@ export enum DOMAIN {
 	DEVICE = 'DEVICE',
 	STORAGE = 'STORAGE',
 	TASK = 'TASK'
-}
+};
+
+export enum ModalType {
+	VIEW,
+	CREATE,
+	EDIT
+};
