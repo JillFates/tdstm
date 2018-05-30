@@ -125,7 +125,19 @@ export class DateUtils {
 		return {init, end};
 	}
 
-	public static getKendoDateFormat(userDateFormatPreference: string) {
-		return (userDateFormatPreference === 'DD/MM/YYYY') ? 'dd/MMM/yyyy' : 'MMM/dd/yyy';
+	/**
+	 * Given a User Preference TimeZone format convert it to a format used by Kendo controls
+	 * if format provided doesn't exists returns default date format
+	 * @returns {string}
+	 */
+	public static translateDateFormatToKendoFormat(userDateFormatPreference: string) {
+		const defaultFormat = 'MMM/dd/yyy';
+
+		const dateFormats = {
+			'DD/MM/YYYY' : 'dd/MMM/yyyy',
+			'MM/DD/YYYY' : defaultFormat
+		};
+
+		return dateFormats[userDateFormatPreference] || defaultFormat;
 	}
 }
