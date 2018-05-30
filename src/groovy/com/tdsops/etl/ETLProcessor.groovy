@@ -86,7 +86,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * An instance of this interface should be assigned
 	 * to be used in fieldDefinition validations
-	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldDefinition(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
 	/**
@@ -529,7 +529,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Load a domain property using an explicit value. It could be a simple String,
+	 * Load a domain fieldName using an explicit value. It could be a simple String,
 	 * a DOMAIN or SOURCE reference, or a CE/local variable.
 	 * <pre>
 	 *    domain Application
@@ -547,7 +547,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return [
 			with: { value ->
 
-				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain.domain, fieldName))
+				Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
 				element.originalValue = ETLValueHelper.valueOf(value)
 				element.value = element.originalValue
 				addElementLoaded(selectedDomain.domain, element)
@@ -609,7 +609,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	Map<String, ?> lookup(final String fieldName){
 		validateStack()
-		lookUpFieldSpecs(selectedDomain.domain, fieldName)
+		lookUpFieldDefinition(selectedDomain.domain, fieldName)
 		return [
 		    with: { value ->
 			    Object stringValue = ETLValueHelper.valueOf(value)
@@ -624,19 +624,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Validates if all the fieldNames are valid properties for a domain class.
-	 * It validates using a lookup fields method for each field name.
-	 * @param domain an instance of ETLDomanin
-	 * @param fieldNames a list of field names
-	 * @see ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
-	 */
-	private void validateFields(ETLDomain domain, String...fieldNames) {
-		for(fieldName in fieldNames){
-			lookUpFieldSpecs(domain, fieldName)
-		}
-	}
-/**
-	 * Initialize a property using a default value
+	 * Initialize a fieldName using a default value
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
@@ -657,7 +645,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return [
 			with: { defaultValue ->
 
-				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain.domain, field))
+				Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, field))
 				element.init = ETLValueHelper.valueOf(defaultValue)
 				addElementLoaded(selectedDomain.domain, element)
 				element
@@ -666,7 +654,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Initialize a property using a default value
+	 * Initialize a fieldName using a default value
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
@@ -720,12 +708,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *			"SN Last Seen": NOW
 	 *		}
 	 * </pre>
-	 * @param property
+	 * @param fieldName
 	 * @return the current find Element
 	 */
-	FoundElement whenNotFound(final String property) {
+	FoundElement whenNotFound(String fieldName) {
 		validateStack()
-		return new WhenNotFoundElement(property, result)
+		if(!currentFindElement){
+			throw ETLProcessorException.whenNotFoundCommandWithoutCurrentFindElement(fieldName)
+		}
+		return new WhenNotFoundElement(fieldName, this)
 	}
 
 	/**
@@ -735,12 +726,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *			"TN Last Seen": NOW
 	 *		}
 	 * </pre>
-	 * @param property
+	 * @param fieldName
 	 * @return the current find Element
 	 */
-	FoundElement whenFound(final String property) {
+	FoundElement whenFound(String fieldName) {
 		validateStack()
-		return new WhenFoundElement(property, result)
+		if(!currentFindElement){
+			throw ETLProcessorException.whenFoundCommandWithoutCurrentFindElement(fieldName)
+		}
+		return new WhenFoundElement(fieldName, this)
 	}
 
 	/**
@@ -818,7 +812,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * It looks up the field Spec for Domain by fieldName.
+	 * It looks up the field definition for a Domain by fieldName.
 	 * It is in charge of validating if a field belongs to a domain class.
 	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
 	 * <br>
@@ -830,7 +824,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see ETLFieldDefinition
 	 * @see ETLProcessorResult
 	 */
-	ETLFieldDefinition lookUpFieldSpecs (ETLDomain domain, String field) {
+	ETLFieldDefinition lookUpFieldDefinition(ETLDomain domain, String field) {
 
 		ETLFieldDefinition fieldSpec
 
@@ -844,14 +838,24 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			if (!fieldSpec) {
 				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
-
-			//TODO: dcorrea@ What are going to do with non domain classes? How we are going to prepare the FieldsSpec
 		}
 		return fieldSpec
 	}
 
 	/**
-	 * It validates if a field is a reference domain property or
+	 * It looks up the field Spec for Domain by fieldName.
+	 * It is in charge of validating if a field belongs to a domain class.
+	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
+	 * @param fieldName field name used in the lookup process
+	 * @return an instance of {@link  ETLFieldDefinition}
+	 * @see ETLProcessor#lookUpFieldDefinition(com.tdsops.etl.ETLDomain, java.lang.String)
+	 */
+	ETLFieldDefinition lookUpFieldDefinitionForCurrentDomain(String fieldName) {
+		return lookUpFieldDefinition(selectedDomain.domain, fieldName)
+	}
+
+	/**
+	 * It validates if a field is a reference domain fieldName or
 	 * if it's a domain identifier
 	 * @param domain
 	 * @param fieldName
@@ -942,6 +946,22 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		findOrCreateCurrentElement(findElement.currentFind.fieldDefinition)
 		result.addFindElement(findElement)
 		popFromStack()
+	}
+
+	/**
+	 * Add a FoundElement in the result based on its fieldName
+	 * <pre>
+	 *		whenFound 'asset' create {
+	 *			assetClass Application
+	 *			assetName primaryName
+	 *			assetType primaryType
+	 *			"SN Last Seen": NOW
+	 *		}
+	 * </pre>
+	 * @param foundElement
+	 */
+	void addFoundElement(FoundElement foundElement){
+		result.addFoundElement(foundElement)
 	}
 
 	/**
