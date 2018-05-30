@@ -19,6 +19,7 @@ import {
 import {CredentialViewEditComponent} from '../credential-view-edit/credential-view-edit.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'credential-list',
@@ -59,7 +60,8 @@ export class CredentialListComponent implements OnInit {
 		@Inject('credentials') credentials: Observable<CredentialModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private preferenceService: PreferenceService) {
 			this.state.take = this.pageSize;
 			this.state.skip = this.skip;
 			credentials
@@ -71,7 +73,7 @@ export class CredentialListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.credentialColumnModel = new CredentialColumnModel(`{0:${dateFormat}}`);

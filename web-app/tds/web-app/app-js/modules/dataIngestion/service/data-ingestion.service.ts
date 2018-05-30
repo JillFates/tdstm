@@ -782,14 +782,4 @@ export class DataIngestionService {
 				return res.json();
 			}).catch((error: any) => error.json());
 	}
-
-	/**
-	 * Get the user date format preference and translate it to the corresponding Kendo date format
-	 * @returns {Observable<string>}
-	 */
-	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
-		return this.preferenceService.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
-			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
-	}
 }

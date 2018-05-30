@@ -19,6 +19,7 @@ import {
 } from '../../../../shared/model/data-list-grid.model';
 import {APIActionViewEditComponent} from '../api-action-view-edit/api-action-view-edit.component';
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'api-action-list',
@@ -61,7 +62,8 @@ export class APIActionListComponent implements OnInit {
 		@Inject('apiActions') apiActions: Observable<APIActionModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		apiActions
@@ -73,7 +75,7 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.apiActionColumnModel = new APIActionColumnModel(`{0:${dateFormat}}`);

@@ -10,6 +10,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
 import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'data-script-list',
@@ -49,7 +50,8 @@ export class DataScriptListComponent implements OnInit {
 		@Inject('dataScripts') dataScripts: Observable<DataScriptModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		dataScripts.subscribe(
@@ -64,7 +66,7 @@ export class DataScriptListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${dateFormat}}`);

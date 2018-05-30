@@ -12,6 +12,7 @@ import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'provider-list',
@@ -48,7 +49,8 @@ export class ProviderListComponent implements OnInit {
 		@Inject('providers') providers: Observable<ProviderModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		providers.subscribe(
@@ -60,7 +62,7 @@ export class ProviderListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.dataIngestionService.getUserDatePreferenceAsKendoFormat()
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.providerColumnModel = new ProviderColumnModel(`{0:${dateFormat}}`);
