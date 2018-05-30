@@ -7,7 +7,6 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import jodd.util.RandomString
-import geb.Browser
 
 @Stepwise
 class RecipeDeletionSpec extends GebReportingSpec {
@@ -51,19 +50,14 @@ class RecipeDeletionSpec extends GebReportingSpec {
         given: 'The User is on the Cookbook Section'
             at CookbookPage
         when: 'The User searches by the Recipe'
-            filterByContext recipeDataMap.context
-            waitForLoadingIndicator()
+            filterByContext recipeDataMap.context // need to play with filtering to refresh grid
+            filterByContext "All" // reset to all because AT page checking
             waitFor{ gebRecipes[0].displayed }
-            def gebRecipeCountBeforeDelete = gebRecipes.size()
-            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
         and: 'The User clicks the "Delete" Button'
-            withConfirm(true) { deleteRecipeButtons[0].click() }
-            println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
-
+            withConfirm(wait: true) { deleteRecipeButtons[0].click() }
         then: 'Recipe count is reduced to 1'
-            waitForSuccessBanner()
-            waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
-            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
+            waitFor{ gebRecipes[0].displayed }
+            getRecipeByName(recipeDataMap.name) == null
     }
 }
 
