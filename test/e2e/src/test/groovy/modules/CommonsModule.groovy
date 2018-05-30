@@ -11,26 +11,26 @@ class CommonsModule extends Module {
 
     def waitForLoader() {
         try {
-            // try to wait loader icon is displayed then gone loading page content
-            // there are big pages where lot of information is loaded
+            // Try and wait that the loading message on the grid is displayed and then gone so it loads the page content.
+            // There are big pages where a lot of information is loaded
             waitFor { $('#main-loader') }
             waitFor { !$('#main-loader') }
         } catch (WaitTimeoutException e) {
-            // nothing to do here, in case server manage fast the page information
-            // and the loader icon is not detected, just prevent test fails
+            // Nothing to do here, in case the server quickly manages the page info
+            // and the loading message on the grid isn't detected, then prevent that the test fails
             true
         }
     }
 
     def waitForLoadingMessage() {
         try {
-            // try to wait loading message in grid is displayed then gone loading page content
-            // there are big pages where lot of information is loaded
+            // Try and wait that the loading message on the grid is displayed and then gone so it loads the page content.
+            // There are big pages where a lot of information is loaded
             waitFor { $('div#load_applicationIdGrid').displayed }
             waitFor { !$('div#load_applicationIdGrid').displayed }
         } catch (WaitTimeoutException e) {
-            // nothing to do here, in case server manage fast the page information
-            // and the loading message in grid is not detected, just prevent test fails
+            // Nothing to do here, in case the server quickly manages the page info
+            // and the loading message on the grid isn't detected, then prevent that the test fails
             true
         }
     }
