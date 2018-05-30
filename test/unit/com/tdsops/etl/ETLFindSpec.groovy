@@ -1997,6 +1997,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Application by 'assetName' with primaryAppVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Application
 						'assetName' primaryAppVar
 					}
 				}
@@ -2007,6 +2008,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Application by 'assetName' with supportAppVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Application
 						'assetName' supportAppVar
 					}
 				}
@@ -2017,6 +2019,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Device by 'assetName' with primaryServerVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Device
 						'assetName' primaryServerVar
 					}
 				}
@@ -2027,6 +2030,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Device by 'assetName' with supportServerVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Device
 						'assetName' supportServerVar
 					}
 				}

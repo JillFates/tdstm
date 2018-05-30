@@ -343,7 +343,7 @@ class RowResult {
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldResult fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition.name)
 		fieldData.addFoundElement(foundElement)
 	}
 

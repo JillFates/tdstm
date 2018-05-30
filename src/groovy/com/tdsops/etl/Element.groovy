@@ -84,7 +84,7 @@ class Element implements RangeChecker {
 	Element load(String fieldName) {
 		processor.validateStack()
 		if(processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
+			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
 			processor.addElementLoaded(processor.selectedDomain.domain, this)
 			return this
 		} else{
@@ -104,7 +104,7 @@ class Element implements RangeChecker {
 	Element initialize(String fieldName) {
 		processor.validateStack()
 		if (processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
+			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
 			this.init = this.value
 			this.originalValue = null
 			this.value = null
