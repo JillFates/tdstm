@@ -828,7 +828,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			DataScript dataScript = dataScriptTestHelper.createDataScript(project, provider, whom, etlSourceCode)
 			String originalFilename = 'test.csv'
 			MultipartFile multiPartFile = new MockMultipartFile(originalFilename, originalFilename, "text/plain", sampleData.getBytes())
-			UploadFileCommand.fileSystemService = fileSystemService
 			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
 			String fileUploadName = fileSystemService.transferFileToFileSystem(cmd)
 			Map transformResults = dataImportService.transformEtlData(project, dataScript.id, fileUploadName)
