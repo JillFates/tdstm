@@ -90,6 +90,13 @@ export class SingleCommentComponent extends UIExtraDialog {
 	}
 
 	/**
+	 * Delete the Asset Comment
+	 */
+	protected onDelete(): void {
+		//
+	}
+
+	/**
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */

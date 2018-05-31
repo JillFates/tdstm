@@ -97,6 +97,7 @@
 				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 					<span class="glyphicon glyphicon-pencil"></span> Edit
 				</button>
+                <button type="button" (click)="onDelete()" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> Delete</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>Cancel</span>
