@@ -226,6 +226,19 @@ export class AssetExplorerService {
 	}
 
 	/**
+	 * Get the List of Asset Class Options
+	 * @returns {Observable<any>}
+	 */
+	getAssetClassOptions(): Observable<any> {
+		return this.http.get(`${this.assetUrl}/classOptions`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 *
 	 * @param changeParams
 	 * @returns {Observable<any>}

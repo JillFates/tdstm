@@ -36,24 +36,36 @@
 									<div class="form-group">
 										<label class="col-sm-3 control-label">Class:</label>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
-
+											<kendo-dropdownlist
+													id="singleCommentClassOptions" name="singleCommentClassOptions"
+													class="form-control single-comment-dropdown" style="width: 100%;"
+													[data]="assetClassOptions"
+													[textField]="'text'"
+													[valueField]="'id'"
+													[(ngModel)]="singleCommentModel.assetClass"
+													(valueChange)="onAssetClassChange(dataItem)"
+													required>
+											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetType}}</label>
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetClass.text}}</label>
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-3 control-label">Asset:</label>
+										<label class="col-sm-3 control-label">
+											Asset:
+											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
+										</label>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
 											<tds-combobox
 													[(model)]="singleCommentModel.asset"
-													[(metaParam)]="singleCommentModel.asset.classType"
+													[(metaParam)]="singleCommentModel.assetClass.id"
 													[serviceRequest]="getAssetListForComboBox"
-													(valueChange)="onDependencyChange($event, dataItem)">
+													(valueChange)="onAssetChange($event)">
 											</tds-combobox>
 										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetName}}</label>
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.asset.text}}</label>
 										</div>
 									</div>
 								</div>
@@ -79,7 +91,10 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left">
+				<button type="button" (click)="onSave()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" [disabled]="singleCommentModel.asset.id === ''">
+					<span class="fa fa-fw fa-floppy-o"></span> Save
+				</button>
+				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 					<span class="glyphicon glyphicon-pencil"></span> Edit
 				</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">

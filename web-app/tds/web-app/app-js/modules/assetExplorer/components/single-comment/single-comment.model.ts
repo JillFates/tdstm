@@ -8,10 +8,13 @@ export class SingleCommentModel {
 	public archive: boolean;
 	public comment: string;
 	public category: string;
-	public assetType: string;
+	public assetClass: {
+		id?: string;
+		text: string;
+	};
 	public asset: {
-		name: string;
-		classType: string;
+		id?: string;
+		text: string;
 	};
 	public lastUpdated: string;
 	public dateCreated: string;

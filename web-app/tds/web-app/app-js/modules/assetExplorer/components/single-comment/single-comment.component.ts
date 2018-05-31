@@ -18,24 +18,40 @@ export class SingleCommentComponent extends UIExtraDialog {
 
 	public modalType = ModalType;
 	public dateFormatTime: string;
+	public assetClassOptions: any[];
 	public commentCategories: string[];
 
 	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService) {
 		super('#single-comment-component');
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
-		this.taskManagerService.getCommentCategories().subscribe((res) => {
-			this.commentCategories = res;
+		this.loadAssetClass();
+		this.loadCommentCategories();
+	}
+
+	/**
+	 * Load All Asset Class and Retrieve
+	 */
+	private loadAssetClass(): void {
+		this.assetExplorerService.getAssetClassOptions().subscribe((res) => {
+			this.assetClassOptions = [];
+			for (let prop in res) {
+				if (res[prop]) {
+					this.assetClassOptions.push({id: prop, text: res[prop]});
+				}
+			}
+			this.singleCommentModel.assetClass = this.assetClassOptions.find((res) => {
+				return res.id === this.singleCommentModel.assetClass.text.toUpperCase();
+			});
 		});
 	}
 
 	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
+	 * Load All Comment Categories
 	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
+	private loadCommentCategories(): void {
+		this.taskManagerService.getCommentCategories().subscribe((res) => {
+			this.commentCategories = res;
+		});
 	}
 
 	/**
@@ -48,10 +64,39 @@ export class SingleCommentComponent extends UIExtraDialog {
 	}
 
 	/**
+	 * Change the Asset selected since the class has changed
+	 * @param assetClass
+	 */
+	public onAssetClassChange(assetClass): void {
+		this.singleCommentModel.asset = {
+			id: '',
+			text: ''
+		};
+	}
+
+	/**
+	 *  Change the Asset Selection
+	 * @param asset
+	 */
+	public onAssetChange(asset: any): void {
+		this.singleCommentModel.asset = asset;
+	}
+
+	/**
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
 		this.singleCommentModel.modal.type = ModalType.EDIT;
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	/**

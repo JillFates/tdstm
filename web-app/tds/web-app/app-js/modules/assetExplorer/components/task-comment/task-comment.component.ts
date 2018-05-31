@@ -54,10 +54,12 @@ export class TaskCommentComponent implements OnInit {
 			archive: comment.commentInstance.isResolved !== 0,
 			comment: comment.commentInstance.comment,
 			category: comment.commentInstance.category,
-			assetType: comment.assetType,
+			assetClass: {
+				text: comment.assetType,
+			},
 			asset: {
-				name: comment.assetName,
-				classType: 'DATABASE'
+				id: '0',
+				text: comment.assetName
 			},
 			lastUpdated: comment.commentInstance.lastUpdated,
 			dateCreated: comment.commentInstance.dateCreated
