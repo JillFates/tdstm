@@ -13,6 +13,8 @@ import 'rxjs/add/operator/catch';
 export class TaskService {
 
 	// private instance variable to hold base url
+	private defaultUrl = '../ws';
+	private taskURL = this.defaultUrl + '/task';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
@@ -25,6 +27,19 @@ export class TaskService {
 	retrieveUserToDoCount(): Observable<any> {
 		return this.http.get('../task/retrieveUserToDoCount')
 			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * @returns {Observable<any>}
+	 */
+	getCommentCategories(): Observable<any> {
+		return this.http.get(`${this.taskURL}/assetCommentCategories`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
 			.catch((error: any) => error.json());
 	}
 

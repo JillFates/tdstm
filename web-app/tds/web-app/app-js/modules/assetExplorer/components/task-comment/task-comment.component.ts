@@ -55,7 +55,10 @@ export class TaskCommentComponent implements OnInit {
 			comment: comment.commentInstance.comment,
 			category: comment.commentInstance.category,
 			assetType: comment.assetType,
-			assetName: comment.assetName,
+			asset: {
+				name: comment.assetName,
+				classType: 'DATABASE'
+			},
 			lastUpdated: comment.commentInstance.lastUpdated,
 			dateCreated: comment.commentInstance.dateCreated
 		};

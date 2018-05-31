@@ -9,8 +9,10 @@ export class SingleCommentModel {
 	public comment: string;
 	public category: string;
 	public assetType: string;
-	public assetName: string;
-
+	public asset: {
+		name: string;
+		classType: string;
+	};
 	public lastUpdated: string;
 	public dateCreated: string;
 }
