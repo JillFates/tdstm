@@ -372,7 +372,7 @@ class FileSystemService implements InitializingBean {
 	 * @param temporaryFilename
 	 * @param toFilename
 	 */
-	boolean renameTemporaryFile(String temporaryFilename, String toFilename) {
+	void renameTemporaryFile(String temporaryFilename, String toFilename) {
 		if (temporaryFileExists(toFilename)) {
 			throw new InvalidParamException('Cannot rename file: [' + temporaryFilename + '] target file already exists: ' + toFilename)
 		}
@@ -382,7 +382,6 @@ class FileSystemService implements InitializingBean {
 
 		if (oldFile.renameTo(newFile)) {
 			log.info('File [{}] successfully renamed to: {}', temporaryFilename, toFilename)
-			return true
 		} else {
 			throw new InvalidParamException('There was an error creating temporary file: [' + temporaryFilename + '] to: ' + toFilename)
 		}

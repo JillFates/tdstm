@@ -181,13 +181,9 @@ class HttpProducerService {
                 String originalFilename = getFilenameFromHeaders(apiActionResponse.headers, contentType)
                 String targetFileExtension = FileSystemUtil.getFileExtension(originalFilename)
                 String targetFilename = fileSystemService.getUniqueFilename('', '', targetFileExtension)
-
-                if (fileSystemService.renameTemporaryFile(tmpResponseFilename, targetFilename)) {
-                    apiActionResponse.filename = targetFilename
-                    apiActionResponse.originalFilename = originalFilename
-                } else {
-                    throw new InvalidParamException('Invalid file extension or content trying to save downloaded file: ' + originalFilename)
-                }
+                fileSystemService.renameTemporaryFile(tmpResponseFilename, targetFilename)
+                apiActionResponse.filename = targetFilename
+                apiActionResponse.originalFilename = originalFilename
             } else {
                 // else, just store it in the action response for further handling
                 apiActionResponse.data = getData(is, contentType)
