@@ -1,4 +1,5 @@
 import com.tds.asset.AssetComment
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
@@ -150,5 +151,13 @@ class WsTaskController implements ControllerMethods {
 			log.error "resetAction: $errorMsg"
 			renderErrorJson([errorMsg])
 		}
+	}
+
+	/**
+	 * Return a list with all the AssetCommentCategory values.
+	 */
+	@HasPermission(Permission.TaskBatchView)
+	def assetCommentCategories() {
+		renderSuccessJson(AssetCommentCategory.list)
 	}
 }

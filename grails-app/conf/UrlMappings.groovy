@@ -139,6 +139,14 @@ class UrlMappings {
 			        POST: "deleteAssets"
 			]
 		}
+
+		"/ws/task/assetCommentCategories" {
+			controller = "wsTask"
+			action = [
+			    GET : 'assetCommentCategories'
+			]
+		}
+		
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
