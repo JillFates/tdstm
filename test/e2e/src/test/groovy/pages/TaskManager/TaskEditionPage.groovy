@@ -33,5 +33,9 @@ class TaskEditionPage extends Page{
         teModalSaveBtn                  { teModalWindow.find("button#saveAndCloseBId")}
         teModalCancelBtn                { teModalWindow.find("button",class:"btn btn-default tablesave cancel")}
         teModalCloseBtn                 { teModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
+        teModalPredecessorUl {$('.k-animation-container')[0].find("ul", "aria-hidden":"false")}
+        teModalSuccessorUl {$('.k-animation-container')[1].find("ul", "aria-hidden":"false")}
+        teModalPredecessorOptions {teModalPredecessorUl.find("li")}
+        teModalSuccessorOptions {teModalSuccessorUl.find("li")}
     }
 }
