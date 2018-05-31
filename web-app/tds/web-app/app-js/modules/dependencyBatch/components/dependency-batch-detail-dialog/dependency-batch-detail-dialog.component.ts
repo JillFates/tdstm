@@ -8,10 +8,14 @@ import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../..
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html',
+	host: {
+		'(keydown)': 'keyDownHandler($event)'
+	}
 })
 export class DependencyBatchDetailDialogComponent implements OnInit {
 
@@ -234,5 +238,15 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private batchRecordCanAction(batchRecord: ImportBatchRecordModel): boolean {
 		return batchRecord.status.code === BatchStatus.PENDING || batchRecord.status.code === BatchStatus.IGNORED;
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	private keyDownHandler($event: KeyboardEvent): void {
+		if ($event && $event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 }
