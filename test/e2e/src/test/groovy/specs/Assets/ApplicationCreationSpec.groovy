@@ -126,6 +126,6 @@ class ApplicationCreationSpec extends GebReportingSpec {
         waitFor{adModalAppName.text().trim() == appName}
         adModalSME1.text().trim() == appSME1
         adModalSME2.text().trim().contains(appSME2) // contains(because user can part of a different company)
-        adModalAppOwner.text().trim() == appOwner
+        adModalAppOwner.text().trim().contains(appOwner) // contains(because user can part of a different company)
     }
 }
