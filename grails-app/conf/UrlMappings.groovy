@@ -140,13 +140,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/classOptions" {
+			controller = "wsAsset"
+			action = [
+			    GET: "retrieveAssetClassOptions"
+			]
+		}
+
 		"/ws/task/assetCommentCategories" {
 			controller = "wsTask"
 			action = [
 			    GET : 'assetCommentCategories'
 			]
 		}
-		
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
