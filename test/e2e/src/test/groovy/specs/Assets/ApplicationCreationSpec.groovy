@@ -124,7 +124,7 @@ class ApplicationCreationSpec extends GebReportingSpec {
         then: 'The User Searches by the AppName, SME1, SME2, AppOwner'
         // TODO some items cannot located due to missing ID's
         waitFor{adModalAppName.text().trim() == appName}
-        adModalSME1.text().trim() == appSME1
+        adModalSME1.text().trim().contains(appSME1) // contains(because user can part of a different company)
         adModalSME2.text().trim().contains(appSME2) // contains(because user can part of a different company)
         adModalAppOwner.text().trim().contains(appOwner) // contains(because user can part of a different company)
     }
