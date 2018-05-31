@@ -169,7 +169,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			def (String filename, OutputStream os) = fileSystemService.createTemporaryFile(suffix, extension)
 		then: 'the file can be renamed'
 			fileSystemService.renameTemporaryFile(filename, renameToFilename)
-		when: 'calling create a second temporaryFile and '
+		when: 'calling create a second temporaryFile'
 			def (String secondFilename, OutputStream secondOS) = fileSystemService.createTemporaryFile(suffix, extension)
 			fileSystemService.renameTemporaryFile(secondFilename, renameToFilename)
 		then: 'exception should be thrown because renameToFilename already exists'
