@@ -69,7 +69,7 @@ class AssetEntityService implements ServiceMethods {
 			(AssetClass.APPLICATION): [ 'assetName' ],
 			(AssetClass.DATABASE): [ 'assetName' ],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocation'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
 			],
 			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
@@ -294,8 +294,8 @@ class AssetEntityService implements ServiceMethods {
 		} else {
 			// This should handle all rackable devices
 			// Set the source/target rack appropriate and create the rack appropriately
-			assignAssetToRack(project, device, params.rackSourceId, params.sourceRack, true)
-			assignAssetToRack(project, device, params.rackTargetId, params.targetRack, false)
+			assignAssetToRack(project, device, params.rackSourceId, params.rackSource, true)
+			assignAssetToRack(project, device, params.rackTargetId, params.rackTarget, false)
 		}
 	}
 
@@ -1952,12 +1952,12 @@ class AssetEntityService implements ServiceMethods {
 			}
 			addCell(cablingSheet, idx + 2, 7, String.valueOf(currentCabling.cableComment ?: ''))
 			addCell(cablingSheet, idx + 2, 8, String.valueOf(currentCabling.cableColor ?: ''))
-			if (currentCabling.assetFrom?.sourceRoom) {
+			if (currentCabling.assetFrom?.getSourceRoomName()) {
 				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackSource?.location + "/" +
-						currentCabling.assetFrom.sourceRoom + "/" + currentCabling.assetFrom.sourceRack))
-			} else if (currentCabling.assetFrom?.targetRoom) {
+						currentCabling.assetFrom.getSourceRoomName() + "/" + currentCabling.assetFrom.getSourceRackName()))
+			} else if (currentCabling.assetFrom?.getTargetRoomName()) {
 				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackTarget?.location + "/" +
-						currentCabling.assetFrom.targetRoom + "/" + currentCabling.assetFrom.targetRack))
+						currentCabling.assetFrom.getTargetRoomName() + "/" + currentCabling.assetFrom.getTargetRackName()))
 			} else {
 				addCell(cablingSheet, idx + 2, 9, '')
 			}
@@ -2359,10 +2359,10 @@ class AssetEntityService implements ServiceMethods {
 		model.manufacturer = filters?.manufacturer ?:''
 		model.prefType = prefType
 		model.serialNumber = filters?.serialNumberFilter ?:''
-		model.sourceLocation = filters?.locationSourceFilter ?:''
-		model.sourceRack = filters?.rackSourceFilter ?:''
-		model.targetLocation = filters?.locationTargetFilter ?:''
-		model.targetRack = filters?.rackTargetFilter ?:''
+		model.sourceLocationName = filters?.locationSourceFilter ?:''
+		model.sourceRackName = filters?.rackSourceFilter ?:''
+		model.targetLocationName = filters?.locationTargetFilter ?:''
+		model.targetRackName = filters?.rackTargetFilter ?:''
 		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
 		model.type = params.type
 
@@ -2415,8 +2415,8 @@ class AssetEntityService implements ServiceMethods {
 				manufacturer: params.manufacturer,
 				moveBundle: params.moveBundle,
 				planStatus: params.planStatus,
-				sourceLocation: params.sourceLocation,
-				sourceRack: params.sourceRack,
+				sourceLocationName: params.sourceLocationName,
+				sourceRackName: params.sourceRackName,
 		]
 		def validSords = ['asc', 'desc']
 		String sortOrder = validSords.indexOf(params.sord) != -1 ? params.sord : 'asc'
@@ -2441,7 +2441,6 @@ class AssetEntityService implements ServiceMethods {
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
-		// TODO: arecordon -> fix sorting to account for locationTarget instead of targetLocation
 
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
@@ -2732,7 +2731,7 @@ class AssetEntityService implements ServiceMethods {
 			        it.assetType ?: '',
 			        it.manufacturer,
 			        it.model,
-			        it.sourceLocation,
+			        it.sourceLocationName,
 			        it[assetPref['1']] ?: '',
 			        it[assetPref['2']] ?: '',
 			        it[assetPref['3']] ?: '',

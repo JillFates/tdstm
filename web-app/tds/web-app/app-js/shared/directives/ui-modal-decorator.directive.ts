@@ -1,7 +1,7 @@
 /**
  * Enable full screen and resizable capabilities to modal windows
  */
-import {Directive, AfterViewInit, ElementRef, Renderer2, Input } from '@angular/core';
+import {Directive, AfterViewInit, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
 import { DecoratorOptions, WindowSettings } from '../model/ui-modal-decorator.model';
 
 declare var jQuery: any;
@@ -16,6 +16,8 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	private defaultOptions: DecoratorOptions = {isFullScreen: false, isCentered: true, isResizable: false, isDraggable: true};
 	private decoratorOptions: DecoratorOptions;
 	private initialWindowSettings: WindowSettings;
+	private parentModal: any;
+	@Output() resizeEvent = new EventEmitter<string>();
 
 	@Input()
 	set isWindowMaximized(isWindowMaximized: boolean) {
@@ -51,6 +53,8 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	 * Based on options passed to directive apply the corresponding decorators
 	 */
 	private setOptions(): void {
+		this.parentModal = this.el.nativeElement.closest('.modal');
+		this.setMaxSizeWindow();
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
@@ -87,7 +91,8 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	 * Convert value to pixels
 	 */
 	private toPixels(value: string | number): string {
-		return value + 'px';
+		const stringValue = value.toString();
+		return (stringValue.endsWith('px')) ? stringValue : value + 'px';
 	}
 
 	/**
@@ -97,7 +102,10 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		const element = jQuery(this.el.nativeElement);
 
 		if (enable) {
-			element.draggable({ containment: '#tdsUiDialog' });
+			element.draggable({
+				containment: '#tdsUiDialog',
+				handle: '.modal-header'
+			});
 		} else {
 			element.draggable('destroy');
 		}
@@ -128,9 +136,8 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
-		const modalParent = this.el.nativeElement.closest('.modal');
-		const fullWidth = parseInt(modalParent.width || modalParent.scrollWidth, 10) - SCROLLBAR_BORDER;
-		const fullHeight = parseInt(modalParent.height || modalParent.scrollHeight, 10) - SCROLLBAR_BORDER;
+		const fullWidth = parseInt(this.parentModal.width || this.parentModal.scrollWidth, 10) - SCROLLBAR_BORDER;
+		const fullHeight = parseInt(this.parentModal.height || this.parentModal.scrollHeight, 10) - SCROLLBAR_BORDER;
 
 		this.renderer.setStyle(this.el.nativeElement, 'width', this.toPixels(fullWidth));
 		this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(fullHeight));
@@ -141,6 +148,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		if (this.options.isResizable) {
 			this.enableResizable(false);
 		}
+		this.resizeEvent.emit('maximize');
 
 		return;
 	}
@@ -163,6 +171,25 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 			this.enableResizable(true);
 		}
 
+		this.resizeEvent.emit('restore');
 		return;
+	}
+	/**
+	 * restrict size/height if current size modal window exceeds the limits of the screen
+	 */
+	private setMaxSizeWindow(): void {
+		const {width, height} = this.el.nativeElement.style;
+		const currentWidth = parseInt(width.toString(), 10);
+		const currentHeight = parseInt(height.toString(), 10);
+
+		this.renderer.setStyle(this.parentModal, 'padding-left', '0');
+
+		if (currentWidth && currentWidth > this.parentModal.clientWidth) {
+			this.renderer.setStyle(this.el.nativeElement, 'width', this.toPixels(this.parentModal.clientWidth - SCROLLBAR_BORDER));
+		}
+
+		if (currentHeight && currentHeight > this.parentModal.clientHeight) {
+			this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(this.parentModal.clientHeight - SCROLLBAR_BORDER));
+		}
 	}
 }

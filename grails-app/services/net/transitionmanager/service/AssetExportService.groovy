@@ -1435,10 +1435,10 @@ class AssetExportService {
 			}
 			WorkbookUtil.addCell(row, 7, String.valueOf(cabling.cableComment ?: ""))
 			WorkbookUtil.addCell(row, 8, String.valueOf(cabling.cableColor ?: ""))
-			if (cabling.assetFrom?.sourceRoom) {
-				WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackSource?.location + "/" + cabling.assetFrom?.sourceRoom + "/" + cabling.assetFrom?.sourceRack))
-			} else if (cabling.assetFrom?.targetRoom) {
-				WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackTarget?.location + "/" + cabling.assetFrom?.targetRoom + "/" + cabling.assetFrom?.targetRack))
+			if (cabling.assetFrom?.getSourceRoomName()) {
+				WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackSource?.location + "/" + cabling.assetFrom?.getSourceRoomName() + "/" + cabling.assetFrom?.getSourceRackName()))
+			} else if (cabling.assetFrom?.getTargetRoomName()) {
+				WorkbookUtil.addCell(row, 9, String.valueOf(cabling.assetFrom?.rackTarget?.location + "/" + cabling.assetFrom?.getTargetRoomName() + "/" + cabling.assetFrom?.getTargetRackName()))
 			} else {
 				WorkbookUtil.addCell(row, 9, '')
 			}

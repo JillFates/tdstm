@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
@@ -76,7 +76,7 @@ export class AssetExplorerService {
 					throw new Error(result.errors.join(';'));
 				}
 			})
-			.do(null, err => console.log(err));
+			.catch((error: any) => error.json());
 	}
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
@@ -324,16 +324,43 @@ export class AssetExplorerService {
 			assetClass: model.asset.assetClass.name,
 			asset: model.asset,
 			dependencyMap: {
-				supportAssets: model.dependencyMap.supportAssets,
-				dependentAssets: model.dependencyMap.dependentAssets
+				supportAssets: this.prepareDependencies(model.dependencyMap.supportAssets),
+				dependentAssets: this.prepareDependencies(model.dependencyMap.dependentAssets)
 			}
 		};
-		console.log(request);
+
 		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.status;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Prepare Support Assets and Dependent Assets
+	 * @param dependencies
+	 * @returns {any}
+	 */
+	private prepareDependencies(dependencies: any): any {
+		if (dependencies && dependencies.length > 0) {
+			dependencies.forEach((support: any) => {
+				support.assetClass = support.assetClass.id;
+				support.moveBundleId = support.assetDepend.moveBundle.id;
+				support.targetAsset = {
+					id: support.assetDepend.id,
+					name: support.assetDepend.text
+				};
+				delete support.assetDepend;
+				delete support.dependencyType;
+				if (support.id === 0) {
+					delete support.id;
+				}
+			});
+		} else {
+			dependencies = [];
+		}
+
+		return dependencies;
 	}
 }

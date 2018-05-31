@@ -1,6 +1,6 @@
 import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../model/data-list-grid.model';
 import {
-	CompositeFilterDescriptor, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
+	CompositeFilterDescriptor, DataResult, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
 	State
 } from '@progress/kendo-data-query';
 import {
@@ -183,8 +183,10 @@ export class DataGridOperationsHelper {
 	 * Toggle select all checkboxes.
 	 */
 	public onSelectAllCheckboxes(): void {
-		Object.keys(this.bulkItems).forEach(key => {
-			this.bulkItems[key] = this.selectAllCheckboxes;
+		let currentPageItems: DataResult = process(this.resultSet, this.state);
+		currentPageItems.data.forEach( item => {
+			// map-key-reference inception here
+			this.bulkItems[item[this.checkboxSelectionConfig.useColumn]] = this.selectAllCheckboxes;
 		});
 	}
 

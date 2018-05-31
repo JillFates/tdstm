@@ -3,6 +3,7 @@ export enum CHECK_ACTION {
 	VALID = 0,
 	UNKNOWN = 1,
 	INVALID = 2,
+	IN_PROGRESS = 3,
 };
 
 export class OperationStatusModel {

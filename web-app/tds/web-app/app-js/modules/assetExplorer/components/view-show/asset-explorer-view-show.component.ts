@@ -1,5 +1,5 @@
 import { Component, Inject, ViewChild, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 

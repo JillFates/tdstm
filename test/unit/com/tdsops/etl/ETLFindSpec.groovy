@@ -845,7 +845,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Project not defined.'
+			e.message == 'No project selected in the user context'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)

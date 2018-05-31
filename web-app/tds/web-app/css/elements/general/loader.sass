@@ -58,3 +58,33 @@ div#main-loader
       40%
         box-shadow: 0 -2em #ffffff
         height: 5em
+
+/*  TDS Custom Progress Bar */
+// Spinner styles
+.fast-right-spinner
+  -webkit-animation: spin-r 1s infinite linear
+  animation: spin-r 1s infinite linear
+
+@-webkit-keyframes spin-r
+  0%
+    -webkit-transform: rotate(0deg)
+    transform: rotate(0deg)
+
+  100%
+    -webkit-transform: rotate(359deg)
+    transform: rotate(359deg)
+
+i.fa-fw.fa-spinner.fast-right-spinner
+  padding-right: 0px
+
+// Progress Bar
+.progressBar-row
+  margin-top: 5px
+  margin-bottom: 10px
+
+  .progressBar-container
+    height: 7px
+
+    .progress
+      margin-bottom: 0px
+      height: 7px

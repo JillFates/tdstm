@@ -4,7 +4,7 @@
 	<tr class="prop">
 		<td class="label">Location</td>
 		<td class="label">
-			${source=='1'? ''+assetEntity.sourceLocation+' / '+assetEntity.sourceRoom+'' : ''+assetEntity.targetLocation+' / '+assetEntity.targetRoom+''}
+			${source=='1'? ''+assetEntity.sourceLocationName+' / '+assetEntity.sourceRoomName+'' : ''+assetEntity.targetLocationName+' / '+assetEntity.targetRoomName +''}
 		</td>
 	</tr>
 	</g:if>
@@ -56,7 +56,7 @@
 	<tr class="prop">
 		<td class="label">Rack</td>
 		<td class="label">
-			${source=='1'? ''+assetEntity.sourceRack+' / '+assetEntity.sourceRackPosition+'' : ''+assetEntity.targetRack+' / '+assetEntity.targetRackPosition+''}
+			${source=='1'? ''+assetEntity.sourceRackName+' / '+assetEntity.sourceRackPosition+'' : ''+assetEntity.targetRackName+' / '+assetEntity.targetRackPosition+''}
 		</td>
 	</tr>
 	</g:if>

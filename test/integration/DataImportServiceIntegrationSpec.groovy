@@ -831,7 +831,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			UploadFileCommand.fileSystemService = fileSystemService
 			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
 			String fileUploadName = fileSystemService.transferFileToFileSystem(cmd)
-			Map transformResults = dataImportService.transformEtlData(project, dataScript.id, fileUploadName)
+			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
 			String transformedFileName = transformResults['filename']
 
 			when: 'Requesting the content of the transformation'

@@ -30,6 +30,7 @@ export function DeviceEditComponent(template, editModel) {
 		]
 	}) class DeviceEditComponent implements OnInit {
 
+		private isDependenciesValidForm = true;
 		private dateFormat: string;
 		private showRackFields = true;
 		private showRackSourceInput: 'none'|'new'|'select' = 'none';
@@ -404,6 +405,14 @@ export function DeviceEditComponent(template, editModel) {
 		 */
 		private cancelCloseDialog(): void {
 			this.activeDialog.close();
+		}
+
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
 		}
 
 	}

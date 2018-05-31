@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/bufferCount';
 import {FieldSettingsModel} from '../model/field-settings.model';
 import {DomainModel} from '../model/domain.model';
 import {DOMAIN} from '../../../shared/model/constants';

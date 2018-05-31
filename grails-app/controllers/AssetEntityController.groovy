@@ -11,6 +11,7 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -26,11 +27,10 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
-import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.Transactional
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.ApiAction
@@ -48,13 +48,15 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
@@ -65,10 +67,7 @@ import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskImportExportService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.UserService
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
@@ -1453,28 +1452,30 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			// Note changes to this list must also be updated in the /views/assetEntity/listTasks.gsp
 			[ cell: [
-					'',
-					it.taskNumber,
-					it.comment,
-					userSelectedCols[0], // taskManagerValues(taskPref["1"],it),
-					userSelectedCols[1], // taskManagerValues(taskPref["2"],it),
-					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
-					dueDate,
-					status ?: '',
-					userSelectedCols[2], // taskManagerValues(taskPref["3"],it),
-					userSelectedCols[3], // taskManagerValues(taskPref["4"],it),
-					userSelectedCols[4], // taskManagerValues(taskPref["5"],it),
-					nGraphUrl,
-					it.score ?: 0,
-					status ? 'task_' + it.status.toLowerCase() : 'task_na',
-					dueClass,
-					it.assetEntity?.id, // 16
-					it.assetEntity?.assetType, // 17
-					it.assetEntity?.assetClass?.toString(), // 18
-					instructionsLinkURL, // 19
-					estStartClass,	// 20
-					estFinishClass	// 21
+					'',	// 0
+					it.taskNumber,	// 1
+					it.comment, // 2
+					userSelectedCols[0], // taskManagerValues(taskPref["1"],it), // 3
+					userSelectedCols[1], // taskManagerValues(taskPref["2"],it), // 4
+					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '', // 5
+					dueDate, // 6
+					status ?: '', // 7
+					userSelectedCols[2], // taskManagerValues(taskPref["3"],it), // 8
+					userSelectedCols[3], // taskManagerValues(taskPref["4"],it), // 9
+					userSelectedCols[4], // taskManagerValues(taskPref["5"],it), // 10
+					nGraphUrl, // 11
+					it.score ?: 0, // 12
+					status ? 'task_' + it.status.toLowerCase() : 'task_na', // 13
+					dueClass, // 14
+					it.assetEntity?.id, // 15
+					it.assetEntity?.assetType , // 16
+					it.assetEntity?.assetClass?.toString(), // 17
+					instructionsLinkURL, // 18
+					estStartClass,	// 19
+					estFinishClass,	// 20
+					it.isPublished // 21
 			],
 			  id:it.id
 			]
@@ -1741,8 +1742,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName,
 			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
 			if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
-			ae.environment as environment, srcr.location AS sourceLocation, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId,
-			tarr.location AS targetLocation, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
+			ae.environment as environment, srcr.location AS sourceLocationName, srcr.room_name AS sourceRoomName, srcr.room_id as sourceRoomId,
+			tarr.location AS targetLocationName, tarr.room_name AS targetRoomName, tarr.room_id as targetRoomId
 			FROM (
 				SELECT * FROM asset_dependency_bundle
 				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
@@ -1902,7 +1903,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				def prefsObject = graphPrefs ? JSON.parse(graphPrefs) : defaultPrefs
 
 				// front end labels for the Color By groups
-				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocation': 'Source Location', 'targetLocation': 'Target Location']
+				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocationName': 'Source Location', 'targetLocationName': 'Target Location']
 				// contains all the subgroups found in the Color By groups of this dependency group
 				def colorByGroups = [:]
 
@@ -1957,17 +1958,17 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					def targetRoomId = it.targetRoomId ?: (long) 0
 					def targetLocationName = 'Unassigned'
 					if (targetRoomId != 0)
-						targetLocationName = it.targetLocation + ' / ' + it.targetRoomName
+						targetLocationName = it.targetLocationName + ' / ' + it.targetRoomName
 
 					// get the id and label for the source room
 					def sourceRoomId = it.sourceRoomId ?: (long) 0
 					def sourceLocationName = 'Unassigned'
 					if (sourceRoomId != 0)
-						sourceLocationName = it.sourceLocation + ' / ' + it.sourceRoomName
+						sourceLocationName = it.sourceLocationName + ' / ' + it.sourceRoomName
 
 					// map the query parameters to the ids and names of the Color By groups
-					def colorByGroupIds = [group: it.bundle, bundle: it.moveBundleId, event: moveEventId, environment: environment, sourceLocation: sourceRoomId, targetLocation: targetRoomId]
-					def colorByGroupNames = [group: 'Group ' + it.bundle, bundle: it.moveBundleName, event: moveEventName, environment: environment, sourceLocation: sourceLocationName, targetLocation: targetLocationName]
+					def colorByGroupIds = [group: it.bundle, bundle: it.moveBundleId, event: moveEventId, environment: environment, sourceLocationName: sourceRoomId, targetLocationName: targetRoomId]
+					def colorByGroupNames = [group: 'Group ' + it.bundle, bundle: it.moveBundleName, event: moveEventName, environment: environment, sourceLocationName: sourceLocationName, targetLocationName: targetLocationName]
 
 					// TM-10537 Group naming for 'Group 0' was changed to 'Remnants'
 					if(it.bundle == 0) {

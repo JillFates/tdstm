@@ -24,6 +24,7 @@ export function StorageEditComponent(template: string, editModel: any): any {
 		]
 	})
 	class StorageShowComponent implements  OnInit {
+		private isDependenciesValidForm = true;
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService,
@@ -85,6 +86,15 @@ export function StorageEditComponent(template: string, editModel: any): any {
 					{ provide: 'ASSET', useValue: assetClass }],
 				'lg');
 		}
+
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
+		}
+
 	}
 
 	return StorageShowComponent;

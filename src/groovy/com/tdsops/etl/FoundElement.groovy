@@ -22,13 +22,13 @@ abstract class FoundElement {
 	 * Defines if the found element instance
 	 * is 'update' or 'create'
 	 */
-	private FoundElementType action
+	FoundElementType action
 
 	/**
 	 * Map that collects properties to be added in the ETLProcessorResult
 	 * @see FoundElement#result
 	 */
-	private Map<String, ?> propertiesMap
+	private Map<String, Object> propertiesMap
 
 	/**
 	 * Result add the result of this ETL command invocation
@@ -134,11 +134,15 @@ abstract class FoundElement {
 		return action.name()
 	}
 
+	FoundElementType getAction() {
+		return action
+	}
+
 	ETLProcessorResult getResult() {
 		return result
 	}
 
-	Map<String, ?> getPropertiesMap() {
+	Map<String, Object> getPropertiesMap() {
 		return propertiesMap
 	}
 }

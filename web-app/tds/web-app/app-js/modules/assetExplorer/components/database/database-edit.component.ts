@@ -27,6 +27,7 @@ export function DatabaseEditComponent(template, editModel) {
 	}) class DatabaseShowComponent implements OnInit {
 
 		private dateFormat: string;
+		private isDependenciesValidForm = true;
 
 		constructor(
 			@Inject('model') private model: any,
@@ -85,9 +86,7 @@ export function DatabaseEditComponent(template, editModel) {
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
+
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
@@ -102,6 +101,15 @@ export function DatabaseEditComponent(template, editModel) {
 					{ provide: 'ASSET', useValue: assetClass }],
 				DIALOG_SIZE.XLG);
 		}
+
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
+		}
+
 	}
 
 	return DatabaseShowComponent;

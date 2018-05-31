@@ -11,12 +11,36 @@ import pages.Cookbook.TabTaskGenTabSummaryPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import jodd.util.RandomString
 
 @Stepwise
 class RecipeTaskGenerationSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static recipeText
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static baseName = "QAE2E"
+    static recipeName = baseName + " " + randStr + " Geb Recipe With Tasks Test"
+    static recipeDataMap = [
+            name: recipeName,
+            context: "Event",
+            description: "This is a Geb created recipe for an Event context"
+    ]
+    static recipeText = [
+            'tasks: [',
+            '  [',
+            '    id: 1100,',
+            '    description: \'Startup ALL applications\',',
+            '    title: \'Startup app ${it.assetName}\',',
+            '    workflow: \'AppStartup\',',
+            '    team: \'APP_COORD\',',
+            '    category: \'startup\',',
+            '    duration: 10,',
+            '      filter : [',
+            '        class: \'application\'',
+            '      ],',
+            '  ],',
+            ']'
+    ].join('\\n')
 
     def setupSpec() {
         testCount = 0
@@ -24,39 +48,18 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         login()
         at MenuPage
         menuModule.goToTasksCookbook()
+        /* CREATE Recipe */
         at CookbookPage
-        waitFor { recipeGridRows.size() > 0 }
-        waitFor { createRecipeButton.click()}
+        clickOnCreateButton()
         at CreateRecipePage
-        nameFieldContents = "Geb Recipe With Tasks Test"
-        contextSelector2 = "Event"
-        descriptionContents = "This is a Geb created recipe for an Event context"
-        saveButton.click()
+        createRecipe recipeDataMap
         at CookbookPage
-        waitFor { !createRecipeModal.present }
-        editorTab.click()
-        waitFor { editorTab.parent(".active") }
+        waitForSuccessBanner()
+        /* EDIT Recipe */
+        openEditTab()
         at TabEditorPage
-        waitFor { edTabEditorBtn.present }
-        edTabEditorBtn.click()
+        clickOnEditButton()
         at EditRecipePage
-        def recipe = [
-                    'tasks: [',
-                    '  [',
-                    '    id: 1100,',
-                    '    description: \'Startup ALL applications\',',
-                    '    title: \'Startup app ${it.assetName}\',',
-                    '    workflow: \'AppStartup\',',
-                    '    team: \'APP_COORD\',',
-                    '    category: \'startup\',',
-                    '    duration: 10,',
-                    '      filter : [',
-                    '        class: \'application\'',
-                    '      ],',
-                    '  ],',
-                    ']'
-            ]
-        String recipeText = recipe.join('\\n')
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
         waitFor {editorModalCloseBtn.click()}
         at TabEditorPage
@@ -77,10 +80,11 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Recipe with Task on It'
-            waitFor { gebRecipesWithTasks.getAt(0).click()}
+            waitFor { gebRecipes.find{it.text().trim()==recipeName}.click()}
 
         then: 'Information should be populated'
-            gebRecipesWithTasks.getAt(0).text().trim() == "Geb Recipe With Tasks Test"
+            def found = gebRecipes.find{it.text()==recipeName}
+            found != null
     }
 
     def "2. Going to The Task Generation tab"() {

@@ -7,7 +7,7 @@ enum ETLDomain {
 	Application(com.tds.asset.Application),
 	Device(com.tds.asset.AssetEntity),
 	Database(com.tds.asset.Database),
-	Storage(com.tds.asset.AssetEntity),
+	Storage(com.tds.asset.Files),
 	External(com.tds.asset.AssetEntity),
 	Task(com.tds.asset.AssetComment),
 	Person(net.transitionmanager.domain.Person),

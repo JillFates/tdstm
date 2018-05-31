@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.etl.ETLDomain
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -232,7 +233,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = 1
+				where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 
@@ -331,7 +332,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = 1
+				where project.id in (:projectIds) and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 	}
@@ -362,7 +363,7 @@ class MetricReportingServiceSpec extends Specification {
 							concat(COALESCE(planStatus, 'Unknown')) as label,
 							count(*) as value
 					from AssetEntity
-					where project.id in (:projectIds) and moveBundle.useForPlanning = 1
+					where project.id in (:projectIds) and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 					group by planStatus, project.id
 					""".stripIndent()
 	}
@@ -390,17 +391,40 @@ class MetricReportingServiceSpec extends Specification {
 						'count' as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = 1
+				where project.id in (:projectIds) and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 				group by project.id
 				""".stripIndent()
+	}
+
+
+	void 'TM-10850 test getQuery invalid domain in query'() {
+
+		setup: 'Given a query JSON structure no where'
+			JSONObject query = [
+				"domain"     : "device",//invalid for ETLDomain
+				"join"       : [
+					[
+						"domain": "Dependency",
+						"on"    : "Dependency.asset.id = Application.id"
+					]
+				],
+				"aggregation": "count(*)"
+			] as JSONObject
+
+		when: 'getQuery is called with the JSON query'
+			service.getQuery(query)
+
+		then: 'getQuery returns an HQL string'
+			thrown InvalidParamException
 	}
 
 	void 'test processWheres'() {
 		setup: 'Given a list of where definitions and a domainClass'
 			List<Map> whereDefinitions = []
 			Class domainClass = Application
+			ETLDomain etlDomain = ETLDomain.Application
 		when: 'processWheres is called on the definitions and the domain class'
-			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass, etlDomain)
 		then: 'the resulting map will have'
 			processedWhereDefinitions == [[column: 'moveBundle.useForPlanning', expression: '= 1']]
 	}
@@ -409,8 +433,9 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a list of where definitions and a domainClass'
 			List<Map> whereDefinitions = []
 			Class domainClass = AssetEntity
+			ETLDomain etlDomain = ETLDomain.Asset
 		when: 'processWheres is called on the definitions and the domain class'
-			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass, etlDomain)
 		then: 'the resulting map will have'
 			processedWhereDefinitions == [[column: 'moveBundle.useForPlanning', expression: '= 1']]
 	}
@@ -419,8 +444,9 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a list of where definitions and a domainClass'
 			List<Map> whereDefinitions = []
 			Class domainClass = AssetDependency
+			ETLDomain etlDomain = ETLDomain.Dependency
 		when: 'processWheres is called on the definitions and the domain class'
-			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass, etlDomain)
 		then: 'the resulting map will have'
 			processedWhereDefinitions == [
 				[column: 'asset.moveBundle.useForPlanning', expression: '= 1'],
@@ -432,8 +458,9 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a list of where definitions and a domainClass'
 			List<Map> whereDefinitions = []
 			Class domainClass = AssetComment
+			ETLDomain etlDomain = ETLDomain.Task
 		when: 'processWheres is called on the definitions and the domain class'
-			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass)
+			List<Map> processedWhereDefinitions = service.processWheres(whereDefinitions, domainClass, etlDomain)
 		then: 'the resulting map will have'
 			processedWhereDefinitions == [
 				[column: 'isPublished', expression: '= 1'],

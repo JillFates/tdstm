@@ -37,7 +37,7 @@ class ETLFindElement implements ETLStackableCommand{
 	/**
 	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
 	 */
-	Map<String, ?> currentFind = [:]
+	Map<String, Object> currentFind = [:]
 	/**
 	 * Total results collected towards a sequence of find/elseFind commands
 	 */
@@ -141,7 +141,7 @@ class ETLFindElement implements ETLStackableCommand{
 				matchOn: null
 			]
 			if(currentFind.objects && !currentFind.objects.isEmpty()){
-				results.objects = currentFind.objects
+				results.objects = currentFind.objects.collect{ it.id }
 				results.matchOn = findings.size()
 
 				if(currentFind.objects.size() > 1){
