@@ -23,7 +23,9 @@
             <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.domainClassName}}</div>
             <div class="col-sm-2">{{importBatch.datascript?.name}}</div>
-            <div class="col-sm-2">{{importBatch.status.label}}</div>
+            <div class="col-sm-2" [ngClass]="{'error': batchHasErrors()}">
+                {{importBatch.status.label}}
+            </div>
         </div>
     </div>
 <div class="collapse in collapsible">
@@ -36,10 +38,10 @@
             <div class="col-sm-4 errors-header"><span>Errors</span></div>
         </div>
         <div class="row">
-            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0 || batchRecord.errorList?.length > 0}">
+            <div class="col-sm-2" [ngClass]="{'error': batchHasErrors()}">
                 {{batchRecord.status.label}}
             </div>
-            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0}">
+            <div class="col-sm-2" [ngClass]="{'error': batchHasErrors()}">
                 {{batchRecord.errorCount}}
             </div>
             <div class="col-sm-2">{{batchRecord.operation}}</div>
