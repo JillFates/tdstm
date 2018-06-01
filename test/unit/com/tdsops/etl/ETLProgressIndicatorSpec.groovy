@@ -283,16 +283,12 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 1
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
-
-		and:
-			1 * callback.reportProgress(50, false, RUNNING, '')
-
-		and:
-			1 * callback.reportProgress(100, false, RUNNING, '')
-
-		and:
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(50, false, RUNNING, '')
+				1 * reportProgress(100, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+			}
 
 		cleanup:
 			if (fileName){
@@ -335,10 +331,12 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 1
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
-			1 * callback.reportProgress(50, false, RUNNING, '')
-			1 * callback.reportProgress(100, false, RUNNING, '')
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(50, false, RUNNING, '')
+				1 * reportProgress(100, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+			}
 
 		cleanup:
 			if (fileName){
@@ -428,13 +426,15 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 2
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
-			1 * callback.reportProgress(25, false, RUNNING, '')
-			1 * callback.reportProgress(50, false, RUNNING, '')
-			1 * callback.reportProgress(50, true, RUNNING, '')
-			1 * callback.reportProgress(75, false, RUNNING, '')
-			1 * callback.reportProgress(100, false, RUNNING, '')
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(25, false, RUNNING, '')
+				1 * reportProgress(50, false, RUNNING, '')
+				1 * reportProgress(50, true, RUNNING, '')
+				1 * reportProgress(75, false, RUNNING, '')
+				1 * reportProgress(100, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+			}
 
 		cleanup:
 			if (fileName){
@@ -485,15 +485,17 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 3
 
 		and: 'It reports 7 messages of progress'
-			1 * callback.reportProgress(0, true, RUNNING, '')
-			1 * callback.reportProgress(16, false, RUNNING, '')
-			1 * callback.reportProgress(33, false, RUNNING, '')
-			1 * callback.reportProgress(33, true, RUNNING, '')
-			1 * callback.reportProgress(49, false, RUNNING, '')
-			1 * callback.reportProgress(66, false, RUNNING, '')
-			1 * callback.reportProgress(67, true, RUNNING, '')
-			1 * callback.reportProgress(83, false, RUNNING, '')
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(16, false, RUNNING, '')
+				1 * reportProgress(33, false, RUNNING, '')
+				1 * reportProgress(33, true, RUNNING, '')
+				1 * reportProgress(49, false, RUNNING, '')
+				1 * reportProgress(66, false, RUNNING, '')
+				1 * reportProgress(67, true, RUNNING, '')
+				1 * reportProgress(83, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+			}
 
 		cleanup:
 			if (fileName){
@@ -580,15 +582,17 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 			etlProcessor.numberOfIterateLoops == 2
 
 		and:
-			1 * callback.reportProgress(0, true, RUNNING, '')
-			1 * callback.reportProgress(12, false, RUNNING, '')
-			1 * callback.reportProgress(25, false, RUNNING, '')
-			1 * callback.reportProgress(37, false, RUNNING, '')
-			1 * callback.reportProgress(50, false, RUNNING, '')
-			1 * callback.reportProgress(50, true, RUNNING, '')
-			1 * callback.reportProgress(75, false, RUNNING, '')
-			1 * callback.reportProgress(100, false, RUNNING, '')
-			1 * callback.reportProgress(100, true, RUNNING, '')
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(12, false, RUNNING, '')
+				1 * reportProgress(25, false, RUNNING, '')
+				1 * reportProgress(37, false, RUNNING, '')
+				1 * reportProgress(50, false, RUNNING, '')
+				1 * reportProgress(50, true, RUNNING, '')
+				1 * reportProgress(75, false, RUNNING, '')
+				1 * reportProgress(100, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+			}
 
 		cleanup:
 			if (fileName){
