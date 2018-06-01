@@ -5,6 +5,10 @@
 	<label for="viewUnpublishedCheckboxId">&nbsp;View Unpublished Tasks</label>
 </span>
 <div class="list" style="position: relative; margin-top: 4px;">
+	<button (click)="createComment()" type="button" class="btn btn-default pull-right">
+		<i class="fa fa-fw fa-plus-circle"></i>
+		<span>Add</span>
+	</button>
 	<table id="listCommentsTables">
 		<thead>
 			<tr>

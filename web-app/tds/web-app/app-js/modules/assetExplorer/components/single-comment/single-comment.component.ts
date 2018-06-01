@@ -39,9 +39,13 @@ export class SingleCommentComponent extends UIExtraDialog {
 					this.assetClassOptions.push({id: prop, text: res[prop]});
 				}
 			}
-			this.singleCommentModel.assetClass = this.assetClassOptions.find((res) => {
-				return res.id === this.singleCommentModel.assetClass.text.toUpperCase();
-			});
+			if (!this.singleCommentModel.assetClass || this.singleCommentModel.assetClass.id === '') {
+				this.singleCommentModel.assetClass = this.assetClassOptions[0];
+			} else {
+				this.singleCommentModel.assetClass = this.assetClassOptions.find((res) => {
+					return res.id === this.singleCommentModel.assetClass.text.toUpperCase();
+				});
+			}
 		});
 	}
 
@@ -51,6 +55,9 @@ export class SingleCommentComponent extends UIExtraDialog {
 	private loadCommentCategories(): void {
 		this.taskManagerService.getCommentCategories().subscribe((res) => {
 			this.commentCategories = res;
+			if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
+				this.singleCommentModel.category = this.commentCategories[0];
+			}
 		});
 	}
 
@@ -86,6 +93,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
+		this.singleCommentModel.modal.title = 'Edit Comment';
 		this.singleCommentModel.modal.type = ModalType.EDIT;
 	}
 

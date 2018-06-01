@@ -10,12 +10,12 @@ export class SingleCommentModel {
 	public category: string;
 	public assetClass: {
 		id?: string;
-		text: string;
+		text?: string;
 	};
 	public asset: {
 		id?: string;
 		text: string;
 	};
-	public lastUpdated: string;
-	public dateCreated: string;
+	public lastUpdated?: string;
+	public dateCreated?: string;
 }

@@ -45,6 +45,38 @@ export class TaskCommentComponent implements OnInit {
 		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : `/${comment.role}`);
 	}
 
+	/**
+	 * Create a new comment
+	 * @param comment
+	 */
+	public createComment(comment: any): void {
+		let singleCommentModel: SingleCommentModel = {
+			modal: {
+				title: 'Create Comment',
+				type: ModalType.CREATE
+			},
+			archive: false,
+			comment: '',
+			category: '',
+			assetClass: {
+				id: '',
+				text: ''
+			},
+			asset: {
+				id: '',
+				text: ''
+			}
+		};
+
+		this.dialogService.extra(SingleCommentComponent, [
+			{provide: SingleCommentModel, useValue: singleCommentModel}
+		], true, false).then(result => {
+			console.log('Success');
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
 	public openCommentDetail(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
