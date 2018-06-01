@@ -8,6 +8,7 @@ import {TaskService} from '../../../taskManager/service/task.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs/Observable';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {UIPromptService} from "../../../../shared/directives/ui-prompt.directive";
 
 @Component({
 	selector: `single-comment`,
@@ -21,7 +22,11 @@ export class SingleCommentComponent extends UIExtraDialog {
 	public assetClassOptions: any[];
 	public commentCategories: string[];
 
-	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService) {
+	constructor(public singleCommentModel: SingleCommentModel,
+	            public userPreferenceService: PreferenceService,
+	            public taskManagerService: TaskService,
+	            public assetExplorerService: AssetExplorerService,
+	            public promptService: UIPromptService) {
 		super('#single-comment-component');
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 		this.loadAssetClass();
@@ -101,7 +106,16 @@ export class SingleCommentComponent extends UIExtraDialog {
 	 * Delete the Asset Comment
 	 */
 	protected onDelete(): void {
-		//
+		this.promptService.open(
+			'Confirmation Required',
+			'Confirm deletion of this record. There is no undo for this action?',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.cancelCloseDialog();
+				}
+			})
+			.catch((error) => console.log(error));
 	}
 
 	/**
