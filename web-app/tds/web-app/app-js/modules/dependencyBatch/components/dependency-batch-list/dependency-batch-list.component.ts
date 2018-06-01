@@ -152,7 +152,7 @@ export class DependencyBatchListComponent {
 		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
 		this.dialogService.open(DependencyBatchDetailDialogComponent, [
 			{ provide: ImportBatchModel, useValue: selectedBatch}
-		], DIALOG_SIZE.XXL, true).then(result => {
+		], DIALOG_SIZE.XXL).then(result => {
 			if (result) {
 				this.reloadImportBatch(selectedBatch);
 			}
