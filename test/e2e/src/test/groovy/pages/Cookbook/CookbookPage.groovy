@@ -46,7 +46,7 @@ class CookbookPage extends Page {
         recipeGridRowsActions       { recipeGridRows.find("a", class:"actions")}
         gridSize                    { recipeGridRows.size()}
         rowSize                     { recipeGridHeaderCols.size()}
-        gebRecipes                  (required: false) { recipeGridRows.find("div.col0 span.ng-binding")}
+        gebRecipes                  (required: false) { recipeGridRows.find("div.ngCellText.col0")}
     }
 
     def clickOnCreateButton(){
@@ -59,12 +59,27 @@ class CookbookPage extends Page {
         waitForLoadingIndicator()
     }
 
-    def waitForLoadingIndicator(){
-        waitFor { loadingIndicator.hasClass("ng-hide")}
+    def waitForLoadingIndicator(repeatTime = 1){
+        def count = 0
+        while (count < repeatTime) {
+            waitFor { loadingIndicator.hasClass("ng-hide")}
+            count = count + 1
+        }
     }
 
     def openEditTab(){
         editorTab.click()
         waitFor { editorTab.parent(".active") }
+    }
+
+    def filterByContext(context){
+        def options = contextSelector.find("option")
+        def option = options.find {it.text() == context}
+        option.click()
+        waitForLoadingIndicator(4) // after filtering loading appears 4 times
+    }
+
+    def getRecipeByName(name){
+        gebRecipes.find{it.text().trim() == name}
     }
 }
