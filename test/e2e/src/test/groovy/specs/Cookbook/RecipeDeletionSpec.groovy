@@ -33,7 +33,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
         at CreateRecipePage
         createRecipe recipeDataMap
         at CookbookPage
-        waitForSuccessBanner()
+        waitForLoadingIndicator()
     }
 
     def setup() {
