@@ -14,7 +14,6 @@
 				var listCaption ="Projects: \
 				<tds:hasPermission permission="${Permission.ProjectCreate}">\
 					<span class='capBtn'><input type='button' class='create' value='Create Project' onClick=\"window.location.href=\'"+contextPath+"/project/create\'\"/></span> \
-					<span class='capBtn'><input type='button' class='create' value='Create Demo Project' onClick=\"window.location.href=\'"+contextPath+"/projectUtil/createDemo\'\" /></span>\
 				</tds:hasPermission>\
 				<span class='capBtn' style='${active=='active' ? 'display:none':'' }'><a href=\'"+contextPath+"/project/list?active=active\'> \
 				<input type='button' value='Show Active Projects'/></a></span>\
