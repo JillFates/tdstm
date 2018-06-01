@@ -58,13 +58,14 @@
 					Include Non-planning
 				</td>
 			</tr>
-			<tr>
-				<td></td>
-				<td style="width:auto;">
-					<input type="checkbox" name="includeDemoProject" />
-					Include Demo project
-				</td>
-			</tr>
+            <tr>
+                <td colspan="2" class="buttonR">
+                    <button type="submit" name="_action_projectActivityMetricsExport" class="btn btn-default" value="Generate Xls">
+                        Generate (.xls)
+                        <span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
+                    </button>
+                </td>
+            </tr>
 		</tbody>
 	</table>
 </g:form>
