@@ -27,8 +27,8 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 })
 export class DependencyBatchListComponent {
 
-	private BatchStatus = BatchStatus;
-	private columnsModel: DependencyBatchColumnsModel;
+	protected BatchStatus = BatchStatus;
+	protected columnsModel: DependencyBatchColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
@@ -86,13 +86,16 @@ export class DependencyBatchListComponent {
 
 	/**
 	 * Reloads the current batch record.
+	 * Stops looper and restarts it.
 	 * @param {ImportBatchModel} batchRecord
 	 */
 	private reloadImportBatch(importBatch: ImportBatchModel) {
 		this.dependencyBatchService.getImportBatch(importBatch.id).subscribe( (response: ApiResponseModel) => {
-			if (response.status === ApiResponseModel.API_SUCCESS) {
-				Object.assign(importBatch, response.data);
-			}
+				if (response.status === ApiResponseModel.API_SUCCESS) {
+					Object.assign(importBatch, response.data);
+					this.clearBatchStatusLooper();
+					this.setBatchStatusLooper();
+				}
 		});
 	}
 
@@ -291,12 +294,15 @@ export class DependencyBatchListComponent {
 	 */
 	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
-		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadImportBatch(item);
+		this.dependencyBatchService.queueImportBatches(ids).subscribe( (response: ApiResponseModel) => {
+				if (response.status === ApiResponseModel.API_SUCCESS && response.data.QUEUE === 1) {
+					item.status.code = BatchStatus.QUEUED.toString();
+					item.status.label = 'Queued';
+					this.clearBatchStatusLooper();
+					this.setBatchStatusLooper();
 				} else {
 					this.reloadBatchList();
-					this.handleError(result.errors ? result.errors[0] : null);
+					this.handleError(response.errors ? response.errors[0] : null);
 				}
 			},
 			(err) => this.handleError(err)
@@ -307,11 +313,11 @@ export class DependencyBatchListComponent {
 	 * On Eject action button clicked, start import batch.
 	 * @param item
 	 */
-	private onEjectButton(item: any): void {
+	private onEjectButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadBatchList();
+					this.reloadImportBatch(item);
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -403,17 +409,47 @@ export class DependencyBatchListComponent {
 		}
 	}
 
+	private runningBatches: Array<ImportBatchModel> = [];
+	private queuedBatches: Array<ImportBatchModel> = [];
 	/**
 	 * Creates an interval loop to retreive batch current progress.
 	 */
 	private setBatchStatusLooper(): void {
-		let runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
-			return item.status.code === BatchStatus.RUNNING;
+		// let runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+		// 	return item.status.code === BatchStatus.RUNNING;
+		// });
+		// let queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+		// 	return item.status.code === BatchStatus.QUEUED;
+		// });
+		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.RUNNING.toString();
 		});
-		this.getBatchesCurrentProgress(runningBatches);
+		this.queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.QUEUED.toString();
+		});
+		this.getBatchesCurrentProgress(this.runningBatches);
+		this.getQueuedBatchesStatus(this.queuedBatches, this.runningBatches);
 		this.batchStatusLooper = setInterval(() => {
-			this.getBatchesCurrentProgress(runningBatches);
+			this.getBatchesCurrentProgress(this.runningBatches);
+			this.getQueuedBatchesStatus(this.queuedBatches, this.runningBatches);
 		}, this.PROGRESS_CHECK_INTERVAL); // every 10 seconds
+	}
+
+	private getQueuedBatchesStatus(queuedBatches: Array<ImportBatchModel>, runningBatches:  Array<ImportBatchModel>): void {
+		for (let batch of queuedBatches ) {
+			this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+				if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
+					batch.status.code = (response.data as ImportBatchModel).status.code;
+					batch.status.label = (response.data as ImportBatchModel).status.label;
+					this.removeBatchFromLoop(batch, queuedBatches);
+					if (batch.status.code === BatchStatus.RUNNING.toString()) {
+						console.log(batch.id + ' moved to RUNNING');
+						this.addToRunningBatchesLoop(batch);
+					}
+				}
+			}, error => this.handleError(error));
+		}
+		console.log('QUEUED', queuedBatches);
 	}
 
 	/**
@@ -429,7 +465,7 @@ export class DependencyBatchListComponent {
 
 					// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
 					if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
-						batch.status.code = BatchStatus.STALLED;
+						batch.status.code = BatchStatus.STALLED.toString();
 						batch.status.label = 'Stalled';
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else if (batch.currentProgress >= 100) {
@@ -446,7 +482,7 @@ export class DependencyBatchListComponent {
 				this.handleError(error);
 			});
 		}
-		console.log(runningBatches);
+		console.log('RUNNING', runningBatches);
 	}
 
 	/**
@@ -457,5 +493,12 @@ export class DependencyBatchListComponent {
 	private removeBatchFromLoop(batch: ImportBatchModel, runningBatches: Array<ImportBatchModel>): void {
 		const filterIndex = runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
 		runningBatches.splice(filterIndex, 1);
+	}
+
+	private addToRunningBatchesLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		if (filterIndex < 0) {
+			this.runningBatches.push(batch);
+		}
 	}
 }
