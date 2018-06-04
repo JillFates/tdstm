@@ -160,7 +160,7 @@ class ScriptProcessorServiceSpec extends Specification {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
 				return true
@@ -270,7 +270,7 @@ application id,vendor name,technology,location
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 			Application.isAssignableFrom(_) >> { Class<?> clazz ->

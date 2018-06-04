@@ -19,7 +19,7 @@ import java.util.Map.Entry
  *
  * In to this HQL query:
  *  <pre>
- *      select D
+ *      select D.id
  *          from AssetEntity D
  *          where  D.project = :project
  *            and D.id = : id
@@ -58,7 +58,7 @@ class DomainClassQueryHelper {
 		String hqlJoins = hqlJoins(clazz, paramsMap)
 
 		String hql = """
-            select $DOMAIN_ALIAS
+            select ${DOMAIN_ALIAS}.id
               from AssetEntity $DOMAIN_ALIAS
 				   $hqlJoins
 			 where ${DOMAIN_ALIAS}.project = :project
@@ -71,10 +71,11 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 *
-	 * @param clazz
-	 * @param paramsMap
-	 * @return
+	 * Executes an HQL query looking for those all non assets referenced by params.
+	 * @param clazz class used to execute the HQL sentence
+	 * @param project a project instance used as a param in the HQL query
+	 * @param paramsMap  a map with params to be used in the HQL query
+	 * @return a list of assets returned by an HQL query
 	 */
 	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap) {
 
@@ -87,7 +88,7 @@ class DomainClassQueryHelper {
 		}
 
 		String hql = """
-			  select $DOMAIN_ALIAS
+			  select ${DOMAIN_ALIAS}.id
               from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
              where $hqlWhere

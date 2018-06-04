@@ -118,39 +118,46 @@ class ETLFindElement implements ETLStackableCommand{
 		].transpose().collectEntries { it }
 
 		if(!results?.objects){
-
-			try{
-				currentFind.objects = DomainClassQueryHelper.where(
-					ETLDomain.lookup(currentFind.domain),
-					processor.project,
-					currentFind.kv)
-			} catch(all){
-
-				processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
-				if(currentFind.errors == null) {
-					currentFind.errors = []
-				}
-				currentFind.errors.add(all.getMessage())
-			}
-
-			// For import process, in case of Domain classes we only need the id value. 
-			currentFind.kv = currentFind.kv.collectEntries { [(it.key): GormUtil.isDomainClass(it.value)?it?.value?.id:it?.value] }
-
-			results = [
-				objects : [],
-				matchOn: null
-			]
-			if(currentFind.objects && !currentFind.objects.isEmpty()){
-				results.objects = currentFind.objects.collect{ it.id }
-				results.matchOn = findings.size()
-
-				if(currentFind.objects.size() > 1){
-					currentFind.errors = ['The find/elseFind command(s) found multiple records']
-				}
-			}
+			findDomainObjectResults()
 		}
 
 		return this
+	}
+
+	/**
+	 * Find results using DomainClassQueryHelper class.
+	 * It saves results in the current results.objects values.
+	 * In case of error it saves error messages using currentFind.errors field.
+	 */
+	private void findDomainObjectResults() {
+
+		try{
+			currentFind.objects = DomainClassQueryHelper.where(
+				ETLDomain.lookup(currentFind.domain),
+				processor.project,
+				currentFind.kv)
+		} catch (all){
+
+			processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
+			if (currentFind.errors == null){
+				currentFind.errors = []
+			}
+			currentFind.errors.add(all.getMessage())
+		}
+
+		results = [
+			objects: [],
+			matchOn: null
+		]
+		
+		if (currentFind.objects && !currentFind.objects.isEmpty()){
+			results.objects = currentFind.objects
+			results.matchOn = findings.size()
+
+			if (currentFind.objects.size() > 1){
+				currentFind.errors = ['The find/elseFind command(s) found multiple records']
+			}
+		}
 	}
 
 	/**

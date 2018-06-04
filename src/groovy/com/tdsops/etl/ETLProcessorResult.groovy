@@ -537,4 +537,16 @@ class FindResult {
 class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
+
+
+	@Override
+	String toString() {
+		return "QueryResult{"
+			.concat( "domain=")
+			.concat(domain)
+			.concat(", kv=")
+			.concat(kv.toString())
+			.concat('}')
+
+	}
 }

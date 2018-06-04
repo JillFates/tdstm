@@ -230,7 +230,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id }
+				assetEntities.findAll { it.id == namedParams.id }*.getId()
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
@@ -878,9 +878,9 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')) {
-					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }
+					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 				} else {
-					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }
+					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
 				}
 			}
 
@@ -1133,9 +1133,9 @@ class ETLFindSpec extends ETLBaseSpec {
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
 				} else if (namedParams.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }*.getId()
 				}
 			}
 
@@ -1757,7 +1757,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -1863,7 +1863,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
