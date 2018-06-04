@@ -47,6 +47,8 @@ export class DependencyBatchListComponent {
 	private readonly ARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEMS_CONFIRMATION';
 	private readonly UNARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEM_CONFIRMATION';
 	private readonly UNARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEMS_CONFIRMATION';
+	private runningBatches: Array<ImportBatchModel> = [];
+	private queuedBatches: Array<ImportBatchModel> = [];
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -299,7 +301,7 @@ export class DependencyBatchListComponent {
 					item.status.code = BatchStatus.QUEUED.toString();
 					item.status.label = 'Queued';
 					this.clearBatchStatusLooper();
-					this.setBatchStatusLooper();
+					setTimeout( () => this.setBatchStatusLooper(), 100);
 				} else {
 					this.reloadBatchList();
 					this.handleError(response.errors ? response.errors[0] : null);
@@ -409,18 +411,10 @@ export class DependencyBatchListComponent {
 		}
 	}
 
-	private runningBatches: Array<ImportBatchModel> = [];
-	private queuedBatches: Array<ImportBatchModel> = [];
 	/**
 	 * Creates an interval loop to retreive batch current progress.
 	 */
 	private setBatchStatusLooper(): void {
-		// let runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
-		// 	return item.status.code === BatchStatus.RUNNING;
-		// });
-		// let queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
-		// 	return item.status.code === BatchStatus.QUEUED;
-		// });
 		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
 			return item.status.code === BatchStatus.RUNNING.toString();
 		});
@@ -428,14 +422,14 @@ export class DependencyBatchListComponent {
 			return item.status.code === BatchStatus.QUEUED.toString();
 		});
 		this.getBatchesCurrentProgress(this.runningBatches);
-		this.getQueuedBatchesStatus(this.queuedBatches, this.runningBatches);
+		this.getQueuedBatchesStatus(this.queuedBatches);
 		this.batchStatusLooper = setInterval(() => {
 			this.getBatchesCurrentProgress(this.runningBatches);
-			this.getQueuedBatchesStatus(this.queuedBatches, this.runningBatches);
-		}, this.PROGRESS_CHECK_INTERVAL); // every 10 seconds
+			this.getQueuedBatchesStatus(this.queuedBatches);
+		}, this.PROGRESS_CHECK_INTERVAL); // every N seconds
 	}
 
-	private getQueuedBatchesStatus(queuedBatches: Array<ImportBatchModel>, runningBatches:  Array<ImportBatchModel>): void {
+	private getQueuedBatchesStatus(queuedBatches: Array<ImportBatchModel>): void {
 		for (let batch of queuedBatches ) {
 			this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
@@ -449,7 +443,7 @@ export class DependencyBatchListComponent {
 				}
 			}, error => this.handleError(error));
 		}
-		console.log('QUEUED', queuedBatches);
+		console.log('QUEUED', queuedBatches.length);
 	}
 
 	/**
@@ -462,7 +456,6 @@ export class DependencyBatchListComponent {
 					batch.currentProgress =  response.data.progress ? response.data.progress : 0;
 					const lastUpdated = (response.data.lastUpdated as Date);
 					batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
-
 					// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
 					if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
 						batch.status.code = BatchStatus.STALLED.toString();
@@ -470,7 +463,9 @@ export class DependencyBatchListComponent {
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else if (batch.currentProgress >= 100) {
 						batch.status = response.data.status as EnumModel;
+						batch.currentProgress = 0;
 						this.removeBatchFromLoop(batch, runningBatches);
+						this.reloadImportBatch(batch);
 					} else {
 						batch.lastUpdated =  response.data.lastUpdated as Date;
 					}
@@ -482,7 +477,7 @@ export class DependencyBatchListComponent {
 				this.handleError(error);
 			});
 		}
-		console.log('RUNNING', runningBatches);
+		console.log('RUNNING', runningBatches.length);
 	}
 
 	/**
