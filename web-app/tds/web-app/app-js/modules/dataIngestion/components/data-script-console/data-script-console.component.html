@@ -1,9 +1,11 @@
-<div class="modal fade in dialog-draggable-no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="0" role="dialog"
-     [style.top.px]="consoleSettings.top"
-     [style.left.px]="consoleSettings.left">
-	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document"
-         [style.width.px]="consoleSettings.width">
-		<div class="modal-content">
+<div class="modal fade in dialog-draggable-no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="0" role="dialog">
+	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document">
+		<div class="modal-content"
+		     tds-ui-modal-decorator=""
+		     [isWindowMaximized]="isWindowMaximized"
+		     [options]="modalOptions"
+		     [style.width.px]="consoleSettings.width"
+		     [style.height.px]="consoleSettings.height">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>

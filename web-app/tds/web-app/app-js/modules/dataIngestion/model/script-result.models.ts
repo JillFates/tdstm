@@ -37,7 +37,7 @@ export class ScriptConsoleSettingsModel {
 	constructor() {
 		this.top = 30;
 		this.left = 30;
-		this.height = 200;
+		this.height = 400;
 		this.width = 500;
 		this.scriptTestResult = new ScriptTestResultModel();
 	};
