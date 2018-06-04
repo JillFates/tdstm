@@ -3,19 +3,19 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ProgressCallback
 import com.tdsops.etl.TDSExcelDriver
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WorkbookUtil
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataScriptMode
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
@@ -27,8 +27,12 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
 import spock.lang.Specification
 
-@TestFor(ScriptProcessorService)
-@Mock([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
+import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
+import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
+
+@TestFor (ScriptProcessorService)
+@TestMixin (ControllerUnitTestMixin)
+@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
 class ScriptProcessorServiceSpec extends Specification {
 
 	String sixRowsDataSetFileName
@@ -238,7 +242,7 @@ class ScriptProcessorServiceSpec extends Specification {
 	void 'test can test a script content for Application domain Asset using a excel dataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',"""invalid headers, are not part, of the valid data set
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """invalid headers, are not part, of the valid data set
 application id,vendor name,technology,location
 152254,Microsoft,(xlsx updated),ACME Data Center
 152255,Mozilla,NGM,ACME Data Center""".stripIndent())
@@ -350,7 +354,9 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName){
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
 	}
 
 	void 'test can test a script content with an invalid command'() {
@@ -406,6 +412,134 @@ application id,vendor name,technology,location
 				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
 				!data.domains
 			}
+	}
+
+	void 'test can test a script and register progress'() {
+
+		given:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+			}
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
+			}
+
+		and:
+			String script = """
+                console on
+                read labels
+                iterate {
+                    domain Application
+                    extract 'application id' transform with toLong() load 'id'
+                    extract 'vendor name' load 'Vendor'
+                    load 'environment' with 'Production'
+                    
+                    find Application by 'id' with DOMAIN.id into 'id'
+                }
+            """.stripIndent()
+
+		and:
+			ProgressCallback callback = Mock(ProgressCallback)
+
+		when: 'Service executes the script with incorrect syntax'
+			def (ETLProcessor etlProcessor, String outputFilename) = service.executeAndSaveResultsInFile(
+				GMDEMO,
+				script,
+				fileSystemService.getTemporaryFullFilename(applicationDataSetFileName),
+				callback)
+
+		then: 'Service result a valid filename with results'
+			outputFilename != null
+
+		and: 'Service result returns the instance of ETLProcessor and its results'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id', 'appVendor', 'environment'] as Set
+
+					data.size() == 2
+					with(data[0].fields.id) {
+						value == 152254l
+						originalValue == '152254'
+						find.results == [152254l]
+						find.matchOn == 0
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 152254l
+					}
+
+					with(data[1].fields.id) {
+						value == 152255l
+						originalValue == '152255'
+						find.results == [152255l]
+						find.matchOn == 0
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 152255l
+					}
+
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						!find.query
+					}
+
+					with(data[1].fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						!find.query
+					}
+
+					with(data[0].fields.environment) {
+						value == 'Production'
+						originalValue == 'Production'
+						!find.query
+					}
+
+					with(data[1].fields.environment) {
+						value == 'Production'
+						originalValue == 'Production'
+						!find.query
+					}
+				}
+			}
+
+		and: 'ProgressCallback registered all report messages'
+			with(callback) {
+				1 * reportProgress(0, true, RUNNING, '')
+				1 * reportProgress(50, false, RUNNING, '')
+				1 * reportProgress(100, false, RUNNING, '')
+				1 * reportProgress(100, true, RUNNING, '')
+				1 * reportProgress(100, true, COMPLETED, { it != null })
+			}
+
+		cleanup:
+			if (outputFilename){
+				fileSystemService.deleteTemporaryFile(outputFilename)
+			}
+
 	}
 
 	static Map fieldSpecsMap = [
@@ -506,9 +640,9 @@ application id,vendor name,technology,location
 
 		// Getting the Sheet at index zero
 		Sheet sheet = workbook.createSheet(sheetName)
-		sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
+		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
 			XSSFRow currentRow = sheet.createRow(rowNumber)
-			line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
 				currentRow.createCell(columnNumber).setCellValue(cellContent)
 			}
 		}
