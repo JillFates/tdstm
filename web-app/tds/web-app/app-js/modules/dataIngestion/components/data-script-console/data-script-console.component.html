@@ -1,8 +1,8 @@
-<div class="modal fade in dialog-draggable-no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog"
-     [style.top]="consoleSettings.top"
-     [style.left]="consoleSettings.left">
+<div class="modal fade in dialog-draggable-no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="0" role="dialog"
+     [style.top.px]="consoleSettings.top"
+     [style.left.px]="consoleSettings.left">
 	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document"
-         [style.width]="consoleSettings.width">
+         [style.width.px]="consoleSettings.width">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
@@ -14,8 +14,8 @@
 				<div class="row">
 					<div class="col-md-12">
 						<textarea id="textAreaLog" class="form-control console" [(ngModel)]="consoleSettings.scriptTestResult.consoleLog" disabled cols="30" rows="10"
-                                  [style.width]="consoleSettings.width"
-                                  [style.height]="consoleSettings.height">
+                                  [style.width.px]="consoleSettings.width"
+                                  [style.height.px]="consoleSettings.height">
 						</textarea>
 					</div>
 				</div>

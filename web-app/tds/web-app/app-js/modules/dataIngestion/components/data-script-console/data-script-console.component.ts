@@ -35,10 +35,10 @@ export class DataScriptConsoleComponent extends UIExtraDialog implements AfterVi
 	 * On close dialog store position/size settings.
 	 */
 	protected cancelCloseDialog(): void {
-		this.consoleSettings.top = this.dialogInstance.css('top');
-		this.consoleSettings.left = this.dialogInstance.css('left');
-		this.consoleSettings.height = this.textAreaInstance.css('height');
-		this.consoleSettings.width = this.textAreaInstance.css('width');
+		this.consoleSettings.top =  parseInt(this.dialogInstance.css('top'), 10);
+		this.consoleSettings.left = parseInt(this.dialogInstance.css('left'), 10);
+		this.consoleSettings.height = parseInt(this.textAreaInstance.css('height'), 10);
+		this.consoleSettings.width = parseInt(this.textAreaInstance.css('width'), 10);
 		this.dismiss();
 	}
 
