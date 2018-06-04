@@ -5,6 +5,8 @@ import {SingleCommentComponent} from '../single-comment/single-comment.component
 import {SingleCommentModel} from '../single-comment/single-comment.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ModalType} from '../../../../shared/model/constants';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TaskCommentColumnsModel} from './model/task-comment-columns.model';
 
 @Component({
 	selector: `task-comment`,
@@ -19,6 +21,9 @@ export class TaskCommentComponent implements OnInit {
 	@Input('can-edit-comments') canEdit ? = false;
 	@Input('can-edit-tasks') canEditTasks ? = false;
 
+	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
+	private taskCommentColumnModel = new TaskCommentColumnsModel();
+
 	showAll: boolean;
 	comments: any[] = [];
 
@@ -30,9 +35,14 @@ export class TaskCommentComponent implements OnInit {
 		this.taskService.searchComments(this.id, '')
 			.subscribe((res) => {
 				this.comments = res;
+				this.dataGridTaskCommentOnHelper = new DataGridOperationsHelper(this.getCommentsWithFilter(), null, null);
 			}, (err) => console.log(err));
 	}
 
+	/**
+	 * Change the list based on the Filters being applied
+	 * @returns {any}
+	 */
 	public getCommentsWithFilter(): any {
 		return this.comments
 			.filter(comment => this.viewUnpublishedValue || comment.commentInstance.isPublished)
@@ -77,6 +87,10 @@ export class TaskCommentComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Open the Comment Detail or Task Detail
+	 * @param comment
+	 */
 	public openCommentDetail(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
@@ -104,5 +118,12 @@ export class TaskCommentComponent implements OnInit {
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	/**
+	 * Delete the selected element
+	 */
+	public onDeleteTaskComment(dataItem: any): void {
+		this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
 	}
 }

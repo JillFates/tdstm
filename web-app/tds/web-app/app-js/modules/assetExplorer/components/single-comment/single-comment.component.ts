@@ -8,7 +8,7 @@ import {TaskService} from '../../../taskManager/service/task.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs/Observable';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {UIPromptService} from "../../../../shared/directives/ui-prompt.directive";
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: `single-comment`,
@@ -22,11 +22,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 	public assetClassOptions: any[];
 	public commentCategories: string[];
 
-	constructor(public singleCommentModel: SingleCommentModel,
-	            public userPreferenceService: PreferenceService,
-	            public taskManagerService: TaskService,
-	            public assetExplorerService: AssetExplorerService,
-	            public promptService: UIPromptService) {
+	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
 		super('#single-comment-component');
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 		this.loadAssetClass();
