@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.etl.TDSExcelDriver
+import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.FileSystemUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -8,6 +9,7 @@ import getl.data.Dataset
 import getl.data.Field
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
+import getl.json.JSONDataset
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -162,13 +164,25 @@ class FileSystemService  implements InitializingBean {
 			dataset.field << new Field(name: value, type: Field.Type.STRING)
 		}
 
-		// TODO: Need to fix column name lookup - see ticket TM-9584
-        // This will need to be moved to a function that will evetunally get context of the sheet name and
-        // the row that the labels reside on and compute dynamically instead of this statically built list.
-		// currently adding Monkey-patching to support getting the fields since the original behaviour is not supported
-//		dataset.connection.driver.metaClass.fields = { Dataset ds ->
-//			return ds.field
-//		}
+		return dataset
+	}
+
+
+	static JSONDataset buildJSONDataset(String fileName){
+		/*
+		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName), driver: TDSJSONDriver)
+		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
+
+		// Iterate over the Header Row to build the Header fields
+		Iterator<Cell> cellIterator = row.cellIterator()
+		while ( cellIterator.hasNext() ) {
+			Cell cell = cellIterator.next()
+			String value = cell.toString()
+			dataset.field << new Field(name: value, type: Field.Type.STRING)
+		}
+		*/
+
+		JSONDataset dataset = null
 
 		return dataset
 	}
@@ -184,6 +198,9 @@ class FileSystemService  implements InitializingBean {
 		Dataset dataset
 		if (ext == 'CSV'){
 			dataset = buildCVSDataset(fileName)
+
+		} else if ( ext == 'JSON' ) {
+			dataset = buildJSONDataset(fileName)
 
 		} else if ( ['XLSX', 'XLS'].contains(ext) ) {
 			dataset = buildExcelDataset(fileName)
