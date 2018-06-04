@@ -47,6 +47,8 @@ class CookbookPage extends Page {
         gridSize                    { recipeGridRows.size()}
         rowSize                     { recipeGridHeaderCols.size()}
         gebRecipes                  (required: false) { recipeGridRows.find("div.ngCellText.col0")}
+        taskGenerationTabContent { $("div[ui-view=taskBatchStart]")}
+        taskGenerationTabRecipeName { taskGenerationTabContent.find("p")}
     }
 
     def clickOnCreateButton(){
@@ -81,5 +83,9 @@ class CookbookPage extends Page {
 
     def getRecipeByName(name){
         gebRecipes.find{it.text().trim() == name}
+    }
+
+    def getRecipeNameDisplayedInTaskGenerationTab(){
+        taskGenerationTabRecipeName.text()
     }
 }
