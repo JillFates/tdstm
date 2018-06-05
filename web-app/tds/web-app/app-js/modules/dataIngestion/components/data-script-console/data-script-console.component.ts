@@ -31,9 +31,6 @@ export class DataScriptConsoleComponent extends UIExtraDialog implements AfterVi
 	}
 
 	protected maximizeWindow() {
-		// const { width, height } = this.resizableForm.nativeElement.style;
-		// this.initialWindowStyle = { width, height };
-
 		this.isWindowMaximized = true;
 	}
 
