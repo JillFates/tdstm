@@ -1,5 +1,4 @@
 <td colspan="2" id="commentsInnerList">
-	<h1 id="tasksAndCommentsLabelId">Tasks and Comments:</h1>
 	<task-comment
 			[asset-id]="${asset.id}"
 			[pref-value]="${prefValue}"
