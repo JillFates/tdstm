@@ -35,7 +35,7 @@
 <!-- KENDO GRID -->
 <kendo-grid
 		*ngIf="dataGridTaskCommentOnHelper"
-		class="dependents-grid supports-on"
+		class="task-comment-grid"
 		[data]="dataGridTaskCommentOnHelper.gridData"
 		[sort]="dataGridTaskCommentOnHelper.state.sort"
 		[sortable]="{mode:'single'}"
@@ -67,38 +67,19 @@
 		<!-- Action -->
 		<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 			<div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-				<button (click)="onDeleteTaskComment(dataItem)"
-						class="btn btn-action btn-default btn-delete"
-						title="Delete">
-					<span class="fa fa-fw fa-trash"></span>
+				<button (click)="openComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+					<span class="glyphicon glyphicon-pencil"></span>
 				</button>
-				<button (click)="openCommentDetail(dataItem)"
-						class="btn btn-action btn-default btn-comment"
-						title="Comments">
-					<i class="fa fa-fw fa-comment-o"></i>
-					<span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
-					<span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
+				<button (click)="onDeleteTaskComment(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
+					<span class="fa fa-fw fa-trash"></span>
 				</button>
 			</div>
 		</ng-template>
 
-		<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-			<kendo-dropdownlist
-					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-					[data]="typeList"
-					[(ngModel)]="dataItem.type"
-					required>
-			</kendo-dropdownlist>
+		<ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
+			<label class="font-normal" (click)="openComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
 		</ng-template>
 
-		<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-			<kendo-dropdownlist
-					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-					[data]="statusList"
-					[(ngModel)]="dataItem.status"
-					required>
-			</kendo-dropdownlist>
-		</ng-template>
 	</kendo-grid-column>
 	<kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
 </kendo-grid>

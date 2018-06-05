@@ -23,9 +23,10 @@ export class TaskCommentComponent implements OnInit {
 
 	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
 	private taskCommentColumnModel = new TaskCommentColumnsModel();
+	private modalType = ModalType;
 
-	showAll: boolean;
-	comments: any[] = [];
+	private showAll: boolean;
+	private comments: any[] = [];
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService) {
 	}
@@ -91,11 +92,11 @@ export class TaskCommentComponent implements OnInit {
 	 * Open the Comment Detail or Task Detail
 	 * @param comment
 	 */
-	public openCommentDetail(comment: any): void {
+	public openComment(comment: any, modalType: ModalType): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
 				title: 'Comment Detail',
-				type: ModalType.VIEW
+				type: modalType
 			},
 			archive: comment.commentInstance.isResolved !== 0,
 			comment: comment.commentInstance.comment,
