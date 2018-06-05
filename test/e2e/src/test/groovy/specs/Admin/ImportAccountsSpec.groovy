@@ -4,9 +4,9 @@ import geb.spock.GebReportingSpec
 import pages.Admin.ImportAccountsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Stepwise
+import spock.lang.Ignore
 
-@Stepwise
+@Ignore
 class ImportAccountsSpec extends GebReportingSpec {
     def testKey
     static testCount
