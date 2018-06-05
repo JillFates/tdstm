@@ -1677,7 +1677,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
-					data.size() == 0
+					data.size() == 2
 					with(data[0]) {
 						op == 'I'
 						warn == false
@@ -1685,8 +1685,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 1
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152254'
+							value == '152254'
 							init == null
 							errors == []
 							warn == false
@@ -1710,8 +1710,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 2
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152255'
+							value == '152255'
 							init == null
 							errors == []
 							warn == false
@@ -1791,8 +1791,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 1
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152254'
+							value == 152254l
 							init == null
 							errors == []
 							warn == false
@@ -1816,8 +1816,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 2
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152255'
+							value == 152255l
 							init == null
 							errors == []
 							warn == false
@@ -1897,8 +1897,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 1
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152254'
+							value == 152254l
 							init == null
 							errors == []
 							warn == false
@@ -1922,8 +1922,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						rowNum == 2
 						with(fields.id) {
-							originalValue == null
-							value == null
+							originalValue == '152255'
+							value == 152255l
 							init == null
 							errors == ['The find/elseFind command(s) found multiple records']
 							warn == false

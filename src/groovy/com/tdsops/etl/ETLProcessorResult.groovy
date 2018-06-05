@@ -128,9 +128,13 @@ class ETLProcessorResult {
 	 * Mark the end of a row cleaning up the ignored result
 	 */
 	void endRow(){
-		RowResult currentRow = findOrCreateCurrentRow()
-		if(currentRow.ignore){
-			ignoreCurrentRow()
+		// Check first if the scenario with an iterate without definig a domain and read labels
+		if(reference.data){
+
+			RowResult currentRow = findOrCreateCurrentRow()
+			if(currentRow.ignore){
+				ignoreCurrentRow()
+			}
 		}
 	}
 
