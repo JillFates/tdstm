@@ -127,4 +127,8 @@ export class TaskCommentComponent implements OnInit {
 	public onDeleteTaskComment(dataItem: any): void {
 		this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
 	}
+
+	public reloadGrid(): void {
+		this.dataGridTaskCommentOnHelper.reloadData(this.getCommentsWithFilter());
+	}
 }

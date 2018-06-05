@@ -13,12 +13,12 @@
 			<label class="pad-top-7 pad-left-10">Tasks and Comments</label>
 
 			<label class="form-check-label aligned-label" for="showAll">
-				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAll" id="showAll" name="showAll" type="checkbox">
+				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAll" id="showAll" name="showAll" type="checkbox" (change)="reloadGrid()">
 				View All Tasks
 			</label>
 
 			<label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
-				<input class="form-check-input aligned-checkbox " [(ngModel)]="viewUnpublishedValue" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox">
+				<input class="form-check-input aligned-checkbox " [(ngModel)]="viewUnpublishedValue" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadGrid()">
 				View Unpublished Tasks
 			</label>
 
@@ -54,7 +54,7 @@
 			</ng-template>
 
 			<ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-				<label (click)="openComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
+				<label class="pointer" (click)="openComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
 			</ng-template>
 
 			<ng-template kendoGridCellTemplate *ngIf="column.property === 'assignedTo'" let-dataItem let-rowIndex="rowIndex">
