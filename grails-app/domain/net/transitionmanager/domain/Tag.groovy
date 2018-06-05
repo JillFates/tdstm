@@ -13,6 +13,8 @@ class Tag {
 
 	Collection tagLinks
 
+	static belongsTo = [project: Project]
+
 	static hasMany = [tagLinks: TagLink]
 
 	static constraints = {
@@ -34,5 +36,16 @@ class Tag {
 
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT().clearTime()
+	}
+
+	Map toMap() {
+		[
+			Name        : name,
+			Description : description,
+			Color       : color.name(),
+			css         : color.css,
+			DateCreated : dateCreated,
+			LastModified: lastUpdated
+		]
 	}
 }
