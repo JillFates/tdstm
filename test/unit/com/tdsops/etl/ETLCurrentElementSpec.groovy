@@ -404,30 +404,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
-					with(data[0]) {
-						op == 'I'
-						errorCount == 0
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						with(fields.id) {
-							originalValue == null
-							value == null
-							//errors == []
-							warn == false
-							with(find) {
-								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										assetName: 'PE2950'
-									}
-								}
-
-							}
-						}
-					}
+					data.size() == 0
 				}
 			}
 

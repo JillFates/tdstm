@@ -325,6 +325,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
 		reportRowProgress(rowNum, totalNumRows)
+		result.endRow()
 	}
 
 	/**
@@ -927,7 +928,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-
 		result.loadElement(element)
 		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
 	}

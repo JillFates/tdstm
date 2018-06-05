@@ -63,9 +63,10 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
-		RowResult currentData = findOrCreateCurrentRow()
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		reference.addFieldName(element)
-		currentData.addLoadElement(element)
+		currentRow.addLoadElement(element)
 	}
 
 	/**
@@ -97,6 +98,7 @@ class ETLProcessorResult {
 	 */
 	void addFoundElement(FoundElement foundElement){
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.addFoundElement(foundElement)
 	}
 
@@ -116,11 +118,20 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 *
-	 * @param rowIndex
+	 * Restart result index for the next row to be processed in an ETL script iteration
 	 */
 	void startRow(){
 		resultIndex = -1
+	}
+
+	/**
+	 * Mark the end of a row cleaning up the ignored result
+	 */
+	void endRow(){
+		RowResult currentRow = findOrCreateCurrentRow()
+		if(currentRow.ignore){
+			ignoreCurrentRow()
+		}
 	}
 
 	/**
@@ -304,7 +315,7 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
-	Boolean ignore = false
+	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
 
 	/**
