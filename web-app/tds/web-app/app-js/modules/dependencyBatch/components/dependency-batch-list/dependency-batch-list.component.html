@@ -1,7 +1,3 @@
-<style>
-
-</style>
-
 <!-- Main content -->
 <div class="content body tds-kendo-grid dependency-batch-list-component">
     <section>
@@ -73,7 +69,7 @@
                                 </div>
                             </ng-template>
                             <ng-template kendoGridCellTemplate let-dataItem>
-                                <label *ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.COMPLETED"
+                                <label *ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.QUEUED && dataItem.status.code !== BatchStatus.COMPLETED"
                                        class="selectall-checkbox-column text-center k-grid-ignore-click">
                                     <input type="checkbox"
                                            [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
@@ -133,6 +129,7 @@
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
                                 {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                             </ng-template>
+
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
@@ -159,17 +156,25 @@
 
                             <!-- Status -->
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-                                <div *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
+                                <div *ngIf="dataItem.status.code === 'RUNNING' ; then progressBarTemplate else statusTemplate;"></div>
                                 <ng-template #progressBarTemplate>
-                                    <div >{{ dataItem.status.label }}</div>
-                                    <div class="progress" style="margin-bottom: 0px;">
-                                        <div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
-                                            {{dataItem.currentProgress}}%
+                                    <div class="text-center">
+                                        <i class="fa fa-fw fa-spinner fast-right-spinner"></i>
+                                        <span>{{dataItem.currentProgress}}%</span>
+                                    </div>
+                                    <!-- Progress bar-->
+                                    <div class="progressBar-row">
+                                        <div class="progressBar-container">
+                                            <div class="progress">
+                                                <div class="progress-bar progress-bar-striped active"
+                                                     [style.width.%]="dataItem.currentProgress">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </ng-template>
                                 <ng-template #statusTemplate>
-                                     <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text">
+                                     <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text text-center">
                                         {{ dataItem.status.label }}
                                      </div>
                                 </ng-template>
