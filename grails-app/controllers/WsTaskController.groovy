@@ -7,6 +7,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.EmptyResultException
@@ -159,5 +160,18 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskBatchView)
 	def assetCommentCategories() {
 		renderSuccessJson(AssetCommentCategory.list)
+	}
+
+	/**
+	 * Delete a comment given its id.
+	 */
+	@HasPermission(Permission.CommentDelete)
+	def deleteComment(Long id) {
+		// Retrieve the project for the current user.
+		Project project = getProjectForWs()
+		// Delete the comment
+		taskService.deleteComment(project, id)
+		renderSuccessJson("AssetComment deleted.")
+
 	}
 }

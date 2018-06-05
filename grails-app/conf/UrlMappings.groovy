@@ -287,6 +287,13 @@ class UrlMappings {
 			action = [GET:'qzCertificate']
 		}
 
+		"/ws/task/deleteComment/$id" {
+			controller = "wsTask"
+			action = [
+				DELETE:"deleteComment"
+			]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]

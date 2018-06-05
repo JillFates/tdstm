@@ -5476,4 +5476,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		return newMethodParams
 	}
+
+	/**
+	 * Delete an AssetComment based on its id and the user's project.
+	 * @param project
+	 * @param assetCommentId
+	 */
+	void deleteComment(Project project, Long assetCommentId) {
+		// Fetch the asset comment
+		AssetComment comment = GormUtil.findInProject(project, AssetComment, assetCommentId, true)
+		// Delete Task Dependencies.
+		TaskDependency.where {
+			assetComment == comment || predecessor == comment
+		}.deleteAll()
+		// Delete the comment.
+		comment.delete()
+	}
 }
