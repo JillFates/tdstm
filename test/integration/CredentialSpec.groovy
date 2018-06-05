@@ -42,15 +42,21 @@ class CredentialSpec extends IntegrationSpec {
 			am.HEADER			| 'a@header:b'	| 'status code equal 200'| 'http://b.ic' | ''			| chm.POST		| null				| false		// Missing requestmode
 	}
 
+	/**
+	 * All these tests should fail because of the OfSameProjectConstraint. These are all the happy path tests, from the previous test, but
+	 * using a bad credential, where credential.project.id != credential.provider.project.id .
+	 *
+	 * The previous test running without breaking for the happy path, is the happy path for OfSameProjectConstraint working.
+	 */
 	void 'Test validation of Credential with the project being of a different provider'() {
 		expect:
 			createBadTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
 		where:
 			method        | sessionName | valExp  | authUrl       | renewUrl      | httpMethod | requestMode | result
-			am.BASIC_AUTH | ''          | ''      | ''            | ''            | null       | null        | false        // HAPPY PATH, fails validation, because of provider
-			am.BASIC_AUTH | 'bogus'     | 'bogus' | ''            | ''            | null       | null        | false        // Still happy, fails validation, because of provider, with bogus values that are unnecessary
-			am.JWT        | ''          | ''      | 'http://b.ic' | 'http://p.ic' | null       | null        | false        // HAPPY PATH, fails validation, because of provider
-			am.JWT        | 'bogus'     | 'bogus' | 'http://b.ic' | 'http://p.ic' | null       | null        | false        // Still happy, fails validation, because of provider, with bogus values that are unnecessary
+			am.BASIC_AUTH | ''          | ''      | ''            | ''            | null       | null        | false
+			am.BASIC_AUTH | 'bogus'     | 'bogus' | ''            | ''            | null       | null        | false
+			am.JWT        | ''          | ''      | 'http://b.ic' | 'http://p.ic' | null       | null        | false
+			am.JWT        | 'bogus'     | 'bogus' | 'http://b.ic' | 'http://p.ic' | null       | null        | false
 	}
 
 	/**
