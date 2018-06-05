@@ -2847,12 +2847,9 @@ class ETLFindSpec extends ETLBaseSpec {
 				extract 'vendor name' set appVendorVar
 				
 				find Application by 'appVendor' with appVendorVar into 'id'
-				if (FINDINGS.size() > 0) {
-						
-					domain Application 	
-					load 'appVendor' with appVendorVar
-					extract 'technology' load 'appTech' 
-					}
+				if (FINDINGS.size() == 0) {
+					domain Device 	
+					load 'description' with appVendorVar
 				}
 			}
 		""".stripIndent())
@@ -2860,42 +2857,36 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'Results should contain Application domain results associated'
 
 			with(etlProcessor.resultsMap()){
-				domains.size() == 1
+				domains.size() == 2
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
+					data.size() == 0
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['description'] as Set
 					data.size() == 1
 					with(data[0]){
 						op == 'I'
 						warn == false
 						duplicate == false
 						errors == []
-						rowNum == 1
+						rowNum == 2
 						fields.keySet().size() == 1
 
-						with(fields.id) {
-							originalValue == null
-							value == null
+						with(fields.description) {
+							originalValue == 'Mozilla'
+							value == 'Mozilla'
 							init == null
 							errors == []
 							warn == false
 							with(find) {
-								results == [152253l]
-								matchOn == 0
-								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Microsoft'
-									}
-								}
-							}
-							with(update){
-								assetClass == ETLDomain.Application.name()
-								appVendor == 'Microsoft'
-								appTech == '(xlsx updated)'
-
+								results == []
+								matchOn == null
+								query.size() == 0
 							}
 						}
 					}

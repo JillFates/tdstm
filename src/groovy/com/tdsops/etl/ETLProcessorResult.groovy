@@ -46,6 +46,7 @@ class ETLProcessorResult {
 	 * @param domain
 	 */
 	void addCurrentSelectedDomain(ETLDomain domain) {
+		endRow()
 		reference = domains.find { it.domain == domain.name() }
 		if(!reference){
 			reference = new DomainResult(domain: domain.name())
@@ -129,7 +130,7 @@ class ETLProcessorResult {
 	 */
 	void endRow(){
 		// Check first if the scenario with an iterate without defining a domain and read labels
-		if(reference){
+		if(reference && processor.iterateIndex){
 			RowResult currentRow = findOrCreateCurrentRow()
 			if(currentRow.ignore){
 				ignoreCurrentRow()
