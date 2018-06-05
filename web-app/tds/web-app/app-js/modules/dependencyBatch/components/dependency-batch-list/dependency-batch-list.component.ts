@@ -41,7 +41,7 @@ export class DependencyBatchListComponent {
 	private viewArchived = false;
 	private batchStatusLooper: any;
 	private readonly PROGRESS_MAX_TRIES = 10;
-	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
+	private readonly PROGRESS_CHECK_INTERVAL = 3 * 1000;
 	private readonly STOP_BATCH_CONFIRMATION = 'IMPORT_BATCH.LIST.STOP_BATCH_CONFIRMATION';
 	private readonly ARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEM_CONFIRMATION';
 	private readonly ARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEMS_CONFIRMATION';
@@ -71,7 +71,9 @@ export class DependencyBatchListComponent {
 		}
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
-			this.setBatchStatusLooper();
+			// this.setBatchStatusLooper();
+			this.setRunningLoop();
+			this.setQueuedLoop();
 		});
 	}
 
@@ -95,8 +97,8 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.getImportBatch(importBatch.id).subscribe( (response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS) {
 					Object.assign(importBatch, response.data);
-					this.clearBatchStatusLooper();
-					this.setBatchStatusLooper();
+					// this.clearBatchStatusLooper();
+					// this.setBatchStatusLooper();
 				}
 		});
 	}
@@ -130,14 +132,14 @@ export class DependencyBatchListComponent {
 	 * Load Archived Batches.
 	 */
 	private loadArchivedBatchList(): void {
-		this.clearBatchStatusLooper();
+		// this.clearBatchStatusLooper();
 		this.dependencyBatchService.getImportBatches().subscribe( result => {
 			if (result.status === 'success') {
 				let batches = result.data.filter( (item: ImportBatchModel) => {
 					return item.archived;
 				});
 				this.dataGridOperationsHelper.reloadData(batches);
-				this.setBatchStatusLooper();
+				// this.setBatchStatusLooper();
 			} else {
 				this.handleError(result.errors ? result.errors[0] : null);
 			}
@@ -300,8 +302,9 @@ export class DependencyBatchListComponent {
 				if (response.status === ApiResponseModel.API_SUCCESS && response.data.QUEUE === 1) {
 					item.status.code = BatchStatus.QUEUED.toString();
 					item.status.label = 'Queued';
-					this.clearBatchStatusLooper();
-					setTimeout( () => this.setBatchStatusLooper(), 100);
+					// this.clearBatchStatusLooper();
+					// setTimeout( () => this.setBatchStatusLooper(), 100);
+					this.addToQueuedBatchesLoop(item);
 				} else {
 					this.reloadBatchList();
 					this.handleError(response.errors ? response.errors[0] : null);
@@ -489,11 +492,129 @@ export class DependencyBatchListComponent {
 		const filterIndex = runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
 		runningBatches.splice(filterIndex, 1);
 	}
+	private removeBatchFromRunningLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		this.runningBatches.splice(filterIndex, 1);
+	}
+	private removeBatchFromQueuedLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.queuedBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		this.queuedBatches.splice(filterIndex, 1);
+	}
 
 	private addToRunningBatchesLoop(batch: ImportBatchModel): void {
 		const filterIndex = this.runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
 		if (filterIndex < 0) {
 			this.runningBatches.push(batch);
+		}
+	}
+	private addToQueuedBatchesLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.queuedBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		if (filterIndex < 0) {
+			this.queuedBatches.push(batch);
+		}
+	}
+
+	private setRunningLoop(): void {
+		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.RUNNING.toString();
+		});
+		this.runningLoop();
+	}
+
+	private runningLoop(): void {
+		console.log('Running batches: ', this.runningBatches.length);
+		if (this.runningBatches.length === 0) {
+			setTimeout(() => {
+				this.setRunningLoop();
+			}, this.PROGRESS_CHECK_INTERVAL);
+		} else {
+			for (let batch of this.runningBatches) {
+				this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
+					if (response.status === ApiResponseModel.API_SUCCESS) {
+						batch.currentProgress =  response.data.progress ? response.data.progress : 0;
+						const lastUpdated = (response.data.lastUpdated as Date);
+						batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
+						// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
+						if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
+							batch.status.code = BatchStatus.STALLED.toString();
+							batch.status.label = 'Stalled';
+							this.removeBatchFromRunningLoop(batch);
+						} else if (batch.currentProgress >= 100) {
+							batch.status = response.data.status as EnumModel;
+							batch.currentProgress = 0;
+							this.removeBatchFromRunningLoop(batch);
+							this.reloadImportBatch(batch);
+						} else {
+							batch.lastUpdated =  response.data.lastUpdated as Date;
+						}
+					} else {
+						this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
+					}
+					// keep the loop running ..
+					setTimeout(() => {
+						this.runningLoop();
+					}, this.PROGRESS_CHECK_INTERVAL);
+				}, error => {
+					this.handleError(error);
+				});
+			}
+		}
+	}
+
+	private setQueuedLoop(): void {
+		this.queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.QUEUED.toString();
+		});
+		this.queuedloop([...this.queuedBatches]);
+	}
+
+	private queuedloop(list: Array<ImportBatchModel>): void {
+		console.log('Queued batches: ', list.length);
+		if (list.length === 0) {
+			setTimeout(() => {
+				this.setQueuedLoop();
+			}, this.PROGRESS_CHECK_INTERVAL);
+		} else {
+			for (let i = 0; i < list.length; i++) {
+				let batch: ImportBatchModel = list[i];
+				this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+					if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
+						batch.status.code = (response.data as ImportBatchModel).status.code;
+						batch.status.label = (response.data as ImportBatchModel).status.label;
+						this.removeBatchFromQueuedLoop(batch);
+						if (batch.status.code === BatchStatus.RUNNING.toString()) {
+							console.log(batch.id + ' moved to RUNNING');
+							this.addToRunningBatchesLoop(batch);
+						}
+					}
+					// last batch to check .. launch the loop;
+					if (i === list.length - 1) {
+						// keep the loop running ..
+						console.log('last queued batch, rechecking .. ');
+						setTimeout(() => {
+							this.setQueuedLoop();
+						}, this.PROGRESS_CHECK_INTERVAL);
+					}
+				}, error => this.handleError(error));
+			}
+
+			// for (let batch of this.queuedBatches ) {
+			// 	this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+			// 		if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
+			// 			batch.status.code = (response.data as ImportBatchModel).status.code;
+			// 			batch.status.label = (response.data as ImportBatchModel).status.label;
+			// 			this.removeBatchFromQueuedLoop(batch);
+			// 			if (batch.status.code === BatchStatus.RUNNING.toString()) {
+			// 				console.log(batch.id + ' moved to RUNNING');
+			// 				this.addToRunningBatchesLoop(batch);
+			// 			}
+			// 		}
+			// 		// keep the loop running ..
+			// 		setTimeout(() => {
+			// 			this.queuedloop();
+			// 		}, this.PROGRESS_CHECK_INTERVAL);
+			// 	}, error => this.handleError(error));
+			// }
 		}
 	}
 }

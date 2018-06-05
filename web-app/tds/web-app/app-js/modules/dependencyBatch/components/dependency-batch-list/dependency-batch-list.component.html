@@ -156,7 +156,7 @@
 
                             <!-- Status -->
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-                                <div *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
+                                <div *ngIf="dataItem.status.code === 'RUNNING' ; then progressBarTemplate else statusTemplate;"></div>
                                 <ng-template #progressBarTemplate>
                                     <div class="text-center">
                                         <i class="fa fa-fw fa-spinner fast-right-spinner"></i>
