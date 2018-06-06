@@ -1,6 +1,7 @@
 import {ModalType} from '../../../../shared/model/constants';
 
 export class SingleCommentModel {
+	public id?: string;
 	public modal: {
 		title:  string;
 		type: ModalType
