@@ -43,7 +43,8 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 
 	ngOnDestroy() {
 		if (this.options.sizeNamePreference) {
-			this.saveWindowSize();
+			this.saveWindowSize()
+				.subscribe((result) => console.log(result))
 		}
 	}
 

@@ -175,19 +175,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				updated: this.operationStatus.save === 'success',
 				newEtlScriptCode: this.script
 			};
-			this.saveSizeDataScriptDesigner()
-				.subscribe(() => this.close(result), (error) => console.log(error));
+
+			this.close(result);
 		}
-	}
-
-	private saveSizeDataScriptDesigner(): Observable<any> {
-		const { width, height } = this.isWindowMaximized ? this.initialWindowStyle : this.resizableForm.nativeElement.style;
-
-		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
-			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
-			.shift();
-
-		return this.dataIngestionService.saveSizeDataScriptDesigner(sizeDataScript.width, sizeDataScript.height);
 	}
 
 	private onSave(): void {
