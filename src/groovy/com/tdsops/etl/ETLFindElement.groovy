@@ -34,8 +34,12 @@ class ETLFindElement implements ETLStackableCommand{
 	 * A sequence of find/elseFind commands are associated to a ETLDomain value
 	 */
 	ETLDomain currentDomain
+
 	/**
-	 * Returns the main ETLDomain used in a combination of find/elseFind command.
+	 * Indicates the main (intended) ETLDomain that will be used by the whenFound or whenNotFound when updating
+	 * the database as well as validating the property names in those commands. The domain is extracted from the
+	 * find command. In the following script, mainSelectedDomain would be set to ETLDomain.Application.
+	 *
 	 * <pre>
 	 *  find Application ..... into 'id'
 	 *  elseFind Asset ....... into 'id'
@@ -44,6 +48,7 @@ class ETLFindElement implements ETLStackableCommand{
 	 * @return an instance of ETLDomain class
 	 */
 	ETLDomain mainSelectedDomain
+
 	/**
 	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
 	 */
@@ -159,7 +164,7 @@ class ETLFindElement implements ETLStackableCommand{
 			objects: [],
 			matchOn: null
 		]
-		
+
 		if (currentFind.objects && !currentFind.objects.isEmpty()){
 			results.objects = currentFind.objects
 			results.matchOn = findings.size()
