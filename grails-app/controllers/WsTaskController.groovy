@@ -1,5 +1,7 @@
 import com.tds.asset.AssetComment
+import com.tds.asset.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
@@ -171,7 +173,7 @@ class WsTaskController implements ControllerMethods {
 		// Retrieve the project for the current user.
 		Project project = getProjectForWs()
 		// Delete the comment
-		taskService.deleteComment(project, id)
+		commentService.deleteComment(project, id)
 		renderSuccessJson("AssetComment deleted.")
 
 	}
@@ -179,31 +181,35 @@ class WsTaskController implements ControllerMethods {
 	/**
 	 * Update an AssetComment
 	 */
+	@HasPermission(Permission.CommentEdit)
 	def updateComment(Long id) {
-		// Get the user's timezone
-		String userTimeZone = userPreferenceService.timeZone
-		// Retrieve the project for the user.
-		Project project = getProjectForWs()
-		// Retrieve the user's date format.
-		String userDateFormat = userPreferenceService.dateFormat
 		// Update the comment.
-		commentService.saveUpdateCommentAndNotes(userTimeZone, userDateFormat, request.JSON, false, null)
+		saveOrUpdateComment()
 		renderSuccessJson("AssetComment updated.")
 	}
 
 	/**
 	 * Update an AssetComment
 	 */
+	@HasPermission(Permission.CommentCreate)
 	def saveComment() {
-		// Get the user's timezone
-		String userTimeZone = userPreferenceService.timeZone
-		// Retrieve the project for the user.
-		Project project = getProjectForWs()
-		// Retrieve the user's date format.
-		String userDateFormat = userPreferenceService.dateFormat
 		// Save the comment.
-		commentService.saveUpdateCommentAndNotes(userTimeZone, userDateFormat, request.JSON, true, null)
+		saveOrUpdateComment()
 		renderSuccessJson("AssetComment created.")
 
+	}
+
+	/**
+	 * Create or Update an AssetComment
+	 * @param id
+	 * @param command
+	 */
+	private void saveOrUpdateComment() {
+		// Retrieve the project for the user.
+		Project project = getProjectForWs()
+		// Populate the command object with the data coming from the request
+		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
+		// Save or update the comment
+		commentService.saveOrUpdateAssetComment(project, command)
 	}
 }
