@@ -39,26 +39,27 @@ class DomainClassQueryHelper {
 	 * @param paramsMap a map with params to be used in the HQL query
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap) {
+	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 		if(AssetEntity.isAssignableFrom(domain.clazz)){
-			return assetEntities(domain.clazz, project, paramsMap)
+			return assetEntities(domain.clazz, project, paramsMap, returnIdOnly)
 		} else {
-			return nonAssetEntities(domain.clazz, project, paramsMap)
+			return nonAssetEntities(domain.clazz, project, paramsMap, returnIdOnly)
 		}
 	}
 	/**
 	 * Executes an HQL query looking for those all assets referenced by params.
 	 * @param project a project instance used as a param in the HQL query
 	 * @param paramsMap a map with params to be used in the HQL query
+	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap) {
+	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
 		String hqlJoins = hqlJoins(clazz, paramsMap)
 
 		String hql = """
-            select ${DOMAIN_ALIAS}.id
+            select ${DOMAIN_ALIAS}${returnIdOnly ? '.id' : ''}
               from AssetEntity $DOMAIN_ALIAS
 				   $hqlJoins
 			 where ${DOMAIN_ALIAS}.project = :project
@@ -75,9 +76,10 @@ class DomainClassQueryHelper {
 	 * @param clazz class used to execute the HQL sentence
 	 * @param project a project instance used as a param in the HQL query
 	 * @param paramsMap  a map with params to be used in the HQL query
+	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap) {
+	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
 		String hqlJoins = hqlJoins(clazz, paramsMap)
@@ -88,7 +90,7 @@ class DomainClassQueryHelper {
 		}
 
 		String hql = """
-			  select ${DOMAIN_ALIAS}.id
+			  select ${DOMAIN_ALIAS}${returnIdOnly ? '.id' : ''}
               from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
              where $hqlWhere

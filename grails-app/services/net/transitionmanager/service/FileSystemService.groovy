@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdsops.etl.TDSExcelDriver
 import com.tdssrc.grails.FileSystemUtil
+import com.tdssrc.grails.StringUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Dataset
@@ -270,7 +271,7 @@ class FileSystemService  implements InitializingBean {
             }
             if (! --tries) {
                 log.error 'Failed to generate a unique filename in {} directory', temporaryDirectory
-                throw new RuntimeErrorException('getUniqueFilename unable to determine unique filename')
+                throw new RuntimeErrorException('getUniqueFilename() unable to determine unique filename')
             }
         }
         return filename
@@ -288,8 +289,9 @@ class FileSystemService  implements InitializingBean {
         if (file.exists()) {
             success = file.delete()
         }
-
-        log.info 'Deletion of temporary file {}{} {}', temporaryDirectory, filename, (success ? 'succeeded' : 'failed')
+        if (! success) {
+            log.warn 'Deletion of temporary file {}{} failed', temporaryDirectory, filename
+        }
 
         return success
     }
@@ -301,9 +303,12 @@ class FileSystemService  implements InitializingBean {
      * @throws InvalidRequestException
      */
     private void validateFilename(String filename) {
+        if (StringUtil.isBlank(filename)) {
+            throw new InvalidParamException('Filename contains no characters')
+        }
         if (filename.contains(File.separator)) {
             securityService.reportViolation("attempted to access file with path separator ($filename)")
-            throw new InvalidRequestException('Filename contains path separator')
+            throw new InvalidParamException('Filename contains path separator')
         }
     }
 
