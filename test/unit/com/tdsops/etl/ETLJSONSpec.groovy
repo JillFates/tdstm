@@ -9,10 +9,10 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 
 /**
- * Using SpreadSheet in ETL script. It manages the following commands:
+ * Using JSON Object in ETL script. It manages the following commands:
  * <ul>
- *     <li><b>sheet Devices</b></li>
- *     <li><b>sheet 'Production Apps'</b></li>
+ *     <li><b>rootNode devices</b></li>
+ *     <li><b>rootNode 'Production Apps'</b></li>
  *     <li><b>read labels on 2</b></li>
  * </ul>
  */
@@ -196,7 +196,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can throw an exception if rootNode is incorrect (not found in the JSON DataSet'(){
+	void 'test can throw an exception if rootNode is incorrect key in the JSON DataSet'(){
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
 
@@ -221,7 +221,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can throw an exception if sheet name is incorrect for a JSON DataSet'(){
+	void 'test can throw an exception rootNode is incorrect (not found) for a JSON DataSet'(){
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
 
