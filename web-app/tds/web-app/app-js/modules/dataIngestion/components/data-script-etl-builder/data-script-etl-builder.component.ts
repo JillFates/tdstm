@@ -97,35 +97,18 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.testScriptProgress.progressKey = result.data.progressKey;
-				this.setTestScriptProgressInterval();
+				this.setProgressLoop();
 			} else {
 				this.operationStatus.test.state = CHECK_ACTION.INVALID;
 			}
 		}, error => this.operationStatus.test.state = CHECK_ACTION.INVALID);
 	}
 
-	/**
-	 * Clears out the Test Script interval loop.
-	 */
-	private clearTestScriptProgressInterval(): void {
-		clearInterval(this.testScripInterval);
+	private setProgressLoop(): void {
+		this.testScriptProgress.currentProgress = 0;
+		this.progressLoop();
 	}
-
-	/**
-	 * Creates an interval loop to retreive Test Script current progress.
-	 */
-	private setTestScriptProgressInterval(): void {
-		this.testScriptProgress.currentProgress = 1;
-
-		this.testScripInterval = setInterval(() => {
-			this.getTestScriptProgress();
-		}, PROGRESSBAR_INTERVAL_TIME);
-	}
-
-	/**
-	 * Operation of the Test Script interval that will be executed n times in a loop.
-	 */
-	private getTestScriptProgress(): void {
+	private progressLoop(): void {
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
@@ -136,8 +119,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.detail;
-					this.clearTestScriptProgressInterval();
-				// On Success
+					// On Success
 				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
 						let scripTestFilename = response.data.detail;
@@ -149,9 +131,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 								this.scriptTestResult.domains = result.domains;
 							});
 					}, 500);
-					this.clearTestScriptProgressInterval();
+				} else {
+					setTimeout(() => {
+						this.progressLoop();
+					}, 2000)
 				}
-		});
+			});
 	}
 
 	/**
