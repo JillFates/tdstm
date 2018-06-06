@@ -104,10 +104,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}, error => this.operationStatus.test.state = CHECK_ACTION.INVALID);
 	}
 
+	/**
+	 * Initializes the Progress loop.
+	 */
 	private setProgressLoop(): void {
 		this.testScriptProgress.currentProgress = 0;
 		this.progressLoop();
 	}
+
+	/**
+	 * Progress loop, this function is called recursively until the progress finish.
+	 */
 	private progressLoop(): void {
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
