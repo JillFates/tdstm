@@ -39,6 +39,11 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	constructor(private el: ElementRef, private renderer: Renderer2) {}
 
 	ngAfterViewInit() {
+		// On resize the windows, recalculate the center position
+		jQuery(window).resize(() => {
+			this.centerWindow();
+		});
+
 		// hide host while setup is executing
 		this.renderer.setStyle(this.el.nativeElement, 'visibility', 'hidden');
 		// we need to delay because the bootstrap effect displaying modals
