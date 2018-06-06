@@ -254,7 +254,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private extractSampleDataFromFile() {
 		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
 			this.sampleDataModel = result;
-			this.setGridHeight();
 		});
 	}
 
@@ -335,9 +334,4 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.resizableForm.nativeElement.style.minHeight = '';
 		}
 	}
-
-	public onResizeEvent(eventName: string) {
-		this.setGridHeight();
-	}
-
 }
