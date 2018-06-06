@@ -800,6 +800,11 @@ class CommentService implements ServiceMethods {
 			commentType = AssetCommentType.COMMENT
 			comment = command.comment
 			category = command.category
+			if (command.status) {
+				status = command.status
+			} else{
+				status = 'Ready'
+			}
 		}
 
 		assetComment.save(failOnError: true)
