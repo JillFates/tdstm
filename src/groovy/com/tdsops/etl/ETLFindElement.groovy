@@ -35,6 +35,16 @@ class ETLFindElement implements ETLStackableCommand{
 	 */
 	ETLDomain currentDomain
 	/**
+	 * Returns the main ETLDomain used in a combination of find/elseFind command.
+	 * <pre>
+	 *  find Application ..... into 'id'
+	 *  elseFind Asset ....... into 'id'
+	 * </pre>
+	 *
+	 * @return an instance of ETLDomain class
+	 */
+	ETLDomain mainSelectedDomain
+	/**
 	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
 	 */
 	Map<String, Object> currentFind = [:]
@@ -211,6 +221,12 @@ class ETLFindElement implements ETLStackableCommand{
 		processor.validateDomainPropertyAsReference(property)
 	}
 
+	/**
+	 * Defines the current domain instance in find list results.
+	 * It also defines mainSelectedDomain
+	 * @param domain an instance or ETLDomain used to set the current domain
+	 * @see ETLFindElement#mainSelectedDomain
+	 */
 	private void setCurrentDomain(ETLDomain domain) {
 		currentDomain = domain
 		currentFind = [
@@ -219,6 +235,9 @@ class ETLFindElement implements ETLStackableCommand{
 			values: [],
 			queryParams: [:]
 		]
+		if(!mainSelectedDomain){
+			mainSelectedDomain = domain
+		}
 	}
 
 	/**

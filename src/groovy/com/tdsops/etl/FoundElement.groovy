@@ -61,8 +61,9 @@ abstract class FoundElement {
 	 */
 	private ETLProcessor processor
 
-	FoundElement(String domainPropertyName, ETLProcessor processor) {
+	FoundElement(String domainPropertyName, ETLDomain domain, ETLProcessor processor) {
 		this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(domainPropertyName)
+		this.domain = domain
 		this.processor = processor
 		this.action = FoundElementType.unknown
 		this.propertiesMap = [:]
@@ -122,7 +123,6 @@ abstract class FoundElement {
 	 * @see ETLDomain
 	 */
 	FoundElement assetClass(ETLDomain domain){
-		this.domain = domain
 		this.propertiesMap.assetClass = domain.name()
 		this
 	}

@@ -5,8 +5,8 @@ package com.tdsops.etl
  */
 class WhenNotFoundElement extends FoundElement {
 
-	WhenNotFoundElement(String domainPropertyName, ETLProcessor processor) {
-		super(domainPropertyName, processor)
+	WhenNotFoundElement(String domainPropertyName, ETLDomain domain, ETLProcessor processor) {
+		super(domainPropertyName, domain, processor)
 	}
 
 	/**
