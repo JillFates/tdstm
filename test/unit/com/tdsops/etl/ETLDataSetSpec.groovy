@@ -96,9 +96,11 @@ class ETLDataSetSpec extends ETLBaseSpec {
 		]""".stripIndent()
 
 		jsonDataSet = new DataSetFacade(new JSONDataset(connection: jsonConnection, fileName: jsonFile.path, rootNode: ".", convertToList: true))
-		// jsonDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		// jsonDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		// jsonDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		/*
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		*/
 
 		environmentDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
@@ -208,8 +210,8 @@ class ETLDataSetSpec extends ETLBaseSpec {
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == jsonDataSet.rowsSize()
 
-			// TODO: Auto detect JSON headers. Not yet implemented
-		and : 'A column map is created'
+			// Auto detecting JSON headers.
+		and : 'A column map is created in alphanumeric order (Json Map)'
 			etlProcessor.column('device id').index == 0
 			etlProcessor.column(0).label == 'device id'
 

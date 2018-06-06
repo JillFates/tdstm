@@ -3,6 +3,9 @@ package com.tdsops.etl
 import getl.data.Dataset
 import getl.data.Field
 import getl.excel.ExcelDataset
+import getl.json.JSONDataset
+import getl.json.JSONDriver
+import org.codehaus.groovy.grails.web.json.JSONElement
 
 class DataSetFacade {
 
@@ -148,5 +151,39 @@ class DataSetFacade {
 			throw ETLProcessorException.invalidExcelDriver()
 		}
 		return (TDSExcelDriver)dataSet.connection.driver
+	}
+
+	/**
+	 * Validates if the current DataSet is an instance of JSONDataSet
+	 * and if it using an instance of TDSJSONDriver.
+	 * If not it throws an ETLProcessorException#invalidJSONDriver exception
+	 * @return the instance of TDSJSONDriver configured for the current DataSet.
+	 */
+
+	private void validateJsonDriverOrThrowException() {
+		if (!dataSet.class.isAssignableFrom(JSONDataset)) {
+			throw ETLProcessorException.invalidJSONDriver()
+		}
+	}
+
+	private TDSJSONDriver jsonDriver(){
+		validateJsonDriverOrThrowException()
+		return (TDSJSONDriver)dataSet.connection.driver
+	}
+
+	private void validateJSONRootNodeOrThrowException(String rootNode) {
+		TDSJSONDriver driver = jsonDriver()
+		JSONElement jsonNode = driver.getRootNode(dataSet, rootNode)
+		if (jsonNode == null) {
+			throw ETLProcessorException.invalidRootNode(rootNode)
+		}
+
+	}
+
+	void setRootNode(String rootNode) {
+		validateJSONRootNodeOrThrowException(rootNode)
+		JSONDataset jdataset =  (JSONDataset)dataSet
+		jdataset.rootNode = rootNode
+		jdataset.field.clear()
 	}
 }

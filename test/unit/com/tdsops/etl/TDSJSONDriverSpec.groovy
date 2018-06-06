@@ -27,9 +27,8 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 	void 'test can read fields from a plain JSON array'() {
 		given:
 			def (String fileName, DataSetFacade dataSetFacade) = buildJSONDataSet(
-				ApplicationDataSet
+				RootApplicationDataSet
 			)
-			TDSJSONDriver tdsJSONDriver = (TDSJSONDriver)dataSetFacade.dataSet.connection.driver
 		when:
 			List<Field> fields = dataSetFacade.fields()
 
@@ -37,71 +36,72 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields.size() == 4
 
 		and:
-			tdsJSONDriver.fields() != null
-
-		/*
-			tdsJSONDriver.fieldsMap.keySet().size() == 1
-			tdsJSONDriver.fieldsMap.containsKey(0)
-			tdsJSONDriver.fieldsMap[0][0].name == 'application id'
-			tdsJSONDriver.fieldsMap[0][1].name == 'vendor name'
-			tdsJSONDriver.fieldsMap[0][2].name == 'technology'
-			tdsJSONDriver.fieldsMap[0][3].name == 'location'
-		*/
+			fields[0].name == 'application id'
+			fields[1].name == 'location'
+			fields[2].name == 'technology'
+			fields[3].name == 'vendor name'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
 	}
 
-/*
-	void 'test can read fields using a particular sheet defined by a sheet name'() {
+
+	void 'test can read fields using a particular path defined by rootNode'() {
 		given:
-			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetDataSet(
-				ApplicationDataSet
+			def (String fileName, DataSetFacade dataSetFacade) = buildJSONDataSet(
+				NodeApplicationDataSet
 			)
-			TDSJSONDriver tdsJSONDriver = (TDSJSONDriver)dataSetFacade.dataSet.connection.driver
 		when:
-			dataSetFacade.setSheetName('Applications')
+			dataSetFacade.setRootNode('Applications')
 			List<Field> fields = dataSetFacade.fields()
 
 		then: 'Fields are read from the Applications sheet'
 			fields.size() == 4
 
 		and:
-			tdsJSONDriver.workbook != null
-
-			tdsJSONDriver.sheetsMap.keySet().size() == 2
-			tdsJSONDriver.sheetsMap.containsKey('Applications')
-			tdsJSONDriver.sheetsMap.containsKey(0)
-
-			tdsJSONDriver.fieldsMap.keySet().size() == 1
-			tdsJSONDriver.fieldsMap.containsKey('Applications')
-			tdsJSONDriver.fieldsMap['Applications'][0].name == 'application id'
-			tdsJSONDriver.fieldsMap['Applications'][1].name == 'vendor name'
-			tdsJSONDriver.fieldsMap['Applications'][2].name == 'technology'
-			tdsJSONDriver.fieldsMap['Applications'][3].name == 'location'
+			fields[0].name == 'application id'
+			fields[1].name == 'location'
+			fields[2].name == 'technology'
+			fields[3].name == 'vendor name'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
 	}
-*/
 
 
-	static final String ApplicationDataSet = """
+
+	static final String RootApplicationDataSet = """
 		[
 			{
 				"application id":152254,
 				"vendor name":"Microsoft",
-				"technology":"(xlsx updated)",
 				"location":"ACME Data Center"
 			},
 			{
 				"application id":152255,
-				"vendor name":"Mozilla",
 				"technology":"NGM",
 				"location":"ACME Data Center"
-			},
+			}
 		]	
+	""".stripIndent().trim()
+
+	static final String NodeApplicationDataSet = """
+		{
+			"Applications" : [
+				{
+					"application id":152254,
+					"vendor name":"Microsoft",
+					"location":"ACME Data Center"
+				},
+				{
+					"application id":152255,
+					"technology":"NGM",
+					"location":"ACME Data Center"
+				}
+			],
+			"Device" : []
+		}
 	""".stripIndent().trim()
 }

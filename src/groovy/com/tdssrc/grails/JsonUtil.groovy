@@ -11,7 +11,6 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
-import com.tdsops.common.lang.ExceptionUtil
 
 @CompileStatic
 @Slf4j(value='logger')
@@ -185,6 +184,44 @@ class JsonUtil {
             throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
         return mapToObject(jsonStr, target)
+    }
+
+    /**
+     * Parse a file by Path (Absolute or relative to Projects dir to JSONObject
+     * @param fileName
+     * @return JSONElement
+     */
+    static JSONElement parseFilePath(String fileName) {
+        File file = new File(fileName)
+        return JSON.parse(file.text)
+    }
+
+    /**
+     * method from Maps to let use XPATH like access
+     * e.g.
+     * <PRE>
+     *       assert xpathAt(result, "person.name") == "Guillaume"
+     *       assert xpathAt(result, "")            == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     *       assert xpathAt(result, ".")           == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     * </PRE>
+     * @param json
+     * @param xpath
+     * @param separator
+     * @return
+     */
+    static JSONElement xpathAt(JSONElement json, String xpath, String separator = '.') {
+        if (!xpath || xpath == separator) {
+            return json
+        }
+
+        if (!xpath.contains(separator)) {
+            return json[xpath] as JSONElement
+        }
+
+        def firstPropName = xpath[0..xpath.indexOf(separator) - 1]
+        def remainingPath = xpath[xpath.indexOf(separator) + 1 .. -1]
+        JSONElement firstProperty = json[firstPropName] as JSONElement
+        return xpathAt(firstProperty, remainingPath, separator)
     }
 
 }

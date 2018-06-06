@@ -224,7 +224,7 @@ abstract class ETLBaseSpec extends Specification {
 		String fullName = service.getTemporaryFullFilename(fileName)
 
 		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver:TDSJSONDriver)
-		JSONDataset dataSet = new JSONDataset(connection: jsonCon, fileName: FileUtils.FileName(fullName))
+		JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
 
 		return [fileName, new DataSetFacade(dataSet)]
 	}

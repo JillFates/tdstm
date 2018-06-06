@@ -9,6 +9,7 @@ import getl.data.Dataset
 import getl.data.Field
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
+import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
 import grails.transaction.Transactional
@@ -169,20 +170,8 @@ class FileSystemService  implements InitializingBean {
 
 
 	static JSONDataset buildJSONDataset(String fileName){
-		/*
-		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName), driver: TDSJSONDriver)
-		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
-
-		// Iterate over the Header Row to build the Header fields
-		Iterator<Cell> cellIterator = row.cellIterator()
-		while ( cellIterator.hasNext() ) {
-			Cell cell = cellIterator.next()
-			String value = cell.toString()
-			dataset.field << new Field(name: value, type: Field.Type.STRING)
-		}
-		*/
-
-		JSONDataset dataset = null
+		JSONConnection con = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fileName), driver:TDSJSONDriver)
+		JSONDataset dataset = new JSONDataset(connection: con, rootNode: "", fileName: FileUtils.FileName(fileName))
 
 		return dataset
 	}

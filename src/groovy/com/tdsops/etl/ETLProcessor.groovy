@@ -487,6 +487,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * Defines the rootNode XPath to be used in an ETl script and a JSON dataset
+	 * @param sheetName
+	 * @return
+	 */
+	ETLProcessor rootNode (String rootNode) {
+		currentRowIndex = 0
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
+		dataSetFacade.setRootNode(rootNode)
+	}
+
+	/**
 	 * Extracts an element from dataSource by its index in the row
 	 * <code>
 	 *     domain Application

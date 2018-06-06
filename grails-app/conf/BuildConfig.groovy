@@ -18,6 +18,8 @@ grails.project.dependency.resolution = {
 		inherits true
 		mavenLocal()
 
+		// mavenRepo 'http://repo.novus.com/releases/'
+		mavenRepo 'https://raw.github.com/Takuto88/sauronsoftware-maven/master/releases'
 		//mavenRepo 'http://repo.grails.org/grails/plugins'
 		//mavenRepo 'https://repo.grails.org/grails/core'
 		//grailsPlugins()
@@ -49,7 +51,12 @@ grails.project.dependency.resolution = {
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
 		// GETL Groovy ETL - https://github.com/ascrus/getl/
-		runtime 'net.sourceforge.getl:getl:1.2.05'
+		runtime ('net.sourceforge.getl:getl:2.0.3') {
+			excludes 'it.sauronsoftware',
+						'org.apache.hadoop:hadoop-common'
+		}
+		// Dependency required by GETL
+		runtime 'it.sauronsoftware:ftp4j:jar:1.7.2'
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
