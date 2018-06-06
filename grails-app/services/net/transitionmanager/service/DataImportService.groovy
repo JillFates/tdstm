@@ -1283,7 +1283,7 @@ class DataImportService implements ServiceMethods {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv)
+				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv, false)
 
 				recordsFound = entities.size()
 				if (recordsFound > 0) {
@@ -1877,11 +1877,15 @@ class DataImportService implements ServiceMethods {
 		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 
+		// TODO : JPM 6/2018 : TM-11017 This call fails silently in one of the DataImportServiceIntegrationSpec tests
+		log.debug "transformEtlData() calling scriptProcessorService.executeAndSaveResultsInFile"
 		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
 			project,
 			dataScript.etlSourceCode,
 			inputFilename,
 			updateProgressClosure)
+
+		log.debug "transformEtlData() returned from call"
 
 		result.filename = outputFilename
 
