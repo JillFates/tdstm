@@ -47,7 +47,7 @@
 					<button (click)="openComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</button>
-					<button (click)="onDeleteTaskComment(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
+					<button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
 						<span class="fa fa-fw fa-trash"></span>
 					</button>
 				</div>
@@ -62,6 +62,6 @@
 			</ng-template>
 
 		</kendo-grid-column>
-		<kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
+		<kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
 	</kendo-grid>
 </div>

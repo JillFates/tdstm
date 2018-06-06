@@ -7,6 +7,8 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ModalType} from '../../../../shared/model/constants';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskCommentColumnsModel} from './model/task-comment-columns.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TaskService} from '../../../taskManager/service/task.service';
 
 @Component({
 	selector: `task-comment`,
@@ -28,11 +30,19 @@ export class TaskCommentComponent implements OnInit {
 	private showAll: boolean;
 	private comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService) {
+	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService) {
 	}
 
 	ngOnInit(): void {
 		this.showAll = this.prefValue;
+		this.getAllComments();
+	}
+
+	/**
+	 * Get all comments
+	 * @returns {any}
+	 */
+	private getAllComments(): any {
 		this.taskService.searchComments(this.id, '')
 			.subscribe((res) => {
 				this.comments = res;
@@ -94,6 +104,7 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	public openComment(comment: any, modalType: ModalType): void {
 		let singleCommentModel: SingleCommentModel = {
+			id: comment.commentInstance.id,
 			modal: {
 				title: 'Comment Detail',
 				type: modalType
@@ -115,20 +126,33 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], true, false).then(result => {
-			console.log('Success');
+			this.getAllComments();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
 	}
 
-	/**
-	 * Delete the selected element
-	 */
-	public onDeleteTaskComment(dataItem: any): void {
-		this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
-	}
-
 	public reloadGrid(): void {
 		this.dataGridTaskCommentOnHelper.reloadData(this.getCommentsWithFilter());
+	}
+
+	/**
+	 * Delete the Asset Comment
+	 */
+	protected onDelete(dataItem: any): void {
+		this.promptService.open(
+			'Confirmation Required',
+			'Confirm deletion of this record. There is no undo for this action?',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.taskManagerService.deleteTaskComment(dataItem.commentInstance.id).subscribe((res) => {
+						// delete the item
+						this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
+						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
+					});
+				}
+			})
+			.catch((error) => console.log(error));
 	}
 }

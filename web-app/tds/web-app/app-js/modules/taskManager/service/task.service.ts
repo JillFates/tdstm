@@ -31,7 +31,7 @@ export class TaskService {
 	}
 
 	/**
-	 *
+	 * Get the Comment Categories
 	 * @returns {Observable<any>}
 	 */
 	getCommentCategories(): Observable<any> {
@@ -43,4 +43,16 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Delete a Comment from a Task
+	 * @returns {Observable<any>}
+	 */
+	deleteTaskComment(commentId: any): Observable<any> {
+		return this.http.delete(`${this.taskURL}/comment/${commentId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
 }

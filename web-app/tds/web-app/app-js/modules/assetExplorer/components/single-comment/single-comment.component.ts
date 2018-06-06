@@ -108,7 +108,9 @@ export class SingleCommentComponent extends UIExtraDialog {
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
-					this.cancelCloseDialog();
+					this.taskManagerService.deleteTaskComment(this.singleCommentModel.id).subscribe((res) => {
+						this.close();
+					});
 				}
 			})
 			.catch((error) => console.log(error));
