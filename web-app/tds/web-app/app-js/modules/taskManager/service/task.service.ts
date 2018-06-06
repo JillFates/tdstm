@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
+import {SingleCommentModel} from '../../assetExplorer/components/single-comment/single-comment.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -54,5 +55,36 @@ export class TaskService {
 				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Save the Task Cooment
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	saveComment(model: SingleCommentModel): Observable<any> {
+		const request: any = {
+			comment: model.comment,
+			category: model.category,
+			isResolved: model.archive,
+			assetEntityId: model.asset.id
+		};
+
+		if (!model.id) {
+			return this.http.post(`${this.taskURL}/comment`, JSON.stringify(request))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data && result.data.dataView;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			request['id'] = model.id;
+			return this.http.put(`${this.taskURL}/comment/${model.id}`, JSON.stringify(request))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data && result.data.dataView;
+				})
+				.catch((error: any) => error.json());
+		}
 	}
 }

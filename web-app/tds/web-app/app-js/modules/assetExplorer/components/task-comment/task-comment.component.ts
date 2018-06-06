@@ -92,7 +92,7 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], true, false).then(result => {
-			console.log('Success');
+			this.getAllComments();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

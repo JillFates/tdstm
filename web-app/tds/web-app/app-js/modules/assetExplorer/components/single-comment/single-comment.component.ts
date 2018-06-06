@@ -98,6 +98,12 @@ export class SingleCommentComponent extends UIExtraDialog {
 		this.singleCommentModel.modal.type = ModalType.EDIT;
 	}
 
+	protected onSave(): void {
+		this.taskManagerService.saveComment(this.singleCommentModel).subscribe((res) => {
+			this.close();
+		});
+	}
+
 	/**
 	 * Delete the Asset Comment
 	 */
