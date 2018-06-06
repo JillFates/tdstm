@@ -10,7 +10,7 @@ import {
 } from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import { PreferenceService } from '../../../../shared/services/preference.service';
+import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -60,12 +60,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
-
-		this.dataIngestionService.getDataScriptDesignerSize()
-			.subscribe((size: {width: number, height: number}) => {
-				this.width = size.width;
-				this.height = size.height;
-			});
 	}
 
 	constructor(
@@ -78,7 +72,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private preferenceService: PreferenceService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
-		this.modalOptions = { isFullScreen: true, isResizable: true };
+		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
 	}
 
 	/**

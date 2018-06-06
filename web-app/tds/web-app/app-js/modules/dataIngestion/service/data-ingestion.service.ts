@@ -671,18 +671,6 @@ export class DataIngestionService {
 		return this.preferenceService.getPreference(preferenceName);
 	}
 
-	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
-		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
-			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
-			.map((size: string) => {
-				let measure: string[] = (size || '').split(UNITS_SIZE_SEPARATOR);
-				let	width = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_WIDTH;
-				let height = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_HEIGHT;
-				return { width, height };
-			})
-			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
 	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
 		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}

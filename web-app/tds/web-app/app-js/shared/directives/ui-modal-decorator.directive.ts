@@ -2,6 +2,9 @@
  * Enable full screen and resizable capabilities to modal windows
  */
 import {Directive, AfterViewInit, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+
+import { PreferenceService} from '../../shared/services/preference.service';
 import { DecoratorOptions, WindowSettings } from '../model/ui-modal-decorator.model';
 
 declare var jQuery: any;
@@ -36,7 +39,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	}
 	get options(): DecoratorOptions { return this.decoratorOptions; }
 
-	constructor(private el: ElementRef, private renderer: Renderer2) {}
+	constructor(private el: ElementRef, private renderer: Renderer2, private preferenceService: PreferenceService) {}
 
 	ngAfterViewInit() {
 		// On resize the windows, recalculate the center position
@@ -48,10 +51,25 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		this.renderer.setStyle(this.el.nativeElement, 'visibility', 'hidden');
 		// we need to delay because the bootstrap effect displaying modals
 		setTimeout(() => {
-			this.setOptions();
-			// show host when setup is done
-			this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
+			this.getWindowSize()
+				.subscribe((size: {width: number, height: number}) => {
+					if (size) {
+						// show host when setup is done
+						this.renderer.setStyle(this.el.nativeElement, 'width', this.toPixels(size.width));
+						this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(size.height));
+					}
+					this.setOptions();
+					// show host when setup is done
+					this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
+				});
 		}, 500);
+	}
+
+	private getWindowSize(): Observable<any> {
+		if (this.options.sizeNamePreference) {
+			return this.preferenceService.getDataScriptDesignerSize();
+		}
+		return Observable.of(null);
 	}
 
 	/**
