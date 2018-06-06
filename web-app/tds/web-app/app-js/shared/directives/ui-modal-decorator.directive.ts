@@ -1,7 +1,7 @@
 /**
  * Enable full screen and resizable capabilities to modal windows
  */
-import {Directive, AfterViewInit, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
+import {Directive, AfterViewInit, OnDestroy, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
 import { PreferenceService} from '../../shared/services/preference.service';
@@ -14,7 +14,7 @@ const TOP_MARGIN = -30;
 @Directive({
 	selector: '[tds-ui-modal-decorator]'
 })
-export class UIModalDecoratorDirective implements AfterViewInit {
+export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	private isMaximized = false;
 	private defaultOptions: DecoratorOptions = {isFullScreen: false, isCentered: true, isResizable: false, isDraggable: true};
 	private decoratorOptions: DecoratorOptions;
@@ -40,6 +40,12 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	get options(): DecoratorOptions { return this.decoratorOptions; }
 
 	constructor(private el: ElementRef, private renderer: Renderer2, private preferenceService: PreferenceService) {}
+
+	ngOnDestroy() {
+		if (this.options.sizeNamePreference) {
+			this.saveWindowSize();
+		}
+	}
 
 	ngAfterViewInit() {
 		// On resize the windows, recalculate the center position
@@ -214,5 +220,18 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		if (currentHeight && currentHeight > this.parentModal.clientHeight) {
 			this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(this.parentModal.clientHeight - SCROLLBAR_BORDER));
 		}
+	}
+
+	/**
+	 * Save the width/height size as a user preference setting
+	 */
+	private saveWindowSize(): Observable<any> {
+		const { width, height } = this.isWindowMaximized ? this.initialWindowSettings : this.el.nativeElement.style;
+
+		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
+			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
+			.shift();
+
+		return this.preferenceService.setPreference(this.options.sizeNamePreference, `${sizeDataScript.width}x${sizeDataScript.height}`)
 	}
 }
