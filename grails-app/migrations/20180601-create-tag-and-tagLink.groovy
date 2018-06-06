@@ -137,67 +137,46 @@ databaseChangeLog = {
 	}
 
 
-	changeSet(author: "tpelletier", id: "20170807 TM-6843") {
-        comment('add new permissions to the Asset explorer epic feature')
+	changeSet(author: "tpelletier", id: "20180605 TM-10929-3") {
+		comment('add new permission for managing tags')
 
-        grailsChange {
-            change {
-                def perms = [
-					(Permission.AssetExplorerSystemCreate): [
-                        group      : 'NONE',
-                        description: 'Can create shared system level views',
-                        roles      : ['ADMIN']
-                    ],
-					(Permission.AssetExplorerSystemDelete): [
-                        group      : 'NONE',
-                        description: 'Can delete shared system level views',
-                        roles      : ['ADMIN']
-                    ],
-                    (Permission.AssetExplorerSystemEdit)  : [
-                        group      : 'NONE',
-                        description: 'Can edit shared system level views',
-                        roles      : ['ADMIN']
-                    ],
-                    (Permission.AssetExplorerSystemSaveAs): [
-                        group      : 'NONE',
-                        description: 'Can modify and \'Save As\' system level views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-                    (Permission.AssetExplorerCreate): [
-                        group      : 'NONE',
-                        description: 'Can create logged in user owned views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-					(Permission.AssetExplorerDelete): [
-                        group      : 'NONE',
-                        description: 'Can delete logged in user owned views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-                    (Permission.AssetExplorerEdit): [
-                        group      : 'NONE',
-                        description: 'Can edit logged in user owned views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-                    (Permission.AssetExplorerSaveAs): [
-                        group      : 'NONE',
-                        description: 'Can modify and \'Save As\' user published views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-					(Permission.AssetExplorerPublish): [
-                        group      : 'NONE',
-                        description: 'Can publish logged in user owned views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-                    (Permission.AssetExplorerUnPublish): [
-                        group      : 'NONE',
-                        description: 'Can unpublish logged in user owned views',
-                        roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
-                    ],
-                ]
+		grailsChange {
+			change {
+				def perms = [
+					(Permission.TagCreate): [
+						group      : 'NONE',
+						description: 'Can view, create, update, merge, and delete tags.',
+						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+					],
 
-                def databaseMigrationService = ctx.getBean('databaseMigrationService')
-                databaseMigrationService.addPermissions(sql, perms)
-            }
-        }
-    }
+					(Permission.TagDelete): [
+						group      : 'NONE',
+						description: 'Can view, create, update, merge, and delete tags.',
+						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
+					],
+
+					(Permission.TagEdit): [
+						group      : 'NONE',
+						description: 'Can view, create, update, merge, and delete tags.',
+						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR']
+					],
+
+					(Permission.TagView): [
+						group      : 'NONE',
+						description: 'Can view, create, update, merge, and delete tags.',
+						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
+					],
+
+					(Permission.TagMerge): [
+						group      : 'NONE',
+						description: 'Can view, create, update, merge, and delete tags.',
+						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
+					]
+				]
+
+				def databaseMigrationService = ctx.getBean('databaseMigrationService')
+				databaseMigrationService.addPermissions(sql, perms)
+			}
+		}
+	}
 }

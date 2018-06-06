@@ -40,6 +40,7 @@ class Tag {
 
 	Map toMap() {
 		[
+			id          : id,
 			Name        : name,
 			Description : description,
 			Color       : color.name(),
