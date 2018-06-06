@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Person
@@ -172,6 +173,37 @@ class WsTaskController implements ControllerMethods {
 		// Delete the comment
 		taskService.deleteComment(project, id)
 		renderSuccessJson("AssetComment deleted.")
+
+	}
+
+	/**
+	 * Update an AssetComment
+	 */
+	def updateComment(Long id) {
+		// Get the user's timezone
+		String userTimeZone = userPreferenceService.timeZone
+		// Retrieve the project for the user.
+		Project project = getProjectForWs()
+		// Retrieve the user's date format.
+		String userDateFormat = userPreferenceService.dateFormat
+		// Update the comment.
+		commentService.saveUpdateCommentAndNotes(userTimeZone, userDateFormat, request.JSON, false, null)
+		renderSuccessJson("AssetComment updated.")
+	}
+
+	/**
+	 * Update an AssetComment
+	 */
+	def saveComment() {
+		// Get the user's timezone
+		String userTimeZone = userPreferenceService.timeZone
+		// Retrieve the project for the user.
+		Project project = getProjectForWs()
+		// Retrieve the user's date format.
+		String userDateFormat = userPreferenceService.dateFormat
+		// Save the comment.
+		commentService.saveUpdateCommentAndNotes(userTimeZone, userDateFormat, request.JSON, true, null)
+		renderSuccessJson("AssetComment created.")
 
 	}
 }

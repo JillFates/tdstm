@@ -287,10 +287,22 @@ class UrlMappings {
 			action = [GET:'qzCertificate']
 		}
 
-		"/ws/task/deleteComment/$id" {
+		/**
+		 * AssetComment CRUD endpoints
+		 */
+
+		"/ws/task/comment/$id" {
 			controller = "wsTask"
 			action = [
-				DELETE:"deleteComment"
+				DELETE:'deleteComment',
+				PUT: 'updateComment'
+			]
+		}
+
+		"/ws/task/comment" {
+			controller = 'wsTask'
+			action = [
+			    POST: 'saveComment'
 			]
 		}
 
