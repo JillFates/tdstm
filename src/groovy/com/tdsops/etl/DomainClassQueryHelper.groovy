@@ -37,6 +37,7 @@ class DomainClassQueryHelper {
 	 * @param domain an instance of ETLDomain used to defined the correct HQL query to be executed
 	 * @param project a project instance used as a param in the HQL query
 	 * @param paramsMap a map with params to be used in the HQL query
+	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
