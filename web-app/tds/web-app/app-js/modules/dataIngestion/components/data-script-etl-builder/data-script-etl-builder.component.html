@@ -134,7 +134,7 @@
                                     <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                               <kendo-grid [data]="domain.data" [resizable]="true">
+                                               <kendo-grid [data]="domain.data" [resizable]="true" class="test-results">
                                                     <kendo-grid-column *ngFor="let column of domain.fieldNames;
                                                                let columnIndex = index;"
                                                                        title="{{column}}">
