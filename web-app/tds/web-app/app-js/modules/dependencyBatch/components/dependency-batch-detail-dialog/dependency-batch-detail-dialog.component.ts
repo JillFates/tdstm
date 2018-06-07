@@ -9,6 +9,7 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -45,6 +46,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		selected: {id: 1, name: 'All'}
 	};
 	private batchRecordsUpdatedFlag = false;
+	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
@@ -101,9 +103,10 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		let fieldColumns: Array<GridColumnModel> = this.importBatchModel.fieldNameList.map( field => {
 			const column: GridColumnModel = new GridColumnModel();
 			column.label = field;
-			column.property = `currentValues.${field}`;
+			column.properties = ['currentValues', field];
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
+			column.type = 'dynamicValue';
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
