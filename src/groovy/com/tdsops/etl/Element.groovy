@@ -156,15 +156,34 @@ class Element implements RangeChecker {
 	 *      load ... transformation with take(n, m)
 	 * <code>
 	 * This method also validate the range that is trying to be taken.
-	 * @param take
-	 * @param position starting in 1
+	 * @param params List of parameters that SHOULD contain the position (starting in 1) and the characters to Take from the String
 	 * @return the element instance that received this command
 	 */
-	Element middle(int position, int take) {
+	Element middle(Integer...params) {
 		value = transformStringObject('middle', value) {
+
+			if ( params.size() != 2 ) {
+				throw ETLProcessorException.invalidRange('The middle transformation requires two parameters (startAt, numOfChars)')
+			}
+
+			int position = params[0]
+			int take = params[1]
+
+			if ( position <=0 || take <= 0 ) {
+				throw ETLProcessorException.invalidRange('Must use positive values greater than 0 for "middle" transform function')
+			}
+
+			int size = value.size()
+			if ( position > size ) {
+				return ""
+			}
+
 			int start = (position - 1)
 			int to = (start + take - 1)
-			subListRangeCheck(start, to, value.size())
+			if ( to >= size ) {
+				to = size - 1
+			}
+			subListRangeCheck(start, to, size)
 			it[start..to]
 		}
 		return this
