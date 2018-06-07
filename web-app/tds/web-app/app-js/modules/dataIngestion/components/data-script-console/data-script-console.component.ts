@@ -1,45 +1,41 @@
 import {AfterViewInit, Component, Inject} from '@angular/core';
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 import {ScriptConsoleSettingsModel} from '../../model/script-result.models';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 declare var jQuery: any;
 const DIALOG_ID = '#viewConsole';
-const TEXT_AREA_LOG_ID = '#textAreaLog';
 
 @Component({
 	selector: 'data-script-console',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-console/data-script-console.component.html'
 })
 export class DataScriptConsoleComponent extends UIExtraDialog implements AfterViewInit {
-
-	private dialogInstance: any;
-	private textAreaInstance: any;
-
-	constructor(private consoleSettings: ScriptConsoleSettingsModel) {
+	public isWindowMaximized = false;
+	public initialWindowStyle = null;
+	public modalOptions: DecoratorOptions;
+	constructor(public consoleSettings: ScriptConsoleSettingsModel) {
 		super(DIALOG_ID);
+		this.modalOptions = { isFullScreen: true, isResizable: true };
 	}
 
 	ngAfterViewInit(): void {
-		this.dialogInstance = jQuery(DIALOG_ID);
-		this.textAreaInstance = jQuery(TEXT_AREA_LOG_ID);
-		// fix to resize modal on textarea resize
-		this.textAreaInstance.resizable({
-			resize: function (event) {
-				let modalDialogInstance = jQuery('#console-modal-dialog');
-				modalDialogInstance.css('width', event.target.offsetWidth);
-			}
-		});
+		console.log('after view init');
 	}
 
 	/**
 	 * On close dialog store position/size settings.
 	 */
 	protected cancelCloseDialog(): void {
-		this.consoleSettings.top = this.dialogInstance.css('top');
-		this.consoleSettings.left = this.dialogInstance.css('left');
-		this.consoleSettings.height = this.textAreaInstance.css('height');
-		this.consoleSettings.width = this.textAreaInstance.css('width');
 		this.dismiss();
+	}
+
+	protected maximizeWindow() {
+		this.isWindowMaximized = true;
+	}
+
+	protected restoreWindow() {
+		this.isWindowMaximized = false;
 	}
 
 }

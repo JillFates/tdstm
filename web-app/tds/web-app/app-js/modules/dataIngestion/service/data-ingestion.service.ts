@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
+import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
@@ -20,10 +20,6 @@ import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
-const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
-const DATA_SCRIPT_SIZE_DEFAULT_WIDTH = 580;
-const DATA_SCRIPT_SIZE_DEFAULT_HEIGHT = 680;
-const UNITS_SIZE_SEPARATOR = 'x';
 export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
 export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 
@@ -669,22 +665,6 @@ export class DataIngestionService {
 	}
 	private getUserPreference(preferenceName: string): Observable<any> {
 		return this.preferenceService.getPreference(preferenceName);
-	}
-
-	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
-		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
-			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
-			.map((size: string) => {
-				let measure: string[] = (size || '').split(UNITS_SIZE_SEPARATOR);
-				let	width = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_WIDTH;
-				let height = Number(measure.length &&  measure.shift()) || DATA_SCRIPT_SIZE_DEFAULT_HEIGHT;
-				return { width, height };
-			})
-			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
-	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
-		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
 
 	/**
