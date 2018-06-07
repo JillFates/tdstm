@@ -1,10 +1,19 @@
 package com.tdsops.etl
 
-import com.tds.asset.*
-import com.tdsops.etl.*
+import com.tds.asset.Application
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 
@@ -352,6 +361,110 @@ class ETLJSONSpec extends ETLBaseSpec {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
+
+				with(data[1].fields.appVendor) {
+					originalValue == 'Mozilla'
+					value == 'Mozilla'
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read JSONObject fields iterating rows for a JSON DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"applications": [ 
+						{
+							"application id":152254,
+							"vendor name": {
+								"value": "Microsoft"
+							},
+							"location": "ACME Data Center"
+						},
+						{
+							"application id":152255,
+							"vendor name": {
+								"value": "Mozilla"
+							},
+							"technology":"NGM",
+							"location":"ACME Data Center"
+						}
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						rootNode 'applications'
+						read labels
+						iterate {
+							domain Application
+							extract 'vendor name' load 'Vendor'
+						}
+						""".stripIndent())
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.resultsMap().domains.size() == 1
+
+		and: 'Results contains values'
+			with(etlProcessor.resultsMap().domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0].fields.appVendor) {
+					originalValue == 'Microsoft'
+					value == 'Microsoft'
+				}
+
+				with(data[1].fields.appVendor) {
+					originalValue == 'Mozilla'
+					value == 'Mozilla'
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						rootNode 'applications'
+						read labels
+						skip 1
+						iterate {
+							domain Application
+							extract 'vendor name' load 'Vendor'
+						}
+						""".stripIndent())
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.resultsMap().domains.size() == 1
+
+		and: 'Results contains values'
+			with(etlProcessor.resultsMap().domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 1
 
 				with(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
