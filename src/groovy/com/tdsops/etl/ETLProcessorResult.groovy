@@ -343,7 +343,7 @@ class RowResult {
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldResult fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition.name)
 		fieldData.addFoundElement(foundElement)
 	}
 
@@ -537,4 +537,16 @@ class FindResult {
 class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
+
+
+	@Override
+	String toString() {
+		return "QueryResult{"
+			.concat( "domain=")
+			.concat(domain)
+			.concat(", kv=")
+			.concat(kv.toString())
+			.concat('}')
+
+	}
 }

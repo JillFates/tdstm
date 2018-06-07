@@ -42,7 +42,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
 	 */
-	@HasPermission(Permission.RackCreate)
+	@HasPermission(Permission.RackView)
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return

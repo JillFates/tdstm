@@ -111,9 +111,25 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Incorrect whenFound command. Use whenFound $fieldName update { .... }".toString())
     }
 
+    static ETLProcessorException whenNotFoundCommandWithoutCurrentFindElement(String fieldName) {
+        new ETLProcessorException("Incorrect used: whenNotFound for field '$fieldName'. It must have defined a find command previously")
+    }
+
+    static ETLProcessorException whenFoundCommandWithoutCurrentFindElement(String fieldName) {
+        new ETLProcessorException("Incorrect used: whenFound for field '$fieldName'. It must have defined a find command previously")
+    }
+
     static ETLProcessorException invalidWhenNotFoundCommand(String fieldName) {
         new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }".toString())
     }
+
+	static ETLProcessorException incorrectFoundUseWithoutAssetClass() {
+		new ETLProcessorException("Incorrect whenFound/whenNotFound command. It must define 'assetClass' first.")
+	}
+
+	static ETLProcessorException incorrectFoundUseWithoutArgValue(String fieldName) {
+		new ETLProcessorException("Incorrect whenFound/whenNotFound command: $fieldName must be defined using arguments.")
+	}
 
     static ETLProcessorException incorrectDomain (ETLDomain domain) {
         new ETLProcessorException("Cannot create a query for domain ${domain.name()}".toString())
@@ -128,7 +144,7 @@ class ETLProcessorException extends GroovyRuntimeException {
 	}
 
     static ETLProcessorException invalidIgnoreCommand () {
-        new ETLProcessorException('You cannot use ignore rows in an empty results')
+        new ETLProcessorException('You cannot use ignore records in an empty results')
     }
 
     static ETLProcessorException invalidSheetCommand () {

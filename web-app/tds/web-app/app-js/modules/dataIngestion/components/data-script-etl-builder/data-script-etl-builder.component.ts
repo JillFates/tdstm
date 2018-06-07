@@ -28,6 +28,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	@ViewChild('resizableForm') resizableForm: ElementRef;
 	private width = 0;
 	private height = 0;
+	private GRID_HEIGHT = 532;
 	private collapsed = {
 		code: true,
 		sample: false,
@@ -96,7 +97,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.testScriptProgress.progressKey = result.data.progressKey;
-				this.setTestScriptProgressInterval();
+				this.setProgressLoop();
 			} else {
 				this.operationStatus.test.state = CHECK_ACTION.INVALID;
 			}
@@ -104,27 +105,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Clears out the Test Script interval loop.
+	 * Initializes the Progress loop.
 	 */
-	private clearTestScriptProgressInterval(): void {
-		clearInterval(this.testScripInterval);
+	private setProgressLoop(): void {
+		this.testScriptProgress.currentProgress = 0;
+		this.progressLoop();
 	}
 
 	/**
-	 * Creates an interval loop to retreive Test Script current progress.
+	 * Progress loop, this function is called recursively until the progress finish.
 	 */
-	private setTestScriptProgressInterval(): void {
-		this.testScriptProgress.currentProgress = 1;
-
-		this.testScripInterval = setInterval(() => {
-			this.getTestScriptProgress();
-		}, PROGRESSBAR_INTERVAL_TIME);
-	}
-
-	/**
-	 * Operation of the Test Script interval that will be executed n times in a loop.
-	 */
-	private getTestScriptProgress(): void {
+	private progressLoop(): void {
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
@@ -135,8 +126,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.detail;
-					this.clearTestScriptProgressInterval();
-				// On Success
+					// On Success
 				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
 						let scripTestFilename = response.data.detail;
@@ -148,9 +138,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 								this.scriptTestResult.domains = result.domains;
 							});
 					}, 500);
-					this.clearTestScriptProgressInterval();
+				} else {
+					setTimeout(() => {
+						this.progressLoop();
+					}, 2000)
 				}
-		});
+			});
 	}
 
 	/**
@@ -330,4 +323,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.isWindowMaximized = false;
 	}
 
+	/**
+	 * Based on data rows of sample data set the grid height
+	 */
+	private setGridHeight() {
+		if (this.sampleDataModel.data && this.sampleDataModel.data.length) {
+			this.sampleDataModel.gridHeight = parseInt(this.resizableForm.nativeElement.style.height, 10)  - this.GRID_HEIGHT;
+			this.resizableForm.nativeElement.style.minHeight = this.resizableForm.nativeElement.style.height
+		} else {
+			this.resizableForm.nativeElement.style.minHeight = '';
+		}
+	}
 }

@@ -1,7 +1,7 @@
 /**
  * Enable full screen and resizable capabilities to modal windows
  */
-import {Directive, AfterViewInit, ElementRef, Renderer2, Input } from '@angular/core';
+import {Directive, AfterViewInit, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
 import { DecoratorOptions, WindowSettings } from '../model/ui-modal-decorator.model';
 
 declare var jQuery: any;
@@ -17,6 +17,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	private decoratorOptions: DecoratorOptions;
 	private initialWindowSettings: WindowSettings;
 	private parentModal: any;
+	@Output() resizeEvent = new EventEmitter<string>();
 
 	@Input()
 	set isWindowMaximized(isWindowMaximized: boolean) {
@@ -38,6 +39,11 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	constructor(private el: ElementRef, private renderer: Renderer2) {}
 
 	ngAfterViewInit() {
+		// On resize the windows, recalculate the center position
+		jQuery(window).resize(() => {
+			this.centerWindow();
+		});
+
 		// hide host while setup is executing
 		this.renderer.setStyle(this.el.nativeElement, 'visibility', 'hidden');
 		// we need to delay because the bootstrap effect displaying modals
@@ -147,6 +153,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		if (this.options.isResizable) {
 			this.enableResizable(false);
 		}
+		this.resizeEvent.emit('maximize');
 
 		return;
 	}
@@ -169,6 +176,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 			this.enableResizable(true);
 		}
 
+		this.resizeEvent.emit('restore');
 		return;
 	}
 	/**

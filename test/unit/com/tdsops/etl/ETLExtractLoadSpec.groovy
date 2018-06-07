@@ -36,7 +36,7 @@ import spock.lang.Shared
  *     <li><b>extract</b></li>
  *     <li><b>load</b></li>
  *     <li><b>read labels</b></li>
- *     <li><b>ignore row</b></li>
+ *     <li><b>ignore record</b></li>
  * </ul>
  */
 @TestFor(FileSystemService)
@@ -1511,7 +1511,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'vendor name' load 'appVendor'
 
 					if (!SOURCE.'vendor name'.startsWith('Mi')){
-						ignore row
+						ignore record
 					} else {
 						domain Device
 						extract 'application id' load 'id'
@@ -1579,14 +1579,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'vendor name' load 'appVendor'
 
 					if (!SOURCE.'vendor name'.startsWith('Mi')){
-						ignore row
+						ignore record
 					} else {
 						domain Device
 						extract 'application id' load 'id'
 						extract 'technology' load 'Name'
 
 						if(DOMAIN.assetName.contains('updated')){
-							ignore row
+							ignore record
 						} else {
 							domain Database
 							extract 'application id' load 'id'
@@ -1643,7 +1643,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				read labels
 				iterate {
-					ignore row
+					ignore record
 				}
 			""".stripIndent())
 
@@ -1668,7 +1668,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'technology'
 					if( CE == 'NGM') {
-						ignore row
+						ignore record
 					} else {
 						load 'Name' with CE
 					}
@@ -1686,7 +1686,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can ignore rows without loading values previously'() {
+	void 'test can ignore records without loading values previously'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1702,7 +1702,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'technology'
 					if( CE != 'NGM') {
-						ignore row
+						ignore record
 					} else {
 						load 'Name' with CE
 					}
@@ -1720,7 +1720,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can ignore rows in the middle of a data set'() {
+	void 'test can ignore records in the middle of a data set'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1740,7 +1740,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'model name' transform with lowercase() load 'Name'
 
 					if( SOURCE.'device id'.startsWith('152253') ){
-						ignore row
+						ignore record
 					}
 
 				}

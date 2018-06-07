@@ -1,16 +1,13 @@
-<div class="modal-content">
+<div class="modal-content" tabIndex="0">
     <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close" tds-autofocus>
             <span aria-hidden="true">×</span>
         </button>
         <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
     </div>
     <div class="modal-body" style="height: 100%; overflow: auto;">
         <div class="modal-body-container">
-
-            <!--
-                Batch Records Grid
-            -->
+            <!-- Batch Records Grid -->
             <section>
                 <div class="box-body box-with-empty-header tds-kendo-grid">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
