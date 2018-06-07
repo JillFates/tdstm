@@ -10,7 +10,7 @@ import {
 } from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -26,9 +26,6 @@ import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	@ViewChild('resizableForm') resizableForm: ElementRef;
-	private width = 0;
-	private height = 0;
-	private GRID_HEIGHT = 532;
 	private collapsed = {
 		code: true,
 		sample: false,
@@ -68,8 +65,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dataIngestionService: DataIngestionService,
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
-		private promptService: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private promptService: UIPromptService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
 		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };

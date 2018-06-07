@@ -50,8 +50,10 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 
 	ngAfterViewInit() {
 		// On resize the windows, recalculate the center position
-		jQuery(window).resize(() => {
-			this.centerWindow();
+		jQuery(window).resize((event) => {
+			if (event.target === window) {
+				this.centerWindow();
+			}
 		});
 
 		// hide host while setup is executing
@@ -61,7 +63,6 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 			this.getWindowSize()
 				.subscribe((size: {width: number, height: number}) => {
 					if (size) {
-						// show host when setup is done
 						this.renderer.setStyle(this.el.nativeElement, 'width', this.toPixels(size.width));
 						this.renderer.setStyle(this.el.nativeElement, 'height', this.toPixels(size.height));
 					}
