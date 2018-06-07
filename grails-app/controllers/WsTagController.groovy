@@ -53,6 +53,7 @@ class WsTagController implements ControllerMethods {
 			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(updatedTag)))
 			return
 		}
+
 		Tag tag = tagService.get(id)
 
 		if (!tag) {

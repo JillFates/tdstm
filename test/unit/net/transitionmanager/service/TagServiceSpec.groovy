@@ -39,7 +39,10 @@ class TagServiceSpec extends Specification {
 			guid: StringUtil.generateGuid()
 		).save(flush: true, failOnError: true)
 
-		service.securityService = [getUserCurrentProject: { -> project }] as SecurityService
+		service.securityService = [
+			getUserCurrentProject: { -> project },
+			assertCurrentProject : { Project project -> }
+		] as SecurityService
 	}
 
 	void 'Test create'() {

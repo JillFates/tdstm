@@ -201,7 +201,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list()
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
@@ -212,7 +212,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].LastModified == now
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue
+			results[1].Color == Color.Blue.name()
 			results[1].css == Color.Blue.css
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
@@ -228,7 +228,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('grouping assets')
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
@@ -244,7 +244,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('group')
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
@@ -268,7 +268,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('', 'Another description')
 		then: 'We get a list of map results'
 			results[0].id == tag2.id
-			results[0].Color == Color.Blue
+			results[0].Color == Color.Blue.name()
 			results[0].css == Color.Blue.css
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
@@ -284,7 +284,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('', 'Anot')
 		then: 'We get a list of map results'
 			results[0].id == tag2.id
-			results[0].Color == Color.Blue
+			results[0].Color == Color.Blue.name()
 			results[0].css == Color.Blue.css
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
@@ -308,7 +308,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('', '', now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
@@ -319,7 +319,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].LastModified == now
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue
+			results[1].Color == Color.Blue.name()
 			results[1].css == Color.Blue.css
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
@@ -342,7 +342,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('', '', null, now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
@@ -353,7 +353,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].LastModified == now
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue
+			results[1].Color == Color.Blue.name()
 			results[1].css == Color.Blue.css
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
@@ -377,7 +377,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			List results = tagService.list('group', 'this is', now, now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
-			results[0].Color == Color.Black
+			results[0].Color == Color.Black.name()
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
