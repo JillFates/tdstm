@@ -135,7 +135,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				}
 			});
 	}
-
 	/**
 	 * On Check Script Syntax button.
 	 */
