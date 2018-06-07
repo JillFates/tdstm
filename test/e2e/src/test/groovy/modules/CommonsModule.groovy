@@ -24,6 +24,7 @@ class CommonsModule extends Module {
             // nothing to do here, in case server manage fast the page information
             // and the loader icon is not detected, just prevent test fails
         }
+
     }
 
     def waitForGlobalProgressBarModal(){
