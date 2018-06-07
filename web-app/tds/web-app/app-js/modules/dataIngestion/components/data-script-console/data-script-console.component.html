@@ -7,18 +7,21 @@
 		     [style.width.px]="consoleSettings.width"
 		     [style.height.px]="consoleSettings.height">
 			<div class="modal-header">
-				<button id="btnCloseDialog" (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close" title="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-
-				<button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
-					<span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
-				</button>
-
-				<button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
-					<span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
-				</button>
 				<h4 class="modal-title">{{'DATA_INGESTION.DATASCRIPT.DESIGNER.CONSOLE_TITLE'|translate}}</h4>
+
+				<div class="tool-box">
+					<button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
+						<span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
+					</button>
+
+					<button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
+						<span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
+					</button>
+
+					<button id="btnCloseDialog" (click)="cancelCloseDialog()" type="button" class="close-screen" aria-label="Close" title="Close">
+						<span class="glyphicon glyphicon-remove" title="Close"></span>
+					</button>
+				</div>
 			</div>
 			<div class="modal-body">
 				<textarea id="textAreaLog" class="form-control console"
