@@ -1672,8 +1672,7 @@ class DataImportService implements ServiceMethods {
 	 * @return true if binding did not encounter any errors
 	 */
 	private Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
-
-		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values + the create and update blocks
+		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
 		Boolean noErrorsEncountered = true
 		Set<String> fieldNames = fieldsInfo.keySet()
 		if (fieldsToIgnore == null) {
@@ -1690,11 +1689,19 @@ class DataImportService implements ServiceMethods {
 		Map fieldsValues = [:]
 		for (fieldName in fieldNames) {
 			Boolean isReference = GormUtil.isReferenceProperty(domain, fieldName)
-
-			def newValue = fieldsInfo[fieldName].value
 			def domainValue = domain[fieldName]
-			def initValue = fieldsInfo[fieldName].init
-			boolean hasInitializeValue = (initValue != null)
+
+			// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
+			// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
+			// extra test.  See ticket TM-10981.
+			def initValue = fieldsInfo[fieldName]['init']
+			def newValue = fieldsInfo[fieldName].value
+			boolean hasInitializeValue = !(initValue instanceof groovy.json.internal.LazyMap) && (initValue != null)
+			boolean newValueIsSet = (newValue != null) && ! (newValue instanceof groovy.json.internal.LazyMap)
+
+			// log.debug 'bindFieldsInfoValuesToEntity() fieldName {} isReference {}, newValue {}, domainValue {}, initValue {}, hasInitializeValue {}',
+			// 	fieldName, isReference, newValue, domainValue, initValue, hasInitializeValue
+			// log.debug 'bindFieldsInfoValuesToEntity() initValue isa {} and value of {}', initValue.getClass().getName(), initValue
 
 			if (hasInitializeValue) {
 				if (isReference) {
@@ -1702,7 +1709,6 @@ class DataImportService implements ServiceMethods {
 					addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "The 'initialize' command is not supported for identifier or reference properties ($fieldName)")
 					continue
 				}
-
 				if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
 					fieldsValues.put(fieldName, initValue)
 				}
@@ -1714,7 +1720,7 @@ class DataImportService implements ServiceMethods {
 					// TODO : JPM 4/2018 : Implement data type checking (use Grails BINDING logic to address ENUM, Date, etc)
 					Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
 					if (String == fieldClassType) {
-						if (newValue != null && newValue != domainValue) {
+						if (newValueIsSet && newValue != domainValue) {
 							fieldsValues.put(fieldName, newValue)
 						}
 					} else {
@@ -1723,6 +1729,8 @@ class DataImportService implements ServiceMethods {
 				}
 			}
 		}
+
+		// log.debug 'bindFieldsInfoValuesToEntity() fieldsValues to bind to domain are: {}, fieldsToIgnore are: {}', fieldsValues, fieldsToIgnore
 		GormUtil.bindMapToDomain(domain, fieldsValues, fieldsToIgnore)
 
 		return noErrorsEncountered
