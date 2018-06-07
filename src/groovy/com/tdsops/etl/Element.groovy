@@ -108,7 +108,7 @@ class Element implements RangeChecker {
 			this.init = this.value
 			this.originalValue = null
 			this.value = null
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			processor.addElementInitialized(processor.selectedDomain.domain, this)
 			return this
 		} else {
 			throw ETLProcessorException.domainMustBeSpecified()
