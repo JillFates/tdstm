@@ -152,11 +152,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Some words to be used in an ETL script.
 	 * <b> read labels</b>
 	 * <b> console on/off</b>
-	 * <b> ignore row</b>
+	 * <b> ignore record</b>
 	 * <b> ... transform with ...</b>
 	 */
 	static enum ReservedWord {
-		labels, with, on, off, row, ControlCharacters
+		labels, with, on, off, record, ControlCharacters
 	}
 
 	/**
@@ -288,7 +288,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Aborts processing of the current row for the domain in the context
 	 * <pre>
 	 *   if (SOURCE.Env == 'Development) {
-	 *      ignore row
+	 *      ignore record
 	 *   }
 	 * </pre>
 	 * @param label just a label to detect if the command was used with 'row' label
@@ -296,12 +296,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	ETLProcessor ignore (ReservedWord reservedWord) {
 		validateStack()
-		if(reservedWord == ReservedWord.row){
+		if(reservedWord == ReservedWord.record){
 			if (!hasSelectedDomain()) {
 				throw ETLProcessorException.domainMustBeSpecified()
 			}
 			result.ignoreCurrentRow()
-			debugConsole.info("Ignore row ${currentRowIndex}")
+			debugConsole.info("Ignore record ${currentRowIndex}")
 		} else {
 			// TODO: add validation for invalid use of this command
 		}

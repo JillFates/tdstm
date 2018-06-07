@@ -144,7 +144,7 @@ class ETLProcessorException extends GroovyRuntimeException {
 	}
 
     static ETLProcessorException invalidIgnoreCommand () {
-        new ETLProcessorException('You cannot use ignore rows in an empty results')
+        new ETLProcessorException('You cannot use ignore records in an empty results')
     }
 
     static ETLProcessorException invalidSheetCommand () {
