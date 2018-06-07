@@ -17,7 +17,9 @@ class ETLBinding extends Binding {
                 },
 	            *: ETLProcessor.ReservedWord.values().collectEntries { [(it.name()): it] },
 	            *: ETLDomain.values().collectEntries { [(it.name()): it] },
-                *: vars
+                *: vars,
+				concat: ETLTransformation.&concat,
+				append: ETLTransformation.&append
         ])
     }
 

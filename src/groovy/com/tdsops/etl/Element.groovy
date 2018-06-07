@@ -40,6 +40,11 @@ class Element implements RangeChecker {
 	ETLFieldDefinition fieldDefinition
 
 	/**
+	 * Flag to determine if ETL element was added to the processor elements
+	 */
+	boolean addedToResults = false
+
+	/**
 	 * Transform command on an element with a closure to be executed
 	 * <pre>
 	 *     domain Application
@@ -86,6 +91,7 @@ class Element implements RangeChecker {
 		if(processor.hasSelectedDomain()){
 			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
 			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			addedToResults = true
 			return this
 		} else{
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -430,16 +436,20 @@ class Element implements RangeChecker {
 	 * @param objects
 	 * @return
 	 */
-	Element append(Object... objects) {
-
-		String newValue = objects.sum { object ->
-			if(Element.class.isInstance(object)){
-				((Element)object).value
-			} else{
-				object ? object.toString() : ''
-			}
-		}
-		this.value += newValue
+//	Element append(Object... objects) {
+//
+//		String newValue = objects.sum { object ->
+//			if(Element.class.isInstance(object)){
+//				((Element)object).value
+//			} else{
+//				object ? object.toString() : ''
+//			}
+//		}
+//		this.value += newValue
+//		return this
+//	}
+	Element concat(String separator, Object...values){
+		this.value = ETLTransformation.concat(separator, this.value, values)
 		return this
 	}
 
@@ -468,6 +478,67 @@ class Element implements RangeChecker {
 	 */
 	Element plus(String value) {
 		this.value += value
+		return this
+	}
+
+	/**
+	 * Perform the concatenate process over all values separated by <code>separator</code> provided
+	 * @param separator - value separator
+	 * @param values - list of values to concatenate
+	 *
+	 *
+	 * Examples
+	 * <code>
+	 * extract 'column' transform with concat(separator, value1, [value2, value3, ...]) uppercase()
+	 *
+	 * extract 'column' transform with concat(', ', ipVar)
+	 * extract 'column' transform with concat(', ', DOMAIN.assetName)
+	 * extract 'column' transform with concat(', ', SOURCE.'device id')
+	 *
+	 * load 'IP Address' with concat(', ', ipVar)
+	 * </code>
+	 *
+	 * @return the joined string
+	 */
+//	Element concat(String separator, Object...values){
+//		this.value = ETLTransformation.concat(separator, this.value, values)
+//
+//		if (this.originalValue == null) {
+//			this.originalValue = this.value
+//		}
+//
+//		if (!addedToResults) {
+//			processor.addElementLoaded(processor.selectedDomain.domain, this)
+//			addedToResults = true
+//		}
+//		return this
+//	}
+	Element append(String separator, Object...values){
+		this.value = ETLTransformation.append(separator, this.value, values)
+
+		if (this.originalValue == null) {
+			this.originalValue = this.value
+		}
+
+		if (!addedToResults) {
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			addedToResults = true
+		}
+		return this
+	}
+
+	/**
+	 *
+	 * @param value
+	 * @return
+	 */
+	Element with(Object value) {
+		this.value = ETLValueHelper.valueOf(value)
+		this.originalValue = ETLValueHelper.valueOf(value)
+
+		processor.addElementLoaded(processor.selectedDomain.domain, this)
+		addedToResults = true
+
 		return this
 	}
 

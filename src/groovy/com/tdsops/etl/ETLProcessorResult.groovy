@@ -166,7 +166,7 @@ class ETLProcessorResult {
 	 * @see RowResult
 	 * @see ETLProcessorResult#resultIndex
 	 */
-	private RowResult currentRow(){
+	RowResult currentRow(){
 		return reference.data[resultIndex]
 	}
 

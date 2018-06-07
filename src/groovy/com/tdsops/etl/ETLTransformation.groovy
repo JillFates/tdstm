@@ -1,5 +1,10 @@
 package com.tdsops.etl
 
+import com.tdsops.common.lang.CollectionUtils
+import com.tdssrc.grails.StringUtil
+
+import java.lang.reflect.Array
+
 /**
  *
  * Creates a transformation for an element withing the ETL Script.
@@ -8,6 +13,7 @@ package com.tdsops.etl
  *
  */
 abstract class ETLTransformation {
+    private final static String DEFAULT_SEPARATOR = ', '
 
     Closure<Element> closure
     /**
@@ -27,4 +33,31 @@ abstract class ETLTransformation {
         element
     }
 
+    /**
+     * Perform the concatenate process over all values separated by <code>separator</code> provided
+     * @param separator - value separator
+     * @param values - list of values to concatenate
+     * @return the joined string
+     */
+    static String concat(String separator, Object...values) {
+        def toJoin = values.findAll{ StringUtil.isNotBlank(it as String) && (it as String) != '[]'  }
+
+        return toJoin.collect {
+            if (it.getClass().isArray()) {
+                return concat(separator, it)
+            } else {
+                ETLValueHelper.valueOf(it)
+            }
+        }.join(StringUtil.defaultIfEmpty(separator, DEFAULT_SEPARATOR))
+    }
+
+    /**
+     *
+     * @param separator
+     * @param values
+     * @return
+     */
+    static String append(String separator, Object...values) {
+        return concat(separator, values)
+    }
 }
