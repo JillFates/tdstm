@@ -63,7 +63,7 @@ class AssetViewsPage extends Page{
     }
 
     def getFavCounter(){
-        favViewsCounter.text().toInteger()
+        waitFor{favViewsCounter.text().toInteger()}
     }
     def validateValueIncrement(int initial, int incremented){
         initial+1==incremented
@@ -74,10 +74,11 @@ class AssetViewsPage extends Page{
      */
     def getFavLimitPopUp(){
         while ((getFavCounter()<favLimit)){
-            waitFor{allViewsModule.favRandomFavs()}
+           allViewsModule.favRandomFavs()
         }
-        waitFor{allViewsModule.favRandomFavs()}
-        return true
+        allViewsModule.setFirstNonFavViewAsFav()
+        favLimitPopUpIsPresent()
+        favViewsCounter.text().toInteger()==favLimit
     }
 
     def favLimitPopUpIsPresent(){

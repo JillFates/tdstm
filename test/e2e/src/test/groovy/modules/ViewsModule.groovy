@@ -2,7 +2,6 @@ package modules
 
 import geb.Module
 import utils.CommonActions
-import org.openqa.selenium.Keys
 
 class ViewsModule extends Module {
 
@@ -64,8 +63,8 @@ class ViewsModule extends Module {
      * returns false if a void star is displayed.
      */
     def noVoidStarsAreDisplayed(){
-        common.waitForLoader()
-        !voidStars.displayed
+        waitFor{!voidStars.displayed}
+
     }
     /**
      * Shared views will have a tick on the "Shared" column
@@ -134,8 +133,7 @@ class ViewsModule extends Module {
     }
 
     def getNumberOfRows(){
-        common.waitForLoader()
-        viewsListed.size()
+        waitFor{viewsListed.size()}
     }
 
     def openViewByName(name){
@@ -156,12 +154,11 @@ class ViewsModule extends Module {
     }
 
     def createdDateNotEmpty(){
-        common.waitForLoader()
-        vwGridRows.findAll { it.find{"td[4]"}.text()!="" }
+
+        waitFor{vwGridRows.findAll { it.find{"td[4]"}.text()!="" }}
     }
 
     def setFirstNonFavViewAsFav(){
-        common.waitForLoader()
         waitFor{voidStars[0].click()}
 
     }
@@ -185,19 +182,17 @@ class ViewsModule extends Module {
     }
 
     def unFavRandomFavs(){
-        def willUnFav =Math.abs(new Random().nextInt() % 9)+1
         def initializeCommonActions = new CommonActions()
-        for (int i=0;i<willUnFav; i++){
-            common.waitForLoader()
-            waitFor{initializeCommonActions.getRandomOption(yellowStars).click()}
-
+        def stars=initializeCommonActions.getRandomOptions(yellowStars,3)
+        stars.each{star -> waitFor{initializeCommonActions.getRandomOption(yellowStars).click()}
+            common.waitForLoader(2)
         }
     }
 
     def favRandomFavs(){
         def initializeCommonActions = new CommonActions()
-        common.waitForLoader()
         waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
-
+        common.waitForLoader(3)
     }
+
 }

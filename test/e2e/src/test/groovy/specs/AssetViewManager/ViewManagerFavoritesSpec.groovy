@@ -21,6 +21,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static randStr =  RandomString.getInstance().randomAlphaNumeric(6)
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
+    static minimumNumberOfRows =11
 
 
     def setupSpec() {
@@ -36,9 +37,9 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
          * this spec.
          */
         int rowCount= allViewsModule.getNumberOfRows()
-        if (rowCount<11) {
+        if (rowCount<minimumNumberOfRows) {
             int i=0
-            while (i < (11-rowCount)) {
+            while (i < (minimumNumberOfRows-rowCount)) {
                 allViewsModule.getNumberOfRows()
                 waitFor { allViewsModule.clickCreateView() }
                 waitFor { createViewModule.selectApplication() }
@@ -59,14 +60,12 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
         testKey = "TM-10911"
         given: "User is in Asset Views Page"
             at AssetViewsPage
-        when: "User adds more than 10 total fav views"
+        when: "User gets the max Favs popup"
             //Count existing number of fav views if any
             //add fav views until number reaches ten,
             getFavLimitPopUp()
             // next addition shuoild display the pop up
-        then: "User sees a pop up"
-            favLimitPopUpIsPresent()
-        and: "The pop up states that the maximum number of Fav views has been reached"
+        then: "The message is as expected"
             favLimitPopUpTextIsAsExpected()
     }
 
@@ -75,23 +74,23 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
         given: "User is in Asset Views Page and the limit pop up is displayed"
             at AssetViewsPage
             favLimitPopUpIsPresent()
+            allViewsModule.validateNumberOfStarredViews(10)
         when: "User closes the pop up"
             closeFavLimitPopUp()
         then: "Ten views are starred"
             allViewsModule.validateNumberOfStarredViews(10)
     }
+
     def "3. Reducing the number of favorites and increasing it will again cause the pop up to display"() {
         testKey = "TM-10911"
         given: "User is in Asset Views Page and there are ten favorite views"
             at AssetViewsPage
-            allViewsModule.validateNumberOfStarredViews(10)
         when: "The user decreases and again adds favorite views"
             allViewsModule.unFavRandomFavs()
             getFavLimitPopUp()
         then: "The pop up is displayed once more"
             waitFor{favLimitPopUpIsPresent()}
     }
-
 
     def "4. Validate User can reach Favorite Views"() {
         testKey = "TM-8503"
@@ -149,5 +148,4 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             waitFor {goToFavourites()}
             waitFor{allViewsModule.validateRowNames(favView, true)}
     }
-
 }
