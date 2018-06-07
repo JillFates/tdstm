@@ -134,6 +134,9 @@ class TagService {
 	 * @return The updated tag
 	 */
 	Tag update(Tag tag, String name = null, String description = null, Color color = null) {
+
+		securityService.assertCurrentProject(tag.project)
+
 		if (name) {
 			tag.name = name
 		}
@@ -155,6 +158,7 @@ class TagService {
 	 * @param tag the tag to delete.
 	 */
 	void delete(Tag tag) {
+		securityService.assertCurrentProject(tag.project)
 		tag?.delete()
 	}
 }
