@@ -34,6 +34,21 @@ class ETLFindElement implements ETLStackableCommand{
 	 * A sequence of find/elseFind commands are associated to a ETLDomain value
 	 */
 	ETLDomain currentDomain
+
+	/**
+	 * Indicates the main (intended) ETLDomain that will be used by the whenFound or whenNotFound when updating
+	 * the database as well as validating the property names in those commands. The domain is extracted from the
+	 * find command. In the following script, mainSelectedDomain would be set to ETLDomain.Application.
+	 *
+	 * <pre>
+	 *  find Application ..... into 'id'
+	 *  elseFind Asset ....... into 'id'
+	 * </pre>
+	 *
+	 * @return an instance of ETLDomain class
+	 */
+	ETLDomain mainSelectedDomain
+
 	/**
 	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
 	 */
@@ -149,7 +164,7 @@ class ETLFindElement implements ETLStackableCommand{
 			objects: [],
 			matchOn: null
 		]
-		
+
 		if (currentFind.objects && !currentFind.objects.isEmpty()){
 			results.objects = currentFind.objects
 			results.matchOn = findings.size()
@@ -211,6 +226,12 @@ class ETLFindElement implements ETLStackableCommand{
 		processor.validateDomainPropertyAsReference(property)
 	}
 
+	/**
+	 * Defines the current domain instance in find list results.
+	 * It also defines mainSelectedDomain
+	 * @param domain an instance or ETLDomain used to set the current domain
+	 * @see ETLFindElement#mainSelectedDomain
+	 */
 	private void setCurrentDomain(ETLDomain domain) {
 		currentDomain = domain
 		currentFind = [
@@ -219,6 +240,9 @@ class ETLFindElement implements ETLStackableCommand{
 			values: [],
 			queryParams: [:]
 		]
+		if(!mainSelectedDomain){
+			mainSelectedDomain = domain
+		}
 	}
 
 	/**

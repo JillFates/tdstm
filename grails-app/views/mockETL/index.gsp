@@ -139,6 +139,16 @@
                                                 <b>Results:</b>
                                                 ${row.fields[fieldName]?.find?.results}
                                             </g:if>
+
+                                            <g:if test="${(row.fields[fieldName]?.create)}">
+                                                <b>Create:</b>
+                                                ${row.fields[fieldName]?.create}
+                                            </g:if>
+                                            <g:if test="${(row.fields[fieldName]?.update)}">
+                                                <b>Update:</b>
+                                                ${row.fields[fieldName]?.update}
+                                            </g:if>
+
                                         </td>
                                     </g:each>
                                 </tr>

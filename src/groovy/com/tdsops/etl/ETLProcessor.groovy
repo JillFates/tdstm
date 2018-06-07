@@ -716,7 +716,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		if(!currentFindElement){
 			throw ETLProcessorException.whenNotFoundCommandWithoutCurrentFindElement(fieldName)
 		}
-		return new WhenNotFoundElement(fieldName, this)
+		return new WhenNotFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
 	}
 
 	/**
@@ -734,7 +734,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		if(!currentFindElement){
 			throw ETLProcessorException.whenFoundCommandWithoutCurrentFindElement(fieldName)
 		}
-		return new WhenFoundElement(fieldName, this)
+		return new WhenFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
 	}
 
 	/**

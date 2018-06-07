@@ -148,7 +148,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenNotFound 'asset' create {
-    							assetClass Device
     							assetName primaryNameVar
     							assetType primaryTypeVar
     							"Modified Date" NOW
@@ -195,7 +194,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						}
 
 						// whenNotFound create command assertions
-						create.assetClass == ETLDomain.Device.name()
 						create.assetName == 'ACMEVMPROD01'
 						create.assetType == 'VM'
 						!!create.lastUpdated
@@ -272,7 +270,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						
     						whenNotFound 'asset' update {
-    							assetClass Application
     							assetName primaryNameVar
     							assetType primaryTypeVar
     							"SN Last Seen" NOW
@@ -433,7 +430,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenFound 'asset' update {
-    						    assetClass Device
     							"Modified Date" NOW
     						}
 						}
@@ -482,85 +478,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 					}
 				}
 			}
-
-		cleanup:
-			if(fileName){
-				service.deleteTemporaryFile(fileName)
-			}
-	}
-
-	void 'test can throw an Exception if whenFound command does not define an assetClass'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
-
-		and:
-			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
-							
-							extract 'AssetDependencyId' load 'id'
-    						extract 'AssetId' load 'asset'
-							extract 'AssetName' set primaryNameVar
-							extract 'AssetType' set primaryTypeVar
-    
-							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, 'primaryType' into 'asset'
-       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
-    						
-    						whenFound 'asset' update {
-    							"Modified Date" NOW
-    						}
-						}
-						""".stripIndent())
-
-		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Incorrect whenFound/whenNotFound command. It must define 'assetClass' first."
 
 		cleanup:
 			if(fileName){
@@ -627,7 +544,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
     						whenFound 'asset' create {
-    						    assetClass Device
     							"Modified Date" NOW
     						}
 						}
