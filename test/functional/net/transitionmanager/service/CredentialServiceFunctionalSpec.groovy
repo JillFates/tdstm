@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import spock.lang.Ignore
 import spock.lang.Shared
 import test.helper.CredentialTestHelper
 import test.helper.ProjectTestHelper
@@ -90,6 +91,30 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 			null 			!= authentication
 			'JSESSIONID' 	== authentication.sessionName
 			null 			!= authentication.sessionValue
+	}
+
+	@Ignore
+	// TODO - SL : 06/07 - This test is being ignored because it depends on an external system (test-api-server)
+	def "4. credentialService validate successful authentication using BASIC_AUTH and Test-API-Server as authority"() {
+		given: 'a credential'
+			final String username = 'tm'
+			final String password = 'passwd123'
+			final String basicAuthEndpoint = 'http://localhost:3000/api/global/user_role_inheritance?user_sysid=e87a8ca1db710300590af7fdbf961966'
+			final String sessionName = ''
+			final String validationExpression = 'status code equal "200"'
+			Project project = projectTestHelper.createProject()
+			Provider provider = providerTestHelper.createProvider(project)
+			Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, username,
+					password, basicAuthEndpoint, AuthenticationMethod.BASIC_AUTH,
+					sessionName, AuthenticationRequestMode.BASIC_AUTH, validationExpression)
+
+		when: 'authenticate using provided credentials for a BASIC_AUTH verification'
+			def authentication = credentialService.authenticate(credential)
+
+		then: 'the system must authenticate and return session information as indicated by the session name expression'
+			println authentication
+			null 			!= authentication
+			'OK'	 		== authentication.statusCode
 	}
 
 }
