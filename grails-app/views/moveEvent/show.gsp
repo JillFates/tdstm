@@ -41,7 +41,7 @@
                         </tr>
                         <tr class="prop">
 				            <td class="name">Calculated Type:</td>
-				
+
 				            <td class="valueNW">
 				            	<g:if test="${moveEventInstance.calcMethod != 'L'}">Manual</g:if>
 								<g:else>Linear</g:else>
@@ -69,15 +69,9 @@
 				            <td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estStartTime}" /></td>
 						</tr>
 						<tr class="prop">
-							<td  class="name">API Action "By-Pass":</td>
+							<td  class="name">By-Pass API Actions:</td>
 							<td class="valueNW">
-								%{--<g:if test="${moveEventInstance.apiActionBypass == true}">--}%
-									%{--Enabled--}%
-								%{--</g:if>--}%
-								%{--<g:else>--}%
-									%{--Disabled--}%
-								%{--</g:else>--}%
-								<tds:enabledDisabled value="${moveEventInstance.apiActionBypass}"/>
+								<tds:yesNo value="${moveEventInstance.apiActionBypass}"/>
 							</td>
 						</tr>
                     </tbody>
@@ -105,7 +99,7 @@
      	 var confirmStatus = confirm("Change asset locations to targets? (No undo, please backup prior)")
      	 if(confirmStatus){
 			$("#messageDiv").show();
-			$('#messageDiv').html("Setting assets to Moved, please wait...")			
+			$('#messageDiv').html("Setting assets to Moved, please wait...")
      		jQuery.ajax({
     			url: '../markEventAssetAsMoved',
     			data: {'moveEventId':moveEventId},

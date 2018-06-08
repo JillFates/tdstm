@@ -572,6 +572,20 @@ class CustomTagLib implements InitializingBean {
 		}
 	}
 
+	/**
+	 * Used to render label Yes/No based on true/false value passed
+	 * Example:
+	 * <tds:YesNo value="true"/>  ==> Returns: Yes
+	 * <tds:YesNo value="false"/> ==> Returns: No
+	 */
+	def yesNo = { attrs ->
+		if (attrs.value != null) {
+			out << (attrs.value == true ? 'Yes' : 'No')
+		} else {
+			out << ""
+		}
+	}
+
 	def currentProjectMoveEvents = { attrs ->
 		MoveEvent.findAllByProject(securityService.loadUserCurrentProject())
 	}
