@@ -80,10 +80,10 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * //TODO complete DMC
-	 * @param domain
-	 * @param field
-	 * @param fieldDefinition
+	 * Save in an internal cache a field definitions for a specific field in a particular domain
+	 * @param domain an instance of ETLDomain
+	 * @param field field name or field label
+	 * @param fieldDefinition ETLFieldDefinition instance for the field parameter
 	 */
 	private void saveInCache(ETLDomain domain, String field, ETLFieldDefinition fieldDefinition){
 		if(!fieldsDefinitionCache.containsKey(domain)){
@@ -93,10 +93,10 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * // TODO complete DMC
-	 * @param domain
-	 * @param field
-	 * @return
+	 * Return from an internal cache an instance of ETLFieldDefinition  
+	 * @param domain an instance of ETLDomain
+	 * @param field field name or field label
+	 * @return ETLFieldDefinition instance for the field parameter
 	 */
 	private ETLFieldDefinition getFromCache(ETLDomain domain, String field){
 		return fieldsDefinitionCache[domain][field]
