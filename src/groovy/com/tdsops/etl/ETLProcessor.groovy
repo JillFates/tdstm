@@ -647,7 +647,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 				Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, field))
 				element.init = ETLValueHelper.valueOf(defaultValue)
-				addElementLoaded(selectedDomain.domain, element)
+				addElementInitialized(selectedDomain.domain, element)
 				element
 			}
 		]
@@ -931,9 +931,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-
 		result.loadElement(element)
 		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
+	}
+
+	/**
+	 * Adds a loaded element with using the init value for the current domain in results.
+	 * It also removes CE (currentElement) from script context.
+	 * @param domain
+	 * @param element
+	 */
+	void addElementInitialized(ETLDomain domain, Element element) {
+		result.loadInitializedElement(element)
+		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.init}' to domain ${domain} results"
 	}
 
 	/**
