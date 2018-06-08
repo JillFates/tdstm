@@ -2,13 +2,15 @@ import {Component, Input, OnInit} from '@angular/core';
 
 import {TaskCommentService} from '../../service/task-comment.service';
 import {SingleCommentComponent} from '../single-comment/single-comment.component';
-import {SingleCommentModel} from '../single-comment/single-comment.model';
+import {SingleCommentModel} from '../single-comment/model/single-comment.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ModalType} from '../../../../shared/model/constants';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskCommentColumnsModel} from './model/task-comment-columns.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
+import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {TaskDetailModel} from '../../../taskManager/components/detail/model/task-detail.model';
 
 @Component({
 	selector: `task-comment`,
@@ -102,7 +104,19 @@ export class TaskCommentComponent implements OnInit {
 	 * Open the Comment Detail or Task Detail
 	 * @param comment
 	 */
-	public openComment(comment: any, modalType: ModalType): void {
+	public openTaskComment(comment: any, modalType: ModalType): void {
+		if (comment.commentInstance.taskNumber && comment.commentInstance.taskNumber !== 'null') {
+			this.openTaskDetail(comment, modalType);
+		} else {
+			this.openCommentDetail(comment, modalType);
+		}
+	}
+
+	/**
+	 * Open the Comment Detail
+	 * @param comment
+	 */
+	public openCommentDetail(comment: any, modalType: ModalType): void {
 		let singleCommentModel: SingleCommentModel = {
 			id: comment.commentInstance.id,
 			modal: {
@@ -127,6 +141,28 @@ export class TaskCommentComponent implements OnInit {
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], true, false).then(result => {
 			this.getAllComments();
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	/**
+	 * Open the Task Detail
+	 * @param comment
+	 */
+	public openTaskDetail(comment: any, modalType: ModalType): void {
+		let taskDetailModel: TaskDetailModel = {
+			id: comment.commentInstance.taskNumber,
+			modal: {
+				title: 'Task Detail',
+				type: modalType
+			}
+		};
+
+		this.dialogService.extra(TaskDetailComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		], true, false).then(result => {
+			// this.getAllComments();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

@@ -1,0 +1,30 @@
+<div class="task-detail-component modal fade in" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content resizable" [style.width.px]="500">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="modal-body-container">
+					<form name="taskDetailForm" role="form" data-toggle="validator" #taskDetailForm='ngForm' class="form-horizontal left-alignment">
+						<div class="box-body">
+							<div class="row">
+
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+                <button type="button" (click)="onDelete()" class="btn btn-danger" *ngIf="taskDetailModel.modal.type !== modalType.CREATE"><span class="fa fa-fw fa-trash"></span> Delete</button>
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+					<span class="glyphicon glyphicon-ban-circle"></span>
+					<span>Cancel</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
-import {SingleCommentModel} from '../../assetExplorer/components/single-comment/single-comment.model';
+import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

@@ -1,5 +1,5 @@
 import {Component, HostListener} from '@angular/core';
-import {SingleCommentModel} from './single-comment.model';
+import {SingleCommentModel} from './model/single-comment.model';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
