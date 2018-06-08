@@ -493,7 +493,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
-					extract 'vendor name' load 'appVendor'
+					extract 'vendor name' load 'Vendor'
 				}
 			""".stripIndent())
 
@@ -502,18 +502,27 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor'] as Set
+
+					with(labelMap){
+						appVendor == 'Vendor'
+					}
+
 					data.size() == 2
-					with(data[0]) {
+
+					with(data[0], RowResult) {
 						rowNum == 1
-						with(fields.appVendor) {
+						fields.keySet().size() == 1
+						with(fields.appVendor, FieldResult) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
 						rowNum == 2
-						with(fields.appVendor) {
+						fields.keySet().size() == 1
+						with(fields.appVendor, FieldResult) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 						}

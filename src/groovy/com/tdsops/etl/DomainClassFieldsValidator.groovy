@@ -6,11 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 class DomainClassFieldsValidator implements ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
-	Map<String, ETLFieldDefinition> fieldsDefinitionCache = [:]
-
-	private String cacheKey(ETLDomain domain, String field){
-		return domain.name().concat('.').concat(field)
-	}
+	Map<ETLDomain, Map<String, ETLFieldDefinition>> fieldsDefinitionCache = [:]
 
 	/**
 	 * Add fields specification for an ETLDomain instance
@@ -30,9 +26,8 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	//TODO: rename validate fieldName exists
 	Boolean hasSpecs(ETLDomain domain, String field) {
 
-		String cacheKey = cacheKey(domain, field)
-		if(fieldsDefinitionCache.containsKey(cacheKey)){
-			return fieldsDefinitionCache.get(cacheKey)
+		if(cacheContains(domain, field)){
+			return true
 		}
 
 		if(domain.isAsset()){
@@ -50,9 +45,8 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	 */
 	ETLFieldDefinition lookup(ETLDomain domain, String field) {
 
-		String cacheKey = cacheKey(domain, field)
-		if(fieldsDefinitionCache.containsKey(cacheKey)){
-			return fieldsDefinitionCache.get(cacheKey)
+		if(cacheContains(domain, field)){
+			return getFromCache(domain, field)
 		}
 
 		ETLFieldDefinition fieldDefinition
@@ -70,7 +64,44 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 			fieldDefinition = new ETLFieldDefinition(domainProperty)
 		}
 
-		fieldsDefinitionCache.put(cacheKey, fieldDefinition)
+		saveInCache(domain, field, fieldDefinition)
 		return fieldDefinition
 	}
+
+	/**
+	 * Check if the internal cache for fieldDefinitions contains an entry
+	 * for the ETLDomain instance and a field name/label
+	 * @param domain and instance of ETLDomain
+	 * @param field a String content with a field name or a field label
+	 * @return true if fieldsDefinitionCache contains the pair of ETLDomain + field name/label
+	 */
+	private boolean cacheContains(ETLDomain domain, String field){
+		return fieldsDefinitionCache.containsKey(domain) && fieldsDefinitionCache[domain].containsKey(field)
+	}
+
+	/**
+	 * //TODO complete DMC
+	 * @param domain
+	 * @param field
+	 * @param fieldDefinition
+	 */
+	private void saveInCache(ETLDomain domain, String field, ETLFieldDefinition fieldDefinition){
+		if(!fieldsDefinitionCache.containsKey(domain)){
+			fieldsDefinitionCache.put(domain, [:])
+		}
+		fieldsDefinitionCache[domain].put(field, fieldDefinition)
+	}
+
+	/**
+	 * // TODO complete DMC
+	 * @param domain
+	 * @param field
+	 * @return
+	 */
+	private ETLFieldDefinition getFromCache(ETLDomain domain, String field){
+		return fieldsDefinitionCache[domain][field]
+	}
+
+
+
 }

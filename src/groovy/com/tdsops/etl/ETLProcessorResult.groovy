@@ -262,6 +262,7 @@ class ETLProcessorResult {
 class DomainResult {
 	String domain
 	Set fieldNames = [] as Set
+	Map<String, String> labelMap = [:]
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
