@@ -183,12 +183,14 @@ class ViewsModule extends Module {
 
     def unFavRandomFavs(){
         def initializeCommonActions = new CommonActions()
-        def stars=initializeCommonActions.getRandomOptions(yellowStars,3)
-        stars.each{star -> waitFor{initializeCommonActions.getRandomOption(yellowStars).click()}
+        def favsToBeClicked = 3
+        def count = 1
+        while (count < favsToBeClicked){
+            waitFor{initializeCommonActions.getRandomOption(yellowStars).click()}
             common.waitForLoader(2)
+            count++
         }
     }
-
     def favRandomFavs(){
         def initializeCommonActions = new CommonActions()
         waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
