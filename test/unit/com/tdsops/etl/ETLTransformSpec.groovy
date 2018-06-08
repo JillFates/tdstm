@@ -135,7 +135,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
-		applicationFieldsValidator = new DomainClassFieldsValidator()
+		applicationFieldsValidator = new ETLFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application,
 			buildFieldSpecsFor(AssetClass.APPLICATION))
 

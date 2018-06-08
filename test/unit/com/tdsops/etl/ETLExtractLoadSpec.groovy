@@ -478,7 +478,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load field with an extracted element value after validate fields specs'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -494,6 +494,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domain Application
 				iterate {
 					extract 'vendor name' load 'Vendor'
+					extract 'technology' load 'appTech'
 				}
 			""".stripIndent())
 
@@ -502,29 +503,38 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					fieldNames == ['appVendor'] as Set
-
+					fieldNames == ['appVendor', 'appTech'] as Set
 					with(labelMap){
 						appVendor == 'Vendor'
 					}
 
 					data.size() == 2
-
 					with(data[0], RowResult) {
 						rowNum == 1
-						fields.keySet().size() == 1
+						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
+							init == null
+						}
+						with(fields.appTech, FieldResult) {
+							value == '(xlsx updated)'
+							originalValue == '(xlsx updated)'
+							init == null
 						}
 					}
 
 					with(data[1], RowResult) {
 						rowNum == 2
-						fields.keySet().size() == 1
+						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
+						}
+						with(fields.appTech, FieldResult) {
+							value == 'NGM'
+							originalValue == 'NGM'
+							init == null
 						}
 					}
 				}
@@ -560,6 +570,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'environment'] as Set
+					with(labelMap){
+						assetName == 'Name'
+					}
+
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -609,6 +623,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
+					labelMap == [:]
+
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -660,6 +676,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					with(labelMap){
+						assetName == 'Name'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -727,6 +746,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					with(labelMap){
+						assetName == 'Name'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -793,7 +815,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					labelMap == [:]
 					data.size() == 2
+					labelMap == [:]
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -827,7 +851,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load 'appVendor' load 'description'
+						extract 'vendor name' load 'appVendor' load 'Description'
 					}
 				""".stripIndent())
 
@@ -836,6 +860,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					with(labelMap){
+						description == 'Description'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -875,7 +902,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an ETLProcessorException when try to load without domain definition'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -903,7 +930,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -953,6 +980,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					labelMap == [:]
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -1005,6 +1033,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
+					labelMap == [:]
 					with(data[0]) {
 						rowNum == 1
 						with(fields.assetName) {
@@ -1078,7 +1107,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						domain Application
 						load 'environment' with 'Production'
 						extract 1 load 'id'
-						extract 'vendor name' load 'appVendor'
+						extract 'vendor name' load 'Vendor'
 
 						domain Device
 						extract 1 load 'id'
@@ -1092,7 +1121,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-
+					with(labelMap){
+						appVendor == 'Vendor'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.environment) {
@@ -1388,7 +1419,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1473,7 +1504,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1636,7 +1667,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw and exception when script tries to ignore a row and there isn not a domain already defined'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
