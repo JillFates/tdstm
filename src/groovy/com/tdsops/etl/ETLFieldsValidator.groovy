@@ -93,7 +93,7 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * Return from an internal cache an instance of ETLFieldDefinition  
+	 * Return from an internal cache an instance of ETLFieldDefinition
 	 * @param domain an instance of ETLDomain
 	 * @param field field name or field label
 	 * @return ETLFieldDefinition instance for the field parameter
