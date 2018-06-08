@@ -57,7 +57,7 @@
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}" required/>
                                     <g:hasErrors bean="${moveEventInstance}" field="name">
 						            <div class="errors">
 						                <g:renderErrors bean="${moveEventInstance}" as="list" field="name"/>
