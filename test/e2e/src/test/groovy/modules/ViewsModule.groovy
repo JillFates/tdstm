@@ -37,7 +37,6 @@ class ViewsModule extends Module {
     }
 
     def moduleTitleIsCorrect(String title){
-        common.waitForLoader()
         waitFor{moduleTitle.text()==title}
     }
     def validateAuthor(){
