@@ -406,11 +406,17 @@ class DataImportService implements ServiceMethods {
 					continue
 				}
 
+				// Truncate the original value if necessary
+				def origValue = field.originalValue
+				if ( (origValue instanceof CharSequence) && origValue != null && origValue.size() > 255 ) {
+					origValue = origValue.substring(0,252) + '...'
+				}
+
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
 					assetEntityId: domainId,
-					importValue: field.originalValue,
+					importValue: origValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
 				)
