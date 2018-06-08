@@ -28,6 +28,9 @@ class MoveEvent {
 	String runbookBridge2
 	String videolink
 	String runbookRecipe
+	
+	// API Action "By-Pass" mode feature
+	Boolean apiActionBypass = true
 
 	Date revisedCompletionTime      // Revised Completion Time of the MoveEvent which is only set as an exception
 
@@ -56,6 +59,7 @@ class MoveEvent {
 		runbookStatus nullable: true, inList: ['Pending', 'Draft', 'Final', 'Done']
 		runbookVersion nullable: true
 		videolink nullable: true
+		apiActionBypass nullable: false
 	}
 
 	static mapping = {
@@ -67,6 +71,7 @@ class MoveEvent {
 			revisedCompletionTime sqlType: 'DateTime'
 			runbookRecipe sqlType: 'Text'
 		}
+		apiActionBypass column: 'api_action_bypass'
 	}
 
 	static transients = ['jdbcTemplate']

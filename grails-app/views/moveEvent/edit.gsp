@@ -17,7 +17,7 @@
       	if( !momentObj.isValid()){
           	alert("Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format");
           	returnVal  =  false;
-      	} 
+      	}
       	return returnVal;
       }
       function validateDates(){
@@ -26,7 +26,7 @@
           var completionTime = $("#completionTime").val();
           if(isValidDate(startTime) && isValidDate(completionTime)){
         	  returnval = true;
-          } 
+          }
           return returnval;
       }
     </script>
@@ -63,8 +63,8 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
                                     <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}" />
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Description:</label>
@@ -72,9 +72,9 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'description','errors')}">
                                     <input type="text" id="description" name="description" value="${fieldValue(bean:moveEventInstance,field:'description')}"/>
                                 </td>
-                            </tr> 
-                        
-                        
+                            </tr>
+
+
                             <tr class="prop">
                                 <td class="name">
                                     <label for="moveBundles">Bundles:</label>
@@ -107,7 +107,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">
                                     <input type="text" id="runbookBridge1" name="runbookBridge1" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Runbook bridge2 :</label>
@@ -115,7 +115,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge2','errors')}">
                                     <input type="text" id="runbookBridge2" name="runbookBridge2" value="${fieldValue(bean:moveEventInstance,field:'runbookBridge1')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Video Link:</label>
@@ -123,7 +123,7 @@
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'videolink','errors')}">
                                     <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
 				                <td class="name">
 				                  <label for="calcMethod"><b>Calculated Type:&nbsp;<span style="color: red">*</span></b></label>
@@ -149,7 +149,7 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-			              </tr>
+			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
@@ -167,7 +167,16 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-                            </tr> 
+                            </tr>
+							<tr class="prop">
+								<td class="name">
+									<label for="apiActionBypass">By-Pass API Actions:</label>
+								</td>
+								<td class="valueNW ${hasErrors(bean:moveEventInstance,field:'apiActionBypass','errors')}">
+									<g:select id="apiActionBypass" optionKey="key" optionValue="value" from="${['true': 'Yes', 'false': 'No']}" name="apiActionBypass" value="${moveEventInstance.apiActionBypass}" >
+									</g:select>
+								</td>
+							</tr>
                         </tbody>
                     </table>
                 </div>
