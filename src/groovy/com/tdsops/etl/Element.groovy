@@ -522,6 +522,7 @@ class Element implements RangeChecker {
 
 		if (!addedToResults) {
 			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			//processor.addElementInitialized(processor.selectedDomain.domain, this)
 			addedToResults = true
 		}
 		return this

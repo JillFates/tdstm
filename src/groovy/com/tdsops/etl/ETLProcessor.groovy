@@ -930,6 +930,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
+
+
+//		validateStack()
+//
+//		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
+//		return element
+
+
 	}
 
 	/**

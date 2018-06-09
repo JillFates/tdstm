@@ -40,22 +40,31 @@ abstract class ETLTransformation {
      * @return the joined string
      */
     static String concat(String separator, Object...values) {
-        def toJoin = values.findAll{ StringUtil.isNotBlank(it as String) && (it as String) != '[]'  }
+        // first flatten values array to unify nested arrays
+        values = values.flatten()
 
-        return toJoin.collect {
-            if (it.getClass().isArray()) {
-                return concat(separator, it)
-            } else {
-                ETLValueHelper.valueOf(it)
-            }
-        }.join(StringUtil.defaultIfEmpty(separator, DEFAULT_SEPARATOR))
+        // determine if we should include blank or null values in the resultant joined string
+        Boolean includeEmpty = false
+        def shouldInclueEmpty = values[-1]
+        if ((shouldInclueEmpty instanceof Boolean) && Boolean.valueOf(shouldInclueEmpty.toString())) {
+            includeEmpty = true
+            values = values.dropRight(1)
+        }
+
+        // find the values to be joined by filtering blank or nulls when required
+        def toJoin = values.findAll {
+            includeEmpty || (StringUtil.isNotBlank(it as String) && (it as String) != '[]')
+        }
+
+        // return a joined string
+        return toJoin.collect{ it == null ? '' : ETLValueHelper.valueOf(it) }.join(separator)
     }
 
     /**
-     *
-     * @param separator
-     * @param values
-     * @return
+     * Perform the append process, but for that we just call the concat with the actual values
+     * @param separator - value separator
+     * @param values - list of values to concatenate
+     * @return the joined string
      */
     static String append(String separator, Object...values) {
         return concat(separator, values)

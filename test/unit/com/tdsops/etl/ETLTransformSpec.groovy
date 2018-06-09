@@ -1330,4 +1330,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 			e.message == 'uppercase function only supported for String values (152254 : class java.lang.Integer)'
 
 	}
+
+	void 'test ETLTransformation concat'() {
+		expect: 'concatenation build correctly'
+
+			ETLTransformation.concat(separator, values) == result
+
+		where:
+			separator	|	values									|	result
+			''			|	['one', 'two', 'three'] 				|	'onetwothree'
+			','			|	['one', 'two', 'three']					|	'one,two,three'
+			','			|	['one', '', 'three']					|	'one,three'
+			','			|	['one', '', 'three', true]				|	'one,,three'
+			','			|	['one', null, 'three', true]			|	'one,,three'
+			','			|	['one', 'two', ['three', 'four']]		|	'one,two,three,four'
+			','			|	['one', 'two', ['three', 'four', null]]	|	'one,two,three,four'
+
+	}
 }

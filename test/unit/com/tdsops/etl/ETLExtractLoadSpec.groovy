@@ -2572,7 +2572,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						extract 'vendor name' transform with concat(',', SOURCE.'location'.value) load 'environment'
+						set envVar with 'Prod'
+						// extract 'vendor name' transform with concat(',', SOURCE.'location'.value) load 'environment'
+						extract 'vendor name' transform with append('-', envVar) load 'environment'
 					}
 				""".stripIndent())
 
@@ -2654,7 +2656,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 					with(fields.ipAddress) {
 						originalValue == '1.2.3.4'
-						value == '1.2.3.4,1.3.5.1'
+						value == '1.2.3.4, 1.3.5.1'
 					}
 				}
 				with(data[1]) {
