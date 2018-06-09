@@ -112,7 +112,6 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 			def authentication = credentialService.authenticate(credential)
 
 		then: 'the system must authenticate and return session information as indicated by the session name expression'
-			println authentication
 			null 			!= authentication
 			'OK'	 		== authentication.statusCode
 	}

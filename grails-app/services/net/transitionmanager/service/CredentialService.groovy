@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
@@ -366,7 +367,7 @@ class CredentialService implements ServiceMethods {
                 }
                 break
             case 'json':
-                Map<String, ?> json = flattenMap(JsonUtil.convertJsonToMap(resp.json))
+                Map<String, ?> json = CollectionUtils.flattenMap(JsonUtil.convertJsonToMap(resp.json))
                 sessionId = ['sessionName': sessionHeaderName, 'sessionValue': json.get(propertyName)]
                 break
             default:
@@ -374,35 +375,6 @@ class CredentialService implements ServiceMethods {
                 break
         }
         return sessionId
-    }
-
-    /**
-     * Flatten authentication response map when session information source is in a JSON format,
-     * So the JSON is converted to flatten map to have direct access to properties even using dotted notation.
-     *
-     * e.g.
-     * Map: ['result': ['user_name': 'test', 'roles': 'USER']]
-     *
-     * is translated to:
-     * ['result.user_name': 'test', 'result.roles': ['USER']]
-     *
-     * Having that if the sessionNameProperties are like:
-     * username@json:result.user_name
-     *
-     * Then, the map can be accessed easily like: map['result.user_name']
-     *
-     * @param map
-     * @return a flatten map
-     */
-    Map<String, ?> flattenMap(Map<String, ?> map) {
-        map.collectEntries { k, v ->
-            v instanceof Map ?
-                    flattenMap(v).collectEntries { k1, v1 ->
-                        [(String.valueOf(k) + '.' + String.valueOf(k1)): v1]
-                    }
-                    :
-                    [(k): v]
-        }
     }
 
     /**
