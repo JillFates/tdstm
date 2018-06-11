@@ -197,7 +197,7 @@ class JsonUtil {
     }
 
     /**
-     * method from Maps to let use XPATH like access
+     * method from JSONElements to let use XPATH like access
      * e.g.
      * <PRE>
      *       assert xpathAt(result, "person.name") == "Guillaume"
@@ -222,6 +222,37 @@ class JsonUtil {
         def remainingPath = xpath[xpath.indexOf(separator) + 1 .. -1]
         JSONElement firstProperty = json[firstPropName] as JSONElement
         return xpathAt(firstProperty, remainingPath, separator)
+    }
+
+    /**
+     * method from Maps to let use GPATH like access in a String
+     * e.g.
+     * <PRE>
+     *       assert gpathAt(result, "person.name") == "Guillaume"
+     *       assert gpathAt(result, "")            == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     *       assert gpathAt(result, ".")           == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     * </PRE>
+     * @param Map
+     * @param gpath
+     * @param separator
+     * @return
+     */
+    static Object gpathAt(Map map, String xpath, String separator = '.') {
+        if (!xpath || xpath == separator) {
+            return map
+        }
+
+        if (!xpath.contains(separator)) {
+            return map[xpath]
+        }
+
+        def firstPropName = xpath[0..xpath.indexOf(separator) - 1]
+        def remainingPath = xpath[xpath.indexOf(separator) + 1 .. -1]
+        def firstProperty = map[firstPropName]
+        if( !(firstProperty instanceof Map) ){
+            throw new MissingPropertyException("No such property: '${remainingPath}' for class: ${firstProperty.class}")
+        }
+        return gpathAt(firstProperty as Map, remainingPath, separator)
     }
 
 }

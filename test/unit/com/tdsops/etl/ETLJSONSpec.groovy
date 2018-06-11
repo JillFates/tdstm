@@ -421,13 +421,13 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
-					originalValue == 'Microsoft'
-					value == 'Microsoft'
+					originalValue.value == 'Microsoft'
+					value.value == 'Microsoft'
 				}
 
 				with(data[1].fields.appVendor) {
-					originalValue == 'Mozilla'
-					value == 'Mozilla'
+					originalValue.value == 'Mozilla'
+					value.value == 'Mozilla'
 				}
 			}
 
@@ -466,7 +466,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 
-				with(data[1].fields.appVendor) {
+				with(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
