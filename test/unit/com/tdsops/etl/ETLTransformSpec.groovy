@@ -371,26 +371,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-					domain Device
-					read labels
-					iterate {
-						extract 'model name' transform with middle(0, 2) lowercase()
-					}
-				""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Must use positive values greater than 0 for "middle" transform function'
-	}
-
-	void 'test can throw an exception when a middle transformation is staring in zero'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 					  GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
