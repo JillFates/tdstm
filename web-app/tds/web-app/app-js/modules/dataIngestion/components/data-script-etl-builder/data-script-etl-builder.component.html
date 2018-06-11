@@ -138,7 +138,7 @@
                                                <kendo-grid [data]="domain.data" [resizable]="true" class="test-results">
                                                     <kendo-grid-column *ngFor="let column of domain.fieldNames;
                                                                let columnIndex = index;"
-                                                                       title="{{column}}">
+                                                                       title="{{(domain.labelMap && domain.labelMap[column]) || column}}">
                                                         <ng-template kendoGridCellTemplate let-dataItem>
                                                             {{dataItem.fields[column] ? dataItem.fields[column].value : '' }}
                                                         </ng-template>

@@ -2355,4 +2355,159 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-11037')
+	void 'test can load current element with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					load 'Name' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == ''
+							originalValue == ''
+							init == null
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11037')
+	void 'test can init current element with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					init 'Name' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == null
+							originalValue == null
+							init == ''
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11037')
+	void 'test can init and load with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					init 'Name' with ''
+					load 'Manufacturer' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == null
+							originalValue == null
+							init == ''
+						}
+						with(fields.manufacturer, FieldResult) {
+							value == ''
+							originalValue == ''
+							init == null
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
 }

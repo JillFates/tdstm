@@ -325,6 +325,48 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 1).value == "id"
 	}
 
+	void 'test can transform a field value with taking middle out of range in taking characters'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(4, 10) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'Every column for every row is transformed with middle 2 transformation'
+			etlProcessor.getElement(0, 1).value == "24g1"
+			etlProcessor.getElement(1, 1).value == "a module"
+			etlProcessor.getElement(2, 1).value == "deaway"
+	}
+
+	void 'test can transform a field value with taking middle starts beyond the size'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(20, 10) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'Every column for every row is transformed with middle 2 transformation'
+			etlProcessor.getElement(0, 1).value == ""
+			etlProcessor.getElement(1, 1).value == ""
+			etlProcessor.getElement(2, 1).value == ""
+	}
+
 	void 'test can throw an exception when a middle transformation is staring in zero'() {
 
 		given:
@@ -342,9 +384,152 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'From To initial position must be >= 1'
+			e.message == 'Must use positive values greater than 0 for "middle" transform function'
 	}
 
+	void 'test can throw an exception when a middle transformation is staring in zero'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(0, 2) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Must use positive values greater than 0 for "middle" transform function'
+	}
+
+	void 'test can throw an exception when a middle transformation is staring in negative value'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(-1, 2) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Must use positive values greater than 0 for "middle" transform function'
+	}
+
+	void 'test can throw an exception when a middle transformation "takes" zero characters'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(1, 0) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Must use positive values greater than 0 for "middle" transform function'
+	}
+
+	void 'test can throw an exception when a middle transformation "takes" is negative'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(1, -5) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Must use positive values greater than 0 for "middle" transform function'
+	}
+
+	void 'test can throw an exception when a middle transformation with NO arguments'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle() lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'The middle transformation requires two parameters (startAt, numOfChars)'
+	}
+
+	void 'test can throw an exception when a middle transformation with one argument'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(1) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'The middle transformation requires two parameters (startAt, numOfChars)'
+	}
+
+	void 'test can throw an exception when a middle transformation with more than 2 arguments'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(1, 2, 3) lowercase()
+					}
+				""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'The middle transformation requires two parameters (startAt, numOfChars)'
+	}
+
+
+	/*
+	// TODO: Delete the following code, how is this different from previous test?
 	void 'test can transform a field value with taking middle 2 characters inside a closure'() {
 
 		given:
@@ -365,6 +550,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(1, 1).value == "ha"
 			etlProcessor.getElement(2, 1).value == "id"
 	}
+	*/
 
 	void 'test can transform a field value replacing first A characters'() {
 		given:

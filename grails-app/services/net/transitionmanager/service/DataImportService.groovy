@@ -16,7 +16,6 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
-import grails.converters.JSON
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -406,11 +405,17 @@ class DataImportService implements ServiceMethods {
 					continue
 				}
 
+				// Truncate the original value if necessary
+				def origValue = field.originalValue
+				if ( (origValue instanceof CharSequence) && origValue != null && origValue.size() > 255 ) {
+					origValue = StringUtil.ellipsis(origValue, 255)
+				}
+
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
 					assetEntityId: domainId,
-					importValue: field.originalValue,
+					importValue: origValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
 				)

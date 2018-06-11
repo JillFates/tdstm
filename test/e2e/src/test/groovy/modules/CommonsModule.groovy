@@ -9,30 +9,22 @@ class CommonsModule extends Module {
 
     }
 
-    def waitForLoader() {
+    def waitForLoader(Integer secondsToWait = null) {
         try {
-            // Try and wait that the loading message on the grid is displayed and then gone so it loads the page content.
-            // There are big pages where a lot of information is loaded
-            waitFor { $('#main-loader') }
-            waitFor { !$('#main-loader') }
+            // try to wait loader icon is displayed then gone loading page content
+            // there are big pages where lot of information is loaded
+            if(secondsToWait) {
+                waitFor(secondsToWait) { $('#main-loader') }
+                waitFor(secondsToWait) { !$('#main-loader') }
+            } else {
+                waitFor { $('#main-loader') }
+                waitFor { !$('#main-loader') }
+            }
         } catch (WaitTimeoutException e) {
-            // Nothing to do here, in case the server quickly manages the page info
-            // and the loading message on the grid isn't detected, then prevent that the test fails
-            true
+            // nothing to do here, in case server manage fast the page information
+            // and the loader icon is not detected, just prevent test fails
         }
-    }
 
-    def waitForLoadingMessage() {
-        try {
-            // Try and wait that the loading message on the grid is displayed and then gone so it loads the page content.
-            // There are big pages where a lot of information is loaded
-            waitFor { $('div#load_applicationIdGrid').displayed }
-            waitFor { !$('div#load_applicationIdGrid').displayed }
-        } catch (WaitTimeoutException e) {
-            // Nothing to do here, in case the server quickly manages the page info
-            // and the loading message on the grid isn't detected, then prevent that the test fails
-            true
-        }
     }
 
     def waitForGlobalProgressBarModal(){

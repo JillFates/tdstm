@@ -423,8 +423,10 @@ export class DataIngestionService {
 		};
 
 		// Properties only required on this methods.
-		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER) {
-			postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
+		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER || model.authMethod === AUTH_METHODS.BASIC_AUTH) {
+			if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER ) {
+				postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
+			}
 			postRequest.validationExpression = (model.validationExpression) ? model.validationExpression  : '';
 		}
 

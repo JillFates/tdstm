@@ -57,15 +57,27 @@ class ETLProcessorResult {
 	/**
 	 * Appends a loaded element in the results.
 	 * First It adds a new element.field.name in the current domain fields list
-	 * and if it already exits, updates that element with the element values.
+	 * and if it already exits, updates that element with the element originalValue and value.
 	 * After that, It saves the new element in the data results.
-	 *
-	 * @param element
+	 * @param element an instance of Element
 	 */
 	void loadElement(Element element) {
 		RowResult currentData = findOrCreateCurrentRow()
 		reference.addFieldName(element)
 		currentData.addLoadElement(element)
+	}
+
+	/**
+	 * Appends a loaded initialized element in the results.
+	 * First It adds a new element.field.name in the current domain fields list
+	 * and if it already exits, updates that element with the element init value.
+	 * After that, It saves the new element in the data results.
+	 * @param element an instance of Element
+	 */
+	void loadInitializedElement(Element element) {
+		RowResult currentData = findOrCreateCurrentRow()
+		reference.addFieldName(element)
+		currentData.addInitElement(element)
 	}
 
 	/**
@@ -330,13 +342,19 @@ class RowResult {
 	 * @param element
 	 */
 	void addLoadElement(Element element){
-		//TODO: Review with John. ETLInitilizeSpec'test can init field defined before the load command'
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
-		fieldData.originalValue = element.originalValue?:fieldData.originalValue
-		fieldData.value = element.value?:fieldData.value
-		fieldData.init = element.init?:fieldData.init
+		fieldData.originalValue = element.originalValue
+		fieldData.value = element.value
 	}
 
+	/**
+	 * Add initialized element to the current row data
+	 * @param element
+	 */
+	void addInitElement(Element element){
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		fieldData.init = element.init
+	}
 	/**
 	 * It adds the find result in the FieldResult
 	 * <pre>
