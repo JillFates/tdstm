@@ -2511,8 +2511,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-//	updater(['application id': 152254, 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-//	updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+	@See('TM-10726')
 	void 'test can transform with concat function'() {
 
 		given:
@@ -2557,6 +2556,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-10726')
 	void 'test can transform with concat transformation'() {
 
 		given:
@@ -2602,6 +2602,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-10726')
 	void 'test can load with append transformation'() {
 
 		given:
@@ -2621,67 +2622,65 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-		// rename append to do what concat is doing right now by loading current record/result
-		// rename concat to do the concat without loading the current record/result
-		etlProcessor
-				.evaluate("""
-					read labels
-					iterate {
-						domain Device
-						extract 'ip' transform with lowercase() set ipVar
-						extract 'srv' set srvVar
-
-						lookup 'assetName' with srvVar
-						if ( LOOKUP.notFound() ) {
-							// Set the server name first time seen
-							load 'Name' with srvVar
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Device
+							extract 'ip' transform with lowercase() set ipVar
+							extract 'srv' set srvVar
+	
+							lookup 'assetName' with srvVar
+							if ( LOOKUP.notFound() ) {
+								// Set the server name first time seen
+								load 'Name' with srvVar
+							}
+							load 'IP Address' transform with append(', ', ipVar)
 						}
-						load 'IP Address' transform with append(', ', ipVar)
-					}
-				""".stripIndent())
+					""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-		with (etlProcessor.resultsMap()) {
-			domains.size() == 1
-			with(domains[0], DomainResult) {
-				domain == ETLDomain.Device.name()
-				data.size() == 3
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 3
 
-				with(data[0]) {
-					rowNum == 1
-					with(fields.assetName) {
-						originalValue == 'x'
-						value == 'x'
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'x'
+							value == 'x'
+						}
+						with(fields.ipAddress) {
+							originalValue == '1.2.3.4, 1.3.5.1'
+							value == '1.2.3.4, 1.3.5.1'
+						}
 					}
-					with(fields.ipAddress) {
-						originalValue == '1.2.3.4, 1.3.5.1'
-						value == '1.2.3.4, 1.3.5.1'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == 'y'
+							value == 'y'
+						}
+						with(fields.ipAddress) {
+							originalValue == '4.5.4.2'
+							value == '4.5.4.2'
+						}
 					}
-				}
-				with(data[1]) {
-					rowNum == 2
-					with(fields.assetName) {
-						originalValue == 'y'
-						value == 'y'
-					}
-					with(fields.ipAddress) {
-						originalValue == '4.5.4.2'
-						value == '4.5.4.2'
-					}
-				}
-				with(data[2]) {
-					rowNum == 4
-					with(fields.assetName) {
-						originalValue == 'z'
-						value == 'z'
-					}
-					with(fields.ipAddress) {
-						originalValue == '3.3.3.3'
-						value == '3.3.3.3'
+					with(data[2]) {
+						rowNum == 4
+						with(fields.assetName) {
+							originalValue == 'z'
+							value == 'z'
+						}
+						with(fields.ipAddress) {
+							originalValue == '3.3.3.3'
+							value == '3.3.3.3'
+						}
 					}
 				}
 			}
-		}
 	}
 
 	@See('TM-10726')

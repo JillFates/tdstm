@@ -19,6 +19,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import spock.lang.See
 import spock.lang.Shared
 /**
  * Test about ETLProcessor commands:
@@ -1311,6 +1312,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	}
 
+	@See('TM-10726')
 	void 'test ETLTransformation concat'() {
 		expect: 'concatenation build correctly'
 

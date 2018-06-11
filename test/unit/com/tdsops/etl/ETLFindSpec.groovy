@@ -145,8 +145,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							
-							
 							load 'environment' with 'Production'
 							extract 'application id' load 'id'
 							

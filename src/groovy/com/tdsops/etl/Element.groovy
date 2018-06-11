@@ -430,26 +430,14 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Appends Element and String values from a ETL Script and assign result String value.
+	 * Concats Element and String values from a ETL Script and assign result String value.
 	 * It's used in this ETL script command
 	 * <code>
-	 *     extract 4 transform append('-', myVar) load description
+	 *     extract 4 transform concat('-', myVar) load description
 	 * </code>
 	 * @param objects
 	 * @return
 	 */
-//	Element append(Object... objects) {
-//
-//		String newValue = objects.sum { object ->
-//			if(Element.class.isInstance(object)){
-//				((Element)object).value
-//			} else{
-//				object ? object.toString() : ''
-//			}
-//		}
-//		this.value += newValue
-//		return this
-//	}
 	Element concat(String separator, Object...values){
 		this.value = ETLTransformation.concat(separator, this.value, values)
 		checkLoadedElement()
@@ -485,37 +473,24 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Perform the concatenate process over all values separated by <code>separator</code> provided
+	 * Perform the append process over all values separated by <code>separator</code> provided
 	 * @param separator - value separator
 	 * @param values - list of values to concatenate
 	 *
 	 *
 	 * Examples
 	 * <code>
-	 * extract 'column' transform with concat(separator, value1, [value2, value3, ...]) uppercase()
+	 * extract 'column' transform with append(separator, value1, [value2, value3, ...]) uppercase()
 	 *
-	 * extract 'column' transform with concat(', ', ipVar)
-	 * extract 'column' transform with concat(', ', DOMAIN.assetName)
-	 * extract 'column' transform with concat(', ', SOURCE.'device id')
+	 * extract 'column' transform with append(', ', ipVar)
+	 * extract 'column' transform with append(', ', DOMAIN.assetName)
+	 * extract 'column' transform with append(', ', SOURCE.'device id')
 	 *
-	 * load 'IP Address' with concat(', ', ipVar)
+	 * load 'IP Address' with append(', ', ipVar)
 	 * </code>
 	 *
 	 * @return the joined string
 	 */
-//	Element concat(String separator, Object...values){
-//		this.value = ETLTransformation.concat(separator, this.value, values)
-//
-//		if (this.originalValue == null) {
-//			this.originalValue = this.value
-//		}
-//
-//		if (!addedToResults) {
-//			processor.addElementLoaded(processor.selectedDomain.domain, this)
-//			addedToResults = true
-//		}
-//		return this
-//	}
 	Element append(String separator, Object...values){
 		this.value = ETLTransformation.append(separator, this.value, values)
 		checkLoadedElement()
@@ -539,9 +514,16 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Perform the evaluation of the value parameter and update current element value and original value.
+	 * @param value - can be a variable, string, DOMAIN..., SOURCE... or a function like concat(....)
 	 *
-	 * @param value
-	 * @return
+	 * <pre>
+	 *		load 'Name' transform with append(',', 'foo', 'bar')
+	 *		initialize 'Name' transform with append(' - ', envVar)
+	 *		extract 'Name' transform with append(' - ', envVar) load 'Name'
+	 * </pre>
+	 *
+	 * @return current Element updated
 	 */
 	Element with(Object value) {
 		this.value = ETLValueHelper.valueOf(value)

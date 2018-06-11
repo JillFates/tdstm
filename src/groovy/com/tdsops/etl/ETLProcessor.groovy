@@ -543,20 +543,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param fieldName
 	 * @return
 	 */
-//	Map<String, ?> load(final String fieldName) {
-//		validateStack()
-//
-//		return [
-//			with: { value ->
-//
-//				Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
-//				element.originalValue = ETLValueHelper.valueOf(value)
-//				element.value = element.originalValue
-//				addElementLoaded(selectedDomain.domain, element)
-//				element
-//			}
-//		]
-//	}
 	Element load(final String fieldName) {
 		validateStack()
 		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
@@ -931,14 +917,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
-
-
-//		validateStack()
-//
-//		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
-//		return element
-
-
 	}
 
 	/**
@@ -1056,13 +1034,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param fieldDefinition
 	 * @return
 	 */
-//	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
-//		if(currentElement?.fieldDefinition?.name == fieldDefinition.name){
-//			return currentElement
-//		} else{
-//			return bindCurrentElement(currentRow.addNewElement(null, fieldDefinition, this))
-//		}
-//	}
 	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
 		RowResult rr
 		// if there is an element found after a lookup invokation,

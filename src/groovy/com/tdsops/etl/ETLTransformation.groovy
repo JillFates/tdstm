@@ -13,8 +13,6 @@ import java.lang.reflect.Array
  *
  */
 abstract class ETLTransformation {
-    private final static String DEFAULT_SEPARATOR = ', '
-
     Closure<Element> closure
     /**
      *
