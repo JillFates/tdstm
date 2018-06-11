@@ -183,15 +183,15 @@ class ETLProcessorResult {
 	 * 		domains <List><Map>
 	 * It also adds the label map used during an ETL script execution based on field name and field label
 	 * @return A map of this object
-	 * @see ETLFieldsValidator#labelMapForResults()
+	 * @see ETLFieldsValidator#fieldLabelMapForResults()
 	 */
 	Map<String, ?> toMap() {
 
-		Map<String, Map<String, String>> labelMaps = processor.fieldsValidator.labelMapForResults()
+		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
 
 		domains.each {DomainResult domainResult ->
-			if(labelMaps?.containsKey(domainResult.domain)){
-				domainResult.setLabelMap(labelMaps[domainResult.domain])
+			if (map?.containsKey(domainResult.domain)) {
+				domainResult.setFieldLabelMap(map[domainResult.domain])
 			}
 		}
 		return [
@@ -271,7 +271,7 @@ class ETLProcessorResult {
 class DomainResult {
 	String domain
 	Set fieldNames = [] as Set
-	Map<String, String> labelMap = [:]
+	Map<String, String> fieldLabelMap = [:]
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
@@ -293,10 +293,10 @@ class DomainResult {
 
 	/**
 	 * Assign a label map collected during an ETL script execution
-	 * @param labelMap a Map instance that contains the relation between field name and field label
+	 * @param fieldLabelMap a Map instance that contains the relation between field name and field label
 	 */
-	void setLabelMap(Map<String, String> labelMap) {
-		this.labelMap = labelMap
+	void setFieldLabelMap(Map<String, String> fieldLabelMap) {
+		this.fieldLabelMap = fieldLabelMap
 	}
 }
 

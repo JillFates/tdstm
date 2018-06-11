@@ -504,8 +504,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'appTech'] as Set
-					with(labelMap){
+					with(fieldLabelMap) {
 						appVendor == 'Vendor'
+						appTech == 'Technology'
 					}
 
 					data.size() == 2
@@ -570,8 +571,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'environment'] as Set
-					with(labelMap){
+					with(fieldLabelMap){
 						assetName == 'Name'
+						environment == 'Environment'
 					}
 
 					data.size() == 2
@@ -623,7 +625,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
-					labelMap == [:]
+					with(fieldLabelMap) {
+						appVendor == 'Vendor'
+						environment == 'Environment'
+					}
 
 					data.size() == 2
 					with(data[0]) {
@@ -676,8 +681,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-					with(labelMap){
+					with(fieldLabelMap){
 						assetName == 'Name'
+						environment == 'Environment'
+						appVendor == 'Vendor'
 					}
 					data.size() == 2
 					with(data[0]) {
@@ -746,8 +753,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
-					with(labelMap){
+					with(fieldLabelMap){
 						assetName == 'Name'
+						environment == 'Environment'
+						appVendor == 'Vendor'
 					}
 					data.size() == 2
 					with(data[0]) {
@@ -815,9 +824,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					labelMap == [:]
+					with(fieldLabelMap) {
+						appVendor == 'Vendor'
+						environment == 'Environment'
+					}
 					data.size() == 2
-					labelMap == [:]
+					with(fieldLabelMap) {
+						appVendor: 'Vendor'
+						environment: 'Environment'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -860,7 +875,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					with(labelMap){
+					with(fieldLabelMap){
 						description == 'Description'
 					}
 					data.size() == 2
@@ -980,7 +995,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					labelMap == [:]
+					with(fieldLabelMap) {
+						id == 'Id'
+						appVendor == 'Vendor'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -1033,7 +1051,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					labelMap == [:]
+					with(fieldLabelMap) {
+						assetName == 'Name'
+						manufacturer == 'Manufacturer'
+						model == 'Model'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.assetName) {
@@ -1121,7 +1143,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-					with(labelMap){
+					with(fieldLabelMap){
 						appVendor == 'Vendor'
 					}
 					with(data[0]) {

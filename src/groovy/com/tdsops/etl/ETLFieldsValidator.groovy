@@ -50,7 +50,6 @@ class ETLFieldsValidator {
 		}
 
 		ETLFieldDefinition fieldDefinition
-
 		if(domain.isAsset()){
 			if(hasSpecs(domain, field)){
 				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
@@ -58,7 +57,7 @@ class ETLFieldsValidator {
 				}
 				fieldDefinition = new ETLFieldDefinition(fieldSpec)
 			}
-		} else{
+		} else {
 			Class<?> domainClass = domain.clazz
 			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
 			fieldDefinition = new ETLFieldDefinition(domainProperty)
@@ -75,7 +74,7 @@ class ETLFieldsValidator {
 	 * @param field a String content with a field name or a field label
 	 * @return true if fieldsDefinitionCache contains the pair of ETLDomain + field name/label
 	 */
-	private boolean cacheContains(ETLDomain domain, String field){
+	private boolean cacheContains(ETLDomain domain, String field) {
 		return fieldsDefinitionCache.containsKey(domain) && fieldsDefinitionCache[domain].containsKey(field)
 	}
 
@@ -115,18 +114,16 @@ class ETLFieldsValidator {
 	 * </pre>
 	 *  It build this Map
 	 * <pre>
-	 *  labelMap : [
+	 *  fieldLabelMap : [
 	 *      'Vendor': 'appVendor'
 	 *  ]
 	 * </pre>
 	 * @return
 	 */
-	Map<String, Map<String, String>> labelMapForResults() {
+	Map<String, Map<String, String>> fieldLabelMapForResults() {
 		return fieldsDefinitionCache.collectEntries { ETLDomain domain, Map<String, ETLFieldDefinition> definitions ->
 			[
-				(domain.name()): definitions.findAll {
-					it.key != it.value.name
-				}.collectEntries { String field, ETLFieldDefinition definition ->
+				(domain.name()): definitions.collectEntries { String field, ETLFieldDefinition definition ->
 					[(definition.name): definition.label]
 				}
 			]
