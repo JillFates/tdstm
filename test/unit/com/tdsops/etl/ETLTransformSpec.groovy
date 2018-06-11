@@ -954,7 +954,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
-						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
+						extract 'location' transform with append('', myLocalVar + ' - ' + CE) load 'description'
 					}
 				""".stripIndent())
 
@@ -991,7 +991,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 					extract 'vendor name' transform with lowercase() set myLocalVar
-					extract 'location' transform with append('-', myLocalVar, '-' , CE ) load 'description'
+					extract 'location' transform with append('', '-', myLocalVar, '-' , CE ) load 'description'
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
@@ -1028,7 +1028,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
-						extract 'location' transform with append(' - ', myLocalVar, ' - ') load 'description'
+						extract 'location' transform with append('', ' - ', myLocalVar, ' - ') load 'description'
 					}
 				""".stripIndent())
 
@@ -1102,7 +1102,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'location' transform {
-							lowercase() append('**')
+							lowercase() append('', '**')
 						} load 'description'
 
 					}
