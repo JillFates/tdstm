@@ -98,6 +98,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             at AssetViewsPage
             closeFavLimitPopUp()
             allViewsModule.unFavRandomFavs()
+            at AssetViewsPage
         when: "I click on Favorite Views"
             waitFor {goToFavourites()}
         then: "I see at least the Favorites section"
