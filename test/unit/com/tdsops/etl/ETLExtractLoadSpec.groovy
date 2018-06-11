@@ -2637,7 +2637,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							// Set the server name first time seen
 							load 'Name' with srvVar
 						}
-						load 'IP Address' append(', ', ipVar)
+						load 'IP Address' transform with append(', ', ipVar)
 					}
 				""".stripIndent())
 

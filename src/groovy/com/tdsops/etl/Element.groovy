@@ -526,6 +526,8 @@ class Element implements RangeChecker {
 			addedToResults = true
 		}
 		return this
+//		this.value = ETLTransformation.append(separator, this.value, values)
+//		return this
 	}
 
 	/**
