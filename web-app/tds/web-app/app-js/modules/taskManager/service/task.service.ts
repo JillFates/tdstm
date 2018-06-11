@@ -15,6 +15,7 @@ export class TaskService {
 
 	// private instance variable to hold base url
 	private defaultUrl = '../ws';
+	private assetGeneric = '../assetEntity';
 	private taskURL = this.defaultUrl + '/task';
 
 	// Resolve HTTP using the constructor
@@ -40,6 +41,19 @@ export class TaskService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the Task Details
+	 * @returns {Observable<any>}
+	 */
+	getTaskDetails(taskId: string): Observable<any> {
+		return this.http.get(`${this.assetGeneric}/showComment?id=${taskId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result[0];
 			})
 			.catch((error: any) => error.json());
 	}

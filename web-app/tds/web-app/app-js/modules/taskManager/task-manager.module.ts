@@ -7,7 +7,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 // Components
-import {TaskDetailComponent} from './components/detail/task-detail.component';
 import {SharedModule} from '../../shared/shared.module';
 // Services
 import {TaskService} from './service/task.service';
@@ -19,12 +18,6 @@ import {TaskService} from './service/task.service';
 		FormsModule,
 	],
 	providers: [TaskService],
-	declarations: [
-		TaskDetailComponent
-	],
-	entryComponents: [
-		TaskDetailComponent
-	]
 })
 
 export class TaskManagerModule {
