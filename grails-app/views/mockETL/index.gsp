@@ -122,8 +122,8 @@
                         <table style="width:100%" class="table table-condensed table-hover">
                             <tr>
                                 <g:each in="${resultsRow.fieldNames}" var="header">
-                                    <g:if test="${resultsRow?.labelMap && resultsRow?.labelMap[header]}">
-                                        <th>${resultsRow?.labelMap[header]}</th>
+                                    <g:if test="${resultsRow?.fieldLabelMap && resultsRow?.fieldLabelMap[header]}">
+                                        <th>${resultsRow?.fieldLabelMap[header]}</th>
                                     </g:if>
                                     <g:else>
                                         <th>${header}</th>

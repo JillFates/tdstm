@@ -45,7 +45,8 @@ class ETLFieldDefinition {
 	 */
 	ETLFieldDefinition(GrailsDomainClassProperty domainProperty) {
 		this.name = domainProperty.getName()
-		this.label = domainProperty.getFieldName()
+		// The label will be the same as the field name until the domain has a field specification like that of assets
+		this.label = this.name
 		this.type = domainProperty.getType()
 	}
 

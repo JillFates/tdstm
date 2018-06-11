@@ -26,13 +26,13 @@ class ETLFieldsValidator {
 	//TODO: rename validate fieldName exists
 	Boolean hasSpecs(ETLDomain domain, String field) {
 
-		if(cacheContains(domain, field)){
+		if (cacheContains(domain, field)) {
 			return true
 		}
 
-		if(domain.isAsset()){
+		if (domain.isAsset()) {
 			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
-		} else{
+		} else {
 			return GormUtil.isDomainProperty(domain.clazz, field)
 		}
 	}
