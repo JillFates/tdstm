@@ -2573,7 +2573,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					iterate {
 						domain Application
 						set envVar with 'Prod'
-						// extract 'vendor name' transform with concat(',', SOURCE.'location'.value) load 'environment'
 						extract 'vendor name' transform with append('-', envVar) load 'environment'
 					}
 				""".stripIndent())
@@ -2589,14 +2588,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Microsoft'
-							value == 'Microsoft,ACME Data Center'
+							value == 'Microsoft-Prod'
 						}
 					}
 					with(data[1]) {
 						rowNum == 2
 						with(fields.environment) {
 							originalValue == 'Mozilla'
-							value == 'Mozilla,ACME Data Center'
+							value == 'Mozilla-Prod'
 						}
 					}
 				}
@@ -2655,7 +2654,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						value == 'x'
 					}
 					with(fields.ipAddress) {
-						originalValue == '1.2.3.4'
+						originalValue == '1.2.3.4, 1.3.5.1'
 						value == '1.2.3.4, 1.3.5.1'
 					}
 				}
@@ -2683,5 +2682,31 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			}
 		}
+	}
+
+	void 'test load with append transformation should fail'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Application
+							set envVar with 'Prod'
+							
+							load 'Name' with append('-', envVar) 
+						}
+					""".stripIndent())
+
+		then: 'exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'No such property: append'
 	}
 }
