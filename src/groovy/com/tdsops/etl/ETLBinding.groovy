@@ -19,7 +19,6 @@ class ETLBinding extends Binding {
 	            *: ETLDomain.values().collectEntries { [(it.name()): it] },
                 *: vars,
 				concat: ETLTransformation.&concat,
-				append: ETLTransformation.&append
         ])
     }
 

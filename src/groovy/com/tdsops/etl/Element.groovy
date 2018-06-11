@@ -40,9 +40,12 @@ class Element implements RangeChecker {
 	ETLFieldDefinition fieldDefinition
 
 	/**
-	 * Flag to determine if ETL element was added to the processor elements
+	 * Defines if an Element instance was created by:
+	 * <pre>
+	 *    load 'name' with 'Foo Bar'
+	 * </pre>
 	 */
-	boolean addedToResults = false
+	boolean loadedElement = false
 
 	/**
 	 * Transform command on an element with a closure to be executed
@@ -91,7 +94,6 @@ class Element implements RangeChecker {
 		if(processor.hasSelectedDomain()){
 			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
 			processor.addElementLoaded(processor.selectedDomain.domain, this)
-			addedToResults = true
 			return this
 		} else{
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -450,6 +452,7 @@ class Element implements RangeChecker {
 //	}
 	Element concat(String separator, Object...values){
 		this.value = ETLTransformation.concat(separator, this.value, values)
+		checkLoadedElement()
 		return this
 	}
 
@@ -515,19 +518,24 @@ class Element implements RangeChecker {
 //	}
 	Element append(String separator, Object...values){
 		this.value = ETLTransformation.append(separator, this.value, values)
-
-		if (this.originalValue == null) {
-			this.originalValue = this.value
-		}
-
-		if (!addedToResults) {
-			processor.addElementLoaded(processor.selectedDomain.domain, this)
-			//processor.addElementInitialized(processor.selectedDomain.domain, this)
-			addedToResults = true
-		}
+		checkLoadedElement()
 		return this
-//		this.value = ETLTransformation.append(separator, this.value, values)
-//		return this
+	}
+
+	/**
+	 * Check if the current element instance was started using load command,
+	 * and save it in ETLProcessorResult
+	 * <pre>
+	 *  load 'Name' transform with append(',', 'foo', 'bar')
+	 * </pre>
+	 * @see Element#loadedElement
+	 */
+	private void checkLoadedElement(){
+		if(loadedElement){
+			this.originalValue = this.value
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			loadedElement = false
+		}
 	}
 
 	/**
@@ -538,10 +546,7 @@ class Element implements RangeChecker {
 	Element with(Object value) {
 		this.value = ETLValueHelper.valueOf(value)
 		this.originalValue = ETLValueHelper.valueOf(value)
-
 		processor.addElementLoaded(processor.selectedDomain.domain, this)
-		addedToResults = true
-
 		return this
 	}
 

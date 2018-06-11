@@ -559,8 +559,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 //	}
 	Element load(final String fieldName) {
 		validateStack()
-
 		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
+		element.loadedElement = true
 		return element
 	}
 
@@ -927,6 +927,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	private Element doExtract () {
 		Element element = createCurrentElement(currentColumnIndex)
+		element.loadedElement = false
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element

@@ -2528,7 +2528,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						load 'environment' with concat(',', SOURCE.'vendor name', SOURCE.'location'.value)
+						load 'environment' transform with concat(',', SOURCE.'vendor name', SOURCE.'location')
 					}
 				""".stripIndent())
 
