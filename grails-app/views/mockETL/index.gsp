@@ -122,7 +122,12 @@
                         <table style="width:100%" class="table table-condensed table-hover">
                             <tr>
                                 <g:each in="${resultsRow.fieldNames}" var="header">
-                                    <th>${header}</th>
+                                    <g:if test="${resultsRow?.fieldLabelMap && resultsRow?.fieldLabelMap[header]}">
+                                        <th>${resultsRow?.fieldLabelMap[header]}</th>
+                                    </g:if>
+                                    <g:else>
+                                        <th>${header}</th>
+                                    </g:else>
                                 </g:each>
                             </tr>
                             <g:each in="${resultsRow.data}" var="row" status="i">

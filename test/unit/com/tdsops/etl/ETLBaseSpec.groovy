@@ -174,8 +174,8 @@ abstract class ETLBaseSpec extends Specification {
 	 * Creates an instance of DomainClassFieldsValidator with all the fields spec correctly set.
 	 * @return an intance of DomainClassFieldsValidator
 	 */
-	protected DomainClassFieldsValidator createDomainClassFieldsValidator(){
-		DomainClassFieldsValidator validator = new DomainClassFieldsValidator()
+	protected ETLFieldsValidator createDomainClassFieldsValidator(){
+		ETLFieldsValidator validator = new ETLFieldsValidator()
 		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
 
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec)

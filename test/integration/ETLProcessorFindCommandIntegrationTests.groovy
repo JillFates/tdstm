@@ -3,9 +3,9 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.DomainClassFieldsValidator
-import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.ETLDomain
+
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.tm.enums.domain.AssetClass
@@ -58,7 +58,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 		GMDEMO = projectTestHelper.createProject(null)
 		TMDEMO = projectTestHelper.createProject(null)
 
-		validator = new DomainClassFieldsValidator()
+		validator = new ETLFieldsValidator()
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))

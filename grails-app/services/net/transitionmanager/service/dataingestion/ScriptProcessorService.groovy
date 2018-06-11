@@ -3,7 +3,7 @@ package net.transitionmanager.service.dataingestion
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ProgressCallback
@@ -48,7 +48,7 @@ class ScriptProcessorService {
 
         Dataset dataset = FileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-        DomainClassFieldsValidator validator = createFieldsSpecValidator(project)
+	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 	    etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
         return etlProcessor
@@ -100,7 +100,7 @@ class ScriptProcessorService {
      * @see com.tdsops.etl.ETLFieldsValidator interface
      * @return an instance of DomainClassFieldsValidator.
      */
-    private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
+    private ETLFieldsValidator createFieldsSpecValidator (Project project) {
 
 	    Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
 
@@ -110,7 +110,7 @@ class ScriptProcessorService {
 	    Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
 	    Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
 
-	    DomainClassFieldsValidator validator = new DomainClassFieldsValidator()
+	    ETLFieldsValidator validator = new ETLFieldsValidator()
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
@@ -215,7 +215,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new DomainClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLFieldsValidator())
 
         List<Map<String, ?>> errors = []
 

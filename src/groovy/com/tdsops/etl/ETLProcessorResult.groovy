@@ -193,10 +193,19 @@ class ETLProcessorResult {
 	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
 	 * 		ETLInfo <Map>
 	 * 		domains <List><Map>
-	 *
+	 * It also adds the label map used during an ETL script execution based on field name and field label
 	 * @return A map of this object
+	 * @see ETLFieldsValidator#fieldLabelMapForResults()
 	 */
 	Map<String, ?> toMap() {
+
+		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
+
+		domains.each {DomainResult domainResult ->
+			if (map?.containsKey(domainResult.domain)) {
+				domainResult.setFieldLabelMap(map[domainResult.domain])
+			}
+		}
 		return [
 			ETLInfo: this.ETLInfo,
 			domains: this.domains
@@ -274,6 +283,7 @@ class ETLProcessorResult {
 class DomainResult {
 	String domain
 	Set fieldNames = [] as Set
+	Map<String, String> fieldLabelMap = [:]
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
@@ -291,6 +301,14 @@ class DomainResult {
 	 */
 	void addFieldName(ETLFindElement findElement){
 		fieldNames.add(findElement.currentFind.property)
+	}
+
+	/**
+	 * Assign a label map collected during an ETL script execution
+	 * @param fieldLabelMap a Map instance that contains the relation between field name and field label
+	 */
+	void setFieldLabelMap(Map<String, String> fieldLabelMap) {
+		this.fieldLabelMap = fieldLabelMap
 	}
 }
 
