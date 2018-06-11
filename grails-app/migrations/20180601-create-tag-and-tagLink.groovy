@@ -75,28 +75,24 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: 'tpelletier', id: '20180601 TM-10929-2') {
-		comment("Create tag_link table")
+		comment("Create tag_asset_entity table")
 
 		preConditions(onFail: 'MARK_RAN') {
 			not {
-				tableExists(tableName: 'tag_link')
+				tableExists(tableName: 'tag_asset_entity')
 			}
 		}
 
-		createTable(tableName: 'tag_link') {
-			column(autoIncrement: 'true', name: 'tag_link_id', type: 'BIGINT(20)') {
-				constraints(nullable: 'false', primaryKey: 'true', primaryKeyName: 'tag_linkPK')
+		createTable(tableName: 'tag_asset_entity') {
+			column(autoIncrement: 'true', name: 'tag_asset_entity_id', type: 'BIGINT(20)') {
+				constraints(nullable: 'false', primaryKey: 'true', primaryKeyName: 'tag_asset_entityPK')
 			}
 
 			column(name: 'version', type: 'BIGINT(20)') {
 				constraints(nullable: 'false')
 			}
 
-			column(name: 'domain', type: 'varchar(255)') {
-				constraints(nullable: 'false')
-			}
-
-			column(name: 'domain_id', type: 'BIGINT(20)') {
+			column(name: 'asset_entity_id', type: 'BIGINT(20)') {
 				constraints(nullable: 'false')
 			}
 
@@ -113,14 +109,14 @@ databaseChangeLog = {
 			}
 		}
 
-		createIndex(indexName: 'FK_tag_link_tag', tableName: 'tag_link') {
+		createIndex(indexName: 'FK_tag_asset_entity', tableName: 'tag_asset_entity') {
 			column(name: 'tag_id')
 		}
 
 		addForeignKeyConstraint(
 			baseColumnNames: 'tag_id',
-			baseTableName: 'tag_link',
-			constraintName: 'FK_tag_link_tag',
+			baseTableName: 'tag_asset_entity',
+			constraintName: 'FK_tag_asset_entity',
 			onDelete: 'CASCADE',
 			deferrable: 'false',
 			initiallyDeferred: 'false',
@@ -129,9 +125,24 @@ databaseChangeLog = {
 			referencesUniqueColumn: 'false'
 		)
 
-		createIndex(indexName: 'UK_tag_link_domain_id_domain_class_tag', tableName: 'tag_link', unique: true) {
-			column(name: 'domain_id')
-			column(name: 'domain')
+		createIndex(indexName: 'FK_tag_asset_entity_asset_entity', tableName: 'tag_asset_entity') {
+			column(name: 'asset_entity_id')
+		}
+
+		addForeignKeyConstraint(
+			baseColumnNames: 'asset_entity_id',
+			baseTableName: 'tag_asset_entity',
+			constraintName: 'FK_tag_asset_entity_asset_entity',
+			onDelete: 'CASCADE',
+			deferrable: 'false',
+			initiallyDeferred: 'false',
+			referencedColumnNames: 'asset_entity_id',
+			referencedTableName: 'asset_entity',
+			referencesUniqueColumn: 'false'
+		)
+
+		createIndex(indexName: 'UK_tag_asset_entity_domain_id_domain_class_tag', tableName: 'tag_asset_entity', unique: true) {
+			column(name: 'asset_entity_id')
 			column(name: 'tag_id')
 		}
 	}
@@ -155,19 +166,19 @@ databaseChangeLog = {
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
 					],
 
-					(Permission.TagEdit): [
+					(Permission.TagEdit)  : [
 						group      : 'NONE',
 						description: 'Can view, create, update, merge, and delete tags.',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR']
 					],
 
-					(Permission.TagView): [
+					(Permission.TagView)  : [
 						group      : 'NONE',
 						description: 'Can view, create, update, merge, and delete tags.',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
 					],
 
-					(Permission.TagMerge): [
+					(Permission.TagMerge) : [
 						group      : 'NONE',
 						description: 'Can view, create, update, merge, and delete tags.',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']

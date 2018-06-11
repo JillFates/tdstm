@@ -1,22 +1,20 @@
 package net.transitionmanager.domain
 
-import com.tdsops.etl.ETLDomain
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 
-class TagLink {
-	Long      domainId
-	ETLDomain domain
+class TagAssetEntity {
 	Date      dateCreated
 	Date      lastUpdated
 
-	static belongsTo = [tag: Tag]
+	static belongsTo = [tag: Tag, assetEntity: AssetEntity]
 
 	static constraints = {
-		domainId unique: ['domain', 'tag']
+		tag unique: ['assetEntity']
 	}
 
 	static mapping = {
-		id column: 'tag_link_id'
+		id column: 'tag_asset_entity_id'
 		autoTimestamp false
 		domainClass enumType: "string"
 	}

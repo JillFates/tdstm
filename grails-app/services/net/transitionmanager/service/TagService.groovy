@@ -1,10 +1,8 @@
 package net.transitionmanager.service
 
-import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.Color
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Tag
-
 /**
  * A service for dealing with tags
  */
@@ -51,9 +49,6 @@ class TagService {
 		List whereFilters = ['t.project = :project']
 
 		Map params = [
-			assetClasses   : [ETLDomain.Asset, ETLDomain.Application, ETLDomain.Device, ETLDomain.Storage],
-			dependencyClass: ETLDomain.Dependency,
-			taskClass      : ETLDomain.Task,
 			project        : securityService.userCurrentProject
 		]
 
@@ -89,13 +84,11 @@ class TagService {
 				t.name as Name,
 				t.description as Description,
 				t.color as Color,
-				SUM( case when tl.domain in (:assetClasses) then 1 else 0 end) as Assets,
-				SUM( case when tl.domain = :dependencyClass then 1 else 0 end) as Dependencies,
-				SUM( case when tl.domain = :taskClass then 1 else 0 end) as Tasks,
+				COUNT(tl) as Assets,
 				t.dateCreated as DateCreated,
 				t.lastUpdated as LastModified)
 			FROM Tag t
-			LEFT OUTER JOIN t.tagLinks tl
+			LEFT OUTER JOIN t.tagAssetEntities tl
 			$where
 			GROUP BY t.id""".stripIndent(), params)
 

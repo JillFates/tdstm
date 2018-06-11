@@ -11,7 +11,7 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagLink
+import net.transitionmanager.domain.TagAssetEntity
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
@@ -123,20 +123,16 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	Tag tag3
 
 	@Shared
-	TagLink tagLink1
+	TagAssetEntity tagAssetEntity1
 
 	@Shared
-	TagLink tagLink2
+	TagAssetEntity tagAssetEntity2
 
 	@Shared
-	TagLink tagLink3
-
-
-	@Shared
-	TagLink tagLink4
+	TagAssetEntity tagAssetEntity3
 
 	@Shared
-	TagLink tagLink5
+	TagAssetEntity tagAssetEntity4
 
 	@Shared
 	Date now
@@ -186,13 +182,12 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
 
-		tagLink1 = new TagLink(tag: tag1, domainId: device.id, domain: ETLDomain.Device).save(flush: true, failOnError: true)
-		tagLink2 = new TagLink(tag: tag2, domainId: device2.id, domain: ETLDomain.Device).save(flush: true, failOnError: true)
-		tagLink3 = new TagLink(tag: tag3, domainId: device3.id, domain: ETLDomain.Device).save(flush: true, failOnError: true)
-		tagLink4 = new TagLink(tag: tag1, domainId: dependency1.id, domain: ETLDomain.Dependency).save(flush: true, failOnError: true)
-		tagLink5 = new TagLink(tag: tag3, domainId: application2.id, domain: ETLDomain.Application).save(flush: true, failOnError: true)
+		tagAssetEntity1 = new TagAssetEntity(tag: tag1, assetEntity: device).save(flush: true, failOnError: true)
+		tagAssetEntity2 = new TagAssetEntity(tag: tag1, assetEntity: device2).save(flush: true, failOnError: true)
+		tagAssetEntity3 = new TagAssetEntity(tag: tag2, assetEntity: device2).save(flush: true, failOnError: true)
+		tagAssetEntity4 = new TagAssetEntity(tag: tag3, assetEntity: device3).save(flush: true, failOnError: true)
 
-		tagService.securityService = [getUserCurrentProject: { -> project }] as SecurityService
+		tagService.securityService = [getUserCurrentProject: { -> project }, assertCurrentProject : { Project project -> }] as SecurityService
 		now = TimeUtil.nowGMT().clearTime()
 	}
 
@@ -205,9 +200,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 
@@ -217,8 +210,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].Dependencies == 0
-			results[1].Tasks == 0
 			results[1].DateCreated == now
 			results[1].LastModified == now
 	}
@@ -232,9 +223,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 	}
@@ -248,9 +237,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 	}
@@ -273,8 +260,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
 			results[0].Assets == 1
-			results[0].Dependencies == 0
-			results[0].Tasks == 0
 			results[0].DateCreated == now
 			results[0].LastModified == now
 	}
@@ -289,8 +274,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
 			results[0].Assets == 1
-			results[0].Dependencies == 0
-			results[0].Tasks == 0
 			results[0].DateCreated == now
 			results[0].LastModified == now
 	}
@@ -312,9 +295,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 
@@ -324,8 +305,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].Dependencies == 0
-			results[1].Tasks == 0
 			results[1].DateCreated == now
 			results[1].LastModified == now
 	}
@@ -346,9 +325,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 
@@ -358,8 +335,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].Dependencies == 0
-			results[1].Tasks == 0
 			results[1].DateCreated == now
 			results[1].LastModified == now
 	}
@@ -381,9 +356,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].css == Color.Black.css
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
-			results[0].Assets == 1
-			results[0].Dependencies == 1
-			results[0].Tasks == 0
+			results[0].Assets == 2
 			results[0].DateCreated == now
 			results[0].LastModified == now
 	}
