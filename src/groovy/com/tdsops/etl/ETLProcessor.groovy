@@ -1083,7 +1083,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 
 		if (currentElement?.fieldDefinition?.name == fieldDefinition.name) {
-			return currentElement
+			return bindCurrentElement(currentElement)
 		} else {
 			return bindCurrentElement(currentRow.addNewElement(null, fieldDefinition, this))
 		}
