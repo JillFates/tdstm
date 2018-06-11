@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
@@ -50,7 +50,9 @@ export class ProviderListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private preferenceService: PreferenceService,
+		private elementRef: ElementRef,
+		private renderer: Renderer2) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		providers.subscribe(
@@ -139,8 +141,19 @@ export class ProviderListComponent implements OnInit {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
+				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
 			},
 			(err) => console.log(err));
+	}
+
+	/**
+	 * This work as a temporary fix.
+	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
+	 */
+	private forceDisplayLastRowAddedToGrid(): void {
+		const lastIndex = this.gridData.data.length - 1;
+		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
+		this.renderer.setStyle(target, 'height', '36px');
 	}
 
 	/**
