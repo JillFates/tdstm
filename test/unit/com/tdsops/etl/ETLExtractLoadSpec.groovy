@@ -2684,6 +2684,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		}
 	}
 
+	@See('TM-10726')
 	void 'test load with append transformation should fail'() {
 
 		given:
