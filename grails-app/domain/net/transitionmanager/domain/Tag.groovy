@@ -11,11 +11,11 @@ class Tag {
 	Date    dateCreated
 	Date    lastUpdated
 
-	Collection tagAssetEntities
+	Collection tagAssets
 
 	static belongsTo = [project: Project]
 
-	static hasMany = [tagAssetEntities: TagAssetEntity]
+	static hasMany = [tagAssets: TagAsset]
 
 	static constraints = {
 		name size: 1..50, unique: 'project'

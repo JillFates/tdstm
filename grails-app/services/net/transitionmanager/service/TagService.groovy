@@ -88,7 +88,7 @@ class TagService {
 				t.dateCreated as DateCreated,
 				t.lastUpdated as LastModified)
 			FROM Tag t
-			LEFT OUTER JOIN t.tagAssetEntities tl
+			LEFT OUTER JOIN t.tagAssets tl
 			$where
 			GROUP BY t.id""".stripIndent(), params)
 

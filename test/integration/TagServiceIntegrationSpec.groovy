@@ -11,7 +11,7 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
-import net.transitionmanager.domain.TagAssetEntity
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
@@ -123,16 +123,16 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	Tag tag3
 
 	@Shared
-	TagAssetEntity tagAssetEntity1
+	TagAsset tagAsset1
 
 	@Shared
-	TagAssetEntity tagAssetEntity2
+	TagAsset tagAsset2
 
 	@Shared
-	TagAssetEntity tagAssetEntity3
+	TagAsset tagAsset3
 
 	@Shared
-	TagAssetEntity tagAssetEntity4
+	TagAsset tagAsset4
 
 	@Shared
 	Date now
@@ -182,10 +182,10 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
 
-		tagAssetEntity1 = new TagAssetEntity(tag: tag1, assetEntity: device).save(flush: true, failOnError: true)
-		tagAssetEntity2 = new TagAssetEntity(tag: tag1, assetEntity: device2).save(flush: true, failOnError: true)
-		tagAssetEntity3 = new TagAssetEntity(tag: tag2, assetEntity: device2).save(flush: true, failOnError: true)
-		tagAssetEntity4 = new TagAssetEntity(tag: tag3, assetEntity: device3).save(flush: true, failOnError: true)
+		tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true, failOnError: true)
+		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
+		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
+		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
 
 		tagService.securityService = [getUserCurrentProject: { -> project }, assertCurrentProject : { Project project -> }] as SecurityService
 		now = TimeUtil.nowGMT().clearTime()

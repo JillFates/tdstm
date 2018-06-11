@@ -75,24 +75,24 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: 'tpelletier', id: '20180601 TM-10929-2') {
-		comment("Create tag_asset_entity table")
+		comment("Create tag_asset table")
 
 		preConditions(onFail: 'MARK_RAN') {
 			not {
-				tableExists(tableName: 'tag_asset_entity')
+				tableExists(tableName: 'tag_asset')
 			}
 		}
 
-		createTable(tableName: 'tag_asset_entity') {
-			column(autoIncrement: 'true', name: 'tag_asset_entity_id', type: 'BIGINT(20)') {
-				constraints(nullable: 'false', primaryKey: 'true', primaryKeyName: 'tag_asset_entityPK')
+		createTable(tableName: 'tag_asset') {
+			column(autoIncrement: 'true', name: 'tag_asset_id', type: 'BIGINT(20)') {
+				constraints(nullable: 'false', primaryKey: 'true', primaryKeyName: 'tag_assetPK')
 			}
 
 			column(name: 'version', type: 'BIGINT(20)') {
 				constraints(nullable: 'false')
 			}
 
-			column(name: 'asset_entity_id', type: 'BIGINT(20)') {
+			column(name: 'asset_id', type: 'BIGINT(20)') {
 				constraints(nullable: 'false')
 			}
 
@@ -109,14 +109,14 @@ databaseChangeLog = {
 			}
 		}
 
-		createIndex(indexName: 'FK_tag_asset_entity', tableName: 'tag_asset_entity') {
+		createIndex(indexName: 'FK_tag_asset_tag', tableName: 'tag_asset') {
 			column(name: 'tag_id')
 		}
 
 		addForeignKeyConstraint(
 			baseColumnNames: 'tag_id',
-			baseTableName: 'tag_asset_entity',
-			constraintName: 'FK_tag_asset_entity',
+			baseTableName: 'tag_asset',
+			constraintName: 'FK_tag_asset_tag',
 			onDelete: 'CASCADE',
 			deferrable: 'false',
 			initiallyDeferred: 'false',
@@ -125,14 +125,14 @@ databaseChangeLog = {
 			referencesUniqueColumn: 'false'
 		)
 
-		createIndex(indexName: 'FK_tag_asset_entity_asset_entity', tableName: 'tag_asset_entity') {
-			column(name: 'asset_entity_id')
+		createIndex(indexName: 'FK_tag_asset_asset', tableName: 'tag_asset') {
+			column(name: 'asset_id')
 		}
 
 		addForeignKeyConstraint(
-			baseColumnNames: 'asset_entity_id',
-			baseTableName: 'tag_asset_entity',
-			constraintName: 'FK_tag_asset_entity_asset_entity',
+			baseColumnNames: 'asset_id',
+			baseTableName: 'tag_asset',
+			constraintName: 'FK_tag_asset_asset',
 			onDelete: 'CASCADE',
 			deferrable: 'false',
 			initiallyDeferred: 'false',
@@ -141,8 +141,8 @@ databaseChangeLog = {
 			referencesUniqueColumn: 'false'
 		)
 
-		createIndex(indexName: 'UK_tag_asset_entity_domain_id_domain_class_tag', tableName: 'tag_asset_entity', unique: true) {
-			column(name: 'asset_entity_id')
+		createIndex(indexName: 'UK_tag_asset_asset_tag', tableName: 'tag_asset', unique: true) {
+			column(name: 'asset_id')
 			column(name: 'tag_id')
 		}
 	}

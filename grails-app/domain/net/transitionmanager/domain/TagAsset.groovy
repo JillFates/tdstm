@@ -3,18 +3,18 @@ package net.transitionmanager.domain
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 
-class TagAssetEntity {
+class TagAsset {
 	Date      dateCreated
 	Date      lastUpdated
 
-	static belongsTo = [tag: Tag, assetEntity: AssetEntity]
+	static belongsTo = [tag: Tag, asset: AssetEntity]
 
 	static constraints = {
-		tag unique: ['assetEntity']
+		tag unique: ['asset']
 	}
 
 	static mapping = {
-		id column: 'tag_asset_entity_id'
+		id column: 'tag_asset_id'
 		autoTimestamp false
 		domainClass enumType: "string"
 	}

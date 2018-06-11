@@ -14,7 +14,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import net.transitionmanager.domain.TagAssetEntity
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.CustomDomainService
 
 import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
@@ -207,9 +207,9 @@ class AssetEntity extends EavEntity {
 	SizeScale  scale
 	Integer    rateOfChange
 	Person     modifiedBy
-	Collection tagAssetEntities
+	Collection tagAssets
 
-	static hasMany = [comments: AssetComment, tagAssetEntities: TagAssetEntity]
+	static hasMany = [comments: AssetComment, tagAssets: TagAsset]
 
 	static constraints = {
 		application nullable: true
