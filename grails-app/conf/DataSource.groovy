@@ -1,6 +1,6 @@
 dataSource {
 	dbCreate = 'none'
-	dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
+	dialect = 'com.tdsops.common.sql.CustomMySQLDialect'
 	driverClassName = 'com.mysql.jdbc.Driver'
 	jmxExport = true
 	pooled = true
