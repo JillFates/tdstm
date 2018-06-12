@@ -208,7 +208,8 @@ class ETLProcessorResult {
 		}
 		return [
 			ETLInfo: this.ETLInfo,
-			domains: this.domains
+			domains: this.domains,
+			consoleLog: this.processor.debugConsole.content()
 		]
 	}
 
