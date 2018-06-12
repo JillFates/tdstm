@@ -1,13 +1,8 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
-import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
@@ -77,42 +72,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
 	AssetEntity device3
 
-	/**
-	 * an application in moveBundle(usedForPlanning = 1)
-	 */
-	@Shared
-	Application application1
-
-	/**
-	 * a device in moveBundle2(usedForPlanning = 0)
-	 */
-	@Shared
-	Application application2
-
-	@Shared
-	AssetEntity otherProjectDevice
-
-	@Shared
-	Map context
-
-	/**
-	 * a dependency that has it's asset and dependent in moveBundle(usedForPlanning = 1)
-	 */
-	@Shared
-	AssetDependency dependency1
-
-	/**
-	 * a dependency that has it's asset in moveBundle2(usedForPlanning = 0) and dependent in moveBundle(usedForPlanning = 1)
-	 */
-	@Shared
-	AssetDependency dependency2
-
-	/**
-	 * a dependency that has it's asset in moveBundle(usedForPlanning = 1) and dependent in moveBundle2(usedForPlanning = 0)
-	 */
-	@Shared
-	AssetDependency dependency3
-
 	@Shared
 	Tag tag1
 
@@ -144,39 +103,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle2)
-
-		application1 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle)
-		application2 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle2)
-
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(
-			AssetClass.DEVICE,
-			otherProject,
-			moveBundleTestHelper.createBundle(otherProject, null)
-		)
-
-		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
-		context.record = new ImportBatchRecord(sourceRowId: 1)
-
-		device.assetType = 'Server'
-		device.validation = 'BundleReady'
-		device.save(flush: true, failOnError: true)
-
-		device2.assetType = 'Server'
-		device2.validation = 'Discovery'
-		device2.save(flush: true, failOnError: true)
-
-		moveBundle2.useForPlanning = 0
-		moveBundle2.save(flush: true, failOnError: true)
-
-		// Create a second project with a device with the same name and type as device above
-		otherProjectDevice.assetName = device.assetName
-		otherProjectDevice.assetType = device.assetType
-		otherProjectDevice.validation = 'Discovery'
-		otherProjectDevice.save(flush: true, failOnError: true)
-
-		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
-		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
 
 		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
