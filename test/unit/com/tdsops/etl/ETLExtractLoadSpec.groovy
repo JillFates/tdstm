@@ -596,60 +596,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using CE'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Application
-				iterate {
-					extract 'vendor name'
-					if ( CE == 'Microsoft'){
-						load 'appVendor' with CE
-					} else {
-						load 'environment' with CE
-					}
-				}
-			""".stripIndent())
-
-		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
-				domains.size() == 1
-				with(domains[0], DomainResult) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['appVendor', 'environment'] as Set
-					with(fieldLabelMap) {
-						appVendor == 'Vendor'
-						environment == 'Environment'
-					}
-
-					data.size() == 2
-					with(data[0]) {
-						rowNum == 1
-						with(fields.appVendor) {
-							value == 'Microsoft'
-							originalValue == 'Microsoft'
-						}
-					}
-
-					with(data[1]) {
-						rowNum == 2
-						with(fields.environment) {
-							value == 'Mozilla'
-							originalValue == 'Mozilla'
-						}
-					}
-				}
-			}
-	}
-
 	void 'test can load a field using DOMAINproperty'() {
 
 		given:
