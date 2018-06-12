@@ -4,8 +4,8 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 
 class TagAsset {
-	Date      dateCreated
-	Date      lastUpdated
+	Date dateCreated
+	Date lastUpdated
 
 	static belongsTo = [tag: Tag, asset: AssetEntity]
 
@@ -25,5 +25,18 @@ class TagAsset {
 
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT().clearTime()
+	}
+
+	Map toMap() {
+		[
+			id          : id,
+			tagId       : tag.id,
+			Name        : tag.name,
+			Description : tag.description,
+			Color       : tag.color.name(),
+			css         : tag.color.css,
+			DateCreated : dateCreated,
+			LastModified: lastUpdated
+		]
 	}
 }
