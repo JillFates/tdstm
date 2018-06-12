@@ -45,4 +45,14 @@ export class FieldImportance {
 	};
 }
 
+export const FIELD_COLORS = {
+	Y: {name: 'yellow', color: '#FFFF00'},
+	G: {name: 'green', color: '#00FF00'},
+	B: {name: 'blue', color: '#0000BB'},
+	P: {name: 'pink', color: '#FFC0CB'},
+	O: {name: 'orange', color: '#FFA500'},
+	N: {name: 'no-color', color: '#DDDDDD'},
+	U: {name: 'unimportant', color: '#F4F4F4'}
+};
+
 export const FIELD_NOT_FOUND = 'Field Not Found';

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { DomainModel } from '../model/domain.model';
-import { FieldSettingsModel } from '../model/field-settings.model';
+import { FieldSettingsModel, FIELD_COLORS } from '../model/field-settings.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
@@ -64,4 +64,18 @@ export class FieldSettingsService {
 			.map((res: Response) => res['_body'] ? res.json() : { status: 'Ok' })
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
+
+	getFieldColorsKeys(): string[] {
+		return Object.keys(FIELD_COLORS);
+	}
+
+	mapColorFromLegacyImportantSchema(legacyValue: string): string {
+		const mapSchemas = {
+			'I': 'G',   // Important to Green
+			'C': 'Y'    // Critical to Yellow
+		};
+
+		return mapSchemas[legacyValue] ? mapSchemas[legacyValue] : legacyValue;
+	}
+
 }

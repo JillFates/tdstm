@@ -1,4 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { FieldSettingsService } from '../../service/field-settings.service';
+import { FIELD_COLORS } from '../../model/field-settings.model';
 
 @Component({
 	selector: 'field-settings-imp',
@@ -7,15 +9,25 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 		span { padding:0 5px; cursor: pointer;}
     `]
 })
-export class FieldSettingsImportanceComponent {
+export class FieldSettingsImportanceComponent implements  OnInit {
 	@Input() model: string;
 	@Input('edit') editMode: boolean;
 	@Output() modelChange = new EventEmitter<string>();
+	public values = []; // ['C', 'I', 'N', 'U'];
 
-	private values = ['C', 'I', 'N', 'U'];
+	constructor(public fieldSettinsService: FieldSettingsService) {
+	}
+
+	ngOnInit() {
+		this.values = Object.keys(FIELD_COLORS);
+	}
 
 	public onModelChange(value: string): void {
 		this.modelChange.emit(value);
+	}
+
+	public mapLegacyColor(value: string): string {
+		return this.fieldSettinsService.mapColorFromLegacyImportantSchema(value);
 	}
 
 }
