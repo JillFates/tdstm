@@ -43,6 +43,9 @@ class ImportBatch {
 	// A JSON List of the field names that are referenced in the detail records
 	String fieldNameList = '[]'
 
+	// A JSON onject with a list of the field names and its field labels values
+	String fieldLabelMap = '{}'
+
 	// The results of the various import process steps (in HTML format)
 	String importResults = ''
 
@@ -100,6 +103,7 @@ class ImportBatch {
 		dateFormat nullable: true, blank:true, size: 0..32
 		dataScript nullable: true
 		fieldNameList size: 2..65635
+		fieldLabelMap size: 2..65635
 		lastUpdated nullable: true
 		originalFilename blank:true, size: 0..255
 		nullIndicator nullable:true, blank:true, size: 0..255
@@ -121,6 +125,7 @@ class ImportBatch {
 		dateFormat sqltype: 'VARCHAR(32)'
 		domainClassName sqltype: 'VARCHAR(32)', enumType: 'String'
 		fieldNameList sqltype: 'TEXT'	// JSON
+		fieldLabelMap sqltype: 'TEXT'
 		overwriteWithBlanks sqltype: 'TINYINT(1)'
 		originalFilename sqltype: 'VARCHAR(255)'
 		processProgress sqltype: 'TINYINT(3)'
@@ -141,6 +146,14 @@ class ImportBatch {
 	 */
 	List fieldNameListAsList() {
 		return JsonUtil.parseJsonList(fieldNameList)
+	}
+
+	/**
+	 * Return the list of fields as a list.
+	 * @return
+	 */
+	Map fieldLabelMapAsJsonMap() {
+		return JsonUtil.parseJson(fieldLabelMap) as Map
 	}
 
 	/**
@@ -178,6 +191,7 @@ class ImportBatch {
 				autoProcess: autoProcess,
 				warnOnChangesAfter: warnOnChangesAfter,
 				fieldNameList: fieldNameListAsList(),
+				fieldLabelMap: fieldLabelMapAsJsonMap(),
 				queuedAt: queuedAt,
 				queuedBy: queuedBy,
 				dateCreated: dateCreated,
