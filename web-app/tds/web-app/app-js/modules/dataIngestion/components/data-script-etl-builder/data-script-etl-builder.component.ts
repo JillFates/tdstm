@@ -126,6 +126,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 						this.importAssetsService.getFileContent(scripTestFilename)
 							.subscribe(result => {
 								this.scriptTestResult.domains = result.domains;
+								this.scriptTestResult.consoleLog = result.consoleLog;
+								this.consoleSettings.scriptTestResult = this.scriptTestResult;
 							});
 					}, 500);
 				} else {
@@ -135,6 +137,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				}
 			});
 	}
+
 	/**
 	 * On Check Script Syntax button.
 	 */
