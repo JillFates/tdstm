@@ -1,11 +1,14 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.StringUtil
+
 /**
  *
  * ETLProcess exception used in DSL processing
  *
  */
 class ETLProcessorException extends GroovyRuntimeException {
+    static final String UNKNOWN_DOMAIN_FIELDS_SPEC = "Specified field '{FIELD}' is not defined in domain {DOMAIN}"
 
     ETLProcessorException (CharSequence message) {
         super(message)
@@ -23,8 +26,9 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('You need to define a find element first')
     }
 
-    static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain, String field) {
-        new ETLProcessorException("There is not validator for domain $domain and field $field")
+    static ETLProcessorException unknownDomainFieldsSpec(ETLDomain domain, String field) {
+        String msg = StringUtil.replacePlaceholders(UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:domain.toString(), FIELD:field])
+        new ETLProcessorException( msg )
     }
 
     static ETLProcessorException domainWithoutFieldsSpec (ETLDomain domain, String field) {

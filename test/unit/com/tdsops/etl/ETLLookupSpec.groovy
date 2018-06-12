@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdssrc.grails.StringUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -95,7 +96,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "There is not validator for domain Device and field unknown"
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Device', FIELD:'unknown'])
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -201,12 +202,12 @@ class ETLLookupSpec extends ETLBaseSpec {
 						console on
 						read labels
 						domain Device
-						
+
 						iterate {
 							extract 'server' set nameVar
 							extract 'model' set modelVar
 							extract 'dependsOn' set dependsOnVar
-	
+
 							lookup 'model' with modelVar
 							if ( LOOKUP.notFound() ) {
 								load 'model' with modelVar

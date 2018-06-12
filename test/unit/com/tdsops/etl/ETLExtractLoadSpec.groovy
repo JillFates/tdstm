@@ -25,6 +25,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import com.tdssrc.grails.StringUtil
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -938,7 +939,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'There is not validator for domain Application and field appVendor'
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'appVendor'])
 
 	}
 
@@ -967,7 +968,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'There is not validator for domain Application and field vendedor'
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'vendedor'])
 	}
 
 	void 'test can extract a field value and load into a domain object property name'() {
