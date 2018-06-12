@@ -535,27 +535,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *    domain Application
 	 *    load 'assetName' with 'Asset Name'
 	 *    load 'assetName' with CE
-	 *    load 'assetName' with myLocalVariable
+	 *    load 'assetName' with myLocalVar
 	 *    load 'assetName' with DOMAIN.id
 	 *    load 'assetName' with SOURCE.'data name'
+	 *    load 'assetName' with concat(',', SOURCE.'column 1', SOURCE.'column 2')
 	 * </pre>
 	 * @param fieldName
 	 * @return
 	 */
-	Map<String, ?> load(final String fieldName) {
+	Element load(final String fieldName) {
 		validateStack()
-		return [
-			with: { value ->
-
-				Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
-				element.originalValue = ETLValueHelper.valueOf(value)
-				element.value = element.originalValue
-				addElementLoaded(selectedDomain.domain, element)
-				element
-			}
-		]
-
+		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
+		element.loadedElement = true
+		return element
 	}
+
 
 	/**
 	 * Create a local variable using variableName parameter.
@@ -919,6 +913,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	private Element doExtract () {
 		Element element = createCurrentElement(currentColumnIndex)
+		element.loadedElement = false
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
@@ -1040,11 +1035,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return
 	 */
 	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
-		if(currentElement?.fieldDefinition?.name == fieldDefinition.name){
-			return currentElement
-		} else{
+		RowResult rr
+		// if there is an element found after a lookup invokation,
+		// let's return that element so the commands like append has access
+		// to the found elemnts
+		if (result.resultIndex >= 0) {
+			rr = result.currentRow()
+			if (rr.fields.containsKey(fieldDefinition.name)) {
+				FieldResult fieldResult = rr.fields[fieldDefinition.name]
+				currentElement = new Element(
+						value: fieldResult.value,
+						originalValue: fieldResult.originalValue,
+						init: fieldResult.init,
+						fieldDefinition: fieldDefinition,
+						processor: this
+				)
+			}
+		}
+
+		if (currentElement?.fieldDefinition?.name == fieldDefinition.name) {
+			return bindCurrentElement(currentElement)
+		} else {
 			return bindCurrentElement(currentRow.addNewElement(null, fieldDefinition, this))
 		}
+
 	}
 
 	/**

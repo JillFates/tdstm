@@ -40,6 +40,14 @@ class Element implements RangeChecker {
 	ETLFieldDefinition fieldDefinition
 
 	/**
+	 * Defines if an Element instance was created by:
+	 * <pre>
+	 *    load 'name' with 'Foo Bar'
+	 * </pre>
+	 */
+	boolean loadedElement = false
+
+	/**
 	 * Transform command on an element with a closure to be executed
 	 * <pre>
 	 *     domain Application
@@ -422,24 +430,17 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Appends Element and String values from a ETL Script and assign result String value.
+	 * Concats Element and String values from a ETL Script and assign result String value.
 	 * It's used in this ETL script command
 	 * <code>
-	 *     extract 4 transform append('-', myVar) load description
+	 *     extract 4 transform concat('-', myVar) load description
 	 * </code>
 	 * @param objects
 	 * @return
 	 */
-	Element append(Object... objects) {
-
-		String newValue = objects.sum { object ->
-			if(Element.class.isInstance(object)){
-				((Element)object).value
-			} else{
-				object ? object.toString() : ''
-			}
-		}
-		this.value += newValue
+	Element concat(String separator, Object...values){
+		this.value = ETLTransformation.concat(separator, this.value, values)
+		checkLoadedElement()
 		return this
 	}
 
@@ -468,6 +469,66 @@ class Element implements RangeChecker {
 	 */
 	Element plus(String value) {
 		this.value += value
+		return this
+	}
+
+	/**
+	 * Perform the append process over all values separated by <code>separator</code> provided
+	 * @param separator - value separator
+	 * @param values - list of values to concatenate
+	 *
+	 *
+	 * Examples
+	 * <code>
+	 * extract 'column' transform with append(separator, value1, [value2, value3, ...]) uppercase()
+	 *
+	 * extract 'column' transform with append(', ', ipVar)
+	 * extract 'column' transform with append(', ', DOMAIN.assetName)
+	 * extract 'column' transform with append(', ', SOURCE.'device id')
+	 *
+	 * load 'IP Address' with append(', ', ipVar)
+	 * </code>
+	 *
+	 * @return the joined string
+	 */
+	Element append(String separator, Object...values){
+		this.value = ETLTransformation.append(separator, this.value, values)
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Check if the current element instance was started using load command,
+	 * and save it in ETLProcessorResult
+	 * <pre>
+	 *  load 'Name' transform with append(',', 'foo', 'bar')
+	 * </pre>
+	 * @see Element#loadedElement
+	 */
+	private void checkLoadedElement(){
+		if(loadedElement){
+			this.originalValue = this.value
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
+			loadedElement = false
+		}
+	}
+
+	/**
+	 * Perform the evaluation of the value parameter and update current element value and original value.
+	 * @param value - can be a variable, string, DOMAIN..., SOURCE... or a function like concat(....)
+	 *
+	 * <pre>
+	 *		load 'Name' transform with append(',', 'foo', 'bar')
+	 *		initialize 'Name' transform with append(' - ', envVar)
+	 *		extract 'Name' transform with append(' - ', envVar) load 'Name'
+	 * </pre>
+	 *
+	 * @return current Element updated
+	 */
+	Element with(Object value) {
+		this.value = ETLValueHelper.valueOf(value)
+		this.originalValue = ETLValueHelper.valueOf(value)
+		processor.addElementLoaded(processor.selectedDomain.domain, this)
 		return this
 	}
 

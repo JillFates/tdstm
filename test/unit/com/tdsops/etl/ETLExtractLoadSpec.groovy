@@ -597,60 +597,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using CE'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Application
-				iterate {
-					extract 'vendor name'
-					if ( CE == 'Microsoft'){
-						load 'appVendor' with CE
-					} else {
-						load 'environment' with CE
-					}
-				}
-			""".stripIndent())
-
-		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
-				domains.size() == 1
-				with(domains[0], DomainResult) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['appVendor', 'environment'] as Set
-					with(fieldLabelMap) {
-						appVendor == 'Vendor'
-						environment == 'Environment'
-					}
-
-					data.size() == 2
-					with(data[0]) {
-						rowNum == 1
-						with(fields.appVendor) {
-							value == 'Microsoft'
-							originalValue == 'Microsoft'
-						}
-					}
-
-					with(data[1]) {
-						rowNum == 2
-						with(fields.environment) {
-							value == 'Mozilla'
-							originalValue == 'Mozilla'
-						}
-					}
-				}
-			}
-	}
-
 	void 'test can load a field using DOMAINproperty'() {
 
 		given:
@@ -2510,5 +2456,204 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			if(fileName){
 				service.deleteTemporaryFile(fileName)
 			}
+	}
+
+	@See('TM-10726')
+	void 'test can transform with concat function'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						load 'environment' transform with concat(',', SOURCE.'vendor name', SOURCE.'location')
+					}
+				""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Microsoft,ACME Data Center'
+							value == 'Microsoft,ACME Data Center'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							originalValue == 'Mozilla,ACME Data Center'
+							value == 'Mozilla,ACME Data Center'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test can transform with concat transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						set envVar with 'Prod'
+						extract 'vendor name' transform with append('-', envVar) load 'environment'
+					}
+				""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Microsoft'
+							value == 'Microsoft-Prod'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							originalValue == 'Mozilla'
+							value == 'Mozilla-Prod'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test can load with append transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+					srv,ip
+					x,1.2.3.4
+					y,4.5.4.2
+					x,
+					z,3.3.3.3
+					x,1.3.5.1
+					""".stripIndent())
+
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Device
+							extract 'ip' transform with lowercase() set ipVar
+							extract 'srv' set srvVar
+	
+							lookup 'assetName' with srvVar
+							if ( LOOKUP.notFound() ) {
+								// Set the server name first time seen
+								load 'Name' with srvVar
+							}
+							load 'IP Address' transform with append(', ', ipVar)
+						}
+					""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 3
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'x'
+							value == 'x'
+						}
+						with(fields.ipAddress) {
+							originalValue == '1.2.3.4, 1.3.5.1'
+							value == '1.2.3.4, 1.3.5.1'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == 'y'
+							value == 'y'
+						}
+						with(fields.ipAddress) {
+							originalValue == '4.5.4.2'
+							value == '4.5.4.2'
+						}
+					}
+					with(data[2]) {
+						rowNum == 4
+						with(fields.assetName) {
+							originalValue == 'z'
+							value == 'z'
+						}
+						with(fields.ipAddress) {
+							originalValue == '3.3.3.3'
+							value == '3.3.3.3'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test load with append transformation should fail'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Application
+							set envVar with 'Prod'
+							
+							load 'Name' with append('-', envVar) 
+						}
+					""".stripIndent())
+
+		then: 'exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'No such property: append'
 	}
 }

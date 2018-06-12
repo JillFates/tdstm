@@ -19,6 +19,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import spock.lang.See
 import spock.lang.Shared
 /**
  * Test about ETLProcessor commands:
@@ -365,26 +366,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(0, 1).value == ""
 			etlProcessor.getElement(1, 1).value == ""
 			etlProcessor.getElement(2, 1).value == ""
-	}
-
-	void 'test can throw an exception when a middle transformation is staring in zero'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-					domain Device
-					read labels
-					iterate {
-						extract 'model name' transform with middle(0, 2) lowercase()
-					}
-				""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Must use positive values greater than 0 for "middle" transform function'
 	}
 
 	void 'test can throw an exception when a middle transformation is staring in zero'() {
@@ -954,7 +935,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
-						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
+						extract 'location' transform with append('', myLocalVar + ' - ' + CE) load 'description'
 					}
 				""".stripIndent())
 
@@ -991,7 +972,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 					extract 'vendor name' transform with lowercase() set myLocalVar
-					extract 'location' transform with append('-', myLocalVar, '-' , CE ) load 'description'
+					extract 'location' transform with append('', '-', myLocalVar, '-' , CE ) load 'description'
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
@@ -1028,7 +1009,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
-						extract 'location' transform with append(' - ', myLocalVar, ' - ') load 'description'
+						extract 'location' transform with append('', ' - ', myLocalVar, ' - ') load 'description'
 					}
 				""".stripIndent())
 
@@ -1102,7 +1083,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'location' transform {
-							lowercase() append('**')
+							lowercase() append('', '**')
 						} load 'description'
 
 					}
@@ -1328,6 +1309,24 @@ class ETLTransformSpec extends ETLBaseSpec {
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'uppercase function only supported for String values (152254 : class java.lang.Integer)'
+
+	}
+
+	@See('TM-10726')
+	void 'test ETLTransformation concat'() {
+		expect: 'concatenation build correctly'
+
+			ETLTransformation.concat(separator, values) == result
+
+		where:
+			separator	|	values									|	result
+			''			|	['one', 'two', 'three'] 				|	'onetwothree'
+			','			|	['one', 'two', 'three']					|	'one,two,three'
+			','			|	['one', '', 'three']					|	'one,three'
+			','			|	['one', '', 'three', true]				|	'one,,three'
+			','			|	['one', null, 'three', true]			|	'one,,three'
+			','			|	['one', 'two', ['three', 'four']]		|	'one,two,three,four'
+			','			|	['one', 'two', ['three', 'four', null]]	|	'one,two,three,four'
 
 	}
 }
