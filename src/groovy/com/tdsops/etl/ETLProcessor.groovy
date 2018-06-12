@@ -1120,8 +1120,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return rows[rowIndex].getElement(columnIndex)
 	}
 
-	Map<String, ?> resultsMap(){
-		this.result.toMap()
+	/**
+	 * Used to return a Map of the results with keys:
+	 *    ETLInfo - Information regarding the ETL Job
+	 *    domains - Data structure with each of the domains processed in DataScript
+	 *    consoleLog - A String containing the console log output (optional)
+	 *
+	 * @param includeConsoleLog - flag if the console log should appear in the results (default false)
+	 * @return Map - the results
+	 */
+	Map<String, ?> resultsMap(Boolean includeConsoleLog=false) {
+		this.result.toMap(includeConsoleLog)
 	}
 
 	List<String> getAvailableMethods () {

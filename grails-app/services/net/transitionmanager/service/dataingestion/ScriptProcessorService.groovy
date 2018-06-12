@@ -62,6 +62,7 @@ class ScriptProcessorService {
 	 * @param project an instance of Project to use in ETLProcessor instance execution
 	 * @param scriptContent an ETLScript content to be executed
 	 * @param filename is the input filename to be used for loading a DataSet
+	 * @param includeConsoleLog - flag to control if console log is included in the response
 	 * @return a pair result with the instance of ETLProcessor used to execute the scriptContent
 	 *         and the filename for the output ETLProcessorResult
 	 * @throws an Exception in case of error in the ETL script content or
@@ -71,7 +72,8 @@ class ScriptProcessorService {
 		Project project,
 		String scriptContent,
 		String filename,
-		ProgressCallback progressCallback = null) {
+		ProgressCallback progressCallback = null,
+		Boolean includeConsoleLog=false) {
 
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
@@ -82,7 +84,7 @@ class ScriptProcessorService {
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
-		os << (etlProcessor.resultsMap() as JSON)
+		os << (etlProcessor.resultsMap(includeConsoleLog) as JSON)
 		os.close()
 
 		progressCallback.reportProgress(
@@ -181,11 +183,13 @@ class ScriptProcessorService {
 			}
 		} as ProgressCallback
 
+		Boolean includeConsoleLog = true
 		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
 			project,
 			scriptContent,
 			sampleDataFullFilename,
-			updateProgressClosure)
+			updateProgressClosure,
+			includeConsoleLog)
 
 		return [filename: outputFilename]
 	}
