@@ -23,7 +23,7 @@ class TagAsset {
 		dateCreated = lastUpdated = TimeUtil.nowGMT().clearTime()
 	}
 
-	def beforeUpdSate = {
+	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT().clearTime()
 	}
 }
