@@ -24,8 +24,8 @@ export class TaskDetailComponent extends UIExtraDialog {
 	 * Load All Asset Class and Retrieve
 	 */
 	private loadTaskDetail(): void {
-		this.taskManagerService.getCommentCategories().subscribe((res) => {
-			//
+		this.taskManagerService.getTaskDetails(this.taskDetailModel.id).subscribe((res) => {
+			this.taskDetailModel.detail = res;
 		});
 	}
 

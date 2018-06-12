@@ -1,30 +1,70 @@
 <div class="task-detail-component modal fade in" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content resizable" [style.width.px]="500">
-			<div class="modal-header">
-				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-				<h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
-			</div>
-			<div class="modal-body">
-				<div class="modal-body-container">
-					<form name="taskDetailForm" role="form" data-toggle="validator" #taskDetailForm='ngForm' class="form-horizontal left-alignment">
-						<div class="box-body">
-							<div class="row">
-
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-			<div class="modal-footer form-group-center">
-                <button type="button" (click)="onDelete()" class="btn btn-danger" *ngIf="taskDetailModel.modal.type !== modalType.CREATE"><span class="fa fa-fw fa-trash"></span> Delete</button>
-				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>Cancel</span>
-				</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content resizable tds-angular-component-content" [style.width.px]="800">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <table style="border: 0">
+                        <tbody>
+                        <tr>
+                            <td colspan="2">
+                                <div class="dialog">
+                                    <table>
+                                        <tbody>
+                                            <tr class="prop">
+                                                <td class="label U" nowrap="nowrap">
+                                                    <label><span>Task # {{taskDetailModel.detail.assetComment.id}}</span></label>
+                                                </td>
+                                                <td class="valueNW U" colspan="5" style="max-width: 400px; font-weight:bold;">
+                                                    <span>{{taskDetailModel.detail.assetComment.comment}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr class="prop">
+                                                <td class="label U" nowrap="nowrap">
+                                                    <label><span>Status</span></label>
+                                                </td>
+                                                <td class="valueNW U task-{{taskDetailModel.detail.assetComment.status |  lowercase}}"><span>{{taskDetailModel.detail.assetComment.status}}</span></td>
+                                                <td class="label U" nowrap="nowrap">
+                                                    <label><span>Asset</span></label>
+                                                </td>
+                                                <td class="valueNW U"><span>{{taskDetailModel.detail.assetName}}</span></td>
+                                                <td class="label U" nowrap="nowrap">
+                                                    <label><span>Introction Link</span></label>
+                                                </td>
+                                                <td class="valueNW U"><span><tds-url-viewer [model]="taskDetailModel.detail.instructionsLinkLabel+'|'+taskDetailModel.detail.instructionsLinkURL"></tds-url-viewer></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="dates-info-container" colspan="2">
+                                <table class="dates-info">
+                                    <tbody>
+                                        <tr>
+                                            <td class="date-created">Date created: </td>
+                                            <td class="last-updated">Last updated: </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer form-group-center">
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

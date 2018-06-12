@@ -152,7 +152,7 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	public openTaskDetail(comment: any, modalType: ModalType): void {
 		let taskDetailModel: TaskDetailModel = {
-			id: comment.commentInstance.taskNumber,
+			id: comment.commentInstance.id,
 			modal: {
 				title: 'Task Detail',
 				type: modalType
