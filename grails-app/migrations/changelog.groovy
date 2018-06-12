@@ -236,4 +236,5 @@ databaseChangeLog = {
 	include file: '20180423-fix-room-rack-location-user-preferences.groovy'
 	include file: '20180430-add-queued-at-to-import-batch.groovy'
 	include file: '20180518-rename-source-target-rack-room-location-dataview-sort-field.groovy'
+	include file: '20180612-datascript-create-unique-index-on-name-project-and-provider.groovy'
 }
