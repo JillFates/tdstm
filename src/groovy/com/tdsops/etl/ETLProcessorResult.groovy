@@ -193,11 +193,13 @@ class ETLProcessorResult {
 	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
 	 * 		ETLInfo <Map>
 	 * 		domains <List><Map>
+	 *      consoleLog <String> (optional)
 	 * It also adds the label map used during an ETL script execution based on field name and field label
+	 * @param includeConsoleLog - flag if console data should be returned (default false)
 	 * @return A map of this object
 	 * @see ETLFieldsValidator#fieldLabelMapForResults()
 	 */
-	Map<String, ?> toMap() {
+	Map<String, ?> toMap(Boolean includeConsoleLog=false) {
 
 		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
 
@@ -206,11 +208,17 @@ class ETLProcessorResult {
 				domainResult.setFieldLabelMap(map[domainResult.domain])
 			}
 		}
-		return [
+
+		Map results = [
 			ETLInfo: this.ETLInfo,
-			domains: this.domains,
-			consoleLog: this.processor.debugConsole.content()
+			domains: this.domains
 		]
+
+		if (includeConsoleLog) {
+			results.put( 'consoleLog',this.processor.debugConsole.content() )
+		}
+
+		return results
 	}
 
 	/**
