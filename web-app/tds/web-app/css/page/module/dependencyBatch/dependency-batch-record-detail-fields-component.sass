@@ -1,5 +1,8 @@
 dependency-batch-record-detail-fields
 
+  .gray-background
+    background-color: $color--grey
+
   label
     font-size: 15px
 
@@ -9,11 +12,26 @@ dependency-batch-record-detail-fields
   .fields-filters
     label
       padding: 3px 0 0 0
-    .fieldsFilterText
-      padding: 0 0 0 0
+
 
   .fields-container
     margin-top: 15px !important
+
+    .fieldsFilterLabel
+      margin-top: 5px
+      padding-right: 0px
+
+    .fieldsFilter
+      padding-left: 0px
+      padding-right: 0px
+
+    .fieldsFilterText
+      .fa-times
+        cursor: pointer
+        color: #656565
+        pointer-events: all
+        margin-right: 25px
+        width: 10px
 
     .row
       margin: 0px 10px 0px 0px
@@ -25,5 +43,13 @@ dependency-batch-record-detail-fields
       div
         background-color: #f6f6f6
 
-    .footer button
-      margin-right: 5px
+    kendo-grid
+      .import-value-input
+        width: 95%
+        margin-left: 5px
+
+    .footer
+      margin-top: 30px
+
+      button
+        margin-right: 5px

@@ -56,6 +56,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	};
 	private originalImportValues: string;
 	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
+	protected BatchStatus = BatchStatus;
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 
@@ -176,8 +177,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		}
 		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
+				this.loadRecordFieldDetails();
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.loadRecordFieldDetails();
 					this.updateSuccessEvent.emit();
 					setTimeout(() => this.saveStatus.state = CHECK_ACTION.VALID, 200);
 				} else {
@@ -252,7 +253,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Text Filter input clear icon click.
 	 */
 	private clearTextFilter(): void {
-		this.fieldsFilter.text = '';
+		this.fieldsFilter.nameFilter.value = '';
 		this.onTextFilter();
 	}
 

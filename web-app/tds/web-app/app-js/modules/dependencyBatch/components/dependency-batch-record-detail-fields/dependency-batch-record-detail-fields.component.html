@@ -4,8 +4,8 @@
             [data]="gridData"
             [pageSize]="25">
         <ng-template kendoGridToolbarTemplate [position]="'top'">
-            <label class="col-sm-1 text-left" style="margin-top: 5px; padding-right: 0px;">Fields</label>
-            <div class="fieldsFilter col-sm-2" style="padding-left: 0px; padding-right: 0px;">
+            <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
+            <div class="fieldsFilter col-sm-2">
                 <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
                                     [data]="fieldsFilter.options"
                                     [textField]="'text'"
@@ -20,21 +20,26 @@
                        type="text" class="form-control"
                        name="fieldsFilterText" placeholder="Filter on field name"
                        (keyup)="onTextFilter()">
-                <span *ngIf="fieldsFilter.text"
-                      style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 25px;width: 10px;"
-                      class="fa fa-times form-control-feedback" (click)="clearTextFilter()"></span>
+                <span *ngIf="fieldsFilter.nameFilter.value"
+                      class="fa fa-times form-control-feedback"
+                      (click)="clearTextFilter()"></span>
             </div>
         </ng-template>
         <kendo-grid-column title="Name" field="name"></kendo-grid-column>
-        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.INSERT"
-                           title="Current Value" [style]="{'background-color': 'lightgrey'}">
+        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.INSERT && batchRecord.status.code === BatchStatus.PENDING"
+                           title="Current Value" [class]="'gray-background'">
         </kendo-grid-column>
-        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE"
-                           title="Current Value" field="dataItem.currentValue">
+        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE && batchRecord.status.code === BatchStatus.PENDING"
+                           title="Current Value" field="currentValue">
+        </kendo-grid-column>
+        <kendo-grid-column *ngIf="batchRecord.status.code === BatchStatus.COMPLETED"
+                           title="Imported Value" field="importValue">
         </kendo-grid-column>
         <kendo-grid-column title="Import Value" *ngIf="showActionButtons()">
-            <ng-template kendoGridCellTemplate let-dataItem >
-                <input type="text" style="width: 100%; height: 30px;" [(ngModel)]="dataItem.importValue"/>
+            <ng-template kendoGridCellTemplate let-dataItem>
+                <div class="text-center">
+                    <input type="text" class="form-control import-value-input" [(ngModel)]="dataItem.importValue"/>
+                </div>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">
@@ -46,10 +51,7 @@
         </kendo-grid-column>
     </kendo-grid>
 
-    <style>
-
-    </style>
-    <div class="row footer" style="margin-top: 30px;">
+    <div class="row footer">
         <tds-check-action
                 *ngIf="showActionButtons()"
                 [disabled]="!areOverrideValuesDirty()"
