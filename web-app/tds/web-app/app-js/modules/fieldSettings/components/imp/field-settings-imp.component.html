@@ -1,9 +1,9 @@
 <div *ngIf="!editMode" [ngClass]="model" class="text-center">
-    {{model}}
+    {{mapLegacyColor(model)}}
 </div>
 <div *ngIf="editMode" [ngClass]="model" class="text-center">
     <span *ngFor="let value of values" (click)="onModelChange(value)">
-        <u *ngIf="model === mapLegacyColor(value); else elseBlock"><b>{{value}}</b></u>
+        <u *ngIf="mapLegacyColor(model) === value; else elseBlock"><b>{{value}}</b></u>
         <ng-template #elseBlock>{{value}}</ng-template>
     </span>
 </div>
