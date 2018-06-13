@@ -165,6 +165,7 @@ class DataImportService implements ServiceMethods {
 						rowNumber = 0
 					}
 					importContext.fieldNames = domainJson.fieldNames
+					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
@@ -297,6 +298,7 @@ class DataImportService implements ServiceMethods {
 				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
 				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
 				fieldNameList: JsonUtil.toJson(importContext.fieldNames),
+				fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
 				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),

@@ -99,10 +99,12 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private prepareColumnsModel(): void {
 		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
+		const {fieldNameList, fieldLabelMap} = this.importBatchModel;
+
 		// const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
-		let fieldColumns: Array<GridColumnModel> = this.importBatchModel.fieldNameList.map( field => {
+		let fieldColumns: Array<GridColumnModel> = fieldNameList.map( field => {
 			const column: GridColumnModel = new GridColumnModel();
-			column.label = field;
+			column.label = (fieldLabelMap && fieldLabelMap[field]) || field;
 			column.properties = ['currentValues', field];
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
