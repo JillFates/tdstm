@@ -32,7 +32,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 		when:
 			List<Field> fields = dataSetFacade.fields()
 
-		then: 'Fields are read from the Applications sheet'
+		then: 'Fields are read from the Applications node'
 			fields.size() == 4
 
 		and:
@@ -56,7 +56,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			dataSetFacade.setRootNode('Applications')
 			List<Field> fields = dataSetFacade.fields()
 
-		then: 'Fields are read from the Applications sheet'
+		then: 'Fields are read from the Applications node'
 			fields.size() == 4
 
 		and:

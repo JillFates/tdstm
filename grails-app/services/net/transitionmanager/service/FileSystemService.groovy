@@ -168,7 +168,11 @@ class FileSystemService  implements InitializingBean {
 		return dataset
 	}
 
-
+	/**
+	 * Build a JSONDataset from the given fileName
+	 * @param fileName
+	 * @return
+	 */
 	static JSONDataset buildJSONDataset(String fileName){
 		JSONConnection con = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fileName), driver:TDSJSONDriver)
 		JSONDataset dataset = new JSONDataset(connection: con, rootNode: "", fileName: FileUtils.FileName(fileName))

@@ -22,12 +22,7 @@ class JsonUtil {
      * @return
      */
     static JSONObject parseJson(String json) {
-        try {
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            return jsonSlurper.parseText(json) as JSONObject
-        } catch (JsonException e) {
-            throw new InvalidParamException("Invalid JSON : ${e.message}")
-        }
+        return parseJsonObject(json) as JSONObject
     }
 
     /**
@@ -39,10 +34,13 @@ class JsonUtil {
      * @return a list after parsing the text
      */
     static List parseJsonList(String jsonText) {
-        // TODO : JPM 2/2018 : Need to add try/catch
+        return parseJsonObject(jsonText) as List
+    }
+
+    static Object parseJsonObject(String jsonText) {
         try {
             JsonSlurper jsonSlurper = new JsonSlurper()
-            return jsonSlurper.parseText(jsonText) as List
+            return jsonSlurper.parseText(jsonText)
         } catch (e) {
             throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
@@ -187,13 +185,14 @@ class JsonUtil {
     }
 
     /**
-     * Parse a file by Path (Absolute or relative to Projects dir to JSONObject
+     * Parse a file by fully qualified filename
      * @param fileName
      * @return JSONElement
      */
-    static JSONElement parseFilePath(String fileName) {
+    static Object parseFilePath(String fileName) {
         File file = new File(fileName)
-        return JSON.parse(file.text)
+        // return JSON.parse(file.text)
+        return JsonUtil.parseJsonObject(file.text)
     }
 
     /**
@@ -237,22 +236,23 @@ class JsonUtil {
      * @param separator
      * @return
      */
-    static Object gpathAt(Map map, String xpath, String separator = '.') {
-        if (!xpath || xpath == separator) {
-            return map
-        }
+    static Object gpathAt(Object obj, String gpath, String separator = '/.') {
+        def parts = gpath.tokenize(separator)  // I think this needs to be escaped
+        Object property = obj
 
-        if (!xpath.contains(separator)) {
-            return map[xpath]
+        for (String key in parts) {
+            key = key.trim()
+            if (key) {
+                if (obj instanceof Map && (obj as Map).containsKey(key)) {
+                    property = obj[key]
+                } else if (obj.hasProperty(key)) {
+                    property = obj[key]
+                } else {
+                    property = null
+                    break
+                }
+            }
         }
-
-        def firstPropName = xpath[0..xpath.indexOf(separator) - 1]
-        def remainingPath = xpath[xpath.indexOf(separator) + 1 .. -1]
-        def firstProperty = map[firstPropName]
-        if( !(firstProperty instanceof Map) ){
-            throw new MissingPropertyException("No such property: '${remainingPath}' for class: ${firstProperty.class}")
-        }
-        return gpathAt(firstProperty as Map, remainingPath, separator)
+        return property
     }
-
 }

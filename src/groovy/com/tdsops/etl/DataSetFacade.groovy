@@ -166,20 +166,32 @@ class DataSetFacade {
 		}
 	}
 
+	/**
+	 * Retrieves the JSONDriver validating that this instance has a reference to an instance of that Class
+	 * @return
+	 */
 	private TDSJSONDriver jsonDriver(){
 		validateJsonDriverOrThrowException()
 		return (TDSJSONDriver)dataSet.connection.driver
 	}
 
+	/**
+	 * Checks that the RootNode exists for any given JSON representation or throws and ETLProcesorException
+	 * @param rootNode
+	 */
 	private void validateJSONRootNodeOrThrowException(String rootNode) {
 		TDSJSONDriver driver = jsonDriver()
-		JSONElement jsonNode = driver.getRootNode(dataSet, rootNode)
+		Object jsonNode = driver.getRootNode(dataSet, rootNode)
 		if (jsonNode == null) {
 			throw ETLProcessorException.invalidRootNode(rootNode)
 		}
 
 	}
 
+	/**
+	 * Sets the rootNode for JSONDatasets using 'dot' notation
+	 * @param rootNode
+	 */
 	void setRootNode(String rootNode) {
 		validateJSONRootNodeOrThrowException(rootNode)
 		JSONDataset jdataset =  (JSONDataset)dataSet

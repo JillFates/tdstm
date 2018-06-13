@@ -16,6 +16,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.Ignore
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -74,7 +75,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 					""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
@@ -101,8 +102,8 @@ class ETLJSONSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						rootNode 'applications'
-						rootNode 'devices'
+						rootNode 'Applications'
+						rootNode 'Devices'
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -128,7 +129,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						read labels
 						""".stripIndent())
 
@@ -249,7 +250,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "JSON rootNode: 'Active Applications' XPATH is invalid"
+			e.message == "Unable to find JSON rootNode with path 'Active Applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -268,13 +269,13 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'Applications'
+						rootNode 'applications'
 						read labels
 						""".stripIndent())
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "JSON rootNode: 'Applications' XPATH is invalid"
+			e.message == "Unable to find JSON rootNode with path 'applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -294,7 +295,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						skip 1
 						read labels
 
@@ -342,7 +343,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						read labels
 						iterate {
 							domain Application
@@ -377,7 +378,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
 				{
-					"applications": [ 
+					"Applications": [ 
 						{
 							"application id":152254,
 							"vendor name": {
@@ -405,7 +406,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						read labels
 						iterate {
 							domain Application
@@ -435,6 +436,66 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	@Ignore
+	void 'test can read JSONObject fields for complex JSON DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   { 
+					      "app id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						rootNode 'devices'
+						read labels
+						iterate {
+							 domain Device
+						    extract 'app id' load 'id'
+						    extract 'attribs' set attribsVar
+						    load 'custom1' with attribsVar.memory  //['memory']
+						    load 'custom2' with attribsVar.cpu  
+						}
+						""".stripIndent())
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.resultsMap().domains.size() == 1
+
+		and: 'Results contains values'
+			with(etlProcessor.resultsMap().domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 1
+				with(data[0].fields.custom1) {
+					originalValue == 4096
+					value == 4096
+				}
+
+				with(data[0].fields.custom2) {
+					originalValue == 2
+					value == 2
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
 		given:
@@ -449,7 +510,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						read labels
 						skip 1
 						iterate {
@@ -491,14 +552,14 @@ class ETLJSONSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					rootNode 'applications'
+					rootNode 'Applications'
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' load 'Vendor'
 					}
 
-					rootNode 'devices'
+					rootNode 'Devices'
 					read labels
 					domain Device
 					iterate {
@@ -557,7 +618,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						skip 1
 						read labels
 						""".stripIndent())
@@ -599,7 +660,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'applications'
+						rootNode 'Applications'
 						read labels
 
 						iterate {
@@ -631,7 +692,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 	static final String DataSet = """
 		{
-			"applications": [
+			"Applications": [
 				{
 					"application id":152254,
 					"vendor name":"Microsoft",
@@ -644,7 +705,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					"location":"ACME Data Center"
 				}
 			],
-			"devices": [
+			"Devices": [
 				{  
 					"name": "xraysrv01",
 					"mfg": "Dell",
