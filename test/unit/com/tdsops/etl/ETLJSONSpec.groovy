@@ -64,7 +64,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can define a rootNode for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -78,7 +78,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						rootNode 'Applications'
 					""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
@@ -90,7 +90,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -107,7 +107,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
@@ -118,7 +118,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read labels by default in first row by default for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -133,25 +133,21 @@ class ETLJSONSpec extends ETLBaseSpec {
 						read labels
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.column('application id') != null
 
 		and:
-			etlProcessor.column('location').index == 1
-			etlProcessor.column(1).label == 'location'
+			etlProcessor.column('location') != null
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.column('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index == 3
-			etlProcessor.column(3).label == 'vendor name'
+			etlProcessor.column('vendor name').index != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -165,7 +161,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can define a quoted string for the JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -180,25 +176,21 @@ class ETLJSONSpec extends ETLBaseSpec {
 						read labels
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.column('application id') != null
 
 		and:
-			etlProcessor.column('location').index == 1
-			etlProcessor.column(1).label == 'location'
+			etlProcessor.column('location') != null
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.column('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index == 3
-			etlProcessor.column(3).label == 'vendor name'
+			etlProcessor.column('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -208,7 +200,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception if rootNode is incorrect key in the JSON DataSet'(){
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -233,7 +225,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception rootNode is incorrect (not found) for a JSON DataSet'(){
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -258,7 +250,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception if rootNode name case is incorrect for a JSON DataSet'(){
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -284,7 +276,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read labels skipping rows for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -301,25 +293,21 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.column('application id') != null
 
 		and:
-			etlProcessor.column('location').index == 1
-			etlProcessor.column(1).label == 'location'
+			etlProcessor.column('location') != null
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.column('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index == 3
-			etlProcessor.column(3).label == 'vendor name'
+			etlProcessor.column('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 2
@@ -332,7 +320,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read iterate rows for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -351,7 +339,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
@@ -391,7 +379,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 							"vendor name": {
 								"value": "Mozilla"
 							},
-							"technology":"NGM",
+							"Technology":"NGM",
 							"location":"ACME Data Center"
 						}
 					]
@@ -414,7 +402,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
@@ -473,7 +461,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
@@ -499,7 +487,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -519,7 +507,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
@@ -540,7 +528,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read iterate rows for more than one rootNode in a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -568,7 +556,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 2
 
 		and: 'Results contains values'
@@ -607,7 +595,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read labels skipping rows before for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -627,20 +615,16 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.resultsMap().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.column('application id') != null
 
 		and:
-			etlProcessor.column('location').index == 1
-			etlProcessor.column(1).label == 'location'
+			etlProcessor.column('location') != null
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.column('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index == 3
-			etlProcessor.column(3).label == 'vendor name'
+			etlProcessor.column('vendor name') != null
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -649,7 +633,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 	void 'test can read rows ignoring rows in the middle of an iteration for a JSON DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DataSet)
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet(DATASET)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -690,7 +674,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	static final String DataSet = """
+	static final String DATASET = """
 		{
 			"Applications": [
 				{
@@ -701,7 +685,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				{
 					"application id":152255,
 					"vendor name": "Mozilla",
-					"technology":"NGM",
+					"Technology":"NGM",
 					"location":"ACME Data Center"
 				}
 			],
@@ -727,7 +711,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				},
 				{
 					"application id":152255,
-					"technology":"NGM",
+					"Technology":"NGM",
 					"location":"ACME Data Center"
 				}
 			],

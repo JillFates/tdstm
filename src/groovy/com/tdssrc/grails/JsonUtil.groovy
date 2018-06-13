@@ -196,34 +196,6 @@ class JsonUtil {
     }
 
     /**
-     * method from JSONElements to let use XPATH like access
-     * e.g.
-     * <PRE>
-     *       assert xpathAt(result, "person.name") == "Guillaume"
-     *       assert xpathAt(result, "")            == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
-     *       assert xpathAt(result, ".")           == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
-     * </PRE>
-     * @param json
-     * @param xpath
-     * @param separator
-     * @return
-     */
-    static JSONElement xpathAt(JSONElement json, String xpath, String separator = '.') {
-        if (!xpath || xpath == separator) {
-            return json
-        }
-
-        if (!xpath.contains(separator)) {
-            return json[xpath] as JSONElement
-        }
-
-        def firstPropName = xpath[0..xpath.indexOf(separator) - 1]
-        def remainingPath = xpath[xpath.indexOf(separator) + 1 .. -1]
-        JSONElement firstProperty = json[firstPropName] as JSONElement
-        return xpathAt(firstProperty, remainingPath, separator)
-    }
-
-    /**
      * method from Maps to let use GPATH like access in a String
      * e.g.
      * <PRE>
@@ -236,17 +208,17 @@ class JsonUtil {
      * @param separator
      * @return
      */
-    static Object gpathAt(Object obj, String gpath, String separator = '/.') {
-        def parts = gpath.tokenize(separator)  // I think this needs to be escaped
+    static Object gpathAt(Object obj, String gpath, String separator = '.') {
+        def parts = gpath.tokenize(separator)
         Object property = obj
 
         for (String key in parts) {
             key = key.trim()
             if (key) {
-                if (obj instanceof Map && (obj as Map).containsKey(key)) {
-                    property = obj[key]
-                } else if (obj.hasProperty(key)) {
-                    property = obj[key]
+                if (property instanceof Map && (property as Map).containsKey(key)) {
+                    property = property[key]
+                } else if (property.hasProperty(key)) {
+                    property = property[key]
                 } else {
                     property = null
                     break
