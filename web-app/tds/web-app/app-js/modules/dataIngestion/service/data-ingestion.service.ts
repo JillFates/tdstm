@@ -12,7 +12,6 @@ import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../mod
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
-import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
 import * as R from 'ramda';
 import 'rxjs/add/operator/map';
@@ -221,9 +220,10 @@ export class DataIngestionService {
 				if (data.config) {
 					for (let property in data.config) {
 						if (data.config.hasOwnProperty(property)) {
+							const label = data.config[property].property;
 							let column = {
-								label: StringUtils.toCapitalCase(data.config[property].property, true),
-								property: data.config[property].property,
+								label,
+								property: label,
 								type: data.config[property].type,
 								width: 140
 							};
