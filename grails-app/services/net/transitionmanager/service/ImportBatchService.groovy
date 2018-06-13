@@ -402,15 +402,25 @@ class ImportBatchService implements ServiceMethods {
 
 		// Retrieve the fields specified in the ImportBatch
 		List<String> validFields = batch.fieldNameListAsList()
+		// TODO JPM -- this is a hack because the frontend is passing the Label now
+		Map fieldNameToLabels = batch.fieldLabelMapAsJsonMap()
+		Map labelsToFieldName = [:]
+		fieldNameToLabels.each { field, label -> labelsToFieldName.put(label, field) }
 
 		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
 		for (field in command.fieldsInfo) {
 			// Check that the fieldName provided is in the list of fields defined for the batch
-			if (field.fieldName in validFields) {
+			String fieldName = ( field.fieldName in validFields ? field.fieldName : null)
+			if (!fieldName) {
+				fieldName = ( field.fieldName in labelsToFieldName ? labelsToFieldName[field.fieldName] : null)
+			}
+println "****** ***** updateBatchRecord() fieldName=$fieldName, validFields=$validFields"
+			if (fieldName != null) {
+			// if (field.fieldName in validFields) {
 				// The field for the id has a different structure
-				fieldsMap[field.fieldName]["value"] = field.value
+				fieldsMap[fieldName]["value"] = field.value
 			} else {
-				throw new InvalidParamException("Encountered unspecified field name ($field) for batch")
+				throw new InvalidParamException("Encountered unspecified field name (${field.fieldName}) for batch")
 			}
 		}
 

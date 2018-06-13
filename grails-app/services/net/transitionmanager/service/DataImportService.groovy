@@ -843,8 +843,9 @@ class DataImportService implements ServiceMethods {
 				break
 
 			default:
-				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
-				error = "Batch process not supported for domain ${domainName}"
+				break
+				//log.error "Batch Import process called for unsupported domain ${batch.domainClassName} in batch ${batch.id} in project ${batch.project}"
+				//error = "Batch process not supported for domain ${domainName}"
 		}
 
 		return error
@@ -884,6 +885,10 @@ class DataImportService implements ServiceMethods {
 				break
 
 			default:
+			println "******** processBatchRecord()"
+				processAssetRecord(batch, record, context)
+				break
+
 				String domain = batch.domainClassName.name()
 				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
 				throw new InvalidRequestException("Batch process not supported for domain ${domain}")
@@ -993,6 +998,83 @@ class DataImportService implements ServiceMethods {
 		}
 	}
 
+	def processAssetRecord = { ImportBatch batch, ImportBatchRecord record, Map context ->
+
+		AssetEntity asset
+		Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
+		Project project = batch.project
+		resetRecordAndFieldsInfoErrors(record, fieldsInfo)
+		// Tally up all the errors that may have occurred during the process
+		record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
+
+		// Now update the Import record
+
+		if (fieldsInfo.containsKey('id') && NumberUtil.isaNumber( fieldsInfo['id'].value) ) {
+			asset = AssetEntity.where {
+				id == fieldsInfo.id.value
+			}.find()
+		}
+
+		if (asset) {
+			//
+		} else {
+			// CREATE
+			asset = new AssetEntity( project:context.project)
+
+			if (! fieldsInfo.containsKey('moveBundle') || ! fieldsInfo['moveBundle'].value ){
+				asset.moveBundle = context.project.getProjectDefaultBundle()
+			}
+
+			log.debug "findAndUpdateOrCreateAsset() Creating new Asset"
+		}
+
+		// Now add/update the remaining properties on the domain entity appropriately
+		Boolean bindingOkay = bindFieldsInfoValuesToEntity(asset, fieldsInfo, context, ['id'])
+		if (! bindingOkay || recordDomainConstraintErrorsToFieldsInfoOrRecord(asset, context.record, fieldsInfo) ) {
+			if (bindingOkay) {
+				// Must of been a contraints issue then
+				log.warn "findAndUpdateOrCreateAsset() Got errors after binding data ${GormUtil.allErrorsString(asset)}"
+			}
+			// Damn it! Couldn't save this sucker...
+			asset.discard()
+			asset = null
+		}
+
+		if (asset) {
+			if (record.errorCount) {
+				log.debug "findAndUpdateOrCreateAsset() Failing due to errors (${record.errorCount})"
+				// Trash the dependency
+				asset.discard()
+				asset = null
+			} else {
+				record.operation = (asset.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+
+				// log.debug "processDependencyRecord() Saving the Dependency"
+				if (asset.save(failOnError:false)) {
+					// If we still have a dependency record then the process must have finished
+					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
+					//    Note that I was running to some strange issues of casting that prevented from doing this originally
+					// record.status = ImportBatchRecordStatusEnum.COMPLETED
+					record.status = ImportBatchStatusEnum.COMPLETED
+				} else {
+					log.warn "findAndUpdateOrCreateAsset() failed to create Dependency ${GormUtil.allErrorsString(dependency)}"
+					asset.discard()
+					asset = null
+				}
+			}
+		}
+
+		// Update the fieldsInfo back into the Import Batch Record
+		record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+		// log.debug "processDependencyRecord() Saving the ImportBatchRecord with status ${record.status}"
+		if (! record.save(failOnError:false) ) {
+			log.warn "findAndUpdateOrCreateAsset() Failed saving ImportBatchRecord : ${ GormUtil.allErrorsString(record) }"
+		}
+	}
+
+
+
+
 	/**
 	 * Used by the processDependencyRecord method to either create a new dependency and set the assets on it or
 	 * to update the asset references if they've changed. If either the primary or supporting asset are missing then
@@ -1049,6 +1131,42 @@ class DataImportService implements ServiceMethods {
 		// TODO : JPM 3/2018 : Need to review the md5 / cache - Here we just created assets that should be cached.
 
 		return dependency
+	}
+
+
+	private AssetEntity findAndUpdateOrCreateAsset(Map fieldsInfo, Map context ) {
+		AssetEntity asset
+
+			// If there is the primary & supporting asset and no dependency yet then try and find it by the two assets
+			if (fieldsInfo.containsKey('id') && NumberUtil.isaNumber( fieldsInfo['id'].value) ) {
+				asset = AssetEntity.where {
+					id == fieldsInfo.id.value
+				}.find()
+			}
+
+			if (asset) {
+				//
+			} else {
+				// CREATE
+				asset = new AssetEntity(asset: primary, dependent: supporting)
+				log.debug "findAndUpdateOrCreateAsset() Creating new Asset"
+			}
+
+			// Now add/update the remaining properties on the domain entity appropriately
+			Boolean bindingOkay = bindFieldsInfoValuesToEntity(dependency, fieldsInfo, context, ['id'])
+			if (! bindingOkay || recordDomainConstraintErrorsToFieldsInfoOrRecord(asset, context.record, fieldsInfo) ) {
+				if (bindingOkay) {
+					// Must of been a contraints issue then
+					log.warn "processDependencyRecord() Got errors after binding data ${GormUtil.allErrorsString(dependency)}"
+				}
+				// Damn it! Couldn't save this sucker...
+				asset.discard()
+				asset = null
+			}
+
+		// TODO : JPM 3/2018 : Need to review the md5 / cache - Here we just created assets that should be cached.
+
+		return asset
 	}
 
 	/**
