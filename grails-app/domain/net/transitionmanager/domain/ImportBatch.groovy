@@ -153,7 +153,7 @@ class ImportBatch {
 	 * @return
 	 */
 	Map fieldLabelMapAsJsonMap() {
-		return JsonUtil.parseJson(fieldLabelMap) as Map
+		return JsonUtil.parseJson(fieldLabelMap)
 	}
 
 	/**
