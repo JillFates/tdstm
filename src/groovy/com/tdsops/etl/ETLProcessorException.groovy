@@ -167,6 +167,14 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('Use TDSExcelDriver for an instance of ExcelConnection in an ETL Script')
     }
 
+    static ETLProcessorException invalidJSONDriver () {
+        new ETLProcessorException('Use TDSJSONDriver for an instance of JSONConnection in an ETL Script')
+    }
+
+    static ETLProcessorException invalidRootNode (String rootNode) {
+        new ETLProcessorException("Unable to find JSON rootNode with path '${rootNode}'")
+    }
+
     static ETLProcessorException invalidETLVariableName (String variableName) {
         new ETLProcessorException("Invalid variable name: ${variableName}. Variable names must end with 'Var'")
     }
