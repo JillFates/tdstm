@@ -18,14 +18,6 @@ class WsApiActionController implements ControllerMethods {
     ApiActionService apiActionService
 
     /**
-     * Get a list of agent names
-     * @return
-     */
-    def agentNames() {
-        renderAsJson(apiActionService.agentNamesList())
-    }
-
-    /**
      * Get agent details by agent name
      * @param id
      * @return
@@ -121,10 +113,11 @@ class WsApiActionController implements ControllerMethods {
      * Returns a JSON map containing the values of all of the enums used to
      * support the ApiAction domain.
      */
-    @HasPermission(Permission.ActionEdit)
+    @HasPermission([Permission.ActionCreate, Permission.ActionEdit])
     def enums() {
         renderSuccessJson([
-                'httpMethod': ApiActionHttpMethod.names()
+                'httpMethod': ApiActionHttpMethod.names(),
+                'agentNames': apiActionService.agentNamesList()
         ])
     }
 }
