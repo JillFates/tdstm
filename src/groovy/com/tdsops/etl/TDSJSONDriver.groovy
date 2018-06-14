@@ -159,7 +159,7 @@ class TDSJSONDriver extends JSONDriver {
 	 * @param initAttr
 	 * @param code
 	 */
-	private void readNodes (Dataset dataset, List<String> listFields, String rootNode, long limit, Map data, Closure initAttr, Closure code) {
+	private void readNodes (Dataset dataset, List<String> listFields, String rootNode, long limit, Object data, Closure initAttr, Closure code) {
 		// TODO: @oluna I'm commenting this as stated in the PR#1257, as far as I can see this is used to generate user specific attributes using a closure
 		// we need to review further impact in the ETL API
 		// generateAttrRead(dataset, data, initAttr)
