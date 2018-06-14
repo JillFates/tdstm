@@ -128,8 +128,8 @@
                                     <table class="dates-info">
                                         <tbody>
                                             <tr>
-                                                <td class="date-created">Date created:  </td>
-                                                <td class="last-updated">Last updated: </td>
+                                                <td class="date-created">Date created: {{taskDetailModel.detail?.assetComment?.dateCreated | date:dateFormatTime}}</td>
+                                                <td class="last-updated">Last updated: {{taskDetailModel.detail?.assetComment?.lastUpdated | date:dateFormatTime}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
