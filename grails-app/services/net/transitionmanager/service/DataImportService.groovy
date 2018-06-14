@@ -950,8 +950,11 @@ class DataImportService implements ServiceMethods {
 				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
+			// Should any of the sides be number (-1, actually), skip the record.
+			if (NumberUtil.isaNumber(primary) || NumberUtil.isaNumber(supporting)) {
+				break
 			// Try finding & updating or creating the dependency with primary and supporting assets that were found
-			if (primary && supporting) {
+			} else if (primary && supporting) {
 				dependency = findAndUpdateOrCreateDependency(primary, supporting, fieldsInfo, context)
 			}
 			break
