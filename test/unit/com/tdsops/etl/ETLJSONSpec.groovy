@@ -652,7 +652,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 							extract 'vendor name' load 'Vendor'
 							if(CE == 'Microsoft'){
-								ignore row
+								ignore record
 							}
 						}
 						""".stripIndent())
