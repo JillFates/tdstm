@@ -37,7 +37,8 @@ class DatascriptDesignerPage extends Page{
     def clickOnTestButton(){
         waitFor{dsTestButton.click()}
         commonsModule.waitForLoader(2)
-        commonsModule.waitForLoader(2) // loader appears twice
+        commonsModule.waitForLoader(2)
+        commonsModule.waitForLoader(2) // loader appears three times
     }
 
     def clickOnCheckSyntaxButton(){
@@ -73,6 +74,7 @@ class DatascriptDesignerPage extends Page{
     }
 
     def getTransformedDataRowsSize(){
+        waitFor{dsTransformedDataRows[0].displayed}
         dsTransformedDataRows.size()
     }
 
