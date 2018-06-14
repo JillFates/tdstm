@@ -46,6 +46,8 @@ export class TaskDetailComponent extends UIExtraDialog {
 			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
 			// Notes are coming into an Array of Arrays...
 			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
+			// Convert the Duration into a Human Readable form
+			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
 		});
 	}
 

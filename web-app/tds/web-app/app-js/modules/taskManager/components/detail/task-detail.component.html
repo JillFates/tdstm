@@ -84,7 +84,7 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
                                                     </td>
-                                                    <td class="valueNW U"><span> </span></td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.durationText}} <i class="fa fa-fw" [ngClass]="{'fa-unlock': !taskDetailModel.detail?.assetComment?.durationLocked, 'fa-lock': taskDetailModel.detail?.assetComment?.durationLocked}"></i></span>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
