@@ -1,6 +1,6 @@
 <div class="task-detail-component modal fade in" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content resizable tds-angular-component-content" [style.width.px]="800">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content resizable tds-angular-component-content">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -11,50 +11,230 @@
                 <div>
                     <table style="border: 0">
                         <tbody>
-                        <tr>
-                            <td colspan="2">
-                                <div class="dialog">
-                                    <table>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="dialog">
+                                        <table>
+                                            <tbody>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Task # {{taskDetailModel.detail?.assetComment?.id}}</span></label>
+                                                    </td>
+                                                    <td class="valueNW U" colspan="5" style="max-width: 400px; font-weight:bold;">
+                                                        <span>{{taskDetailModel.detail?.assetComment?.comment}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Status</span></label>
+                                                    </td>
+                                                    <td class="valueNW U task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}"><span>{{taskDetailModel.detail?.assetComment?.status}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Asset</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assetName}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Instruction Link</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Event</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.eventName}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Priority</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Action</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Category</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Workflow Step</span></label>
+                                                    </td>
+                                                    <td class="valueNW U" colspan="2"><span></span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Team</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Task Spec ID</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.taskSpecId}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Recipe</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assetComment?.recipe}}</span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Person</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span> </span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Due Date</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assetComment?.dueDate | date:dateFormat}}</span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Fixed Assignment</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.etStart}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Finish</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.etFinish}}</span></td>
+                                                </tr>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Send Notification</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.atStart}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Finish</span></label>
+                                                    </td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.dtResolved}}</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="dates-info-container" colspan="2">
+                                    <table class="dates-info">
                                         <tbody>
-                                            <tr class="prop">
-                                                <td class="label U" nowrap="nowrap">
-                                                    <label><span>Task # {{taskDetailModel.detail.assetComment.id}}</span></label>
-                                                </td>
-                                                <td class="valueNW U" colspan="5" style="max-width: 400px; font-weight:bold;">
-                                                    <span>{{taskDetailModel.detail.assetComment.comment}}</span>
-                                                </td>
-                                            </tr>
-                                            <tr class="prop">
-                                                <td class="label U" nowrap="nowrap">
-                                                    <label><span>Status</span></label>
-                                                </td>
-                                                <td class="valueNW U task-{{taskDetailModel.detail.assetComment.status |  lowercase}}"><span>{{taskDetailModel.detail.assetComment.status}}</span></td>
-                                                <td class="label U" nowrap="nowrap">
-                                                    <label><span>Asset</span></label>
-                                                </td>
-                                                <td class="valueNW U"><span>{{taskDetailModel.detail.assetName}}</span></td>
-                                                <td class="label U" nowrap="nowrap">
-                                                    <label><span>Introction Link</span></label>
-                                                </td>
-                                                <td class="valueNW U"><span><tds-url-viewer [model]="taskDetailModel.detail.instructionsLinkLabel+'|'+taskDetailModel.detail.instructionsLinkURL"></tds-url-viewer></span></td>
+                                            <tr>
+                                                <td class="date-created">Date created:  </td>
+                                                <td class="last-updated">Last updated: </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="dates-info-container" colspan="2">
-                                <table class="dates-info">
-                                    <tbody>
-                                        <tr>
-                                            <td class="date-created">Date created: </td>
-                                            <td class="last-updated">Last updated: </td>
-                                        </tr>
-                                    </tbody>
+                                </td>
+                            </tr>
+                            <tr class="deps">
+                                <table>
+                                    <tr>
+                                        <td valign="top">
+                                            <kendo-grid
+                                                    *ngIf="dataGridTaskPredecessorsHelper"
+                                                    class="successor-predecessor-table"
+                                                    [data]="dataGridTaskPredecessorsHelper.gridData"
+                                                    [sort]="dataGridTaskPredecessorsHelper.state.sort"
+                                                    [sortable]="{mode:'single'}"
+                                                    [resizable]="false"
+                                                    (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)"
+                                                    [rowClass]="rowStatusColor">
+                                                    <!-- Toolbar Template -->
+                                                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                                        <label class="pad-top-7 pad-left-10">Predecessor</label>
+                                                    </ng-template>
+                                                    <!-- Columns -->
+                                                    <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
+                                                                       field="{{column.property}}"
+                                                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                                        <!-- Header Template -->
+                                                        <ng-template kendoGridHeaderTemplate>
+                                                            <label>{{column.label}}</label>
+                                                        </ng-template>
+
+                                                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                                                            <div>{{dataItem[column.property]}}</div>
+                                                        </ng-template>
+
+                                                    </kendo-grid-column>
+                                                <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                            </kendo-grid>
+                                        </td>
+                                        <td valign="top">
+                                            <kendo-grid
+                                                    *ngIf="dataGridTaskSuccessorsHelper"
+                                                    class="successor-predecessor-table"
+                                                    [data]="dataGridTaskSuccessorsHelper.gridData"
+                                                    [sort]="dataGridTaskSuccessorsHelper.state.sort"
+                                                    [sortable]="{mode:'single'}"
+                                                    [resizable]="false"
+                                                    (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)"
+                                                    [rowClass]="rowStatusColor">
+                                                <!-- Toolbar Template -->
+                                                <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                                    <label class="pad-top-7 pad-left-10">Successors</label>
+                                                </ng-template>
+                                                <!-- Columns -->
+                                                <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
+                                                                   field="{{column.property}}"
+                                                                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                                    <!-- Header Template -->
+                                                    <ng-template kendoGridHeaderTemplate>
+                                                        <label>{{column.label}}</label>
+                                                    </ng-template>
+
+                                                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" >
+                                                        <div>{{dataItem[column.property]}}</div>
+                                                    </ng-template>
+
+                                                </kendo-grid-column>
+                                                <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                            </kendo-grid>
+                                         </td>
+                                    </tr>
                                 </table>
-                            </td>
-                        </tr>
+                            </tr>
+                            <tr  class="deps">
+                                <td colspan="5">
+                                    <kendo-grid
+                                        *ngIf="dataGridTaskNotesHelper"
+                                        class="successor-predecessor-table"
+                                        [data]="dataGridTaskNotesHelper.gridData"
+                                        [sort]="dataGridTaskNotesHelper.state.sort"
+                                        [sortable]="{mode:'single'}"
+                                        [resizable]="false"
+                                        (sortChange)="dataGridTaskNotesHelper.sortChange($event)">
+                                    <!-- Toolbar Template -->
+                                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                        <label class="pad-top-7 pad-left-10">Task Notes</label>
+                                    </ng-template>
+                                    <!-- Columns -->
+                                    <kendo-grid-column *ngFor="let column of taskNotesColumnsModel.columns"
+                                                       field="{{column.property}}"
+                                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                        <!-- Header Template -->
+                                        <ng-template kendoGridHeaderTemplate>
+                                            <label>{{column.label}}</label>
+                                        </ng-template>
+
+                                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" >
+                                            <div>{{dataItem[column.property]}}</div>
+                                        </ng-template>
+
+                                    </kendo-grid-column>
+                                    <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                </kendo-grid>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -6,5 +6,5 @@ export class TaskDetailModel {
 		title:  string;
 		type: ModalType
 	}
-	public detail?: {}
+	public detail?: any;
 }

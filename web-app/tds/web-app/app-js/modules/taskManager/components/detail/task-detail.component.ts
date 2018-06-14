@@ -4,6 +4,12 @@ import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TaskSuccessorPredecessorColumnsModel} from './model/task-successor-predecessor-columns.model';
+import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
+import {RowClassArgs} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: `task-detail`,
@@ -13,9 +19,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 export class TaskDetailComponent extends UIExtraDialog {
 
 	public modalType = ModalType;
+	public dateFormat: string;
 	public dateFormatTime: string;
+	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	public dataGridTaskNotesHelper: DataGridOperationsHelper;
+	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
+	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 
-	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, public promptService: UIPromptService) {
+	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, public promptService: UIPromptService, public userPreferenceService: PreferenceService) {
 		super('#task-detail-component');
 		this.loadTaskDetail();
 	}
@@ -25,8 +37,34 @@ export class TaskDetailComponent extends UIExtraDialog {
 	 */
 	private loadTaskDetail(): void {
 		this.taskManagerService.getTaskDetails(this.taskDetailModel.id).subscribe((res) => {
+			this.dateFormat = this.userPreferenceService.getUserTimeZone();
+			this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 			this.taskDetailModel.detail = res;
+			this.taskDetailModel.detail.instructionLink = this.taskDetailModel.detail.instructionsLinkLabel + '|' + this.taskDetailModel.detail.instructionsLinkURL;
+
+			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.predecessorList, null, null);
+			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
+			// Notes are coming into an Array of Arrays...
+			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
 		});
+	}
+
+	/**
+	 * Create the structure of the notes from the simple array returned in the API
+	 * @param notes
+	 * @returns {Array<any>}
+	 */
+	private generateNotes(notes: any): Array<any> {
+		let noteList = new Array<any>();
+		notes.forEach((note) => {
+			noteList.push({
+				dateCreated: note[0],
+				createdBy: note[1],
+				note: note[2],
+			});
+		});
+
+		return noteList;
 	}
 
 	protected onSave(): void {
@@ -62,6 +100,15 @@ export class TaskDetailComponent extends UIExtraDialog {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
+	}
+
+	/**
+	 * Change the background color based on the task status
+	 * @param {RowClassArgs} context
+	 * @returns {string}
+	 */
+	protected rowStatusColor(context: RowClassArgs) {
+		return 'task-' + context.dataItem.status.toLowerCase();
 	}
 
 	/**
