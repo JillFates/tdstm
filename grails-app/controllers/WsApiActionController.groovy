@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -116,4 +117,14 @@ class WsApiActionController implements ControllerMethods {
         renderSuccessJson(domains: [domainsFieldsMap])
     }
 
+    /**
+     * Returns a JSON map containing the values of all of the enums used to
+     * support the ApiAction domain.
+     */
+    @HasPermission(Permission.ActionEdit)
+    def enums() {
+        renderSuccessJson([
+                'httpMethod': ApiActionHttpMethod.names()
+        ])
+    }
 }

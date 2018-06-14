@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.JsonUtil
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
@@ -66,12 +67,13 @@ class ApiActionServiceIntegrationTests extends Specification {
 		action = new ApiAction(
 			name:'testAction',
 			description: 'This is a bogus action for testing',
-			agentClass: AgentClass.AWS,
+			agentClass: AgentClass.HTTP,
 			agentMethod: 'sendSnsNotification',
 			methodParams: paramsJson,
 			asyncQueue: 'test_outbound_queue',
 			callbackMethod: 'updateTaskState',
 			callbackMode: CallbackMode.MESSAGE,
+			httpMethod: ApiActionHttpMethod.GET,
 			project: project
 		)
 		if (action.hasErrors()) println "action has errors: ${GormUtil.allErrorsString(action)}"
@@ -101,7 +103,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 		when: 'calling agentClassForAction to get an implemented ApiAction'
 			clazz = apiActionService.agentClassForAction(action)
 		then: 'the specified class should be returned'
-			clazz == net.transitionmanager.agent.AwsAgent
+			clazz == net.transitionmanager.agent.HttpAgent
 
 		when: 'the method is called referencing an unimplemented Agent'
 			action.agentClass = AgentClass.RACIME
