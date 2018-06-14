@@ -22,11 +22,12 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-//import spock.lang.Specification
-import spock.lang.*
+import spock.lang.Ignore
+import spock.lang.Specification
+import spock.lang.Title
 import test.helper.ProviderTestHelper
 
+// TODO : SL - 06/14 : To be fixed with ticket TM-11121
 @Title('Tests for the ApiActionService class')
 class ApiActionServiceIntegrationTests extends Specification {
 
