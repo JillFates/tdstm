@@ -1855,3 +1855,13 @@ div.account-import-step1 .requiredField {
 .clearable.x  { background-position: right 5px center; }
 .clearable.onX{ cursor: pointer; }
 .clearable::-ms-clear {display: none; width:0; height:0;}
+
+.no-spinners {
+	-moz-appearance: textfield
+}
+
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0
+}
