@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import org.apache.commons.lang3.EnumUtils
+
 /**
  * Enums manipulation methods
  *
@@ -15,5 +17,15 @@ class EnumUtil {
 	 */
 	static <T extends Enum<T>> T searchfParam(Iterable<T> values, String param) {
 		param ? values.find { it.value == param } : null
+	}
+
+	/**
+	 * Checks if the specified name is a valid enum for the class.
+	 * @param enumClass - the class of the enum to query, not null
+	 * @param enumName - the enum name, null returns false
+	 * @return
+	 */
+	static boolean isValidEnum(Class enumClass, String enumName) {
+		return EnumUtils.isValidEnum(enumClass, enumName)
 	}
 }

@@ -22,7 +22,7 @@ class ApiActionTestHelper {
                 name: RSU.randomAlphabetic(10),
                 provider: provider,
                 description: 'This is a bogus action for testing',
-                agentClass: AgentClass.AWS,
+                agentClass: AgentClass.HTTP,
                 agentMethod: 'sendSnsNotification',
                 methodParams: null,
                 asyncQueue: 'test_outbound_queue',

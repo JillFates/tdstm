@@ -120,10 +120,7 @@ export class APIActionParameterColumnModel {
 export const EVENT_STATUS_TEXT = '// Check the HTTP response code for a 200 OK \n if (response.status == SC.OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}';
 export const EVENT_SUCCESS_TEXT = '// Update the task status that the task completed\n task.done()';
 export const EVENT_DEFAULT_TEXT = '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )';
-export const EVENT_BEFORE_CALL_TEXT  = `// Set the HTTP Method used for the invocation, options GET|POST|PUT|PATCH, default GET
-// request.config.setProperty('HttpMethod', 'POST')
-
-// Setting Content Type, default 'application/json'
+export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'application/json'
 // request.config.setProperty('Content-Type', 'text/csv')
 
 // Setting content type Accepted, default 'application/json'
