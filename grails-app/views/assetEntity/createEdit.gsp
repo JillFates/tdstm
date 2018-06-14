@@ -338,7 +338,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.size}" value="${assetEntityInstance.size}" />
 							<td nowrap="nowrap" class="sizeScale">
 							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.size}">
-								<input type="number" min="0"  id="size" name="size" class="${standardFieldSpecs.size.imp?:''} no-spinners" value="${assetEntityInstance.size}" tabindex="410"/>
+								<input type="number" min="0"  id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
 								<g:select id="scale" name="scale"
 										  from="${assetEntityInstance.constraints.scale.inList}"
 										  optionValue="value" noSelection="${['':'Please select...']}"
