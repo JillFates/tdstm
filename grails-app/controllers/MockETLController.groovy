@@ -1,4 +1,4 @@
-import com.tdsops.etl.ETLProcessor
+  import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.StringAppendElement
 import grails.converters.JSON
@@ -46,7 +46,16 @@ class MockETLController implements ControllerMethods {
         
             set environmentVar with 'Production'
             find Application by 'id' with applicationIdVar into 'id'
-        
+            whenNotFound 'id' create {
+                assetClass Device
+                environment 'Name' 
+                description DOMAIN.'description' 
+            }
+            
+            whenFound 'id' update {
+                environment 'Name' 
+            }
+            
             domain Device
             extract 1 transform with toLong() load 'id' set deviceIdVar
             extract 'model name' transform with uppercase() load 'Name'

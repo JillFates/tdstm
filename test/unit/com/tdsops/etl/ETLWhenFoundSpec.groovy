@@ -142,16 +142,15 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
     
-							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+							find Device by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenNotFound 'asset' create {
-    							assetClass Application
     							assetName primaryNameVar
     							assetType primaryTypeVar
-    							"SN Last Seen" NOW
+    							"Modified Date" NOW
     						}
 						}
 						""".stripIndent())
@@ -174,18 +173,18 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 						find.query.size() == 4
 						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.id == '151954'
 						}
 
 						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.assetName == 'ACMEVMPROD01'
 							kv.assetClass == 'VM'
 						}
 
 						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.assetName == 'VMWare Vcenter'
 						}
 
@@ -195,10 +194,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						}
 
 						// whenNotFound create command assertions
-						create.assetClass == ETLDomain.Application.name()
 						create.assetName == 'ACMEVMPROD01'
 						create.assetType == 'VM'
-						!!create."SN Last Seen"
+						!!create.lastUpdated
 					}
 				}
 			}
@@ -272,7 +270,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						
     						whenNotFound 'asset' update {
-    							assetClass Application
     							assetName primaryNameVar
     							assetType primaryTypeVar
     							"SN Last Seen" NOW
@@ -427,13 +424,13 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
     
-							find Application by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset' 
-       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+							find Device by 'id' with DOMAIN.asset into 'asset'  
+   							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+       						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenFound 'asset' update {
-    							"TN Last Seen" NOW
+    							"Modified Date" NOW
     						}
 						}
 						""".stripIndent())
@@ -456,18 +453,18 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 						find.query.size() == 4
 						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.id == '151954'
 						}
 
 						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.assetName == 'ACMEVMPROD01'
 							kv.assetClass == 'VM'
 						}
 
 						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
+							domain == ETLDomain.Device.name()
 							kv.assetName == 'VMWare Vcenter'
 						}
 
@@ -477,7 +474,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						}
 
 						// whenFound update command assertions
-						!!update."TN Last Seen"
+						!!update.lastUpdated
 					}
 				}
 			}
@@ -488,4 +485,77 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			}
 	}
 
+	void 'test can throw an Exception if whenFound is used without using previously a find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.moveBundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+							
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
+    
+    						whenFound 'asset' create {
+    							"Modified Date" NOW
+    						}
+						}
+						""".stripIndent())
+
+		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Incorrect used: whenFound for field 'asset'. It must have defined a find command previously"
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
 }

@@ -627,12 +627,12 @@ class MoveBundleController implements ControllerMethods {
 		// Application Plan Methodology
 		def customField = project.planMethodology ?: "''"
 
-		def groupingSumQuery = "SELECT new map(${customField} as key, COUNT(ae) as count) FROM Application ae WHERE ae.project=:project"
+		def groupingSumQuery = "SELECT new map(${customField} as key, COUNT(ae) as count) FROM Application ae WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)"
 
 		if (customField) {
 			groupingSumQuery += " group by ${customField}"
 		}
-		def groupValues = Application.executeQuery(groupingSumQuery, [project:project])
+		def groupValues = Application.executeQuery(groupingSumQuery, [project:project, moveBundles:moveBundleList])
 
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key

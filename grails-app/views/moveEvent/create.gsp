@@ -57,7 +57,7 @@
                                     <label for="name"><b>Name:&nbsp;<span style="color: red">*</span></b> </label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'name','errors')}">
-                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}"/>
+                                    <input type="text" id="name" name="name" value="${fieldValue(bean:moveEventInstance,field:'name')}" required/>
                                     <g:hasErrors bean="${moveEventInstance}" field="name">
 						            <div class="errors">
 						                <g:renderErrors bean="${moveEventInstance}" as="list" field="name"/>
@@ -83,7 +83,7 @@
 	                                <ul id="moveBundleList">
                                         <g:if test="${bundles.size() > 0}">
                                             <g:each in="${bundles}" var="bundle">
-                                                <input type="checkbox" name="moveBundle" value="${bundle.id}"> &nbsp;${bundle.name}<br>
+                                                <input type="checkbox" id="moveBundle" name="moveBundle" value="${bundle.id}"> &nbsp;${bundle.name}<br>
                                             </g:each>
                                         </g:if>
                                         <g:else>
@@ -124,7 +124,7 @@
                                     <input type="text" id="videolink" name="videolink" value="${fieldValue(bean:moveEventInstance,field:'videolink')}"/>
                                 </td>
                             </tr>
-                        <tr class="prop">
+                        	<tr class="prop">
 				                <td class="name">
 				                  <label for="newsBarMode"><b>News Bar Mode:&nbsp;<span style="color: red">*</span></b></label>
 				                </td>
@@ -136,7 +136,7 @@
 				                    </div>
 				                  </g:hasErrors>
 				                </td>
-			              </tr>
+			              	</tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Estimated Start:</label>
@@ -155,6 +155,16 @@
 				                  </g:hasErrors>
 				                </td>
                             </tr>
+							<tr class="prop">
+								<td class="name">
+									<label for="apiActionBypass">By-Pass API Actions:</label>
+								</td>
+								<td class="valueNW ${hasErrors(bean:moveEventInstance,field:'apiActionBypass','errors')}">
+									<g:select id="apiActionBypass" optionKey="key" optionValue="value" from="${['true': 'Yes', 'false': 'No']}" name="apiActionBypass" value="${moveEventInstance.apiActionBypass}" >
+									</g:select>
+								</td>
+							</tr>
+
                         </tbody>
                     </table>
                 </div>

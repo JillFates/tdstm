@@ -3,10 +3,14 @@ package specs.Cookbook
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.Cookbook.CreateRecipePage
+import pages.Cookbook.EditRecipePage
+import pages.Cookbook.TabTaskGenPage
+import pages.Cookbook.TabEditorPage
 import pages.Cookbook.TabHistoryPage
 import pages.Cookbook.TabHistoryTabActionsPage
 import pages.Cookbook.TabHistoryTabGenLogPage
 import pages.Cookbook.TabHistoryTabTasksPage
+import pages.Cookbook.TabTaskGenTabSummaryPage
 import pages.Cookbook.TaskDetailsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -20,10 +24,33 @@ class RecipeHistorySpec extends GebReportingSpec {
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "QAE2E"
     static recipeName = baseName + " " + randStr + " Geb Recipe Test"
+    static recipeWithTasksName = baseName + " " + randStr + " Geb Recipe with Tasks Test"
     static recipeDataMap = [
             name: recipeName,
             context: "Event",
             description: "This is a Geb created recipe for an Event context"
+    ]
+
+    static recipeWithTasksDataMap = [
+            name: recipeWithTasksName,
+            context: "Event",
+            description: "This is a Geb created recipe for an Event context",
+            recipeText: [
+                    'tasks: [',
+                    '  [',
+                    '    id: 1100,',
+                    '    description: \'Startup ALL applications\',',
+                    '    title: \'Startup app ${it.assetName}\',',
+                    '    workflow: \'AppStartup\',',
+                    '    team: \'APP_COORD\',',
+                    '    category: \'startup\',',
+                    '    duration: 10,',
+                    '      filter : [',
+                    '        class: \'application\'',
+                    '      ],',
+                    '  ],',
+                    ']'
+            ].join('\\n')
     ]
 
     def setupSpec() {
@@ -33,9 +60,37 @@ class RecipeHistorySpec extends GebReportingSpec {
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
+        // Create clean recipe verify stuff
         clickOnCreateButton()
         at CreateRecipePage
         createRecipe recipeDataMap
+        // Create recipe with tasks verify stuff
+        at CookbookPage
+        waitForLoadingIndicator()
+        clickOnCreateButton()
+        at CreateRecipePage
+        createRecipe recipeWithTasksDataMap
+        at CookbookPage
+        waitForLoadingIndicator(2)
+        /* EDIT Recipe */
+        openEditTab()
+        at TabEditorPage
+        clickOnEditButton()
+        at EditRecipePage
+        browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeWithTasksDataMap.recipeText+'"');
+        waitFor {editorModalCloseBtn.click()}
+        at TabEditorPage
+        waitFor {edTabSaveWipBtn.click()}
+        at CookbookPage
+        waitForLoadingIndicator(2)
+        taskGenerationTab.click()
+        at TabTaskGenPage
+        def buildOutOp = tskGTabEventSelector.find("option").find{it.text() == "Buildout"}
+        waitFor { buildOutOp.click()}
+        waitFor { tskGTabGenUsingWipCBox.click()}
+        waitFor { tskGTabGenerateTasksBtn.click()}
+        at TabTaskGenTabSummaryPage
+        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
     }
 
     def setup() {
@@ -52,11 +107,11 @@ class RecipeHistorySpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks in the Recipe'
-            waitFor { gebRecipes.getAt(0).click()}
-
+            filterByContext recipeDataMap.context // need to play with filtering to refresh grid
+            filterByContext "All" // reset to all because AT page checking
+            waitFor { getRecipeByName(recipeDataMap.name).click()}
         then: 'Text containing the Recipe Name should be displayed'
-            gebRecipes.getAt(0).text().trim() == recipeName
-    }
+            waitFor { getRecipeNameDisplayedInTaskGenerationTab().contains(recipeDataMap.name)} }
 
     // History Tab (empty)
 
@@ -65,7 +120,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the History Option'
-            historyTab.click()
+            waitFor { historyTab.click()}
 
         then: 'History Tab should be Active'
             at TabHistoryPage
@@ -136,8 +191,8 @@ class RecipeHistorySpec extends GebReportingSpec {
             at TabHistoryTabGenLogPage
 
         then: 'Text should not be present'
-            hisTabGenLogTabExcpRadio == "exceptionLog"
-            hisTabGenLogTabTxt.text().trim() == ""
+            waitFor { hisTabGenLogTabExcpRadio == "exceptionLog"}
+            waitFor { hisTabGenLogTabTxt.text().trim() == ""}
     }
 
     def "9. Checking 'Generation Log' tab 'Info/Warning' empty text"() {
@@ -157,10 +212,11 @@ class RecipeHistorySpec extends GebReportingSpec {
         given: 'The User is in the CookBook Section'
             at CookbookPage
         when: 'The User searches by a Recipe'
-            waitFor { gebRecipesWithTasks[0].click()}
-
-        then: 'Recipe should be displayed'
-            gebRecipesWithTasks[0].text().trim() == "Geb Recipe With Tasks Test"
+            filterByContext recipeDataMap.context // need to play with filtering to refresh grid
+            filterByContext "All" // reset to all because AT page checking
+            waitFor { getRecipeByName(recipeWithTasksDataMap.name).click()}
+        then: 'Text containing the Recipe Name should be displayed'
+            waitFor { getRecipeNameDisplayedInTaskGenerationTab().contains(recipeWithTasksDataMap.name)}
     }
 
     def "11. Going to the populated 'History' tab"() {
@@ -284,8 +340,8 @@ class RecipeHistorySpec extends GebReportingSpec {
             at TabHistoryTabGenLogPage
 
         then: 'Some values should be present'
-            hisTabGenLogTabExcpRadio == "exceptionLog"
-            hisTabGenLogTabTxt.text().contains("has no predecessor tasks")
+            waitFor { hisTabGenLogTabExcpRadio == "exceptionLog"}
+            waitFor { hisTabGenLogTabTxt.text().contains("has no predecessor tasks")}
     }
 
     def "21. Clicking on Info/Warning radio"() {
@@ -293,7 +349,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         given: 'The User is in the Generation Log Tab Section'
             at TabHistoryTabGenLogPage
         when: 'The User Clicks the Info Checkbox'
-            hisTabGenLog TabInfoRadio.click()
+            hisTabGenLogTabInfoRadio.click()
 
         then: 'Related information should be displayed'
             hisTabGenLogTabInfoRadio == "infoLog"

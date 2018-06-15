@@ -395,8 +395,6 @@ projectTeam,saveDemoProject,
 projectUtil,index,ProjectView
 projectUtil,searchList,ProjectView
 projectUtil,addUserPreference,UserGeneralAccess
-projectUtil,createDemo,ProjectCreate
-projectUtil,saveDemoProject,ProjectCreate
 rackLayouts,create,RackCreate
 rackLayouts,generateElevations,RackEdit
 rackLayouts,retrieveRackDetails,RackView

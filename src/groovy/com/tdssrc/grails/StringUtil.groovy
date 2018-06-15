@@ -451,7 +451,7 @@ class StringUtil {
 	 *
 	 * @usage
 	 * <pre>
-	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {{COLOR}}', [COLOR:'Red'] )
+	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {COLOR}', [COLOR:'Red'] )
 	 * </pre>
 	 */
 	static String replacePlaceholders(String text, Map params) throws InvalidParamException {

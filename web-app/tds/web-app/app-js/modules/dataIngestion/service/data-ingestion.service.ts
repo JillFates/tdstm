@@ -12,7 +12,6 @@ import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../mod
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
-import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
 import * as R from 'ramda';
 import 'rxjs/add/operator/map';
@@ -20,8 +19,6 @@ import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
-const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
-const UNITS_SIZE_SEPARATOR = 'x';
 export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
 export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 
@@ -223,9 +220,10 @@ export class DataIngestionService {
 				if (data.config) {
 					for (let property in data.config) {
 						if (data.config.hasOwnProperty(property)) {
+							const label = data.config[property].property;
 							let column = {
-								label: StringUtils.toCapitalCase(data.config[property].property, true),
-								property: data.config[property].property,
+								label,
+								property: label,
 								type: data.config[property].type,
 								width: 140
 							};
@@ -425,8 +423,10 @@ export class DataIngestionService {
 		};
 
 		// Properties only required on this methods.
-		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER) {
-			postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
+		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER || model.authMethod === AUTH_METHODS.BASIC_AUTH) {
+			if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER ) {
+				postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
+			}
 			postRequest.validationExpression = (model.validationExpression) ? model.validationExpression  : '';
 		}
 
@@ -667,23 +667,6 @@ export class DataIngestionService {
 	}
 	private getUserPreference(preferenceName: string): Observable<any> {
 		return this.preferenceService.getPreference(preferenceName);
-	}
-
-	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
-		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
-			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
-			.filter((size: string) => Boolean(size))
-			.map((size: string) => {
-				let measure: string[] = size.split(UNITS_SIZE_SEPARATOR);
-				let	width = Number(measure.length &&  measure.shift()) || null;
-				let height = Number(measure.length &&  measure.shift()) || null;
-				return { width, height };
-			})
-			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
-	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
-		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
 
 	/**

@@ -9,6 +9,7 @@ import pages.TaskManager.TaskManagerPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import utils.CommonActions
 
 @Stepwise
 class TaskEditionSpec extends GebReportingSpec {
@@ -26,11 +27,10 @@ class TaskEditionSpec extends GebReportingSpec {
     static taskPerson = "Unassigned" //TODO verify other staff id values
     static taskTeam = "Unassigned"  //TODO verify other team id values
     static taskAssetType = "Applications"
-    static taskAssetName = "App 1"
+    static taskAssetName
     static taskInsLink = "https://www.transitionaldata.com"
-    static taskPredecessor = "11747: ZZ Test Task 2"
-    static taskSuccessor = "11749: ZZ Test Task 3"
     static taskNote = "This is a Note for "+ baseName +" "+ randStr + " Task For E2E Edited"
+    def commonActions = new CommonActions()
 
     def setupSpec() {
         testCount = 0
@@ -104,8 +104,9 @@ class TaskEditionSpec extends GebReportingSpec {
             waitFor { teModalAssetNameSelector.find("span", text: "Please select") }
             teModalAssetNameSelector.click()
             waitFor { teModalAssetNameSelValues.size() > 1 }
-            waitFor { teModalAssetNameSelValues.find("div", class: "select2-result-label", text: taskAssetName).click() }
-
+            def assetName = commonActions.getRandomOption(teModalAssetNameSelValues.find("div", class: "select2-result-label"))
+            taskAssetName = assetName.text()
+            assetName.click()
         then: 'The User should remain in the Taks Edition Section'
             at TaskEditionPage
     }
@@ -117,11 +118,14 @@ class TaskEditionSpec extends GebReportingSpec {
         when: 'The User adds some values such as Predecessor and Successor'
             teModalAddPredecessorBtn.click()
             waitFor {teModalPredecessorDD.click()}
-            waitFor {$("li",text:taskPredecessor).click()}
+            waitFor {teModalPredecessorUl}
+            def predecessor = commonActions.getSelectRandomOption(teModalPredecessorOptions)
+            waitFor {predecessor.click()}
             teModalAddSuccessorBtn.click()
             waitFor {teModalSuccessorDD.click()}
-            waitFor {$("li",text:taskSuccessor).click()}
-
+            waitFor {teModalSuccessorUl}
+            def sucessor = commonActions.getSelectRandomOption(teModalSuccessorOptions)
+            waitFor {sucessor.click()}
         then: 'The User should remain in the Taks Edition Section'
             at TaskEditionPage
     }
@@ -147,7 +151,7 @@ class TaskEditionSpec extends GebReportingSpec {
             tdModalTaskPerson.text().trim() == taskPerson
             tdModalTaskTeam.text().trim() == taskTeam
             tdModalTaskEvent.text().trim() == taskEvent
-            tdModalTaskAssetName.text().trim() == taskAssetName
+            tdModalTaskAssetName.text().trim().contains(taskAssetName)
             tdModalInstructionsLink.text().trim() == taskInsLink
             tdModalTaskStatus.text().trim() == taskStatus
             tdModalNoteLast.text().trim() == taskNote
