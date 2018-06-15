@@ -58,8 +58,8 @@ class AssetViewsPage extends Page{
     def getFavCounter(){
         favViewsCounter.text().toInteger()
     }
+
     def validateValueIncrement(int initial, int incremented){
         initial+1==incremented
     }
-
 }
