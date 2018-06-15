@@ -294,7 +294,6 @@ class AssetEntity {
 	}
 
 	static mapping = {
-		version false
 		appOwner column: 'app_owner_id'
 		autoTimestamp false
 		id column: 'asset_entity_id'
@@ -307,6 +306,9 @@ class AssetEntity {
 		retireDate sqltype: 'date'
 		tablePerHierarchy false
 		autoTimestamp false
+		columns {
+			id column: 'asset_entity_id'
+		}
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties

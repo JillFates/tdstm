@@ -782,7 +782,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		Integer rowNum,
 		List<Map<String, ?>> fieldSpecs
 	) {
-
 		// Try loading the application and make sure it is associated to the current project
 		def asset
 		def clazzName = clazz.name.tokenize('.')[-1]

@@ -154,7 +154,8 @@ class DataTransferBatchController implements ControllerMethods {
 			def domainName
 			def className
 
-			String entityTypeDomainName = entry.eavEntityType.domainName
+			// String entityTypeDomainName = entry.eavEntityType.domainName
+			String entityTypeDomainName = entry.assetClass
 			if (entityTypeDomainName) {
 				if (entityTypeDomainName == 'Files') {
 					domainName = 'Logical Storage'

@@ -78,21 +78,6 @@ databaseChangeLog = {
 		sql('DROP TABLE asset_entity_varchar')
 	}
 
-	changeSet(author: 'tpelletier', id: '20180508 TM-6778-6') {
-		comment('Add asset class to data_transfer_batch')
-
-		preConditions(onFail: 'MARK_RAN') {
-			not {
-				columnExists(tableName: 'data_transfer_batch', columnName: 'asset_class')
-			}
-		}
-
-		addColumn(tableName: 'data_transfer_batch') {
-			column(name: 'asset_class', type: 'varchar(12)')
-		}
-	}
-
-
 	changeSet(author: 'tpelletier', id: '20180508 TM-6778-7') {
 		comment('Set the asset class on data_transfer_batch from eav_entity_type')
 
@@ -103,7 +88,7 @@ databaseChangeLog = {
 		}
 
 		sql('''
-			UPDATE data_transfer_batch d 
+			UPDATE data_transfer_batch d
 			JOIN  eav_entity_type e ON  d.eav_entity_type_id = e.entity_type_id
 			SET d.asset_class = CASE
 				WHEN e.entity_type_code = 'Appication' THEN 'APPLICATION'
@@ -139,12 +124,12 @@ databaseChangeLog = {
 		""")
 
 		sql("""
-				INSERT INTO asset_options (value, type) 
+				INSERT INTO asset_options (value, type)
 				SELECT DISTINCT asset_type, 'ASSET_TYPE'
 				FROM model
 				WHERE asset_type NOT IN(
-					SELECT value 
-					FROM asset_options 
+					SELECT value
+					FROM asset_options
 					WHERE type = 'ASSET_TYPE'
 				);
 		""")
@@ -237,5 +222,27 @@ databaseChangeLog = {
 		}
 
 		sql('DROP TABLE eav_entity_varchar_auditable;')
+	}
+
+	changeSet(author: 'jmartin', id: '20180614 TM-6778-19') {
+		comment('Add AUTO_INCREMENT to the asset_entity table')
+		sql('SET FOREIGN_KEY_CHECKS=0')
+		sql('ALTER TABLE asset_entity MODIFY asset_entity_id BIGINT(20) NOT NULL AUTO_INCREMENT;')
+		sql('SET FOREIGN_KEY_CHECKS=1')
+	}
+
+	changeSet(author: 'jmartin', id: '20180614 TM-6778-20') {
+		comment('Add version column to the asset_entity table')
+		preConditions(onFail: 'MARK_RAN') {
+			not {
+				columnExists(tableName: 'asset_entity', columnName: 'version')
+			}
+		}
+
+		addColumn(tableName: 'asset_entity') {
+			column(name: 'version', type: 'int(11)', defaultValue: 0) {
+				constraints(nullable: 'false')
+			}
+		}
 	}
 }
