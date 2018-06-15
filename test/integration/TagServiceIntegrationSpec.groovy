@@ -127,8 +127,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 
 			results[1].id == tag2.id
 			results[1].Color == Color.Blue.name()
@@ -136,8 +134,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].DateCreated == now
-			results[1].LastModified == now
 	}
 
 	void "test list with full name"() {
@@ -150,8 +146,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 	}
 
 	void "test list with partial name"() {
@@ -164,8 +158,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 	}
 
 	void "test list with a name not in the db"() {
@@ -186,8 +178,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
 			results[0].Assets == 1
-			results[0].DateCreated == now
-			results[0].LastModified == now
 	}
 
 	void "test list with partial description"() {
@@ -200,8 +190,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'some assets'
 			results[0].Description == 'Another description'
 			results[0].Assets == 1
-			results[0].DateCreated == now
-			results[0].LastModified == now
 	}
 
 	void "test list with a description not in the db"() {
@@ -222,8 +210,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 
 			results[1].id == tag2.id
 			results[1].Color == Color.Blue.name()
@@ -231,8 +217,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].DateCreated == now
-			results[1].LastModified == now
 	}
 
 	void "test list with dateCreated tomorrow"() {
@@ -252,8 +236,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 
 			results[1].id == tag2.id
 			results[1].Color == Color.Blue.name()
@@ -261,8 +243,6 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].Name == 'some assets'
 			results[1].Description == 'Another description'
 			results[1].Assets == 1
-			results[1].DateCreated == now
-			results[1].LastModified == now
 	}
 
 	void "test list with lastUpdated tomorrow"() {
@@ -283,7 +263,5 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].Name == 'grouping assets'
 			results[0].Description == 'This is a description'
 			results[0].Assets == 2
-			results[0].DateCreated == now
-			results[0].LastModified == now
 	}
 }

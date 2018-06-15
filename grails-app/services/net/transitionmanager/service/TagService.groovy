@@ -63,13 +63,15 @@ class TagService {
 		}
 
 		if (dateCreated) {
-			whereFilters << 't.dateCreated = :dateCreated'
-			params.dateCreated = dateCreated
+			whereFilters << '(t.dateCreated >= :dateCreatedStart AND t.dateCreated < :dateCreatedEnd)'
+			params.dateCreatedStart = dateCreated.clearTime()
+			params.dateCreatedEnd = dateCreated.clearTime() + 1
 		}
 
 		if (lastUpdated) {
-			whereFilters << 't.lastUpdated = :lastUpdated'
-			params.lastUpdated = lastUpdated
+			whereFilters << '(t.lastUpdated >= :lastUpdatedStart AND t.lastUpdated < :lastUpdatedEnd)'
+			params.lastUpdatedStart = lastUpdated.clearTime()
+			params.lastUpdatedEnd = lastUpdated.clearTime() + 1
 		}
 
 		String where = ''
