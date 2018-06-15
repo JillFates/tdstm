@@ -79,7 +79,7 @@ class ApplicationDeletionSpec extends GebReportingSpec {
             at ApplicationDetailsPage
             // TODO The Following item fetched by data-content cannot be located as itself (Label and Value have the same properties)
         and: 'The appName should be shown'
-            adModalAppName[1].text().trim() == appName
+            adModalAppName.text().trim() == appName
     }
 
     def "3. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {

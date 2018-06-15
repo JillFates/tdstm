@@ -54,7 +54,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         at CreateRecipePage
         createRecipe recipeDataMap
         at CookbookPage
-        waitForSuccessBanner()
+        waitForLoadingIndicator(2)
         /* EDIT Recipe */
         openEditTab()
         at TabEditorPage
@@ -80,11 +80,9 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Recipe with Task on It'
-            waitFor { gebRecipes.find{it.text().trim()==recipeName}.click()}
-
+            waitFor { getRecipeByName(recipeName).click()}
         then: 'Information should be populated'
-            def found = gebRecipes.find{it.text()==recipeName}
-            found != null
+            getRecipeByName(recipeName) != null
     }
 
     def "2. Going to The Task Generation tab"() {
@@ -92,7 +90,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Generation Tab'
-            taskGenerationTab.click()
+            waitFor {taskGenerationTab.click() }
 
         then: 'Generation Section should be displayed'
             at TabTaskGenPage

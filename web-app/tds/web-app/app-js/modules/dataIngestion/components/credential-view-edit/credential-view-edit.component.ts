@@ -170,7 +170,9 @@ export class CredentialViewEditComponent {
 	 */
 	protected onSaveCredential(): void {
 		// Cookie and Header requires an extra validation before to save the credential
-		if (this.credentialModel.authMethod === this.authMethods.COOKIE || this.credentialModel.authMethod === this.authMethods.HEADER) {
+		if (this.credentialModel.authMethod === this.authMethods.COOKIE ||
+			this.credentialModel.authMethod === this.authMethods.HEADER ||
+			this.credentialModel.authMethod === this.authMethods.BASIC_AUTH) {
 			this.validateExpressionCheck().subscribe((result) => {
 				if (result) {
 					this.validExpressionResult = result;

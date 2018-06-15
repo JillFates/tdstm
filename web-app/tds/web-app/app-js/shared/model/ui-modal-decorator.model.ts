@@ -10,5 +10,6 @@ export interface DecoratorOptions {
 	isCentered?: boolean;
 	isResizable?: boolean;
 	isDraggable?: boolean;
+	sizeNamePreference?: string;
 }
 

@@ -35,6 +35,7 @@
                         <div *ngIf="OPTIONS.selected === OPTIONS.FILE" class="col-md-12">
                             <kendo-upload
                                     #kendoUploadInstance="kendoUpload"
+                                    [restrictions]="file.uploadRestrictions"
                                     [autoUpload]="file.autoUpload"
                                     [saveUrl]="file.uploadSaveUrl"
                                     [removeUrl]="file.uploadDeleteUrl"
