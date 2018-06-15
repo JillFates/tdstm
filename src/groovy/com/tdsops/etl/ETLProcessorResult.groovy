@@ -40,6 +40,11 @@ class ETLProcessorResult {
 	@DoNotMarshall
 	Integer resultIndex = -1
 
+	/**
+	 * Debug Console content filed used to create the final result
+	 */
+	String debugConsole
+
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
@@ -247,7 +252,13 @@ class ETLProcessorResult {
 		return results
 	}
 
-	private
+	void setFieldLabelMapInResults(Map<String, Map<String, String>> map){
+		domains.each {DomainResult domainResult ->
+			if (map?.containsKey(domainResult.domain)) {
+				domainResult.setFieldLabelMap(map[domainResult.domain])
+			}
+		}
+	}
 
 	/**
 	 * Look up a field name that contain a value equals to the value and if found then the current

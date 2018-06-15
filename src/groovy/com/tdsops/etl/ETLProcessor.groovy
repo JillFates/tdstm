@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import getl.data.Field
+import grails.converters.JSON
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -1157,6 +1158,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	Map<String, ?> resultsMap(Boolean includeConsoleLog=false) {
 		this.result.toMap(includeConsoleLog)
+	}
+
+	/**
+	 *
+	 * @param includeConsoleLog
+	 * @return an instance of ETLProcessorResult
+	 */
+	ETLProcessorResult finalResults(Boolean includeConsoleLog = false){
+		this.result.setFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
+		if (includeConsoleLog) {
+			this.result.debugConsole = this.debugConsole.content()
+		}
+		return this.result
 	}
 
 	List<String> getAvailableMethods () {
