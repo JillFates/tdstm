@@ -76,6 +76,7 @@ class Credential {
 		httpMethod  nullable: true, validator: httpMethodValidator
 		requestMode nullable: true, validator: requestModeValidator
 		lastUpdated nullable: true
+		provider ofSameProject:true
 	}
 
 	static mapping = {
