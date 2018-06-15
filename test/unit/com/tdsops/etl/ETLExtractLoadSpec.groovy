@@ -16,6 +16,8 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -39,6 +41,7 @@ import spock.lang.Shared
  *     <li><b>ignore row</b></li>
  * </ul>
  */
+@TestMixin(ControllerUnitTestMixin)
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLExtractLoadSpec extends ETLBaseSpec {
@@ -182,8 +185,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()) {
-				ETLInfo.originalFilename == fileName
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -214,8 +216,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()){
-				ETLInfo.originalFilename == fileName
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -257,7 +258,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 3
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -294,7 +295,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and: 'A new result was added in the result'
 
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -498,7 +499,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -546,7 +547,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -595,7 +596,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -646,7 +647,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -713,7 +714,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -780,7 +781,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -823,7 +824,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -940,7 +941,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -992,7 +993,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1078,7 +1079,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1211,7 +1212,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Room domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 			}
 
@@ -1266,7 +1267,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.result.domains.size() == 1
 
 		cleanup:
 			if(fileName){
@@ -1298,7 +1299,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1432,7 +1433,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1521,7 +1522,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1596,7 +1597,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1676,7 +1677,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1710,7 +1711,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1747,7 +1748,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Third row was removed from the domain results'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1795,7 +1796,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1853,7 +1854,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1912,7 +1913,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1984,7 +1985,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2071,7 +2072,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate(scriptContent)
 
 		then:
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					with(data[0], RowResult) {
@@ -2126,7 +2127,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.result) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2259,7 +2260,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.result){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 

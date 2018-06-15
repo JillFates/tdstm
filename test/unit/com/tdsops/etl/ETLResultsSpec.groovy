@@ -4,11 +4,16 @@ import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
+import groovy.json.JsonOutput
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -16,11 +21,13 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.See
 
 /**
  * Test about ETLProcessorResults and JSON transformation:
  */
+@TestMixin(ControllerUnitTestMixin)
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
 class ETLResultsSpec extends ETLBaseSpec {
@@ -97,6 +104,11 @@ class ETLResultsSpec extends ETLBaseSpec {
 		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
+	}
+
+	def teardown(){
+
 	}
 
 	@See ('TM-10695')
@@ -147,7 +159,8 @@ class ETLResultsSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
 						""".stripIndent())
-			JSON jsonResult = etlProcessor.resultsMap() as JSON
+
+			JSONObject jsonResult = JSON.parse(new JSON(etlProcessor.result).toString())
 
 		then: 'Results should contain Application domain results associated'
 			with(jsonResult) {

@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.marshall.ConfigureMarshalling
+import com.tdsops.etl.marshall.DoNotMarshall
 import groovy.transform.CompileStatic
 
 /**
@@ -8,11 +10,13 @@ import groovy.transform.CompileStatic
  * <br>
  * Every part of the results are covered in formatter functions.
  */
+@ConfigureMarshalling
 class ETLProcessorResult {
 
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
+	@DoNotMarshall
 	ETLProcessor processor
 
 	/**
@@ -23,6 +27,7 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
+	@DoNotMarshall
 	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
@@ -32,6 +37,7 @@ class ETLProcessorResult {
 	 * Result row index position in the reference.data list
 	 * @see DomainResult#data
 	 */
+	@DoNotMarshall
 	Integer resultIndex = -1
 
 	ETLProcessorResult(ETLProcessor processor) {
@@ -260,6 +266,7 @@ class ETLProcessorResult {
 
 }
 
+
 /**
  * <pre>
  *  "domains": {
@@ -274,7 +281,9 @@ class ETLProcessorResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class DomainResult {
+
 	String domain
 	Set fieldNames = [] as Set
 	List<RowResult> data = new ArrayList<RowResult>()
@@ -312,6 +321,7 @@ class DomainResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class RowResult {
 	String op = 'I'
 	Integer rowNum
@@ -319,6 +329,7 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
+	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
 
@@ -423,6 +434,7 @@ class RowResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class FieldResult {
 
 	Object originalValue
@@ -486,6 +498,7 @@ class FieldResult {
 }
 
 @CompileStatic
+@ConfigureMarshalling
 class FindResult {
 	List<QueryResult> query = []
 	List<Long> results = []
@@ -549,6 +562,7 @@ class FindResult {
  * @return
  */
 @CompileStatic
+@ConfigureMarshalling
 class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
