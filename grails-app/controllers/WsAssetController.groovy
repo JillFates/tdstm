@@ -326,6 +326,13 @@ class WsAssetController implements ControllerMethods {
 				asset: asset
 			]
 			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+            // prepare value names as well (needed for UI)
+            if (model.asset.manufacturer) {
+                model.manufacturerName = model.asset.manufacturer.name;
+            }
+            if (model.asset.model) {
+                model.modelName = model.asset.model.modelName;
+            }
 			if (mode == 'show') {
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
 			} else {

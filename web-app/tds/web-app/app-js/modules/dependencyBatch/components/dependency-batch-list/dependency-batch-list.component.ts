@@ -27,8 +27,8 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 })
 export class DependencyBatchListComponent {
 
-	private BatchStatus = BatchStatus;
-	private columnsModel: DependencyBatchColumnsModel;
+	protected BatchStatus = BatchStatus;
+	protected columnsModel: DependencyBatchColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
@@ -41,12 +41,14 @@ export class DependencyBatchListComponent {
 	private viewArchived = false;
 	private batchStatusLooper: any;
 	private readonly PROGRESS_MAX_TRIES = 10;
-	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
+	private readonly PROGRESS_CHECK_INTERVAL = 3 * 1000;
 	private readonly STOP_BATCH_CONFIRMATION = 'IMPORT_BATCH.LIST.STOP_BATCH_CONFIRMATION';
 	private readonly ARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEM_CONFIRMATION';
 	private readonly ARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEMS_CONFIRMATION';
 	private readonly UNARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEM_CONFIRMATION';
 	private readonly UNARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEMS_CONFIRMATION';
+	private runningBatches: Array<ImportBatchModel> = [];
+	private queuedBatches: Array<ImportBatchModel> = [];
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -69,7 +71,8 @@ export class DependencyBatchListComponent {
 		}
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
-			this.setBatchStatusLooper();
+			this.setRunningLoop();
+			this.setQueuedLoop();
 		});
 	}
 
@@ -77,22 +80,22 @@ export class DependencyBatchListComponent {
 	 * Load all Import Batch Unarchived list
 	 */
 	private reloadBatchList(): void {
-		this.clearBatchStatusLooper();
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper.reloadData(batchList);
-			this.setBatchStatusLooper();
+			this.clearLoopsLists();
 		});
 	}
 
 	/**
 	 * Reloads the current batch record.
+	 * Stops looper and restarts it.
 	 * @param {ImportBatchModel} batchRecord
 	 */
-	private reloadImportBatch(importBatch: ImportBatchModel) {
-		this.dependencyBatchService.getImportBatch(importBatch.id).subscribe( (response: ApiResponseModel) => {
-			if (response.status === ApiResponseModel.API_SUCCESS) {
-				Object.assign(importBatch, response.data);
-			}
+	private reloadImportBatch(batch: ImportBatchModel) {
+		this.dependencyBatchService.getImportBatch(batch.id).subscribe( (response: ApiResponseModel) => {
+				if (response.status === ApiResponseModel.API_SUCCESS) {
+					Object.assign(batch, response.data);
+				}
 		});
 	}
 
@@ -125,14 +128,13 @@ export class DependencyBatchListComponent {
 	 * Load Archived Batches.
 	 */
 	private loadArchivedBatchList(): void {
-		this.clearBatchStatusLooper();
 		this.dependencyBatchService.getImportBatches().subscribe( result => {
 			if (result.status === 'success') {
 				let batches = result.data.filter( (item: ImportBatchModel) => {
 					return item.archived;
 				});
 				this.dataGridOperationsHelper.reloadData(batches);
-				this.setBatchStatusLooper();
+				this.clearLoopsLists();
 			} else {
 				this.handleError(result.errors ? result.errors[0] : null);
 			}
@@ -287,16 +289,18 @@ export class DependencyBatchListComponent {
 
 	/**
 	 * On Play action button clicked, start import batch.
-	 * @param item
+	 * @param batch
 	 */
-	private onPlayButton(item: ImportBatchModel): void {
-		const ids = [item.id];
-		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadImportBatch(item);
+	private onPlayButton(batch: ImportBatchModel): void {
+		const ids = [batch.id];
+		this.dependencyBatchService.queueImportBatches(ids).subscribe( (response: ApiResponseModel) => {
+				if (response.status === ApiResponseModel.API_SUCCESS && response.data.QUEUE === 1) {
+					batch.status.code = BatchStatus.QUEUED.toString();
+					batch.status.label = 'Queued';
+					this.addToQueuedBatchesLoop(batch);
 				} else {
 					this.reloadBatchList();
-					this.handleError(result.errors ? result.errors[0] : null);
+					this.handleError(response.errors ? response.errors[0] : null);
 				}
 			},
 			(err) => this.handleError(err)
@@ -305,13 +309,15 @@ export class DependencyBatchListComponent {
 
 	/**
 	 * On Eject action button clicked, start import batch.
-	 * @param item
+	 * @param batch
 	 */
-	private onEjectButton(item: any): void {
-		const ids = [item.id];
+	private onEjectButton(batch: ImportBatchModel): void {
+		const ids = [batch.id];
 		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadBatchList();
+					batch.status.code = BatchStatus.PENDING.toString();
+					batch.status.label = 'Pending';
+					this.removeBatchFromQueuedLoop(batch);
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -349,7 +355,8 @@ export class DependencyBatchListComponent {
 		const ids = [batch.id];
 		this.dependencyBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
-				this.reloadBatchList();
+				this.removeBatchFromRunningLoop(batch);
+				this.reloadImportBatch(batch);
 			} else {
 				this.handleError(result.errors[0] ? result.errors[0] : 'Error on stop import batch endpoint.');
 			}
@@ -395,67 +402,154 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
-	 * Clears out the Batch Status Interval if currently running.
+	 * Initializes the loop for batches on RUNNING state.
 	 */
-	private clearBatchStatusLooper(): void {
-		if (this.batchStatusLooper) {
-			clearInterval(this.batchStatusLooper);
-		}
-	}
-
-	/**
-	 * Creates an interval loop to retreive batch current progress.
-	 */
-	private setBatchStatusLooper(): void {
-		let runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
-			return item.status.code === BatchStatus.RUNNING;
+	private setRunningLoop(): void {
+		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.RUNNING.toString();
 		});
-		this.getBatchesCurrentProgress(runningBatches);
-		this.batchStatusLooper = setInterval(() => {
-			this.getBatchesCurrentProgress(runningBatches);
-		}, this.PROGRESS_CHECK_INTERVAL); // every 10 seconds
+		this.runningLoop();
 	}
 
 	/**
-	 * Gets from API batch current progress.
+	 * Running Loop, called recursively to check if there's any batch on RUNNING state and checking it's progress.
+	 * This implementation waits for the first API call to finish in order to apply the time interval and do the next
+	 * check. (instead of queuing the API calls asynchronously).
 	 */
-	private getBatchesCurrentProgress(runningBatches: Array<ImportBatchModel>): void {
-		for (let batch of runningBatches ) {
-			this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
-				if (response.status === ApiResponseModel.API_SUCCESS) {
-					batch.currentProgress =  response.data.progress ? response.data.progress : 0;
-					const lastUpdated = (response.data.lastUpdated as Date);
-					batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
-
-					// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
-					if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
-						batch.status.code = BatchStatus.STALLED;
-						batch.status.label = 'Stalled';
-						this.removeBatchFromLoop(batch, runningBatches);
-					} else if (batch.currentProgress >= 100) {
-						batch.status = response.data.status as EnumModel;
-						this.removeBatchFromLoop(batch, runningBatches);
+	private runningLoop(): void {
+		console.log('Running batches: ', this.runningBatches.length);
+		if (this.runningBatches.length === 0) {
+			setTimeout(() => {
+				this.setRunningLoop();
+			}, this.PROGRESS_CHECK_INTERVAL);
+		} else {
+			for (let batch of this.runningBatches) {
+				this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
+					if (response.status === ApiResponseModel.API_SUCCESS) {
+						batch.currentProgress =  response.data.progress ? response.data.progress : 0;
+						const lastUpdated = (response.data.lastUpdated as Date);
+						batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
+						// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
+						if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
+							batch.status.code = BatchStatus.STALLED.toString();
+							batch.status.label = 'Stalled';
+							this.removeBatchFromRunningLoop(batch);
+						} else if (batch.currentProgress >= 100) {
+							batch.status = response.data.status as EnumModel;
+							batch.currentProgress = 0;
+							this.removeBatchFromRunningLoop(batch);
+							this.reloadImportBatch(batch);
+						} else {
+							batch.lastUpdated =  response.data.lastUpdated as Date;
+						}
 					} else {
-						batch.lastUpdated =  response.data.lastUpdated as Date;
+						this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
 					}
-				} else {
-					this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
-				}
-			}, error => {
-				this.clearBatchStatusLooper();
-				this.handleError(error);
-			});
+					// keep the loop running ..
+					setTimeout(() => {
+						this.runningLoop();
+					}, this.PROGRESS_CHECK_INTERVAL);
+				}, error => {
+					this.handleError(error);
+				});
+			}
 		}
-		console.log(runningBatches);
 	}
 
 	/**
-	 * Removes a batch from Running Loop List.
-	 * @param {ImportBatchModel} batch
-	 * @param {Array} runningBatches
+	 * Initializes the loop for batches on QUEUED state.
 	 */
-	private removeBatchFromLoop(batch: ImportBatchModel, runningBatches: Array<ImportBatchModel>): void {
-		const filterIndex = runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
-		runningBatches.splice(filterIndex, 1);
+	private setQueuedLoop(): void {
+		this.queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.QUEUED.toString();
+		});
+		this.queuedLoop([...this.queuedBatches]);
 	}
+
+	/**
+	 * Queued Loop, called recursively to check if there's any batch on QUEUED state and checking it's state.
+	 * Receives a copy of the original list of queued batches, since this queued state can be applied to several batches
+	 * at time, this avoids to run the function exponentially every time we add a batch to the list.
+	 * This implementation waits for the first API call to finish in order to apply the time interval and do the next
+	 * check. (instead of queuing the API calls asynchronously).
+	 * @param {Array<ImportBatchModel>} batchList
+	 */
+	private queuedLoop(batchList: Array<ImportBatchModel>): void {
+		console.log('Queued batches: ', batchList.length);
+		if (batchList.length === 0) {
+			setTimeout(() => {
+				this.setQueuedLoop();
+			}, this.PROGRESS_CHECK_INTERVAL);
+		} else {
+			for (let i = 0; i < batchList.length; i++) {
+				let batch: ImportBatchModel = batchList[i];
+				this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+					if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
+						batch.status.code = (response.data as ImportBatchModel).status.code;
+						batch.status.label = (response.data as ImportBatchModel).status.label;
+						this.removeBatchFromQueuedLoop(batch);
+						if (batch.status.code === BatchStatus.RUNNING.toString()) {
+							this.addToRunningBatchesLoop(batch);
+						}
+					}
+					// last batch to check .. launch the loop;
+					if (i === batchList.length - 1) {
+						// keep the loop running ..
+						setTimeout(() => {
+							this.setQueuedLoop();
+						}, this.PROGRESS_CHECK_INTERVAL);
+					}
+				}, error => this.handleError(error));
+			}
+		}
+	}
+
+	/**
+	 * Removes a batch from the RUNNING state batch list.
+	 * @param {ImportBatchModel} batch
+	 */
+	private removeBatchFromRunningLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		this.runningBatches.splice(filterIndex, 1);
+	}
+
+	/**
+	 * Removes a batch from the QUEUED state batch list.
+	 * @param {ImportBatchModel} batch
+	 */
+	private removeBatchFromQueuedLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.queuedBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		this.queuedBatches.splice(filterIndex, 1);
+	}
+
+	/**
+	 * Adds a batch to the RUNNING state batch list.
+	 * @param {ImportBatchModel} batch
+	 */
+	private addToRunningBatchesLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		if (filterIndex < 0) {
+			this.runningBatches.push(batch);
+		}
+	}
+
+	/**
+	 * Adds a batch to the QUEUED state batch list.
+	 * @param {ImportBatchModel} batch
+	 */
+	private addToQueuedBatchesLoop(batch: ImportBatchModel): void {
+		const filterIndex = this.queuedBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		if (filterIndex < 0) {
+			this.queuedBatches.push(batch);
+		}
+	}
+
+	/**
+	 * Clears both RUNNING and QUEUED lists.
+	 */
+	private clearLoopsLists(): void {
+		this.runningBatches = [];
+		this.queuedBatches = [];
+	}
+
 }

@@ -1,11 +1,10 @@
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.os.Shell
 import com.tdsops.common.security.AESCodec
 import com.tdsops.common.security.DESCodec
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import net.transitionmanager.controller.ControllerMethods
@@ -1116,13 +1115,15 @@ class AdminController implements ControllerMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def retrieveAssetTypes() {
 		Project project = controllerService.getProjectForPage(this)
+
 		if (!project) {
 			return
 		}
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute, [sort: 'value']).value
+
+		List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
 		List assetTypes = []
 		assetTypeOptions.remove('Blade') // TODO : temp fix to resolve the below issue
+
 		assetTypeOptions.each { type ->
 			def modelCount = Model.findAllByAssetType(type)
 			def assets = AssetEntity.findAllByAssetType(type) // TODO : getting Exception when type=Blade. assuming data issue.
@@ -1134,6 +1135,7 @@ class AdminController implements ControllerMethods {
 			boolean toPurge = (assetRef == 0 && modelRef == 0)
 			assetTypes << [type, assetRef, modelRef, projectRef, projectCnt, toPurge]
 		}
+
 		render(template: 'getAssetTypes', model: [assetTypes: assetTypes])
 	}
 
@@ -1143,19 +1145,24 @@ class AdminController implements ControllerMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def cleanAssetTypes() {
 		Project project = controllerService.getProjectForPage(this)
+
 		if (!project) {
 			return
 		}
 
 		def deletedTypes = []
-		EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'), [sort: 'value']).value.each { type ->
+		List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+
+		assetTypeOptions.each { type ->
 			int assetCount = AssetEntity.countByAssetType(type)
 			int modelCount = Model.countByAssetType(type)
+
 			if (!assetCount && !modelCount) {
-				def eavAttributeOption = EavAttributeOption.findByValue(type)
-				if (eavAttributeOption) {
+				AssetOptions assetOption = AssetOptions.findByValue(type)
+
+				if (assetOption) {
 					deletedTypes << type
-					eavAttributeOption.delete()
+					assetOption.delete()
 				}
 			}
 		}

@@ -62,6 +62,11 @@
 			$("#addEnvironmentButtonId").val("SAVE");
 			$(".deleteEnvironment").show();
 			$("#addEnvironmentButtonId").attr("onClick","submitForm('"+option+"')");
+		} else if(value=='assetType') {
+			$("#newAssetType").show(500);
+			$("#addAssetTypeButtonId").val("SAVE");
+			$(".deleteAssetType").show();
+			$("#addAssetTypeButtonId").attr("onClick","submitForm('"+option+"')");
 		}
 	}
 	
@@ -72,7 +77,8 @@
 			var dependencyType = $("#dependencyType").val();
 			var dependencyStatus = $("#dependencyStatus").val();
 			var environment = $("#environment").val();
-			
+			var assetType = $("#assetType").val();
+
 			if (option=='planStatus' && planStatus) {
 				${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ encodeURIComponent(planStatus)+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(data,planStatus,option)')};
 			} else if(option=='Priority' && priorityOption) {
@@ -81,6 +87,8 @@
 				${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ encodeURIComponent(dependencyType) +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(data,dependencyType,option)')};
 			} else if(option=='dependencyStatus' && dependencyStatus) {
 				${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ encodeURIComponent(dependencyStatus) +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(data,dependencyStatus,option)')};
+			} else if(option=='assetType' && assetType) {
+				${remoteFunction(action:'saveAssetoptions', params:'\'assetType=\'+ encodeURIComponent(assetType) +\'&assetOptionType=\'+"assetType"', onSuccess:'addAssetOption(data,assetType,option)')};
 			} else if(option=='environment' && environment) {
 				if (environment.length <= 20) {
 					${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ encodeURIComponent(environment) +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
@@ -138,6 +146,11 @@
  			var environmentValue = value;
  			$("#envOptionTbodyId").append("<tr id='environment_"+id+"' style='cursor: pointer;'><td>"+environmentValue+"</td><td><span class=\'deleteEnvironment clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  			$("#environment").val("");
+		} else if(option=='assetType') {
+            var id = data.id;
+            var assetTypeValue = value;
+            $("#assetTypeTbodyId").append("<tr id='assetType_"+id+"' style='cursor: pointer;'><td>"+assetTypeValue+"</td><td><span class=\'deleteAssetType clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
+            $("#assetType").val("");
 		}
 	}
 	// invokes the controller method to delete the asset option then calls fillAssetOptions to update the UI if the call was successful
@@ -157,6 +170,9 @@
 		 } else if(option=='environment') {
 			 var id = id
 			 ${remoteFunction(action:'deleteAssetOptions', params:'\'environmentId=\'+ id +\'&assetOptionType=\'+"environment"', onSuccess:'fillAssetOptions(id,option)')};
+		 } else if (option == 'assetType') {
+			 var id = id
+			 ${remoteFunction(action:'deleteAssetOptions', params:'\'assetTypeId=\'+ id +\'&assetOptionType=\'+"assetType"', onSuccess:'fillAssetOptions(id,option)')};
 		 }
 	}
 	
@@ -172,6 +188,8 @@
 			$('#dependencyStatus_'+id).remove();
 		} else if(option=='environment') {
 			$('#environment_'+id).remove();
+		} else if (option == 'assetType') {
+			$('#assetType_' + id).remove();
 		}
 	}
 	</script>

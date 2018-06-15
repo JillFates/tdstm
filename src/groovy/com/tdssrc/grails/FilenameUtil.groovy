@@ -15,7 +15,6 @@ import org.apache.commons.io.FilenameUtils
 @Slf4j(value='logger')
 class FilenameUtil {
 
-
 	static final String CSV_SUFIX = 'csv'
 	/**
 	 * Main method for creating a file name.
@@ -258,6 +257,8 @@ class FilenameUtil {
 	static String safeFilename (String str){
 		if (str) {
 			str = StringUtil.sanitize(str).replaceAll(/\s/, "_")
+			// TM-9050 Replaces all the invalid characters for filenames on Windows and Linux with a '_'.
+			str= str.replaceAll(/\#|<|\$|%|>|!|`|&|\*|“|\||\{|\?|”|}|\/|:|\\b|\\|=|@|"|\+/,'_')
 		}
 		return str
 	}

@@ -12,13 +12,20 @@ export class DependencyBatchRecordDetailSummaryComponent {
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 
-	private summaryCollapsed = false;
+	protected summaryCollapsed = false;
 
 	constructor(private userPreferenceService: PreferenceService) {
 		// Silence is golden
 	}
 
-	private toggleSummary(): void {
+	/**
+	 * Returns true if batch record got errors.
+	 */
+	protected batchHasErrors(): boolean {
+		return this.batchRecord.errorCount > 0 || (this.batchRecord.errorList && this.batchRecord.errorList.length > 0)
+	}
+
+	protected toggleSummary(): void {
 		this.summaryCollapsed = !this.summaryCollapsed;
 	}
 }

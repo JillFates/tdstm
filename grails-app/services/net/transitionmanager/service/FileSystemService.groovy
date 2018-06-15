@@ -18,7 +18,6 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
-import net.transitionmanager.service.InvalidRequestException
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
@@ -30,14 +29,14 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.InitializingBean
-
 import javax.management.RuntimeErrorException
+
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
 @Transactional(readOnly = true)
 @Slf4j
-class FileSystemService  implements InitializingBean {
+class FileSystemService implements InitializingBean {
 
 	/*
      * These are the accepted file extensions when uploading ETL files
@@ -382,4 +381,25 @@ class FileSystemService  implements InitializingBean {
 	List<String> getAllowedExtensions() {
 		return ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS
 	}
+
+	/**
+	 * Rename a temporary file to another target filename
+	 * @param temporaryFilename
+	 * @param toFilename
+	 */
+	void renameTemporaryFile(String temporaryFilename, String toFilename) {
+		if (temporaryFileExists(toFilename)) {
+			throw new InvalidParamException('Cannot rename file: [' + temporaryFilename + '] target file already exists: ' + toFilename)
+		}
+
+		File oldFile = new File(temporaryDirectory + temporaryFilename)
+		File newFile = new File(temporaryDirectory + toFilename)
+
+		if (oldFile.renameTo(newFile)) {
+			log.info('File [{}] successfully renamed to: {}', temporaryFilename, toFilename)
+		} else {
+			throw new InvalidParamException('There was an error creating temporary file: [' + temporaryFilename + '] to: ' + toFilename)
+		}
+	}
+
 }

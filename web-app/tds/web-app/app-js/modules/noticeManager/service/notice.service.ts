@@ -3,7 +3,7 @@ import {Response, Headers, RequestOptions} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {NotifierService} from '../../../shared/services/notifier.service';
 import {NoticeModel} from '../model/notice.model';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

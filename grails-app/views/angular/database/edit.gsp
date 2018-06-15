@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div class="modal-content tds-angular-component-content">
+<div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Edit</h4>
@@ -145,7 +145,7 @@
 					<!-- Dependencies -->
 					<tr id="deps">
 						<td valign="top" colspan="2">
-							<tds-supports-depends [(model)]="model"></tds-supports-depends>
+							<tds-supports-depends [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 						</td>
 					</tr>
 				</table>
@@ -153,7 +153,7 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>

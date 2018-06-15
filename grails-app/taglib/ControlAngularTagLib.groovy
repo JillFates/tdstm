@@ -138,6 +138,7 @@ class ControlAngularTagLib {
 	 * @param size - used to define the HTML size attribute on controls (optional)
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
+	 * @param min - used to specify minimum allowed value (used by the number fields)
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
@@ -158,11 +159,15 @@ class ControlAngularTagLib {
 		// the order specified in the fieldSpec.
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
+		String min = (attrs.min ?: (attrs.min ?: "" ))
 
 		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
 		// This parameter is optional to modify default tooltip positioning
 		// Also checks that the value is one of the valid data-placement element values
 		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+
+		String placeholder = attrs.placeholder ?: ''
+
 		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
 			throw new InvalidParamException('<tdsAngular:inputControl> tag optional argument tooltipDataPlacement requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
 		}
@@ -176,9 +181,12 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
+			case ControlType.NUMBER.toString():
+				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder, min)
+				break
 			case ControlType.STRING.toString():
 			default:
-				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
 		}
 	}
 
@@ -267,8 +275,12 @@ class ControlAngularTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+	}
+
+	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
 	/**

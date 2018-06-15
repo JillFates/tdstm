@@ -1,0 +1,79 @@
+<div class="single-comment-component modal fade in" id="single-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content resizable" [style.width.px]="500">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{singleCommentModel.modal.title}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="modal-body-container">
+					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group single-component">
+										<textarea rows="15" id="singleComment" name="singleComment" class="form-control" *ngIf="singleCommentModel.modal.type === modalType.EDIT"></textarea>
+										<div *ngIf="singleCommentModel.modal.type === modalType.VIEW">{{singleCommentModel.comment}}</div>
+									</div>
+								</div>
+								<div class="col-md-8">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Category:
+											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
+										</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.category}}</label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Class:
+											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
+										</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetType}}</label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Asset:
+											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
+										</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetName}}</label>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="form-check">
+										<label class="form-check-label aligned-label control-label" for="singleCommentArchive">
+											<input type="checkbox" id="singleCommentArchive" name="singleCommentArchive" [(ngModel)]="singleCommentModel.archive" [disabled]="singleCommentModel.modal.type === modalType.VIEW" class="form-check-input aligned-checkbox">
+											Archived
+										</label>
+									</div>
+								</div>
+								<div class="col-md-12 single-comment-date-container">
+									<div class="col-md-6 pad-left-0">
+										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | date: dateFormatTime}}</label>
+									</div>
+									<div class="col-md-6">
+										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{singleCommentModel.lastUpdated | date: dateFormatTime}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left">
+					<span class="glyphicon glyphicon-pencil"></span> Edit
+				</button>
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+					<span class="glyphicon glyphicon-ban-circle"></span>
+					<span>Cancel</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

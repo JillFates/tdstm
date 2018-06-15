@@ -15,13 +15,15 @@ export class UIDialogService {
 
 	/**
 	 * Method to open a dialog, returns a Promise that gonna be resolved ou rejected based on the UIActiveDialog Action
-	 * @param component ComponentType
-	 * @param params properties to be inject in the component creation
+	 * @param component
+	 * @param {Array<any>} params
+	 * @param {DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL} size
+	 * @param {boolean} enableEsc
+	 * @returns {Promise<any>}
 	 */
 	open(
 		component: any, params: Array<any>,
-		size: DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL = DIALOG_SIZE.MD,
-		enableEsc = false): Promise<any> {
+		size: DIALOG_SIZE.SM | DIALOG_SIZE.MD | DIALOG_SIZE.LG | DIALOG_SIZE.XLG | DIALOG_SIZE.XXL = DIALOG_SIZE.MD, enableEsc = false): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.open',

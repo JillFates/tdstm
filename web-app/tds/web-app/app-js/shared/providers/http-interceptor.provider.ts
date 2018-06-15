@@ -15,6 +15,10 @@ import {
 } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/finally';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/observable/empty';
 import { NotifierService } from '../services/notifier.service';
 import { AlertType } from '../model/alert.model';
 // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #2

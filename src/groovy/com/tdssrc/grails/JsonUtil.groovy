@@ -9,6 +9,7 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.InvalidParamException
+import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -130,9 +131,12 @@ class JsonUtil {
      * @return
      */
     static JSONObject parseFile(String fileName) {
-        // TODO : JPM 2/2018 : Need to add try/catch
-
-        return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
+        try {
+            return (JSONObject) JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
     }
 
     /**
@@ -141,9 +145,12 @@ class JsonUtil {
      * @return JSON
      */
     static JSONObject parseFile(InputStream inputStream) {
-        // TODO : JPM 2/2018 : Need to add try/catch
-
-        return (JSONObject)JSON.parse(inputStream.text)
+        try {
+            return (JSONObject) JSON.parse(IOUtils.toString(inputStream))
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
     }
 
     /**

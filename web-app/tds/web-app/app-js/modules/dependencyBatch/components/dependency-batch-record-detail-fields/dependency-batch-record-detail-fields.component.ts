@@ -6,6 +6,7 @@ import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -53,9 +54,11 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 			ignoreCase: true
 		}
 	};
+	private processStatus: OperationStatusModel = new OperationStatusModel();
 
 	constructor(private dependencyBatchService: DependencyBatchService) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
+			this.processStatus.state = CHECK_ACTION.NONE;
 	}
 
 	/**
@@ -68,12 +71,17 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	/**
 	 * Gets the Batch Record Field Details from API.
 	 */
-	private loadRecordFieldDetails(): void {
+	private loadRecordFieldDetails(updateProcessStatus = false): void {
 		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.onBatchRecordUpdated.emit({batchRecord: result.data});
 				this.buildGridData(result.data.fieldsInfo);
+				this.processStatus.state = CHECK_ACTION.NONE;
+				if (updateProcessStatus) {
+					let fieldsWithErrors = this.fieldsInfo.filter(item => item.errors.length > 0);
+					this.processStatus.state = fieldsWithErrors.length > 0 ? CHECK_ACTION.INVALID : CHECK_ACTION.NONE;
+				}
 			} else {
 				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
 			}
@@ -181,7 +189,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.processBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.loadRecordFieldDetails();
+					this.loadRecordFieldDetails(true);
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on Process batch record.');

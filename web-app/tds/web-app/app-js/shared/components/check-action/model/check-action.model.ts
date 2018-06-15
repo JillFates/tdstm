@@ -1,4 +1,5 @@
 export enum CHECK_ACTION {
+	NONE = -1,
 	VALID = 0,
 	UNKNOWN = 1,
 	INVALID = 2,

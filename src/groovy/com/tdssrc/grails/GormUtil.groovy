@@ -754,7 +754,7 @@ public class GormUtil {
 	 * @return the cloned object
 	 */
 	static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
-		logger.debug("** Clonning: {} *****", originDomain.getClass())
+		logger.debug("** Cloning: {} *****", originDomain.getClass())
 		if (!isDomainClass(originDomain.getClass())) {
 			throw new RuntimeException('A non-Grails Domain object was received')
 		}
