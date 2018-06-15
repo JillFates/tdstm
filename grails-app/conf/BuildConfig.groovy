@@ -1,5 +1,3 @@
-grails.plugin.location.'eav-model' = './pluginscustom/eav-model-0.1'
-
 grails.servlet.version = '3.0'
 grails.project.work.dir = 'target'
 grails.project.target.level = 1.7

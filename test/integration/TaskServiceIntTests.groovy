@@ -3,8 +3,6 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
 import groovyx.gpars.GParsPool
@@ -82,8 +80,6 @@ class TaskServiceIntTests extends IntegrationSpec {
 
     private List<AssetEntity> prepareMoveEventData() {
         Project project = projectTestHelper.getProject()
-        EavEntityType entityType = new EavEntityType(entityTypeCode: RandomStringUtils.randomAlphabetic(10), domainName: RandomStringUtils.randomAlphabetic(10), isAuditable: 1).save(failOnError: true)
-        EavAttributeSet attributeSet = new EavAttributeSet(attributeSetName: 'Server', entityType: entityType, sortOrder: 10).save(failOnError: true)
         MoveBundle moveBundle = moveBundleTestHelper.createBundle(project)
 
         // Create assets for Bundle
@@ -93,8 +89,7 @@ class TaskServiceIntTests extends IntegrationSpec {
                     assetType: it.toString(),
                     assetTag: 'TAG-' + it.toString(),
                     moveBundle: moveBundle,
-                    project: project,
-                    attributeSet: attributeSet
+                    project: project
             )
             if (!assetEntity.validate() || !assetEntity.save(failOnError: true)) {
                 String etext = "Unable to create assetEntity" +
