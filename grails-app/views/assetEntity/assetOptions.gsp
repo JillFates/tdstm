@@ -26,6 +26,9 @@
              <div>
                 <g:render template="dependencyStatus"/>
              </div>
+            <div>
+                <g:render template="assetType"/>
+            </div>
         </div>
     </div>
 </body>

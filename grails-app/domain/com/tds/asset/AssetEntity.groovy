@@ -3,7 +3,6 @@ package com.tds.asset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdssrc.eav.EavEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Manufacturer
@@ -29,7 +28,7 @@ import static com.tdsops.validators.CustomValidators.inList
 import static com.tdsops.validators.CustomValidators.optionsClosure
 import static com.tdsops.validators.CustomValidators.validateCustomFields
 
-class AssetEntity extends EavEntity {
+class AssetEntity {
 	CustomDomainService customDomainService
 	static final List<String> COMMON_FIELD_LIST = [
 		'assetClass',
@@ -44,6 +43,15 @@ class AssetEntity extends EavEntity {
 		'planStatus',
 		'supportType',
 		'validation'
+	]
+
+	static final List<String> RAIL_TYPES = [
+		'Rails',
+		'Snap Rails',
+		'Screw Rails',
+		'Ears',
+		'Shelf',
+		'None'
 	]
 
 	static String alternateKey = 'assetName'
@@ -207,6 +215,9 @@ class AssetEntity extends EavEntity {
 	Integer rateOfChange
 	Person modifiedBy
 
+	Date dateCreated
+	Date lastUpdated
+
 	static hasMany = [comments: AssetComment]
 
 	static constraints = {
@@ -256,7 +267,7 @@ class AssetEntity extends EavEntity {
 		truck nullable: true
 		cart nullable: true
 		shelf nullable: true
-		railType nullable: true
+		railType nullable: true, inList: RAIL_TYPES
 
 		// TODO : owner should not be nullable - remove and test
 		owner nullable: true
@@ -278,6 +289,8 @@ class AssetEntity extends EavEntity {
 		modifiedBy nullable: true
 
 		custom1 validator: validateCustomFields()
+		dateCreated nullable: true
+		lastUpdated nullable: true
 	}
 
 	static mapping = {
@@ -292,6 +305,10 @@ class AssetEntity extends EavEntity {
 		rateOfChange sqltype: 'int(4)'
 		retireDate sqltype: 'date'
 		tablePerHierarchy false
+		autoTimestamp false
+		columns {
+			id column: 'asset_entity_id'
+		}
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties

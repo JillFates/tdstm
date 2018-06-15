@@ -1,7 +1,5 @@
 package net.transitionmanager.domain
 
-import com.tdssrc.eav.EavAttribute
-
 class DataTransferValue {
 
 	String importValue
@@ -10,8 +8,6 @@ class DataTransferValue {
 	Integer rowId
 	Integer assetEntityId
 	Integer hasError
-	// <SL> TM-6585, TM-6586: remove this attribute when field specs are fully tested and in place
-	EavAttribute eavAttribute
 	String fieldName
 
 	static belongsTo = [dataTransferBatch: DataTransferBatch]
@@ -23,7 +19,6 @@ class DataTransferValue {
 		errorText nullable: true
 		hasError nullable: true
 		importValue nullable: true
-		eavAttribute nullable: true
 	}
 
 	static mapping = {
