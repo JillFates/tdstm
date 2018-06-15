@@ -17,6 +17,7 @@ interface Message {
 			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
 			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
 			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+			ApiActionTaskMessageByPassed 		= 'apiAction.task.message.bypassed',
 			DomainFailureBulk					= 'domain.failure.bulk',
 			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
 			FileSystemFileNotExists 			= 'fileSystem.file.notExists',

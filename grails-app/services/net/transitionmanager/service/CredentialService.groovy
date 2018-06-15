@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
@@ -365,7 +366,7 @@ class CredentialService implements ServiceMethods {
                 }
                 break
             case 'json':
-                Map<String, ?> json = JsonUtil.convertJsonToMap(resp.json)
+                Map<String, ?> json = CollectionUtils.flattenMap(JsonUtil.convertJsonToMap(resp.json))
                 sessionId = ['sessionName': sessionHeaderName, 'sessionValue': json.get(propertyName)]
                 break
             default:

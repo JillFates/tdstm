@@ -236,4 +236,8 @@ databaseChangeLog = {
 	include file: '20180423-fix-room-rack-location-user-preferences.groovy'
 	include file: '20180430-add-queued-at-to-import-batch.groovy'
 	include file: '20180518-rename-source-target-rack-room-location-dataview-sort-field.groovy'
+	include file: '20180524-add-bypass-mode-to-move-event.groovy'
+	include file: '20180531-Rename-back-the-first-dataview-record-to-name-All-Assets.groovy'
+	include file: '20180606-import-batch-record-drop-ignored-flag.groovy'
+	include file: '20180612-add-field-label-map-property-to-import-batch.groovy'
 }

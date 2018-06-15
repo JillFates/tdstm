@@ -9,6 +9,7 @@ import pages.Assets.ApplicationListPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import utils.CommonActions
 
 @Stepwise
 class ApplicationEditionSpec extends GebReportingSpec {
@@ -86,8 +87,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             alNameFilter = appNameOld
 
         then: 'That App should be shown'
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
+            commonsModule.waitForLoadingMessage()
             waitFor{alFirstAppName.text().trim() == appNameOld}
         when: 'The User clicks on that Application'
             waitFor{alFirstAppName.click()}
@@ -121,8 +121,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             alNameFilter = appNameOld
 
         then: 'That App should be shown'
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
+            commonsModule.waitForLoadingMessage()
             waitFor{alFirstAppName.text().trim() == appNameOld}
         when: 'The User clicks on the "Edit" Button right on the left'
             waitFor{alFirstAppEdit.click()}
@@ -244,7 +243,8 @@ class ApplicationEditionSpec extends GebReportingSpec {
             aeModalIsDepTypeSelector.click()
             waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
             aeModalIsDepStatusSelector.click()
-            waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).first().click() }
+            isDepStatus = new CommonActions().getRandomOption(aeModalIsDepStatusSelector.find("option")).text()
+            waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).click() }
 
         then: 'Every value should be accordingly added'
             aeModalIsDepFreqSelector.find("option", value:aeModalIsDepFreqSelector.value()).text().trim() == isDepFreq
@@ -293,7 +293,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
 
         then: 'New AppName, SME1, SME2 and AppOwner values should be displayed'
             // TODO following items are located by array instead of itself because cannot be identified
-            waitFor{adModalAppName[1].text().trim() == appName}
+            waitFor{adModalAppName.text().trim() == appName}
             // TODO some items cannot be located due to missing ID's
             adModalSME1.text().trim().contains(appSME1)
             adModalSME2.text().trim().contains(appSME2)

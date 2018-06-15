@@ -6,6 +6,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
+import pages.AssetViewManager.SaveViewPage
 import jodd.util.RandomString
 
 
@@ -17,9 +18,10 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static numberOfRows
     static favView
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(6)
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
+    static minimumNumberOfRows =11
 
 
     def setupSpec() {
@@ -27,12 +29,75 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+
         waitFor { menuModule.goToAssetViewManager() }
+        at AssetViewsPage
+        /**
+         * The existence of at least 11 views is a precondition to
+         * this spec.
+         */
+        int rowCount= allViewsModule.getNumberOfRows()
+        if (rowCount<minimumNumberOfRows) {
+            int i=0
+            while (i < (minimumNumberOfRows-rowCount)) {
+                allViewsModule.getNumberOfRows()
+                waitFor { allViewsModule.clickCreateView() }
+                waitFor { createViewModule.selectApplication() }
+                waitFor { createViewModule.clickNext() }
+                createViewModule.selectRandomCheckboxes()
+                waitFor { createViewModule.clickSave() }
+                at SaveViewPage
+                waitFor { enterName(RandomString.getInstance().randomAlphaNumeric(10)) }
+                waitFor { clickSave() }
+                waitFor { menuModule.goToAssetViewManager() }
+                at AssetViewsPage
+                i++
+            }
+        }
+    }
+    //count number of viwes
+    def "1. Validate Favorite number limit pop up is diplayed"() {
+        testKey = "TM-10911"
+        given: "User is in Asset Views Page"
+            at AssetViewsPage
+        when: "User gets the max Favs popup"
+            //Count existing number of fav views if any
+            //add fav views until number reaches ten,
+            getFavLimitPopUp()
+            // next addition shuoild display the pop up
+        then: "The message is as expected"
+            favLimitPopUpTextIsAsExpected()
     }
 
-    def "1. Validate User can reach Favorite Views"() {
+    def "2. Validate there are actually 10 starred views"() {
+        testKey = "TM-10911"
+        given: "User is in Asset Views Page and the limit pop up is displayed"
+            at AssetViewsPage
+            favLimitPopUpIsPresent()
+            allViewsModule.validateNumberOfStarredViews(10)
+        when: "User closes the pop up"
+            closeFavLimitPopUp()
+        then: "Ten views are starred"
+            allViewsModule.validateNumberOfStarredViews(10)
+    }
+
+    def "3. Reducing the number of favorites and increasing it will again cause the pop up to display"() {
+        testKey = "TM-10911"
+        given: "User is in Asset Views Page and there are ten favorite views"
+            at AssetViewsPage
+        when: "The user decreases and again adds favorite views"
+            allViewsModule.unFavRandomFavs()
+            getFavLimitPopUp()
+        then: "The pop up is displayed once more"
+            waitFor{favLimitPopUpIsPresent()}
+    }
+
+    def "4. Validate User can reach Favorite Views"() {
         testKey = "TM-8503"
-        given: "I am in Asset Views Page"
+        given: "I am in Asset Views Page and the limit of favorites has not been reached"
+            at AssetViewsPage
+            closeFavLimitPopUp()
+            allViewsModule.unFavRandomFavs()
             at AssetViewsPage
         when: "I click on Favorite Views"
             waitFor {goToFavourites()}
@@ -46,7 +111,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             allViewsModule.noVoidStarsAreDisplayed()
     }
 
-    def "2. Validates adding Favorites increases the counter on the left"(){
+    def "5. Validates adding Favorites increases the counter on the left"(){
         testKey = "TM-8503"
         given: "The user is in the View Manager Page"
             waitFor {goToAllViews()}
@@ -58,7 +123,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             waitFor{validateValueIncrement(initialFavAmount,getFavCounter())}
     }
 
-    def "3. Validate star is off in non-fav view"(){
+    def "6. Validate star is off in non-fav view"(){
         testKey = "TM-8503"
         given: "The user is in the View Manager Page"
             at AssetViewsPage
@@ -70,7 +135,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             validateStarIsOff()
     }
 
-    def "4. Validates that the view just added as fav is listed in all"(){
+    def "7. Validates that the view just added as fav is listed in all"(){
         testKey = "TM-8503"
         given: "The user is in the View page"
             at ViewPage

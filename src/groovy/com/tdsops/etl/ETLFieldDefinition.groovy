@@ -30,7 +30,7 @@ class ETLFieldDefinition {
 	 *  ]
 	 * </pre>
 	 * @param fieldSpec
-	 * @see DomainClassFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
+	 * @see ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldDefinition(Map<String, ?> fieldSpec) {
 		this.name = fieldSpec.field
@@ -41,11 +41,12 @@ class ETLFieldDefinition {
 	/**
 	 * Creates an instance of ETLFieldDefinition using GrailsDomainClassProperty definition.
 	 * @param domainProperty an instance of GrailsDomainClassProperty
-	 * @see DomainClassFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
+	 * @see ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldDefinition(GrailsDomainClassProperty domainProperty) {
 		this.name = domainProperty.getName()
-		this.label = domainProperty.getFieldName()
+		// The label will be the same as the field name until the domain has a field specification like that of assets
+		this.label = this.name
 		this.type = domainProperty.getType()
 	}
 

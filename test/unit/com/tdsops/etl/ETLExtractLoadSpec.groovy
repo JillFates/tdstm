@@ -27,6 +27,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import com.tdssrc.grails.StringUtil
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -38,7 +39,7 @@ import spock.lang.Shared
  *     <li><b>extract</b></li>
  *     <li><b>load</b></li>
  *     <li><b>read labels</b></li>
- *     <li><b>ignore row</b></li>
+ *     <li><b>ignore record</b></li>
  * </ul>
  */
 @TestMixin(ControllerUnitTestMixin)
@@ -185,7 +186,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -216,7 +217,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()){
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -258,7 +259,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 3
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -295,7 +296,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and: 'A new result was added in the result'
 
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -479,7 +480,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load field with an extracted element value after validate fields specs'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -494,29 +495,49 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
-					extract 'vendor name' load 'appVendor'
+					extract 'vendor name' load 'Vendor'
+					extract 'technology' load 'appTech'
 				}
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'appTech'] as Set
+					with(fieldLabelMap) {
+						appVendor == 'Vendor'
+						appTech == 'Technology'
+					}
+
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
 						rowNum == 1
-						with(fields.appVendor) {
+						fields.keySet().size() == 2
+						with(fields.appVendor, FieldResult) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
+							init == null
+						}
+						with(fields.appTech, FieldResult) {
+							value == '(xlsx updated)'
+							originalValue == '(xlsx updated)'
+							init == null
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
 						rowNum == 2
-						with(fields.appVendor) {
+						fields.keySet().size() == 2
+						with(fields.appVendor, FieldResult) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
+						}
+						with(fields.appTech, FieldResult) {
+							value == 'NGM'
+							originalValue == 'NGM'
+							init == null
 						}
 					}
 				}
@@ -547,11 +568,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['assetName', 'environment'] as Set
+					with(fieldLabelMap){
+						assetName == 'Name'
+						environment == 'Environment'
+					}
+
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -566,55 +592,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						with(fields.environment) {
 							value == 'This is not a Microsoft Application'
 							originalValue == 'This is not a Microsoft Application'
-						}
-					}
-				}
-			}
-	}
-
-	void 'test can load a field using CE'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Application
-				iterate {
-					extract 'vendor name'
-					if ( CE == 'Microsoft'){
-						load 'appVendor' with CE
-					} else {
-						load 'environment' with CE
-					}
-				}
-			""".stripIndent())
-
-		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
-				domains.size() == 1
-				with(domains[0], DomainResult) {
-					domain == ETLDomain.Application.name()
-					fieldNames == ['appVendor', 'environment'] as Set
-					data.size() == 2
-					with(data[0]) {
-						rowNum == 1
-						with(fields.appVendor) {
-							value == 'Microsoft'
-							originalValue == 'Microsoft'
-						}
-					}
-
-					with(data[1]) {
-						rowNum == 2
-						with(fields.environment) {
-							value == 'Mozilla'
-							originalValue == 'Mozilla'
 						}
 					}
 				}
@@ -647,11 +624,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					with(fieldLabelMap){
+						assetName == 'Name'
+						environment == 'Environment'
+						appVendor == 'Vendor'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -714,11 +696,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					with(fieldLabelMap){
+						assetName == 'Name'
+						environment == 'Environment'
+						appVendor == 'Vendor'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -781,11 +768,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					with(fieldLabelMap) {
+						appVendor == 'Vendor'
+						environment == 'Environment'
+					}
 					data.size() == 2
+					with(fieldLabelMap) {
+						appVendor: 'Vendor'
+						environment: 'Environment'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -819,15 +814,18 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load 'appVendor' load 'description'
+						extract 'vendor name' load 'appVendor' load 'Description'
 					}
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					with(fieldLabelMap){
+						description == 'Description'
+					}
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
@@ -867,7 +865,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an ETLProcessorException when try to load without domain definition'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -888,14 +886,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'There is not validator for domain Application and field appVendor'
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'appVendor'])
 
 	}
 
 	void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -917,7 +915,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'There is not validator for domain Application and field vendedor'
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'vendedor'])
 	}
 
 	void 'test can extract a field value and load into a domain object property name'() {
@@ -941,10 +939,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
+					with(fieldLabelMap) {
+						id == 'Id'
+						appVendor == 'Vendor'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.appVendor) {
@@ -993,10 +995,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
+					with(fieldLabelMap) {
+						assetName == 'Name'
+						manufacturer == 'Manufacturer'
+						model == 'Model'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.assetName) {
@@ -1070,7 +1077,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						domain Application
 						load 'environment' with 'Production'
 						extract 1 load 'id'
-						extract 'vendor name' load 'appVendor'
+						extract 'vendor name' load 'Vendor'
 
 						domain Device
 						extract 1 load 'id'
@@ -1079,12 +1086,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
-
+					with(fieldLabelMap){
+						appVendor == 'Vendor'
+					}
 					with(data[0]) {
 						rowNum == 1
 						with(fields.environment) {
@@ -1212,7 +1221,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Room domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 			}
 
@@ -1267,7 +1276,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		cleanup:
 			if(fileName){
@@ -1299,7 +1308,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1380,7 +1389,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1433,7 +1442,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1465,7 +1474,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1512,7 +1521,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'vendor name' load 'appVendor'
 
 					if (!SOURCE.'vendor name'.startsWith('Mi')){
-						ignore row
+						ignore record
 					} else {
 						domain Device
 						extract 'application id' load 'id'
@@ -1522,7 +1531,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1580,14 +1589,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'vendor name' load 'appVendor'
 
 					if (!SOURCE.'vendor name'.startsWith('Mi')){
-						ignore row
+						ignore record
 					} else {
 						domain Device
 						extract 'application id' load 'id'
 						extract 'technology' load 'Name'
 
 						if(DOMAIN.assetName.contains('updated')){
-							ignore row
+							ignore record
 						} else {
 							domain Database
 							extract 'application id' load 'id'
@@ -1597,7 +1606,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1628,7 +1637,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can throw and exception when script tries to ignore a row and there isn not a domain already defined'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			ETLFieldsValidator validator = new ETLFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
@@ -1644,7 +1653,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				read labels
 				iterate {
-					ignore row
+					ignore record
 				}
 			""".stripIndent())
 
@@ -1669,7 +1678,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'technology'
 					if( CE == 'NGM') {
-						ignore row
+						ignore record
 					} else {
 						load 'Name' with CE
 					}
@@ -1677,7 +1686,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1687,7 +1696,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can ignore rows without loading values previously'() {
+	void 'test can ignore records without loading values previously'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1703,7 +1712,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'technology'
 					if( CE != 'NGM') {
-						ignore row
+						ignore record
 					} else {
 						load 'Name' with CE
 					}
@@ -1711,7 +1720,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1721,7 +1730,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can ignore rows in the middle of a data set'() {
+	void 'test can ignore records in the middle of a data set'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1741,14 +1750,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'model name' transform with lowercase() load 'Name'
 
 					if( SOURCE.'device id'.startsWith('152253') ){
-						ignore row
+						ignore record
 					}
 
 				}
 			""".stripIndent())
 
 		then: 'Third row was removed from the domain results'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1796,7 +1805,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1854,7 +1863,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1913,7 +1922,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1985,7 +1994,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2072,7 +2081,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate(scriptContent)
 
 		then:
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					with(data[0], RowResult) {
@@ -2127,7 +2136,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.result) {
+			with (etlProcessor.resultsMap()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -2260,7 +2269,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.result){
+			with(etlProcessor.resultsMap()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
@@ -2294,4 +2303,358 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-11037')
+	void 'test can load current element with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					load 'Name' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == ''
+							originalValue == ''
+							init == null
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11037')
+	void 'test can init current element with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					init 'Name' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == null
+							originalValue == null
+							init == ''
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11037')
+	void 'test can init and load with a blank content from an ETL Script'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				iterate {
+					domain Device
+					init 'Name' with ''
+					load 'Manufacturer' with ''
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						rowNum == 1
+						with(fields.assetName, FieldResult) {
+							value == null
+							originalValue == null
+							init == ''
+						}
+						with(fields.manufacturer, FieldResult) {
+							value == ''
+							originalValue == ''
+							init == null
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-10726')
+	void 'test can transform with concat function'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						load 'environment' transform with concat(',', SOURCE.'vendor name', SOURCE.'location')
+					}
+				""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Microsoft,ACME Data Center'
+							value == 'Microsoft,ACME Data Center'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							originalValue == 'Mozilla,ACME Data Center'
+							value == 'Mozilla,ACME Data Center'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test can transform with concat transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						set envVar with 'Prod'
+						extract 'vendor name' transform with append('-', envVar) load 'environment'
+					}
+				""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.environment) {
+							originalValue == 'Microsoft'
+							value == 'Microsoft-Prod'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.environment) {
+							originalValue == 'Mozilla'
+							value == 'Mozilla-Prod'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test can load with append transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+					srv,ip
+					x,1.2.3.4
+					y,4.5.4.2
+					x,
+					z,3.3.3.3
+					x,1.3.5.1
+					""".stripIndent())
+
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Device
+							extract 'ip' transform with lowercase() set ipVar
+							extract 'srv' set srvVar
+	
+							lookup 'assetName' with srvVar
+							if ( LOOKUP.notFound() ) {
+								// Set the server name first time seen
+								load 'Name' with srvVar
+							}
+							load 'IP Address' transform with append(', ', ipVar)
+						}
+					""".stripIndent())
+
+		then: 'Results should contain Application vendor name and location domain fields concatenated'
+			with (etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 3
+
+					with(data[0]) {
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'x'
+							value == 'x'
+						}
+						with(fields.ipAddress) {
+							originalValue == '1.2.3.4, 1.3.5.1'
+							value == '1.2.3.4, 1.3.5.1'
+						}
+					}
+					with(data[1]) {
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == 'y'
+							value == 'y'
+						}
+						with(fields.ipAddress) {
+							originalValue == '4.5.4.2'
+							value == '4.5.4.2'
+						}
+					}
+					with(data[2]) {
+						rowNum == 4
+						with(fields.assetName) {
+							originalValue == 'z'
+							value == 'z'
+						}
+						with(fields.ipAddress) {
+							originalValue == '3.3.3.3'
+							value == '3.3.3.3'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-10726')
+	void 'test load with append transformation should fail'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+					.evaluate("""
+						read labels
+						iterate {
+							domain Application
+							set envVar with 'Prod'
+							
+							load 'Name' with append('-', envVar) 
+						}
+					""".stripIndent())
+
+		then: 'exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'No such property: append'
+	}
 }

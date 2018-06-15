@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdssrc.grails.StringUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -18,6 +19,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.Issue
 
 /**
  * Test about ETLProcessor commands:
@@ -94,7 +96,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "There is not validator for domain Device and field unknown"
+			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Device', FIELD:'unknown'])
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -177,6 +179,65 @@ class ETLLookupSpec extends ETLBaseSpec {
 				}
 			}
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@Issue("https://support.transitionmanager.com/browse/TM-10625")
+	void 'test group data using LOOKUP as a String list in a custom field'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Device
+
+						iterate {
+							extract 'server' set nameVar
+							extract 'model' set modelVar
+							extract 'dependsOn' set dependsOnVar
+
+							lookup 'model' with modelVar
+							if ( LOOKUP.notFound() ) {
+								load 'model' with modelVar
+								load 'custom1' with nameVar
+							} else {
+								load 'custom1' with DOMAIN.custom1 + ', ' + nameVar
+							}
+						}
+
+						""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with (etlProcessor.result.toMap()){
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['model', 'custom1'] as Set
+					data.size() == 1
+					with(data[0]){
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1){
+							value == 'xray01, deltasrv03, alpha'
+							originalValue == 'xray01, deltasrv03, alpha'
+						}
+					}
+				}
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -463,6 +524,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								find Application by 'assetName', 'appVendor' with DOMAIN.assetName, 'vmWare' into 'id'
 								elseFind Application by 'assetName' with DOMAIN.assetName into 'id' warn 'Not sure about this match'
 								whenNotFound 'id' create {
+									assetClass Application
 									assetName clusterNameVar
 									appVendor 'vmWare'
 								}
@@ -480,6 +542,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							load 'asset' with 'vmName'
 							find Device by 'assetName', 'assetType' with 'vmName', 'assetTypeVM' into 'asset'
 							whenNotFound 'asset' create {
+								assetClass Device
 								assetName 'vmName'
 								assetType 'assetTypeVM'
 								manufacturer 'VMWare'
@@ -489,6 +552,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							load 'dependent' with 'clusterName'
 							find Application by 'assetName' with 'clusterName' into 'dependent'
 							whenNotFound 'dependent' create {
+								assetClass Application
 								assetName 'clusterName'
 								appVendor 'VMWare'
 							}

@@ -30,9 +30,6 @@ class ImportBatchRecord {
 	// The number of attributes that have errors in the fieldsInfo JSON specification
 	Integer errorCount = 0
 
-	// A flag that indicates that the record will be/was ignored by the batch process
-	Integer ignored = 0
-
 	// A flag that indicates that the record can not be automatically posted without warning the user of
 	// some concern. If set, the warning will be associated to one or more individual properties.
 	Integer warn = 0
@@ -111,7 +108,6 @@ class ImportBatchRecord {
 		duplicateReferences range: 0..1
 		errorList size: 2..16777215
 		fieldsInfo size: 2..16777215
-		ignored range: 0..1
 		lastUpdated nullable: true
 		sourceRowId nullable: true
 		warn range: 0..1
@@ -124,7 +120,6 @@ class ImportBatchRecord {
 		duplicateReferences sqltype: 'TINYINT(1)'
 		errorList sqltype: 'TEXT' // JSON
 		fieldsInfo sqltype: 'TEXT' // JSON
-		ignored sqltype: 'TINYINT(1)'
 		lastUpdated sqltype: 'DATE'
 		operation  enumType: "String"
 		sourceRowId sqltype: 'INT(8)'
@@ -145,7 +140,6 @@ class ImportBatchRecord {
 			domainPrimaryId: domainPrimaryId,
 			duplicateReferences: duplicateReferences,
 			errorCount: errorCount,
-			ignored: ignored,
 			lastUpdated: lastUpdated,
 			operation: operation.name(),
 			sourceRowId: sourceRowId,

@@ -64,16 +64,29 @@ class ETLProcessorResult {
 	/**
 	 * Appends a loaded element in the results.
 	 * First It adds a new element.field.name in the current domain fields list
-	 * and if it already exits, updates that element with the element values.
+	 * and if it already exits, updates that element with the element originalValue and value.
 	 * After that, It saves the new element in the data results.
-	 *
-	 * @param element
+	 * @param element an instance of Element
 	 */
 	void loadElement(Element element) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.ignore = false
 		reference.addFieldName(element)
 		currentRow.addLoadElement(element)
+	}
+
+	/**
+	 * Appends a loaded initialized element in the results.
+	 * First It adds a new element.field.name in the current domain fields list
+	 * and if it already exits, updates that element with the element init value.
+	 * After that, It saves the new element in the data results.
+	 * @param element an instance of Element
+	 */
+	void loadInitializedElement(Element element) {
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
+		reference.addFieldName(element)
+		currentRow.addInitElement(element)
 	}
 
 	/**
@@ -158,8 +171,12 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * TODO: Complete docs!!
-	 * @return
+	 * <p>Find the current row in ETLProcessorResult#reference</p>
+	 * If ETLProcessorResult#resultIndex is equals -1,
+	 * then a new instance of RowResult is created and added in
+	 * ETLProcessorResult#reference#data
+	 *
+	 * @return and instance of RowResult
 	 */
 	private RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
@@ -175,7 +192,7 @@ class ETLProcessorResult {
 	 * @see RowResult
 	 * @see ETLProcessorResult#resultIndex
 	 */
-	private RowResult currentRow(){
+	RowResult currentRow(){
 		return reference.data[resultIndex]
 	}
 
@@ -202,15 +219,35 @@ class ETLProcessorResult {
 	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
 	 * 		ETLInfo <Map>
 	 * 		domains <List><Map>
-	 *
+	 *      consoleLog <String> (optional)
+	 * It also adds the label map used during an ETL script execution based on field name and field label
+	 * @param includeConsoleLog - flag if console data should be returned (default false)
 	 * @return A map of this object
+	 * @see ETLFieldsValidator#fieldLabelMapForResults()
 	 */
-	Map<String, ?> toMap() {
-		return [
+	Map<String, ?> toMap(Boolean includeConsoleLog = false) {
+
+		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
+
+		domains.each {DomainResult domainResult ->
+			if (map?.containsKey(domainResult.domain)) {
+				domainResult.setFieldLabelMap(map[domainResult.domain])
+			}
+		}
+
+		Map results = [
 			ETLInfo: this.ETLInfo,
 			domains: this.domains
 		]
+
+		if (includeConsoleLog) {
+			results.put( 'consoleLog',this.processor.debugConsole.content() )
+		}
+
+		return results
 	}
+
+	private
 
 	/**
 	 * Look up a field name that contain a value equals to the value and if found then the current
@@ -286,6 +323,7 @@ class DomainResult {
 
 	String domain
 	Set fieldNames = [] as Set
+	Map<String, String> fieldLabelMap = [:]
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
@@ -303,6 +341,14 @@ class DomainResult {
 	 */
 	void addFieldName(ETLFindElement findElement){
 		fieldNames.add(findElement.currentFind.property)
+	}
+
+	/**
+	 * Assign a label map collected during an ETL script execution
+	 * @param fieldLabelMap a Map instance that contains the relation between field name and field label
+	 */
+	void setFieldLabelMap(Map<String, String> fieldLabelMap) {
+		this.fieldLabelMap = fieldLabelMap
 	}
 }
 
@@ -338,13 +384,19 @@ class RowResult {
 	 * @param element
 	 */
 	void addLoadElement(Element element){
-		//TODO: Review with John. ETLInitilizeSpec'test can init field defined before the load command'
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
-		fieldData.originalValue = element.originalValue?:fieldData.originalValue
-		fieldData.value = element.value?:fieldData.value
-		fieldData.init = element.init?:fieldData.init
+		fieldData.originalValue = element.originalValue
+		fieldData.value = element.value
 	}
 
+	/**
+	 * Add initialized element to the current row data
+	 * @param element
+	 */
+	void addInitElement(Element element){
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		fieldData.init = element.init
+	}
 	/**
 	 * It adds the find result in the FieldResult
 	 * <pre>
@@ -369,7 +421,7 @@ class RowResult {
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldResult fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition.name)
 		fieldData.addFoundElement(foundElement)
 	}
 
@@ -566,4 +618,16 @@ class FindResult {
 class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
+
+
+	@Override
+	String toString() {
+		return "QueryResult{"
+			.concat( "domain=")
+			.concat(domain)
+			.concat(", kv=")
+			.concat(kv.toString())
+			.concat('}')
+
+	}
 }
