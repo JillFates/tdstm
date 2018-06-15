@@ -60,13 +60,13 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Workflow Step</span></label>
                                                     </td>
-                                                    <td class="valueNW U" colspan="2"><span></span></td>
+                                                    <td class="valueNW U" colspan="2"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
                                                 </tr>
                                                 <tr class="prop">
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Team</span></label>
                                                     </td>
-                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="valueNW U"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Task Spec ID</span></label>
                                                     </td>
@@ -94,7 +94,7 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Fixed Assignment</span></label>
                                                     </td>
-                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="valueNW U"><span>{{ (taskDetailModel.detail?.assetComment?.hardAssigned === 0 || taskDetailModel.detail?.assetComment?.hardAssigned === false)? 'N' : 'Y' }}</span></td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>
                                                     </td>
@@ -108,7 +108,7 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Send Notification</span></label>
                                                     </td>
-                                                    <td class="valueNW U"><span></span></td>
+                                                    <td class="valueNW U"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span></td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>

@@ -72,6 +72,19 @@ export class TaskService {
 	}
 
 	/**
+	 * Get the Current Team Assigned for the Comment
+	 * @returns {Observable<any>}
+	 */
+	getAssignedTeam(commentId: any): Observable<any> {
+		return this.http.post(`${this.assetGeneric}/updateAssignedToSelect?format=json&forView=&id=${commentId}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Save the Task Cooment
 	 * @param model
 	 * @returns {Observable<any>}

@@ -48,6 +48,9 @@ export class TaskDetailComponent extends UIExtraDialog {
 			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
 			// Convert the Duration into a Human Readable form
 			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
+
+			// Get Assigned Team
+			this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
 		});
 	}
 
@@ -102,6 +105,25 @@ export class TaskDetailComponent extends UIExtraDialog {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
+	}
+
+	/**
+	 * Get the assigned team name
+	 * @param commentId
+	 * @param assignedToId
+	 * @returns {any}
+	 */
+	public getAssignedTeam(commentId: any, assignedToId: any): void {
+		this.taskManagerService.getAssignedTeam(commentId).subscribe((res: any) => {
+			let team = res.filter((team) => team.id === assignedToId);
+			if (team) {
+				// is this a real case in the legacy view?
+				if (team.length > 1) {
+					team = team[0];
+				}
+				this.taskDetailModel.detail.assignedTeam = team.nameRole.split(':')[0];
+			}
+		});
 	}
 
 	/**
