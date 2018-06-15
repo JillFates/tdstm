@@ -1,7 +1,6 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.eav.EavAttribute
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
@@ -155,7 +154,8 @@ class DataTransferBatchController implements ControllerMethods {
 			def domainName
 			def className
 
-			String entityTypeDomainName = entry.eavEntityType.domainName
+			// String entityTypeDomainName = entry.eavEntityType.domainName
+			String entityTypeDomainName = entry.assetClass
 			if (entityTypeDomainName) {
 				if (entityTypeDomainName == 'Files') {
 					domainName = 'Logical Storage'
@@ -228,12 +228,12 @@ class DataTransferBatchController implements ControllerMethods {
 			currentValues = assetEntity?.(it.field_name)
 
 			completeDataTransferErrorList << [
-				assetName: assetEntity.assetName,
-				assetTag: assetEntity.assetTag ?: '',
-				attribute: it.field_name,
-				error: it.error_text,
+				assetName   : assetEntity.assetName,
+				assetTag    : assetEntity.assetTag ?: '',
+				attribute   : it.field_name,
+				error       : it.error_text,
 				currentValue: currentValues,
-				importValue: it.import_value
+				importValue : it.import_value
 			]
 		}
 

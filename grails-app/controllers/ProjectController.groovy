@@ -622,13 +622,6 @@ class ProjectController implements ControllerMethods {
 	@Deprecated
 	def retrieveAssetFields() {
 		throw new RuntimeException('retrieveAssetFields is no longer used')
-		def assetTypes=EntityType.list
-		def fieldMap= [:]
-		assetTypes.each { type ->
-			fieldMap[type] = projectService.getFields(type)
-		}
-		fieldMap.customs = projectService.getCustoms()
-		render fieldMap as JSON
 	}
 
 	/**

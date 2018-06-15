@@ -1,6 +1,6 @@
 package net.transitionmanager.domain
 
-import com.tdssrc.eav.EavEntityType
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.TimeUtil
 
 class DataTransferBatch {
@@ -24,6 +24,8 @@ class DataTransferBatch {
 	// The results of the review and/or the posting results (text field)
 	String importResults
 
+	AssetClass assetClass
+
 	// Used by the import process to compare the time of the last change of the domain
 	// object to that of when the data was originally exported. If the exported time is
 	// earlier it will cause a change conflict to occur and the data will not be updated.
@@ -46,8 +48,7 @@ class DataTransferBatch {
 	static belongsTo = [
 			dataTransferSet: DataTransferSet,
 			project: Project,
-			userLogin: UserLogin,
-			eavEntityType: EavEntityType
+			userLogin: UserLogin
 		]
 
 	static mapping = {

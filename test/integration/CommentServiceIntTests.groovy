@@ -1,11 +1,5 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityType
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
 import org.apache.commons.lang.RandomStringUtils
 import spock.lang.Specification
 
