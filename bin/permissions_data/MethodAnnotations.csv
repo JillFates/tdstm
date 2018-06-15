@@ -129,9 +129,6 @@ comment,list,CommentView
 comment,editComment,CommentView
 comment,showComment,CommentView
 common,index,
-common,tooltips,ProjectFieldSettingsView
-common,tooltipsUpdate,ProjectFieldSettingsEdit
-common,retrieveTooltips,UserGeneralAccess
 common,tmLinkableUrl,UserGeneralAccess
 cookbook,index,CookbookView
 dashboard,index,DashboardMenuView

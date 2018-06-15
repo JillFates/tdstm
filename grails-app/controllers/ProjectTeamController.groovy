@@ -48,12 +48,6 @@ class ProjectTeamController implements ControllerMethods {
 			  and roleTypeCodeFrom.id = 'TEAM'
 		''', args)
 
-		for (String property in ['sourceTeamMt', 'targetTeamMt', 'sourceTeamLog', 'targetTeamLog',
-		                         'sourceTeamSa', 'targetTeamSa', 'sourceTeamDba', 'targetTeamDba']) {
-			AssetEntity.executeUpdate('update AssetEntity ae set ae.' + property + ' = null ' +
-			                          'where ae.' + property + ' = :projectTeam', args)
-		}
-
 		projectTeam.delete()
 
 		flash.message = "ProjectTeam $projectTeam deleted"

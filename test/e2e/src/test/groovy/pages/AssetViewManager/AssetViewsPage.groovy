@@ -65,9 +65,11 @@ class AssetViewsPage extends Page{
     def getFavCounter(){
         waitFor{favViewsCounter.text().toInteger()}
     }
+
     def validateValueIncrement(int initial, int incremented){
         initial+1==incremented
     }
+
     /**
      * Adds fav views. On the attempt to add an 11th, the user
      * is to get a pop up
@@ -93,7 +95,4 @@ class AssetViewsPage extends Page{
     def closeFavLimitPopUp(){
         closeLimitPopupBtn.click()
     }
-
-
-
 }

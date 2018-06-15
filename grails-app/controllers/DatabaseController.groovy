@@ -4,8 +4,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.search.FieldSearchData
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -284,20 +282,21 @@ class DatabaseController implements ControllerMethods {
 
 		assetService.setCustomDefaultValues(databaseInstance)
 
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.DATABASE)
 		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
 
-		[	databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value,
-			moveBundleList:moveBundleList, planStatusOptions:planStatusOptions?.value,
-			projectId: project.id, project:project,
-			environmentOptions:environmentOptions?.value,
+		[
+			databaseInstance  : databaseInstance,
+			moveBundleList    : moveBundleList,
+			planStatusOptions : planStatusOptions?.value,
+			projectId         : project.id,
+			project           : project,
+			environmentOptions: environmentOptions?.value,
 			standardFieldSpecs: standardFieldSpecs,
-			customs: customFields
+			customs           : customFields
 		]
 	}
 

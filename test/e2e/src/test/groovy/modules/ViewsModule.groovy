@@ -32,6 +32,14 @@ class ViewsModule extends Module {
         ticks              {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
         common                      { module CommonsModule}
     }
+
+    def openRandomView(){
+        def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
+        def editedViewName = viewsListed[willSelect].text()
+        waitFor{viewsListed[willSelect].click()}
+        editedViewName
+    }
+
     def clickCreateView(){
         createViewButton.click()
     }
@@ -80,7 +88,7 @@ class ViewsModule extends Module {
      * This method validates the the condition of equal number of ticks and rows is met.
      */
     def systemViewsOnly(){
-       // createdBy.text()==""
+        // createdBy.text()==""
         ticks.size()==viewsListed.size()
     }
     /**
@@ -195,5 +203,4 @@ class ViewsModule extends Module {
         waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
         common.waitForLoader(3)
     }
-
 }
