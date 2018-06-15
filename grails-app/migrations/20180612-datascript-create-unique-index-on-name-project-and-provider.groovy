@@ -9,17 +9,14 @@
 databaseChangeLog = {
 
     changeSet(author: 'ecantu', id: 'TM-10194-1') {
-        comment('Drop unique index IX_DATASCRIPT_PROJECT_NAME')
-        dropIndex(tableName:'data_script', indexName:'IX_DATASCRIPT_PROJECT_NAME')
-    }
+        comment('Drop unique index IX_DATASCRIPT_PROJECT_NAME, then re-create unique index on name, Project and Provider')
 
-    changeSet(author: 'ecantu', id: 'TM-10194-2') {
-        comment('re-create unique index on name, Project and Provider')
+        dropIndex(tableName:'data_script', indexName:'IX_DATASCRIPT_PROJECT_NAME')
+
         createIndex(indexName:'IX_DATASCRIPT_PROJECT_NAME', tableName:'data_script', unique:true) {
             column(name:'name')
             column(name:'project_id')
             column(name:'provider_id')
         }
-
     }
 }
