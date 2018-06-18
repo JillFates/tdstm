@@ -13,13 +13,14 @@ export class FieldSettingsImportanceComponent implements  OnInit {
 	@Input() model: string;
 	@Input('edit') editMode: boolean;
 	@Output() modelChange = new EventEmitter<string>();
-	public values = []; // ['C', 'I', 'N', 'U'];
+	public values = [];
+	public colors = FIELD_COLORS;
 
 	constructor(public fieldSettinsService: FieldSettingsService) {
 	}
 
 	ngOnInit() {
-		this.values = Object.keys(FIELD_COLORS);
+		this.values = Object.keys(this.colors);
 	}
 
 	public onModelChange(value: string): void {

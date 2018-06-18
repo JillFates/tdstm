@@ -568,25 +568,53 @@ span.cellWithoutBackground
 	margin-left: 10px;
 }
 td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N{background-color:#FFF !important;}
-/* CRITICAL */
+/* CRITICAL || YELLOW */
 td[data-for].C .select2-choice,
+.Y,
 .C{
 	background-color:#F9FF90 !important;
 	background-image: none !important;
 }
-/* IMPORTANT */
+/* IMPORTANT || GREEN */
 td[data-for].I .select2-choice,
+.G,
 .I{
 	background-color:#D4F8D4 !important;
 	background-image: none !important;
 }
+
+/* BLUE */
+td[data-for].B .select2-choice,
+.B {
+	background-color:#3C8CBC !important;
+	background-image: none !important;
+}
+
+/* PINK */
+td[data-for].P .select2-choice,
+.P {
+	background-color:#FFC0CB !important;
+	background-image: none !important;
+}
+
+/* ORANGE */
+td[data-for].O .select2-choice,
+.O {
+	background-color:#FFA500 !important;
+	background-image: none !important;
+}
+
 /* NORMAL */
-td[data-for].N.label, td.N.label {
+td[data-for].N.label,
+td.N.label,
+.N {
 	background-color: #ddd !important;
 	background-image: none !important;
 }
 /* UNIMPORTANT */
-td[data-for].U label, td.U label{
+td[data-for].U label,
+td.U label,
+.U {
     background-color: #F4F4F4 !important;
     background-image: none !important;
 }
