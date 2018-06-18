@@ -102,10 +102,12 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	private buildGridData(fields): void {
 		// let data: Array<{name: string, currentValue: string, importValue: string, error: boolean}> = [];
+		const {fieldNameList, fieldLabelMap} = this.importBatch;
+
 		this.fieldsInfo = [];
-		for (const fieldName of this.importBatch.fieldNameList) {
+		for (const fieldName of fieldNameList) {
 			this.fieldsInfo.push({
-				name: fieldName,
+				name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
 				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
 					? fields[fieldName].originalValue : '(null)',
 				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)

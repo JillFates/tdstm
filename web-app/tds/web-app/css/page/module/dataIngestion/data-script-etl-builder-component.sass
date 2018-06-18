@@ -1,9 +1,10 @@
-data-script-etl-builder
+.data-script-etl-builder-component
   overflow-y: hidden!important
   .modal-dialog
     width: 100%
     display: flex
     align-items: center
+    margin: 30px auto
     .sample-preview
       margin: 10px auto
     .resizable
@@ -16,14 +17,11 @@ data-script-etl-builder
         border-width: 0 0 16px 16px
         border-color: transparent transparent #AAA transparent
         background: none
-    .modal-header
-      .full-screen, .restore-screen
-        background: transparent
-        margin-top: 2px
-        border: 0
-        float: right
-        font-size: 11px
-        font-weight: bold
+    .modal-content
+      .modal-header
+        display: flex
+        flex-direction: row
+        justify-content: space-between
   .btn-resize
     font-size: 14px
   hr
@@ -31,15 +29,20 @@ data-script-etl-builder
   .modal-body h4
     margin-top: 0px
   .modal-body
+    height: 90%;
+    overflow: auto
     padding: 0
     .modal-body-container
       margin: 10px 15px 20px
+      height: 100%
 
   .data-preview
     label
       margin-bottom: 0px
       width: 100%
       cursor: pointer
+  .test-results
+    height: 600px
 
     button i
       padding-right: 0px !important

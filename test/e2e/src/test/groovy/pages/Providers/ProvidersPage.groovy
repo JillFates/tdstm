@@ -22,7 +22,7 @@ class ProvidersPage extends Page{
         firstProviderDate(wait:true) { $('td#k-grid0-r2c3')}
         firstProviderName(wait:true) { $('td#k-grid0-r2c1')}
         firstProviderDesc(wait:true) { $('td#k-grid0-r2c2')}
-
+        firstProviderEditPencilBtn(wait:true) {$("div", class: "text-center").find("span", class: "glyphicon glyphicon-pencil")}
     }
 
 }

@@ -1,7 +1,7 @@
 export class ProviderColumnModel {
 	columns: any[];
 
-	constructor() {
+	constructor(dateFormat: string) {
 		this.columns = [
 			{
 				label: 'Action',
@@ -23,7 +23,7 @@ export class ProviderColumnModel {
 				label: 'Date Create',
 				property: 'dateCreated',
 				type: 'date',
-				format: '{0:d}',
+				format: dateFormat,
 				width: 170
 			}
 		];

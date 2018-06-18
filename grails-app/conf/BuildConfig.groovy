@@ -1,5 +1,3 @@
-grails.plugin.location.'eav-model' = './pluginscustom/eav-model-0.1'
-
 grails.servlet.version = '3.0'
 grails.project.work.dir = 'target'
 grails.project.target.level = 1.7
@@ -18,6 +16,7 @@ grails.project.dependency.resolution = {
 		inherits true
 		mavenLocal()
 
+		// mavenRepo 'http://repo.novus.com/releases/'
 		//mavenRepo 'http://repo.grails.org/grails/plugins'
 		//mavenRepo 'https://repo.grails.org/grails/core'
 		//grailsPlugins()
@@ -47,7 +46,9 @@ grails.project.dependency.resolution = {
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
 		// GETL Groovy ETL - https://github.com/ascrus/getl/
-		runtime 'net.sourceforge.getl:getl:1.2.05'
+		// NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
+		// TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
+		runtime 'net.sourceforge.getl:getl:1.2.11'
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'

@@ -138,6 +138,7 @@ class ControlAngularTagLib {
 	 * @param size - used to define the HTML size attribute on controls (optional)
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
+	 * @param min - used to specify minimum allowed value (used by the number fields)
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
@@ -158,6 +159,7 @@ class ControlAngularTagLib {
 		// the order specified in the fieldSpec.
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
+		String min = (attrs.min ?: (attrs.min ?: "" ))
 
 		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
 		// This parameter is optional to modify default tooltip positioning
@@ -180,7 +182,7 @@ class ControlAngularTagLib {
 				break
 
 			case ControlType.NUMBER.toString():
-				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
+				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder, min)
 				break
 			case ControlType.STRING.toString():
 			default:
@@ -277,8 +279,8 @@ class ControlAngularTagLib {
 		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
-	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
 	/**

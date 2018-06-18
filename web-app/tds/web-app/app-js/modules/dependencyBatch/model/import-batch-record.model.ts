@@ -14,7 +14,6 @@ export class ImportBatchRecordModel {
 	errorList: Array<string>;
 	operation: BATCH_RECORD_OPERATION;
 	sourceRowId: number;
-	ignored: boolean;
 	lastUpdated: Date;
 	warn: number;
 	currentValues: any;
@@ -31,13 +30,6 @@ export class ImportBatchRecordDetailColumnsModel {
 				type: 'text',
 				width: 130,
 				locked: true,
-			},
-			{
-				label: 'Ignored',
-				property: 'ignored',
-				type: 'number',
-				width: 100,
-				hidden: true,
 			},
 			{
 				label: 'Error Count',

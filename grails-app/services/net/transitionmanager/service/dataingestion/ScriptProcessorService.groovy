@@ -3,7 +3,7 @@ package net.transitionmanager.service.dataingestion
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ProgressCallback
@@ -48,7 +48,7 @@ class ScriptProcessorService {
 
         Dataset dataset = FileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-        DomainClassFieldsValidator validator = createFieldsSpecValidator(project)
+	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 	    etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
         return etlProcessor
@@ -62,6 +62,7 @@ class ScriptProcessorService {
 	 * @param project an instance of Project to use in ETLProcessor instance execution
 	 * @param scriptContent an ETLScript content to be executed
 	 * @param filename is the input filename to be used for loading a DataSet
+	 * @param includeConsoleLog - flag to control if console log is included in the response
 	 * @return a pair result with the instance of ETLProcessor used to execute the scriptContent
 	 *         and the filename for the output ETLProcessorResult
 	 * @throws an Exception in case of error in the ETL script content or
@@ -71,7 +72,8 @@ class ScriptProcessorService {
 		Project project,
 		String scriptContent,
 		String filename,
-		ProgressCallback progressCallback = null) {
+		ProgressCallback progressCallback = null,
+		Boolean includeConsoleLog=false) {
 
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
@@ -82,7 +84,7 @@ class ScriptProcessorService {
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
-		os << (etlProcessor.resultsMap() as JSON)
+		os << (etlProcessor.resultsMap(includeConsoleLog) as JSON)
 		os.close()
 
 		progressCallback.reportProgress(
@@ -100,7 +102,7 @@ class ScriptProcessorService {
      * @see com.tdsops.etl.ETLFieldsValidator interface
      * @return an instance of DomainClassFieldsValidator.
      */
-    private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
+    private ETLFieldsValidator createFieldsSpecValidator (Project project) {
 
 	    Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
 
@@ -110,7 +112,7 @@ class ScriptProcessorService {
 	    Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
 	    Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
 
-	    DomainClassFieldsValidator validator = new DomainClassFieldsValidator()
+	    ETLFieldsValidator validator = new ETLFieldsValidator()
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
 	    validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
@@ -181,11 +183,13 @@ class ScriptProcessorService {
 			}
 		} as ProgressCallback
 
+		Boolean includeConsoleLog = true
 		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
 			project,
 			scriptContent,
 			sampleDataFullFilename,
-			updateProgressClosure)
+			updateProgressClosure,
+			includeConsoleLog)
 
 		return [filename: outputFilename]
 	}
@@ -215,7 +219,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new DomainClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLFieldsValidator())
 
         List<Map<String, ?>> errors = []
 

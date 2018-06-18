@@ -6,17 +6,16 @@ import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
-import grails.converters.JSON
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -166,6 +165,7 @@ class DataImportService implements ServiceMethods {
 						rowNumber = 0
 					}
 					importContext.fieldNames = domainJson.fieldNames
+					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
@@ -234,15 +234,11 @@ class DataImportService implements ServiceMethods {
 			dts = DataTransferSet.get(1)
 		}
 
-		String transDomainName = LEGACY_DOMAIN_CLASSES[importContext.domainClass]
-
-		// Check if the domain class is valid
-		EavEntityType eavEntityType = EavEntityType.findByDomainName(
-			(transDomainName.equals('Device') ? 'AssetEntity' : transDomainName)
-		)
+		Class<?> clazz = LEGACY_DOMAIN_CLASSES[importContext.domainClass].getClazz()
+		AssetClass assetClass = AssetClass.lookup(clazz)
 
 		// If the asset class is invalid, return null
-		if (! eavEntityType) {
+		if (! assetClass) {
 			importContext.errors << "Import does not support domain type ${transDomainName}"
 			return null
 		}
@@ -252,9 +248,8 @@ class DataImportService implements ServiceMethods {
 				userLogin: importContext.userLogin,
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
-				eavEntityType: eavEntityType,
+				assetClass: assetClass,
 				dataTransferSet: dts,
-
 				// Make an assumption that the export time was now...
 				exportDatetime: new Date()
 			)
@@ -298,6 +293,7 @@ class DataImportService implements ServiceMethods {
 				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
 				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
 				fieldNameList: JsonUtil.toJson(importContext.fieldNames),
+				fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
 				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
@@ -406,11 +402,17 @@ class DataImportService implements ServiceMethods {
 					continue
 				}
 
+				// Truncate the original value if necessary
+				def origValue = field.originalValue
+				if ( (origValue instanceof CharSequence) && origValue != null && origValue.size() > 255 ) {
+					origValue = StringUtil.ellipsis(origValue, 255)
+				}
+
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
 					assetEntityId: domainId,
-					importValue: field.originalValue,
+					importValue: origValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
 				)
@@ -943,8 +945,11 @@ class DataImportService implements ServiceMethods {
 				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
+			// Should any of the sides be number (-1, actually), skip the record.
+			if (NumberUtil.isaNumber(primary) || NumberUtil.isaNumber(supporting)) {
+				break
 			// Try finding & updating or creating the dependency with primary and supporting assets that were found
-			if (primary && supporting) {
+			} else if (primary && supporting) {
 				dependency = findAndUpdateOrCreateDependency(primary, supporting, fieldsInfo, context)
 			}
 			break
@@ -1283,7 +1288,7 @@ class DataImportService implements ServiceMethods {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv)
+				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv, false)
 
 				recordsFound = entities.size()
 				if (recordsFound > 0) {
@@ -1672,8 +1677,7 @@ class DataImportService implements ServiceMethods {
 	 * @return true if binding did not encounter any errors
 	 */
 	private Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
-
-		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values + the create and update blocks
+		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
 		Boolean noErrorsEncountered = true
 		Set<String> fieldNames = fieldsInfo.keySet()
 		if (fieldsToIgnore == null) {
@@ -1690,11 +1694,19 @@ class DataImportService implements ServiceMethods {
 		Map fieldsValues = [:]
 		for (fieldName in fieldNames) {
 			Boolean isReference = GormUtil.isReferenceProperty(domain, fieldName)
-
-			def newValue = fieldsInfo[fieldName].value
 			def domainValue = domain[fieldName]
-			def initValue = fieldsInfo[fieldName].init
-			boolean hasInitializeValue = (initValue != null)
+
+			// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
+			// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
+			// extra test.  See ticket TM-10981.
+			def initValue = fieldsInfo[fieldName]['init']
+			def newValue = fieldsInfo[fieldName].value
+			boolean hasInitializeValue = !(initValue instanceof groovy.json.internal.LazyMap) && (initValue != null)
+			boolean newValueIsSet = (newValue != null) && ! (newValue instanceof groovy.json.internal.LazyMap)
+
+			// log.debug 'bindFieldsInfoValuesToEntity() fieldName {} isReference {}, newValue {}, domainValue {}, initValue {}, hasInitializeValue {}',
+			// 	fieldName, isReference, newValue, domainValue, initValue, hasInitializeValue
+			// log.debug 'bindFieldsInfoValuesToEntity() initValue isa {} and value of {}', initValue.getClass().getName(), initValue
 
 			if (hasInitializeValue) {
 				if (isReference) {
@@ -1702,7 +1714,6 @@ class DataImportService implements ServiceMethods {
 					addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "The 'initialize' command is not supported for identifier or reference properties ($fieldName)")
 					continue
 				}
-
 				if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
 					fieldsValues.put(fieldName, initValue)
 				}
@@ -1714,7 +1725,7 @@ class DataImportService implements ServiceMethods {
 					// TODO : JPM 4/2018 : Implement data type checking (use Grails BINDING logic to address ENUM, Date, etc)
 					Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
 					if (String == fieldClassType) {
-						if (newValue != null && newValue != domainValue) {
+						if (newValueIsSet && newValue != domainValue) {
 							fieldsValues.put(fieldName, newValue)
 						}
 					} else {
@@ -1723,6 +1734,8 @@ class DataImportService implements ServiceMethods {
 				}
 			}
 		}
+
+		// log.debug 'bindFieldsInfoValuesToEntity() fieldsValues to bind to domain are: {}, fieldsToIgnore are: {}', fieldsValues, fieldsToIgnore
 		GormUtil.bindMapToDomain(domain, fieldsValues, fieldsToIgnore)
 
 		return noErrorsEncountered
@@ -1877,11 +1890,15 @@ class DataImportService implements ServiceMethods {
 		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 
+		// TODO : JPM 6/2018 : TM-11017 This call fails silently in one of the DataImportServiceIntegrationSpec tests
+		log.debug "transformEtlData() calling scriptProcessorService.executeAndSaveResultsInFile"
 		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
 			project,
 			dataScript.etlSourceCode,
 			inputFilename,
 			updateProgressClosure)
+
+		log.debug "transformEtlData() returned from call"
 
 		result.filename = outputFilename
 

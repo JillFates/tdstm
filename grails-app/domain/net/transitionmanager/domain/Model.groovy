@@ -1,9 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.commons.lang.exception.PersistenceException
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
@@ -181,9 +180,7 @@ class Model {
 	}
 
 	private List<String> getAssetTypeList() {
-		EavAttributeOption.findAllByAttribute(
-				EavAttribute.findByAttributeCode('assetType'),
-				[sort: 'value', order: 'asc'])*.value*.trim().findAll()
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
 	}
 
 	int getNoOfConnectors() {
