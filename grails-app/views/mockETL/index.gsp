@@ -122,19 +122,38 @@
                         <table style="width:100%" class="table table-condensed table-hover">
                             <tr>
                                 <g:each in="${resultsRow.fieldNames}" var="header">
-                                    <th>${header}</th>
+                                    <g:if test="${resultsRow?.fieldLabelMap && resultsRow?.fieldLabelMap[header]}">
+                                        <th>${resultsRow?.fieldLabelMap[header]}</th>
+                                    </g:if>
+                                    <g:else>
+                                        <th>${header}</th>
+                                    </g:else>
                                 </g:each>
                             </tr>
                             <g:each in="${resultsRow.data}" var="row" status="i">
                                 <tr>
                                     <g:each in="${resultsRow.fieldNames}" var="fieldName">
                                         <td>${row.fields[fieldName]?.value} <br>
-                                            ${row.fields[fieldName]?.find?.query?:''} <br>
 
+                                            <g:if test="${row.fields[fieldName]?.find?.query}">
+                                                <b>Query:</b>
+                                                ${row.fields[fieldName]?.find?.query}
+                                            </g:if>
+                                            <br>
                                             <g:if test="${(row.fields[fieldName]?.find?.results)}">
                                                 <b>Results:</b>
                                                 ${row.fields[fieldName]?.find?.results}
                                             </g:if>
+
+                                            <g:if test="${(row.fields[fieldName]?.create)}">
+                                                <b>Create:</b>
+                                                ${row.fields[fieldName]?.create}
+                                            </g:if>
+                                            <g:if test="${(row.fields[fieldName]?.update)}">
+                                                <b>Update:</b>
+                                                ${row.fields[fieldName]?.update}
+                                            </g:if>
+
                                         </td>
                                     </g:each>
                                 </tr>

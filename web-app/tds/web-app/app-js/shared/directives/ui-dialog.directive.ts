@@ -60,7 +60,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			}
 		});
 		jQuery(this.el.nativeElement).draggable({
-			handle: '.modal-header'
+			handle: '.modal-header',
+			containment: 'window'
 		});
 	}
 
@@ -100,6 +101,42 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.tdsUiDialog.modal({
 				keyboard: this.keyboard
 			}).modal('show');
+		});
+
+		// Show the Dialog on the center of the screen
+		jQuery(window).on('shown.bs.modal', (e) => {
+			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
+			let isUIConfirm = jQuery(modalDialog).parent().parent().find('.tds-ui-prompt');
+			jQuery(modalDialog).css({
+				'display': 'block',
+				'visibility': 'hidden'
+			}).css({
+				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 30) + 'px',
+				'left': (jQuery(window).width() - modalDialog.width()) / 2
+			}).css({
+				'visibility': 'visible'
+			});
+		});
+
+		// hides completely the dialog so it can be calculated again
+		jQuery(window).on('hidden.bs.modal', (e) => {
+			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
+			jQuery(modalDialog).css({
+				'display': 'none',
+				'visibility': 'hidden'
+			});
+		});
+
+		// On resize the windows, recalculate the center position of all open dialog
+		jQuery(window).resize(function () {
+			let modalDialogs = jQuery(document).find('.modal-dialog');
+			if (modalDialogs) {
+				for (let m = 0; m <= modalDialogs.length; m++) {
+					jQuery(modalDialogs[m]).css({
+						'left': (jQuery(window).width() - jQuery(modalDialogs[m]).width()) / 2
+					});
+				}
+			}
 		});
 
 		this.extraNotifier = this.notifierService.on('dialog.extra', event => {

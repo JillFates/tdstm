@@ -1,6 +1,7 @@
 package pages.Assets
 
 import geb.Page
+import modules.CommonsModule
 
 class ApplicationListPage extends Page {
 
@@ -64,6 +65,7 @@ class ApplicationListPage extends Page {
         alGridPager                 { $("div#pg_applicationIdGridPager")}
         alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
         alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}
+        commonsModule { module CommonsModule }
     }
 
     def clickOnCreateButton(){

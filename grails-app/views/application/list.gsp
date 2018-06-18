@@ -51,13 +51,13 @@
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				$("#filterPane").draggable()
 
-				// JqGrid implementations 
+				// JqGrid implementations
 				var filter = '${filter}'
 				var latencys = '${latencys}'
 			  	var planMethodology = '${planMethodology}'
 				var event = '${event}'
 				var moveEvent = '${moveEvent}'
-				var plannedStatus = '${plannedStatus}' 
+				var plannedStatus = '${plannedStatus}'
 				var validation = '${validation}'
 				var moveBundleId = '${moveBundleId}'
 				var appName = '${appName}'
@@ -68,7 +68,8 @@
 				var toValidate = '${toValidate}'
 				var runbook = '${runbook}'
 				var unassigned = '${unassigned}'
-				
+				var ufp = '${ufp}'
+
 				var sizePref = '${sizePref}'
 				var listCaption = 'Application: \
 					<tds:hasPermission permission="${Permission.AssetEdit}">\
@@ -87,7 +88,7 @@
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${appPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'${appPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${appPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${appPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${appPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
@@ -104,8 +105,8 @@
 					showPager="true"
 					loadComplete="function(){resizeGrid('applicationId')}"
 					postData="{filter: filter, event:event, latencys:latencys, planMethodology:planMethodology, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
-						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
-						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
+						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme,
+						toValidate:toValidate,runbook:runbook, unassigned:unassigned, ufp:ufp}">
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="applicationId" />
 				</jqgrid:grid>
@@ -113,7 +114,7 @@
 				TDS.jqGridFilterToolbar('applicationId');
 
 				populateFilter();
-				
+
 				$("#del_applicationIdGrid").click(function(){
 					$("#applicationId").jqGrid("editGridRow","new",
 						{afterSubmit:deleteMessage}
@@ -162,22 +163,22 @@
 			function populateFilter() {
 				$("#gs_assetName").val('${appName}')
 				$("#gs_sme").val('${appSme}')
-				
+
 				if (validationFilter)
 					$("#gs_validation").val('${validationFilter}')
 				else if ( validation )
 					$("#gs_validation").val('${validation}')
-					
+
 				if (planStatus)
 					$("#gs_planStatus").val('${planStatus}')
 				else if( plannedStatus )
 					$("#gs_planStatus").val( plannedStatus )
-					
+
 				if (event)
 					$("#gs_event").val('${event}')
 				else if( event )
 					$("#gs_event").val( event )
-				
+
 				$("#gs_assetName").trigger( 'keydown' );
 			}
 			})
@@ -195,7 +196,7 @@
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label>
 								<input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}"
-								${appPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
+								${appPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.App_Columns}')"
 								/> ${attribute.frontendLabel}
 							</label>

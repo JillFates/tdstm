@@ -33,7 +33,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
         at CreateRecipePage
         createRecipe recipeDataMap
         at CookbookPage
-        waitForSuccessBanner()
+        waitForLoadingIndicator()
     }
 
     def setup() {
@@ -50,16 +50,14 @@ class RecipeDeletionSpec extends GebReportingSpec {
         given: 'The User is on the Cookbook Section'
             at CookbookPage
         when: 'The User searches by the Recipe'
-            def gebRecipeCountBeforeDelete = gebRecipes.size()
-            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
+            filterByContext recipeDataMap.context // need to play with filtering to refresh grid
+            filterByContext "All" // reset to all because AT page checking
+            waitFor{ gebRecipes[0].displayed }
         and: 'The User clicks the "Delete" Button'
-            withConfirm(true) { deleteRecipeButtons[0].click() }
-            println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
-
+            withConfirm(wait: true) { deleteRecipeButtons[0].click() }
         then: 'Recipe count is reduced to 1'
-            waitForSuccessBanner()
-            waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
-            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
+            waitFor{ gebRecipes[0].displayed }
+            getRecipeByName(recipeDataMap.name) == null
     }
 }
 

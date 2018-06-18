@@ -31,6 +31,7 @@ export class ImportBatchModel {
 	autoProcess: number;
 	warnOnChangesAfter: any;
 	fieldNameList: Array<string>;
+	fieldLabelMap: any;
 	dateCreated: Date;
 	lastUpdated: Date;
 	recordsSummary: {
