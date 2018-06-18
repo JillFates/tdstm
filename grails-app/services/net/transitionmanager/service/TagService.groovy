@@ -19,7 +19,10 @@ class TagService {
 	 */
 	@Transactional(readOnly = true)
 	Tag get(Long tagId) {
-		return Tag.get(tagId)
+		Tag tag = Tag.get(tagId)
+		securityService.assertCurrentProject(tag.project)
+
+		return tag
 	}
 
 	/**
