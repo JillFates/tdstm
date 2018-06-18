@@ -1,31 +1,133 @@
 package com.tdsops.etl
 
-/**
- *
- * Interface for validation of fields in the ETL processor
- *
- */
-interface ETLFieldsValidator {
+import com.tdssrc.grails.GormUtil
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 
-    /**
-     *
-     * Checks if there is a Field spec for a domain and field name
-     *
-     * @param domain : a ETL Domain used for looking a field spec up
-     * @param field : field name use to lookup
-     *
-     * @return true if there is field spec for that field and domain
-     */
-    Boolean hasSpecs (ETLDomain domain, String field)
+class ETLFieldsValidator {
 
-    /**
-     *
-     * It looks a field specification up based on a ETLDomain
-     *
-     * @param domain : a ETL Domain used for looking a field spec up
-     * @param field : field name use to lookup
-     *
-     * @return an instance of ETLFieldDefinition with field name, label and type
-     */
-	ETLFieldDefinition lookup (ETLDomain domain, String field)
+	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
+	Map<ETLDomain, Map<String, ETLFieldDefinition>> fieldsDefinitionCache = [:]
+
+	/**
+	 * Add fields specification for an ETLDomain instance
+	 * @param domain an instance of ETLDomain
+	 * @param fieldsSpec
+	 */
+	void addAssetClassFieldsSpecFor(ETLDomain domain, List<Map<String, ?>> fieldsSpec) {
+		assetClassFieldsSpecMap[domain] = fieldsSpec
+	}
+
+	/**
+	 * Checks if there is a Field spec for a domain and field name
+	 * @param domain : a ETL Domain used for looking a field spec up
+	 * @param field : field name use to lookup
+	 * @return true if there is field spec for that field and domain
+	 */
+	//TODO: rename validate fieldName exists
+	Boolean hasSpecs(ETLDomain domain, String field) {
+
+		if (cacheContains(domain, field)) {
+			return true
+		}
+
+		if (domain.isAsset()) {
+			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
+		} else {
+			return GormUtil.isDomainProperty(domain.clazz, field)
+		}
+	}
+
+	/**
+	 * It looks a field specification up based on a ETLDomain
+	 * @param domain : a ETL Domain used for looking a field spec up
+	 * @param field : field name use to lookup
+	 * @return an instance of ETLFieldDefinition with field name, label and type
+	 */
+	ETLFieldDefinition lookup(ETLDomain domain, String field) {
+
+		if(cacheContains(domain, field)){
+			return getFromCache(domain, field)
+		}
+
+		ETLFieldDefinition fieldDefinition
+		if(domain.isAsset()){
+			if(hasSpecs(domain, field)){
+				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
+					it.field == field || it.label == field
+				}
+				fieldDefinition = new ETLFieldDefinition(fieldSpec)
+			}
+		} else {
+			Class<?> domainClass = domain.clazz
+			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
+			fieldDefinition = new ETLFieldDefinition(domainProperty)
+		}
+
+		saveInCache(domain, field, fieldDefinition)
+		return fieldDefinition
+	}
+
+	/**
+	 * Check if the internal cache for fieldDefinitions contains an entry
+	 * for the ETLDomain instance and a field name/label
+	 * @param domain and instance of ETLDomain
+	 * @param field a String content with a field name or a field label
+	 * @return true if fieldsDefinitionCache contains the pair of ETLDomain + field name/label
+	 */
+	private boolean cacheContains(ETLDomain domain, String field) {
+		return fieldsDefinitionCache.containsKey(domain) && fieldsDefinitionCache[domain].containsKey(field)
+	}
+
+	/**
+	 * Save in an internal cache a field definitions for a specific field in a particular domain
+	 * @param domain an instance of ETLDomain
+	 * @param field field name or field label
+	 * @param fieldDefinition ETLFieldDefinition instance for the field parameter
+	 */
+	private void saveInCache(ETLDomain domain, String field, ETLFieldDefinition fieldDefinition){
+		if(!fieldsDefinitionCache.containsKey(domain)){
+			fieldsDefinitionCache.put(domain, [:])
+		}
+		fieldsDefinitionCache[domain].put(field, fieldDefinition)
+	}
+
+	/**
+	 * Return from an internal cache an instance of ETLFieldDefinition
+	 * @param domain an instance of ETLDomain
+	 * @param field field name or field label
+	 * @return ETLFieldDefinition instance for the field parameter
+	 */
+	private ETLFieldDefinition getFromCache(ETLDomain domain, String field){
+		return fieldsDefinitionCache[domain][field]
+	}
+
+	/**
+	 * Builds a map with label results used during the ETL script valuation
+	 * Following this ETL script:
+	 * <pre>
+	 *  read labels
+	 *  domain Application
+	 *  iterate {
+	 *      extract 1 load 'Vendor'
+	 *      extract 2 load 'assetName'
+	 *  }
+	 * </pre>
+	 *  It build this Map
+	 * <pre>
+	 *  fieldLabelMap : [
+	 *      'Vendor': 'appVendor'
+	 *  ]
+	 * </pre>
+	 * @return
+	 */
+	Map<String, Map<String, String>> fieldLabelMapForResults() {
+		return fieldsDefinitionCache.collectEntries { ETLDomain domain, Map<String, ETLFieldDefinition> definitions ->
+			[
+				(domain.name()): definitions.collectEntries { String field, ETLFieldDefinition definition ->
+					[(definition.name): definition.label]
+				}
+			]
+		}
+	}
+
 }

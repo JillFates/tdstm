@@ -1,7 +1,7 @@
 package modules
 
 import geb.Module
-import org.openqa.selenium.Keys
+import utils.CommonActions
 
 class ViewsModule extends Module {
 
@@ -14,7 +14,7 @@ class ViewsModule extends Module {
         clearFilterX      {$(".form-control-feedback")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
-        viewsListed       {$("[uisref]")}
+        viewsListed       (required: false) {$("[uisref]")}
         viewsContainer    { $( "div", class:"content body")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
@@ -30,13 +30,22 @@ class ViewsModule extends Module {
         yellowStars       (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star")}
         createdBy         {viewList.find("td:nth-child(4)")}
         ticks              {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
-
+        common                      { module CommonsModule}
     }
+
+    def openRandomView(){
+        def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
+        def editedViewName = viewsListed[willSelect].text()
+        waitFor{viewsListed[willSelect].click()}
+        editedViewName
+    }
+
     def clickCreateView(){
         createViewButton.click()
     }
+
     def moduleTitleIsCorrect(String title){
-        moduleTitle.text()==title
+        waitFor{moduleTitle.text()==title}
     }
     def validateAuthor(){
         createdBy.each{
@@ -61,7 +70,8 @@ class ViewsModule extends Module {
      * returns false if a void star is displayed.
      */
     def noVoidStarsAreDisplayed(){
-        !voidStars.displayed
+        waitFor{!voidStars.displayed}
+
     }
     /**
      * Shared views will have a tick on the "Shared" column
@@ -78,7 +88,7 @@ class ViewsModule extends Module {
      * This method validates the the condition of equal number of ticks and rows is met.
      */
     def systemViewsOnly(){
-       // createdBy.text()==""
+        // createdBy.text()==""
         ticks.size()==viewsListed.size()
     }
     /**
@@ -130,7 +140,7 @@ class ViewsModule extends Module {
     }
 
     def getNumberOfRows(){
-        viewsListed.size()
+        waitFor{viewsListed.size()}
     }
 
     def openViewByName(name){
@@ -151,11 +161,13 @@ class ViewsModule extends Module {
     }
 
     def createdDateNotEmpty(){
-        vwGridRows.findAll { it.find{"td[4]"}.text()!="" }
+
+        waitFor{vwGridRows.findAll { it.find{"td[4]"}.text()!="" }}
     }
 
     def setFirstNonFavViewAsFav(){
-        voidStars[0].click()
+        waitFor{voidStars[0].click()}
+
     }
 
     def goToFirstNonFavView(){
@@ -166,4 +178,29 @@ class ViewsModule extends Module {
         voidStars[0].parent().parent().next().text()
     }
 
+    /**
+     * This method will count the number of starred views in the table.
+     * There is a similar method in ViewPage, but that one will read the number
+     * in the starred views counter on the left of the screen, while this one will check or stars
+     * in each row.
+     */
+    def validateNumberOfStarredViews(int value){
+        yellowStars.size()==value
+    }
+
+    def unFavRandomFavs(){
+        def initializeCommonActions = new CommonActions()
+        def favsToBeClicked = 4
+        def count = 1
+        while (count < favsToBeClicked){
+            waitFor{initializeCommonActions.getRandomOption(yellowStars).click()}
+            common.waitForLoader(2)
+            count++
+        }
+    }
+    def favRandomFavs(){
+        def initializeCommonActions = new CommonActions()
+        waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
+        common.waitForLoader(3)
+    }
 }

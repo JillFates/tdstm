@@ -7,7 +7,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
 import com.tds.asset.Database
@@ -20,11 +19,8 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -37,7 +33,6 @@ import grails.transaction.Transactional
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
-import net.transitionmanager.domain.KeyValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
@@ -69,21 +64,12 @@ class AssetEntityService implements ServiceMethods {
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
 	protected static final List<String> customLabels = (1..Project.CUSTOM_FIELD_COUNT).collect { 'Custom' + it }.asImmutable()
 
-	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
-	protected static final List<String> bundleMoveAndClientTeams = [
-		'sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
-		'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
-		'targetTeamSa', 'targetTeamDba' ].asImmutable()
-
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
 			(AssetClass.APPLICATION): [ 'assetName' ],
 			(AssetClass.DATABASE): [ 'assetName' ],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName',
-				// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
-				'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
-				'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
 			],
 			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
@@ -977,7 +963,6 @@ class AssetEntityService implements ServiceMethods {
 		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
 
 		ProjectAssetMap.where { asset in assets }.deleteAll()
-		AssetEntityVarchar.where { assetEntity in assets }.deleteAll()
 
 		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
 
@@ -1144,16 +1129,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return List of RailTypes
 	 */
 	List<String> getAssetRailTypeOptions() {
-		EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('railType'))*.value
-	}
-
-	/**
-	 * Used to retrieve the assettype attribute object
-	 * @param the name of the attribute
-	 * @return the Attribute object
-	 */
-	Object getPropertyAttribute(String property) {
-		EavAttribute.findByAttributeCode(property)
+		AssetEntity.RAIL_TYPES
 	}
 
 	/**
@@ -2224,23 +2200,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Add the css for the labels which fieldImportance is 'C','I'
-	 * @deprecated
-	 * TM-6617
-	 */
-	Map getHighlightedInfo(forWhom, assetEntity, configMap, projectAttributes = null) {
-		throw new RuntimeException('getHighlightedInfo no longer used')
-		def highlightMap = [:]
-		(projectService.getFields(forWhom, projectAttributes) + projectService.getCustoms(projectAttributes)).each { f ->
-			def configMaps = configMap.config
-			if (configMaps.(f.label) in ['C','I'] && (assetEntity && !assetEntity.(f.label))) {
-				highlightMap[f.label] = 'highField'
-			}
-		}
-		return highlightMap
-	}
-
-	/**
 	 * This is used to escape quotes in a string to be used in Javascript
 	 * TODO : JPM 9/2014 : getEscapeName should be refactored into a reusable function in String or HtmlUtil as it should not be SOOOOO tied to an asset
 	 */
@@ -2952,7 +2911,17 @@ class AssetEntityService implements ServiceMethods {
 	 * @param term the term to be searched
 	 * @return the map of asset types
 	 */
-	def assetTypesOf(manufacturerId, term) {
+	def assetTypesOf(String manufacturerId, String term) {
+		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+
+			List<Map> results = assetOptions.collect { options ->
+				[id: options.value, text : options.value]
+			}
+
+			return results
+		}
+
 		def hql = "SELECT distinct m.assetType as assetType FROM Model m WHERE m.assetType is not null "
 		def joinTables = " "
 		def condition = ""
@@ -2973,28 +2942,6 @@ class AssetEntityService implements ServiceMethods {
 
 		result = result.sort {it.text}
 		return result
-	}
-
-	/**
-	 * Used to get Key,values of Help Text and append to asset cruds.
-	 * @param entityType type of entity.
-	 * @param project to look for
-	 * @return tooltips map
-	 * TODO : REMOVE TM-6722
-	 */
-	@Deprecated
-	Map<String, String> retrieveTooltips(String entityType, Project project) {
-		Map<String, String> returnMap = [:]
-		String category = EntityType.getListAsCategory(entityType)
-		try {
-			for (String attributeCode in projectService.getAttributes(entityType)*.attributeCode) {
-				KeyValue keyMap = KeyValue.findAllByCategoryAndKey(category, attributeCode).find { it.project == project }
-				returnMap[attributeCode] = keyMap?.value
-			}
-		}catch(Exception ex) {
-			log.error("An error occurred : $ex.message", ex)
-		}
-		return returnMap
 	}
 
 	/**
@@ -3030,7 +2977,7 @@ class AssetEntityService implements ServiceMethods {
 	Map dependencyEditMap(params) {
 		Project project = securityService.userCurrentProject
 		Long id = params.long('id')
-		if (! id) {
+		if (!id) {
 			throw new InvalidRequestException('An invalid asset id was requested')
 		}
 
@@ -3051,24 +2998,25 @@ class AssetEntityService implements ServiceMethods {
 			AssetType.APPLICATION,
 			AssetType.VM,
 			AssetType.FILES,
-		    AssetType.DATABASE,
-		    AssetType.BLADE
+			AssetType.DATABASE,
+			AssetType.BLADE
 		]*.toString()
 
 		Map map = [
 			assetClassOptions: AssetClass.classOptions,
-			assetEntity: assetEntity,
-			dependencyStatus: getDependencyStatuses(),
-			dependencyType: getDependencyTypes(),
-			whom: params.whom,
-			nonNetworkTypes: nonNetworkTypes,
-			supportAssets: getSupportingAssets(assetEntity),
-			dependentAssets: getDependentAssets(assetEntity),
-			moveBundleList: getMoveBundles(project)
+			assetEntity      : assetEntity,
+			dependencyStatus : getDependencyStatuses(),
+			dependencyType   : getDependencyTypes(),
+			whom             : params.whom,
+			nonNetworkTypes  : nonNetworkTypes,
+			supportAssets    : getSupportingAssets(assetEntity),
+			dependentAssets  : getDependentAssets(assetEntity),
+			moveBundleList   : getMoveBundles(project)
 		]
 
 		return map
 	}
+
 
 	/**
 	 * Used to clone an asset and optionally the dependencies associated with the asset

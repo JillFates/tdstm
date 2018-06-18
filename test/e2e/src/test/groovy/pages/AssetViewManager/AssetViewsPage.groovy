@@ -2,13 +2,16 @@ package pages.AssetViewManager
 import geb.Page
 import modules.CreateViewModule
 import modules.ViewsModule
+import modules.CommonsModule
 
 class AssetViewsPage extends Page{
+    static int favLimit=10
 
     static at = {
         waitFor {viewMgrPageWindow.displayed}
         avPageTitle.text().trim().startsWith("View")
         waitFor {allViewsModule.viewModuleContainer.displayed}
+
     }
 
     static content = {
@@ -25,10 +28,10 @@ class AssetViewsPage extends Page{
         //>>>>>>>>> MODULES
         allViewsModule              { module ViewsModule}
         createViewModule            { module CreateViewModule}
+        common                      { module CommonsModule}
 
         avPageTitle                 { $("h1")}
         //>>>>>>>>>>BUTTONS
-        createViewBton              {$("button", text:"Create View")}
         toggleListBtn               { staffViewHeaderBar.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}
 
         //>>> grids
@@ -36,6 +39,10 @@ class AssetViewsPage extends Page{
         vwGrid                      (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows                  (required: false, wait:true) { vwGrid.find("tr","role":"row")}
         vwGridRowsLink {$("tr td a")}
+
+        //pop ups
+        favViewsLimitPopup (required: false, wait:true){$(".alert-dismissable")}
+        closeLimitPopupBtn (required: false, wait:true){favViewsLimitPopup.find(".close")}
     }
     def goToCreateView(){
         createViewBtn.click()
@@ -56,10 +63,36 @@ class AssetViewsPage extends Page{
     }
 
     def getFavCounter(){
-        favViewsCounter.text().toInteger()
+        waitFor{favViewsCounter.text().toInteger()}
     }
+
     def validateValueIncrement(int initial, int incremented){
         initial+1==incremented
     }
 
+    /**
+     * Adds fav views. On the attempt to add an 11th, the user
+     * is to get a pop up
+     */
+    def getFavLimitPopUp(){
+        while ((getFavCounter()<favLimit)){
+           allViewsModule.favRandomFavs()
+        }
+        allViewsModule.setFirstNonFavViewAsFav()
+        favLimitPopUpIsPresent()
+        favViewsCounter.text().toInteger()==favLimit
+    }
+
+    def favLimitPopUpIsPresent(){
+        //Maximum number of favorite data views reached
+        waitFor{favViewsLimitPopup.displayed}
+    }
+    def favLimitPopUpTextIsAsExpected(){
+        //Maximum number of favorite data views reached
+        favViewsLimitPopup.text().trim().contains("Maximum number of favorite data views reached")
+    }
+
+    def closeFavLimitPopUp(){
+        closeLimitPopupBtn.click()
+    }
 }

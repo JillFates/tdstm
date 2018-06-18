@@ -5,8 +5,6 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.search.FieldSearchData
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -272,14 +270,14 @@ class FilesController implements ControllerMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		def customFields = assetEntityService.getCustomFieldsSettings(project, files.assetClass.toString(), true)
 
-		[	assetTypeOptions: EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('assetType'))*.value,
-			fileInstance: files,
-			moveBundleList: MoveBundle.findAllByProject(project,[sort: 'name']),
-			planStatusOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
+		[
+			fileInstance      : files,
+			moveBundleList    : MoveBundle.findAllByProject(project, [sort: 'name']),
+			planStatusOptions : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value,
 			environmentOptions: AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value,
 			standardFieldSpecs: standardFieldSpecs,
-			project:project,
-			customs: customFields
+			project           : project,
+			customs           : customFields
 		]
 	}
 

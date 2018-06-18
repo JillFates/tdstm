@@ -5,8 +5,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.search.FieldSearchData
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -60,12 +58,13 @@ class ApplicationController implements ControllerMethods {
 
 		def fieldPrefs = assetEntityService.getExistingPref(PREF.App_Columns)
 
-		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
+		[ appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
 		 company: project.client, latencys: params.latencys, planMethodology: params.planMethodology,
 		 partyGroupList: partyRelationshipService.getCompaniesList(), runbook: params.runbook,
-		 validationFilter: filters?.appValidationFilter ?: ''] +
-		 assetEntityService.getDefaultModelForLists(APPLICATION, 'Application', project, fieldPrefs, params, filters)
+		 validationFilter: filters?.appValidationFilter ?: '',
+		 ufp: params.ufp == 'true' ?: ''
+		] + assetEntityService.getDefaultModelForLists(APPLICATION, 'Application', project, fieldPrefs, params, filters)
 	}
 
 	/**
@@ -122,9 +121,9 @@ class ApplicationController implements ControllerMethods {
 		Map queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
-			                      if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
-			                      if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
-			                      me.move_event_id AS event, ''')
+				if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
+				if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+				me.move_event_id AS event, ''')
 
 		if (customizeQuery.query) {
 			query.append(customizeQuery.query)
@@ -160,7 +159,7 @@ class ApplicationController implements ControllerMethods {
 		query.append('''
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
-			''')
+		''')
 
 		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
@@ -173,8 +172,9 @@ class ApplicationController implements ControllerMethods {
 			LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 			WHERE ae.project_id=''').append(securityService.userCurrentProjectId).append(' ')
 
-		if (justPlanning == 'true')
-			query.append(" AND mb.use_for_planning=$justPlanning ")
+		if (justPlanning == 'true' || params.ufp == 'true') {
+			query.append(" AND mb.use_for_planning=true ")
+		}
 
 		if (params.event && params.event.isNumber() && moveBundleList)
 			query.append(" AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})")
@@ -357,8 +357,6 @@ class ApplicationController implements ControllerMethods {
 		// Set the default values on the custom properties
 		assetService.setCustomDefaultValues(application)
 
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
@@ -371,15 +369,20 @@ class ApplicationController implements ControllerMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, domain, true)
 
-		[ 	applicationInstance: application, assetTypeOptions: assetTypeOptions?.value,
-			moveBundleList: moveBundleList, planStatusOptions: planStatusOptions?.value,
-			projectId: project.id, project: project,moveEventList: moveEventList,
-			personList: personList, company: project.client,
+		[
+			applicationInstance: application,
+			moveBundleList     : moveBundleList,
+			planStatusOptions  : planStatusOptions?.value,
+			projectId          : project.id,
+			project            : project,
+			moveEventList      : moveEventList,
+			personList         : personList,
+			company            : project.client,
 			// TODO : fix misspelled variable availabaleRoles
-			availabaleRoles: availabaleRoles,
-			environmentOptions: environmentOptions?.value,
-			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs
+			availabaleRoles    : availabaleRoles,
+			environmentOptions : environmentOptions?.value,
+			customs            : customFields,
+			standardFieldSpecs : standardFieldSpecs
 		]
 	}
 

@@ -4,6 +4,7 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
 import {DataIngestionService} from '../../modules/dataIngestion/service/data-ingestion.service';
+import {FileRestrictions} from '@progress/kendo-angular-upload';
 
 /**
  * Mainly used by Kendo Upload Component.
@@ -39,7 +40,7 @@ export class KendoFileUploadBasicConfig {
 
 	public static readonly REMOVE_FIELD = 'filename';
 
-	uploadRestrictions: any;
+	uploadRestrictions: FileRestrictions;
 	uploadSaveUrl: string;
 	uploadDeleteUrl: string;
 	autoUpload: boolean;
@@ -49,7 +50,7 @@ export class KendoFileUploadBasicConfig {
 	[x: string]: any; // this enables the model to add any extra property as needed.
 
 	constructor() {
-		this.uploadRestrictions = { allowedExtensions: ['csv', 'txt', 'xml', 'json', 'xlxs', 'xls'] };
+		this.uploadRestrictions = { allowedExtensions: ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'] };
 		this.uploadSaveUrl = KendoFileUploadInterceptor.SAVE_URL;
 		this.uploadDeleteUrl = KendoFileUploadInterceptor.REMOVE_URL;
 		this.autoUpload = false;

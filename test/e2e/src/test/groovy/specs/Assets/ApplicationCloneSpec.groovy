@@ -93,8 +93,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
         when: 'The User searches by the App Name'
             waitFor {alNameFilter.click()}
             alNameFilter = appName
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
+            commonsModule.waitForLoadingMessage()
             waitFor{alFirstAppName.text().trim() == appName}
 
         then: 'That App should be shown'
@@ -151,8 +150,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
         when: 'The User searches by that App Name'
             waitFor {alNameFilter.click()}
             alNameFilter = appName
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
+            commonsModule.waitForLoadingMessage()
             waitFor{alFirstAppName.text().trim() == appName}
 
         then: 'App Name should be displayed'
@@ -212,8 +210,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
             alNameFilter = appName
 
         then: 'App Name should be duplicated'
-            waitFor {alLoadingGrid.displayed}
-            waitFor {!alLoadingGrid.displayed}
+            commonsModule.waitForLoadingMessage()
             waitFor{alGridRows.size() == appCountBefore + 1}
     }
 }

@@ -1,7 +1,5 @@
 package net.transitionmanager.domain
 
-import com.tdssrc.eav.EavAttribute
-
 /**
  * Maps the spreadsheet sheet/columns to the entity attributes, used for
  * importing and exporting data of the referenced DataTransferSet.
@@ -12,13 +10,12 @@ class DataTransferAttributeMap {
 	String columnName       // Spreadsheet column name
 	String validation       // Validation rules
 	Integer isRequired      // Flag if column is a required field
-	EavAttribute eavAttribute
 
 	static belongsTo = [dataTransferSet: DataTransferSet]
 
 	static mapping = {
 		version false
-		eavAttribute lazy: false
+
 		columns {
 			isRequired sqlType: 'smallint'
 		}

@@ -139,7 +139,11 @@ databaseChangeLog = {
 	include file: '20160920-create-license-table.groovy'
 	include file: '20160920-create-licensed_client-table.groovy'
 	include file: '20170220-create-license-activity-track-table.groovy'
-	// The Delete Orphans using the PersonService.deletePerson can be temperamental with changes to the service
+	include file: '20171002-create-provider-and-datascript-tables.groovy'
+	include file: '20180129-create-import-batch-tables.groovy'
+	include file: '20180508-add-asset-class-to-transferbatch.groovy'
+	include file: '20161010-notice-support.groovy'
+		// The Delete Orphans using the PersonService.deletePerson can be temperamental with changes to the service
 	// like adding new references.
  	include file: '20160727-delete-orphaned-persons.groovy'
 	// Back to our regularly scheduled program
@@ -150,7 +154,7 @@ databaseChangeLog = {
 	include file: '20160817-delete-source-target-team-eav-attributes.groovy'
 	include file: '20160909-add-duration-locked-to-tasks.groovy'
 	include file: '20161006-update-user-preference-code-legendTwistieState.groovy'
-	include file: '20161010-notice-support.groovy'
+	// include file: '20161010-notice-support.groovy'
 	include file: '20161010-notice-support-change-noticetype-column.groovy'
 	include file: '20161111-delete-asset-dependency-orphans.groovy'
 	include file: '20161129-fix-license-columns.groovy'
@@ -194,7 +198,7 @@ databaseChangeLog = {
 	include file: '20170830-Assign-a-company-as-the-owner-for-the-default-project.groovy'
 	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
-	include file: '20171002-create-provider-and-datascript-tables.groovy'
+	// include file: '20171002-create-provider-and-datascript-tables.groovy'
 	include file: '20171010-remove-legacy-field-settings.groovy'
 	include file: '20171011-create-credential-table.groovy'
 	include file: '20170816-add-api-action-permissions.groovy'
@@ -218,7 +222,7 @@ databaseChangeLog = {
 	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
 	include file: '20180123-api-action-make-description-nullable.groovy'
 	include file: '20180201-set-asset_entity-project_id-mandatory.groovy'
-	include file: '20180129-create-import-batch-tables.groovy'
+	// include file: '20180129-create-import-batch-tables.groovy'
 	include file: '20180213-change-credential-and-add-credential-permission.groovy'
 	include file: '20180216-additional-changes-to-credential.groovy'
 	include file: '20180225-changes-to-import-batch.groovy'
@@ -235,6 +239,11 @@ databaseChangeLog = {
 	include file: '20180404-purge-test-apis-credentials-datascripts.groovy'
 	include file: '20180423-fix-room-rack-location-user-preferences.groovy'
 	include file: '20180430-add-queued-at-to-import-batch.groovy'
+	include file: '20180508-migrate-and-remove-eav.groovy'
 	include file: '20180518-rename-source-target-rack-room-location-dataview-sort-field.groovy'
+	include file: '20180524-add-bypass-mode-to-move-event.groovy'
+	include file: '20180531-Rename-back-the-first-dataview-record-to-name-All-Assets.groovy'
+	include file: '20180606-import-batch-record-drop-ignored-flag.groovy'
+	include file: '20180612-add-field-label-map-property-to-import-batch.groovy'
 	include file: '20180613-add-http-method-api-action-table.groovy'
 }

@@ -7,21 +7,13 @@ import spock.lang.Stepwise
 
 @Stepwise
 class LoginSpec extends GebReportingSpec {
-    static username
-    static password
 
-    def setupSpec() {
-        //TODO put the following values on a property file
-        username = "e2e_test_user"
-        password = "e2e_password"
-    }
-
-    def loginTDS(){
-        given:
+    def "1. Login to Transition Manager"(){
+        given: "The User goes to Login page"
             to LoginPage
-        when:
-            loginModule.login(username,password)
-        then:
+        when: "The user tries to login with his credentials"
+            login() //credentials are taken from config file inside method
+        then: "The user should be logged in and menu should be displayed"
             at MenuPage
     }
 }

@@ -775,13 +775,6 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent" {
-			controller = "wsApiAction"
-			action = [
-			        GET: "agentNames"
-			]
-		}
-
 		"/ws/apiAction/agent/$id" {
 			controller = "wsApiAction"
 			action = [
