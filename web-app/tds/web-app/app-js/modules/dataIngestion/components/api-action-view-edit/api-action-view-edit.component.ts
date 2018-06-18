@@ -71,6 +71,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public providerList = new Array<ProviderModel>();
 	public agentList = new Array<AgentModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
+	protected httpMethodList = new Array<String>();
 	public agentCredentialList = new Array<CredentialModel>();
 	public providerCredentialList = new Array<CredentialModel>();
 	public datascriptList = new Array<DataScriptModel>();
@@ -208,14 +209,14 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of possible Agents
 	 */
 	getAgents(): void {
-		this.dataIngestionService.getAgents().subscribe(
+		this.dataIngestionService.getAPIActionEnums().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.agentClass = this.agentList[0];
 					this.modifySignatureByProperty('agentClass');
 				}
-				this.agentList.push(...result);
+				this.agentList.push(...result.data.agentNames);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 					this.onAgentValueChange(this.apiActionModel.agentClass);
 				} else {
@@ -223,6 +224,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
 				}
+				this.httpMethodList = result.data.httpMethod;
 			},
 			(err) => console.log(err));
 	}

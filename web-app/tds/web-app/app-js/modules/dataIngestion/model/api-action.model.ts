@@ -131,6 +131,7 @@ export class APIActionModel {
 	name: string;
 	description: string;
 	agentMethod?: AgentMethodModel;
+	httpMethod: string;
 	agentClass?: {
 		id?: number,
 		name?: string
