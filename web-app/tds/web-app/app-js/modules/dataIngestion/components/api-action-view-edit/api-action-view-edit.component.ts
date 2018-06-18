@@ -71,7 +71,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public providerList = new Array<ProviderModel>();
 	public agentList = new Array<AgentModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
-	protected httpMethodList = new Array<String>();
+	protected httpMethodList = new Array<any>();
 	public agentCredentialList = new Array<CredentialModel>();
 	public providerCredentialList = new Array<CredentialModel>();
 	public datascriptList = new Array<DataScriptModel>();
@@ -224,7 +224,9 @@ export class APIActionViewEditComponent implements OnInit {
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
 				}
-				this.httpMethodList = result.data.httpMethod;
+				this.httpMethodList.push('Select...');
+				this.apiActionModel.httpMethod = this.httpMethodList[0];
+				this.httpMethodList.push(...result.data.httpMethod);
 			},
 			(err) => console.log(err));
 	}
@@ -422,7 +424,10 @@ export class APIActionViewEditComponent implements OnInit {
 		// Test API Action Form
 		if (this.apiActionForm) {
 			this.validInfoForm = this.apiActionForm.valid &&
-				(this.apiActionModel.agentMethod.id !== '0' && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
+				(this.apiActionModel.agentMethod.id !== '0'
+					&& this.apiActionModel.agentClass.id !== 0
+					&& this.apiActionModel.provider.id !== 0
+					&& this.apiActionModel.httpMethod !== 'Select...');
 
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {

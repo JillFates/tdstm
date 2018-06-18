@@ -245,6 +245,8 @@
                                                  class="col-sm-7" style="padding-left: 32px;">
                                                 <kendo-dropdownlist id="httpMethodList" name="httpMethodList" class="form-control"
                                                                     [data]="httpMethodList"
+                                                                    required
+                                                                    [ngClass]="{'has-error':  !apiActionForm.form.valid && apiActionModel.httpMethod === 'Select...'}"
                                                                     [(ngModel)]="apiActionModel.httpMethod">
                                                 </kendo-dropdownlist>
                                             </div>
