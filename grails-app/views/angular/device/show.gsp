@@ -23,7 +23,7 @@
                                 <tbody>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}" />
-                                    <td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
+                                    <td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
                                         <tdsAngular:tooltipSpan field="${standardFieldSpecs.assetName}">
                                             ${assetEntity.assetName}
                                         </tdsAngular:tooltipSpan>
