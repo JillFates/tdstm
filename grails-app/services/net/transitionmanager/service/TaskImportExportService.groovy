@@ -16,12 +16,10 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.slf4j.LoggerFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.servlet.http.HttpServletRequest
-import java.text.SimpleDateFormat
 
 class TaskImportExportService implements ServiceMethods {
 
@@ -238,7 +236,6 @@ class TaskImportExportService implements ServiceMethods {
 	CoreService coreService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	/**

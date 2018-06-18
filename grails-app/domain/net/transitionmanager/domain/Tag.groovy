@@ -1,7 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.Color
-import com.tdssrc.grails.TimeUtil
 
 class Tag {
 	String  name
@@ -27,16 +26,8 @@ class Tag {
 
 	static mapping = {
 		id column: 'tag_id'
-		autoTimestamp false
 	}
 
-	def beforeInsert = {
-		dateCreated = lastUpdated = TimeUtil.nowGMT().clearTime()
-	}
-
-	def beforeUpdate = {
-		lastUpdated = TimeUtil.nowGMT().clearTime()
-	}
 
 	Map toMap() {
 		[

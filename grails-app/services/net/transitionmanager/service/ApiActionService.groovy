@@ -35,8 +35,6 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.codehaus.groovy.control.ErrorCollector
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -50,7 +48,6 @@ class ApiActionService implements ServiceMethods {
 	]
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	SecurityService securityService
 	CustomDomainService customDomainService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
@@ -305,7 +302,12 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
-					agent.invoke(action.agentMethod, actionRequest)
+					if (context?.moveEvent?.apiActionBypass) {
+						log.info('By passing API Action invocation with following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest)
+						taskFacade.byPassed()
+					} else {
+						agent.invoke(action.agentMethod, actionRequest)
+					}
 				} catch (Exception e) {
 					log.warn(e.message)
 					taskFacade.error(e.message)

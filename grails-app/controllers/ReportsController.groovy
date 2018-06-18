@@ -1369,7 +1369,6 @@ class ReportsController implements ControllerMethods {
 		def startDate = params.startDate
 		def endDate = params.endDate
 		def includeNonPlanning = params.includeNonPlanning
-		def includeDemoProject = params.includeDemoProject
 
 		def validDates = true
 		try {
@@ -1388,15 +1387,8 @@ class ReportsController implements ControllerMethods {
 			List<Long> allProjectIds = []
 
 			for (Project p in userProjects) {
-				if (Project.isDefaultProject(p)) {
-					if (includeDemoProject) {
-						userProjectsMap[p.id] = p
-						allProjectIds << p.id
-					}
-				} else {
-					userProjectsMap[p.id] = p
-					allProjectIds << p.id
-				}
+				userProjectsMap[p.id] = p
+				allProjectIds << p.id
 			}
 
 			if ( allProjects ) {

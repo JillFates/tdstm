@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
@@ -27,7 +28,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 
 import javax.net.ssl.SSLContext
@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate
 @Slf4j
 class CredentialService implements ServiceMethods {
     ProjectService projectService
-    SecurityService securityService
 
     /**
      * Creates a new credential
@@ -365,7 +364,7 @@ class CredentialService implements ServiceMethods {
                 }
                 break
             case 'json':
-                Map<String, ?> json = JsonUtil.convertJsonToMap(resp.json)
+                Map<String, ?> json = CollectionUtils.flattenMap(JsonUtil.convertJsonToMap(resp.json))
                 sessionId = ['sessionName': sessionHeaderName, 'sessionValue': json.get(propertyName)]
                 break
             default:

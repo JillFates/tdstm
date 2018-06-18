@@ -24,8 +24,8 @@ trait ProgressIndicator {
 
 	/**
 	 * Interface implementation used to report progress.
-	 * It is loaded first in prepareProgressIndicator method
-	 * @see ProgressIndicator#prepareProgressIndicator(java.lang.String, com.tdsops.etl.ProgressCallback)
+	 * It is loaded first in setUpProgressIndicator method
+	 * @see ProgressIndicator#setUpProgressIndicator(java.lang.String, com.tdsops.etl.ProgressCallback)
 	 * @see ProgressCallback
 	 */
 	ProgressCallback progressCallback
@@ -59,15 +59,26 @@ trait ProgressIndicator {
 	 * @param script an ETL script content
 	 * @see ProgressCallback
 	 */
-	void prepareProgressIndicator(String script, ProgressCallback aProgressCallback) {
-		progressCallback = aProgressCallback
-		numberOfIterateLoops = calculateNumberOfIterateLoops(script)
-		if(numberOfIterateLoops > 0){
-			iterateRatio = 1 / numberOfIterateLoops
+	void setUpProgressIndicator(String script, ProgressCallback aProgressCallback) {
+		if(aProgressCallback){
+			progressCallback = aProgressCallback
+			numberOfIterateLoops = calculateNumberOfIterateLoops(script)
+			if (numberOfIterateLoops > 0){
+				iterateRatio = 1 / numberOfIterateLoops
+			} else {
+				iterateRatio = 0
+			}
+			iterateCounter = 0
+
+			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, '')
+
 		} else {
+			numberOfIterateLoops = 0
+			factorStepFrequency = 0
 			iterateRatio = 0
+			frequencyCounter = -1
+			iterateCounter = 0
 		}
-		iterateCounter = 0
 	}
 
 	/**
@@ -109,12 +120,10 @@ trait ProgressIndicator {
 
 			if (frequencyCounter == -1) {
 				frequencyCounter = 0
-				// Calculate how many rows to process before actually reporting the progress back for the current iterate loop
 				factorStepFrequency = (totalRows / 100).intValue()
 			}
 			frequencyCounter += 1
 			if (factorStepFrequency < frequencyCounter) {
-				// Integer percentage = ((currentRow + totalRows*iterateCounter )/ (totalRows*numberOfIterateLoops)*100).intValue()
 				Integer percentage = (((iterateCounter * iterateRatio) + (currentRow / totalRows * iterateRatio)) * 100).intValue()
 				progressCallback.reportProgress(percentage, false, ProgressCallback.ProgressStatus.RUNNING, '')
 				frequencyCounter = 0
@@ -132,17 +141,5 @@ trait ProgressIndicator {
 			progressCallback.reportProgress(percentage, true, ProgressCallback.ProgressStatus.RUNNING, '')
 		}
 		frequencyCounter = -1
-	}
-
-	/**
-	 * Reporting Success.
-	 *  In this method the following call should be made to indicate to the Progress Service
-	 *  that the ETL process has completed
-	 * @param filename
-	 */
-	void scriptStarted() {
-		if (progressCallback){
-			progressCallback.reportProgress(0, true, ProgressCallback.ProgressStatus.RUNNING, '')
-		}
 	}
 }

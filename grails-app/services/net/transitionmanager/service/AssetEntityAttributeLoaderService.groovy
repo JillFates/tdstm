@@ -33,7 +33,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	MoveBundleService moveBundleService
 
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'

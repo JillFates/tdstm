@@ -43,6 +43,23 @@ class CredentialSpec extends IntegrationSpec {
 	}
 
 	/**
+	 * All these tests should fail because of the OfSameProjectConstraint. These are all the happy path tests, from the previous test, but
+	 * using a bad credential, where credential.project.id != credential.provider.project.id .
+	 *
+	 * The previous test running without breaking for the happy path, is the happy path for OfSameProjectConstraint working.
+	 */
+	void 'Test validation of Credential with the project being of a different provider'() {
+		expect:
+			createBadTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
+		where:
+			method        | sessionName | valExp  | authUrl       | renewUrl      | httpMethod | requestMode | result
+			am.BASIC_AUTH | ''          | ''      | ''            | ''            | null       | null        | false
+			am.BASIC_AUTH | 'bogus'     | 'bogus' | ''            | ''            | null       | null        | false
+			am.JWT        | ''          | ''      | 'http://b.ic' | 'http://p.ic' | null       | null        | false
+			am.JWT        | 'bogus'     | 'bogus' | 'http://b.ic' | 'http://p.ic' | null       | null        | false
+	}
+
+	/**
 	 * Create a Credential domain object with the given parameters
 	 * @param  authMethod
 	 * @param  sessionName
@@ -58,5 +75,36 @@ class CredentialSpec extends IntegrationSpec {
 		Provider provider = providerTestHelper.createProvider(project)
 		return credentialTestHelper.createCredential(project, provider, authMethod,
 				sessionName, validationExp, authUrl, renewUrl, httpMethod, requestMode)
+	}
+
+	/**
+	 * Create a Credential domain object with the given parameters that has a project, that is different from
+	 * the one the provider has.
+	 *
+	 * @param authMethod
+	 * @param sessionName
+	 * @param validationExp
+	 * @param authUrl
+	 * @param renewUrl
+	 * @param httpMethod
+	 * @param requestMode
+	 *
+	 * @return The bad Credential domain object
+	 */
+	private Credential createBadTestCredential(authMethod, sessionName, validationExp, authUrl, renewUrl, httpMethod, requestMode) {
+		Project project = projectTestHelper.createProject()
+		Project otherProject = projectTestHelper.createProject()
+		Provider provider = providerTestHelper.createProvider(project)
+		return credentialTestHelper.createCredential(
+			otherProject,
+			provider,
+			authMethod,
+			sessionName,
+			validationExp,
+			authUrl,
+			renewUrl,
+			httpMethod,
+			requestMode
+		)
 	}
 }

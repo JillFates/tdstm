@@ -10,17 +10,17 @@ import groovy.transform.CompileStatic
 @CompileStatic
 enum Color {
 
-	Black('black-tag'),
-	Brown('brown-tag'),
-	Red('red-tag'),
-	Orange('orange-tag'),
-	Yellow('yellow-tag'),
-	Green('green-tag'),
-	Cyan('cyan-tag'),
-	Blue('blue-tag'),
-	Purple('purple-tag'),
-	Pink('pink-tag'),
-	Unselected('unselected-tag')
+	Black('tag-black'),
+	Brown('tag-brown'),
+	Red('tag-red'),
+	Orange('tag-orange'),
+	Yellow('tag-yellow'),
+	Green('tag-green'),
+	Cyan('tag-cyan'),
+	Blue('tag-blue'),
+	Purple('tag-purple'),
+	Pink('tag-pink'),
+	Unselected('tag-unselected')
 
 	final String css
 

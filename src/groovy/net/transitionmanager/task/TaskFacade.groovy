@@ -127,6 +127,14 @@ class TaskFacade {
 		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.i18nMessage(Message.ApiActionTaskMessageTimedout))
 	}
 
+	/**
+	 * Updates the task status to DONE and records the date/time and description of the activity in the Task comment section.
+	 * It also adds a comment informing that this API Action has been by-passed.
+	 */
+	void byPassed() {
+		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.COMPLETED, messageSourceService.i18nMessage(Message.ApiActionTaskMessageByPassed))
+	}
+
 	private void addTaskCommentNoteAndUpdateStatus(String status, String message) {
 		Person whom = getWhom()
 		taskService.addNote(task, whom, message)

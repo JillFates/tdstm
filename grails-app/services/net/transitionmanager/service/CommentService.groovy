@@ -55,7 +55,6 @@ class CommentService implements ServiceMethods {
 	Scheduler quartzScheduler
 	SecurityService securityService
 	TaskService taskService
-	SequenceService sequenceService
 	UserPreferenceService userPreferenceService
 
 	/**

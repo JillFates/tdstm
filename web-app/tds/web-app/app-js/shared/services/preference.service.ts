@@ -53,6 +53,37 @@ export class PreferenceService {
 		}
 		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
 	}
+
+	/**
+	 * Get the user date format preference and translate it to the corresponding Kendo date format
+	 * @returns {Observable<string>}
+	 */
+	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
+		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
+			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
+	}
+
+	/**
+	 * Get the user preference datascript designer size (width/height)
+	 * @returns {Observable<{number, number}>}
+	 */
+	public getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
+		const unitSizeSeparator = 'x';
+		const defaultWidth = 580;
+		const defaultHeight = 680;
+
+		return this.getPreference(PREFERENCES_LIST.DATA_SCRIPT_SIZE)
+			.map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || '')
+			.map((size: string) => {
+				let measure: string[] = (size || '').split(unitSizeSeparator);
+				let	width = Number(measure.length &&  measure.shift()) || defaultWidth;
+				let height = Number(measure.length &&  measure.shift()) || defaultHeight;
+				return { width, height };
+			})
+			.filter((size: any) =>  size.width !== null && size.height !== null);
+	}
+
 }
 
 // add constants as needed
@@ -60,5 +91,6 @@ export const PREFERENCES_LIST = {
 	ASSET_JUST_PLANNING: 'assetJustPlanning',
 	ASSET_LIST_SIZE : 'assetListSize',
 	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
-	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT'
+	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
+	DATA_SCRIPT_SIZE: 'DataScriptSize'
 };

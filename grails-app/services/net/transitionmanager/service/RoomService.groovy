@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
@@ -10,8 +11,6 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import net.transitionmanager.security.Permission
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -21,7 +20,6 @@ import org.springframework.dao.DataIntegrityViolationException
 class RoomService implements ServiceMethods {
 
 	RackService rackService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	/**
