@@ -683,7 +683,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
-				action: assetComment.apiAction?.name
+				action: assetComment.apiAction?.name,
+				recipe: assetComment.taskBatch?.recipe?.name
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
