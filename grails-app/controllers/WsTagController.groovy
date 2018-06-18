@@ -22,7 +22,7 @@ class WsTagController implements ControllerMethods {
 			return
 		}
 
-		renderAsJson(tagService.list(filter.name, filter.description, filter.dateCreated, filter.lastUpdated))
+		renderAsJson(tagService.list(projectForWs, filter.name, filter.description, filter.dateCreated, filter.lastUpdated))
 	}
 
 	@HasPermission(Permission.TagCreate)
@@ -34,12 +34,7 @@ class WsTagController implements ControllerMethods {
 			return
 		}
 
-		Tag tag = tagService.create(newTag.name, newTag.description, newTag.color)
-
-		if (tag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(tag)))
-			return
-		}
+		Tag tag = tagService.create(projectForWs, newTag.name, newTag.description, newTag.color)
 
 		renderSuccessJson(tag.toMap())
 
@@ -54,31 +49,14 @@ class WsTagController implements ControllerMethods {
 			return
 		}
 
-		Tag tag = tagService.get(id)
-
-		if (!tag) {
-			return sendNotFound()
-		}
-
-		tag = tagService.update(tag, updatedTag.name, updatedTag.description, updatedTag.color)
-
-		if (tag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(tag)))
-			return
-		}
+		Tag tag = tagService.update(id, projectForWs, updatedTag.name, updatedTag.description, updatedTag.color)
 
 		renderSuccessJson(tag.toMap())
 	}
 
 	@HasPermission(Permission.TagDelete)
 	def delete(Long id) {
-		Tag tag = tagService.get(id)
-
-		if (tag) {
-			tagService.delete(tag)
+			tagService.delete(id, projectForWs)
 			return renderSuccessJson()
-		} else {
-			return sendNotFound()
-		}
 	}
 }

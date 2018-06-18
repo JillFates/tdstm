@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
 import grails.transaction.Transactional
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 /**
  * A service for dealing with tags
@@ -32,11 +33,11 @@ class TagService implements ServiceMethods {
 	 *
 	 */
 	@Transactional(readOnly = true)
-	List<Map> list(String name = null, String description = null, Date dateCreated = null, Date lastUpdated = null) {
+	List<Map> list(Project currentProject, String name = null, String description = null, Date dateCreated = null, Date lastUpdated = null) {
 		List whereFilters = ['t.project = :project']
 
 		Map params = [
-			project        : securityService.userCurrentProject
+			project        : currentProject
 		]
 
 		if (name) {
@@ -100,9 +101,9 @@ class TagService implements ServiceMethods {
 	 *
 	 * @return returns the new tag, or the tag object with error set.
 	 */
-	Tag create(String name, String description, Color color) {
-		Tag tag = new Tag(name: name, description: description, color: color, project: securityService.userCurrentProject)
-		return tag.save() ?: tag
+	Tag create(Project currentProject, String name, String description, Color color) {
+		Tag tag = new Tag(name: name, description: description, color: color, project: currentProject)
+		return tag.save(failOnError: true)
 	}
 
 	/**
@@ -115,9 +116,8 @@ class TagService implements ServiceMethods {
 	 *
 	 * @return The updated tag
 	 */
-	Tag update(Tag tag, String name = null, String description = null, Color color = null) {
-
-		securityService.assertCurrentProject(tag.project)
+	Tag update(Long id, Project currentProject, String name = null, String description = null, Color color = null) {
+		Tag tag = get(Tag, id, currentProject)
 
 		if (name) {
 			tag.name = name
@@ -131,7 +131,7 @@ class TagService implements ServiceMethods {
 			tag.color = color
 		}
 
-		return tag.save() ?: tag
+		return tag.save(failOnError: true)
 	}
 
 	/**
@@ -139,8 +139,8 @@ class TagService implements ServiceMethods {
 	 *
 	 * @param tag the tag to delete.
 	 */
-	void delete(Tag tag) {
-		securityService.assertCurrentProject(tag.project)
-		tag?.delete()
+	void delete(Long id, Project currentProject) {
+		Tag tag = get(Tag, id, currentProject)
+		tag.delete(failOnError: true)
 	}
 }
