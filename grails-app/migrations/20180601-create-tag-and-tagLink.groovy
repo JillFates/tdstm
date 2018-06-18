@@ -88,10 +88,6 @@ databaseChangeLog = {
 				constraints(nullable: 'false', primaryKey: 'true', primaryKeyName: 'tag_assetPK')
 			}
 
-			column(name: 'version', type: 'BIGINT(20)') {
-				constraints(nullable: 'false')
-			}
-
 			column(name: 'asset_id', type: 'BIGINT(20)') {
 				constraints(nullable: 'false')
 			}
@@ -102,10 +98,6 @@ databaseChangeLog = {
 
 			column(name: 'date_created', type: 'DATETIME') {
 				constraints(nullable: 'false')
-			}
-
-			column(name: 'last_updated', type: 'DATETIME') {
-				constraints(nullable: 'true')
 			}
 		}
 
@@ -156,31 +148,31 @@ databaseChangeLog = {
 				def perms = [
 					(Permission.TagCreate): [
 						group      : 'NONE',
-						description: 'Can view, create, update, merge, and delete tags.',
+						description: 'Can create tags',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
 					],
 
 					(Permission.TagDelete): [
 						group      : 'NONE',
-						description: 'Can view, create, update, merge, and delete tags.',
+						description: 'Can delete tags',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR']
 					],
 
 					(Permission.TagEdit)  : [
 						group      : 'NONE',
-						description: 'Can view, create, update, merge, and delete tags.',
+						description: 'Can update tags',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR']
 					],
 
 					(Permission.TagView)  : [
 						group      : 'NONE',
-						description: 'Can view, create, update, merge, and delete tags.',
+						description: 'Can view tags',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR', 'SUPERVISOR', 'EDITOR', 'USER']
 					],
 
 					(Permission.TagMerge) : [
 						group      : 'NONE',
-						description: 'Can view, create, update, merge, and delete tags.',
+						description: 'Can merge tags',
 						roles      : ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR']
 					]
 				]
