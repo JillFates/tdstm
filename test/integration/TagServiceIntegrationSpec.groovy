@@ -119,7 +119,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with no parameters"() {
 		when: 'Calling the list method with no parameters'
-			List results = tagService.list()
+			List results = tagService.list(project)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
@@ -138,7 +138,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with full name"() {
 		when: 'Calling the list method with the full name of a tag'
-			List results = tagService.list('grouping assets')
+			List results = tagService.list(project, 'grouping assets')
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
@@ -150,7 +150,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with partial name"() {
 		when: 'Calling the list method with a partial name of a tag'
-			List results = tagService.list('group')
+			List results = tagService.list(project, 'group')
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
@@ -162,7 +162,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with a name not in the db"() {
 		when: 'Calling the list method with a tag name not in the db'
-			List results = tagService.list('!@#@$!')
+			List results = tagService.list(project, '!@#@$!')
 		then: 'We get an empty list'
 			!results
 	}
@@ -170,7 +170,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with full description"() {
 		when: 'Calling the list method with a full description parameter'
-			List results = tagService.list('', 'Another description')
+			List results = tagService.list(project, '', 'Another description')
 		then: 'We get a list of map results'
 			results[0].id == tag2.id
 			results[0].Color == Color.Blue.name()
@@ -182,7 +182,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with partial description"() {
 		when: 'Calling the list method with a partial description parameter'
-			List results = tagService.list('', 'Anot')
+			List results = tagService.list(project, '', 'Anot')
 		then: 'We get a list of map results'
 			results[0].id == tag2.id
 			results[0].Color == Color.Blue.name()
@@ -194,7 +194,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with a description not in the db"() {
 		when: 'Calling the list method with a description that does not match any in the db'
-			List results = tagService.list('', 'This will not match.')
+			List results = tagService.list(project, '', 'This will not match.')
 		then: 'We get an empty list'
 			!results
 	}
@@ -202,7 +202,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with dateCreated"() {
 		when: 'Calling the list method with a date created parameter'
-			List results = tagService.list('', '', now)
+			List results = tagService.list(project, '', '', now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
@@ -221,14 +221,14 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with dateCreated tomorrow"() {
 		when: 'Calling the list method with a date created parameter that does not match any tag'
-			List results = tagService.list('', '', now + 1)
+			List results = tagService.list(project, '', '', now + 1)
 		then: 'We get an empty list'
 			!results
 	}
 
 	void "test list with lastUpdated"() {
 		when: '\'Calling the list method with a lastUpdated parameter'
-			List results = tagService.list('', '', null, now)
+			List results = tagService.list(project, '', '', null, now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
@@ -247,7 +247,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with lastUpdated tomorrow"() {
 		when: 'Calling the list method with a last updated parameter that does not match any tag '
-			List results = tagService.list('', '', null, now + 1)
+			List results = tagService.list(project, '', '', null, now + 1)
 		then: 'We get an empty list'
 			!results
 	}
@@ -255,7 +255,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with all parameters"() {
 		when: 'Calling the list method with all parameters set'
-			List results = tagService.list('group', 'this is', now, now)
+			List results = tagService.list(project, 'group', 'this is', now, now)
 		then: 'We get a list of map results'
 			results[0].id == tag1.id
 			results[0].Color == Color.Black.name()
