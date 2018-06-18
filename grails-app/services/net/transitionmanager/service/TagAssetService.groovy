@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import grails.transaction.Transactional
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 
@@ -9,22 +10,7 @@ import net.transitionmanager.domain.TagAsset
  * A service for managing the relationship of Tags to Assets.
  */
 @Transactional
-class TagAssetService {
-
-	TagService      tagService
-	SecurityService securityService
-
-	/**
-	 * Retrieves a tagAssets by id
-	 *
-	 * @param tagAssetId The id of the tagAsset to lookup
-	 *
-	 * @return The looked up tagAsset
-	 */
-	@Transactional(readOnly = true)
-	TagAsset get(Long tagAssetId) {
-		return TagAsset.get(tagAssetId)
-	}
+class TagAssetService implements ServiceMethods {
 
 	/**
 	 * Gets a list of tagAssets for an asset.
@@ -34,8 +20,8 @@ class TagAssetService {
 	 * @return A list of tagAssets for an asset.
 	 */
 	@Transactional(readOnly = true)
-	List<TagAsset> list(AssetEntity asset) {
-		securityService.assertCurrentProject(asset?.project)
+	List<TagAsset> list(Project currentProject, Long assetId) {
+		AssetEntity asset = get(AssetEntity, assetId, currentProject)
 
 		return TagAsset.findAllWhere(asset: asset)
 	}
@@ -48,8 +34,8 @@ class TagAssetService {
 	 * @return A list of tags for an asset.
 	 */
 	@Transactional(readOnly = true)
-	List<Tag> getTags(AssetEntity asset) {
-		securityService.assertCurrentProject(asset?.project)
+	List<Tag> getTags(Project currentProject, Long assetId) {
+		AssetEntity asset = get(AssetEntity, assetId, currentProject)
 
 		return TagAsset.findAllWhere(asset: asset)*.tag
 	}
@@ -62,12 +48,11 @@ class TagAssetService {
 	 *
 	 * @return A List of tagAssets linking tags, to assets.
 	 */
-	List<TagAsset> applyTags(List<Long> tagIds, AssetEntity asset) {
-		securityService.assertCurrentProject(asset?.project)
+	List<TagAsset> applyTags(Project currentProject, List<Long> tagIds, Long assetId) {
+		AssetEntity asset = get(AssetEntity, assetId, currentProject)
 
 		tagIds.collect { Long tagId ->
-			Tag tag = tagService.get(tagId)
-			securityService.assertCurrentProject(tag?.project)
+			Tag tag = get(Tag, tagId, currentProject)
 
 			TagAsset tagAsset = new TagAsset(tag: tag, asset: asset)
 			asset.refresh()
@@ -80,17 +65,15 @@ class TagAssetService {
 	 *
 	 * @param tagAssetIds the id of the tagAsset to remove.
 	 */
-	void removeTags(List<Long> tagAssetIds) {
+	void removeTags(Project currentProject, List<Long> tagAssetIds) {
 		tagAssetIds.each { Long id ->
-			TagAsset link = get(id)
-
-			if (!link) {
-				throw new EmptyResultException('Tag not found, or already removed.')
+			TagAsset tagAsset = get(TagAsset, id, currentProject)
+			if (currentProject.id != tagAsset?.tag?.project?.id) {
+				securityService.reportViolation("attempted to access asset from unrelated project (asset ${tagAsset?.id})")
+				throw new EmptyResultException()
 			}
 
-			securityService.assertCurrentProject(link?.tag?.project)
-
-			link.delete(flush: true)
+			tagAsset.delete(flush: true)
 		}
 	}
 
@@ -103,9 +86,9 @@ class TagAssetService {
 	 *
 	 * @return A list of AssetTags that have been updated.
 	 */
-	List<TagAsset> merge(Tag primary, Tag secondary) {
-		securityService.assertCurrentProject(primary?.project)
-		securityService.assertCurrentProject(secondary?.project)
+	List<TagAsset> merge(Project currentProject, Long primaryId, Long secondaryId) {
+		Tag primary = get(Tag, primaryId, currentProject)
+		Tag secondary = get(Tag, secondaryId, currentProject)
 
 		List<TagAsset> tagAssets = TagAsset.findAllWhere(tag: secondary)
 

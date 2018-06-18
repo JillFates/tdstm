@@ -7,7 +7,9 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import net.transitionmanager.service.TagService
@@ -123,68 +125,9 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 		now = TimeUtil.nowGMT().clearTime()
 	}
 
-	void 'Test custom MySQL dialect'() {
-		when: 'Executing a HQL query with group_concat and Json_object'
-			List<Map> results = AssetEntity.executeQuery("""
-				SELECT new map(
-					a.id as id, 
-					a.assetType as type, 
-					a.assetClass as assetClass, 
-					CONCAT(
-						'[',
-						if(
-							ta.id,
-							group_concat(
-								json_object('name', t.name, 'description', t.description, 'color', t.color)
-							),
-							''
-						), 
-						']'
-					) as tags) 
-				from AssetEntity a 
-				left outer join a.tagAssets ta
-				left outer join ta.tag t
-				where ta.id is not null
-				group by a.id
-			""")
-		then: 'results from a joined table are returned as a JSON string in one column'
-			results.size() == 3
-
-			results[0].id == device.id
-			results[0].assetClass == AssetClass.DEVICE
-			results[0].type == 'Server'
-			results[0].tags == '[{"name": "grouping assets", "color": "Black", "description": "This is a description"}]'
-
-			results[1].id == device2.id
-			results[1].assetClass == AssetClass.DEVICE
-			results[1].type == 'Server'
-			results[1].tags == '[{"name": "grouping assets", "color": "Black", "description": "This is a description"},{"name": "some assets", "color": "Blue", "description": "Another description"}]'
-
-			results[2].id == device3.id
-			results[2].assetClass == AssetClass.DEVICE
-			results[2].type == 'Server'
-			results[2].tags == '[{"name": "other", "color": "Red", "description": "Yet another description"}]'
-	}
-
-	void 'Test get'() {
-		when: 'getting a TagAsset by id'
-			TagAsset tagAsset = tagAssetService.get(tagAsset1.id)
-
-		then: 'The TagAsset is returned'
-			tagAsset.tag == tag1
-	}
-
-	void 'Test get of AssetTag for an id that does not exist'() {
-		when: 'getting an tagAssets by id, for an asset that does not exist'
-			TagAsset tagAsset = tagAssetService.get(0)
-
-		then: 'no assets are returned'
-			!tagAsset
-	}
-
 	void 'Test list'() {
 		when: 'Getting a list of tagAssets by asset'
-			List<TagAsset> tagAssets = tagAssetService.list(device2)
+			List<TagAsset> tagAssets = tagAssetService.list(project, device2.id)
 
 		then: 'a list of tagAssets are returned for the asset'
 			tagAssets.size() == 2
@@ -194,15 +137,15 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test list with asset from another project'() {
 		when: 'trying to get a list of tagAssets from an asset, that belongs to another project'
-			tagAssetService.list(device3)
+			tagAssetService.list(project, device3.id)
 
 		then: 'An exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test getTags'() {
 		when: 'getting tags based on an asset'
-			List<TagAsset> tagAssets = tagAssetService.getTags(device2)
+			List<TagAsset> tagAssets = tagAssetService.getTags(project, device2.id)
 
 		then: 'a list of tags is returned'
 			tagAssets.size() == 2
@@ -212,15 +155,15 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test getTags with asset from another project'() {
 		when: 'trying to get a list of tags, from an asset, that belongs to another project'
-			tagAssetService.getTags(device3)
+			tagAssetService.getTags(project, device3.id)
 
 		then: 'an exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test add tags'() {
 		when: 'adding a tag(s) to an asset'
-			List<TagAsset> tagAssets = tagAssetService.applyTags([tag2.id], device)
+			List<TagAsset> tagAssets = tagAssetService.applyTags(project, [tag2.id], device.id)
 
 		then: 'a list of tagAssets is returned'
 			tagAssets.size() == 1
@@ -229,22 +172,22 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test add tag from another project'() {
 		when: 'trying to add tags from another project to an asset'
-			tagAssetService.applyTags([tag3.id], device)
+			tagAssetService.applyTags(project, [tag3.id], device.id)
 		then: 'an exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test add tag to an asset from another project'() {
 		when: 'trying to add tags to an asset from another project'
-			tagAssetService.applyTags([tag1.id], device3)
+			tagAssetService.applyTags(project, [tag1.id], device3.id)
 		then: 'an exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test remove tags'() {
 		when: 'removing a tagAsset, from an asset, and checking the list of tagAssets'
-			tagAssetService.removeTags([tagAsset3.id])
-			List<TagAsset> tagAssets = tagAssetService.list(device2)
+			tagAssetService.removeTags(project, [tagAsset3.id])
+			List<TagAsset> tagAssets = tagAssetService.list(project, device2.id)
 		then: 'The list of tagAssets will not contain the delete tagAsset'
 			tagAssets.size() == 1
 			tagAssets[0].tag == tag1
@@ -252,32 +195,33 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test remove tags from another project'() {
 		when: 'trying to remove a tagAsset from an asset that belongs to another project'
-			tagAssetService.removeTags([tagAsset4.id])
-			tagAssetService.list(device2)
+			tagAssetService.removeTags(project, [tagAsset4.id])
 		then: 'an exception it thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test asset cascade delete'() {
 		when: 'deleting an asset'
 			device.delete(flush: true)
-			List<TagAsset> tagAssets = TagAsset.list()
+			List<TagAsset> tagAssets = tagAssetService.getTags(project, device.id)
 		then: 'all related tagAssets are deleted'
-			tagAssets.size() == 3
+			thrown InvalidParamException
 	}
 
 	void 'Test tag cascade delete'() {
 		when: 'deleting a tag'
 			tag1.delete(flush: true)
-			List<TagAsset> tagAssets = TagAsset.list()
+			List<TagAsset> tagAssets = tagAssetService.getTags(project, device.id)
+			List<TagAsset> tagAssets2 = tagAssetService.getTags(project, device2.id)
 		then: 'all related tagAssets are deleted'
-			tagAssets.size() == 2
+			tagAssets.size() == 0
+			tagAssets2.size() == 1
 	}
 
 	void 'Test tagMerge'() {
 		when: 'merging one tag into another'
 			long tagId = tag1.id
-			List<TagAsset> tagAssets = tagAssetService.merge(tag2, tag1)
+			List<TagAsset> tagAssets = tagAssetService.merge(project, tag2.id, tag1.id)
 			Tag tag = Tag.get(tagId)
 
 		then: 'the tag is deleted and all the tagAssets are updated with that tag'
@@ -289,16 +233,16 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	void 'Test tagMerge primary tag from another project'() {
 		when: 'trying to merge a tag from another project into a tag'
 			long tagId = tag1.id
-			tagAssetService.merge(tag3, tag1)
+			tagAssetService.merge(project, tag3.id, tag1.id)
 		then: 'an exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 
 	void 'Test tagMerge secondary tag from another project'() {
 		when: 'trying to merge a tag from another project into a tag'
 			long tagId = tag1.id
-			tagAssetService.merge(tag1, tag3)
+			tagAssetService.merge(project, tag1.id, tag3.id)
 		then: 'an exception is thrown'
-			thrown IllegalArgumentException
+			thrown EmptyResultException
 	}
 }
