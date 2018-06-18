@@ -79,7 +79,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -108,7 +108,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -134,7 +134,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -177,7 +177,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -294,7 +294,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
@@ -340,10 +340,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -403,10 +403,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -462,10 +462,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.custom1) {
@@ -508,10 +508,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 
@@ -557,10 +557,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 2
+			etlProcessor.finalResult().domains.size() == 2
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -574,7 +574,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.resultsMap().domains[1]) {
+			with(etlProcessor.finalResult().domains[1]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 2
 				with(data[0].fields.assetName) {
@@ -612,7 +612,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
 			etlProcessor.column('application id') != null
@@ -658,10 +658,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {

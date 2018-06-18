@@ -6,14 +6,11 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.JsonUtil
-import com.tdssrc.grails.NumberUtil
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
-import groovy.json.JsonOutput
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
@@ -160,7 +157,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-			JSONObject jsonResult = JSON.parse(new JSON(etlProcessor.result).toString())
+			JSONObject jsonResult = JSON.parse(new JSON(etlProcessor.finalResult()).toString())
 
 		then: 'Results should contain Application domain results associated'
 			with(jsonResult) {

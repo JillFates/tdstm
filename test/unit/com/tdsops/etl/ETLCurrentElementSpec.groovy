@@ -194,7 +194,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()){
+			with (etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0], DomainResult) {
@@ -248,7 +248,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0]) {
@@ -318,7 +318,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0]) {
@@ -399,7 +399,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -534,7 +534,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()

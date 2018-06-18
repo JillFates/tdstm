@@ -43,7 +43,7 @@ class ETLProcessorResult {
 	/**
 	 * Debug Console content filed used to create the final result
 	 */
-	String debugConsole
+	String debugConsole = ''
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
@@ -252,7 +252,7 @@ class ETLProcessorResult {
 		return results
 	}
 
-	void setFieldLabelMapInResults(Map<String, Map<String, String>> map){
+	void addFieldLabelMapInResults(Map<String, Map<String, String>> map){
 		domains.each {DomainResult domainResult ->
 			if (map?.containsKey(domainResult.domain)) {
 				domainResult.setFieldLabelMap(map[domainResult.domain])

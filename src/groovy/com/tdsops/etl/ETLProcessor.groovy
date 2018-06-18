@@ -3,7 +3,6 @@ package com.tdsops.etl
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import getl.data.Field
-import grails.converters.JSON
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -1153,22 +1152,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *    domains - Data structure with each of the domains processed in DataScript
 	 *    consoleLog - A String containing the console log output (optional)
 	 *
+	 * An instance of ETLProcessorResult will be returned and it needs to be converted to JSON using
+	 * com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 * @param includeConsoleLog - flag if the console log should appear in the results (default false)
-	 * @return Map - the results
-	 */
-	Map<String, ?> resultsMap(Boolean includeConsoleLog=false) {
-		this.result.toMap(includeConsoleLog)
-	}
-
-	/**
-	 *
-	 * @param includeConsoleLog
 	 * @return an instance of ETLProcessorResult
+	 * @see com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 */
-	ETLProcessorResult finalResults(Boolean includeConsoleLog = false){
-		this.result.setFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
+	ETLProcessorResult finalResult(Boolean includeConsoleLog = false){
+		this.result.addFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
 		if (includeConsoleLog) {
 			this.result.debugConsole = this.debugConsole.content()
+		} else {
+			this.result.debugConsole = ''
 		}
 		return this.result
 	}

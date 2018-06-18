@@ -13,11 +13,9 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import com.tdssrc.grails.NumberUtil
 import spock.lang.See
-import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -153,7 +151,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -255,7 +253,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -571,7 +569,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -715,7 +713,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -779,7 +777,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -907,7 +905,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -1019,7 +1017,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -1235,7 +1233,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Rack.name()
@@ -1383,7 +1381,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -1507,7 +1505,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -1599,7 +1597,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -1673,7 +1671,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -1779,7 +1777,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -1885,7 +1883,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -2070,7 +2068,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 3
 
 				with(domains[0]) {
@@ -2270,7 +2268,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 
 				with(domains[0]) {
@@ -2394,7 +2392,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 
 				with(domains[0]) {
@@ -2518,7 +2516,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 
 				with(domains[0]) {
@@ -2646,7 +2644,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 
 				with(domains[0]) {
@@ -2755,7 +2753,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 
 				with(domains[0]) {
@@ -2860,7 +2858,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 2
 
 				with(domains[0]) {

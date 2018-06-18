@@ -84,7 +84,7 @@ class ScriptProcessorService {
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
-		os << (etlProcessor.resultsMap(includeConsoleLog) as JSON)
+		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
 		os.close()
 
 		progressCallback.reportProgress(
@@ -151,7 +151,7 @@ class ScriptProcessorService {
 
 	     if (etlProcessor) {
 		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.resultsMap()
+		     result.data = etlProcessor.finalResult()
 	     }
 
         return result

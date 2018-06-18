@@ -6,10 +6,12 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.etl.TDSExcelDriver
+import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.WorkbookUtil
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
+import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -80,6 +82,8 @@ class ScriptProcessorServiceSpec extends Specification {
 		service.customDomainService.fieldSpecsWithCommon(_) >> { Project project ->
 			fieldSpecsMap
 		}
+
+		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 	}
 
 	def cleanup() {
@@ -473,7 +477,7 @@ application id,vendor name,technology,location
 			outputFilename != null
 
 		and: 'Service result returns the instance of ETLProcessor and its results'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
