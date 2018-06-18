@@ -225,8 +225,10 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('agentMethod');
 				}
 				this.httpMethodList.push('Select...');
-				this.apiActionModel.httpMethod = this.httpMethodList[0];
 				this.httpMethodList.push(...result.data.httpMethod);
+				if (!this.apiActionModel.httpMethod) {
+					this.apiActionModel.httpMethod = this.httpMethodList[0];
+				}
 			},
 			(err) => console.log(err));
 	}
