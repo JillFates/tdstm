@@ -85,7 +85,6 @@ class TaskService implements ServiceMethods {
 	def personService
 	def progressService
 	Scheduler quartzScheduler
-	def securityService
 	def sequenceService
 	CustomDomainService customDomainService
 

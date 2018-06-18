@@ -156,7 +156,6 @@ class AssetEntityService implements ServiceMethods {
 	def projectService
 	def rackService
 	def roomService
-	def securityService
 	def taskService
 	def userPreferenceService
     def assetService

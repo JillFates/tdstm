@@ -28,7 +28,6 @@ class PartyRelationshipService implements ServiceMethods {
 
 	JdbcTemplate jdbcTemplate
 	ProjectService projectService
-	SecurityService securityService
 
 	/**
 	 * Used to create a party relationship

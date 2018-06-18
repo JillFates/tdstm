@@ -8,22 +8,6 @@ import net.transitionmanager.domain.Tag
  */
 @Transactional
 class TagService implements ServiceMethods {
-	SecurityService securityService
-
-	/**
-	 * Looks up a tag based on id.
-	 *
-	 * @param tagId the id of the tag
-	 *
-	 * @return the looked up tag, if it exist, null otherwise.
-	 */
-	@Transactional(readOnly = true)
-	Tag get(Long tagId) {
-		Tag tag = Tag.get(tagId)
-		securityService.assertCurrentProject(tag.project)
-
-		return tag
-	}
 
 	/**
 	 * Lists tags by project with optional filtering.
