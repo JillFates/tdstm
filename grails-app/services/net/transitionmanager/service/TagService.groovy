@@ -7,7 +7,7 @@ import net.transitionmanager.domain.Tag
  * A service for dealing with tags
  */
 @Transactional
-class TagService {
+class TagService implements ServiceMethods {
 	SecurityService securityService
 
 	/**
