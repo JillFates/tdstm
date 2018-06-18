@@ -4,7 +4,6 @@ import com.tds.asset.AssetEntity
 
 class TagAsset {
 	Date      dateCreated
-	Date      lastUpdated
 
 	static belongsTo = [tag: Tag, asset: AssetEntity]
 
