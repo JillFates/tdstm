@@ -1,7 +1,9 @@
 dependency-batch-record-detail-fields
 
+  $grid-left-padding: 7px
+
   .gray-background
-    background-color: $color--grey
+    background-color: $color--grey-kendo-header
 
   label
     font-size: 15px
@@ -44,9 +46,18 @@ dependency-batch-record-detail-fields
         background-color: #f6f6f6
 
     kendo-grid
-      .import-value-input
-        width: 95%
-        margin-left: 5px
+      .k-header
+        padding-left: $grid-left-padding
+      .k-grid-table
+        td
+          padding-left: $grid-left-padding
+        .import-value
+          padding-left: 2px
+          .import-value-input
+            padding: 1px 4px 1px 4px
+            width: 95%
+            height: inherit
+            // margin-left: 5px
 
     .footer
       margin-top: 30px
