@@ -354,13 +354,13 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_td">
 								<g:link controller="application" action="list"
-										params="[filter:'application', planMethodology:counter.key]" class="links">
+										params="[filter:'application', planMethodology:counter.key, ufp:'true']" class="links">
 									${counter.value}
 								</g:link>
 							</td>
 							<td>
 								<g:link controller="application" action="list"
-										params="[filter:'application', planMethodology:counter.key]" class="links">
+										params="[filter:'application', planMethodology:counter.key, ufp:'true']" class="links">
 									${counter.key}
 								</g:link>
 							</td>

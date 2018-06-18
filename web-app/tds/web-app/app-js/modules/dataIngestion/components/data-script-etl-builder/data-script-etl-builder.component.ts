@@ -10,7 +10,7 @@ import {
 } from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import { PreferenceService } from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -26,9 +26,6 @@ import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	@ViewChild('resizableForm') resizableForm: ElementRef;
-	private width = 0;
-	private height = 0;
-	private GRID_HEIGHT = 532;
 	private collapsed = {
 		code: true,
 		sample: false,
@@ -60,12 +57,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
-
-		this.dataIngestionService.getDataScriptDesignerSize()
-			.subscribe((size: {width: number, height: number}) => {
-				this.width = size.width;
-				this.height = size.height;
-			});
 	}
 
 	constructor(
@@ -74,11 +65,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dataIngestionService: DataIngestionService,
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
-		private promptService: UIPromptService,
-		private preferenceService: PreferenceService) {
+		private promptService: UIPromptService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
-		this.modalOptions = { isFullScreen: true, isResizable: true };
+		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
 	}
 
 	/**
@@ -97,7 +87,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.testScriptProgress.progressKey = result.data.progressKey;
-				this.setTestScriptProgressInterval();
+				this.setProgressLoop();
 			} else {
 				this.operationStatus.test.state = CHECK_ACTION.INVALID;
 			}
@@ -105,27 +95,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Clears out the Test Script interval loop.
+	 * Initializes the Progress loop.
 	 */
-	private clearTestScriptProgressInterval(): void {
-		clearInterval(this.testScripInterval);
+	private setProgressLoop(): void {
+		this.testScriptProgress.currentProgress = 0;
+		this.progressLoop();
 	}
 
 	/**
-	 * Creates an interval loop to retreive Test Script current progress.
+	 * Progress loop, this function is called recursively until the progress finish.
 	 */
-	private setTestScriptProgressInterval(): void {
-		this.testScriptProgress.currentProgress = 1;
-
-		this.testScripInterval = setInterval(() => {
-			this.getTestScriptProgress();
-		}, PROGRESSBAR_INTERVAL_TIME);
-	}
-
-	/**
-	 * Operation of the Test Script interval that will be executed n times in a loop.
-	 */
-	private getTestScriptProgress(): void {
+	private progressLoop(): void {
 		this.dataIngestionService.getJobProgress(this.testScriptProgress.progressKey)
 			.subscribe( (response: ApiResponseModel) => {
 				let currentProgress = response.data.percentComp;
@@ -136,8 +116,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
 					this.scriptTestResult.error = response.data.detail;
-					this.clearTestScriptProgressInterval();
-				// On Success
+					// On Success
 				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
 						let scripTestFilename = response.data.detail;
@@ -147,11 +126,16 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 						this.importAssetsService.getFileContent(scripTestFilename)
 							.subscribe(result => {
 								this.scriptTestResult.domains = result.domains;
+								this.scriptTestResult.consoleLog = result.consoleLog;
+								this.consoleSettings.scriptTestResult = this.scriptTestResult;
 							});
 					}, 500);
-					this.clearTestScriptProgressInterval();
+				} else {
+					setTimeout(() => {
+						this.progressLoop();
+					}, 2000)
 				}
-		});
+			});
 	}
 
 	/**
@@ -189,19 +173,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				updated: this.operationStatus.save === 'success',
 				newEtlScriptCode: this.script
 			};
-			this.saveSizeDataScriptDesigner()
-				.subscribe(() => this.close(result), (error) => console.log(error));
+
+			this.close(result);
 		}
-	}
-
-	private saveSizeDataScriptDesigner(): Observable<any> {
-		const { width, height } = this.isWindowMaximized ? this.initialWindowStyle : this.resizableForm.nativeElement.style;
-
-		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
-			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
-			.shift();
-
-		return this.dataIngestionService.saveSizeDataScriptDesigner(sizeDataScript.width, sizeDataScript.height);
 	}
 
 	private onSave(): void {
@@ -262,7 +236,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private extractSampleDataFromFile() {
 		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
 			this.sampleDataModel = result;
-			this.setGridHeight();
 		});
 	}
 
@@ -331,21 +304,4 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	protected restoreWindow() {
 		this.isWindowMaximized = false;
 	}
-
-	/**
-	 * Based on data rows of sample data set the grid height
-	 */
-	private setGridHeight() {
-		if (this.sampleDataModel.data && this.sampleDataModel.data.length) {
-			this.sampleDataModel.gridHeight = parseInt(this.resizableForm.nativeElement.style.height, 10)  - this.GRID_HEIGHT;
-			this.resizableForm.nativeElement.style.minHeight = this.resizableForm.nativeElement.style.height
-		} else {
-			this.resizableForm.nativeElement.style.minHeight = '';
-		}
-	}
-
-	public onResizeEvent(eventName: string) {
-		this.setGridHeight();
-	}
-
 }

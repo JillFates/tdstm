@@ -28,17 +28,17 @@ export class ScriptValidSyntaxResultModel {
 }
 
 export class ScriptConsoleSettingsModel {
-	top: string;
-	left: string;
-	height: string;
-	width: string;
+	top: number;
+	left: number;
+	height: number;
+	width: number;
 	scriptTestResult: ScriptTestResultModel;
 
 	constructor() {
-		this.top = '30px';
-		this.left = '30px';
-		this.height = '200px';
-		this.width = '500px';
+		this.top = 30;
+		this.left = 30;
+		this.height = 500;
+		this.width = 600;
 		this.scriptTestResult = new ScriptTestResultModel();
 	};
 }

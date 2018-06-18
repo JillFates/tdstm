@@ -141,7 +141,7 @@ class Credential {
 	 * Used to validate if the validationExpression is syntactically correct
 	 */
 	static Closure validationExpressionValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+		List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
@@ -162,7 +162,7 @@ class Credential {
 	 * based on the authentication method. This property is required for COOKIE, HEADER and JWT methods.
 	 */
 	static Closure authenticationUrlValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+		List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'

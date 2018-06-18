@@ -8,10 +8,15 @@ import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../..
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
+import {KEYSTROKE} from '../../../../shared/model/constants';
+import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html',
+	host: {
+		'(keydown)': 'keyDownHandler($event)'
+	}
 })
 export class DependencyBatchDetailDialogComponent implements OnInit {
 
@@ -41,6 +46,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		selected: {id: 1, name: 'All'}
 	};
 	private batchRecordsUpdatedFlag = false;
+	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
@@ -93,13 +99,16 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private prepareColumnsModel(): void {
 		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
+		const {fieldNameList, fieldLabelMap} = this.importBatchModel;
+
 		// const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
-		let fieldColumns: Array<GridColumnModel> = this.importBatchModel.fieldNameList.map( field => {
+		let fieldColumns: Array<GridColumnModel> = fieldNameList.map( field => {
 			const column: GridColumnModel = new GridColumnModel();
-			column.label = field;
-			column.property = `currentValues.${field}`;
+			column.label = (fieldLabelMap && fieldLabelMap[field]) || field;
+			column.properties = ['currentValues', field];
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
+			column.type = 'dynamicValue';
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
@@ -234,5 +243,15 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private batchRecordCanAction(batchRecord: ImportBatchRecordModel): boolean {
 		return batchRecord.status.code === BatchStatus.PENDING || batchRecord.status.code === BatchStatus.IGNORED;
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	private keyDownHandler($event: KeyboardEvent): void {
+		if ($event && $event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 }

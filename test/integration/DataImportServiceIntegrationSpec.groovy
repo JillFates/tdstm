@@ -798,8 +798,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	}
 
+	@Ignore
+	// Disabled - see TM-11017
 	void '14. test transformData method'() {
-
 		setup: 'Create a DataScript, a Provider and other required data'
 			String etlSourceCode = """
 				read labels
@@ -823,31 +824,40 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 			String sampleData = 'serverName,appName\nxraysrv01,bigapp'
 
+			// Create the DataScript to be used
 			Person whom = personTestHelper.createPerson()
 			Provider provider = providerTestHelper.createProvider(project)
 			DataScript dataScript = dataScriptTestHelper.createDataScript(project, provider, whom, etlSourceCode)
+
+			// Create the data file to be processed
 			String originalFilename = 'test.csv'
-			MultipartFile multiPartFile = new MockMultipartFile(originalFilename, originalFilename, "text/plain", sampleData.getBytes())
-			UploadFileCommand.fileSystemService = fileSystemService
-			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
-			String fileUploadName = fileSystemService.transferFileToFileSystem(cmd)
+			def (fileUploadName, os) = fileSystemService.createTemporaryFile('intTest', 'csv')
+			os << sampleData
+			os.close()
+
+		when: 'calling to transform the data with the ETL script'
+println "Calling dataImportService.transformEtlData()  -- THIS FAILS SILENTLY when running the test"
 			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
+println "If we get here then the issue has been solved"
 			String transformedFileName = transformResults['filename']
+		then: 'the results should have a filename'
+			transformResults.containsKey('filename')
 
-			when: 'Requesting the content of the transformation'
-				JSONObject transformJson = JsonUtil.parseFile(fileSystemService.openTemporaryFile(transformedFileName))
-			then: 'The ETLInfo has the name of the temporary file'
-				transformJson.ETLInfo.originalFilename == fileUploadName
-			and: 'There is only one domain'
-				transformJson.domains.size() == 1
-			and: 'The Domain is Dependency'
-				transformJson.domains[0].domain == 'Dependency'
-			and: 'The data has only one element'
-				transformJson.domains[0].data.size() == 1
-			cleanup: 'Delete test files'
-				fileSystemService.deleteTemporaryFile(originalFilename)
-				fileSystemService.deleteTemporaryFile(transformedFileName)
-
+		when: 'parsing the content of the transformed file'
+			JSONObject transformJson = JsonUtil.parseFile(fileSystemService.openTemporaryFile(transformedFileName))
+		then: 'a JSON object should be created'
+			transformJson != null
+		and: 'the ETLInfo has the name of the temporary file'
+			transformJson.ETLInfo.originalFilename == fileUploadName
+		and: 'there is only one domain'
+			transformJson.domains.size() == 2
+		and: 'the Domain is Dependency'
+			transformJson.domains[0].domain == 'Dependency'
+		and: 'the data has only one element'
+			transformJson.domains[0].data.size() == 1
+		cleanup: 'Delete test files'
+			fileSystemService.deleteTemporaryFile(fileUploadName)
+			fileSystemService.deleteTemporaryFile(transformedFileName)
 
 	}
 

@@ -55,7 +55,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
+		validator = new ETLFieldsValidator()
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))

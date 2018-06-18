@@ -22,6 +22,7 @@ export enum ActionType {
 export class GridColumnModel {
 	label: string;
 	property: string;
+	properties ?: Array<string>; // use this when it's a multi-level object accessor. i.e. [dataItem.currentValues.name]
 	type: string;
 	format?: string;
 	width: number;

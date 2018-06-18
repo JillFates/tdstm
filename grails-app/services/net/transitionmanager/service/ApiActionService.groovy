@@ -306,7 +306,12 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
-					agent.invoke(action.agentMethod, actionRequest)
+					if (context?.moveEvent?.apiActionBypass) {
+						log.info('By passing API Action invocation with following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest)
+						taskFacade.byPassed()
+					} else {
+						agent.invoke(action.agentMethod, actionRequest)
+					}
 				} catch (Exception e) {
 					log.warn(e.message)
 					taskFacade.error(e.message)

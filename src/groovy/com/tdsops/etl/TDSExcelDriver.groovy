@@ -73,7 +73,7 @@ class TDSExcelDriver extends ExcelDriver {
 
 
 	@Override
-	protected long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
+	long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
 
 		if(!workbook) {
 			this.readWorkbookAndSheets(dataset)
@@ -120,7 +120,7 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	@Override
-	protected List<Field> fields(Dataset dataset) {
+	List<Field> fields(Dataset dataset) {
 
 		dataset.params.listName = dataset.params.listName?:0
 		if(!fieldsMap.containsKey(dataset.params.listName)){
