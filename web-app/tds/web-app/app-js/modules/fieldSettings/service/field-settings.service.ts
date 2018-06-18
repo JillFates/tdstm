@@ -65,10 +65,10 @@ export class FieldSettingsService {
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
-	getFieldColorsKeys(): string[] {
-		return Object.keys(FIELD_COLORS);
-	}
-
+	/**
+	 * Accept the previous legacy field color value and returns the new corresponding color;
+	 * @returns {String}
+	 */
 	mapColorFromLegacyImportantSchema(legacyValue: string): string {
 		const mapSchemas = {
 			'I': 'G',   // Important to Green
