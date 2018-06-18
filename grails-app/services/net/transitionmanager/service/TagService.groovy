@@ -144,7 +144,7 @@ class TagService {
 			tag.color = color
 		}
 
-		return tag.save()
+		return tag.save() ?: tag
 	}
 
 	/**
