@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { FIELD_COLORS} from '../../../../modules/fieldSettings/model/field-settings.model';
 
 @Component({
 	selector: 'popup-legends',
@@ -10,7 +9,6 @@ import { FIELD_COLORS} from '../../../../modules/fieldSettings/model/field-setti
 })
 
 export class PopupLegendsComponent {
-	public colors = FIELD_COLORS;
 	private show = false;
 
 	public onToggle(): void {

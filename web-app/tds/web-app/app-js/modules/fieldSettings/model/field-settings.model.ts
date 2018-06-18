@@ -45,14 +45,6 @@ export class FieldImportance {
 	};
 }
 
-export const FIELD_COLORS = {
-	Y: {name: 'yellow', color: '#F9FF90'},
-	G: {name: 'green', color: '#D4F8D4'},
-	B: {name: 'blue', color: '#3C8CBC'},
-	P: {name: 'pink', color: '#FFC0CB'},
-	O: {name: 'orange', color: '#FFA500'},
-	N: {name: 'no-color', color: '#DDDDDD'},
-	U: {name: 'unimportant', color: '#F4F4F4'}
-};
+export const FIELD_COLORS = ['Y', 'G', 'B', 'P', 'O', 'N', 'U'];
 
 export const FIELD_NOT_FOUND = 'Field Not Found';

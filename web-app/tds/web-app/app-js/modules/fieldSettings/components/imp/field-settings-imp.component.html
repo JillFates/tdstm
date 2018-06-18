@@ -1,4 +1,4 @@
-<div *ngIf="!editMode" [ngClass]="model" [style.background-color]="colors[mapLegacyColor(model)].color" class="text-center">
+<div *ngIf="!editMode" [ngClass]="mapLegacyColor(model)" class="text-center">
     {{mapLegacyColor(model)}}
 </div>
 <div *ngIf="editMode" [ngClass]="model" class="text-center">
@@ -7,3 +7,4 @@
         <ng-template #elseBlock>{{value}}</ng-template>
     </span>
 </div>
+
