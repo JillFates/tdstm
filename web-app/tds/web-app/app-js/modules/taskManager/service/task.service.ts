@@ -85,6 +85,18 @@ export class TaskService {
 	}
 
 	/**
+	 * Get Laste Created Task Params from Session
+	 */
+	getLastCreatedTaskSessionParams(): Observable<any> {
+		return this.http.get(`${this.defaultUrl}/task/taskCreateDefaults`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Save the Task Cooment
 	 * @param model
 	 * @returns {Observable<any>}
@@ -94,7 +106,8 @@ export class TaskService {
 			comment: model.comment,
 			category: model.category,
 			isResolved: model.archive,
-			assetEntityId: model.asset.id
+			assetEntityId: model.asset.id,
+			status: 'Ready'
 		};
 
 		if (!model.id) {

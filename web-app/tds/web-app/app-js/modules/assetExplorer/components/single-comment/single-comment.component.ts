@@ -75,7 +75,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 	 * Change the Asset selected since the class has changed
 	 * @param assetClass
 	 */
-	public onAssetClassChange(assetClass): void {
+	public onAssetClassChange(): void {
 		this.singleCommentModel.asset = {
 			id: '',
 			text: ''

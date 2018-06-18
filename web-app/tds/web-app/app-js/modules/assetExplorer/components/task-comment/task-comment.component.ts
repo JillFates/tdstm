@@ -24,6 +24,8 @@ export class TaskCommentComponent implements OnInit {
 	@Input('has-publish-permission') hasPublishPermission ? = false;
 	@Input('can-edit-comments') canEdit ? = false;
 	@Input('can-edit-tasks') canEditTasks ? = false;
+	@Input('asset-name') assetName: string;
+	@Input('asset-type') assetType: string;
 
 	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
 	private taskCommentColumnModel = new TaskCommentColumnsModel();
@@ -82,12 +84,11 @@ export class TaskCommentComponent implements OnInit {
 			comment: '',
 			category: '',
 			assetClass: {
-				id: '',
-				text: ''
+				text: this.assetType
 			},
 			asset: {
-				id: '',
-				text: ''
+				id: this.id,
+				text: this.assetName
 			}
 		};
 
@@ -130,7 +131,7 @@ export class TaskCommentComponent implements OnInit {
 				text: comment.assetType,
 			},
 			asset: {
-				id: '0',
+				id: this.id,
 				text: comment.assetName
 			},
 			lastUpdated: comment.commentInstance.lastUpdated,

@@ -14,7 +14,7 @@ export class SingleCommentModel {
 		text?: string;
 	};
 	public asset: {
-		id?: string;
+		id?: any;
 		text: string;
 	};
 	public lastUpdated?: string;

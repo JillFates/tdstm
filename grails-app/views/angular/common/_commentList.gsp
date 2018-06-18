@@ -5,6 +5,8 @@
 			[view-unpublished-value]="${viewUnpublishedValue}"
 			[has-publish-permission]="${hasPublishPermission}"
 	 		[can-edit-comments]="${canEdit}"
-			[can-edit-tasks]="${canEditTasks}">
+			[can-edit-tasks]="${canEditTasks}"
+			[asset-name]="'${asset.assetName}'"
+			[asset-type]="'${asset.assetType}'">
 	</task-comment>
 </td>
