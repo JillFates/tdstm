@@ -1161,9 +1161,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	ETLProcessorResult finalResult(Boolean includeConsoleLog = false){
 		this.result.addFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
 		if (includeConsoleLog) {
-			this.result.debugConsole = this.debugConsole.content()
+			this.result.consoleLog = this.debugConsole.content()
 		} else {
-			this.result.debugConsole = ''
+			this.result.consoleLog = ''
 		}
 		return this.result
 	}

@@ -43,7 +43,7 @@ class ETLProcessorResult {
 	/**
 	 * Debug Console content filed used to create the final result
 	 */
-	String debugConsole = ''
+	String consoleLog = ''
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
