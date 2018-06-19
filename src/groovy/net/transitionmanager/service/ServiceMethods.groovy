@@ -36,7 +36,9 @@ trait ServiceMethods {
 	 */
 	def <T> T get(Class<T> type, id, Project currentProject, boolean throwException = true) {
 		T t
-		if (!id) return null
+		if (!id){
+			throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
+		}
 
 		if (id in type) {
 			return (T) id
@@ -99,7 +101,7 @@ trait ServiceMethods {
 		}
 
 		if (!t && throwException) {
-			// TODO
+			throw new EmptyResultException()
 		}
 
 		t
