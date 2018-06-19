@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.tm.enums.domain.TimeScale
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
@@ -880,5 +881,82 @@ class TimeUtil {
 	 */
 	static String formatToISO8601DateTime(Date date) {
 		DateFormatUtils.formatUTC(date, FORMAT_DATE_TIME_ISO8601)
+	}
+
+	/**
+	 * Provide a function for formatting durations with the same logic the front-end has.
+	 * This method expresses a TimeDuration in days, hours and minutes.
+	 *
+	 * Examples:
+	 *      3 days 1 minute
+	 *      1 day 10 hours
+	 *      20 hours
+	 *
+	 * @param duration
+	 * @return
+	 */
+	static String formatDuration(TimeDuration duration) {
+		// If the parameter is null, return null.
+		if (duration == null) {
+			return null
+		}
+
+		// Fields of a Time Duration used for formatting.
+		String[] labels = ["day", "hr", "min"]
+		// Field values for the given Time Duration.
+		int[] values = [duration.days, duration.hours, duration.minutes]
+		// List that will contain each field formatted accordingly.
+		List<String> formattedValues = []
+		// Iterate over each field formatting it if greater than zero.
+		for (int i = 0; i < labels.length; i++) {
+			int currentValue = values[i]
+			// If the current value is greater than zero, it needs to be included and formatted.
+			if (currentValue != 0) {
+				String currentLabel = labels[i]
+				String formattedValue = "$currentValue $currentLabel"
+				// If the value is greater than one, then add an 's' to the label.
+				if (Math.abs(currentValue) > 1) {
+					formattedValue = formattedValue + "s"
+				}
+				// Add the current formatted value to the list of formatted fields.
+				formattedValues << formattedValue
+			}
+		}
+
+		return formattedValues.join(" ")
+	}
+
+	/**
+	 * Create a TimeDuration from a duration and a TimeScale. This is useful
+	 * when working with tasks, since its duration is stored as a pair duration, scale to a
+	 * format that can be easily manipulated.
+	 *
+	 * @param duration
+	 * @param scale
+	 * @return
+	 */
+	static TimeDuration createTimeDuration(Integer duration, TimeScale scale) {
+		if (duration == null || scale == null) {
+			return null
+		}
+		int days = 0
+		int hours = 0
+		int minutes = 0
+		switch (scale) {
+			case TimeScale.W:
+				days = duration * 7
+				break
+			case TimeScale.D:
+				days = duration
+				break
+			case TimeScale.H:
+				hours = duration
+				break
+			case TimeScale.M:
+				minutes = duration
+				break
+		}
+
+		return new TimeDuration(days, hours, minutes, 0, 0)
 	}
 }
