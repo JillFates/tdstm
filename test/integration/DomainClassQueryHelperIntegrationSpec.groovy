@@ -101,7 +101,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void '2. can find a Device by sourceRoom'() {
+	void '2. can find a Device by roomSource'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -116,7 +116,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-	void '3. can find a Device by targetRoom'() {
+	void '3. can find a Device by roomTarget'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -139,7 +139,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			device.save(failOnError: true)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomSource: device.roomSource.location])
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationSource: device.roomSource.location])
 
 		then:
 			results.size() == 1
@@ -154,7 +154,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			device.save(failOnError: true)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomSource: device.roomTarget.location])
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationTarget: device.roomTarget.location])
 
 		then:
 			results.size() == 1
@@ -174,7 +174,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == room.id
 	}
 
-	void '7. can find a Device by locationTarget'() {
+	void '7. can find a Rack by room'() {
 
 		given:
 			Room room = roomTestHelper.createRoom(project)
