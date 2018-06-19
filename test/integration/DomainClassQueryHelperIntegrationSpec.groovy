@@ -10,14 +10,12 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
-
-class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
+class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
 
@@ -64,6 +62,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 	void setupSpec() {
 
 	}
+
 	void setup() {
 		// project = projectTestHelper.createProject(null)
 		// otherProject = projectTestHelper.createProject()
@@ -72,8 +71,8 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
 			moveBundleTestHelper.createBundle(otherProject, null))
-		context = dataImportService.initContextForProcessBatch( project, ETLDomain.Dependency )
-		context.record = new ImportBatchRecord(sourceRowId:1)
+		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
+		context.record = new ImportBatchRecord(sourceRowId: 1)
 
 		device.assetType = 'Server'
 		device.save()
@@ -86,7 +85,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 		otherProjectDevice.assetType = device.assetType
 		otherProjectDevice.save()
 	}
-
 
 
 	void '1. can find a Device by its id'() {
@@ -114,7 +112,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomSource: device.roomSource.roomName])
 
 		then:
-			results.size() == 0
+			results.size() == 1
 			results.first() == device.id
 	}
 
@@ -277,8 +275,52 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 			results.first() == device.id
 	}
 
+	void '14. can find a Device by its id and return an instance of Device'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [id: device.id], false)
+
+		then:
+			results.size() == 1
+			with(results.first()){
+				AssetEntity.isAssignableFrom(it.getClass())
+				id == device.id
+			}
+	}
 
 
+	void '15. can find a Room by a by locationTarget and return an instance of Room'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [roomName: room.roomName], false)
+
+		then:
+			results.size() == 1
+			with(results.first()){
+				Room.isAssignableFrom(it.getClass())
+				id == room.id
+			}
+	}
+
+
+	void '16. can find a Device by Bundle name and return an instance of Device'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [moveBundle: moveBundle.name], false)
+
+		then:
+			!results.isEmpty()
+			results.contains(device)
+	}
 
 //	void '11. can find a Device by manufacturer'() {
 //
@@ -318,7 +360,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [moveBundle: moveBundle.name])
 
 	 */
-
 
 
 }
