@@ -10,6 +10,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -101,6 +102,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 
+	//@IgnoreRest
 	void '2. can find a Device by roomSource'() {
 
 		given:
@@ -161,7 +163,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-	void '6. can find a Room by a by locationTarget'() {
+	void '6. can find a Room by a by roomName'() {
 
 		given:
 			Room room = roomTestHelper.createRoom(project)
@@ -275,7 +277,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-	void '14. can find a Device by its id and return an instance of Device'() {
+	void '14. can find a Device by its id returning an instance of Device'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -292,7 +294,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void '15. can find a Room by a by locationTarget and return an instance of Room'() {
+	void '15. can find a Room by a by locationTarget returning an instance of Room'() {
 
 		given:
 			Room room = roomTestHelper.createRoom(project)
@@ -309,7 +311,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void '16. can find a Device by Bundle name and return an instance of Device'() {
+	void '16. can find a Device by Bundle name returning an instance of Device'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -321,45 +323,4 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			!results.isEmpty()
 			results.contains(device)
 	}
-
-//	void '11. can find a Device by manufacturer'() {
-//
-//		given:
-//			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-//
-//		when:
-//			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetClass: AssetClass.DEVICE])
-//
-//		then:
-//			results.size() == 1
-//			results.first().id == device.id
-//	}
-
-//	void '12. can find a Device by a model instance'() {
-//
-//		given:
-//			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-//
-//		when:
-//			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetClass: AssetClass.DEVICE])
-//
-//		then:
-//			results.size() == 1
-//			results.first().id == device.id
-//	}
-
-	/*
-		More tests:
-		def manufacturer = Manufacturer.get(336)
-		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [manufacturer: manufacturer.name])
-
-		def model = Model.get(6941)
-		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [model: model.modelName])
-
-		def moveBundle = MoveBundle.get(5926)
-		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [moveBundle: moveBundle.name])
-
-	 */
-
-
 }
