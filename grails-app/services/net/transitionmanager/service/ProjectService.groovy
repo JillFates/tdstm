@@ -60,6 +60,7 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -1341,13 +1342,11 @@ class ProjectService implements ServiceMethods {
 
 		String personsCountsQuery = '''
 			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons,
-			       count(u.username) as totalUserLogins, count(u_active.username) as activeUserLogins
+			       count(u.username) as totalUserLogins
 			FROM person p
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
-			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
 			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
-			LEFT OUTER JOIN user_login u_active on p.person_id=u_active.person_id AND u_active.last_modified > (? - INTERVAL 1 DAY)
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE pg.party_group_id in (''' + companyIds.collect { NumberUtil.toLong(it) }.join(',') + ''')
 			GROUP BY pg.party_group_id
@@ -1359,7 +1358,10 @@ class ProjectService implements ServiceMethods {
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins
-				projectDailyMetric.activeUserLogins = it.activeUserLogins
+				projectDailyMetric.activeUserLogins = UserLoginProjectAccess.where {
+					project.id in companyIds.collect { NumberUtil.toLong(it) }
+					date == sqlSearchDate
+				}.count()
 			}
 		}
 	}

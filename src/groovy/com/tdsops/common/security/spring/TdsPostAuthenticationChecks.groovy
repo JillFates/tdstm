@@ -4,7 +4,9 @@ import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.MetricReportingService
 import net.transitionmanager.service.SecurityService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsChecker
@@ -19,6 +21,8 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 	private static final int MILLIS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 	SecurityService securityService
+	@Autowired
+	MetricReportingService metricReportingService
 
 	@Transactional
 	void check(UserDetails user) {
@@ -35,7 +39,6 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 			// no exception, just set the flag to force a password update
 			securityService.forcePasswordChange(userLogin)
 		}
-
 		// checkPasswordAge
 
 		Long maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays
@@ -45,6 +48,9 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 			// no exception, just set the flag to force a password update
 			securityService.forcePasswordChange(userLogin)
 		}
+
+		// create a new UserLoginProjectAccess to account later for user logins on metric recollection
+		metricReportingService.createNewUserLoginProjectAccess(userLogin)
 
 		// checkIfUserHasRoles
 

@@ -7,6 +7,7 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StopWatch
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -15,6 +16,8 @@ import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserLoginProjectAccess
 import org.apache.commons.lang.math.RandomUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -328,6 +331,33 @@ class MetricReportingService {
 	 */
 	private List<Map> runSql(String query, List<Long> projectIds) {
 		return namedParameterJdbcTemplate.queryForList(query, [projectIds: projectIds])
+	}
+
+	/**
+	 * Creates a new record of a UserLoginProjectAccess, if it does not exist already.
+	 * If there is another record for the same UserLogin and same Project in the same day,
+	 * do nothing. Otherwise create a new record for this day.
+	 * This entities will be used to collect metrics of logged users.
+	 * See TM-10119
+	 * @param userLogin  The UserLogin that will be associated to the new UserLoginProjectAccess
+	 */
+	boolean createNewUserLoginProjectAccess(UserLogin userLogin) {
+		Date date = TimeUtil.nowGMT().clearTime()
+		Project project = userLogin.getCurrentProject()
+		// Make sure that is unique
+		int count = UserLoginProjectAccess.where {
+			userLogin == userLogin
+			project == project
+			date == date
+		}.count()
+		if (count == 0) {
+			UserLoginProjectAccess userLoginProjectAccess = new UserLoginProjectAccess(
+					userLogin: userLogin,
+					project: project,
+					date: date
+			)
+			userLoginProjectAccess.save(failOnError: true)
+		}
 	}
 
 	/**

@@ -37,6 +37,7 @@ class UserService implements ServiceMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AuditService auditService
+	MetricReportingService metricReportingService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -636,7 +637,6 @@ class UserService implements ServiceMethods {
 	 * - Current Bundle
 	 * - Current Room
 	 *
-	 * @param user - a given UserLogin
 	 * @param projectId - the id of the project to be assigned to the user.
 	 *
 	 * @return true: context updated / false: unable to update.
@@ -649,6 +649,8 @@ class UserService implements ServiceMethods {
 		}
 
 		userPreferenceService.setCurrentProjectId(projectId)
+		// create a new UserLoginProjectAccess to account later for user logins on metric recollection
+		metricReportingService.createNewUserLoginProjectAccess(securityService.getUserLogin())
 		true
 	}
 
