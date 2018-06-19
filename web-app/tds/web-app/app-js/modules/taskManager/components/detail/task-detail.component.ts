@@ -26,6 +26,7 @@ export class TaskDetailComponent extends UIExtraDialog {
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
 	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
+	public collapsedTaskDetail = false;
 
 	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, public promptService: UIPromptService, public userPreferenceService: PreferenceService) {
 		super('#task-detail-component');
@@ -124,6 +125,10 @@ export class TaskDetailComponent extends UIExtraDialog {
 				this.taskDetailModel.detail.assignedTeam = team.nameRole.split(':')[0];
 			}
 		});
+	}
+
+	public onCollapseTaskDetail(): void {
+		this.collapsedTaskDetail = !this.collapsedTaskDetail;
 	}
 
 	/**
