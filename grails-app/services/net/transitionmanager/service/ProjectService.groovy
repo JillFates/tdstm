@@ -1341,27 +1341,27 @@ class ProjectService implements ServiceMethods {
 		}
 
 		String personsCountsQuery = '''
-			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons,
-			       count(u.username) as totalUserLogins
-			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE pg.party_group_id in (''' + companyIds.collect { NumberUtil.toLong(it) }.join(',') + ''')
-			GROUP BY pg.party_group_id
+			SELECT 
+				pr.party_id_from_id as projectId,
+				COUNT(*) as totalPersons,
+				SUM( IF(u.username IS NULL, 0, 1) ) as totalUserLogins,
+				COUNT(DISTINCT ulpa.user_login_id) as activeUserLogins
+			FROM party_relationship pr
+			  LEFT OUTER JOIN user_login u ON u.person_id = pr.party_id_to_id
+			  LEFT OUTER JOIN user_login_project_access ulpa ON ulpa.project_id = pr.party_id_from_id AND ulpa.date BETWEEN (? - INTERVAL ONE DAY) AND ?
+			WHERE pr.role_type_code_from_id='PROJECT' AND
+				  pr.party_relationship_type_id='PROJ_STAFF' AND
+				  pr.role_type_code_to_id='STAFF'
+			GROUP BY pr.party_id_from_id
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
-			def project = projectsMapByCompanyId[it.companyId]
+			def project = projectsMapByCompanyId[it.projectId]
 			projectDailyMetric = metricsByProject[project.id]
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins
-				projectDailyMetric.activeUserLogins = UserLoginProjectAccess.where {
-					project.id in companyIds.collect { NumberUtil.toLong(it) }
-					date == sqlSearchDate
-				}.count()
+				projectDailyMetric.activeUserLogins = it.activeUserLogins
 			}
 		}
 	}
