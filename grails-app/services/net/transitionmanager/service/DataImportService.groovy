@@ -972,7 +972,7 @@ class DataImportService implements ServiceMethods {
 					break
 				}
 
-					// May have found the elusive sucker!
+				// May have found the elusive sucker!
 				dependency = findDomainByIdResult
 			}
 
@@ -1006,9 +1006,9 @@ class DataImportService implements ServiceMethods {
 				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
-				if ( primary in AssetEntity && supporting in AssetEntity ) {
-			// Try finding & updating or creating the dependency with primary and supporting assets that were found
-					dependency = findAndUpdateOrCreateDependency(dependency, primary, supporting, fieldsInfo, context)
+			if ( primary in AssetEntity && supporting in AssetEntity ) {
+				// Try finding & updating or creating the dependency with primary and supporting assets that were found
+				dependency = findAndUpdateOrCreateDependency(dependency, primary, supporting, fieldsInfo, context)
 			}
 			break
 		}
@@ -1067,30 +1067,29 @@ class DataImportService implements ServiceMethods {
 		if (primary && supporting) {
 			Boolean foundById = (dependency ? true : false)
 			if (! foundById) {
-			// If there is the primary & supporting asset and no dependency yet then try and find it by the two assets
-			dependency = AssetDependency.where {
-				asset.id == primary.id
-				dependent.id == supporting.id
-			}.find()
+				// If there is the primary & supporting asset and no dependency yet then try and find it by the two assets
+				dependency = AssetDependency.where {
+					asset.id == primary.id
+					dependent.id == supporting.id
+				}.find()
 
-				// If not found by the ID previously then the assets may have changed
-			if (dependency) {
-				// Update the primary or supporting assets if they changed
-				if (dependency.asset.id != primary.id) {
-					log.debug "findAndUpdateOrCreateDependency() Updated primary asset on Dependency"
-					dependency.asset = primary
-				}
-				if (dependency.dependent.id != supporting.id) {
-					log.debug "findAndUpdateOrCreateDependency() Updated supporting asset on Dependency"
-					dependency.dependent = supporting
-				}
+				// If not found by the ID previously then the assets may have changed so attempt to update the references
+				if (dependency) {
+					if (dependency.asset.id != primary.id) {
+						log.debug "findAndUpdateOrCreateDependency() updated primary asset on Dependency"
+						dependency.asset = primary
+					}
+					if (dependency.dependent.id != supporting.id) {
+						log.debug "findAndUpdateOrCreateDependency() updated supporting asset on Dependency"
+						dependency.dependent = supporting
+					}
 				}
 			}
 
 			if (! dependency) {
 				// CREATE
 				dependency = new AssetDependency(asset: primary, dependent: supporting)
-				log.debug "findAndUpdateOrCreateDependency() Created new Dependency"
+				log.debug "findAndUpdateOrCreateDependency() created new Dependency"
 			}
 
 			// Now add/update the remaining properties on the domain entity appropriately
@@ -1667,15 +1666,15 @@ class DataImportService implements ServiceMethods {
 						// Perform lookup by ID
 						// TODO : JPM 4/2018 : Refactor into Gorm as a single function
 						Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
-						def entity = GormUtil.findInProject(context.project, refDomainClass, item.value)
+						def entity = GormUtil.findInProject(context.project, refDomainClass, value)
 
 						if (entity) {
 							domainInstance[propertyName] = entity
 						} else {
-							errorMsg = "No reference record found for field ${propertyName} (${item.value}) by ID in 'whenNotFound create'"
+							errorMsg = "No reference record found for field ${propertyName} (${value}) by ID in 'whenNotFound create'"
 							break
 						}
-						// searchForDomainById(refDomainClass, propertyName, item.value, fieldsInfo, context)
+						// searchForDomainById(refDomainClass, propertyName, value, fieldsInfo, context)
 					} else if (! StringUtil.isBlank(value)) {
 						// Attempt the find the reference by the alternate key
 						List references = findReferenceDomainByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
