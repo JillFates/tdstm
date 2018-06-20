@@ -705,7 +705,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				apiActionId: assetComment.apiAction?.id,
 				action: assetComment.apiAction?.name,
 				recipe: recipeMap,
-				estimatedDuration: TimeUtil.formatDuration(estimatedDuration),
 				actualDuration: TimeUtil.formatDuration(actualDuration),
 				durationDelta: TimeUtil.formatDuration(durationDelta)
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]

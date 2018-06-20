@@ -957,7 +957,7 @@ class TimeUtil {
 				break
 			case TimeScale.M:
 				minutes = duration % 60
-				hours = duration / 60
+				hours = (duration % 1440) / 60
 				days = duration / 1440
 				break
 		}
