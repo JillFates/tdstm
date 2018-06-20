@@ -64,11 +64,7 @@ class DataImportEntityCache {
 		Object value = cache[key]
 
 		if (value instanceof Map) {
-			// Need to
 			value = value.clazz.get(value.id)
-			println "Entity retrieved from cache $value"
-		} else {
-			println "Entity not found in cache"
 		}
 
 		return value
@@ -80,19 +76,18 @@ class DataImportEntityCache {
 	 * @param value - the entity object or error message
 	 */
 	void put(String key, Object value) {
-		println "Adding entity to cache - key:$key, object:$value"
 		lastKey = key
-
 		if (GormUtil.isDomainClass(value)) {
 			// For domain objects we are caching the domain Class and ID
 			cache.put(key, [clazz: value.getClass(), id: value.id])
-		} else { //if (value instanceof CharSequence) {
+		} else {
 			cache.put(key, value)
-		} //else {
-		// 	throw new RuntimeException("Attempted to add unsupported object type ${value ? value.getClass().getName() : 'null'} to cache with key $key")
-		// }
+		}
 	}
 
+	/**
+	 * Returnes the # of objects contained in the cache
+	 */
 	Long size() {
 		return cache.size()
 	}
