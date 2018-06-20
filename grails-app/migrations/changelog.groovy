@@ -243,7 +243,9 @@ databaseChangeLog = {
 	include file: '20180518-rename-source-target-rack-room-location-dataview-sort-field.groovy'
 	include file: '20180524-add-bypass-mode-to-move-event.groovy'
 	include file: '20180531-Rename-back-the-first-dataview-record-to-name-All-Assets.groovy'
+	include file: '20180601-create-tag-and-tagLink.groovy'
 	include file: '20180606-import-batch-record-drop-ignored-flag.groovy'
+	include file: '20180612-datascript-create-unique-index-on-name-project-and-provider.groovy'
 	include file: '20180612-add-field-label-map-property-to-import-batch.groovy'
 	include file: '20180613-add-http-method-api-action-table.groovy'
 }

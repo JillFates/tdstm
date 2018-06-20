@@ -24,7 +24,6 @@ class DeviceService implements ServiceMethods {
 	ProjectService projectService
 	RackService rackService
 	RoomService roomService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	/**

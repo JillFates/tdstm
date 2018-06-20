@@ -21,8 +21,6 @@ class EmailDispatchService implements ServiceMethods {
 	def mailService
 	Scheduler quartzScheduler
 
-	SecurityService securityService
-
 	static SimpleEmailDispatchJob = "EmailDispatchJob"
 
 	/**

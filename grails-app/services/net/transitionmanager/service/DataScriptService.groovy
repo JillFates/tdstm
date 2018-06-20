@@ -26,7 +26,6 @@ import java.text.DecimalFormat
 class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
-    SecurityService securityService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],

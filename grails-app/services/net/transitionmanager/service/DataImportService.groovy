@@ -56,7 +56,6 @@ class DataImportService implements ServiceMethods {
 	// IOC
 	FileSystemService fileSystemService
 	ScriptProcessorService scriptProcessorService
-	SecurityService securityService
 	ProgressService progressService
 	Scheduler quartzScheduler
 
