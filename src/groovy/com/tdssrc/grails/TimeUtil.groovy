@@ -885,12 +885,14 @@ class TimeUtil {
 
 	/**
 	 * Provide a function for formatting durations with the same logic the front-end has.
-	 * This method expresses a TimeDuration in days, hours and minutes.
+	 * This method expresses a TimeDuration in days, hours and minutes and allows for negative durations. This is
+	 * to support scenarios such as the delta between the Task Estimated Duration and the Actual Duration.
 	 *
 	 * Examples:
 	 *      3 days 1 minute
 	 *      1 day 10 hours
 	 *      20 hours
+	 *      -1 day 1 hour
 	 *
 	 * @param duration
 	 * @return
@@ -950,10 +952,13 @@ class TimeUtil {
 				days = duration
 				break
 			case TimeScale.H:
-				hours = duration
+				hours = duration % 24
+				days = duration / 24
 				break
 			case TimeScale.M:
-				minutes = duration
+				minutes = duration % 60
+				hours = duration / 60
+				days = duration / 1440
 				break
 		}
 
