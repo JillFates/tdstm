@@ -6,6 +6,10 @@ import net.transitionmanager.domain.Person
 
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.FUTURE
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+import static com.tdsops.validators.CustomValidators.inList
+import static com.tdsops.validators.CustomValidators.optionsClosure
+import static com.tds.asset.AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
+import static com.tds.asset.AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
 
 class AssetDependency {
 
@@ -33,18 +37,18 @@ class AssetDependency {
 
 	static constraints = {
 		asset unique: ['dependent', 'type']
-		c1 nullable: true
-		c2 nullable: true
-		c3 nullable: true
-		c4 nullable: true
-		comment size: 0..65535, blank: true
+		dependent nullable: false
+		c1 nullable: true, blank: true, size:0..65535
+		c2 nullable: true, blank: true, size:0..65535
+		c3 nullable: true, blank: true, size:0..65535
+		c4 nullable: true, blank: true, size:0..65535
+		comment nullable: true, blank: true, size: 0..65535
     	createdBy nullable: true // @See TM-8392
 		updatedBy nullable: true
 		dataFlowDirection blank: false, size: 0..14, inList: ['Unknown', 'bi-directional', 'incoming', 'outgoing']
 		dataFlowFreq nullable: true, size: 0..8, inList: ['Unknown', 'constant', 'hourly', 'daily', 'weekly', 'monthly']
-		dependent nullable: true
-		status blank: false
-		type blank: false
+		status blank: false, validator: inList(optionsClosure(DEPENDENCY_STATUS), 'status')
+		type blank: false, validator: inList(optionsClosure(DEPENDENCY_TYPE), 'type')
 	}
 
 	static mapping = {
