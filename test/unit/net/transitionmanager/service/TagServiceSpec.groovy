@@ -136,6 +136,6 @@ class TagServiceSpec extends Specification {
 			tag = service.get(Tag, 1l, project)
 
 		then: 'The tag is deleted.'
-			thrown InvalidParamException
+			thrown EmptyResultException
 	}
 }
