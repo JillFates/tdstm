@@ -396,7 +396,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 						rootNode 'Applications'
 						read labels
-						trim off
 						iterate {
 							domain Application
 							extract 'vendor name' load 'Vendor'

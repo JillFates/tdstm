@@ -135,7 +135,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Set globalTransformers = [] as Set
 
 	static Trimmer = { Element element ->
-		element.trim()
+		element.trim(true)
 	}
 
 	static Sanitizer = { Element element ->
