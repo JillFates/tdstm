@@ -159,6 +159,15 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Try to get a property from the content we delegate to the value in case that it is a Map
+	 * @param name
+	 * @return
+	 */
+	Object get(String name) {
+		return value."$name"
+	}
+
+	/**
 	 * Middle transformation. It takes <code>n</code> characters from position  <code>m</code>
 	 * <code>
 	 *      load ... transformation with take(n, m)
