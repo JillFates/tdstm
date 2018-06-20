@@ -35,8 +35,6 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.codehaus.groovy.control.ErrorCollector
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -50,7 +48,6 @@ class ApiActionService implements ServiceMethods {
 	]
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	SecurityService securityService
 	CustomDomainService customDomainService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)

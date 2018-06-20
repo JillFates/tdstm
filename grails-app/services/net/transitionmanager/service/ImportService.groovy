@@ -70,7 +70,6 @@ class ImportService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProgressService progressService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	def jdbcTemplate
 	CustomDomainService customDomainService

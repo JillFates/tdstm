@@ -39,7 +39,6 @@ class PersonService implements ServiceMethods {
 	def namedParameterJdbcTemplate
 	def partyRelationshipService
 	def projectService
-	def securityService
 	def userPreferenceService
 
 	private static final List<String> SUFFIXES = [

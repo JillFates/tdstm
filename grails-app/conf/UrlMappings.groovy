@@ -920,6 +920,22 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/tag" {
+			controller = "wsTag"
+			action = [
+				GET : "list",
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/$id" {
+			controller = "wsTag"
+			action = [
+				PUT : "update",
+				DELETE: "delete"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
