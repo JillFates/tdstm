@@ -236,12 +236,28 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * On Page change, pagination change.
 	 * Manage Pagination
 	 * @param {PageChangeEvent} event
 	 */
 	public pageChange(event: PageChangeEvent): void {
 		this.state.skip = event.skip;
 		this.state.take = event.take;
+
+		// reset the select all checkbox to un-selected.
+		this.selectAllCheckboxes = false;
+		// If current page items all are checked then Select All box should be true, otherwise false.
+		let allSelectedOnCurrentPage = true;
+		let currentPageItems: DataResult = process(this.resultSet, this.state);
+		currentPageItems.data.forEach( item => {
+			// map-key-reference inception here
+			if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
+				allSelectedOnCurrentPage = false;
+				return;
+			}
+		});
+		this.selectAllCheckboxes = allSelectedOnCurrentPage;
+
 		this.loadPageData();
 	}
 

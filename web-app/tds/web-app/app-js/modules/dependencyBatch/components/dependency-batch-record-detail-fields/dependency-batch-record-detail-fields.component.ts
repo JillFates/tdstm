@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
-import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
+import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {process, State} from '@progress/kendo-data-query';
@@ -34,8 +34,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 			logic: 'and'
 		}
 	};
-	private gridData: GridDataResult;
-	private fieldsFilter: any = {
+	protected gridData: GridDataResult;
+	protected fieldsFilter: any = {
 		options: [
 			{text: 'All', value: 1},
 			{text: 'With Errors', value: 2}
@@ -54,11 +54,16 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 			ignoreCase: true
 		}
 	};
-	private processStatus: OperationStatusModel = new OperationStatusModel();
+	private originalImportValues: string;
+	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
+	protected BatchStatus = BatchStatus;
+	protected saveStatus: OperationStatusModel = new OperationStatusModel();
+	protected processStatus: OperationStatusModel = new OperationStatusModel();
 
 	constructor(private dependencyBatchService: DependencyBatchService) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 			this.processStatus.state = CHECK_ACTION.NONE;
+			this.saveStatus.state = CHECK_ACTION.NONE;
 	}
 
 	/**
@@ -97,19 +102,23 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	private buildGridData(fields): void {
 		// let data: Array<{name: string, currentValue: string, importValue: string, error: boolean}> = [];
+		const {fieldNameList, fieldLabelMap} = this.importBatch;
+
 		this.fieldsInfo = [];
-		for (const fieldName of this.importBatch.fieldNameList) {
+		for (const fieldName of fieldNameList) {
 			this.fieldsInfo.push({
-				name: fieldName,
-				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
-					? fields[fieldName].value : '(null)',
-				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
+				name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
+				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
 					? fields[fieldName].originalValue : '(null)',
+				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
+					? fields[fieldName].value : '',
 				errors: fields[fieldName].errors,
 				errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
 				overridedValue: null
 			});
 		}
+		let importValues = this.fieldsInfo.map( item => item.importValue);
+		this.originalImportValues = JSON.stringify(importValues);
 		this.gridData = process(this.fieldsInfo, this.state);
 	}
 
@@ -117,10 +126,10 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * Checks if input overrided values are not empty or with a text value.
 	 */
 	public areOverrideValuesDirty(): boolean {
-		for (let field of this.fieldsInfo) {
-			if (field.overridedValue && field.overridedValue.length > 0) {
-				return true;
-			}
+		let currentImportValues = this.fieldsInfo.map( item => item.importValue);
+		if (this.originalImportValues !== JSON.stringify(currentImportValues)) {
+			this.saveStatus.state = CHECK_ACTION.NONE;
+			return true;
 		}
 		return false;
 	}
@@ -144,7 +153,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	/**
 	 * On Include button click.
 	 */
-	private onInclude(): void {
+	protected onInclude(): void {
 		const ids = [this.batchRecord.id];
 		this.dependencyBatchService.includeBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
@@ -160,20 +169,22 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	/**
 	 * On Update button click.
 	 */
-	private onUpdate(): void {
+	protected onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
 		for (let field of this.fieldsInfo) {
-			if (field.overridedValue) {
-				const newFieldValue = {fieldName: field.name, value: field.overridedValue};
+			if (field.importValue) {
+				const newFieldValue = {fieldName: field.name, value: field.importValue};
 				newFieldsValues.push(newFieldValue);
 			}
 		}
 		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
+				this.loadRecordFieldDetails();
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.loadRecordFieldDetails();
 					this.updateSuccessEvent.emit();
+					setTimeout(() => this.saveStatus.state = CHECK_ACTION.VALID, 200);
 				} else {
+					setTimeout(() => this.saveStatus.state = CHECK_ACTION.INVALID, 200);
 					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
 				}
 		}, error => this.handleError(error));
@@ -182,7 +193,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	/**
 	 * On Process button click.
 	 */
-	private onProcess(): void {
+	protected onProcess(): void {
 		const ids = [this.batchRecord.id];
 		this.dependencyBatchService.processBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
@@ -199,7 +210,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * Determine if Ignore button should be showed on UI.
 	 * @returns {boolean}
 	 */
-	private showIgnoreButton(): boolean {
+	protected showIgnoreButton(): boolean {
 		return this.batchRecord.status.code === BatchStatus.PENDING;
 	}
 
@@ -207,7 +218,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * Determine if Include button should be showed on UI.
 	 * @returns {boolean}
 	 */
-	private showIncludeButton(): boolean {
+	protected showIncludeButton(): boolean {
 		return this.batchRecord.status.code === BatchStatus.IGNORED;
 	}
 
@@ -215,7 +226,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * Hide Action buttons if Record is already completed.
 	 * @returns {boolean}
 	 */
-	private showActionButtons(): boolean {
+	protected showActionButtons(): boolean {
 		return this.batchRecord.status.code === BatchStatus.PENDING;
 	}
 
@@ -244,7 +255,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Text Filter input clear icon click.
 	 */
 	private clearTextFilter(): void {
-		this.fieldsFilter.text = '';
+		this.fieldsFilter.nameFilter.value = '';
 		this.onTextFilter();
 	}
 

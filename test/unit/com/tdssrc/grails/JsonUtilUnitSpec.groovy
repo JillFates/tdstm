@@ -92,7 +92,84 @@ class JsonUtilUnitSpec extends Specification {
 			thrown InvalidParamException
 	}
 
+	def 'Test the parseJsonObject method'() {
+		when:
+			def expected = JsonUtil.parseJsonObject('{"a":1,"b":"x"}')
+
+		then:
+			expected == [a:1,b:"x"]
+			expected instanceof Map
+
+		when:
+			expected = JsonUtil.parseJsonObject('[{"a":1,"b":"x"}]')
+
+		then:
+			expected == [[a:1,b:"x"]]
+			expected instanceof List
+	}
+
+	def 'Test the gpathAt method'() {
+		given:
+			def jsonMap = [
+				a:[
+					b:[
+						c:"value"
+               ],
+					list: [
+						[l1: "one"],
+						[l2: "two"]
+					]
+            ]
+			]
+
+		when: "Navigate to a Node"
+			def expected = JsonUtil.gpathAt(jsonMap,'a.b')
+
+		then:
+			expected == [c:"value"]
+			expected instanceof Map
+
+		when: "Navigate to a List"
+			expected = JsonUtil.gpathAt(jsonMap,'a.list')
+
+		then:
+			expected == [[l1: "one"],[l2: "two"]]
+			expected instanceof List
+
+		when: "Navigate to a value"
+			expected = JsonUtil.gpathAt(jsonMap,'a.b.c')
+
+		then:
+			expected == "value"
+
+		when: "Path not found return null"
+			expected = JsonUtil.gpathAt(jsonMap,'a.b.notFound')
+
+		then:
+			expected == null
+
+		when: "navigate to root path using 'dot' gpath"
+			expected = JsonUtil.gpathAt(jsonMap,'.')
+
+		then:
+			expected == jsonMap
+
+		when: "navigate to root Path using 'empty' gpath"
+			expected = JsonUtil.gpathAt(jsonMap,'')
+
+		then:
+			expected == jsonMap
+
+		when: "Navigate to a path using '/' separator instead of '.'"
+			expected = JsonUtil.gpathAt(jsonMap,'a/b', '/')
+
+		then:
+			expected == [c:"value"]
+
+	}
+
 }
+
 // class JsonUtilUnitSpecPO implements CommandObject {
 class JsonUtilUnitSpecPOJO {
 	Map letters

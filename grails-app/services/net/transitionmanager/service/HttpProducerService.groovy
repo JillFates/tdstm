@@ -4,6 +4,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialStatus
+import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.UrlUtil
@@ -11,8 +12,6 @@ import com.tdssrc.grails.XmlUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.command.FileCommand
-import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade
@@ -53,12 +52,10 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
-import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.web.multipart.MultipartFile
 
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
@@ -82,6 +79,8 @@ class HttpProducerService {
     private static final String DEFAULT_ACCEPT_HEADER = MediaType.APPLICATION_JSON_VALUE
     private static final int DEFAULT_REQUEST_TIMEOUT = -1
     private static final Charset DEFAULT_CHARSET = Consts.UTF_8
+    private static final String RESPONSE_TEMPORARY_FILENAME_PREFIEX = 'APIActionResponse'
+    private static final String DEFAULT_TDSTM_TMP_RESPONSE_FILENAME_HEADER  = 'X-TDSTM-TMP-RESPONSE-FILENAME'
     private static final Pattern JSON = ~/.*${MediaType.APPLICATION_JSON_VALUE}.*/
     private static final Pattern XML = ~/.*${MediaType.APPLICATION_XML_VALUE}.*/
     private static final Pattern FORM_URLENCODED = ~/.*${MediaType.APPLICATION_FORM_URLENCODED_VALUE}.*/
@@ -140,8 +139,11 @@ class HttpProducerService {
         AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ASSET_FACADE)
         ApiActionJob apiActionJob = new ApiActionJob()
 
-        // obtain content type from httpResponse header
+        // obtain content type from httpResponse headers
         String contentType = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE)?.value as String
+
+        // obtain response temporary filename from httpResponse headers
+        String tmpResponseFilename = httpResponse.getFirstHeader(DEFAULT_TDSTM_TMP_RESPONSE_FILENAME_HEADER)?.value as String
 
         // constructs ApiActionResponse object
         ApiActionResponse apiActionResponse = new ApiActionResponse()
@@ -176,13 +178,12 @@ class HttpProducerService {
             if (actionRequest.options.producesData == 1) {
                 // if the api action call produces data, it means that a file is being downloaded
                 // and therefore it requires to be saved into the file system
-                String filename = getFilename(apiActionResponse.headers, contentType)
-                apiActionResponse.filename = fileSystemService.transferFileToFileSystem(getFileCommandFromInputStream(is, filename, contentType))
-                if (apiActionResponse.filename) {
-                    apiActionResponse.originalFilename = filename
-                } else {
-                    throw new InvalidParamException('Invalid file extension or content trying to save downloaded file: ' + filename)
-                }
+                String originalFilename = getFilenameFromHeaders(apiActionResponse.headers, contentType)
+                String targetFileExtension = FileSystemUtil.getFileExtension(originalFilename)
+                String targetFilename = fileSystemService.getUniqueFilename('', '', targetFileExtension)
+                fileSystemService.renameTemporaryFile(tmpResponseFilename, targetFilename)
+                apiActionResponse.filename = targetFilename
+                apiActionResponse.originalFilename = originalFilename
             } else {
                 // else, just store it in the action response for further handling
                 apiActionResponse.data = getData(is, contentType)
@@ -320,7 +321,7 @@ class HttpProducerService {
      * @param message
      * @return
      */
-    private String getFilename(LinkedHashMap<String, String> headers, String contentType) {
+    private String getFilenameFromHeaders(LinkedHashMap<String, String> headers, String contentType) {
         String disposition = headers.get(HttpHeaders.CONTENT_DISPOSITION)
 		Integer index = disposition?.indexOf('filename=')
 		if (index && index > 0) {
@@ -377,21 +378,6 @@ class HttpProducerService {
         } else {
             return is
         }
-    }
-
-    /**
-     * Gets a file commands object from a given input stream
-     * @param is - the input stream
-     * @param filename - the original filename
-     * @param contentType - the content type
-     * @return
-     */
-    private FileCommand getFileCommandFromInputStream(InputStream is, String filename, String contentType) {
-        MultipartFile multipartFile = new GrailsMockMultipartFile('file', filename, contentType, is)
-        UploadFileCommand uploadFileCommand = new UploadFileCommand()
-        uploadFileCommand.file = multipartFile
-		uploadFileCommand.fileSystemService = fileSystemService
-        return uploadFileCommand
     }
 
     /**
@@ -573,13 +559,16 @@ class HttpProducerService {
         log.debug('HTTP response status line: {}', closeableHttpResponse.getStatusLine())
 
         // create a temporary file with the http response input stream
-        def (String tmpFilename, OutputStream os) = fileSystemService.createTemporaryFile('ApiActionResponse')
+        def (String tmpFilename, OutputStream os) = fileSystemService.createTemporaryFile(RESPONSE_TEMPORARY_FILENAME_PREFIEX)
         IOUtils.copy(closeableHttpResponse?.entity?.content, os)
         os.flush()
         os.close()
 
         // update httpResponse, set httpEntity with the temporary file input stream
         EntityUtils.updateEntity(closeableHttpResponse, new InputStreamEntity(fileSystemService.openTemporaryFile(tmpFilename)))
+
+        // additional header added to set the response temporary file created
+        closeableHttpResponse.addHeader(DEFAULT_TDSTM_TMP_RESPONSE_FILENAME_HEADER, tmpFilename)
 
         //  return HTTP response
         return closeableHttpResponse

@@ -56,7 +56,7 @@ class DataScript {
     static belongsTo = [ project: Project, provider: Provider ]
 
     static constraints = {
-        name blank: false, size: 1..255, unique: 'provider'
+        name blank: false, size: 1..255, unique: ['project', 'provider']
         description size: 0..255, nullable: true
         target size: 0..255, nullable: true
         lastModifiedBy nullable: true

@@ -4604,39 +4604,43 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					throw new RuntimeException("$msg (options 'source', 'target')")
 				}
 
+				String locationDispositionName = loc + 'LocationName'
+				String rackDispositionName =  loc + 'RackName'
+				String roomDispositionName = loc + 'RoomName'
+
 				switch(action) {
 					case 'location':
 						// Get the Distinct Racks from the list which includes the location and room as well
-						tasksToCreate.unique { it[loc + 'Location'] }
+						tasksToCreate.unique { it[locationDispositionName] }
 						findAssets = { asset ->
-							assetsForAction.findAll { it[loc + 'Location'] == asset[loc + 'Location'] }
+							assetsForAction.findAll { it[locationDispositionName] == asset[locationDispositionName] }
 						}
 						break
 					case 'room':
 						// Get the Distinct Racks from the list which includes the location and room as well
-						tasksToCreate.unique { it[loc + 'Location'] + ':' + it[loc + 'Room'] }
+						tasksToCreate.unique { it[locationDispositionName] + ':' + it[roomDispositionName] }
 						findAssets = { asset ->
 							assetsForAction.findAll {
-								it[loc + 'Location'] == asset[loc + 'Location'] &&
-								it[loc + 'Room'] == asset[loc + 'Room'] }
+								it[locationDispositionName] == asset[locationDispositionName] &&
+								it[roomDispositionName] == asset[locationDispositionName] }
 						}
 						break
 					case 'rack':
 						// Get the Distinct Racks from the list which includes the location and room as well
 						// log.info "%% assetsForAction before ${assetsForAction.size()}"
-						tasksToCreate.unique { it[loc + 'Location'] + ':' + it[loc + 'Room'] + ':' + it[loc + 'Rack'] }
+						tasksToCreate.unique { it[locationDispositionName] + ':' + it[roomDispositionName] + ':' + it[rackDispositionName] }
 						// log.info "%% assetsForAction after ${assetsForAction.size()}"
 						findAssets = { asset ->
 							assetsForAction.findAll {
 								// log.info "Finding match to $asset in ${assetsForAction.size()}"
-								it[loc + 'Location'] == asset[loc + 'Location'] &&
-								it[loc + 'Room'] == asset[loc + 'Room'] &&
-								it[loc + 'Rack'] == asset[loc + 'Rack'] }
+								it[locationDispositionName] == asset[locationDispositionName] &&
+								it[roomDispositionName] == asset[roomDispositionName] &&
+								it[rackDispositionName] == asset[rackDispositionName] }
 						}
 						break
 
 				}
-				validateForTask = { asset -> asset[loc + action.capitalize()]?.size() > 0 }
+				validateForTask = { asset -> asset[loc + action.capitalize() + 'Name']?.size() > 0 }
 				break
 
 			default:
@@ -4685,11 +4689,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 					// location/room/rack compound adding the details to the map
 					case 'rack':
-						map.rack = ttc[loc + 'Rack'] ?: ''
+						map.rack = ttc[loc + 'RackName'] ?: ''
 					case 'room':
-						map.room = ttc[loc + 'Room'] ?: ''
+						map.room = ttc[loc + 'RoomName'] ?: ''
 					case 'location':
-						map.location = ttc[loc + 'Location'] ?: ''
+						map.location = ttc[loc + 'LocationName'] ?: ''
 						break
 				}
 				try {

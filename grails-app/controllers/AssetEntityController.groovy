@@ -17,9 +17,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavEntityAttribute
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
@@ -402,8 +400,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			ProjectTeam.executeUpdate('update ProjectTeam set latestAsset=null where latestAsset=?', [assetEntity])
 			AssetEntity.executeUpdate('''
 				update AssetEntity
-				set moveBundle=null, project=null, sourceTeamMt=null, targetTeamMt=null, sourceTeamLog=null,
-				    targetTeamLog=null, sourceTeamSa=null, targetTeamSa=null, sourceTeamDba=null, targetTeamDba=null
+				set moveBundle=null, project=null
 				where id=?''', assetEntity.id)
 			flash.message = "AssetEntity $assetEntity.assetName Removed from Project"
 		}
@@ -411,83 +408,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			flash.message = "AssetEntity not found with id $params.id"
 		}
 		redirect(action: 'list')
-	}
-
-	/**
-	 * remote link for asset entity dialog.
-	 */
-	@HasPermission(Permission.AssetEdit)
-	def editShow() {
-		Project project = securityService.userCurrentProject
-		AssetEntity assetEntity = AssetEntity.get(params.id)
-		List<EavEntityAttribute> entityAttributes = EavEntityAttribute.executeQuery(
-			'from EavEntityAttribute where eavAttributeSet=? order by sortOrder', [assetEntity.attributeSetId])
-		def items = entityAttributes.collect { EavEntityAttribute entityAttribute ->
-			EavAttribute attribute = entityAttribute.attribute
-			String code = attribute.attributeCode
-			if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) && code != "currentStatus" && code != "usize") {
-				String frontEndLabel = attribute.frontendLabel
-				if (AssetEntityService.customLabels.contains(frontEndLabel)) {
-					frontEndLabel = project[code] ?: frontEndLabel
-				}
-
-				List<EavAttributeOption> attributeOptions = EavAttributeOption.findAllByAttribute(attribute, [sort: 'value', order: 'asc'])
-				[label: frontEndLabel, attributeCode: code, frontendInput: attribute.frontendInput,
-				 options: attributeOptions.collect { [option: it.value] }, modelId: assetEntity?.modelId,
-				 value: assetEntity.(code)?.toString() ?: '', bundleId: assetEntity?.moveBundleId,
-				 manufacturerId: assetEntity?.manufacturerId]
-			}
-		}
-		renderAsJson items
-	}
-
-	@HasPermission(Permission.AssetView)
-	def retrieveAttributes() {
-		def items = []
-
-		if (params.attribSet) {
-			Project project = securityService.userCurrentProject
-			List<EavEntityAttribute> entityAttributes = EavEntityAttribute.executeQuery('''
-				from EavEntityAttribute
-				where eavAttributeSet = :attributeSetId
-				order by sortOrder
-			''', [attributeSetId: params.attribSet])
-			for (EavEntityAttribute it in entityAttributes) {
-				List<EavAttributeOption> attributeOptions = EavAttributeOption.findAllByAttribute(it.attribute,
-					[sort: 'value', order: 'asc'])
-				def options = attributeOptions.collect { option -> [option: option.value] }
-				String code = it.attribute.attributeCode
-				if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) &&
-					 	code != "moveBundle" && code != "currentStatus" && code != "usize") {
-					def frontEndLabel = it.attribute.frontendLabel
-					if (AssetEntityService.customLabels.contains(frontEndLabel)) {
-						frontEndLabel = project[code] ?: frontEndLabel
-					}
-					items << [label: frontEndLabel, attributeCode: code,
-					          frontendInput: it.attribute.frontendInput, options: options]
-				}
-			}
-		}
-
-		renderAsJson items
-	}
-
-	@HasPermission(Permission.AssetView)
-	def retrieveAssetAttributes() {
-		def items = []
-		if (params.assetId) {
-			def entityAttributes = EavEntityAttribute.executeUpdate(
-				'from EavEntityAttribute where eavAttributeSet = :attributeSetId order by sortOrder',
-				[attributeSetId: AssetEntity.load(params.assetId).attributeSetId])
-			for (EavEntityAttribute it in entityAttributes) {
-				String code = it.attribute.attributeCode
-				if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) &&
-						code != "currentStatus" && code != "usize") {
-					items << [attributeCode: code, frontendInput: it.attribute.frontendInput]
-				}
-			}
-		}
-		renderAsJson items
 	}
 
 	@HasPermission(Permission.AssetEdit)
@@ -1622,8 +1542,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
+
+		def assetType = assetTypes.collect{ AssetOptions option ->
+			[type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
+		}
+
 		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
-		 dependencyStatus: dependencyStatus, environment: environment]
+		 dependencyStatus: dependencyStatus, environment: environment, assetType: assetType]
 	}
 
 	/**
@@ -1649,6 +1575,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				assetOption.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
 				assetOption.value = params.environment
 				break
+			case 'assetType':
+				assetOption.type = AssetOptions.AssetOptionsType.ASSET_TYPE
+				assetOption.value = params.assetType
+				break
 			default:
 				assetOption.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 				assetOption.value = params.dependencyStatus
@@ -1667,15 +1597,23 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def deleteAssetOptions() {
 		String idParamName
-		switch(params.assetOptionType) {
+		String optionType = params.assetOptionType
+
+		switch(optionType) {
 			case 'planStatus':  idParamName = 'assetStatusId'; break
 			case 'Priority':    idParamName = 'priorityId'; break
 			case 'dependency':  idParamName = 'dependecyId'; break
 			case 'environment': idParamName = 'environmentId'; break
+			case 'assetType':   idParamName = 'assetTypeId'; break
 			default:            idParamName = 'dependecyId'; break
 		}
 
 		AssetOptions assetOption = AssetOptions.get(params[idParamName])
+
+		if(optionType == 'assetType' && assetEntityService.assetTypesOf(null, assetOption.value)){
+			throw new InvalidRequestException('You cannot delete an assetType, that is being used, by a model.')
+		}
+
 		assetOption.delete(flush: true)
 		render assetOption.id
 	}
@@ -2664,24 +2602,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * Updates columnList with custom labels.
-	 * @param entityDTAMap :  dataTransferEntityMap for entity type
-	 * @param columnslist :  column Names
-	 * @param project :project instance
-	 */
-	@Deprecated
-	private retrieveColumnNames(entityDTAMap, columnslist, project) {
-		entityDTAMap.eachWithIndex { item, pos ->
-			if (AssetEntityService.customLabels.contains(item.columnName)) {
-				columnslist.add(project[item.eavAttribute?.attributeCode] ?: item.columnName)
-			} else {
-				columnslist.add(item.columnName)
-			}
-		}
-		return columnslist
-	}
-
-	/**
 	 * Sets Import preferences.(ImportApplication,ImportServer,ImportDatabase, ImportStorage,ImportRoom,ImportRack,ImportDependency)
 	 * @param preference
 	 * @param value
@@ -2992,70 +2912,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	@HasPermission(Permission.AssetExport)
 	def poiDemo() {
-	}
-
-	@HasPermission(Permission.AssetExport)
-	def exportPoiDemo() {
-		String filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
-		String today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_5)
-		String filename = "Demo_POI_Export-$today" // Export file name
-
-		def assetEntities = AssetEntity.findAllByProject(securityService.loadUserCurrentProject(), [max:50])
-		File file = grailsApplication.parentContext.getResource(filePath).getFile()
-
-		//creating Workbook insatnce with using template fileInput stream
-		Workbook workbook = WorkbookFactory.create(new FileInputStream(file))
-		Sheet sheet = workbook.getSheet("Servers")
-
-		//Get all column count of first row or header
-		def dataTransferSetInstance = DataTransferSet.get(1)
-		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName(dataTransferSetInstance,"Servers")
-		def serverMap = [:]
-		def serverColumnNameList =[]
-		def serverSheetColumnNames = [:]
-		serverDTAMap.eachWithIndex { item, pos ->
-			serverMap[item.columnName] = null
-			serverColumnNameList << item.columnName
-		}
-		serverMap.DepGroup = null
-		serverColumnNameList << "DepGroup"
-
-		def serverCol = sheet.getRow(0).getPhysicalNumberOfCells()
-		for (int c = 0; c < serverCol; c++) {
-			String serverCellContent = sheet.getRow(0).getCell(c).stringCellValue
-			serverSheetColumnNames[serverCellContent] = c
-			if (serverMap.containsKey(serverCellContent)) {
-				serverMap[serverCellContent] = c
-			}
-		}
-		for (int r=1; r<=assetEntities.size(); r++) {
-			// creating row here
-			Row row = sheet.createRow(r)
-			Cell cell = row.createCell(0)
-			cell.setCellValue(assetEntities[r-1].id)
-			for (String colName in serverColumnNameList) {
-				cell = row.createCell(serverMap[colName])
-				def attribute = serverDTAMap.eavAttribute.attributeCode[serverMap[colName]]
-				if (attribute) {
-					cell.setCellValue(String.valueOf(assetEntities[r-1][attribute] ?: ""))
-				}
-			}
-		}
-
-		response.setContentType('application/vnd.ms-excel')
-		filename = filename.replace('.xls', '')
-		response.setHeader('Content-Disposition', 'attachment; filename="' +  filename + '.xls"')
-
-		try {
-			OutputStream out = new FileOutputStream(file)
-			workbook.write(out)
-			out.close()
-
-			StreamUtils.copy new FileInputStream(new File(file.getAbsolutePath())), response.outputStream
-		}
-		catch (IOException e) {
-			log.error e.message, e
-		}
 	}
 
 	/**

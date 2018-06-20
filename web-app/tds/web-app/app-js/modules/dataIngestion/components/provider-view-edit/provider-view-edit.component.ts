@@ -36,7 +36,7 @@ export class ProviderViewEditComponent implements OnInit {
 		private dataIngestionService: DataIngestionService) {
 
 		this.providerModel = Object.assign({}, this.originalModel);
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Provider' : (this.modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
+		this.modalTitle = this.getModalTitle(this.modalType);
 		this.dataSignature = JSON.stringify(this.providerModel);
 		this.providerName.next(this.providerModel.name);
 	}
@@ -115,6 +115,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 */
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.modalTitle = this.getModalTitle(this.modalType);
 		this.focusForm();
 	}
 
@@ -159,5 +160,17 @@ export class ProviderViewEditComponent implements OnInit {
 
 	private focusForm() {
 		this.providerContainer.nativeElement.focus();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	private getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.CREATE) {
+			return 'Create Provider';
+		}
+		return (modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
 	}
 }

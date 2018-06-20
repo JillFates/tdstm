@@ -42,7 +42,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
 	 */
-	@HasPermission(Permission.RackCreate)
+	@HasPermission(Permission.RackView)
 	def create() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -94,7 +94,7 @@ class RackLayoutsController implements ControllerMethods {
 	/**
 	 * Used to generate multiple rack elevation diagrams
 	 */
-	@HasPermission(Permission.RackEdit)
+	@HasPermission(Permission.RackView)
 	def generateElevations() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -1245,7 +1245,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * @param : targetrack[] : list of target racks
 	 * @return : json list
 	 */
-	@HasPermission(Permission.RackEdit)
+	@HasPermission(Permission.RackView)
 	def retrieveAssignedCables() {
 		List<String> bundleIds = request.getParameterValues("moveBundle[]")
 		Project project = securityService.userCurrentProject

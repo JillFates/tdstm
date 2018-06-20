@@ -57,7 +57,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 
 	def '3. Creating and deleting files from text upload'() {
 		when: "Creating a command object with a txt extension and some random content"
-			String extension = "TXT"
+			String extension = "csv"
 			String fileContent = 'Hello, World!'
 			UploadTextCommand cmd = new UploadTextCommand(extension: extension, content: fileContent)
 		then: "The command object pass all validations."
@@ -118,7 +118,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 
 	def "5. Test uploadFile with valid inputs"() {
 		setup: "Set required objects for the test"
-			String extension = "txt"
+			String extension = "csv"
 			String uploadFileName = "mockfile.${extension}"
 			String content = "Hello, World!"
 			MultipartFile multiPartFile = new MockMultipartFile(uploadFileName, uploadFileName, "text/plain", content.getBytes())
@@ -158,5 +158,27 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			cmd.hasErrors()
 		and: "The filename is null"
 			filename == null
+	}
+
+	def '7. Creating and renaming files'() {
+		setup:
+			String suffix = 'abc'
+			String extension = 'xyz'
+			String renameToFilename = fileSystemService.getUniqueFilename('')
+		when: 'calling createTemporaryFile'
+			def (String filename, OutputStream os) = fileSystemService.createTemporaryFile(suffix, extension)
+		then: 'the file can be renamed'
+			fileSystemService.renameTemporaryFile(filename, renameToFilename)
+		when: 'calling create a second temporaryFile'
+			def (String secondFilename, OutputStream secondOS) = fileSystemService.createTemporaryFile(suffix, extension)
+			fileSystemService.renameTemporaryFile(secondFilename, renameToFilename)
+		then: 'exception should be thrown because renameToFilename already exists'
+			thrown InvalidParamException
+		when: 'the temporary file is deleted'
+			fileSystemService.deleteTemporaryFile(renameToFilename)
+			fileSystemService.deleteTemporaryFile(secondFilename)
+		then: 'the file should no longer exist'
+			! fileSystemService.temporaryFileExists(renameToFilename)
+			! fileSystemService.temporaryFileExists(secondFilename)
 	}
 }

@@ -26,6 +26,7 @@ import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
+import { UtilsPipe } from './pipes/utils.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -65,6 +66,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIBooleanPipe,
 		TranslatePipe,
 		FilterPipe,
+		UtilsPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -110,6 +112,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIFloatingHeaderKGridDirective,
 		TranslatePipe,
 		FilterPipe,
+		UtilsPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		DynamicComponent,

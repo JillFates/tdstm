@@ -1,74 +1,78 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.StringUtil
+
 /**
  *
  * ETLProcess exception used in DSL processing
  *
  */
 class ETLProcessorException extends GroovyRuntimeException {
+    static final String UNKNOWN_DOMAIN_FIELDS_SPEC = "Specified field '{FIELD}' is not defined in domain {DOMAIN}"
 
-    ETLProcessorException (String message) {
+    ETLProcessorException (CharSequence message) {
         super(message)
     }
 
     static ETLProcessorException invalidDomain (String domain) {
-        new ETLProcessorException("Invalid domain: '$domain'. It should be one of these values: ${ETLDomain.values()}".toString())
+        new ETLProcessorException("Invalid domain: '$domain'. It should be one of these values: ${ETLDomain.values()}")
     }
 
     static ETLProcessorException invalidSkipStep (Integer skip) {
-        new ETLProcessorException("Incorrect skip step: $skip".toString())
+        new ETLProcessorException("Incorrect skip step: $skip")
     }
 
     static ETLProcessorException notCurrentFindElement() {
         new ETLProcessorException('You need to define a find element first')
     }
 
-    static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain, String field) {
-        new ETLProcessorException("There is not validator for domain $domain and field $field".toString())
+    static ETLProcessorException unknownDomainFieldsSpec(ETLDomain domain, String field) {
+        String msg = StringUtil.replacePlaceholders(UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:domain.toString(), FIELD:field])
+        new ETLProcessorException( msg )
     }
 
     static ETLProcessorException domainWithoutFieldsSpec (ETLDomain domain, String field) {
-        new ETLProcessorException("The domain $domain does not have specifications for field: $field".toString())
+        new ETLProcessorException("The domain $domain does not have specifications for field: $field")
     }
 
     static ETLProcessorException methodMissing (String method, args) {
-        new ETLProcessorException("Unrecognized command $method with args $args".toString())
+        new ETLProcessorException("Unrecognized command $method with args $args")
     }
 
     static ETLProcessorException methodMissingInFindCommand (String method, args) {
-        new ETLProcessorException("Unrecognized command $method with args $args for the find / elseFind command".toString())
+        new ETLProcessorException("Unrecognized command $method with args $args for the find / elseFind command")
     }
 
     static ETLProcessorException parameterMissing (String parameter) {
-        new ETLProcessorException("Unrecognized command $parameter".toString())
+        new ETLProcessorException("Unrecognized command $parameter")
     }
 
     static ETLProcessorException extractMissingColumn (String columnName) {
-        new ETLProcessorException("Extracting a missing column name '$columnName'".toString())
+        new ETLProcessorException("Extracting a missing column name '$columnName'")
     }
 
     static ETLProcessorException missingColumn (String columnName) {
-        new ETLProcessorException("Missing column name '$columnName'".toString())
+        new ETLProcessorException("Missing column name '$columnName'")
     }
 
     static ETLProcessorException extractInvalidColumn (Integer index) {
-        new ETLProcessorException("Invalid column index: $index".toString())
+        new ETLProcessorException("Invalid column index: $index")
     }
 
     static ETLProcessorException unknownTransformation (String name) {
-        new ETLProcessorException("Invalid transformation method '$name'".toString())
+        new ETLProcessorException("Invalid transformation method '$name'")
     }
 
     static ETLProcessorException invalidConsoleStatus (String status) {
-        new ETLProcessorException("Unknown console command option: $status".toString())
+        new ETLProcessorException("Unknown console command option: $status")
     }
 
     static ETLProcessorException nonUniqueResults (List<String> fields) {
-        new ETLProcessorException("The match was non-unique for fields ${fields}".toString())
+        new ETLProcessorException("The match was non-unique for fields ${fields}")
     }
 
     static ETLProcessorException incorrectAmountOfParameters (List<String> fields, List values) {
-        new ETLProcessorException("Incorrect number of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]".toString())
+        new ETLProcessorException("Incorrect number of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]")
     }
 
     static ETLProcessorException nonProjectDefined () {
@@ -80,15 +84,15 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException UnknownVariable (Object value) {
-        new ETLProcessorException("Unknown variable: ${value}".toString())
+        new ETLProcessorException("Unknown variable: ${value}")
     }
 
     static ETLProcessorException unknownDataSetProperty (Object value) {
-        new ETLProcessorException("Unknown dataSet property: ${value}".toString())
+        new ETLProcessorException("Unknown dataSet property: ${value}")
     }
 
     static ETLProcessorException unknownDomainProperty (Object value) {
-        new ETLProcessorException("Unknown DOMAIN property: ${value}".toString())
+        new ETLProcessorException("Unknown DOMAIN property: ${value}")
     }
 
     static ETLProcessorException currentElementNotDefined () {
@@ -96,39 +100,55 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidFindCommand (String dependentId) {
-        new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value".toString())
+        new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value")
     }
 
     static ETLProcessorException invalidDomainPropertyName (ETLDomain domain, String fieldName) {
-        new ETLProcessorException("$fieldName is not a domain property for ${domain.name()}".toString())
+        new ETLProcessorException("$fieldName is not a domain property for ${domain.name()}")
     }
 
     static ETLProcessorException invalidDomainReference (ETLDomain domain, String fieldName) {
-        new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
+        new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}")
     }
 
     static ETLProcessorException invalidWhenFoundCommand(String fieldName) {
-        new ETLProcessorException("Incorrect whenFound command. Use whenFound $fieldName update { .... }".toString())
+        new ETLProcessorException("Incorrect whenFound command. Use whenFound $fieldName update { .... }")
+    }
+
+    static ETLProcessorException whenNotFoundCommandWithoutCurrentFindElement(String fieldName) {
+        new ETLProcessorException("Incorrect used: whenNotFound for field '$fieldName'. It must have defined a find command previously")
+    }
+
+    static ETLProcessorException whenFoundCommandWithoutCurrentFindElement(String fieldName) {
+        new ETLProcessorException("Incorrect used: whenFound for field '$fieldName'. It must have defined a find command previously")
     }
 
     static ETLProcessorException invalidWhenNotFoundCommand(String fieldName) {
-        new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }".toString())
+        new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }")
     }
 
+	static ETLProcessorException incorrectFoundUseWithoutAssetClass() {
+		new ETLProcessorException("Incorrect whenFound/whenNotFound command. It must define 'assetClass' first.")
+	}
+
+	static ETLProcessorException incorrectFoundUseWithoutArgValue(String fieldName) {
+		new ETLProcessorException("Incorrect whenFound/whenNotFound command: $fieldName must be defined using arguments.")
+	}
+
     static ETLProcessorException incorrectDomain (ETLDomain domain) {
-        new ETLProcessorException("Cannot create a query for domain ${domain.name()}".toString())
+        new ETLProcessorException("Cannot create a query for domain ${domain.name()}")
     }
 
 	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
-		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
+		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS")
 	}
 
 	static ETLProcessorException unknownAssetControlType (String controlType) {
-		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
+		new ETLProcessorException("Unknown AssetControlType: ${controlType}")
 	}
 
     static ETLProcessorException invalidIgnoreCommand () {
-        new ETLProcessorException('You cannot use ignore rows in an empty results')
+        new ETLProcessorException('You cannot use ignore records in an empty results')
     }
 
     static ETLProcessorException invalidSheetCommand () {
@@ -136,19 +156,27 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidSheetName (String sheetName) {
-        new ETLProcessorException("Sheet '$sheetName' not found in workbook".toString())
+        new ETLProcessorException("Sheet '$sheetName' not found in workbook")
     }
 
     static ETLProcessorException invalidSheetNumber (Integer sheetNumber) {
-        new ETLProcessorException("Sheet number $sheetNumber not found in workbook".toString())
+        new ETLProcessorException("Sheet number $sheetNumber not found in workbook")
     }
 
     static ETLProcessorException invalidExcelDriver () {
         new ETLProcessorException('Use TDSExcelDriver for an instance of ExcelConnection in an ETL Script')
     }
 
+    static ETLProcessorException invalidJSONDriver () {
+        new ETLProcessorException('Use TDSJSONDriver for an instance of JSONConnection in an ETL Script')
+    }
+
+    static ETLProcessorException invalidRootNode (String rootNode) {
+        new ETLProcessorException("Unable to find JSON rootNode with path '${rootNode}'")
+    }
+
     static ETLProcessorException invalidETLVariableName (String variableName) {
-        new ETLProcessorException("Invalid variable name: ${variableName}. Variable names must end with 'Var'".toString())
+        new ETLProcessorException("Invalid variable name: ${variableName}. Variable names must end with 'Var'")
     }
 
     static final String missingPropertyExceptionMessage = "No such property: variableName"

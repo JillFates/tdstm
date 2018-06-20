@@ -167,7 +167,7 @@
                                 <g:link params="[roomId:room.id]" controller="room">Room ${room.location}/${room.roomName}</g:link>
                             </li>
                         </g:if>
-                        <tds:hasPermission permission="${Permission.AssetEdit}">
+                        <tds:hasPermission permission="${Permission.RackView}">
                             <li class="menu-child-item menu-parent-data-centers-rack-elevation">
                                 <g:link controller="rackLayouts" action="create">Rack Elevations</g:link>
                             </li>
