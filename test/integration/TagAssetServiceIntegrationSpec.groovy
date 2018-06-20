@@ -9,7 +9,6 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
 import net.transitionmanager.service.TagService
@@ -203,16 +202,16 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	void 'Test asset cascade delete'() {
 		when: 'deleting an asset'
 			device.delete(flush: true)
-			List<TagAsset> tagAssets = tagAssetService.getTags(project, device.id)
+			tagAssetService.getTags(project, device.id)
 		then: 'all related tagAssets are deleted'
-			thrown InvalidParamException
+			thrown EmptyResultException
 	}
 
 	void 'Test tag cascade delete'() {
 		when: 'deleting a tag'
 			tag1.delete(flush: true)
-			List<TagAsset> tagAssets = tagAssetService.getTags(project, device.id)
-			List<TagAsset> tagAssets2 = tagAssetService.getTags(project, device2.id)
+			List<TagAsset> tagAssets = tagAssetService.list(project, device.id)
+			List<TagAsset> tagAssets2 = tagAssetService.list(project, device2.id)
 		then: 'all related tagAssets are deleted'
 			tagAssets.size() == 0
 			tagAssets2.size() == 1
@@ -232,7 +231,6 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test tagMerge primary tag from another project'() {
 		when: 'trying to merge a tag from another project into a tag'
-			long tagId = tag1.id
 			tagAssetService.merge(project, tag3.id, tag1.id)
 		then: 'an exception is thrown'
 			thrown EmptyResultException
@@ -240,7 +238,6 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test tagMerge secondary tag from another project'() {
 		when: 'trying to merge a tag from another project into a tag'
-			long tagId = tag1.id
 			tagAssetService.merge(project, tag1.id, tag3.id)
 		then: 'an exception is thrown'
 			thrown EmptyResultException
