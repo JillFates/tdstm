@@ -38,10 +38,10 @@ class AssetDependency {
 	static constraints = {
 		asset unique: ['dependent', 'type']
 		dependent nullable: false
-		c1 nullable: true, blank: true, size:0..65535
-		c2 nullable: true, blank: true, size:0..65535
-		c3 nullable: true, blank: true, size:0..65535
-		c4 nullable: true, blank: true, size:0..65535
+		c1 nullable: true, blank: true, size:0..255
+		c2 nullable: true, blank: true, size:0..255
+		c3 nullable: true, blank: true, size:0..255
+		c4 nullable: true, blank: true, size:0..255
 		comment nullable: true, blank: true, size: 0..65535
     	createdBy nullable: true // @See TM-8392
 		updatedBy nullable: true
