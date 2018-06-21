@@ -56,8 +56,8 @@ class ETLBinding extends Binding {
      * @param value the ETL Element define for the name variable
      */
     void addDynamicVariable (String name, def value) {
-        dynamicVariables.add(name)
-        this.variables[name] = value
+	    dynamicVariables.add(name)
+	    this.variables[name] = value
     }
 
     /**

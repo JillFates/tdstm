@@ -16,7 +16,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Ignore
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -424,7 +423,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	@Ignore
 	void 'test can read JSONObject fields for complex JSON DataSet'(){
 
 		given:
@@ -435,7 +433,17 @@ class ETLJSONSpec extends ETLBaseSpec {
 					      "app id": 123,
 					      "attribs": {
 					         "memory": 4096,
-					         "cpu": 2
+					         "cpu": 2,
+					         "storage":[
+					            {
+					               "type": "IDE",
+					               "size": "1T"
+					            },
+					            {
+					               "type": "SSD",
+					               "size": "500G"
+					            }
+					         ]
 					      }
 					   }
 					]
@@ -450,23 +458,28 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
+						console on
 						rootNode 'devices'
 						read labels
+						domain Device
 						iterate {
-							 domain Device
 						    extract 'app id' load 'id'
 						    extract 'attribs' set attribsVar
-						    load 'custom1' with attribsVar.memory  //['memory']
-						    load 'custom2' with attribsVar.cpu  
+						    load 'custom1' with attribsVar['memory']
+						    load 'custom2' with attribsVar.cpu
+						    load 'custom3' with attribsVar.storage.size() 
+						    load 'custom4' with attribsVar.storage.collect { it.type }
+						    load 'custom5' with attribsVar.propNotFound
 						}
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
 			etlProcessor.resultsMap().domains.size() == 1
+			println debugConsole.content()
 
 		and: 'Results contains values'
 			with(etlProcessor.resultsMap().domains[0]) {
-				domain == ETLDomain.Application.name()
+				domain == ETLDomain.Device.name()
 				data.size() == 1
 				with(data[0].fields.custom1) {
 					originalValue == 4096
@@ -476,6 +489,21 @@ class ETLJSONSpec extends ETLBaseSpec {
 				with(data[0].fields.custom2) {
 					originalValue == 2
 					value == 2
+				}
+
+				with(data[0].fields.custom3) {
+					originalValue == 2
+					value == 2
+				}
+
+				with(data[0].fields.custom4) {
+					originalValue == ["IDE", "SSD"]
+					value == ["IDE", "SSD"]
+				}
+
+				with(data[0].fields.custom5) {
+					originalValue == null
+					value == null
 				}
 			}
 
