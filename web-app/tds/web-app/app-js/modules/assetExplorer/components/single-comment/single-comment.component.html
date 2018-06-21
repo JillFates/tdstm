@@ -14,33 +14,58 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group single-component">
-										<textarea rows="15" id="singleComment" name="singleComment" class="form-control" *ngIf="singleCommentModel.modal.type === modalType.EDIT"></textarea>
+										<textarea rows="4" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW"></textarea>
 										<div *ngIf="singleCommentModel.modal.type === modalType.VIEW">{{singleCommentModel.comment}}</div>
 									</div>
 								</div>
 								<div class="col-md-8">
 									<div class="form-group">
-										<label class="col-sm-3 control-label">Category:
-											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
-										</label>
+										<label class="col-sm-3 control-label">Category:</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
+											<kendo-dropdownlist
+												id="singleCommentCategory" name="singleCommentCategory"
+												class="form-control single-comment-dropdown"
+												[data]="commentCategories"
+												[(ngModel)]="singleCommentModel.category">
+											</kendo-dropdownlist>
+										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 											<label class="control-label label-detail text-capitalize">{{singleCommentModel.category}}</label>
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-3 control-label">Class:
-											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
-										</label>
+										<label class="col-sm-3 control-label">Class:</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
+											<kendo-dropdownlist
+													id="singleCommentClassOptions" name="singleCommentClassOptions"
+													class="form-control single-comment-dropdown" style="width: 100%;"
+													[data]="assetClassOptions"
+													[textField]="'text'"
+													[valueField]="'id'"
+													[(ngModel)]="singleCommentModel.assetClass"
+													(valueChange)="onAssetClassChange(dataItem)"
+													required>
+											</kendo-dropdownlist>
+										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetType}}</label>
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetClass.text}}</label>
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-3 control-label">Asset:
+										<label class="col-sm-3 control-label">
+											Asset:
 											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
 										</label>
+										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
+											<tds-combobox
+													[(model)]="singleCommentModel.asset"
+													[(metaParam)]="singleCommentModel.assetClass.id"
+													[serviceRequest]="getAssetListForComboBox"
+													(valueChange)="onAssetChange($event)">
+											</tds-combobox>
+										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetName}}</label>
+											<label class="control-label label-detail text-capitalize">{{singleCommentModel.asset.text}}</label>
 										</div>
 									</div>
 								</div>
@@ -52,7 +77,7 @@
 										</label>
 									</div>
 								</div>
-								<div class="col-md-12 single-comment-date-container">
+								<div class="col-md-12 single-comment-date-container" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 									<div class="col-md-6 pad-left-0">
 										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | date: dateFormatTime}}</label>
 									</div>
@@ -66,9 +91,13 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left">
+				<button type="button" (click)="onSave()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" [disabled]="singleCommentModel.asset?.id === '' || singleCommentModel.comment === ''">
+					<span class="fa fa-fw fa-floppy-o"></span> Save
+				</button>
+				<button type="button" (click)="onEdit()" class="btn btn-primary pull-left" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 					<span class="glyphicon glyphicon-pencil"></span> Edit
 				</button>
+                <button type="button" (click)="onDelete()" class="btn btn-danger" *ngIf="singleCommentModel.modal.type !== modalType.CREATE"><span class="fa fa-fw fa-trash"></span> Delete</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span>
 					<span>Cancel</span>

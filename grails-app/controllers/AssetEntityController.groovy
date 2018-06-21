@@ -30,6 +30,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import grails.util.Environment
+import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
@@ -45,6 +46,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -565,6 +567,24 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
+
+			TimeDuration estimatedDuration = TimeUtil.createTimeDuration(assetComment.duration, assetComment.durationScale)
+			TimeDuration actualDuration
+			TimeDuration durationDelta
+			if (assetComment.actStart && assetComment.actFinish) {
+				actualDuration = TimeUtil.elapsed(assetComment.actStart, assetComment.actFinish)
+				if (estimatedDuration) {
+					durationDelta = actualDuration.minus(estimatedDuration)
+				}
+			}
+			Map recipeMap
+			if (assetComment?.taskBatch?.recipe) {
+				Recipe recipe = assetComment.taskBatch.recipe
+				recipeMap = [
+				    id: recipe.id,
+					name: recipe.name
+				]
+			}
 			commentList << [
 				assetComment:assetComment,
 				durationScale:assetComment.durationScale.value(),
@@ -603,7 +623,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,
-				action: assetComment.apiAction?.name
+				action: assetComment.apiAction?.name,
+				recipe: recipeMap,
+				actualDuration: TimeUtil.formatDuration(actualDuration),
+				durationDelta: TimeUtil.formatDuration(durationDelta)
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
