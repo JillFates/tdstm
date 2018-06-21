@@ -30,6 +30,7 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
@@ -166,6 +167,7 @@ class DataImportService implements ServiceMethods {
 					}
 					importContext.fieldNames = domainJson.fieldNames
 					importContext.fieldLabelMap = domainJson.fieldLabelMap
+					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
@@ -282,11 +284,13 @@ class DataImportService implements ServiceMethods {
 			warnOnChangesAfter = new Date()
 		}
 
+		DataScript dataScript = GormUtil.findInProject(importContext.project, DataScript, importContext.etlInfo.dataScriptId)
+
 		ImportBatch batch = new ImportBatch(
 				project: importContext.project,
 				status: ImportBatchStatusEnum.PENDING,
-				provider: importContext.etlInfo.provider,
-				dataScript: (importContext.etlInfo.dataScript ?: ''),
+				dataScript: dataScript,
+				provider: dataScript?.provider,
 				domainClassName: importContext.domainClass,
 				createdBy: importContext.userLogin.person,
 				// createdBy: importContext.etlInfo.createdBy,
@@ -1894,6 +1898,7 @@ class DataImportService implements ServiceMethods {
 		log.debug "transformEtlData() calling scriptProcessorService.executeAndSaveResultsInFile"
 		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
 			project,
+			dataScript?.id,
 			dataScript.etlSourceCode,
 			inputFilename,
 			updateProgressClosure)
