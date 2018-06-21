@@ -167,7 +167,6 @@ class DataImportService implements ServiceMethods {
 					}
 					importContext.fieldNames = domainJson.fieldNames
 					importContext.fieldLabelMap = domainJson.fieldLabelMap
-					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
