@@ -160,6 +160,13 @@ class Element implements RangeChecker {
 
 	/**
 	 * Try to get a property from the content we delegate to the value in case that it is a Map
+	 * <code>
+	 *      load 'custom2' with attribsVar.cpu
+	 * 		load 'custom3' with attribsVar.storage.size()
+	 * <code>
+	 * The get is called when the parser evalates the attribs.* and passes the .propertyName to the
+	 * method. The get method then return's that property (e.g. cpu and storage)
+	 *
 	 * @param name
 	 * @return
 	 */
