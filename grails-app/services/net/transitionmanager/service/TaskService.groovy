@@ -37,7 +37,6 @@ import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
