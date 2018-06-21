@@ -6,7 +6,10 @@ import geb.waiting.WaitTimeoutException
 class CommonsModule extends Module {
 
     static content = {
-
+        filterCalendarIcons { $('.k-i-calendar')}
+        kendoDateFilter { $('kendo-popup td[role=gridcell]')}//
+        removeKendoDateFilterIcons { $('kendo-datepicker + span.fa-times')}
+        allFilters { $('input + span.fa-times')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -30,5 +33,26 @@ class CommonsModule extends Module {
     def waitForGlobalProgressBarModal(){
         waitFor{$('div#globalProgressBar')}
         waitFor{!$('div#globalProgressBar')}
+    }
+
+    /*
+    * date: string formatted date required by kendo picker. "EEEE, MMMM dd, yyyy"//Friday, June 1, 2018
+    * calendarIconIndex: NOT REQUIRED if one date filter, number because is possible to have more than one inputs
+    * */
+    def setKendoDateFilter(date, calendarIconIndex = null){
+        if (calendarIconIndex != null) {
+            filterCalendarIcons[calendarIconIndex].click()
+        } else {
+            filterCalendarIcons.click()
+        }
+        waitFor{kendoDateFilter.find{it.@title.contains(date)}.click()}
+    }
+
+    def removeKendoDateFilter(calendarIconIndex = null){
+        if (calendarIconIndex != null) {
+            removeKendoDateFilterIcons[calendarIconIndex].click()
+        } else {
+            removeKendoDateFilterIcons.click()
+        }
     }
 }
