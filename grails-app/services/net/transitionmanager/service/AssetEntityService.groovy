@@ -2869,30 +2869,24 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the map of manufacturers
 	 */
 	def manufacturersOf(assetType, term) {
-		String projectionFields = "SELECT distinct m.id, m.name FROM Manufacturer m"
+		String projectionFields = 'SELECT distinct m.id, m.name FROM Manufacturer m'
 		String joinTables = ""
-		String condition = ""
-		String orderBy = " ORDER BY m.name"
+		List<String> conditions = []
+		String orderBy = ' ORDER BY m.name'
 		Map hqlParams = [:]
 
 		if (StringUtils.isNotBlank(term)) {
-			if (hqlParams.isEmpty()) {
-				condition = condition + " WHERE m.name LIKE :manufacturerName"
-			} else {
-				condition = condition + " AND m.name LIKE :manufacturerName"
-			}
-			hqlParams['manufacturerName'] = "%" + term + "%"
+			conditions << 'm.name LIKE :manufacturerName'
+			hqlParams['manufacturerName'] = '%' + term + '%'
 		}
 
 		if (StringUtils.isNotBlank(assetType)) {
-			joinTables = " LEFT OUTER JOIN m.models as model"
-			if (hqlParams.isEmpty()) {
-				condition = condition + " WHERE model.assetType = :modelAssetType"
-			} else {
-				condition = condition + " AND model.assetType = :modelAssetType"
-			}
+			joinTables = ' LEFT OUTER JOIN m.models as model'
+			conditions << 'model.assetType = :modelAssetType'
 			hqlParams['modelAssetType'] = assetType
 		}
+
+		String condition = ' WHERE ' + conditions.join(' AND ')
 
 		String hqlQuery = projectionFields + joinTables + condition + orderBy
 
