@@ -665,6 +665,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() replace('Inc', 'Incorporated') load 'appVendor'
 					}
@@ -697,6 +698,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load 'appVendor'
 					}
@@ -1139,6 +1141,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() load 'appVendor'
 					}
@@ -1160,7 +1163,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					replace 'Inc', 'Incorporated'
 					domain Application
 					read labels
@@ -1184,7 +1186,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					replace ControlCharacters with '~'
 					domain Application
 					read labels
@@ -1198,14 +1199,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
-	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
+	void 'test can turn on globally trim command to remove leading and trailing whitespaces by default'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						trim on
 						domain Application
 						read labels
 						iterate {
@@ -1229,7 +1229,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					domain Application
 					read labels
 					iterate {
