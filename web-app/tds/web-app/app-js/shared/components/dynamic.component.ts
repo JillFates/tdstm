@@ -14,6 +14,7 @@ import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 
 @Component({
 	selector: `empty-component`,
@@ -33,7 +34,8 @@ export class DynamicComponent {
 				DropDownsModule,
 				IntlModule,
 				DateInputsModule,
-				GridModule
+				GridModule,
+				InputsModule,
 			].concat(imports),
 			declarations: [
 				compClass
