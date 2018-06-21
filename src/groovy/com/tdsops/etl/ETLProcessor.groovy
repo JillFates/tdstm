@@ -135,7 +135,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Set globalTransformers = [] as Set
 
 	static Trimmer = { Element element ->
-		element.trim()
+		element.trim(true)
 	}
 
 	static Sanitizer = { Element element ->
@@ -182,6 +182,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
+		this.initializeDefaultGlobalTransformations()
 	}
 
 	// ------------------------------------
@@ -996,6 +997,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		globalTransformers.each { transformer ->
 			transformer(element)
 		}
+	}
+
+	private void initializeDefaultGlobalTransformations(){
+		globalTransformers.add(Trimmer)
+		//  globalTransformers.add(Sanitizer)
 	}
 
 	/**
