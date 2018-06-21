@@ -46,7 +46,7 @@ class ETLProcessorResult {
 	 * @param dataScriptId an id of an instance of DataScript
 	 */
 	void addDataScriptIdInETLInfo(Long dataScriptId){
-		this.ETLInfo.setDataScriptId = dataScriptId
+		this.ETLInfo.dataScriptId = dataScriptId
 	}
 
 	/**
