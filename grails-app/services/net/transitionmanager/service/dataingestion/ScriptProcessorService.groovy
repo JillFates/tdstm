@@ -70,6 +70,7 @@ class ScriptProcessorService {
 	 */
 	def executeAndSaveResultsInFile(
 		Project project,
+		Long dataScriptId,
 		String scriptContent,
 		String filename,
 		ProgressCallback progressCallback = null,
@@ -80,6 +81,10 @@ class ScriptProcessorService {
 			new DataSetFacade(FileSystemService.buildDataset(filename)),
 			new DebugConsole(buffer: new StringBuffer()),
 			createFieldsSpecValidator(project))
+
+		if(dataScriptId){
+			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
+		}
 
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
@@ -186,6 +191,7 @@ class ScriptProcessorService {
 		Boolean includeConsoleLog = true
 		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
 			project,
+			null,
 			scriptContent,
 			sampleDataFullFilename,
 			updateProgressClosure,
