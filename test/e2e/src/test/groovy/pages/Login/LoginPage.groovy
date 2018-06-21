@@ -30,4 +30,14 @@ class LoginPage extends Page {
         password =  System.properties['tm.creds.password'] ?: pass
         submitButton.click()
     }
+
+    def loginSecondaryUser(){
+        Login log=new Login()
+        String credentials=log.readCredentials()
+        String usr = credentials.split(",")[2]
+        String pass = credentials.split(",")[3]
+        username =  usr
+        password =  pass
+        submitButton.click()
+    }
 }
