@@ -2872,6 +2872,7 @@ class AssetEntityService implements ServiceMethods {
 		String projectionFields = 'SELECT distinct m.id, m.name FROM Manufacturer m'
 		String joinTables = ""
 		List<String> conditions = []
+		String condition = ''
 		String orderBy = ' ORDER BY m.name'
 		Map hqlParams = [:]
 
@@ -2886,7 +2887,9 @@ class AssetEntityService implements ServiceMethods {
 			hqlParams['modelAssetType'] = assetType
 		}
 
-		String condition = ' WHERE ' + conditions.join(' AND ')
+		if (conditions) {
+			condition = ' WHERE ' + conditions.join(' AND ')
+		}
 
 		String hqlQuery = projectionFields + joinTables + condition + orderBy
 
