@@ -936,7 +936,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/tag/$primaryId/merge/$secondaryId" {
+		"/ws/tag/$targetId/merge/$sourceId" {
 			controller = "wsTagAsset"
 			action = [
 				PUT: "merge",

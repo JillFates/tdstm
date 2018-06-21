@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.tag.CreateTagAssetCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -19,21 +18,16 @@ class WsTagAssetController implements ControllerMethods {
 	@HasPermission(Permission.TagCreate)
 	def create() {
 		CreateTagAssetCommand newAssetTag = populateCommandObject(CreateTagAssetCommand)
-
-		if (newAssetTag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(newAssetTag)))
-			return
-		}
-
+		validateCommandObject(newAssetTag)
 		List<TagAsset> tagAssets = tagAssetService.applyTags(projectForWs,newAssetTag.tagIds, newAssetTag?.assetId)
 
 		renderSuccessJson(tagAssets*.toMap())
 
 	}
 
-	@HasPermission(Permission.TagEdit)
-	def merge(Long primaryId, Long secondaryId) {
-		List<TagAsset> tagAssets = tagAssetService.merge(projectForWs, primaryId, secondaryId)
+	@HasPermission(Permission.TagDelete)
+	def merge(Long targetId, Long sourceId) {
+		List<TagAsset> tagAssets = tagAssetService.merge(projectForWs, targetId, sourceId)
 
 		renderSuccessJson(tagAssets*.toMap())
 	}

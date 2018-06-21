@@ -35,9 +35,14 @@ class TagAssetService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	List<Tag> getTags(Project currentProject, Long assetId) {
-		AssetEntity asset = get(AssetEntity, assetId, currentProject)
+		AssetEntity assetToLookUp = get(AssetEntity, assetId, currentProject)
 
-		return TagAsset.findAllWhere(asset: asset)*.tag
+		return TagAsset.where {
+			asset == assetToLookUp
+			projections {
+				property("tag")
+			}
+		}.list(sort: "id", order: "asc")
 	}
 
 	/**
@@ -86,20 +91,20 @@ class TagAssetService implements ServiceMethods {
 	 *
 	 * @return A list of AssetTags that have been updated.
 	 */
-	List<TagAsset> merge(Project currentProject, Long primaryId, Long secondaryId) {
-		Tag primary = get(Tag, primaryId, currentProject)
-		Tag secondary = get(Tag, secondaryId, currentProject)
+	List<TagAsset> merge(Project currentProject, Long targetId, Long sourceId) {
+		Tag primary = get(Tag, targetId, currentProject)
+		Tag secondary = get(Tag, sourceId, currentProject)
 
 		List<TagAsset> tagAssets = TagAsset.findAllWhere(tag: secondary)
 
 		//This will ignore nulls resulting from a duplicate key.
 		List<TagAsset> updatedLinks = tagAssets.findResults { TagAsset link ->
 			link.tag = primary
-			return link.save(flush: true)
+			return link.save(flush: true, failOnError: false)
 		}
 
 		//removes the secondary tag, and by cascade any links, that would create a duplicate key.
-		secondary.delete()
+		secondary.delete(failOnError:true)
 
 		return updatedLinks
 	}
