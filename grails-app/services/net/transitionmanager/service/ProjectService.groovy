@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-import com.tdssrc.grails.TimeUtil
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -72,7 +71,6 @@ class ProjectService implements ServiceMethods {
 	AuditService auditService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	SecurityService securityService
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService

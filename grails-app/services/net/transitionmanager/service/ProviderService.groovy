@@ -7,8 +7,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class ProviderService implements ServiceMethods {
 
-    SecurityService securityService
-
     /**
      * Validate that a given name is unique for providers for the project.
      * @param providerName

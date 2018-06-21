@@ -20,7 +20,6 @@ class TaskNonTranService implements ServiceMethods {
 
 	CommentService commentService
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 

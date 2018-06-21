@@ -139,6 +139,21 @@ class UrlMappings {
 			        POST: "deleteAssets"
 			]
 		}
+
+		"/ws/asset/classOptions" {
+			controller = "wsAsset"
+			action = [
+			    GET: "retrieveAssetClassOptions"
+			]
+		}
+
+		"/ws/task/assetCommentCategories" {
+			controller = "wsTask"
+			action = [
+			    GET : 'assetCommentCategories'
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -270,6 +285,25 @@ class UrlMappings {
 		"/ws/qzCertificate" {
 			controller = 'wsApplication'
 			action = [GET:'qzCertificate']
+		}
+
+		/**
+		 * AssetComment CRUD endpoints
+		 */
+
+		"/ws/task/comment/$id" {
+			controller = "wsTask"
+			action = [
+				DELETE:'deleteComment',
+				PUT: 'updateComment'
+			]
+		}
+
+		"/ws/task/comment" {
+			controller = 'wsTask'
+			action = [
+			    POST: 'saveComment'
+			]
 		}
 
 		"/ws/task/generateTasks" {
@@ -917,6 +951,22 @@ class UrlMappings {
 			controller = "wsCredential"
 			action = [
 				POST: "checkValidExprSyntax"
+			]
+		}
+
+		"/ws/tag" {
+			controller = "wsTag"
+			action = [
+				GET : "list",
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/$id" {
+			controller = "wsTag"
+			action = [
+				PUT : "update",
+				DELETE: "delete"
 			]
 		}
 

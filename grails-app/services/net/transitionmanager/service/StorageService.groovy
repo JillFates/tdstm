@@ -9,7 +9,6 @@ import net.transitionmanager.domain.Project
 class StorageService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
-	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a Storage asset

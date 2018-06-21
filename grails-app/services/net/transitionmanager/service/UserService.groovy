@@ -33,7 +33,6 @@ class UserService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AuditService auditService
