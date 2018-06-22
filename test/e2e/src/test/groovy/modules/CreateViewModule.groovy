@@ -45,7 +45,7 @@ class CreateViewModule extends Module {
     }
 
     def clickSaveOptions(){
-        commonsModule.waitForLoader(3)
+        commonsModule.waitForLoader(5)
         waitFor{saveOptions.click()}
     }
 
