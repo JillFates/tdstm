@@ -970,6 +970,28 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/tag/$targetId/merge/$sourceId" {
+			controller = "wsTagAsset"
+			action = [
+				PUT: "merge",
+			]
+		}
+
+		"/ws/tag/asset" {
+			controller = "wsTagAsset"
+			action = [
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/asset/$id" {
+			controller = "wsTagAsset"
+			action = [
+				GET : "list",
+				DELETE: "delete"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
