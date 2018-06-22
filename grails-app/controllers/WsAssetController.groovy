@@ -465,5 +465,13 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(rackOptions)
 	}
 
+	/**
+	 * Return a list with all the Asset Class Options
+	 */
+	@HasPermission(Permission.AssetView)
+	def retrieveAssetClassOptions() {
+		renderSuccessJson(AssetClass.classOptions)
+	}
+
 
 }

@@ -10,7 +10,6 @@ class DashboardService implements ServiceMethods {
 
 	static transactional = false
 
-	SecurityService securityService
 	TaskService taskService
 
 	/**

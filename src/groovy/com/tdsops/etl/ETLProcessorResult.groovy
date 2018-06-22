@@ -48,8 +48,16 @@ class ETLProcessorResult {
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName()
+			originalFilename: processor.dataSetFacade.fileName(),
 		]
+	}
+
+	/**
+	 * Adds dataScriptId in ETLInfo map for results
+	 * @param dataScriptId an id of an instance of DataScript
+	 */
+	void addDataScriptIdInETLInfo(Long dataScriptId){
+		this.ETLInfo.dataScriptId = dataScriptId
 	}
 
 	/**

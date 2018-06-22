@@ -19,6 +19,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
+import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -56,7 +57,8 @@ import { DependecyService } from './service/dependecy.service';
 		AssetEditComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
-		SingleCommentComponent
+		SingleCommentComponent,
+		TaskDetailComponent
 	],
 	providers: [AssetExplorerService, TaskCommentService, DependecyService],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
@@ -66,7 +68,8 @@ import { DependecyService } from './service/dependecy.service';
 		AssetShowComponent,
 		AssetEditComponent,
 		AssetDependencyComponent,
-		SingleCommentComponent
+		SingleCommentComponent,
+		TaskDetailComponent
 	],
 })
 

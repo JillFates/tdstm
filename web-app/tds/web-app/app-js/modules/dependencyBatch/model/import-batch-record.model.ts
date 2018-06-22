@@ -1,13 +1,18 @@
 import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
 import {EnumModel} from '../../../shared/model/enum.model';
 
+export enum BATCH_RECORD_OPERATION {
+	INSERT = 'INSERT',
+	UPDATE = 'UPDATE'
+}
+
 export class ImportBatchRecordModel {
 	id: number;
 	importBatch: any;
 	status: EnumModel;
 	errorCount: number;
 	errorList: Array<string>;
-	operation: string;
+	operation: BATCH_RECORD_OPERATION;
 	sourceRowId: number;
 	lastUpdated: Date;
 	warn: number;

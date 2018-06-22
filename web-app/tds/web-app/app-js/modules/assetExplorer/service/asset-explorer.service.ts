@@ -156,6 +156,20 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Delete an specific Asset Comment
+	 * @param {string[]} ids
+	 * @returns {Observable<any>}
+	 */
+	deleteAssetComment(ids: string[]): Observable<any> {
+		return this.http.post(`${this.assetEntitySearch}/deleteComment`, JSON.stringify({ids: ids}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	getFileName(viewName: string): Observable<any> {
 		return this.http.post(`${this.defaultUrl}/filename`, JSON.stringify({viewName: viewName}))
 			.map((res: Response) => {
@@ -221,6 +235,19 @@ export class AssetExplorerService {
 					page: response.page
 				};
 				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the List of Asset Class Options
+	 * @returns {Observable<any>}
+	 */
+	getAssetClassOptions(): Observable<any> {
+		return this.http.get(`${this.assetUrl}/classOptions`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}

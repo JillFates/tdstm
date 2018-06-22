@@ -23,7 +23,7 @@
                                 <tbody>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}" />
-                                    <td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
+                                    <td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
                                         <tdsAngular:tooltipSpan field="${standardFieldSpecs.assetName}">
                                             ${assetEntity.assetName}
                                         </tdsAngular:tooltipSpan>
@@ -265,6 +265,6 @@
     </div>
     <div class="modal-footer form-group-center">
         <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
-        <button class="btn btn-default pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
     </div>
 </div>

@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
@@ -15,6 +16,9 @@ trait ServiceMethods {
 
 	GrailsApplication grailsApplication
 	MessageSourceService messageSourceService
+	SecurityService securityService
+
+
 
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can
@@ -25,12 +29,16 @@ trait ServiceMethods {
 	 *
 	 * @param type  the class
 	 * @param id  the id in number or string form, or a domain class instance
+	 * @param currentProject the current project passed down through the controller
 	 * @param throwException  if true, throw exceptions if the id is invalid or no
 	 * instance is found, otherwise return null
 	 * @return  the instance
 	 */
-	def <T> T get(Class<T> type, id, boolean throwException = true) {
-		if (!id) return null
+	def <T> T get(Class<T> type, id, Project currentProject, boolean throwException = true) {
+		T t
+		if (!id){
+			throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
+		}
 
 		if (id in type) {
 			return (T) id
@@ -42,7 +50,7 @@ trait ServiceMethods {
 			}
 
 			try {
-				return doGet(type, id.toLong(), throwException)
+				t = doGet(type, id.toLong(), throwException)
 			}
 			catch (NumberFormatException e) {
 				throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
@@ -50,10 +58,37 @@ trait ServiceMethods {
 		}
 
 		if (id instanceof Number) {
-			return doGet(type, ((Number)id).longValue(), throwException)
+			t = doGet(type, ((Number)id).longValue(), throwException)
 		}
 
-		throw new InvalidParamException("Unable to retrieve an instance of $type.name with unsupported id type $id (${id?.getClass()?.name})")
+		if(!t) {
+			throw new InvalidParamException("Unable to retrieve an instance of $type.name with unsupported id type $id (${id?.getClass()?.name})")
+		}
+
+		checkProject(t, currentProject)
+
+		return t
+	}
+
+	/**
+	 * Checks the domain passed in to see if it has a project field and if it is the same ast the current project.
+	 * If the project doesn't match and EmptyResult exception is thrown.
+	 *
+	 * @param domain The domain to check against the current project.
+	 * @param currentProject The current project that should have been, passed down through the controller.
+	 */
+	void checkProject(domain, Project currentProject) {
+		if (GormUtil.isDomainProperty(domain, 'project')) {
+
+			if (!currentProject) {
+				throw new EmptyResultException()
+			}
+
+			if (currentProject.id != domain.project.id) {
+				securityService.reportViolation("attempted to access asset from unrelated project (asset ${domain?.id})")
+				throw new EmptyResultException()
+			}
+		}
 	}
 
 	private <T> T doGet(Class<T> type, id, boolean throwException) {
@@ -66,7 +101,7 @@ trait ServiceMethods {
 		}
 
 		if (!t && throwException) {
-			// TODO
+			throw new EmptyResultException()
 		}
 
 		t

@@ -21,13 +21,13 @@
                                 <tbody>
                                     <tr class="prop">
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
-                                        <td colspan="2" class="valueNW ${standardFieldSpecs.assetName.imp?:''}" style="max-width: 400px; font-weight:bold;">
+                                        <td colspan="3" class="valueNW ${standardFieldSpecs.assetName.imp?:''}" style="max-width: 400px; font-weight:bold;">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.assetName}">
                                                 ${asset?.assetName}
                                             </tdsAngular:tooltipSpan>
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
-                                        <td colspan="2" style="max-width: 400px;" class="valueNW ${standardFieldSpecs.description.imp?:''}" >
+                                        <td colspan="3" style="max-width: 400px;" class="valueNW ${standardFieldSpecs.description.imp?:''}" >
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.description}">
                                                 ${asset.description}
                                             </tdsAngular:tooltipSpan>
@@ -121,7 +121,7 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-default pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
         <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>
