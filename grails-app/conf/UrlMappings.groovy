@@ -154,6 +154,13 @@ class UrlMappings {
 			]
 		}
 
+
+		'/ws/bulkChange' {
+			controller = 'wsBulkAssetChange'
+			action = [
+			    put:'change'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
