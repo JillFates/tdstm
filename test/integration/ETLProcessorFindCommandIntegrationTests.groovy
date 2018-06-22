@@ -116,7 +116,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -255,7 +255,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -389,7 +389,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -465,7 +465,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -597,7 +597,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -831,7 +831,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -1188,7 +1188,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Dependency.name()
@@ -1277,7 +1277,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Rack.name()

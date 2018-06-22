@@ -2,8 +2,10 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
+import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
 import grails.util.Environment
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.Manufacturer
@@ -80,6 +82,9 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
+
+		// ETLProcessorResult marshaller.
+		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 
 	}
 

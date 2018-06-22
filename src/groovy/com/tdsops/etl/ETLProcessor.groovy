@@ -328,6 +328,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
 		reportRowProgress(rowNum, totalNumRows)
+		result.endRow()
 	}
 
 	/**
@@ -1159,11 +1160,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *    domains - Data structure with each of the domains processed in DataScript
 	 *    consoleLog - A String containing the console log output (optional)
 	 *
+	 * An instance of ETLProcessorResult will be returned and it needs to be converted to JSON using
+	 * com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 * @param includeConsoleLog - flag if the console log should appear in the results (default false)
-	 * @return Map - the results
+	 * @return an instance of ETLProcessorResult
+	 * @see com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 */
-	Map<String, ?> resultsMap(Boolean includeConsoleLog=false) {
-		this.result.toMap(includeConsoleLog)
+	ETLProcessorResult finalResult(Boolean includeConsoleLog = false){
+		this.result.addFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
+		if (includeConsoleLog) {
+			this.result.consoleLog = this.debugConsole.content()
+		} else {
+			this.result.consoleLog = ''
+		}
+		return this.result
 	}
 
 	List<String> getAvailableMethods () {
