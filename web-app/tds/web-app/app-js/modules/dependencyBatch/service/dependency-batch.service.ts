@@ -301,12 +301,7 @@ export class DependencyBatchService {
 			fieldsInfo: fieldsValues
 		};
 		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
-			.map((res: Response) => {
-				// return res.json();
-				let mockResponse = new ApiResponseModel();
-				mockResponse.status = ApiResponseModel.API_SUCCESS;
-				return mockResponse;
-			})
+			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
 }

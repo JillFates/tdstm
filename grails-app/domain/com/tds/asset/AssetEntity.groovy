@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.CustomDomainService
 
 import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
@@ -209,16 +210,17 @@ class AssetEntity {
 
 	String externalRefId
 
-	Integer dependencyBundle = 0
-	Integer size
-	SizeScale scale
-	Integer rateOfChange
-	Person modifiedBy
+	Integer    dependencyBundle = 0
+	Integer    size
+	SizeScale  scale
+	Integer    rateOfChange
+	Person     modifiedBy
+	Collection tagAssets
 
 	Date dateCreated
 	Date lastUpdated
 
-	static hasMany = [comments: AssetComment]
+	static hasMany = [comments: AssetComment, tagAssets: TagAsset]
 
 	static constraints = {
 		application nullable: true

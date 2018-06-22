@@ -12,8 +12,6 @@ import net.transitionmanager.domain.Room
 
 class RackService implements ServiceMethods {
 
-	SecurityService securityService
-
 	/**
 	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD'
 	 * @param project - the project to find/create the rack for

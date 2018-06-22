@@ -28,7 +28,6 @@ class ReportsService implements ServiceMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	RunbookService runbookService
-	SecurityService securityService
 	TaskService taskService
 
 	@Transactional(readOnly = true)

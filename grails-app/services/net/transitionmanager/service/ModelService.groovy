@@ -29,7 +29,6 @@ class ModelService implements ServiceMethods {
 	AssetEntityService assetEntityService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	SecurityService securityService
 
 	/**
 	 * @param fromModel : instance of the model that is being merged

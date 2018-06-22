@@ -665,13 +665,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() replace('Inc', 'Incorporated') load 'appVendor'
 					}
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -697,13 +698,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load 'appVendor'
 					}
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					with(data[0].fields.appVendor) {
@@ -760,7 +762,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -856,7 +858,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'Evaluating a DataScript with having substitute with default value'
 			etlProcessor.evaluate(dataScript)
 		then: 'The evaluate process completed successfully replacing using the default value for custom2 where applicable.'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -940,7 +942,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -976,7 +978,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1014,7 +1016,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1051,7 +1053,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1090,7 +1092,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1139,6 +1141,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					domain Application
 					read labels
+					trim off
 					iterate {
 						extract 'vendor name' transform with trim() load 'appVendor'
 					}
@@ -1160,7 +1163,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					replace 'Inc', 'Incorporated'
 					domain Application
 					read labels
@@ -1184,7 +1186,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					replace ControlCharacters with '~'
 					domain Application
 					read labels
@@ -1198,14 +1199,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
-	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
+	void 'test can turn on globally trim command to remove leading and trailing whitespaces by default'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						trim on
 						domain Application
 						read labels
 						iterate {
@@ -1229,7 +1229,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-					trim on
 					domain Application
 					read labels
 					iterate {

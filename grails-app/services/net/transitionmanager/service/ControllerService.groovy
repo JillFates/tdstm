@@ -25,7 +25,6 @@ class ControllerService implements ServiceMethods {
 	AssetEntityService assetEntityService
 	AuditService auditService
 	PersonService personService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	/**

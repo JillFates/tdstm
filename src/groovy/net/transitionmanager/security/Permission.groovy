@@ -224,6 +224,11 @@ interface Permission {
 			WorkflowEdit                  = 'WorkflowEdit',
 			WorkflowList                  = 'WorkflowList',
 			WorkflowView                  = 'WorkflowView',
+			TagCreate                     = 'TagCreate',
+			TagDelete                     = 'TagDelete',
+			TagEdit                       = 'TagEdit',
+			TagView                       = 'TagView',
+			TagMerge                      = 'TagMerge',
 
 			// Refactor the following:
 			moveBundleShowView			  = 'moveBundleShowView',

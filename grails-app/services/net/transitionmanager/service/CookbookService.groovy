@@ -53,7 +53,6 @@ class CookbookService implements ServiceMethods {
 	JdbcTemplate 	jdbcTemplate
 	PersonService 	personService
 	ProjectService 	projectService
-	SecurityService securityService
 	TaskService		taskService
 
 	/**

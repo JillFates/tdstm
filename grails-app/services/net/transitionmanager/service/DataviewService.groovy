@@ -27,8 +27,6 @@ class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
 
-	SecurityService securityService
-
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'

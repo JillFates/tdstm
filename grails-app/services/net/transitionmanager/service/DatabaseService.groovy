@@ -12,7 +12,6 @@ import net.transitionmanager.domain.Project
 class DatabaseService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
-	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a database asset

@@ -334,10 +334,14 @@
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset.size}"/>
                                     <td nowrap="nowrap" class="sizeScale">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.size}"
-                                                                 size="4" tabindex="410" min="0"
-                                                                 value="${asset.size}"
-                                                                 ngmodel="model.asset.size"/>
+										<kendo-numerictextbox
+											name="deviceSize"
+											[format]="'n'"
+											[min]="0"
+											[autoCorrect]=true
+											tabindex="410"
+											[(ngModel)]="model.asset.size">
+										</kendo-numerictextbox>
                                         <tdsAngular:tooltipSpan field="${standardFieldSpecs.scale}">
                                             <kendo-dropdownlist
                                                     class="select"

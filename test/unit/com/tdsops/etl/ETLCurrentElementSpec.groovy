@@ -194,7 +194,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()){
+			with (etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0], DomainResult) {
@@ -248,7 +248,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0]) {
@@ -318,7 +318,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 				with(domains[0]) {
@@ -399,35 +399,12 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
-					with(data[0]) {
-						op == 'I'
-						errorCount == 0
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						with(fields.id) {
-							originalValue == null
-							value == null
-							//errors == []
-							warn == false
-							with(find) {
-								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										assetName: 'PE2950'
-									}
-								}
-
-							}
-						}
-					}
+					data.size() == 0
 				}
 			}
 
@@ -557,7 +534,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()

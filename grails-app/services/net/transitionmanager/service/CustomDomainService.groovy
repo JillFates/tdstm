@@ -22,7 +22,6 @@ class CustomDomainService implements ServiceMethods {
     public static final int STANDARD_FIELD = 0
     public static final int ALL_FIELDS = 2
 
-    SecurityService securityService
     SettingService settingService
     def jdbcTemplate
 

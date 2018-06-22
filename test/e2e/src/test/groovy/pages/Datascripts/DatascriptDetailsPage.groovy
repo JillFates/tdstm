@@ -14,7 +14,11 @@ class DatascriptDetailsPage extends Page{
         modaltitle(required:false) { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
         datascriptDetail { $('div.modal-header h4[_ngcontent-c7]')}
         dsDetailXIcon {$("div", class:"modal-header").find("button","aria-label":"Close", class:"close")[0]}
+        dsDesignerButton {$("data-script-view-edit").find("button", text: contains("DataScript Designer"))}
+    }
 
+    def clickOnDesignerButton(){
+        waitFor{dsDesignerButton.click()}
     }
 
 }
