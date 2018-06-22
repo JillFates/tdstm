@@ -10,7 +10,7 @@
 
 		<!-- Toolbar Template -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
-			<label class="pad-top-7 pad-left-10">Tasks and Comments</label>
+			<label class="pad-top-3 pad-left-10 mar-bottom-3">Tasks and Comments ({{dataGridTaskCommentOnHelper.gridData.data.length}})</label>
 
 			<label class="form-check-label aligned-label" for="showAll">
 				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAll" id="showAll" name="showAll" type="checkbox" (change)="reloadGrid()">
@@ -22,8 +22,8 @@
 				View Unpublished Tasks
 			</label>
 
-			<button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-6" type="button">
-				<i class="fa fa-fw fa-plus-circle"></i> Add
+			<button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
+				<i class="fa fa-med fa-fw fa-comment-o"></i> Add
 			</button>
 		</ng-template>
 
@@ -43,22 +43,31 @@
 
 			<!-- Action -->
 			<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-				<div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-					<button (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+				<div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
+					<button *ngIf="!dataItem.commentInstance.taskNumber || dataItem.commentInstance.taskNumber === 'null'"
+							(click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</button>
 					<button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
-						<span class="fa fa-fw fa-trash"></span>
+						<i class="fa fa-fw fa-trash"></i>
 					</button>
 				</div>
 			</ng-template>
 
+			<ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.taskNumber'" let-dataItem let-rowIndex="rowIndex">
+				<label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.taskNumber}}</label>
+			</ng-template>
+
 			<ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-				<label class="pointer" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
+				<label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
 			</ng-template>
 
 			<ng-template kendoGridCellTemplate *ngIf="column.property === 'assignedTo'" let-dataItem let-rowIndex="rowIndex">
-				<label class="font-normal">{{getAssignedTo(dataItem)}}</label>
+				<label class="font-normal pad-left-7 pad-top-8">{{getAssignedTo(dataItem)}}</label>
+			</ng-template>
+
+			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+				<div class="pad-left-7 pad-top-8">{{dataItem[column.property]}}</div>
 			</ng-template>
 
 		</kendo-grid-column>
