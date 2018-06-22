@@ -52,7 +52,7 @@ export class DataScriptViewEditComponent implements OnInit {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create DataScript' : (this.modalType === ActionType.EDIT ? 'DataScript Edit' : 'DataScript Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create ETL Script' : (this.modalType === ActionType.EDIT ? 'ETL Script Edit' : 'ETL Script Detail');
 		// ignore etl script from this context
 		let copy = {...this.dataScriptModel};
 		this.etlScriptCode.code = copy.etlSourceCode;

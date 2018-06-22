@@ -32,9 +32,9 @@ export const dataScriptListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	url: DataIngestionStates.DATA_SCRIPT_LIST.url,
 	data: {
 		page: {
-			title: 'DATA_INGESTION.DATA_SCRIPTS',
+			title: 'DATA_INGESTION.ETL_SCRIPTS',
 			instruction: '',
-			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.DATA_SCRIPTS']
+			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.ETL_SCRIPTS']
 		},
 		requiresAuth: true,
 	},

@@ -98,7 +98,7 @@ export class DependencyBatchColumnsModel {
 				locked: false
 			},
 			{
-				label: 'DataScript',
+				label: 'ETL Script',
 				property: 'dataScript.name',
 				type: 'text',
 				width: 130,

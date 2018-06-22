@@ -248,4 +248,5 @@ databaseChangeLog = {
 	include file: '20180612-datascript-create-unique-index-on-name-project-and-provider.groovy'
 	include file: '20180612-add-field-label-map-property-to-import-batch.groovy'
 	include file: '20180613-add-http-method-api-action-table.groovy'
+	include file: '20180620-rename-etl-permissions.groovy'
 }
