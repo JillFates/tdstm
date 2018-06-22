@@ -276,21 +276,18 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 	void '14. can find a Device by its id returning an instance of Device'() {
-
-		given:
+		given: 'an asset has been created'
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-
-		when:
+		when: 'calling the DomainClassQueryHelper.where with flag to return domain instead of id'
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [id: device.id], false)
-
-		then:
+		then: 'one result should be returned'
 			results.size() == 1
+		and: 'the return value should be an instance of the expected asset domain and id'
 			with(results.first()){
 				AssetEntity.isAssignableFrom(it.getClass())
 				id == device.id
 			}
 	}
-
 
 	void '15. can find a Room by a by locationTarget returning an instance of Room'() {
 
@@ -307,7 +304,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				id == room.id
 			}
 	}
-
 
 	void '16. can find a Device by Bundle name returning an instance of Device'() {
 
