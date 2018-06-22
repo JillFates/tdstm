@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import grails.transaction.Transactional
+import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
@@ -11,6 +12,7 @@ import net.transitionmanager.domain.TagAsset
  */
 @Transactional
 class TagAssetService implements ServiceMethods {
+	TagService tagService
 
 	/**
 	 * Gets a list of tagAssets for an asset.
@@ -107,5 +109,121 @@ class TagAssetService implements ServiceMethods {
 		secondary.delete(failOnError:true)
 
 		return updatedLinks
+	}
+
+	/**
+	 * Coerces the string value passed from the BulkChangeService to a List of longs, and validates them as tag ids.
+	 *
+	 * @param currentProject the current project passed from the controller for use in validating the tag ids.
+	 * @param value The string value that need to be coerce.
+	 *
+	 * @return a List of longs, that represent tag ids.
+	 */
+	def coerceBulkValue(Project currentProject, String value) {
+		JsonSlurper jsonSlurper = new JsonSlurper()
+		def parsedValue = jsonSlurper.parseText(value)
+		if(!(parsedValue instanceof List<Integer>)){
+			throw new InvalidParamException('Value is not a list of numbers.')
+		}
+
+		List<Long> tagIds = ((List<Integer>) parsedValue).collect { Integer i -> i.toLong() }
+		validateBulkValues(currentProject, tagIds)
+
+		return tagIds
+	}
+
+	/**
+	 * Validates the tagId sent in to make sure they are valid for the project, by looking them up.
+	 *
+	 * @param currentProject the current project passed down through the controller.
+	 *
+	 * @param tagIds the ids to validate.
+	 */
+	void validateBulkValues(Project currentProject, List<Long> tagIds) {
+		tagIds.each { Long id ->
+			tagService.get(Tag, id, currentProject)
+		}
+	}
+
+	/**
+	 * Bulk adds tags to assets.
+	 *
+	 * @param tagIds The ids of the tags to add.
+	 * @param assetIds The assets to add TagAssetLinks to. this can be an empty list meaning that the filtering query will be used instead.
+	 * @param assetIdsFilterQuery If assetIds are not specified  this query and params are added to the query to apply to all assets,
+	 * from the filtering in the frontend.
+	 */
+	void bulkAdd(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		String queryForAssetIds
+		Map params = [:]
+
+		if (assetIds && !assetIdsFilterQuery) {
+			queryForAssetIds = ':assetIds'
+			params.assetIds = assetIds
+		} else {
+			queryForAssetIds = assetIdsFilterQuery.query
+			params << assetIdsFilterQuery.params
+		}
+
+		params.tagIds = tagIds
+
+		String query = """
+			INSERT into TagAsset
+			(asset, tag, dateCreated)
+			SELECT
+				a as asset,
+				t as tag,
+				current_date() as dateCreated
+			FROM AssetEntity a, Tag t
+			WHERE a.id in ($queryForAssetIds) AND t.id in (:tagIds)
+			AND NOT EXISTS(FROM TagAsset ta WHERE ta.asset = a AND ta.tag = t)
+		"""
+
+		TagAsset.executeUpdate(query, params)
+	}
+
+	/**
+	 * Bulk removes tags from assets.
+	 *
+	 * @param tagIds The tags to remove, is it's an empty list, all tags will be removed.
+	 * @param assetIds The ids of the assets to remove tags from.
+	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 */
+	void bulkRemove(List<Long> tagIds = [], List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		String queryForAssetIds
+		String queryForTagIds = ''
+		Map params = [:]
+
+		if (assetIds && !assetIdsFilterQuery) {
+			queryForAssetIds = ':assetIds'
+			params.assetIds = assetIds
+		} else {
+			queryForAssetIds = assetIdsFilterQuery.query
+			params << assetIdsFilterQuery.params
+		}
+
+		if (tagIds) {
+			queryForTagIds = 'and tag.id in(:tagIds)'
+			params.tagIds = tagIds
+		}
+
+		String query = """
+			delete from TagAsset
+			where  asset.id in($queryForAssetIds) $queryForTagIds
+		"""
+
+		TagAsset.executeUpdate(query, params)
+	}
+
+	/**
+	 * Replaces the current tags with new ones.
+	 *
+	 * @param tagIds The tag ids to replace the current ones for the assets.
+	 * @param assetIds The ids of the assets to replace tags for.
+	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 */
+	void bulkReplace(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		bulkRemove([], assetIds, assetIdsFilterQuery)
+		bulkAdd(tagIds, assetIds, assetIdsFilterQuery)
 	}
 }
