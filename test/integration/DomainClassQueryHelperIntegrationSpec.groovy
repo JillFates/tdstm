@@ -10,7 +10,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -102,13 +101,12 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	//@IgnoreRest
 	void '2. can find a Device by roomSource'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomSource = roomTestHelper.createRoom(project)
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomSource: device.roomSource.roomName])
@@ -123,7 +121,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomTarget = roomTestHelper.createRoom(project)
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [roomTarget: device.roomTarget.roomName])
@@ -138,7 +136,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomSource = roomTestHelper.createRoom(project)
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationSource: device.roomSource.location])
@@ -153,7 +151,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.roomTarget = roomTestHelper.createRoom(project)
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [locationTarget: device.roomTarget.location])
@@ -250,7 +248,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			device.roomSource = roomTestHelper.createRoom(project)
 			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
 			device.rackSource = rack
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackSource: rack.tag])
@@ -267,7 +265,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			device.roomSource = roomTestHelper.createRoom(project)
 			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
 			device.rackTarget = rack
-			device.save(failOnError: true)
+			device.save(failOnError: true, flush: true)
 
 		when:
 			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackTarget: rack.tag])

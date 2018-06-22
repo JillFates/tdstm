@@ -54,7 +54,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
+	static List assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
 		String hqlJoins = hqlJoins(clazz, paramsMap)
@@ -80,7 +80,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
+	static <T> List nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
 		String hqlJoins = hqlJoins(clazz, paramsMap)
