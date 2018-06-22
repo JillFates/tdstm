@@ -672,7 +672,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -705,7 +705,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
 					with(data[0].fields.appVendor) {
@@ -762,7 +762,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -858,7 +858,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'Evaluating a DataScript with having substitute with default value'
 			etlProcessor.evaluate(dataScript)
 		then: 'The evaluate process completed successfully replacing using the default value for custom2 where applicable.'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -942,7 +942,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -978,7 +978,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1016,7 +1016,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1053,7 +1053,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'
@@ -1092,7 +1092,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == 'Application'

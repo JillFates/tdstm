@@ -6,7 +6,6 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.grails.StringUtil
-import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -17,7 +16,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Issue
 
@@ -134,7 +132,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -273,7 +271,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -351,7 +349,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -431,7 +429,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
@@ -565,7 +563,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.resultsMap()) {
+			with(etlProcessor.finalResult()) {
 				domains.size() == 3
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()

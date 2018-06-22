@@ -20,8 +20,6 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
 
-import java.util.concurrent.TimeoutException
-
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
 class ETLSandboxingSpec  extends ETLBaseSpec {
@@ -117,7 +115,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
