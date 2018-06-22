@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -15,14 +16,6 @@ import net.transitionmanager.service.ApiActionService
 class WsApiActionController implements ControllerMethods {
 
     ApiActionService apiActionService
-
-    /**
-     * Get a list of agent names
-     * @return
-     */
-    def agentNames() {
-        renderAsJson(apiActionService.agentNamesList())
-    }
 
     /**
      * Get agent details by agent name
@@ -116,4 +109,15 @@ class WsApiActionController implements ControllerMethods {
         renderSuccessJson(domains: [domainsFieldsMap])
     }
 
+    /**
+     * Returns a JSON map containing the values of all of the enums used to
+     * support the ApiAction domain.
+     */
+    @HasPermission([Permission.ActionCreate, Permission.ActionEdit])
+    def enums() {
+        renderSuccessJson([
+                'httpMethod': ApiActionHttpMethod.names(),
+                'agentNames': apiActionService.agentNamesList()
+        ])
+    }
 }
