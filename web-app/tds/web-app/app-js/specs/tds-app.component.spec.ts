@@ -3,22 +3,18 @@ import {By} from '@angular/platform-browser';
 import {DebugElement} from '@angular/core';
 
 import {TDSAppComponent} from '../config/tds-app.component';
-import {UserService} from '../shared/services/user.service';
 import {SharedModule} from '../shared/shared.module';
 
 describe('TDSAppComponent:', () => {
 	let fixture: ComponentFixture<TDSAppComponent>;
 	let comp: TDSAppComponent;
 	let de: DebugElement;
-	let userStub: UserService = {
-		userName: 'Bruce Wayne'
-	};
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
 			imports: [SharedModule],
 			declarations: [TDSAppComponent],
-			providers: [{provide: UserService, useValue: userStub}]
+			providers: []
 		}).compileComponents();
 	}));
 

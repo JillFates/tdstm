@@ -22,7 +22,7 @@
             <div class="col-sm-2">{{importBatch.dateCreated | date: userPreferenceService.getUserTimeZone()}}</div>
             <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.domainClassName}}</div>
-            <div class="col-sm-2">{{importBatch.datascript?.name}}</div>
+            <div class="col-sm-2">{{importBatch.dataScript?.name}}</div>
             <div class="col-sm-2" [ngClass]="{'error': batchHasErrors()}">
                 {{importBatch.status.label}}
             </div>

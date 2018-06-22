@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -30,6 +31,7 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
@@ -38,7 +40,60 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.transaction.annotation.Propagation
-// LEGACY
+
+/**
+ * DataImportEntityCache is a caching object used for the Data Import that retains the results of
+ * searches based on the query specs of a field. The cache will contain the error of the query results
+ * or the cache of the entity as a Map containing the domain and it's ID. The get method will reconstitute
+ * the object. This was done so that the cache doesn't load ALL of the objects into memory.
+ */
+class DataImportEntityCache {
+	Map cache = [:]
+
+	// Used primarilly for testing
+	String lastKey = null
+
+	/**
+	 * Used to retrieve the cached Entity or Error Message
+	 *
+	 * If the entity was cached then it will be refetched from the database as it may have changed
+	 * and we want to avoid ballooning memory with all domain objects in memory.
+	 * @param key - the key that the reference was stored
+	 * @return String error or domain entity object
+	 */
+	Object get(String key) {
+		Object value = cache[key]
+
+		if (value instanceof Map) {
+			value = value.clazz.get(value.id)
+		}
+
+		return value
+	}
+
+	/**
+	 * Used to add an object to the cache
+	 * @param key - the key that the object will be referencable by
+	 * @param value - the entity object or error message
+	 */
+	void put(String key, Object value) {
+		lastKey = key
+		if (GormUtil.isDomainClass(value)) {
+			// For domain objects we are caching the domain Class and ID
+			cache.put(key, [clazz: value.getClass(), id: value.id])
+		} else {
+			cache.put(key, value)
+		}
+	}
+
+	/**
+	 * Returnes the # of objects contained in the cache
+	 */
+	Long size() {
+		return cache.size()
+	}
+}
+
 /**
  * DataImportService - contains the methods for dealing with data importing from the ETL process;
  * interacting with the Import Batch management; and posting of data into various domains.
@@ -124,7 +179,7 @@ class DataImportService implements ServiceMethods {
 			// The cache will be used to hold on to domain entity references when found or a String if there
 			// was an error when looking up the domain object. The key will be the md5hex of the query element
 			// of the field.
-			cache: [:],
+			cache: new DataImportEntityCache(),
 
 			// The following are reset per domain
 			domainClass: null,
@@ -281,11 +336,13 @@ class DataImportService implements ServiceMethods {
 			warnOnChangesAfter = new Date()
 		}
 
+		DataScript dataScript = GormUtil.findInProject(importContext.project, DataScript, importContext.etlInfo.dataScriptId)
+
 		ImportBatch batch = new ImportBatch(
 				project: importContext.project,
 				status: ImportBatchStatusEnum.PENDING,
-				provider: importContext.etlInfo.provider,
-				dataScript: (importContext.etlInfo.dataScript ?: ''),
+				dataScript: dataScript,
+				provider: dataScript?.provider,
 				domainClassName: importContext.domainClass,
 				createdBy: importContext.userLogin.person,
 				// createdBy: importContext.etlInfo.createdBy,
@@ -690,7 +747,7 @@ class DataImportService implements ServiceMethods {
 	private Map initContextForProcessBatch( Project project, ETLDomain domain ) {
 		return [
 			// The cache will be populated with cached entity references where the key is an MD5 of the query or id lookup of domain objects
-			cache: [:],
+			cache: new DataImportEntityCache(),
 
 			// The actual class of the domain (e.g. net.transitionmanager.domain.Person)
 			domainClass: domain.getClazz(),
@@ -771,9 +828,10 @@ class DataImportService implements ServiceMethods {
 				ImportBatchRecord.withNewTransaction { status ->
 					for (record in records) {
 						context.record = record
-						processBatchRecord(batch, record, context)
 						rowsProcessed++
+						processBatchRecord(batch, record, context, rowsProcessed)
 					}
+					log.debug 'processBatch({}) clearing Hibernate Session', batchId
 					GormUtil.flushAndClearSession()
 				}
 
@@ -871,10 +929,10 @@ class DataImportService implements ServiceMethods {
 	 * @param record - the ImportBatchRecord to be processed
 	 * @param context - the batch processing context that contains objects used throughout the process
 	 */
-	private void processBatchRecord(ImportBatch batch, ImportBatchRecord record, Map context) {
+	private void processBatchRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		switch (batch.domainClassName) {
 			case ETLDomain.Dependency:
-				processDependencyRecord(batch, record, context)
+				processDependencyRecord(batch, record, context, recordCount)
 				break
 
 			default:
@@ -893,24 +951,25 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the batch processing context that contains objects used throughout the process
 	 * @return a list of errors if any were detected during the process.
 	 */
-	def processDependencyRecord = { ImportBatch batch, ImportBatchRecord record, Map context ->
+	def processDependencyRecord = { ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount ->
 		Object primary, supporting
-		AssetDependency dependency
+		AssetDependency dependency = null
 		Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
 		Project project = batch.project
 		resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
+		try {
 		while (true) {
 			// Try finding the Dependency by it's id if specified in fieldsInfo
 			if (fieldsInfo.containsKey('id')) {
 				def findDomainByIdResult = lookupDomainRecordByFieldMetaData('id', fieldsInfo, context)
-				if (NumberUtil.isaNumber(findDomainByIdResult)) {
+					if ( findDomainByIdResult == -1 ) {
 					// the fields.Info.id.value had a number but the id was not found which is an error
 					log.debug "processDependencyRecord() lookupDomainRecordByFieldMetaData() failed ($findDomainByIdResult)"
 					break
 				}
 
-				// Yes! Found the elusive sucker!
+				// May have found the elusive sucker!
 				dependency = findDomainByIdResult
 			}
 
@@ -944,14 +1003,15 @@ class DataImportService implements ServiceMethods {
 				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
-			// Should any of the sides be number (-1, actually), skip the record.
-			if (NumberUtil.isaNumber(primary) || NumberUtil.isaNumber(supporting)) {
-				break
-			// Try finding & updating or creating the dependency with primary and supporting assets that were found
-			} else if (primary && supporting) {
-				dependency = findAndUpdateOrCreateDependency(primary, supporting, fieldsInfo, context)
+			if ( primary in AssetEntity && supporting in AssetEntity ) {
+				// Try finding & updating or creating the dependency with primary and supporting assets that were found
+				dependency = findAndUpdateOrCreateDependency(dependency, primary, supporting, fieldsInfo, context)
 			}
 			break
+		}
+		} catch (e) {
+			record.addError(e.getMessage())
+			log.error ExceptionUtil.stackTraceToString("processDependencyRecord() Error while processing record ${recordCount}", e)
 		}
 
 		// Tally up all the errors that may have occurred during the process
@@ -1000,34 +1060,33 @@ class DataImportService implements ServiceMethods {
 	 * @param supporting - the supporting asset
 	 * @return the new or updated dependency or null if primary or supporting are null
 	 */
-	private AssetDependency findAndUpdateOrCreateDependency(AssetEntity primary, AssetEntity supporting, Map fieldsInfo, Map context ) {
-		AssetDependency dependency
-
+	private AssetDependency findAndUpdateOrCreateDependency(AssetDependency dependency, AssetEntity primary, AssetEntity supporting, Map fieldsInfo, Map context ) {
 		if (primary && supporting) {
+			Boolean foundById = (dependency ? true : false)
+			if (! foundById) {
+				// If there is the primary & supporting asset and no dependency yet then try and find it by the two assets
+				dependency = AssetDependency.where {
+					asset.id == primary.id
+					dependent.id == supporting.id
+				}.find()
 
-			// If there is the primary & supporting asset and no dependency yet then try and find it by the two assets
-			dependency = AssetDependency.where {
-				asset.id == primary.id
-				dependent.id == supporting.id
-			}.find()
-
-			if (dependency) {
-				// UPDATE
-				log.debug 'findAndUpdateOrCreateDependency() UPDATING DEPENDENCY ID {}', dependency.id
-				// Update the primary or supporting assets if they changed
-				if (dependency.asset.id != primary.id) {
-					log.debug "findAndUpdateOrCreateDependency() Updated primary asset on Dependency"
-					dependency.asset = primary
+				// If not found by the ID previously then the assets may have changed so attempt to update the references
+				if (dependency) {
+					if (dependency.asset.id != primary.id) {
+						log.debug "findAndUpdateOrCreateDependency() updated primary asset on Dependency"
+						dependency.asset = primary
+					}
+					if (dependency.dependent.id != supporting.id) {
+						log.debug "findAndUpdateOrCreateDependency() updated supporting asset on Dependency"
+						dependency.dependent = supporting
+					}
 				}
-				if (dependency.dependent.id != supporting.id) {
-					log.debug "findAndUpdateOrCreateDependency() Updated supporting asset on Dependency"
-					dependency.dependent = supporting
-				}
+			}
 
-			} else {
+			if (! dependency) {
 				// CREATE
 				dependency = new AssetDependency(asset: primary, dependent: supporting)
-				log.debug "findAndUpdateOrCreateDependency() Creating new Dependency"
+				log.debug "findAndUpdateOrCreateDependency() created new Dependency"
 			}
 
 			// Now add/update the remaining properties on the domain entity appropriately
@@ -1043,7 +1102,7 @@ class DataImportService implements ServiceMethods {
 			}
 		}
 
-		// TODO : JPM 3/2018 : Need to review the md5 / cache - Here we just created assets that should be cached.
+		// TODO : JPM 3/2018 : Need to review the md5 / cache - Here we just created assets that should be cached
 
 		return dependency
 	}
@@ -1109,8 +1168,8 @@ class DataImportService implements ServiceMethods {
 		log.debug 'lookupDomainRecordByFieldMetaData() called with domain {} on row {}, propertyName {}, value={}',
 			context.domainShortName, context.record.sourceRowId, propertyName, fieldsInfo[propertyName]?.value
 
-		boolean recordNewError=true
 		boolean foundInCache=false
+		boolean errorPreviouslyRecorded = false
 
 		boolean working = true
 		while (working) {
@@ -1122,58 +1181,77 @@ class DataImportService implements ServiceMethods {
 
 			// See if this property based on ID is in the cache already
 			md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
-			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
-			entity = context.cache[md5]
+			// log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
+			entity = context.cache.get(md5)
 			if (entity) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity
+				log.debug 'lookupDomainRecordByFieldMetaData() found cache ID {}, {}', md5, entity
 				foundInCache=true
-				if (entity instanceof String) {
-					recordNewError = false
+				if (GormUtil.isDomainClass(entity)) {
+					// Need to reattach to the Hibernate session because the session is cleared often
+					if (! entity.isAttached()) {
+						log.debug 'lookupDomainRecordByFieldMetaData() reattaching asset {}', entity
+						entity.attach()
+					}
 				}
 				break
 			}
 
-			// Attempt to find the domain by the ID in find.results or the value if numeric
+			//
+			// Going to try upto 4 different ways to find the domain entity
+			//
+
+			// 1. Attempt to find the domain by the ID in find.results or the value if numeric
 			entity = searchForDomainById(propertyName, fieldsInfo, context)
 			if (entity) {
+				log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 1 (ID)'
 				break
 			}
 
-			// Try requerying the domain using the find.query elements
+			// 2. Attempt to find domain with the single result (find.results[0])
+			if ( hasSingleFindResult(propertyName, fieldsInfo) ) {
+				entity = fetchEntityByFindResults(propertyName, fieldsInfo, context)
+				if (entity != null) {
+					log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 2 (find results)'
+					break
+				}
+			}
+
+			// 3. Attept to find domain by re-applying the find/elseFind queries
 			List entities = performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
 			int qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
-				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} with ETL find/elseFind criteria', entity.id
+				log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 3 (requery), found 1 '
 				break
 			} else if (qtyFound > 1 ) {
-				log.debug "lookupDomainRecordByFieldMetaData() FOUND MULTIPLE - ETL find/elseFind criteria returned {} entities", qtyFound
+				log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 3 (requery), found {}', qtyFound
 				entity = FIND_FOUND_MULTIPLE_REFERENCES_MSG
+				errorPreviouslyRecorded = true
 				break
 			}
 
-			// Let's see if the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name) if the
-			// domain has one specified
+			// 4. Attept to find domain by alternate key
+			// If the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name)
 			entities = findDomainByAlternateProperty(propertyName, fieldsInfo, context)
 			qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found by alternate property with value: {}', fieldsInfo[propertyName].value
+				log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 4 (alternate key), found 1 by {}', fieldsInfo[propertyName].value
 				entity = entities[0]
 			} else if (qtyFound > 1 ) {
-				log.debug "lookupDomainRecordByFieldMetaData() called findDomainByAlternateProperty returned {} entities", qtyFound
+				log.debug 'lookupDomainRecordByFieldMetaData() resolved by method 4 (alternate key), found {} by []', qtyFound, fieldsInfo[propertyName].value
 				entity = ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
 			}
 			break
 		}
 
-		// Save the result to cache regardless of found, not found or error (unless it was found in cache above)
-		if (md5 && ! foundInCache) {
-			context.cache[md5] = entity
+		// Cache the entity or error message for the lookup (unless it was found in cache above)
+		if (! foundInCache) {
+			context.cache.put(md5, entity)
 		}
 
-		// Deal with entity being set to an error message
-		if (entity instanceof CharSequence) {
-			if (recordNewError) {
+		// Deal with setting the error message if the entity wasn't found
+		if ( (entity instanceof CharSequence) ) {
+			if (! errorPreviouslyRecorded) {
 				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, entity)
 			}
 			entity = -1
@@ -1259,6 +1337,56 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to determine if the fieldsInfo for a property has a single result
+	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
+	 * @param context - the context map that the process uses to cart crap around
+	 * @return true if there is a single result otherwise false
+	 */
+	private Boolean hasSingleFindResult(String propertyName, Map fieldsInfo) {
+		return fieldsInfo[propertyName].find?.results?.size() == 1
+	}
+
+	/**
+	 * Used to fetch a single domain entity based on the find/elseFind commands having found a single entity. The
+	 * hasSingleFindResult method should be called first to determine if this method should be called.
+	 *
+	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
+	 * @param context - the context map that the process uses to cart crap around
+	 * @return String with error or the entity if found otherwise null
+	 */
+	private Object fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
+		Object entity=null
+		String error=null
+		Map find = fieldsInfo[propertyName].find ?: null
+		if (find) {
+			if (find.results?.size() == 1) {
+				Long domainId = find.results[0]
+				String domainName = find.query[0].domain
+				// Get the class of the domain specified in find of the ETL script
+				Class domainClass = ETLDomain.lookup(domainName)?.getClazz()
+
+				if (domainClass) {
+					// Now get the entity by the id in the results
+					entity = domainClass.get(domainId)
+					if (! entity) {
+						errorMsg = "Original ID ($domainId) of entity not found"
+					}
+				} else {
+					// This really should never happen but just in case
+					errorMsg = "ETL find references invalid domain '${domainName}'"
+					log.error 'fetchEntityByFindResults() received invalid ETL meta data - find referenced invalid domain name {}', domainName
+				}
+			}
+		} else {
+			// This really should never happen but just in case
+			errorMsg = 'Information for find missing from ETL results'
+			log.error 'fetchEntityByFindResults() called for field \'{}\' that has no find element', propertyName
+		}
+
+		return errorMsg ?: entity
+	}
+
+	/**
 	 * Used to query for domain entities using the meta-data generated by the find/elseFind commands in the
 	 * ELT DataScript. After performing the queries it will update the find section of the fieldsInfo with the
 	 * the results. It will return a list of the entities found.
@@ -1273,9 +1401,7 @@ class DataImportService implements ServiceMethods {
 		// If the lookup is for a reference field then it is mandatory in the script to account for this via
 		if ( ! fieldsInfo[propertyName].find?.query || fieldsInfo[propertyName].find.query.size() == 0 ) {
 			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, NO_FIND_QUERY_SPECIFIED_MSG)
-
 		} else {
-
 			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
 			int foundMatchOn = 0
@@ -1468,7 +1594,7 @@ class DataImportService implements ServiceMethods {
 			String md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
 			log.debug "createReferenceDomain() replaced cache $md5 with {}", entity
 			// TODO : JPM 4/2018 : change to cache the ID of the object instead of the object to conserve memory
-			context.cache[md5] = entity
+			context.cache.put(md5, entity)
 
 			break
 		} // while(true)
@@ -1537,15 +1663,15 @@ class DataImportService implements ServiceMethods {
 						// Perform lookup by ID
 						// TODO : JPM 4/2018 : Refactor into Gorm as a single function
 						Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
-						def entity = GormUtil.findInProject(context.project, refDomainClass, item.value)
+						def entity = GormUtil.findInProject(context.project, refDomainClass, value)
 
 						if (entity) {
 							domainInstance[propertyName] = entity
 						} else {
-							errorMsg = "No reference record found for field ${propertyName} by ID in 'whenNotFound create'"
+							errorMsg = "No reference record found for field ${propertyName} (${value}) by ID in 'whenNotFound create'"
 							break
 						}
-						// searchForDomainById(refDomainClass, propertyName, item.value, fieldsInfo, context)
+						// searchForDomainById(refDomainClass, propertyName, value, fieldsInfo, context)
 					} else if (! StringUtil.isBlank(value)) {
 						// Attempt the find the reference by the alternate key
 						List references = findReferenceDomainByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
@@ -1553,10 +1679,10 @@ class DataImportService implements ServiceMethods {
 						if (numFound == 1) {
 							domainInstance[propertyName] = references[0]
 						} else if (numFound > 1) {
-							errorMsg = "Multiple references found for field ${propertyName} by Name in 'whenNotFound create'"
+							errorMsg = "Multiple references found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
 							break
 						} else {
-							errorMsg = "No reference record found for field ${propertyName} by Name in 'whenNotFound create'"
+							errorMsg = "No reference record found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
 							break
 						}
 					}
@@ -1893,6 +2019,7 @@ class DataImportService implements ServiceMethods {
 		log.debug "transformEtlData() calling scriptProcessorService.executeAndSaveResultsInFile"
 		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
 			project,
+			dataScript?.id,
 			dataScript.etlSourceCode,
 			inputFilename,
 			updateProgressClosure)
