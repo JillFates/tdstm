@@ -25,9 +25,4 @@ export class FieldSettingsImportanceComponent implements  OnInit {
 	public onModelChange(value: string): void {
 		this.modelChange.emit(value);
 	}
-
-	public mapLegacyColor(value: string): string {
-		return this.fieldSettinsService.mapColorFromLegacyImportantSchema(value);
-	}
-
 }

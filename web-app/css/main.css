@@ -567,18 +567,25 @@ span.cellWithoutBackground
 .assetFieldHeader1 {
 	margin-left: 10px;
 }
-td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N{background-color:#FFF !important;}
-/* CRITICAL || YELLOW */
-td[data-for].C .select2-choice,
-.Y,
-.C{
-	background-color:#F9FF90 !important;
+td[data-for].Y,
+td[data-for].G,
+td[data-for].B,
+td[data-for].P,
+td[data-for].O,
+td[data-for].H,
+td[data-for].U,
+td[data-for].N {
+	background-color:#FFF !important;
+}
+/* YELLOW */
+td[data-for].Y .select2-choice,
+.Y{
+	background-color:#FAFF9B !important;
 	background-image: none !important;
 }
-/* IMPORTANT || GREEN */
-td[data-for].I .select2-choice,
-.G,
-.I{
+/* GREEN */
+td[data-for].G .select2-choice,
+.G{
 	background-color:#D4F8D4 !important;
 	background-image: none !important;
 }
@@ -586,21 +593,21 @@ td[data-for].I .select2-choice,
 /* BLUE */
 td[data-for].B .select2-choice,
 .B {
-	background-color:#3C8CBC !important;
+	background-color:#A9D6F2 !important;
 	background-image: none !important;
 }
 
 /* PINK */
 td[data-for].P .select2-choice,
 .P {
-	background-color:#FFC0CB !important;
+	background-color:#FFA5B4 !important;
 	background-image: none !important;
 }
 
 /* ORANGE */
 td[data-for].O .select2-choice,
 .O {
-	background-color:#FFA500 !important;
+	background-color:#FFC65E !important;
 	background-image: none !important;
 }
 

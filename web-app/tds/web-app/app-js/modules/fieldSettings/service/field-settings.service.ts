@@ -64,18 +64,4 @@ export class FieldSettingsService {
 			.map((res: Response) => res['_body'] ? res.json() : { status: 'Ok' })
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
-
-	/**
-	 * Accept the previous legacy field color value and returns the new corresponding color;
-	 * @returns {String}
-	 */
-	mapColorFromLegacyImportantSchema(legacyValue: string): string {
-		const mapSchemas = {
-			'I': 'G',   // Important to Green
-			'C': 'Y'    // Critical to Yellow
-		};
-
-		return mapSchemas[legacyValue] ? mapSchemas[legacyValue] : legacyValue;
-	}
-
 }
