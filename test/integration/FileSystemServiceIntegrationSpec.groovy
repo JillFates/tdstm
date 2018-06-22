@@ -24,7 +24,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			String filename = 'abc' + File.separator + '123'
 			fileSystemService.validateFilename(filename)
 		then: 'an exception should be thrown'
-			thrown InvalidRequestException
+			thrown InvalidParamException
 	}
 
 	def '2. Creating and delete files'() {
@@ -167,10 +167,12 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			String renameToFilename = fileSystemService.getUniqueFilename('')
 		when: 'calling createTemporaryFile'
 			def (String filename, OutputStream os) = fileSystemService.createTemporaryFile(suffix, extension)
+			os.close()
 		then: 'the file can be renamed'
 			fileSystemService.renameTemporaryFile(filename, renameToFilename)
 		when: 'calling create a second temporaryFile'
 			def (String secondFilename, OutputStream secondOS) = fileSystemService.createTemporaryFile(suffix, extension)
+			secondOS.close()
 			fileSystemService.renameTemporaryFile(secondFilename, renameToFilename)
 		then: 'exception should be thrown because renameToFilename already exists'
 			thrown InvalidParamException
