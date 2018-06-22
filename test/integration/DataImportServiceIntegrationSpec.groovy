@@ -575,7 +575,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	@Ignore
-	void '7. test recordDomainConstraintErrorsToFieldsInfoOrRecord method'() {
+	void 'test recordDomainConstraintErrorsToFieldsInfoOrRecord method'() {
 		// recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo)
 	}
 
@@ -669,7 +669,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	@Ignore
-	void '9. test createReferenceDomain method'() {
+	void 'test createReferenceDomain method'() {
 		// createReferenceDomain(String propertyName, Map fieldsInfo, Map context)
 		// TODO : Augusto - work on killing this one
 
@@ -794,7 +794,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	@Ignore
 		// generateMd5OfQuery
-	void '13. test findAndUpdateOrCreateDependency method'() {
+	void 'test findAndUpdateOrCreateDependency method'() {
 		// generateMd5OfQuery
 	}
 
