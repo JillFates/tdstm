@@ -35,10 +35,9 @@ class DatascriptListSpec extends GebReportingSpec{
         at CreateDatascriptPage
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
-        waitFor{
-            datascriptProvider = latestProvider.text().trim()
-            latestProvider.click()
-        }
+        waitFor{latestProvider.displayed}
+        datascriptProvider = latestProvider.text().trim()
+        latestProvider.click()
         waitFor{datascriptDescField.click()}
         datascriptDescField = datascriptDescription
         datascriptNameField = datascriptName
@@ -117,7 +116,7 @@ class DatascriptListSpec extends GebReportingSpec{
         then: 'Datascript information is properly displayed'
             getDSProviderLabelText() == firstDSInformation.provider
             getDSNameLabelText() == firstDSInformation.name
-            //getDSModeLabelText() == firstDSInformation.mode
+            getDSModeLabelText() == firstDSInformation.mode
             getDSDescriptionLabelText() == firstDSInformation.description
     }
 
