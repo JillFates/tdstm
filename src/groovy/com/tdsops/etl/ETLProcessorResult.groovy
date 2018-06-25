@@ -436,6 +436,7 @@ class RowResult {
 	void addFindElement(ETLFindElement findElement){
 		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElement(findElement)
+		this.op = (fieldData.find.hasResults() == true) ? 'U' : 'I'
 		this.errorCount = fieldData.errors.size()
 	}
 
@@ -615,6 +616,14 @@ class FindResult {
 	void addQueryAndResults(ETLFindElement findElement){
 		addQuery(findElement)
 		addResults(findElement)
+	}
+
+	/**
+	 * Returns true if results list is not empty
+	 * @return
+	 */
+	Boolean hasResults(){
+		return !this.results.isEmpty()
 	}
 
 }
