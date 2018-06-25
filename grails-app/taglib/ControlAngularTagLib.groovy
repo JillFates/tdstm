@@ -106,9 +106,7 @@ class ControlAngularTagLib {
 		def fieldValue = attrs.value ?: ""
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
-		sb.append("<span ")
-		sb.append(tooltipAttrib(fieldSpec, attrs.tooltipDataPlacement))
-		sb.append(" >")
+		sb.append("<span>")
 		sb.append(fieldValue)
 		sb.append("</span>")
 		sb.append("</td>")
