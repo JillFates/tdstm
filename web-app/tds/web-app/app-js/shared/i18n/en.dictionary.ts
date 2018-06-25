@@ -35,6 +35,10 @@ export const en_DICTIONARY: Object = {
 		},
 		'SYSTEM_VIEW': 'System View'
 	},
+	'ASSET_TAGS': {
+		'MANAGE_TAGS': 'Manage Tags',
+		'CREATE_TAG': 'Create Tag'
+	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
 		'API_ACTIONS': 'API Actions',
@@ -156,6 +160,7 @@ export const en_DICTIONARY: Object = {
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
+		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
 		'CONFIRMATION_PROMPT' : {
