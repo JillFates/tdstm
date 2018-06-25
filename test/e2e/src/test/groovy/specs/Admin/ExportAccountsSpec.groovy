@@ -2,6 +2,7 @@ package specs.Admin
 
 import geb.spock.GebReportingSpec
 import pages.Admin.ExportAccountsPage
+import pages.Admin.LandingItems.ExportAccountsLandingPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Ignore
@@ -43,7 +44,7 @@ class ExportAccountsSpec extends GebReportingSpec {
         when: 'The User Clicks in the Admin > Export Accounts Menu Option'
             adminModule.goToExportAccounts()
         then: 'Export Accounts page should be displayed'
-            at ExportAccountsPage
+            at ExportAccountsLandingPage
     }
 
     def "2. The User exports user accounts"() {

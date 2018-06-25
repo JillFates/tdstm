@@ -1,4 +1,4 @@
-package pages.Admin.MenuItems
+package pages.Admin.LandingItems
 
 import geb.Page
 import modules.AdminModule

@@ -1,7 +1,7 @@
 package specs.Admin
 
 import geb.spock.GebReportingSpec
-import pages.Admin.ImportAccountsPage
+//import pages.Admin.LandingItems.ImportAccountsLandingPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Ignore
@@ -36,7 +36,7 @@ class ImportAccountsSpec extends GebReportingSpec {
         when: 'The user Clicks in the Admin > Import Accounts Menu Option'
             adminModule.goToImportAccounts()
         then: 'Import Accounts page should be displayed'
-            at ImportAccountsPage
+            at ImportAccountsLandingPage
         and: 'Import accounts form container to upload file should be displayed'
             waitFor { step1Container.displayed }
     }
