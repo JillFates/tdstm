@@ -29,8 +29,8 @@ class ViewsModule extends Module {
         voidStars         (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star-o")}
         yellowStars       (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star")}
         createdBy         {viewList.find("td:nth-child(4)")}
-        ticks              {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
-        common                      { module CommonsModule}
+        ticks             (required: false) {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
+        common            { module CommonsModule}
     }
 
     def openRandomView(){
@@ -47,6 +47,7 @@ class ViewsModule extends Module {
     def moduleTitleIsCorrect(String title){
         waitFor{moduleTitle.text()==title}
     }
+
     def validateAuthor(){
         createdBy.each{
             def validation=true
@@ -55,13 +56,16 @@ class ViewsModule extends Module {
             }
         }
     }
+
     def clickOnFirstDelete(){
         deleteButtons[0].click()
     }
+
     def confirmationRequiredIsDisplayed(){
         waitFor{($("h4.modal-title")).isDisplayed()}
         closeDeleteModal.click()
     }
+
     def closeDeleteModal(){
         closeDeleteModal.click()
     }
@@ -198,9 +202,20 @@ class ViewsModule extends Module {
             count++
         }
     }
+
     def favRandomFavs(){
         def initializeCommonActions = new CommonActions()
         waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
         common.waitForLoader(3)
     }
+
+    /**
+     * Clicks on the first non-shared view
+     * @return
+     */
+    def clickOnNonSharedView(){
+        def nonSharedView=vwGridRows.find(":nth-child(7)").hasNot(".glyphicon-ok")[0]
+        nonSharedView.siblings().find("[uisref]").click()
+    }
+
 }

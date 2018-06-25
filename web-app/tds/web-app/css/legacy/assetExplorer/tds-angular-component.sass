@@ -41,13 +41,12 @@
     th
       background: #CCCCCC
       color: #000
-      font-size: 12px
+      font-size: 13px
       font-weight: bold
       line-height: 16px
       padding: 2px 6px
     th, td
-      font-family: helvetica, arial, sans-serif
-      font-size: 12px
+      font-size: 13px
       line-height: 12px
       padding: 0px 2px
       text-align: left
@@ -81,10 +80,10 @@
         vertical-align: inherit
         color: inherit
         font-weight: inherit
-        font-size: 12px
+        font-size: 13px
         label
           color: #333
-          font-size: 12px
+          font-size: 13px
           font-style: normal
           font-weight: normal
       input#assetName
@@ -93,26 +92,57 @@
         width: 100%
       input
         height: 27px
-    td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N
+    td[data-for].Y,
+    td[data-for].G,
+    td[data-for].B,
+    td[data-for].P,
+    td[data-for].O,
+    td[data-for].H,
+    td[data-for].U,
+    td[data-for].N
       background-color: #FFF !important
-    /* CRITICAL */
-    td[data-for].C .select2-choice,
-    .C
-      background-color: #F9FF90 !important
+
+    /* YELLOW */
+    td[data-for].Y .select2-choice,
+    .Y
+      background-color: $color-field-yellow !important
       background-image: none !important
-    /* IMPORTANT */
-    td[data-for].I .select2-choice,
-    .I
-      background-color: #D4F8D4 !important
+
+    /* GREEN */
+    td[data-for].G .select2-choice,
+    .G
+      background-color: $color-field-green !important
       background-image: none !important
+
+    /* BLUE */
+    td[data-for].B .select2-choice,
+    .B
+      background-color:$color-field-blue !important
+      background-image: none !important
+
+    /* PINK */
+    td[data-for].P .select2-choice,
+    .P
+      background-color: $color-field-pink !important
+      background-image: none !important
+
+    /* ORANGE */
+    td[data-for].O .select2-choice,
+    .O
+      background-color: $color-field-orange !important
+      background-image: none !important
+
     /* NORMAL */
     td[data-for].N.label .select2-choice,
-    .N.label
-      background-color: #ddd !important
+    .N.label,
+    .N
+      background-color: $color-field-normal !important
       background-image: none !important
     /* UNIMPORTANT */
-    td[data-for].U label, td.U label
-      background-color: #F4F4F4 !important
+    td[data-for].U label,
+    td.U label,
+    .U
+      background-color: $color-field-unimportant !important
       background-image: none !important
     /* HIDDEN */
     td[data-for].H .select2-choice,
@@ -132,8 +162,16 @@
       text-align: center
     .k-grid-toolbar
       padding-bottom: 1px !important
+      font-size: 14px
       .btn-add-new-dependency
-        padding-bottom: 5px
+        height: 24px
+        width: 59px
+        .fa
+          width: 17px
+          margin-left: -6px
+        span
+          position: relative
+          top: -1px
     .k-grid-container
       .k-grid-norecords
         td

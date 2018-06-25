@@ -93,6 +93,19 @@ class MenuModule extends Module {
 
         projectName             { menuContainer.find("li a#nav-project-name")}
         projectLicenseIcon      { menuContainer.find("li a.licensing-error-warning i.fa-warning")}
+
+        userMenu {$(class:"user-menu")}
+        logoutBtn {userMenu.find(class:"pull-right")}
+
+    }
+
+    def clickUserMenu(){
+        userMenu.click()
+    }
+
+    def logout(){
+        clickUserMenu()
+        waitFor{logoutBtn.click()}
     }
 
     def selectMenu(menuItem) {
@@ -166,5 +179,4 @@ class MenuModule extends Module {
         projectName.text().contains(name)
     }
 
-    // TODO Add remains menu items here
 }
