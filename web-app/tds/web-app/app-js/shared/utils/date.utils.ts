@@ -133,10 +133,10 @@ export class DateUtils {
 	 * @returns {string}
 	 */
 	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
-		const defaultFormat = 'MMM/dd/yyy';
+		const defaultFormat = 'MM/dd/yyy';
 
 		const dateFormats = {
-			'DD/MM/YYYY' : 'dd/MMM/yyyy',
+			'DD/MM/YYYY' : 'dd/MM/yyyy',
 			'MM/DD/YYYY' : defaultFormat
 		};
 
