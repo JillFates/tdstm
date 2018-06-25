@@ -25,7 +25,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	static final Map actions = [
 		tags: [
 			add    : 'bulkAdd',
-			clear  : 'bulkRemove',
+			clear  : 'bulkClear',
 			replace: 'bulkReplace',
 			remove : 'bulkRemove'
 		]
@@ -45,7 +45,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		String action
 
 		//Maps field names to services.
-		Map filedToService = [
+		Map fieldToService = [
 			tags: tagAssetService
 		]
 
@@ -53,13 +53,16 @@ class BulkAssetChangeService implements ServiceMethods {
 			assetQueryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
 		} else {
 			assetIds = bulkChange.assetIds
-			assetIds.each { Long id ->
-				get(AssetEntity, id, currentProject)
+
+			int validAssetCount = AssetEntity.where{id in assetIds && project == currentProject}.count()
+
+			if(validAssetCount != assetIds.size() ){
+				throw new InvalidParamException('Some asset ids, are not part of your project, and may have been deleted.')
 			}
 		}
 
 		bulkChange.edits.each { EditCommand edit ->
-			service = filedToService[edit.fieldName]
+			service = fieldToService[edit.fieldName]
 			action = actions[edit.fieldName][edit.action]
 			value = service.coerceBulkValue(currentProject, edit.value)
 

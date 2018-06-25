@@ -119,15 +119,19 @@ class TagAssetService implements ServiceMethods {
 	 *
 	 * @return a List of longs, that represent tag ids.
 	 */
-	def coerceBulkValue(Project currentProject, String value) {
+	List<Long> coerceBulkValue(Project currentProject, String value) {
 		JsonSlurper jsonSlurper = new JsonSlurper()
 		def parsedValue = jsonSlurper.parseText(value)
-		if(!(parsedValue instanceof List<Integer>)){
+
+		if(!(parsedValue instanceof List)){
 			throw new InvalidParamException('Value is not a list of numbers.')
 		}
 
-		List<Long> tagIds = ((List<Integer>) parsedValue).collect { Integer i -> i.toLong() }
-		validateBulkValues(currentProject, tagIds)
+		List<Long> tagIds = (parsedValue).collect { i -> i.toLong() }
+
+		if(tagIds) {
+			validateBulkValues(currentProject, tagIds)
+		}
 
 		return tagIds
 	}
@@ -140,8 +144,10 @@ class TagAssetService implements ServiceMethods {
 	 * @param tagIds the ids to validate.
 	 */
 	void validateBulkValues(Project currentProject, List<Long> tagIds) {
-		tagIds.each { Long id ->
-			tagService.get(Tag, id, currentProject)
+		int tagCount = Tag.where {id in tagIds && project == currentProject}.count()
+
+		if(tagCount != tagIds.size()){
+			throw new InvalidParamException("Some tags specified don't exist in your project, and may have been deleted.")
 		}
 	}
 
@@ -183,13 +189,43 @@ class TagAssetService implements ServiceMethods {
 	}
 
 	/**
+	 * Bulk clears tags for assets.
+	 *
+	 * @param tagIds should be null, because it is not used, it's only here so that all the bulk methods have the same signature, for the dynamic call.
+	 * @param assetIds The ids of the assets to remove tags from.
+	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 */
+	void bulkClear(List<Long> tagIds = null, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
+		if(tagIds){
+			throw InvalidParamException("Tag Id's shouldn't be specified, for clearing a field.")
+		}
+
+		remove([], assetIds, assetIdsFilterQuery)
+	}
+
+	/**
+	 * Bulk removes tags from assets.
+	 *
+	 * @param tagIds The ids of the tags to be removed.
+	 * @param assetIds The ids of the assets to remove tags from.
+	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 */
+	void bulkRemove(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
+		if(!tagIds){
+			throw InvalidParamException("Tag Id's must be specified, for removal.")
+		}
+
+		remove(tagIds, assetIds, assetIdsFilterQuery)
+	}
+
+	/**
 	 * Bulk removes tags from assets.
 	 *
 	 * @param tagIds The tags to remove, is it's an empty list, all tags will be removed.
 	 * @param assetIds The ids of the assets to remove tags from.
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
 	 */
-	void bulkRemove(List<Long> tagIds = [], List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	private void remove(List<Long> tagIds, List<Long> assetIds, Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
 		String queryForTagIds = ''
 		Map params = [:]
@@ -223,7 +259,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
 	 */
 	void bulkReplace(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkRemove([], assetIds, assetIdsFilterQuery)
+		bulkClear([], assetIds, assetIdsFilterQuery)
 		bulkAdd(tagIds, assetIds, assetIdsFilterQuery)
 	}
 }

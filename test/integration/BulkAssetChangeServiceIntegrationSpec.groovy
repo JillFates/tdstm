@@ -177,7 +177,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkRemove function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange clear, all assets in filter'() {
@@ -194,7 +194,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.dataviewService.getAssetIdsHql(project, 1, dataviewUserParamsCommand)
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [], null)
+			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, [], null)
 	}
 
 	void 'Test bulkChange replace'() {

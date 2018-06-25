@@ -255,7 +255,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 		when: 'validating tags not all from the current project, against the current project'
 			tagAssetService.validateBulkValues(project, [tag1.id, tag2.id, tag3.id])
 		then: 'an EmptyResultException is thrown'
-			thrown EmptyResultException
+			thrown InvalidParamException
 	}
 
 	void 'test bulkAdd'() {
@@ -352,9 +352,9 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			tagAssets2[0].asset.id == device2.id
 	}
 
-	void 'test bulkRemove no tagIds/clear'() {
+	void 'test bulkClear no tagIds/clear'() {
 		when: 'running a bulk remove on a list of assets, not specifying the tags'
-			tagAssetService.bulkRemove([], [device.id, device2.id])
+			tagAssetService.bulkClear([], [device.id, device2.id])
 			List<TagAsset> tagAssets = tagAssetService.list(project, device.id)
 			List<TagAsset> tagAssets2 = tagAssetService.list(project, device2.id)
 		then: 'The assets are cleared of all associations with tags.'
@@ -362,7 +362,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			tagAssets2.size() == 0
 	}
 
-	void 'test bulkRemove no tagIds/clear filter query'() {
+	void 'test bulkClear no tagIds/clear filter query'() {
 		setup: 'given an AssetFilterQuery'
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
@@ -371,7 +371,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
 			"""
 		when: 'running a bulk remove on a query filter of assets, not specifying the tags'
-			tagAssetService.bulkRemove([], [], [query: query, params: params])
+			tagAssetService.bulkClear([], [], [query: query, params: params])
 			List<TagAsset> tagAssets = tagAssetService.list(project, device.id)
 			List<TagAsset> tagAssets2 = tagAssetService.list(project, device2.id)
 		then: 'The assets are cleared of all associations with tags.'
@@ -444,7 +444,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			tagAssetService.coerceBulkValue(project, "[1,${tag2.id}]")
 
 		then: 'an EmptyResultException is returned'
-			thrown EmptyResultException
+			thrown InvalidParamException
 	}
 
 	void 'test coerceBulkValue input false'() {
