@@ -1,14 +1,13 @@
-package pages.Admin
+package pages.Admin.MenuItems
 
 import geb.Page
 import modules.AdminModule
 
-
-class AssetOptionsAdminPage extends Page {
+class AdminPortalLandingPage extends Page {
 
     static at = {
-        title == "Asset Options"
-        pageHeaderName.text() == "Administrative Setting"
+        title == "TDS TransitionManager™ Admin Portal"
+        pageHeaderName.text() == "Admin Portal"
     }
 
     static content = {

@@ -1,14 +1,13 @@
-package pages.Admin
+package pages.Admin.MenuItems
 
 import geb.Page
 import modules.AdminModule
 
-
-class ListManufacturersPage extends Page{
+class ListStaffLandingPage extends Page{
 
     static at = {
-        title == "Manufacturer List"
-        pageHeaderName.text() == "Manufacturer List"
+        title == "Staff List"
+        pageHeaderName.text() == "Staff List"
     }
 
     static content = {

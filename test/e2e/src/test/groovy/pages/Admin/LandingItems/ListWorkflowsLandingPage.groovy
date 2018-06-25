@@ -1,13 +1,13 @@
-package pages.Admin
+package pages.Admin.MenuItems
 
 import geb.Page
 import modules.AdminModule
 
-class ListUsersAdminPage extends Page{
+class ListWorkflowsLandingPage extends Page{
 
     static at = {
-        title == "User List - Active Users"
-        pageHeaderName.text() == "UserLogin List - Active Users"
+        title == "Workflows"
+        pageHeaderName.text() == "Workflows"
     }
 
     static content = {

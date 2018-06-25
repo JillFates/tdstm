@@ -1,18 +1,17 @@
-package pages.Admin
+package pages.Admin.MenuItems
 
 import geb.Page
 import modules.AdminModule
 
-class ExportMfgModelsPage extends Page{
+class AssetOptionsLandingPage extends Page {
 
     static at = {
-        title == "Sync Management"
-        pageHeaderName.text() == "Export Mfg & Models"
+        title == "Asset Options"
+        pageHeaderName.text() == "Administrative Setting"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
-
 }
