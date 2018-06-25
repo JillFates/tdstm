@@ -1,5 +1,7 @@
 package net.transitionmanager.domain
 
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -78,6 +80,9 @@ class ApiAction {
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
+	// Determines which HTTP method to use when visiting the action endpoint
+	ApiActionHttpMethod httpMethod = ApiActionHttpMethod.GET
+
 	// The fully qualified URL to the endpoint
 	String endpointUrl
 
@@ -150,6 +155,7 @@ class ApiAction {
 			methodParams	sqlType: 'text'
 			endpointUrl		sqlType: 'varchar(255)'
 			docUrl			sqlType: 'varchar(255)'
+			httpMethod		sqlType: 'varchar(10)'
 		}
 	}
 

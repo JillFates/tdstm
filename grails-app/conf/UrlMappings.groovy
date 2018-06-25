@@ -92,6 +92,14 @@ class UrlMappings {
 					POST: "create"
 			]
 		}
+
+		"/ws/apiAction/enums" {
+			controller = "wsApiAction"
+			action = [
+					GET: "enums"
+			]
+		}
+
 		"/ws/asset/retrieveBundleChange" {
 			controller = 'wsAsset'
 			action = [
@@ -822,13 +830,6 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent" {
-			controller = "wsApiAction"
-			action = [
-			        GET: "agentNames"
-			]
-		}
-
 		"/ws/apiAction/agent/$id" {
 			controller = "wsApiAction"
 			action = [

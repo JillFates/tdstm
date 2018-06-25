@@ -8,6 +8,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
@@ -63,6 +64,7 @@ class ApiActionService implements ServiceMethods {
 	 * Get a list of agent names
 	 * @return
 	 */
+	@NotTransactional()
 	List<String> agentNamesList () {
 		List<Map> agents = new ArrayList<>()
 
@@ -85,6 +87,7 @@ class ApiActionService implements ServiceMethods {
 	 * @return the method dictionary for the specified agent code
 	 * @throws InvalidParamException when
 	 */
+	@NotTransactional()
 	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []
