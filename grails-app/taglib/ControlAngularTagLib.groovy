@@ -159,32 +159,23 @@ class ControlAngularTagLib {
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 		String min = (attrs.min ?: (attrs.min ?: "" ))
 
-		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
-		// This parameter is optional to modify default tooltip positioning
-		// Also checks that the value is one of the valid data-placement element values
-		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
-
 		String placeholder = attrs.placeholder ?: ''
-
-		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
-			throw new InvalidParamException('<tdsAngular:inputControl> tag optional argument tooltipDataPlacement requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
-		}
 
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
-				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 
 			case ControlType.YES_NO.toString():
-				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
 
 			case ControlType.NUMBER.toString():
-				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder, min)
+				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder, min)
 				break
 			case ControlType.STRING.toString():
 			default:
-				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
+				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder)
 		}
 	}
 
@@ -354,7 +345,6 @@ class ControlAngularTagLib {
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
 		classAttrib(fieldSpec) +
 		sizeAttrib(size) +
-		tooltipAttrib(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +
 		dataLabelAttrib(fieldSpec)
 	}
