@@ -92,26 +92,57 @@
         width: 100%
       input
         height: 27px
-    td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N
+    td[data-for].Y,
+    td[data-for].G,
+    td[data-for].B,
+    td[data-for].P,
+    td[data-for].O,
+    td[data-for].H,
+    td[data-for].U,
+    td[data-for].N
       background-color: #FFF !important
-    /* CRITICAL */
-    td[data-for].C .select2-choice,
-    .C
-      background-color: #F9FF90 !important
+
+    /* YELLOW */
+    td[data-for].Y .select2-choice,
+    .Y
+      background-color: $color-field-yellow !important
       background-image: none !important
-    /* IMPORTANT */
-    td[data-for].I .select2-choice,
-    .I
-      background-color: #D4F8D4 !important
+
+    /* GREEN */
+    td[data-for].G .select2-choice,
+    .G
+      background-color: $color-field-green !important
       background-image: none !important
+
+    /* BLUE */
+    td[data-for].B .select2-choice,
+    .B
+      background-color:$color-field-blue !important
+      background-image: none !important
+
+    /* PINK */
+    td[data-for].P .select2-choice,
+    .P
+      background-color: $color-field-pink !important
+      background-image: none !important
+
+    /* ORANGE */
+    td[data-for].O .select2-choice,
+    .O
+      background-color: $color-field-orange !important
+      background-image: none !important
+
     /* NORMAL */
     td[data-for].N.label .select2-choice,
-    .N.label
-      background-color: #ddd !important
+    .N.label,
+    .N
+      background-color: $color-field-normal !important
       background-image: none !important
     /* UNIMPORTANT */
-    td[data-for].U label, td.U label
-      background-color: #F4F4F4 !important
+    td[data-for].U label,
+    td.U label,
+    .U
+      background-color: $color-field-unimportant !important
       background-image: none !important
     /* HIDDEN */
     td[data-for].H .select2-choice,
