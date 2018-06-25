@@ -468,8 +468,8 @@ application id,vendor name,technology,location
 
 		when: 'Service executes the script with incorrect syntax'
 			def (ETLProcessor etlProcessor, String outputFilename) = service.executeAndSaveResultsInFile(
-				54321l,
 				GMDEMO,
+				54321l,
 				script,
 				fileSystemService.getTemporaryFullFilename(applicationDataSetFileName),
 				callback)
