@@ -21,6 +21,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 	public dateFormatTime: string;
 	public assetClassOptions: any[];
 	public commentCategories: string[];
+	private dataSignature: string;
 
 	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
 		super('#single-comment-component');
@@ -47,6 +48,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 					return res.id === this.singleCommentModel.assetClass.text.toUpperCase();
 				});
 			}
+			this.dataSignature = JSON.stringify(this.singleCommentModel);
 		});
 	}
 
@@ -59,6 +61,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 			if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
 				this.singleCommentModel.category = this.commentCategories[0];
 			}
+			this.dataSignature = JSON.stringify(this.singleCommentModel);
 		});
 	}
 
@@ -88,6 +91,14 @@ export class SingleCommentComponent extends UIExtraDialog {
 	 */
 	public onAssetChange(asset: any): void {
 		this.singleCommentModel.asset = asset;
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.singleCommentModel);
 	}
 
 	/**
@@ -133,9 +144,22 @@ export class SingleCommentComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Close Dialog
+	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.isDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
 	}
 }

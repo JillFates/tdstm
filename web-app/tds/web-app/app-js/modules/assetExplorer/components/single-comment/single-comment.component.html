@@ -14,7 +14,7 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group single-component">
-										<textarea rows="4" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW"></textarea>
+										<textarea rows="4" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" tds-autofocus></textarea>
 										<div *ngIf="singleCommentModel.modal.type === modalType.VIEW">{{singleCommentModel.comment}}</div>
 									</div>
 								</div>
