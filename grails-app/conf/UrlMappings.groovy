@@ -92,6 +92,14 @@ class UrlMappings {
 					POST: "create"
 			]
 		}
+
+		"/ws/apiAction/enums" {
+			controller = "wsApiAction"
+			action = [
+					GET: "enums"
+			]
+		}
+
 		"/ws/asset/retrieveBundleChange" {
 			controller = 'wsAsset'
 			action = [
@@ -801,13 +809,6 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent" {
-			controller = "wsApiAction"
-			action = [
-			        GET: "agentNames"
-			]
-		}
-
 		"/ws/apiAction/agent/$id" {
 			controller = "wsApiAction"
 			action = [
@@ -966,6 +967,28 @@ class UrlMappings {
 			controller = "wsTag"
 			action = [
 				PUT : "update",
+				DELETE: "delete"
+			]
+		}
+
+		"/ws/tag/$targetId/merge/$sourceId" {
+			controller = "wsTagAsset"
+			action = [
+				PUT: "merge",
+			]
+		}
+
+		"/ws/tag/asset" {
+			controller = "wsTagAsset"
+			action = [
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/asset/$id" {
+			controller = "wsTagAsset"
+			action = [
+				GET : "list",
 				DELETE: "delete"
 			]
 		}

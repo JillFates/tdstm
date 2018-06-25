@@ -10,11 +10,9 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
-import org.springframework.http.HttpStatus
 
 /**
  * Provide the endpoints for working with DataScripts.
@@ -32,7 +30,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     /**
      * Endpoint for creating a new DataScript.
      */
-    @HasPermission(Permission.DataScriptCreate)
+    @HasPermission(Permission.ETLScriptCreate)
     def createDataScript () {
         DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON)
         renderSuccessJson([dataScript: dataScript.toMap()])
@@ -43,7 +41,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      *
      * @param id - DataScript id
      */
-    @HasPermission(Permission.DataScriptUpdate)
+    @HasPermission(Permission.ETLScriptUpdate)
     def updateDataScript (Long id) {
         DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON, id)
         renderSuccessJson([dataScript: dataScript.toMap()])
@@ -53,7 +51,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * Saves the script to the datascript domain record
      * @return
      */
-    @HasPermission(Permission.DataScriptUpdate)
+    @HasPermission(Permission.ETLScriptUpdate)
     def saveScript () {
         Long id = request.JSON.id
         DataScript dataScript = dataScriptService.saveScript(id, request.JSON.script)
@@ -66,7 +64,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @param id - DataScript id
      * @return
      */
-    @HasPermission(Permission.DataScriptView)
+    @HasPermission(Permission.ETLScriptView)
     def getDataScript (Long id) {
         DataScript dataScript = dataScriptService.getDataScript(id)
         renderSuccessJson([dataScript: dataScript.toMap()])
@@ -82,7 +80,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * The latter is to contemplate the scenario where the user is editing a DataScript and this
      * endpoint is invoked. If the name hasn't changed, it would report the name as not unique.
      */
-    @HasPermission(Permission.DataScriptView)
+    @HasPermission(Permission.ETLScriptView)
     def validateUniqueName (String name) {
         DataScriptNameValidationCommand cmd = populateCommandObject(DataScriptNameValidationCommand)
         boolean isUnique = dataScriptService.validateUniqueName(cmd)
@@ -95,7 +93,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      *
      * @return
      */
-    @HasPermission(Permission.DataScriptView)
+    @HasPermission(Permission.ETLScriptView)
     def list() {
         Long providerId = NumberUtil.toLong(request.JSON.providerId)
         List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)?.sort {it.name}
@@ -108,7 +106,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @param id - id of the DataScript that has to be deleted.
      * @return
      */
-    @HasPermission(Permission.DataScriptDelete)
+    @HasPermission(Permission.ETLScriptDelete)
     def deleteDataScript (Long id) {
         dataScriptService.deleteDataScript(id)
         renderSuccessJson([status: DELETE_OK_MESSAGE])
@@ -119,7 +117,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @param id
      * @return
      */
-    @HasPermission(Permission.DataScriptDelete)
+    @HasPermission(Permission.ETLScriptDelete)
     def validateDelete(Long id) {
         renderSuccessJson(dataScriptService.checkDataScriptReferences(id))
     }
@@ -129,7 +127,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * Runs the script against the data provided and returns resulting transformed data
      * @return
      */
-    @HasPermission(Permission.DataScriptUpdate)
+    @HasPermission(Permission.ETLScriptUpdate)
     def initiateTestScript(DataScriptValidateScriptCommand command) {
 
         if (!command.validate()) {
@@ -147,7 +145,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * Compiles the script and returns any syntax errors
      * @return
      */
-    @HasPermission(Permission.DataScriptUpdate)
+    @HasPermission(Permission.ETLScriptUpdate)
     def checkSyntax (DataScriptValidateScriptCommand command) {
 
         if (!command.validate()) {
@@ -175,7 +173,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @param rows - maximum amount of rows to return
      * @return
      */
-    @HasPermission(Permission.DataScriptCreate)
+    @HasPermission(Permission.ETLScriptCreate)
     def sampleData (String filename) {
         Map jsonMap = dataScriptService.parseDataFromFile(filename, paginationMaxRowValue())
         renderSuccessJson(jsonMap)

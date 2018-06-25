@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.marshall.ConfigureMarshalling
+import com.tdsops.etl.marshall.DoNotMarshall
 import groovy.transform.CompileStatic
 
 /**
@@ -8,11 +10,13 @@ import groovy.transform.CompileStatic
  * <br>
  * Every part of the results are covered in formatter functions.
  */
+@ConfigureMarshalling
 class ETLProcessorResult {
 
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
+	@DoNotMarshall
 	ETLProcessor processor
 
 	/**
@@ -23,6 +27,7 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
+	@DoNotMarshall
 	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
@@ -32,13 +37,27 @@ class ETLProcessorResult {
 	 * Result row index position in the reference.data list
 	 * @see DomainResult#data
 	 */
+	@DoNotMarshall
 	Integer resultIndex = -1
+
+	/**
+	 * Debug Console content filed used to create the final result
+	 */
+	String consoleLog = ''
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName()
+			originalFilename: processor.dataSetFacade.fileName(),
 		]
+	}
+
+	/**
+	 * Adds dataScriptId in ETLInfo map for results
+	 * @param dataScriptId an id of an instance of DataScript
+	 */
+	void addDataScriptIdInETLInfo(Long dataScriptId){
+		this.ETLInfo.dataScriptId = dataScriptId
 	}
 
 	/**
@@ -46,6 +65,7 @@ class ETLProcessorResult {
 	 * @param domain
 	 */
 	void addCurrentSelectedDomain(ETLDomain domain) {
+		endRow()
 		reference = domains.find { it.domain == domain.name() }
 		if(!reference){
 			reference = new DomainResult(domain: domain.name())
@@ -62,9 +82,10 @@ class ETLProcessorResult {
 	 * @param element an instance of Element
 	 */
 	void loadElement(Element element) {
-		RowResult currentData = findOrCreateCurrentRow()
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		reference.addFieldName(element)
-		currentData.addLoadElement(element)
+		currentRow.addLoadElement(element)
 	}
 
 	/**
@@ -75,9 +96,10 @@ class ETLProcessorResult {
 	 * @param element an instance of Element
 	 */
 	void loadInitializedElement(Element element) {
-		RowResult currentData = findOrCreateCurrentRow()
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		reference.addFieldName(element)
-		currentData.addInitElement(element)
+		currentRow.addInitElement(element)
 	}
 
 	/**
@@ -109,6 +131,7 @@ class ETLProcessorResult {
 	 */
 	void addFoundElement(FoundElement foundElement){
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.addFoundElement(foundElement)
 	}
 
@@ -128,11 +151,23 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 *
-	 * @param rowIndex
+	 * Restart result index for the next row to be processed in an ETL script iteration
 	 */
 	void startRow(){
 		resultIndex = -1
+	}
+
+	/**
+	 * Mark the end of a row cleaning up the ignored result
+	 */
+	void endRow(){
+		// Check first if the scenario with an iterate without defining a domain and read labels
+		if(reference && processor.iterateIndex){
+			RowResult currentRow = findOrCreateCurrentRow()
+			if(currentRow.ignore){
+				ignoreCurrentRow()
+			}
+		}
 	}
 
 	/**
@@ -149,8 +184,12 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * TODO: Complete docs!!
-	 * @return
+	 * <p>Find the current row in ETLProcessorResult#reference</p>
+	 * If ETLProcessorResult#resultIndex is equals -1,
+	 * then a new instance of RowResult is created and added in
+	 * ETLProcessorResult#reference#data
+	 *
+	 * @return and instance of RowResult
 	 */
 	private RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
@@ -199,7 +238,7 @@ class ETLProcessorResult {
 	 * @return A map of this object
 	 * @see ETLFieldsValidator#fieldLabelMapForResults()
 	 */
-	Map<String, ?> toMap(Boolean includeConsoleLog=false) {
+	Map<String, ?> toMap(Boolean includeConsoleLog = false) {
 
 		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
 
@@ -219,6 +258,14 @@ class ETLProcessorResult {
 		}
 
 		return results
+	}
+
+	void addFieldLabelMapInResults(Map<String, Map<String, String>> map){
+		domains.each {DomainResult domainResult ->
+			if (map?.containsKey(domainResult.domain)) {
+				domainResult.setFieldLabelMap(map[domainResult.domain])
+			}
+		}
 	}
 
 	/**
@@ -275,6 +322,7 @@ class ETLProcessorResult {
 
 }
 
+
 /**
  * <pre>
  *  "domains": {
@@ -289,7 +337,9 @@ class ETLProcessorResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class DomainResult {
+
 	String domain
 	Set fieldNames = [] as Set
 	Map<String, String> fieldLabelMap = [:]
@@ -336,6 +386,7 @@ class DomainResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class RowResult {
 	String op = 'I'
 	Integer rowNum
@@ -343,7 +394,8 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
-	Boolean ignore = false
+	@DoNotMarshall
+	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
 
 	/**
@@ -453,6 +505,7 @@ class RowResult {
  * </pre>
  */
 @CompileStatic
+@ConfigureMarshalling
 class FieldResult {
 
 	Object originalValue
@@ -516,6 +569,7 @@ class FieldResult {
 }
 
 @CompileStatic
+@ConfigureMarshalling
 class FindResult {
 	List<QueryResult> query = []
 	List<Long> results = []
@@ -579,6 +633,7 @@ class FindResult {
  * @return
  */
 @CompileStatic
+@ConfigureMarshalling
 class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
