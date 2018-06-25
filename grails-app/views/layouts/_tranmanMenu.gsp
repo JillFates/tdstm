@@ -144,7 +144,7 @@
                         </li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="datascript" id="list">
-                                DataScripts
+                                ETL Scripts
                             </g:link>
                         </li>
                         <li class="menu-child-item ">

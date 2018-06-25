@@ -70,6 +70,7 @@ class ScriptProcessorService {
 	 */
 	def executeAndSaveResultsInFile(
 		Project project,
+		Long dataScriptId,
 		String scriptContent,
 		String filename,
 		ProgressCallback progressCallback = null,
@@ -81,10 +82,14 @@ class ScriptProcessorService {
 			new DebugConsole(buffer: new StringBuffer()),
 			createFieldsSpecValidator(project))
 
+		if(dataScriptId){
+			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
+		}
+
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
-		os << (etlProcessor.resultsMap(includeConsoleLog) as JSON)
+		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
 		os.close()
 
 		progressCallback.reportProgress(
@@ -151,7 +156,7 @@ class ScriptProcessorService {
 
 	     if (etlProcessor) {
 		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.resultsMap()
+		     result.data = etlProcessor.finalResult()
 	     }
 
         return result
@@ -186,6 +191,7 @@ class ScriptProcessorService {
 		Boolean includeConsoleLog = true
 		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
 			project,
+			null,
 			scriptContent,
 			sampleDataFullFilename,
 			updateProgressClosure,

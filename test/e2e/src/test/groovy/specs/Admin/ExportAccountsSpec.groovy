@@ -4,11 +4,11 @@ import geb.spock.GebReportingSpec
 import pages.Admin.ExportAccountsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Stepwise
+import spock.lang.Ignore
 import java.text.SimpleDateFormat
 import pages.Downloads.HomeUserDownloadsPage
 
-@Stepwise
+@Ignore
 class ExportAccountsSpec extends GebReportingSpec {
     def testKey
     static testCount

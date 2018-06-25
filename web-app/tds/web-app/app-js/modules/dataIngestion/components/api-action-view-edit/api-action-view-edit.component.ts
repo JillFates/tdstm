@@ -71,6 +71,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public providerList = new Array<ProviderModel>();
 	public agentList = new Array<AgentModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
+	protected httpMethodList = new Array<any>();
 	public agentCredentialList = new Array<CredentialModel>();
 	public providerCredentialList = new Array<CredentialModel>();
 	public datascriptList = new Array<DataScriptModel>();
@@ -208,20 +209,25 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of possible Agents
 	 */
 	getAgents(): void {
-		this.dataIngestionService.getAgents().subscribe(
+		this.dataIngestionService.getAPIActionEnums().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.agentClass = this.agentList[0];
 					this.modifySignatureByProperty('agentClass');
 				}
-				this.agentList.push(...result);
+				this.agentList.push(...result.data.agentNames);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 					this.onAgentValueChange(this.apiActionModel.agentClass);
 				} else {
 					this.agentMethodList.push({ id: '0', name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
+				}
+				this.httpMethodList.push('Select...');
+				this.httpMethodList.push(...result.data.httpMethod);
+				if (!this.apiActionModel.httpMethod) {
+					this.apiActionModel.httpMethod = this.httpMethodList[0];
 				}
 			},
 			(err) => console.log(err));
@@ -420,7 +426,10 @@ export class APIActionViewEditComponent implements OnInit {
 		// Test API Action Form
 		if (this.apiActionForm) {
 			this.validInfoForm = this.apiActionForm.valid &&
-				(this.apiActionModel.agentMethod.id !== '0' && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
+				(this.apiActionModel.agentMethod.id !== '0'
+					&& this.apiActionModel.agentClass.id !== 0
+					&& this.apiActionModel.provider.id !== 0
+					&& this.apiActionModel.httpMethod !== 'Select...');
 
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {

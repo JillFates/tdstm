@@ -16,18 +16,20 @@ class LoginPage extends Page {
         submitButton    { $("#submitButton") }
     }
 
-    def login() {
-        Login log=new Login()
-        String credentials=log.readCredentials()
-        String usr = credentials.split(",")[0]
-        String pass = credentials.split(",")[1]
+    def getCredentials(userIndex, passIndex){
+        def log=new Login()
+        def credentials=log.readCredentials()
+        ["user":credentials.split(",")[userIndex], "pass": credentials.split(",")[passIndex]]
+    }
 
+    def login(userIndex = 0, passIndex = 1) {
+        def userCredencials = getCredentials(userIndex, passIndex)
         /**
          * The following two lines will use the credentials in te testData.txt file unless
          * different credentials are provided when executing.
          */
-        username = System.properties['tm.creds.username']?: usr
-        password =  System.properties['tm.creds.password'] ?: pass
+        username = System.properties['tm.creds.username']?: userCredencials.user
+        password =  System.properties['tm.creds.password'] ?: userCredencials.pass
         submitButton.click()
     }
 }

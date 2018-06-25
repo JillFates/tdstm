@@ -67,7 +67,8 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	public getAssignedTo(comment): any {
-		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : `/${comment.role}`);
+		let assignedToRoleLabel = (comment.role ? `/${comment.role}` : '');
+		return comment.assignedTo + (comment.commentInstance.commentType === 'comment' ? '' : assignedToRoleLabel);
 	}
 
 	/**

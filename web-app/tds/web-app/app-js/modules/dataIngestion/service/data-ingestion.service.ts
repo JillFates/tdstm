@@ -116,12 +116,10 @@ export class DataIngestionService {
 		}
 	}
 
-	getAgents(): Observable<AgentModel[]> {
-		return this.http.get(`${this.dataApiActionUrl}/agent`)
+	getAPIActionEnums(): Observable<any> {
+		return this.http.get(`${this.dataApiActionUrl}/enums`)
 			.map((res: Response) => {
-				let result = res.json();
-				let agentModels = result;
-				return agentModels;
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}
@@ -339,6 +337,7 @@ export class DataIngestionService {
 			provider: { id: model.provider.id },
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
+			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
 			docUrl: model.docUrl,
 			producesData: (model.producesData) ? 1 : 0,
