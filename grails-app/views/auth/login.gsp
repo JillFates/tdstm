@@ -1,4 +1,4 @@
-<%@page import="com.tdsops.common.security.spring.TdsHttpSessionRequestCache; com.tdsops.common.security.SecurityUtil" expressionCodec="html" %>
+<%@page import="com.tdsops.common.security.spring.TdsHttpSessionRequestCache; com.tdsops.common.security.SecurityUtil" %>
 <!DOCTYPE>
 <html lang="en">
 <head>
