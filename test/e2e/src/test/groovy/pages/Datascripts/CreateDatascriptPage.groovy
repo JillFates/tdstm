@@ -5,8 +5,8 @@ import geb.Page
 class CreateDatascriptPage extends Page{
 
     static at = {
-        title == "DataScripts"
-        modaltitle.text() == "Create DataScript"
+        title == "ETL Scripts"
+        modaltitle.text() == "Create ETL Script"
         providerDdownName.text() == "Provider: *"
         datascriptDesc.text() == "Description:"
         datascriptName.text() == "Name: *"
