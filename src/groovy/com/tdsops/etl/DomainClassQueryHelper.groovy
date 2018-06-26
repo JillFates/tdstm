@@ -171,15 +171,10 @@ class DomainClassQueryHelper {
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
 	 */
-	static String getPropertyForField(Class clazz, String fieldName, Object value) {
+	static String getPropertyForField(Class clazz, String fieldName) {
 
 		if(otherAlternateKeys.containsKey(fieldName)){
 			return otherAlternateKeys[fieldName].property
-		}
-
-		if(fieldName == 'id' && !NumberUtil.isLong(value)) {
-			String alternateKey = GormUtil.getAlternateKeyPropertyName(clazz)
-			return "${DOMAIN_ALIAS}.${alternateKey}"
 		}
 
 		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
@@ -235,7 +230,7 @@ class DomainClassQueryHelper {
 	 * @param mapParams key/value pair use for preparing where and params in the HQL sentence.
 	 * @return a alist with 2 values: first the where sentence part for an HQL query using Clazz
 	 *          and second the hql params for an HQL query..
-	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String, java.lang.Object)
+	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 */
 	static List hqlWhereAndHqlParams(Project project, Class clazz, Map<String, ?> mapParams) {
@@ -244,7 +239,7 @@ class DomainClassQueryHelper {
 
 		String hqlWhere = mapParams.collect { Entry entry ->
 
-			String property = getPropertyForField(clazz, entry.key, entry.value)
+			String property = getPropertyForField(clazz, entry.key)
 			String namedParameter = getNamedParameterForField(clazz, entry.key)
 
 			if (shouldQueryByReferenceId(clazz, entry.key, entry.value) ) {

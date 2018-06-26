@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -1241,7 +1242,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					data.size() == 5
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1252,7 +1253,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1263,7 +1264,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[2]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1274,7 +1275,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[3]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1285,7 +1286,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[4]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1677,7 +1678,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 					data.size() == 2
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1702,7 +1703,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1783,7 +1784,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1808,7 +1809,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.UPDATE
 						warn == false
 						duplicate == false
 						errors == []
@@ -1889,7 +1890,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -1914,7 +1915,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.UNDETERMINED
 						warn == false
 						duplicate == false
 						errors == []
@@ -2076,7 +2077,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 2
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2105,7 +2106,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 					with(data[1]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2139,7 +2140,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 2
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2168,7 +2169,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 					with(data[1]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2276,7 +2277,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2400,7 +2401,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2524,7 +2525,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2652,7 +2653,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []
@@ -2761,7 +2762,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.UPDATE
 						warn == false
 						duplicate == false
 						errors == []
@@ -2872,7 +2873,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['description'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT
 						warn == false
 						duplicate == false
 						errors == []

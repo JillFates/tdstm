@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
@@ -397,10 +398,8 @@ class DomainResult {
 @CompileStatic
 @ConfigureMarshalling
 class RowResult {
-	static final String INSERT = 'I'
-	static final String UPDATE = 'I'
 
-	String op = INSERT
+	ImportOperationEnum op = ImportOperationEnum.INSERT
 	Integer rowNum
 	Integer errorCount = 0
 	Boolean warn = false
@@ -448,7 +447,15 @@ class RowResult {
 	void addFindElement(ETLFindElement findElement){
 		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElement(findElement)
-		this.op = (fieldData.find.hasResults() == true) ? RowResult.UPDATE : RowResult.INSERT
+
+		if(fieldData.find.results.isEmpty()){
+			this.op = ImportOperationEnum.INSERT
+		} else if (fieldData.find.results.size() == 1){
+			this.op = ImportOperationEnum.UPDATE
+		} else {
+			this.op = ImportOperationEnum.UNDETERMINED
+		}
+
 		this.errorCount = fieldData.errors.size()
 	}
 
@@ -629,15 +636,6 @@ class FindResult {
 		addQuery(findElement)
 		addResults(findElement)
 	}
-
-	/**
-	 * Returns true if results list is not empty
-	 * @return
-	 */
-	Boolean hasResults(){
-		return !this.results.isEmpty()
-	}
-
 }
 /**
  * Prepares the query data Map in the ETLProcessorResult

@@ -28,13 +28,12 @@ class DomainClassQueryHelperSpec extends Specification {
 	void 'test can get property for field for clazz #clazz and field #field'() {
 
 		expect:
-			DomainClassQueryHelper.getPropertyForField(clazz, field, value) == result
+			DomainClassQueryHelper.getPropertyForField(clazz, field) == result
 
 		where:
 			clazz                           | field            | value     || result
 			ETLDomain.Device.getClazz()     | 'id'             | 234234l   || 'D.id'
 			ETLDomain.Device.getClazz()     | 'id'             | '234234'  || 'D.id'
-			ETLDomain.Device.getClazz()     | 'id'             | 'Foo Bar' || 'D.assetName'
 			ETLDomain.Device.getClazz()     | 'manufacturer'   | 'Foo Bar' || 'D.manufacturer.name'
 			ETLDomain.Device.getClazz()     | 'moveBundle'     | 'Foo Bar' || 'D.moveBundle.name'
 			ETLDomain.Device.getClazz()     | 'rackSource'     | 'Foo Bar' || 'D.rackSource.tag'
