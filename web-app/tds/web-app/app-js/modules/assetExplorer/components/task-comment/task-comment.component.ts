@@ -11,6 +11,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {TaskDetailModel} from '../../../taskManager/components/detail/model/task-detail.model';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: `task-comment`,
@@ -19,8 +20,6 @@ import {TaskDetailModel} from '../../../taskManager/components/detail/model/task
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
-	@Input('pref-value') prefValue ? = false;
-	@Input('view-unpublished-value') viewUnpublishedValue ? = false;
 	@Input('has-publish-permission') hasPublishPermission ? = false;
 	@Input('can-edit-comments') canEdit ? = false;
 	@Input('can-edit-tasks') canEditTasks ? = false;
@@ -30,15 +29,17 @@ export class TaskCommentComponent implements OnInit {
 	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
 	private taskCommentColumnModel = new TaskCommentColumnsModel();
 	private modalType = ModalType;
+	private viewUnpublished = false;
 
 	private showAll: boolean;
 	private comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService) {
+	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
+		this.getPreferences();
 	}
 
 	ngOnInit(): void {
-		this.showAll = this.prefValue;
+		this.showAll = false;
 		this.getAllComments();
 	}
 
@@ -60,7 +61,7 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	public getCommentsWithFilter(): any {
 		return this.comments
-			.filter(comment => this.viewUnpublishedValue || comment.commentInstance.isPublished)
+			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
 			.filter(comment => this.showAll
 				|| (comment.commentInstance.commentType === 'issue' && comment.commentInstance.status !== 'Completed')
 				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
@@ -172,6 +173,23 @@ export class TaskCommentComponent implements OnInit {
 
 	public reloadGrid(): void {
 		this.dataGridTaskCommentOnHelper.reloadData(this.getCommentsWithFilter());
+	}
+
+	/**
+	 * Safe the preference as soon a user change the value
+	 */
+	public onViewUnpublishedChange(): void {
+		this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_UNPUBLISHED, this.viewUnpublished.toString()).subscribe();
+	}
+
+	/**
+	 * Get Preference for the View Unpublished
+	 * @returns {Observable<any>}
+	 */
+	private getPreferences(): void {
+		this.preferenceService.getPreferences(PREFERENCES_LIST.VIEW_UNPUBLISHED).subscribe((preferences: any) => {
+			this.viewUnpublished =  preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() ===  'true';
+		});
 	}
 
 	/**
