@@ -8,7 +8,7 @@
 	</g:if>
 	<tdsAngular:inputLabel field="${custom}" value="${assetEntityInstance.(custom.field)}"/>
 	<td>
-		<tdsAngular:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" ngmodel="model.asset.${custom.field}" tabOffset="$tabOffset" tooltipDataPlacement="${j % 4 == 3 ? 'bottom': 'right' }"/>
+		<tdsAngular:inputControl field="${custom}" value="${assetEntityInstance.(custom.field)}" ngmodel="model.asset.${custom.field}" tabOffset="$tabOffset"/>
 	</td>
 	<g:if test="${j % 4 == 3}">
 		</tr>

@@ -21,17 +21,9 @@
                                 <tbody>
                                     <tr class="prop">
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
-                                        <td colspan="3" class="valueNW ${standardFieldSpecs.assetName.imp?:''}" style="max-width: 400px; font-weight:bold;">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.assetName}">
-                                                ${asset?.assetName}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td colspan="3" class="valueNW ${standardFieldSpecs.assetName.imp?:''}" style="max-width: 400px; font-weight:bold;">${asset?.assetName}</td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
-                                        <td colspan="3" style="max-width: 400px;" class="valueNW ${standardFieldSpecs.description.imp?:''}" >
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.description}">
-                                                ${asset.description}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td colspan="3" style="max-width: 400px;" class="valueNW ${standardFieldSpecs.description.imp?:''}" >${asset.description}</td>
                                     </tr>
                                     <tr class="prop">
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}"/>
@@ -44,54 +36,31 @@
                                                 ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
                                             </label>
                                         </td>
-                                        <td class="valueNW ${standardFieldSpecs.size.imp?:''}">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.size}">
-                                                ${asset?.size}&nbsp;${asset.scale?.value()}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td class="valueNW ${standardFieldSpecs.size.imp?:''}">${asset?.size}&nbsp;${asset.scale?.value()}</td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
-                                        <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.retireDate}">
-                                                <tds:convertDate date="${asset?.retireDate}" endian = "${dateFormat}" />
-                                            </tdsAngular:tooltipSpan>
+                                        <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${asset?.retireDate}" endian = "${dateFormat}" /></td>
+                                        <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+                                            <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+                                                ${standardFieldSpecs.moveBundle.label} : Dep. Group
+                                            </label>
                                         </td>
-																				<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-																					<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-																						${standardFieldSpecs.moveBundle.label} : Dep. Group
-																					</label>
-																				</td>
-																				<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-																					<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-																						${asset?.moveBundle}
-																					</tdsAngular:tooltipSpan>
-																					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
-																				</td>
+                                        <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">${asset?.moveBundle}
+                                            <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
+                                        </td>
                                     </tr>
                                     <tr class="prop">
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
-                                        <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-                                                <tds:convertDate date="${asset?.maintExpDate}" endian = "${dateFormat}" />
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}"><tds:convertDate date="${asset?.maintExpDate}" endian = "${dateFormat}" /></td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
-                                        <td class="valueNW ${standardFieldSpecs.planStatus.imp?:''}" colspan="3">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">
-                                                ${asset.planStatus}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td class="valueNW ${standardFieldSpecs.planStatus.imp?:''}" colspan="3">${asset.planStatus}</td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
-                                        <td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">
-                                                ${asset.validation}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+                                        <td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">${asset.validation}</td>
                                     </tr>
                                     <g:render template="/angular/common/customShow" model="[asset:asset, project:project]"></g:render>
                                 </tbody>
