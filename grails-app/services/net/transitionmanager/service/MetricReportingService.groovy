@@ -334,33 +334,6 @@ class MetricReportingService {
 	}
 
 	/**
-	 * Creates a new record of a UserLoginProjectAccess, if it does not exist already.
-	 * If there is another record for the same UserLogin and same Project in the same day,
-	 * do nothing. Otherwise create a new record for this day.
-	 * This entities will be used to collect metrics of logged users.
-	 * See TM-10119
-	 * @param userLogin  The UserLogin that will be associated to the new UserLoginProjectAccess
-	 */
-	boolean createNewUserLoginProjectAccess(UserLogin userLogin) {
-		Date date = TimeUtil.nowGMT().clearTime()
-		Project project = userLogin.getCurrentProject()
-		// Make sure that is unique
-		int count = UserLoginProjectAccess.where {
-			userLogin == userLogin
-			project == project
-			date == date
-		}.count()
-		if (count == 0) {
-			UserLoginProjectAccess userLoginProjectAccess = new UserLoginProjectAccess(
-					userLogin: userLogin,
-					project: project,
-					date: date
-			)
-			userLoginProjectAccess.save(failOnError: true)
-		}
-	}
-
-	/**
 	 * This is a test function to generate data, for when a metric is running in function mode.
 	 *
 	 * @param projectIds A list of ids to create metric data for.

@@ -1330,32 +1330,25 @@ class ProjectService implements ServiceMethods {
 	private void fillUsersMetrics(metricsByProject, List<Project> projects, sqlSearchDate) {
 
 		def projectDailyMetric
-		def companyIds = [0]
-		Map projectsMapByCompanyId = [:]
-
-		projects.each { p ->
-			companyIds << p.client.id
-			projectsMapByCompanyId[p.client.id] = p
-		}
 
 		String personsCountsQuery = '''
-			SELECT 
-				pr.party_id_from_id as projectId,
-				COUNT(*) as totalPersons,
-				SUM( IF(u.username IS NULL, 0, 1) ) as totalUserLogins,
-				COUNT(DISTINCT ulpa.user_login_id) as activeUserLogins
+			SELECT
+			  pr.party_id_from_id projectId,
+			  COUNT(distinct party_id_to_id) as totalPersons,
+			  COUNT(distinct u.username) as totalUserLogins,
+			  COUNT(distinct ulpa.user_login_id, ulpa.date) as activeUserLogins
 			FROM party_relationship pr
-			  LEFT OUTER JOIN user_login u ON u.person_id = pr.party_id_to_id
-			  LEFT OUTER JOIN user_login_project_access ulpa ON ulpa.project_id = pr.party_id_from_id AND ulpa.date BETWEEN (? - INTERVAL ONE DAY) AND ?
-			WHERE pr.role_type_code_from_id='PROJECT' AND
-				  pr.party_relationship_type_id='PROJ_STAFF' AND
-				  pr.role_type_code_to_id='STAFF'
-			GROUP BY pr.party_id_from_id
+			  LEFT OUTER JOIN user_login u ON pr.party_id_to_id = u.person_id
+			  LEFT OUTER JOIN user_login_project_access ulpa ON PR.party_id_from_id = ulpa.project_id and ulpa.date = ?
+			WHERE
+			  pr.role_type_code_from_id='PROJECT' AND
+			  pr.party_relationship_type_id='PROJ_STAFF' AND
+			  pr.role_type_code_to_id='STAFF'
+			GROUP BY party_id_from_id
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
-			def project = projectsMapByCompanyId[it.projectId]
-			projectDailyMetric = metricsByProject[project.id]
+			projectDailyMetric = metricsByProject[it.projectId]
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins

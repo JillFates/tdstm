@@ -78,7 +78,7 @@ class UserLogin {
 		[domain: UserAudit, 			onDelete:'delete', properties: ['userLogin'] ],
 		[domain: ModelSyncBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: LicenseActivityTrack,	onDelete:'null',   properties: ['userLogin'] ],
-		[domain: UserLoginProjectAccess,onDelete:'null',   properties: ['userLogin'] ]
+		[domain: UserLoginProjectAccess,onDelete:'delete',   properties: ['userLogin'] ]
 	]
 
 	// Transient flag set whenever the password is changed
