@@ -320,6 +320,7 @@ class DataviewService implements ServiceMethods {
 	        FROM AssetEntity AE
 	        $hqlJoins
 	        WHERE AE.project = :project AND $conditions
+			group by AE.id
 	    """
 
 		return [query: query, params: whereInfo.params]
@@ -376,8 +377,9 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $conditions  
-          order by $hqlOrder  
+             where AE.project = :project and $conditions
+          order by $hqlOrder
+		  group by AE.id
         """
 
 		String countHql = """
@@ -385,6 +387,7 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $conditions
+			 group by AE.id
         """
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
@@ -935,6 +938,27 @@ class DataviewService implements ServiceMethods {
 		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
 		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
 		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
+		'tags': [
+			property: """
+				CONCAT(
+					'[',
+					if(
+						tl.id,
+						group_concat(
+							json_object('name', T.name, 'description', T.description, 'color', T.color)
+						),
+						''
+					), 
+					']'
+				)""",
+			type: String,
+			namedParameter: 'tags',
+			alias: 'tags',
+			join: """
+				left outer join AE.tagAssets TA
+				left outer join TA.tag T
+			"""
+		],
 
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
