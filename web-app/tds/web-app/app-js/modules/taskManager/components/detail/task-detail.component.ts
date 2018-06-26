@@ -12,6 +12,7 @@ import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
 import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: `task-detail`,
@@ -30,9 +31,11 @@ export class TaskDetailComponent extends UIExtraDialog {
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public collapsedTaskDetail = false;
 	public hasCookbookPermission = false;
+	public modalOptions: DecoratorOptions;
 
 	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, private dialogService: UIDialogService, public promptService: UIPromptService, public userPreferenceService: PreferenceService, private permissionService: PermissionService) {
 		super('#task-detail-component');
+		this.modalOptions = { isResizable: true };
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}

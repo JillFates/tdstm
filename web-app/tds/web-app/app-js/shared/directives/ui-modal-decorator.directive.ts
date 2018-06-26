@@ -42,7 +42,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	constructor(private el: ElementRef, private renderer: Renderer2, private preferenceService: PreferenceService) {}
 
 	ngOnDestroy() {
-		if (this.options.sizeNamePreference) {
+		if (this.options && this.options.sizeNamePreference) {
 			this.saveWindowSize()
 				.subscribe((result) => console.log(result))
 		}
@@ -74,7 +74,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	}
 
 	private getWindowSize(): Observable<any> {
-		if (this.options.sizeNamePreference) {
+		if (this.options && this.options.sizeNamePreference) {
 			return this.preferenceService.getDataScriptDesignerSize();
 		}
 		return Observable.of(null);
@@ -89,15 +89,15 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
-		if (this.options.isDraggable) {
+		if (this.options && this.options.isDraggable) {
 			this.enableDraggable(true);
 		}
 
-		if (this.options.isResizable) {
+		if (this.options && this.options.isResizable) {
 			this.enableResizable(true);
 		}
 
-		if (this.options.isCentered) {
+		if (this.options && this.options.isCentered) {
 			this.centerWindow();
 		}
 
@@ -176,7 +176,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 		this.renderer.setStyle(this.el.nativeElement, 'left', '0');
 		this.renderer.setStyle(this.el.nativeElement, 'top', this.toPixels(TOP_MARGIN));
 
-		if (this.options.isResizable) {
+		if (this.options && this.options.isResizable) {
 			this.enableResizable(false);
 		}
 		this.resizeEvent.emit('maximize');
@@ -194,11 +194,11 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 		this.renderer.setStyle(this.el.nativeElement, 'width', width);
 		this.renderer.setStyle(this.el.nativeElement, 'height', height);
 
-		if (this.options.isCentered) {
+		if (this.options && this.options.isCentered) {
 			this.centerWindow();
 		}
 
-		if (this.options.isResizable) {
+		if (this.options && this.options.isResizable) {
 			this.enableResizable(true);
 		}
 
