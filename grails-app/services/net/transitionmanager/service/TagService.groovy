@@ -143,4 +143,14 @@ class TagService implements ServiceMethods {
 		Tag tag = get(Tag, id, currentProject)
 		tag.delete(failOnError: true)
 	}
+
+	void copyTags(Project destination, Project source = Project.defaultProject){
+		List<Tag> tags = Tag.findAllWhere(project: source)
+		Tag newTag
+
+		tags.each{ Tag tag ->
+			newTag = new Tag(name: tag.name, description: tag.description, color: tag.color, project: destination)
+			newTag.save(failOnError: true)
+		}
+	}
 }
