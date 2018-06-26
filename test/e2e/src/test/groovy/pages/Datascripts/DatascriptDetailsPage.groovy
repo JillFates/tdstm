@@ -13,12 +13,21 @@ class DatascriptDetailsPage extends Page{
     static content = {
         modaltitle(required:false) { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
         datascriptDetail { $('div.modal-header h4[_ngcontent-c7]')}
-        dsDetailXIcon {$("div", class:"modal-header").find("button","aria-label":"Close", class:"close")[0]}
+        dsDetailXIcon {$('div.modal.fade.in button.close')}
         dsDesignerButton {$("data-script-view-edit").find("button", text: contains("ETL Script Designer"))}
+        datascriptEditBtn  { $("button", text: contains("Edit"))}
     }
 
     def clickOnDesignerButton(){
         waitFor{dsDesignerButton.click()}
+    }
+
+    def clickOnXButton(){
+        waitFor{dsDetailXIcon.click()}
+    }
+
+    def clickOnEditButton(){
+        waitFor{datascriptEditBtn.click()}
     }
 
 }
