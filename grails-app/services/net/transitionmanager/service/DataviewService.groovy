@@ -943,7 +943,7 @@ class DataviewService implements ServiceMethods {
 				CONCAT(
 					'[',
 					if(
-						tl.id,
+						TA.id,
 						group_concat(
 							json_object('name', T.name, 'description', T.description, 'color', T.color)
 						),
