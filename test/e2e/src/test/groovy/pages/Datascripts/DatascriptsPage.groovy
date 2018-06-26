@@ -4,9 +4,9 @@ import geb.Page
 
 class DatascriptsPage extends Page {
     static at = {
-        title == "DataScripts"
-        pageHeaderName.text() == "DataScripts"
-        createBtn.text() == "Create DataScript"
+        title == "ETL Scripts"
+        pageHeaderName.text() == "ETL Scripts"
+        createBtn.text() == "Create ETL Script"
     }
 
     static content = {
