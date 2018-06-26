@@ -165,7 +165,9 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		], true, false).then(result => {
-			// this.getAllComments();
+			if (result && result.commentInstance) {
+				this.openTaskDetail(result, ModalType.VIEW);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
