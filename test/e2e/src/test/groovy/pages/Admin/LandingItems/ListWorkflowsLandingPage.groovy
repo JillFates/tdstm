@@ -1,13 +1,13 @@
-package pages.Admin
+package pages.Admin.LandingItems
 
 import geb.Page
 import modules.AdminModule
 
-class ExportMfgModelsPage extends Page{
+class ListWorkflowsLandingPage extends Page{
 
     static at = {
-        title == "Sync Management"
-        pageHeaderName.text() == "Export Mfg & Models"
+        title == "Workflows"
+        pageHeaderName.text() == "Workflows"
     }
 
     static content = {
