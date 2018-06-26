@@ -121,6 +121,11 @@
                             <li class="menu-child-item menu-projects-field-settings">
                                 <g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link>
                             </li>
+                            <li class="menu-child-item menu-projects-tags">
+                                <g:link class="mmlink" controller="module" action="tag" id="list">
+                                    Tags
+                                </g:link>
+                            </li>
                         </g:if>
                         <g:else>
                             <li class="menu-child-warn">No Project Selected</li>

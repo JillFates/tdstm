@@ -1,1 +1,110 @@
-works baby!
+<style>
+    .btn i.fa {
+        padding-right: 0px;
+    }
+</style>
+<!-- Main content -->
+<div class="content body tds-kendo-grid dependency-batch-list-component">
+    <section>
+        <div>
+            <div class="box-body box-with-empty-header">
+                <kendo-grid
+                        *ngIf="gridSettings"
+                        [data]="gridSettings.gridData"
+                        [filter]="gridSettings.state.filter"
+                        [filterable]="true"
+                        (filterChange)="gridSettings.filterChange($event)"
+                        [sort]="gridSettings.state.sort"
+                        [sortable]="{mode:'single'}"
+                        [pageSize]="gridSettings.state.take"
+                        [skip]="gridSettings.state.skip"
+                        [pageable]="{pageSizes: gridSettings.defaultPageOptions, info: true}"
+                        (pageChange)="gridSettings.pageChange($event)"
+                        [resizable]="true"
+                        (sortChange)="gridSettings.sortChange($event)"
+                        [selectable]="selectableSettings"
+                        [rowSelected]="gridSettings.isRowSelected"
+                        (cellClick)="openBatchDetail($event)">
+
+                    <!-- Toolbar Template -->
+                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                        <button (click)="onCreate()"
+                                class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            {{ 'GLOBAL.CREATE' | translate }} Tag
+                        </button>
+                        <label class="reload-grid-button pull-right" title="Reload List" (click)="onReload()">
+                            <span class="glyphicon glyphicon-repeat"></span>
+                        </label>
+                    </ng-template>
+
+                    <!-- Action -->
+                    <kendo-grid-column title="Action" [locked]="true" [filterable]="false" [width]="130">
+                        <ng-template kendoGridHeaderTemplate>
+                            <div class="text-center">
+                                <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
+                            </div>
+                        </ng-template>
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                            <div class="k-grid-ignore-click text-center" style="cursor: default">
+                                <button (click)="onEdit(dataItem)"
+                                        class="btn btn-action btn-default" title="Edit">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                                <button (click)="onDelete(dataItem)"
+                                        class="btn btn-action btn-default" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                                <button (click)="onMerge(dataItem)"
+                                        class="btn btn-action btn-default" title="Merge">
+                                    <i class="fa fa-exchange"></i>
+                                </button>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+
+                    <!-- Columns -->
+                    <kendo-grid-column *ngFor="let column of gridColumns.columns"
+                                       field="{{column.property}}"
+                                       [locked]="column.locked"
+                                       format="{{column.format}}"
+                                       [headerClass]="column.headerClass ? column.headerClass : ''"
+                                       [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                                       [class]="column.cellClass ? column.cellClass : ''"
+                                       [style]="column.cellStyle ? column.cellStyle : ''"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                        <!-- Header Template -->
+                        <ng-template kendoGridHeaderTemplate>
+                            <label>{{column.label}}</label>
+                        </ng-template>
+
+                        <!-- Cell Templates -->
+                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
+                            {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
+                        </ng-template>
+
+                        <!-- Filter Template -->
+                        <ng-template kendoGridFilterCellTemplate let-filter>
+                            <div class="has-feedback" *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )" style="margin-bottom:0px;">
+                                <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
+                                <ng-template #dateFilter>
+                                    <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
+                                          style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                </ng-template>
+                                <ng-template #stringFilter>
+                                    <input [(ngModel)]="column.filter" (keyup)="gridSettings.onFilter(column)"
+                                           type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
+                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                </ng-template>
+                            </div>
+                        </ng-template>
+
+                    </kendo-grid-column>
+                </kendo-grid>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </section>
+</div>
