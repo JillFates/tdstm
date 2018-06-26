@@ -378,8 +378,8 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $conditions
-          order by $hqlOrder
 		  group by AE.id
+          order by $hqlOrder
         """
 
 		String countHql = """
