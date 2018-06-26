@@ -317,4 +317,57 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			!results.isEmpty()
 			results.contains(device)
 	}
+
+
+	void '17. can find a Device by its id as String value'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [id: device.id.toString()])
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '17. can find a Device by its alternateKey'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [id: device.assetName])
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '18. can find a Room by a by id'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.id])
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	void '19. can find a Room by a by alternateKey'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.roomName])
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
 }

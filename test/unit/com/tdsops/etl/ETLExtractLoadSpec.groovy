@@ -513,6 +513,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 					data.size() == 2
 					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
@@ -528,6 +529,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 
 					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
@@ -579,7 +581,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'This is a Microsoft Application'
@@ -587,7 +590,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							value == 'This is not a Microsoft Application'
@@ -635,7 +639,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -651,7 +656,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -707,7 +713,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -723,7 +730,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -781,7 +789,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor: 'Vendor'
 						environment: 'Environment'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -789,7 +798,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Mozilla'
@@ -827,7 +837,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						description == 'Description'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == "Microsoft"
@@ -835,7 +846,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.description) {
 							originalValue == "Microsoft"
@@ -843,7 +855,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.appVendor) {
 							originalValue == "Mozilla"
@@ -851,7 +864,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.description) {
 							originalValue == "Mozilla"
@@ -947,7 +961,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						id == 'Id'
 						appVendor == 'Vendor'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == "Microsoft"
@@ -955,7 +970,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.appVendor) {
 							originalValue == "Mozilla"
@@ -1004,7 +1020,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						manufacturer == 'Manufacturer'
 						model == 'Model'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							originalValue == "xraysrv01"
@@ -1020,7 +1037,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							originalValue == "oradbsrv02"
@@ -1036,7 +1054,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[2]) {
+					with(data[2], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 3
 						with(fields.assetName) {
 							originalValue == "oradbsrv03"
@@ -1094,7 +1113,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(fieldLabelMap){
 						appVendor == 'Vendor'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Production'
@@ -1102,7 +1122,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1110,7 +1131,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == 'Microsoft'
@@ -1118,7 +1140,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Production'
@@ -1126,7 +1149,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1134,7 +1158,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == 'Microsoft'
@@ -1148,7 +1173,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1156,7 +1182,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.description) {
 							originalValue == 'Development'
@@ -1164,7 +1191,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1172,7 +1200,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.description) {
 							originalValue == 'Development'
@@ -1313,7 +1342,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -1321,7 +1351,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							value == 'Production'
@@ -1329,7 +1360,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -1337,7 +1369,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Development'
@@ -1537,7 +1570,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1555,7 +1589,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1612,7 +1647,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1811,7 +1847,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -1819,7 +1856,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -1869,7 +1907,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -1877,7 +1916,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'zuludb01'
@@ -1928,7 +1968,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['environment', 'assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							value == 'Server'
@@ -1940,7 +1981,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Blade'
@@ -2000,7 +2042,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -2020,7 +2063,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'zuludb01'
@@ -2085,6 +2129,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						with(fields, Map){
 
 							with(assetName, FieldResult) {
@@ -2142,7 +2187,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -2150,7 +2196,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -2276,7 +2323,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -2285,7 +2333,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.model) {
 							value == 'PE2950'
@@ -2337,6 +2386,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
 					with(data[0], RowResult){
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
 							value == ''
@@ -2438,6 +2488,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
 					with(data[0], RowResult){
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
 							value == null
@@ -2486,14 +2537,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Microsoft,ACME Data Center'
 							value == 'Microsoft,ACME Data Center'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							originalValue == 'Mozilla,ACME Data Center'
@@ -2532,14 +2585,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Microsoft'
 							value == 'Microsoft-Prod'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.environment) {
 							originalValue == 'Mozilla'
@@ -2594,7 +2649,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 1
 						with(fields.assetName) {
 							originalValue == 'x'
@@ -2605,7 +2661,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							value == '1.2.3.4, 1.3.5.1'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 2
 						with(fields.assetName) {
 							originalValue == 'y'
@@ -2616,7 +2673,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							value == '4.5.4.2'
 						}
 					}
-					with(data[2]) {
+					with(data[2], RowResult) {
+						op == RowResult.INSERT
 						rowNum == 4
 						with(fields.assetName) {
 							originalValue == 'z'

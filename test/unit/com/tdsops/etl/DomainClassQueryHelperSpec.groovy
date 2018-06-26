@@ -28,18 +28,20 @@ class DomainClassQueryHelperSpec extends Specification {
 	void 'test can get property for field for clazz #clazz and field #field'() {
 
 		expect:
-			DomainClassQueryHelper.getPropertyForField(clazz, field) == result
+			DomainClassQueryHelper.getPropertyForField(clazz, field, value) == result
 
 		where:
-			clazz                           | field            || result
-			ETLDomain.Device.getClazz()     | 'id'             || 'D.id'
-			ETLDomain.Device.getClazz()     | 'manufacturer'   || 'D.manufacturer.name'
-			ETLDomain.Device.getClazz()     | 'moveBundle'     || 'D.moveBundle.name'
-			ETLDomain.Device.getClazz()     | 'rackSource'     || 'D.rackSource.tag'
-			ETLDomain.Device.getClazz()     | 'locationSource' || 'D.roomSource.location'
-			ETLDomain.Room.getClazz()       | 'roomName'       || 'D.roomName'
-			ETLDomain.Rack.getClazz()       | 'room'           || 'D.room'
-			ETLDomain.Dependency.getClazz() | 'asset'          || 'D.asset'
+			clazz                           | field            | value     || result
+			ETLDomain.Device.getClazz()     | 'id'             | 234234l   || 'D.id'
+			ETLDomain.Device.getClazz()     | 'id'             | '234234'  || 'D.id'
+			ETLDomain.Device.getClazz()     | 'id'             | 'Foo Bar' || 'D.assetName'
+			ETLDomain.Device.getClazz()     | 'manufacturer'   | 'Foo Bar' || 'D.manufacturer.name'
+			ETLDomain.Device.getClazz()     | 'moveBundle'     | 'Foo Bar' || 'D.moveBundle.name'
+			ETLDomain.Device.getClazz()     | 'rackSource'     | 'Foo Bar' || 'D.rackSource.tag'
+			ETLDomain.Device.getClazz()     | 'locationSource' | 'Foo Bar' || 'D.roomSource.location'
+			ETLDomain.Room.getClazz()       | 'roomName'       | 'Foo Bar' || 'D.roomName'
+			ETLDomain.Rack.getClazz()       | 'room'           | 'Foo Bar' || 'D.room'
+			ETLDomain.Dependency.getClazz() | 'asset'          | 'Foo Bar' || 'D.asset'
 	}
 
 	@Unroll

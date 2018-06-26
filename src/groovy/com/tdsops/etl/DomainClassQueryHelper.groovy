@@ -4,6 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
@@ -165,14 +166,20 @@ class DomainClassQueryHelper {
 	 * </pre>
 	 * @param clazz
 	 * @param fieldName
+	 * @param value
 	 * @return a property value for a HQL query.
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
 	 */
-	static String getPropertyForField(Class clazz, String fieldName) {
+	static String getPropertyForField(Class clazz, String fieldName, Object value) {
 
 		if(otherAlternateKeys.containsKey(fieldName)){
 			return otherAlternateKeys[fieldName].property
+		}
+
+		if(fieldName == 'id' && !NumberUtil.isLong(value)) {
+			String alternateKey = GormUtil.getAlternateKeyPropertyName(clazz)
+			return "${DOMAIN_ALIAS}.${alternateKey}"
 		}
 
 		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
@@ -228,8 +235,8 @@ class DomainClassQueryHelper {
 	 * @param mapParams key/value pair use for preparing where and params in the HQL sentence.
 	 * @return a alist with 2 values: first the where sentence part for an HQL query using Clazz
 	 *          and second the hql params for an HQL query..
+	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String, java.lang.Object)
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
-	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
 	 */
 	static List hqlWhereAndHqlParams(Project project, Class clazz, Map<String, ?> mapParams) {
 
@@ -237,10 +244,10 @@ class DomainClassQueryHelper {
 
 		String hqlWhere = mapParams.collect { Entry entry ->
 
-			String property = getPropertyForField(clazz, entry.key)
+			String property = getPropertyForField(clazz, entry.key, entry.value)
 			String namedParameter = getNamedParameterForField(clazz, entry.key)
 
-			if (shouldQueryById(clazz, entry.key, entry.value) ) {
+			if (shouldQueryByReferenceId(clazz, entry.key, entry.value) ) {
 				hqlParams[namedParameter] = entry.value
 				String where = " ${property}.id = :${namedParameter}\n"
 
@@ -253,7 +260,14 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				hqlParams[namedParameter] = entry.value
+				if(entry.key == 'id' && NumberUtil.isLong(entry.value)) {
+					hqlParams[namedParameter] = NumberUtil.toLong(entry.value)
+				} else {
+					hqlParams[namedParameter] = entry.value
+				}
+
+
+
 				return " ${property} = :${namedParameter}\n"
 			}
 
@@ -269,7 +283,7 @@ class DomainClassQueryHelper {
 	 * @param value - value to query with
 	 * @return true if should query using the ID
 	 */
-	static private boolean shouldQueryById(clazz, field, value) {
+	static private boolean shouldQueryByReferenceId(clazz, field, value) {
 		return (value instanceof Long) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 	}
 
