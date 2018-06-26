@@ -2,6 +2,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
+import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.grails.GormUtil
@@ -71,6 +72,9 @@ class BootStrap {
 		// Warm up AESCodec
 		AESCodec.getInstance()
 
+		// ETLProcessorResult marshaller.
+		ETLProcessorResult.registerObjectMarshaller()
+
 		//
 		// NOTHING NEEDED IN PRODUCTION SHOULD BE PLACED BELOW HERE
 		//
@@ -83,8 +87,6 @@ class BootStrap {
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
 
-		// ETLProcessorResult marshaller.
-		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 
 	}
 

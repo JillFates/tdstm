@@ -1,7 +1,9 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
+import grails.converters.JSON
 import groovy.transform.CompileStatic
 
 /**
@@ -320,6 +322,13 @@ class ETLProcessorResult {
 		}
 	}
 
+	/**
+	 * Register an instance of AnnotationDrivenObjectMarshaller for ETLProcessorResult
+	 */
+	static void registerObjectMarshaller() {
+		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
+	}
+
 }
 
 
@@ -388,7 +397,10 @@ class DomainResult {
 @CompileStatic
 @ConfigureMarshalling
 class RowResult {
-	String op = 'I'
+	static final String INSERT = 'I'
+	static final String UPDATE = 'I'
+
+	String op = INSERT
 	Integer rowNum
 	Integer errorCount = 0
 	Boolean warn = false
@@ -436,7 +448,7 @@ class RowResult {
 	void addFindElement(ETLFindElement findElement){
 		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElement(findElement)
-		this.op = (fieldData.find.hasResults() == true) ? 'U' : 'I'
+		this.op = (fieldData.find.hasResults() == true) ? RowResult.UPDATE : RowResult.INSERT
 		this.errorCount = fieldData.errors.size()
 	}
 
