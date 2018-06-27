@@ -277,7 +277,16 @@ export class ManualImportComponent implements OnInit {
 		if (!this.fetchResult || !this.fetchResult.filename) {
 			return;
 		}
-		e.data = { filename: this.fetchResult.filename };
+		// delete temporary server uploaded file
+		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+
+		// delete temporary transformed file
+		if (this.transformResult) {
+			tempServerFilesToDelete.push(this.transformResult.data.filename)
+		}
+
+		// get the coma separated file names to delete
+		e.data = { filename: tempServerFilesToDelete.join(',') };
 
 		this.fetchResult = null;
 		this.fetchFileContent = null;
