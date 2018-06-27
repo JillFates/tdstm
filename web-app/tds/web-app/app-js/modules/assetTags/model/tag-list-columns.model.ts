@@ -10,7 +10,7 @@ export class TagListColumnsModel {
 				label: 'Name',
 				property: 'Name',
 				type: 'text',
-				width: 180,
+				width: 200,
 				locked: false
 			},
 			{
@@ -24,7 +24,7 @@ export class TagListColumnsModel {
 				label: 'Color',
 				property: 'Color',
 				type: 'text',
-				width: 130,
+				width: 80,
 				locked: false
 			},
 			{
@@ -32,7 +32,8 @@ export class TagListColumnsModel {
 				property: 'Assets',
 				type: 'number',
 				width: 130,
-				locked: false
+				locked: false,
+				cellStyle: {'text-align': 'center'}
 			},
 			{
 				label: 'Dependencies',

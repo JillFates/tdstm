@@ -80,13 +80,25 @@
                         </ng-template>
 
                         <!-- Cell Templates -->
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'Color'" let-dataItem>
+                            <div class="text-center">
+                                <span [style.background-color]="dataItem[column.property]"
+                                      class="label"
+                                      style="width: 30px;
+                                      height: 25px;
+                                      display: block;
+                                      margin: 0 auto 0 auto;"
+                                ></span>
+                            </div>
+                        </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
                             {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                         </ng-template>
 
                         <!-- Filter Template -->
                         <ng-template kendoGridFilterCellTemplate let-filter>
-                            <div class="has-feedback" *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )" style="margin-bottom:0px;">
+                            <div class="has-feedback" style="margin-bottom:0px;"
+                                 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'Color' )">
                                 <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
                                 <ng-template #dateFilter>
                                     <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
