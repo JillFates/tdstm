@@ -124,7 +124,7 @@ class TagAssetService implements ServiceMethods {
 		def parsedValue = jsonSlurper.parseText(value)
 
 		if(!(parsedValue instanceof List)){
-			throw new InvalidParamException('Value is not a list of numbers.')
+			throw new InvalidParamException('Value is not a list of numbers')
 		}
 
 		List<Long> tagIds = (parsedValue).collect { i -> i.toLong() }
@@ -147,7 +147,7 @@ class TagAssetService implements ServiceMethods {
 		int tagCount = Tag.where {id in tagIds && project == currentProject}.count()
 
 		if(tagCount != tagIds.size()){
-			throw new InvalidParamException("Some tags specified don't exist in your project, and may have been deleted.")
+			throw new InvalidParamException('One or more tags specified were not found')
 		}
 	}
 
@@ -191,13 +191,13 @@ class TagAssetService implements ServiceMethods {
 	/**
 	 * Bulk clears tags for assets.
 	 *
-	 * @param tagIds should be null, because it is not used, it's only here so that all the bulk methods have the same signature, for the dynamic call.
-	 * @param assetIds The ids of the assets to remove tags from.
-	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 * @param tagIds should be null because it is not used. The parameter is specified so that all the bulk methods have the same signature.
+	 * @param assetIds The ids of the assets to remove tags from
+	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present
 	 */
 	void bulkClear(List<Long> tagIds = null, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
-		if(tagIds){
-			throw InvalidParamException("Tag Id's shouldn't be specified, for clearing a field.")
+		if (tagIds) {
+			throw InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
 		}
 
 		remove([], assetIds, assetIdsFilterQuery)
@@ -212,7 +212,7 @@ class TagAssetService implements ServiceMethods {
 	 */
 	void bulkRemove(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if(!tagIds){
-			throw InvalidParamException("Tag Id's must be specified, for removal.")
+			throw InvalidParamException("Tag IDs must be specified for removal")
 		}
 
 		remove(tagIds, assetIds, assetIdsFilterQuery)
