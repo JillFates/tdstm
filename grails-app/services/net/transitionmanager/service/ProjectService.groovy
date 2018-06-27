@@ -1344,7 +1344,8 @@ class ProjectService implements ServiceMethods {
 			  pr.role_type_code_from_id='PROJECT' AND
 			  pr.party_relationship_type_id='PROJ_STAFF' AND
 			  pr.role_type_code_to_id='STAFF'
-			GROUP BY party_id_from_id
+			  AND pr.party_id_from_id in (''' + projects.collect { NumberUtil.toLong(it.id) }.join(',') + ''')
+			GROUP BY pr.party_id_from_id
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
