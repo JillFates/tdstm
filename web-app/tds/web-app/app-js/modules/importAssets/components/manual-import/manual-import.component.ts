@@ -256,12 +256,6 @@ export class ManualImportComponent implements OnInit {
 	 * Clears out most of results peformed on the page.
 	 */
 	private onClear(): void {
-		this.fetchResult = null;
-		this.fetchFileContent = null;
-		this.transformResult = null;
-		this.transformFileContent = null;
-		this.viewDataType = null;
-		this.importResult = null;
 		this.removeFileByUID();
 	}
 
@@ -284,6 +278,13 @@ export class ManualImportComponent implements OnInit {
 			return;
 		}
 		e.data = { filename: this.fetchResult.filename };
+
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.viewDataType = null;
+		this.importResult = null;
 	}
 
 	private onUploadFile(e: any): void {
