@@ -35,7 +35,7 @@ export class TaskDetailComponent extends UIExtraDialog {
 
 	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, private dialogService: UIDialogService, public promptService: UIPromptService, public userPreferenceService: PreferenceService, private permissionService: PermissionService) {
 		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: false };
+		this.modalOptions = { isResizable: true, isCentered: true };
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
