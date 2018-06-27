@@ -6,19 +6,20 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.command.DataviewUserParamsCommand
+import groovy.json.JsonSlurper
 import net.transitionmanager.command.DataviewNameValidationCommand
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
-
 /**
  * Service class with main database operations for Dataview.
  * @see net.transitionmanager.domain.Dataview
@@ -506,6 +507,10 @@ class DataviewService implements ServiceMethods {
 				Map row = [:]
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
+					if(dataviewSpec.columns[index].property == 'tags'){
+						handleTags(cell)
+					}
+
 					if (dataviewSpec.columns[index]) {
 						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
 					}
@@ -515,6 +520,17 @@ class DataviewService implements ServiceMethods {
 			}
         ]
     }
+
+	private void handleTags(cell) {
+		JsonSlurper slurper = new JsonSlurper()
+		def json = slurper.parseText(cell)
+
+		json.each { Map tag ->
+			tag.css = Color.valueOfParam(tag.color).css
+		}
+
+		cell = json
+	}
 
     /**
 	 * Used to prepare the left outer join sentence based on
@@ -945,7 +961,7 @@ class DataviewService implements ServiceMethods {
 					if(
 						TA.id,
 						group_concat(
-							json_object('name', T.name, 'description', T.description, 'color', T.color)
+							json_object('id', TA.id, 'tagId', T.id, 'name', T.name, 'description', T.description, 'color', T.color)
 						),
 						''
 					), 
