@@ -40,6 +40,7 @@ export class Permission {
 	static CompanyEdit = 'CompanyEdit';
 	static CompanyView = 'CompanyView';
 	static CookbookView = 'CookbookView';
+	static CookbookEdit = 'CookbookEdit';
 	static DashboardMenuView = 'DashboardMenuView';
 	static DataTransferBatchDelete = 'DataTransferBatchDelete';
 	static DataTransferBatchProcess = 'DataTransferBatchProcess';
