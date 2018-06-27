@@ -1,13 +1,16 @@
 <style>
+    .tds-kendo-grid .k-grid-content .k-grid-table tbody td {
+        cursor: default;
+    }
     .btn i.fa {
         padding-right: 0px;
     }
 </style>
 <!-- Main content -->
-<div class="content body tds-kendo-grid dependency-batch-list-component">
+<div class="content body tds-kendo-grid">
     <section>
-        <div>
-            <div class="box-body box-with-empty-header">
+        <div class="box-body box-with-empty-header">
+            <form novalidate #myForm="ngForm">
                 <kendo-grid
                         *ngIf="gridSettings"
                         [data]="gridSettings.gridData"
@@ -22,14 +25,11 @@
                         (pageChange)="gridSettings.pageChange($event)"
                         [resizable]="true"
                         (sortChange)="gridSettings.sortChange($event)"
-                        [selectable]="selectableSettings"
-                        [rowSelected]="gridSettings.isRowSelected"
-                        (cellClick)="openBatchDetail($event)">
+                        (add)="addHandler($event)">
 
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button (click)="onCreate()"
-                                class="btn btn-default" type="button">
+                        <button kendoGridAddCommand class="btn btn-default" type="button">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             {{ 'GLOBAL.CREATE' | translate }} Tag
                         </button>
@@ -95,13 +95,23 @@
                             {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                         </ng-template>
 
+                        <ng-template kendoGridEditTemplate let-dataItem *ngIf="column.property === 'Name'">
+                                <input [(ngModel)]="dataItem.Name" autofocus
+                                       type="text" name="name" class="form-control" required/>
+                        </ng-template>
+                        <ng-template kendoGridEditTemplate let-dataItem *ngIf="column.property === 'Description'">
+                            <input [(ngModel)]="dataItem.Description"
+                                   type="text" name="description" class="form-control"/>
+                        </ng-template>
+
                         <!-- Filter Template -->
                         <ng-template kendoGridFilterCellTemplate let-filter>
                             <div class="has-feedback" style="margin-bottom:0px;"
                                  *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'Color' )">
                                 <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
                                 <ng-template #dateFilter>
-                                    <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+                                    <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"
+                                                      [ngModelOptions]="{standalone: true}"></kendo-datepicker>
                                     <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
                                           style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
                                 </ng-template>
@@ -115,8 +125,7 @@
 
                     </kendo-grid-column>
                 </kendo-grid>
-            </div>
-            <!-- /.box-body -->
+            </form>
         </div>
     </section>
 </div>
