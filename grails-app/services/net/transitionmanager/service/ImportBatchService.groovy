@@ -22,7 +22,6 @@ class ImportBatchService implements ServiceMethods {
 
 	DataImportService dataImportService
 	Scheduler quartzScheduler
-	SecurityService securityService
 
 	/**
 	 * Find a all batches and include the records summary information. If a batchId is given,

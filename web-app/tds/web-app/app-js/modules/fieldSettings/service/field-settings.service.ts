@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 import { DomainModel } from '../model/domain.model';
 import { FieldSettingsModel } from '../model/field-settings.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';

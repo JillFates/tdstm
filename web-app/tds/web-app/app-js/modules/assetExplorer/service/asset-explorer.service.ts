@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
@@ -76,7 +76,7 @@ export class AssetExplorerService {
 					throw new Error(result.errors.join(';'));
 				}
 			})
-			.do(null, err => console.log(err));
+			.catch((error: any) => error.json());
 	}
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
@@ -156,6 +156,20 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Delete an specific Asset Comment
+	 * @param {string[]} ids
+	 * @returns {Observable<any>}
+	 */
+	deleteAssetComment(ids: string[]): Observable<any> {
+		return this.http.post(`${this.assetEntitySearch}/deleteComment`, JSON.stringify({ids: ids}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	getFileName(viewName: string): Observable<any> {
 		return this.http.post(`${this.defaultUrl}/filename`, JSON.stringify({viewName: viewName}))
 			.map((res: Response) => {
@@ -221,6 +235,19 @@ export class AssetExplorerService {
 					page: response.page
 				};
 				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the List of Asset Class Options
+	 * @returns {Observable<any>}
+	 */
+	getAssetClassOptions(): Observable<any> {
+		return this.http.get(`${this.assetUrl}/classOptions`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -299,14 +326,17 @@ export class AssetExplorerService {
 			{id: 13173, text: 'B5'},
 			{id: 13161, text: 'B6'},
 		];
-		return this.http.post(`../${this.assetEntitySearch}/retrieveRackSelectForRoom`, JSON.stringify(request))
+		return this.http.get(`${this.assetUrl}/retrieveRackSelectOptions/${roomId}`)
 			.map((res: Response) => {
-				console.log(res);
-				if (sourceTarget === 'S') {
-					return mockSourceResponse;
-				} else {
-					return mockTargetResponse;
-				}
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getChassisForRoom(roomId: number): Observable<any> {
+		return this.http.get(`${this.assetUrl}/retrieveChassisSelectOptions/${roomId}`)
+			.map((res: Response) => {
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}
@@ -321,16 +351,43 @@ export class AssetExplorerService {
 			assetClass: model.asset.assetClass.name,
 			asset: model.asset,
 			dependencyMap: {
-				supportAssets: model.dependencyMap.supportAssets,
-				dependentAssets: model.dependencyMap.dependentAssets
+				supportAssets: this.prepareDependencies(model.dependencyMap.supportAssets),
+				dependentAssets: this.prepareDependencies(model.dependencyMap.dependentAssets)
 			}
 		};
-		console.log(request);
+
 		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.status;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Prepare Support Assets and Dependent Assets
+	 * @param dependencies
+	 * @returns {any}
+	 */
+	private prepareDependencies(dependencies: any): any {
+		if (dependencies && dependencies.length > 0) {
+			dependencies.forEach((support: any) => {
+				support.assetClass = support.assetClass.id;
+				support.moveBundleId = support.assetDepend.moveBundle.id;
+				support.targetAsset = {
+					id: support.assetDepend.id,
+					name: support.assetDepend.text
+				};
+				delete support.assetDepend;
+				delete support.dependencyType;
+				if (support.id === 0) {
+					delete support.id;
+				}
+			});
+		} else {
+			dependencies = [];
+		}
+
+		return dependencies;
 	}
 }

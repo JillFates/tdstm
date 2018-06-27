@@ -7,6 +7,8 @@ import getl.csv.CSVDataset
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
 import getl.excel.ExcelDriver
+import getl.json.JSONConnection
+import getl.json.JSONDataset
 import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
@@ -203,6 +205,26 @@ abstract class ETLBaseSpec extends Specification {
 
 		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
 		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
+
+		return [fileName, new DataSetFacade(dataSet)]
+	}
+
+	/**
+	 * Builds a JSON dataSet for json content
+	 * @param sheetName
+	 * @param sheetContent
+	 * @return
+	 */
+	protected List buildJSONDataSet(String jsonContent) {
+
+		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'json')
+		dataSetOS << jsonContent
+		dataSetOS.close()
+
+		String fullName = service.getTemporaryFullFilename(fileName)
+
+		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver:TDSJSONDriver)
+		JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
 
 		return [fileName, new DataSetFacade(dataSet)]
 	}

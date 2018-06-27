@@ -31,7 +31,6 @@ class MoveBundleService implements ServiceMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProgressService progressService
-	SecurityService securityService
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService

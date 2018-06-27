@@ -3,6 +3,8 @@ import geb.Page
 import modules.CreateViewModule
 import modules.ViewsModule
 import modules.CommonsModule
+import modules.MenuModule
+
 
 class AssetViewsPage extends Page{
     static int favLimit=10
@@ -24,8 +26,10 @@ class AssetViewsPage extends Page{
         viewMgrSharedViews          {viewOptions[3]}
         viewMgrSystemViews          {viewOptions[4]}
         favViewsCounter             (required: false, wait:true){viewOptions[1].find("span")}
+        sharedViewsCounter          (required: false, wait:true){viewOptions[3].find("span")}
 
         //>>>>>>>>> MODULES
+        upperMenu                   { module MenuModule}
         allViewsModule              { module ViewsModule}
         createViewModule            { module CreateViewModule}
         common                      { module CommonsModule}
@@ -58,6 +62,10 @@ class AssetViewsPage extends Page{
         viewMgrFavoriteViews.click()
     }
 
+    def goToSharedViews(){
+        waitFor{viewMgrSharedViews.click()}
+    }
+
     def goToSystemViews(){
         viewMgrSystemViews.click()
     }
@@ -65,16 +73,18 @@ class AssetViewsPage extends Page{
     def getFavCounter(){
         waitFor{favViewsCounter.text().toInteger()}
     }
+
     def validateValueIncrement(int initial, int incremented){
         initial+1==incremented
     }
+
     /**
      * Adds fav views. On the attempt to add an 11th, the user
      * is to get a pop up
      */
     def getFavLimitPopUp(){
         while ((getFavCounter()<favLimit)){
-           allViewsModule.favRandomFavs()
+            allViewsModule.favRandomFavs()
         }
         allViewsModule.setFirstNonFavViewAsFav()
         favLimitPopUpIsPresent()
@@ -94,6 +104,11 @@ class AssetViewsPage extends Page{
         closeLimitPopupBtn.click()
     }
 
+    def validateSharedViewsCount(){
+        getSharedCounter()==allViewsModule.getNumberOfRows()
+    }
 
-
+    def getSharedCounter(){
+        sharedViewsCounter.text().toInteger()
+    }
 }

@@ -159,6 +159,22 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Try to get a property from the content we delegate to the value in case that it is a Map
+	 * <code>
+	 *      load 'custom2' with attribsVar.cpu
+	 * 		load 'custom3' with attribsVar.storage.size()
+	 * <code>
+	 * The get is called when the parser evalates the attribs.* and passes the .propertyName to the
+	 * method. The get method then return's that property (e.g. cpu and storage)
+	 *
+	 * @param name
+	 * @return
+	 */
+	Object get(String name) {
+		return value."$name"
+	}
+
+	/**
 	 * Middle transformation. It takes <code>n</code> characters from position  <code>m</code>
 	 * <code>
 	 *      load ... transformation with take(n, m)
@@ -280,12 +296,18 @@ class Element implements RangeChecker {
 	 * <code>
 	 *      load ... transformation with trim()
 	 * <code>
+	 * @param safe this parameter defines if it is necessary to check the Element#value type
 	 * @return the element instance that received this command
 	 */
-	Element trim() {
-		value = transformStringObject('trim', value) {
-			it.trim()
+	Element trim(Boolean safe = false) {
+		if (safe){
+			value = (value instanceof CharSequence) ? value.trim() : value
+		} else {
+			value = transformStringObject('trim', value) {
+				it.trim()
+			}
 		}
+
 		return this
 	}
 

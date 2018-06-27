@@ -1,8 +1,10 @@
 import {INTERVAL} from '../model/constants';
+import * as moment from 'moment';
 
 export class DateUtils {
 
 	public static readonly DEFAULT_TIMEZONE_FORMAT = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
 
 	/**
 	 * Create a Date Object
@@ -131,13 +133,45 @@ export class DateUtils {
 	 * @returns {string}
 	 */
 	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
-		const defaultFormat = 'MMM/dd/yyy';
+		const defaultFormat = 'MM/dd/yyy';
 
 		const dateFormats = {
-			'DD/MM/YYYY' : 'dd/MMM/yyyy',
+			'DD/MM/YYYY' : 'dd/MM/yyyy',
 			'MM/DD/YYYY' : defaultFormat
 		};
 
 		return dateFormats[userDateFormatPreference] || defaultFormat;
+	}
+
+	/**
+	 * Return a duration in a readable human way, show we use https://www.unc.edu/~rowlett/units/symbol.html ?
+	 * @param duration (number)
+	 * @param scale (char val)
+	 * return string representation of the duration in terms of days, hours, minutes
+	 */
+	public static formatDuration(duration: any, scale: any): string {
+		scale = scale.toLowerCase();
+		let startDate = moment().startOf('day');
+		let endDate = moment().startOf('day');
+		endDate.add(duration, scale);
+
+		let durationDate = moment.duration(endDate.diff(startDate)), durationResult = '';
+
+		let days = durationDate.asDays();
+		if (days > 0) {
+			durationResult += days + ' day' + ((days > 1) ? 's ' : ' ');
+		}
+
+		let hours = durationDate.hours();
+		if (hours > 0) {
+			durationResult += hours + ' hr' + ((hours > 1) ? 's ' : ' ');
+		}
+
+		let minutes = durationDate.minutes();
+		if (minutes > 0) {
+			durationResult += minutes + ' min' + ((minutes > 1) ? 's ' : ' ');
+		}
+
+		return durationResult;
 	}
 }

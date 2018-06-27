@@ -45,4 +45,6 @@ export class FieldImportance {
 	};
 }
 
+export const FIELD_COLORS = ['Y', 'G', 'B', 'P', 'O', 'N', 'U'];
+
 export const FIELD_NOT_FOUND = 'Field Not Found';

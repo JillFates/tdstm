@@ -3,14 +3,12 @@ package net.transitionmanager.service
 import com.tds.asset.AssetType
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
 class StorageService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
-	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a Storage asset

@@ -5,8 +5,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.search.FieldSearchData
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -359,8 +357,6 @@ class ApplicationController implements ControllerMethods {
 		// Set the default values on the custom properties
 		assetService.setCustomDefaultValues(application)
 
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort: 'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
@@ -373,15 +369,20 @@ class ApplicationController implements ControllerMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, domain, true)
 
-		[ 	applicationInstance: application, assetTypeOptions: assetTypeOptions?.value,
-			moveBundleList: moveBundleList, planStatusOptions: planStatusOptions?.value,
-			projectId: project.id, project: project,moveEventList: moveEventList,
-			personList: personList, company: project.client,
+		[
+			applicationInstance: application,
+			moveBundleList     : moveBundleList,
+			planStatusOptions  : planStatusOptions?.value,
+			projectId          : project.id,
+			project            : project,
+			moveEventList      : moveEventList,
+			personList         : personList,
+			company            : project.client,
 			// TODO : fix misspelled variable availabaleRoles
-			availabaleRoles: availabaleRoles,
-			environmentOptions: environmentOptions?.value,
-			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs
+			availabaleRoles    : availabaleRoles,
+			environmentOptions : environmentOptions?.value,
+			customs            : customFields,
+			standardFieldSpecs : standardFieldSpecs
 		]
 	}
 

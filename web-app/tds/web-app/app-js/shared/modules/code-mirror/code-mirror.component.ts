@@ -1,32 +1,36 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
-import * as CodeMirror from 'codemirror/lib/codemirror';
-import 'codemirror/mode/groovy/groovy';
-import 'codemirror/mode/javascript/javascript';
+import {Component, ViewChild, ElementRef, Output, EventEmitter, Input, OnInit} from '@angular/core';
 
-declare var jQuery: any;
 @Component({
 	selector: 'code-mirror',
 	template: '<textarea  #codeMirror></textarea>',
 	exportAs: 'codeMirror'
 })
-export class CodeMirrorComponent implements AfterViewInit {
+export class CodeMirrorComponent implements OnInit {
 	@ViewChild('codeMirror') el: ElementRef;
 	@Output() change = new EventEmitter<{ newValue: string, oldValue: string }>();
 	@Input() model: string;
 	@Input() mode;
 	@Output() modelChange = new EventEmitter<string>();
 	instance;
+	CodeMirror;
 
-	ngAfterViewInit(): void {
-		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
-			mode: this.mode,
-			lineNumbers: true
-		});
-		this.instance.setValue(this.model);
-		this.instance.on('change', () => {
-			this.change.emit({ newValue: this.instance.getValue(), oldValue: this.model });
-			this.modelChange.emit(this.instance.getValue());
-		});
+	/**
+	 * Get Code Mirror when initializing the component
+	 */
+	ngOnInit(): void {
+		this.getCodeMirrorLibrary().then(component => {
+			this.CodeMirror = component.default;
+
+			this.instance = this.CodeMirror.fromTextArea(this.el.nativeElement, {
+				mode: this.mode,
+				lineNumbers: true
+			});
+			this.instance.setValue(this.model);
+			this.instance.on('change', () => {
+				this.change.emit({newValue: this.instance.getValue(), oldValue: this.model});
+				this.modelChange.emit(this.instance.getValue());
+			});
+		})
 	}
 
 	/**
@@ -48,5 +52,17 @@ export class CodeMirrorComponent implements AfterViewInit {
 		for (let elem of elems) {
 			elem.classList.remove('line-with-syntax-errors');
 		}
+	}
+
+	/**
+	 * Get Code Mirror Async
+	 * @returns {any}
+	 */
+	public getCodeMirrorLibrary(): any {
+		return import(
+			/* webpackChunkName: "codemirror" */
+			/* webpackMode: "lazy" */
+			'codemirror/lib/codemirror')
+			.catch(error => 'An error occurred while loading the component');
 	}
 }

@@ -4,7 +4,7 @@ import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-sp
 import { State } from '@progress/kendo-data-query';
 import {GridDataResult, DataStateChangeEvent, RowClassArgs} from '@progress/kendo-angular-grid';
 import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
@@ -282,7 +282,7 @@ export class AssetExplorerViewGridComponent {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, true).then(x => {
+			DIALOG_SIZE.XLG, true).then(x => {
 				if (x) {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}

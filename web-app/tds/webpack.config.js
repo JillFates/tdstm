@@ -4,9 +4,7 @@
 
 const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
-const pkg = require('./package.json');  //loads npm config file
-const helpers = require('./server-utils/helpers');
-// let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
+let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
 
@@ -18,18 +16,20 @@ module.exports = function (env) {
 		mode: 'production',
 		entry: {
 			app: './web-app/app-js/main.ts',
-			vendor: Object.keys(pkg.dependencies) //get npm vendors deps from config
+			polyfills: './web-app/app-js/polyfills.ts',
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
-			filename: '[name].js'
+			filename: '[name].js',
+			chunkFilename: '[name].js',
+			publicPath: '../'
 		},
 		module: {
 			rules: [
 				{test: /\.tsx?$/, loader: 'ts-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
-				{ test: /[\/\\]@angular[\/\\].+\.js$/, parser: { system: true } },
+				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
 		resolve: {
@@ -37,24 +37,44 @@ module.exports = function (env) {
 			unsafeCache: true
 		},
 		plugins: [
+			new webpack.DefinePlugin({
+				'process.env.NODE_ENV': '"production"'
+			}),
 			new webpack.SourceMapDevToolPlugin({
 				filename: '[name].js.map'
 			}),
 			new webpack.ContextReplacementPlugin(
 				/\@angular(\\|\/)core(\\|\/)esm5/,
 				path.resolve(__dirname, "app-js")
-			)
+			),
 			// Uncomment if you want to take a peek to the structure of dependencies
 			// new BundleAnalyzerPlugin()
 		],
 		optimization: {
 			splitChunks: {
-				name: true,
+				automaticNameDelimiter: '-',
 				cacheGroups: {
 					commons: {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
-						chunks: "all"
+						chunks: 'all',
+						test(module, chunks) {
+							const name = module.nameForCondition && module.nameForCondition();
+							return chunks.some(chunk => {
+								return (chunk.name === 'app' || chunk.name === 'polyfills') && /[\\/]node_modules[\\/]/.test(name);
+							});
+						}
+					},
+					codemirror: {
+						name: 'codemirror',
+						chunks: chunk => chunk.name == 'codemirror',
+						priority: 1,
+						enforce: true,
+						test(module, chunks) {
+							return chunks.some((chunk) =>  {
+								return chunk.name === 'codemirror'
+							});
+						}
 					}
 				}
 			}

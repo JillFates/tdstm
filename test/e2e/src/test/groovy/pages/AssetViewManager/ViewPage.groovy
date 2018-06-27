@@ -1,6 +1,7 @@
 package pages.AssetViewManager
 import geb.Page
 import modules.CommonsModule
+import modules.CreateViewModule
 
 class ViewPage extends Page{
 
@@ -17,9 +18,11 @@ class ViewPage extends Page{
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
         commonsModule { module CommonsModule }
+        createViewModule {module CreateViewModule}
         viewMgrBreadCrumb {$('a.font-weight-bold')}
         //starOn {$("fa text-yellow fa-star")}
         starOff {$(".fa.text-yellow.fa-star-o")}
+        gearBtn {$(".fa-cog")}
     }
 
     def verifyViewTitle(title) {
@@ -32,7 +35,7 @@ class ViewPage extends Page{
 
 
     def clickViewManagerBreadCrumb(){
-        viewMgrBreadCrumb.click()
+        waitFor{viewMgrBreadCrumb.click()}
     }
     def waitForHiddenModalContainer(){
         waitFor{!exportModalContainer.isDisplayed()}
@@ -62,6 +65,8 @@ class ViewPage extends Page{
         starOff.click()
     }
 
-
-
+    def clickOnGear(){
+        gearBtn.click()
+    }
 }
+

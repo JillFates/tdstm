@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.Application
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.eav.EavAttributeSet
 import grails.transaction.Transactional
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
@@ -21,7 +20,6 @@ class ApplicationService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
 	ControllerService controllerService
-	SecurityService securityService
 	PartyRelationshipService partyRelationshipService
 
 	/**
@@ -88,10 +86,13 @@ class ApplicationService implements ServiceMethods {
 		def testingById = testingBy instanceof Person ? testingBy.id : -1
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+		def availableRoles = partyRelationshipService.getStaffingRoles()
+		def partyGroupList = partyRelationshipService.getCompaniesList()
 
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
+				availableRoles: availableRoles, partyGroupList: partyGroupList,
 		        personList: personList] +
 		        assetEntityService.getCommonModelForShows('Application', project, params, app)
 	}

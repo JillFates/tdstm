@@ -24,12 +24,10 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
-import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 
 import javax.net.ssl.SSLContext
@@ -43,7 +41,6 @@ import java.security.cert.X509Certificate
 @Slf4j
 class CredentialService implements ServiceMethods {
     ProjectService projectService
-    SecurityService securityService
 
     /**
      * Creates a new credential

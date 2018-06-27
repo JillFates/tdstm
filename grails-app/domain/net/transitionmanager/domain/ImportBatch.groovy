@@ -107,7 +107,7 @@ class ImportBatch {
 		lastUpdated nullable: true
 		originalFilename blank:true, size: 0..255
 		nullIndicator nullable:true, blank:true, size: 0..255
-		processProgress nullable: true, size: 0..100
+		processProgress nullable: true, range: 0..100
 		processLastUpdated nullable: true
 		queuedAt nullable: true
 		queuedBy nullable: true, size: 0..50

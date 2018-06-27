@@ -39,6 +39,7 @@ class GETLReaderSpec extends Specification {
             csvFile.field << new Field(name: 'Name', type: Field.Type.STRING, isNull: false, trim: true)
             csvFile.field << new Field(name: 'Description', type: Field.Type.STRING)
             csvFile.field << new Field(name: 'Environment', type: Field.Type.STRING)
+            csvFile.field << new Field(name: 'Modified Date', type: Field.Type.STRING)
 
         then: 'It can read rows count'
             csvFile.readRowCount() == 3

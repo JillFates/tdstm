@@ -1,6 +1,11 @@
 import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/mergeMap';
+
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
@@ -47,7 +52,7 @@ export class DataScriptViewEditComponent implements OnInit {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create DataScript' : (this.modalType === ActionType.EDIT ? 'DataScript Edit' : 'DataScript Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create ETL Script' : (this.modalType === ActionType.EDIT ? 'ETL Script Edit' : 'ETL Script Detail');
 		// ignore etl script from this context
 		let copy = {...this.dataScriptModel};
 		this.etlScriptCode.code = copy.etlSourceCode;

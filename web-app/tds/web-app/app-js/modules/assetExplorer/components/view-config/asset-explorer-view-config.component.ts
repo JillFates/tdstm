@@ -5,7 +5,8 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { StateService } from '@uirouter/angular';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/zip';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';

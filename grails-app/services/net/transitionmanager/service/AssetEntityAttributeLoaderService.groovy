@@ -2,15 +2,11 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -18,9 +14,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
@@ -28,19 +22,10 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ModelConnector
 import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRelationshipType
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 @Slf4j(value='logger')
@@ -48,137 +33,10 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	MoveBundleService moveBundleService
-
-	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
-	protected static final Map<String, String> targetTeamType = [MOVE_TECH: 'targetTeamMt', CLEANER: 'targetTeamLog',
-	                                                             SYS_ADMIN: 'targetTeamSa', DB_ADMIN: 'targetTeamDba']
-	protected static sourceTeamType = [MOVE_TECH:'sourceTeamMt', CLEANER: 'sourceTeamLog',
-	                                   SYS_ADMIN:'sourceTeamSa', DB_ADMIN:'sourceTeamDba']
 
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'
 	private static final String UNKNOWN_MFG_MODEL = 'Unknown'
-
-	/**
-	 * upload records in to EavAttribute table from from AssetEntity.xls
-	 */
-	@Transactional
-	void uploadEavAttribute(InputStream stream) {
-		EavEntityType entityType = EavEntityType.findByEntityTypeCode('AssetEntity')
-		int sheetNo = 0
-		def map = ["Attribute Code": null, Label: null, Type: null, sortOrder: null, Note: null, Mode: null,
-		           "Input type": null, Required: null, Unique: null, "Business Rules (hard/soft errors)": null,
-		           "Spreadsheet Sheet Name": null, "Spreadsheet Column Name": null, Options: null,
-		           "Walkthru Sheet Name": null, "Walkthru Column Name": null]
-		try {
-			Workbook workbook = new HSSFWorkbook(stream)
-			Sheet sheet = workbook.getSheetAt(sheetNo)
-			int col =  WorkbookUtil.getColumnsCount(sheet)
-			boolean checkCol = checkHeader(col, map, sheet)
-			// Statement to check Headers if header are not found it will return Error message
-			if (!checkCol) {
-				println "headers not matched "
-			} else {
-
-				// Iterate over the spreadsheet rows and populate the EavAttribute table appropriately
-				for (int r = 1; r < sheet.getLastRowNum(); r++) {
-					// get fields
-					def attributeCode = WorkbookUtil.getStringCellValue(sheet, map["Attribute Code"], r)
-					def backEndType = WorkbookUtil.getStringCellValue(sheet, map["Type"], r)
-					def frontEndInput = WorkbookUtil.getStringCellValue(sheet, map["Input type"], r)
-					def fronEndLabel = WorkbookUtil.getStringCellValue(sheet, map["Label"], r)
-					def isRequired = WorkbookUtil.getStringCellValue(sheet, map["Required"], r)
-					def isUnique = WorkbookUtil.getStringCellValue(sheet, map["Unique"], r)
-					def note = WorkbookUtil.getStringCellValue(sheet, map["Note"], r)
-					def mode = WorkbookUtil.getStringCellValue(sheet, map["Mode"], r)
-					def sortOrder = WorkbookUtil.getStringCellValue(sheet, map["sortOrder"], r)
-					def validation = WorkbookUtil.getStringCellValue(sheet, map["Business Rules (hard/soft errors)"], r)
-					def options = WorkbookUtil.getStringCellValue(sheet, map["Options"], r)
-					def spreadSheetName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Sheet Name"], r)
-					def spreadColumnName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Column Name"], r)
-					def walkthruSheetName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Sheet Name"], r)
-					def walkthruColumnName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Column Name"], r)
-					// save data in to db(eavAttribute)
-
-					// Only save "Actual" or "Reference" attributes for the time being
-					if (!"AR".contains(mode)) continue
-
-					def eavAttribute = new EavAttribute(attributeCode:attributeCode, note: note, backendType: backEndType,
-							frontendInput: frontEndInput, entityType: entityType, frontendLabel: fronEndLabel,
-							defaultValue: "null", validation: validation, isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0,
-							isUnique: isUnique.equalsIgnoreCase("X") ? 1 : 0, sortOrder: sortOrder)
-
-					save eavAttribute
-					if (eavAttribute.hasErrors()) {
-						continue
-					}
-
-					//create DataTransferAttributeMap records related to the DataTransferSet
-					//def dataTransferSetId
-					try {
-						save new DataTransferAttributeMap(
-							columnName: spreadColumnName,
-							sheetName: spreadSheetName,
-							dataTransferSet: DataTransferSet.findByTitle("TDS Master Spreadsheet"),
-							eavAttribute: eavAttribute,
-							validation: validation,
-							isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					// create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
-
-					try {
-						save new DataTransferAttributeMap(
-							columnName:walkthruColumnName,
-							sheetName:walkthruSheetName,
-							dataTransferSet: DataTransferSet.findByTitle("TDS Walkthru"),
-							eavAttribute:eavAttribute,
-							validation:validation,
-							isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					//populate the EavEntityAttribute map associating each of the attributes to the set
-					def eavAttributeSetId
-					def eavAttributeSet
-					try {
-						eavAttributeSetId = 1
-						eavAttributeSet = EavAttributeSet.get(eavAttributeSetId)
-
-						save new EavEntityAttribute(
-							attribute:eavAttribute,
-							eavAttributeSet:eavAttributeSet,
-							sortOrder:sortOrder)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					/*
-					 * After eavAttribute saved it will check for any options is there corresponding to current attribute
-					 * If there then eavAttributeOptions.save() will be called corresponding to current attribute
-					 */
-					if (options) {
-						for (String option in options.split(',')) {
-							save new EavAttributeOption(
-								attribute: eavAttribute,
-								sortOrder: sortOrder,
-								value: option.trim())
-						}
-					}
-				}
-			}
-		}
-		catch(e) {
-			logger.error e.message, e
-		}
-	}
 
 	/**
 	 * Check the sheet headers.
@@ -193,104 +51,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		!map.containsValue(null)
 	}
 
-	// get StringArray from StringList
-	// TODO : JPM - Why not just use String.split(",") ?
-	def getStringArray(def stringList){
-		def list = []
-		def token = new StringTokenizer(stringList, ",")
-		while (token.hasMoreTokens()) {
-			list.add(token.nextToken())
-		}
-		return list
-	}
-
-	/*
-	 * get Team - #Asset count corresponding to Bundle
-	 */
-	def getTeamAssetCount (def bundleInstance, def rackPlan, def role) {
-		def teamAssetCounts = []
-		//def bundleInstance = MoveBundle.get(bundleId)
-		def projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
-		def assetEntityInstanceList = AssetEntity.findAllByMoveBundle(bundleInstance)
-		if (rackPlan == 'RerackPlan') {
-			projectTeamInstanceList.each {projectTeam ->
-				def assetCount = assetEntityInstanceList.findAll{it[targetTeamType.get(role)]?.id == projectTeam.id}?.size()
-				teamAssetCounts << [teamCode: projectTeam.teamCode , assetCount:assetCount]
-			}
-			def unAssignCount = assetEntityInstanceList.findAll{!it[targetTeamType.get(role)]?.id}?.size()
-			teamAssetCounts << [teamCode: "UnAssigned" , assetCount:unAssignCount]
-
-		} else {
-			projectTeamInstanceList.each { projectTeam ->
-				def assetCount = assetEntityInstanceList.findAll{it[sourceTeamType.get(role)]?.id == projectTeam.id}?.size()
-				teamAssetCounts << [teamCode: projectTeam.teamCode , assetCount:assetCount]
-			}
-			def unAssignCount = assetEntityInstanceList.findAll{!it[sourceTeamType.get(role)]?.id}?.size()
-			teamAssetCounts << [teamCode: "UnAssigned" , assetCount:unAssignCount]
-		}
-		return teamAssetCounts
-	}
-
-
-	//	get Cart - #Asset count corresponding to Bundle
-	List getCartAssetCounts (def bundleId) {
-		List cartAssetCounts = []
-		MoveBundle bundleInstance = MoveBundle.get(bundleId)
-		def cartList = AssetEntity.executeQuery("select ma.cart from AssetEntity ma where ma.moveBundle=$bundleInstance.id group by ma.cart")
-		cartList.each { assetCart ->
-			def cartAssetCount = AssetEntity.countByMoveBundleAndCart(bundleInstance, assetCart)
-			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart)
-			def usize = 0
-			for (int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++) {
-				try {
-					usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow]?.model?.usize? (AssetEntityList[AssetEntityRow]?.model?.usize).trim() : "0")
-				} catch (Exception e) {
-					println "uSize containing blank value."
-				}
-			}
-			cartAssetCounts << [cart:assetCart, cartAssetCount:cartAssetCount,usizeUsed:usize]
-		}
-		return cartAssetCounts
-	}
-
-	//get assetsList  corresponding to selected bundle to update assetsList dynamically
-
-	List getAssetList (def assetEntityList, rackPlan, bundleInstance, role) {
-		List assetEntity = []
-		List projectTeam =[]
-		List projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
-		projectTeamInstanceList.each { teams ->
-			projectTeam << [teamCode: teams.teamCode]
-		}
-
-		for (int assetRow = 0; assetRow < assetEntityList.size(); assetRow++) {
-			def displayTeam
-			if (rackPlan == "RerackPlan") {
-				displayTeam = assetEntityList[assetRow][targetTeamType.get(role)]?.teamCode
-			}else {
-				displayTeam = assetEntityList[assetRow][sourceTeamType.get(role)]?.teamCode
-			}
-			def assetEntityInstance = AssetEntity.get(assetEntityList[assetRow].id)
-			assetEntity << [
-				id: assetEntityInstance.id,
-				assetName: assetEntityInstance.assetName,
-				model: assetEntityInstance?.model?.toString(),
-			    sourceLocation: assetEntityInstance.sourceLocationName,
-				sourceRack: assetEntityInstance.sourceRackName,
-				targetLocation: assetEntityInstance.targetLocationName,
-				targetRack: assetEntityInstance.targetRackName,
-				sourcePosition: assetEntityInstance?.sourceRackPosition,
-				targetPosition: assetEntityInstance?.targetRackPosition,
-				uSize: assetEntityInstance?.model?.usize,
-				team: displayTeam,
-				cart: assetEntityList[assetRow]?.cart,
-				shelf: assetEntityList[assetRow]?.shelf,
-				projectTeam: projectTeam,
-				assetTag: assetEntityInstance?.assetTag
-			]
-		}
-		return assetEntity
-	}
 	/**
 	 * To Validate the Import Process If any Errors update DataTransferBatch and DataTransferValue
 	 * @author Srinivas
@@ -489,15 +249,19 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		def performCreateMfgModel = { mfgObj, createModelName, createDeviceType, createUsize ->
 			logger.debug '{}.performCreateMfgModel() mfg={}, createModelName={}, createDeviceType={}, createUsize={}',
 					methodName, mfgObj, createModelName, createDeviceType, createUsize
+
 			if (mfgObj instanceof String) {
 				mfgName = mfgObj
+
 				if (canCreateMfgAndModel) {
 					mfg = new Manufacturer(name: mfgName)
 					save mfg, true
+
 					if (mfg.hasErrors()) {
 						errorMsg = "An error occured while trying to create the new manufacturer ($mfgName)"
 						return
 					}
+
 					logger.info '{}.performCreateMfgModel() Manufacturer {} was just created (${})', methodName, mfgName, mfg.id
 					mfgWasCreated = true
 				} else {
@@ -511,10 +275,12 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 			if (canCreateMfgAndModel) {
 				modelName = createModelName
+
 				try {
 					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  NumberUtil.toInteger(createUsize), userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
+					AssetOptions.findOrSaveWhere(type: AssetOptions.AssetOptionsType.ASSET_TYPE, value: createDeviceType)
 					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
 				} catch (e) {
 					errorMsg = e.message
@@ -831,37 +597,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated, cachable: cachable]
 	}
 
-	/* To get DataTransferValue Asset Manufacturer
-	 * @param dataTransferValue
-	 * @author Lokanada Reddy
-	 */
-	@Transactional
-	List findOrCreateManufacturer(UserLogin userLogin, String mfgName, boolean canCreateMfgAndModel) {
-		Manufacturer mfg
-		String errorMsg
-
-		if (mfgName) {
-			mfg = Manufacturer.findByName(mfgName)
-			if (! mfg) {
-				mfg = ManufacturerAlias.findByName(mfgName)?.manufacturer
-				if (! mfg) {
-					if (canCreateMfgAndModel) {
-						mfg = new Manufacturer(name: mfgName)
-						save mfg,  true
-						if (mfg.hasErrors()) {
-							errorMsg = "Unable to create manufacturer ($mfgName): ${GormUtil.allErrorsString(mfg)}"
-						} else {
-							logger.info 'Manufacturer ({}) was created', mfgName
-						}
-					} else {
-						errorMsg = "Unable to find manufacturer $mfgName"
-					}
-				}
-			}
-		}
-		return [mfg, errorMsg]
-	}
-
 	/**
 	 * Used to retrieve a list of all manufacturers and their aliases that have the same name
 	 * @param name - the name to lookup
@@ -930,27 +665,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		return [model, errorMsg]
 	}
 
-	/* To get DataTransferValue source/target Team
-	 * @param dataTransferValue,moveBundle
-	 * @author srinivas
-	 */
-	@Transactional
-	def getdtvTeam(def dtv, def bundleInstance, def role) {
-		def teamInstance
-		if (dtv.correctedValue && bundleInstance) {
-			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue, bundleInstance)
-			if (!teamInstance &&!teamInstance.find{it.role==role}){
-				teamInstance = new ProjectTeam(teamCode:dtv.correctedValue, moveBundle:bundleInstance, role:role).save()
-			}
-		} else if (dtv.importValue && bundleInstance) {
-			teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(dtv.importValue, bundleInstance)
-			if (!teamInstance &&!teamInstance.find{it.role==role}){
-				teamInstance = new ProjectTeam(name:dtv.importValue, teamCode:dtv.importValue, moveBundle:bundleInstance, role:role).save()
-			}
-		}
-		return teamInstance
-	}
-
 	// TODO: Move to AssetEntityService and change the code to check for existing connectors (see TM-3308)
 	/*
 	*  Create asset_cabled_Map for all asset model connectors
@@ -1007,62 +721,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		}
 	}
 
-	 /**
-	  * Storing imported asset type in EavAttributeOptions table if not exist .
-	  * @param assetTypeName : assetTypeName is imported assetTypeName
-	  * @param create : create (Boolean) a flag to determine assetType will get created or not
-	  * @return
-	  */
-	@Transactional
-	def findOrCreateAssetType(assetTypeName, def create = false){
-		 def typeAttribute = EavAttribute.findByAttributeCode("assetType")
-		 def assetType = EavAttributeOption.findByValueAndAttribute(assetTypeName, typeAttribute)
-		 if (!assetType && create){
-			 save new EavAttributeOption('value':assetTypeName, 'attribute':typeAttribute, 'sort':0), true
-		 }
-		 return assetType
-	}
-
-	// TODO: Move to AssetEntityService
-	/**
-	 * This method is used to find a person object after importing and if not found create it
-	 * @param importValue is value what is there in excel file consist firstName and LastName
-	 * @param create : create is flag which will determine if person does not exist in db should they create record or not
-	 * @return instance of person
-	 */
-	@Transactional
-	def findOrCreatePerson(importValue, def create = false){
-		Project project = securityService.userCurrentProject
-		def firstName
-		def lastName
-		if (importValue.contains(",")){
-			def splittedName = importValue.split(",")
-			firstName = splittedName[1].trim()
-			lastName = splittedName[0].trim()
-		} else if (StringUtils.containsAny(importValue, " ")){
-			def splittedName = importValue.split("\\s+")
-			firstName = splittedName[0].trim()
-			lastName = splittedName[1].trim()
-		} else {
-			firstName = importValue.trim()
-		}
-
-		//Serching Person in compnies staff list .
-		def personList = partyRelationshipService.getCompanyStaff(project.clientId)
-		def person = personList.find { it.firstName == firstName && it.lastName == lastName }
-		if (!person && firstName && create) {
-			logger.debug 'Person {} {} not found in selected company', firstName, lastName
-			person = new Person(firstName: firstName, lastName: lastName, staffType: 'Contractor')
-			save person, true
-
-			save new PartyRelationship(partyRelationshipType: PartyRelationshipType.load("STAFF"),
-				 partyIdFrom: Party.load(project.clientId), roleTypeCodeFrom: RoleType.load("COMPANY"), partyIdTo:person,
-				 roleTypeCodeTo: RoleType.load("STAFF"), statusCode: "ENABLED")
-		 }
-
-		return person
-	}
-
 	/**
 	 * A helper closure used to set property to null or blank if the import value equals "NULL" and the property supports NULL or is a String.
 	 * In the case of being a String, if not blankable, then it sets the field to "NULL"
@@ -1097,7 +755,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	}
 
 	/**
-	 * A helper method used to do the initial lookup of an asset and perform the EAV attribute validation. If the asset was not found then it will
+	 * A helper method used to do the initial lookup of an asset. If the asset was not found then it will
 	 * create a new asset and initialize various properties. If the asset was modified since the export and import then it will return null
 	 * @param The class to use (e.g. AssetEntity or Application)
 	 * @param The asset id to lookup
@@ -1117,14 +775,12 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		Long assetId,
 		DataTransferBatch dataTransferBatch,
 		List<DataTransferValue> dtvList,
-		EavAttributeSet eavAttributeSet,
 		Integer errorCount,
 		Integer errorConflictCount,
 		List<String> ignoredAssets,
 		Integer rowNum,
 		List<Map<String, ?>> fieldSpecs
 	) {
-
 		// Try loading the application and make sure it is associated to the current project
 		def asset
 		def clazzName = clazz.name.tokenize('.')[-1]
@@ -1174,7 +830,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset = clazz.newInstance()
 			asset.project = project
 			asset.owner = project.client
-//			asset.attributeSet = eavAttributeSet
 			asset.assetType = clazzMap[clazzName]
 
 			logger.debug 'findAndValidateAsset() Created {}', clazzName

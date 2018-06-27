@@ -1,12 +1,10 @@
 package net.transitionmanager.service
 
-import com.tdssrc.grails.TimeUtil
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetType
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
@@ -20,8 +18,6 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -74,7 +70,6 @@ class ProjectService implements ServiceMethods {
 	AuditService auditService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	SecurityService securityService
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
@@ -273,69 +268,6 @@ class ProjectService implements ServiceMethods {
 		}
 
 		staffList.sort { it.toString() }
-	}
-
-	/**
-	 * Used to get the fields by splitting fields into name/value pairs for the customs field settings
-	 * TODO - validate exactly what this definition means...
-	 * @param entityType - the class type to get the field setting for
-	 * @param projectAttributes - the list of attributes to parse apart
-	 * @return a List containing key/value pairs of all of the projectAttributes
-	 * TM-6617
-	 */
-	@Deprecated
-	List<Map<String, String>> getFields(String entityType, List<EavAttribute> projectAttributes = null){
-		throw new RuntimeException('getFields is no longer used')
-		if (!projectAttributes) {
-			projectAttributes = getAttributes(entityType)
-		}
-
-		projectAttributes.findAll { !(it.attributeCode.contains('custom')) }.collect { p ->
-			[id: p.frontendLabel, label: p.attributeCode]
-		}
-	}
-
-	/**
-	 * Get the custom fields
-	 */
-	@Deprecated
-	List<Map<String, Object>> getCustoms(List<EavAttribute> projectAttributes = null) {
-		throw new RuntimeException('getFields is no longer used')
-		Project project = securityService.userCurrentProject
-		if (!projectAttributes) {
-			projectAttributes = getAttributes('Application')
-		}
-
-		projectAttributes.findAll { it.attributeCode.contains('custom') }.collect { p ->
-			[id: project[p.attributeCode] ?: p.frontendLabel, label: p.attributeCode]
-		}
-	}
-
-	/**
-	 * Get attributes from eavAttribute based on EntityType.
-	 * TM-6617
-	 */
-	@Deprecated
-	List<EavAttribute> getAttributes(String entityType) {
-		throw new RuntimeException('getAttributes no longer used')
-		EavEntityType eavEntityType = EavEntityType.findByDomainName(entityType)
-		List<EavAttribute> attributes = EavAttribute.findAllByEntityType(eavEntityType, [sort: 'frontendLabel'])
-
-		int firstCustom = attributes.findIndexOf { it.frontendLabel == "Custom1" }
-		int lastCustom = attributes.findIndexOf { it.frontendLabel == 'Custom' + Project.CUSTOM_FIELD_COUNT }
-		List<EavAttribute> firsts = []
-		if ( firstCustom > 0 ) {
-			firsts = attributes[0..firstCustom - 1]
-		}
-		List<EavAttribute> lasts = attributes[lastCustom + 1..attributes.size() - 1]
-		List<EavAttribute> nonCustoms = firsts + lasts
-		List<EavAttribute>  customs = attributes[firstCustom..lastCustom]
-		def oneDigitCustoms = customs.findAll { it.frontendLabel.size() == 7}
-		customs.removeAll(oneDigitCustoms)
-
-		attributes = nonCustoms + oneDigitCustoms + customs
-
-		return attributes
 	}
 
 	/**
@@ -639,7 +571,6 @@ class ProjectService implements ServiceMethods {
 
 		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
 		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
-		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
 		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = $projectInstance.id")
 		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
 		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='$AssetCableStatus.UNKNOWN',assetTo=null,

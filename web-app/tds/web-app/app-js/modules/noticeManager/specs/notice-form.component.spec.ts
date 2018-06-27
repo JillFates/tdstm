@@ -6,7 +6,7 @@ import {By} from '@angular/platform-browser';
 import {DebugElement} from '@angular/core';
 import {HttpModule, Http} from '@angular/http';
 import {FormsModule} from '@angular/forms';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
 // import { TranslateModule, TranslateLoader, TranslateStaticLoader, TranslateService } from 'ng2-translate';
 

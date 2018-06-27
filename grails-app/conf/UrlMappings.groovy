@@ -92,6 +92,14 @@ class UrlMappings {
 					POST: "create"
 			]
 		}
+
+		"/ws/apiAction/enums" {
+			controller = "wsApiAction"
+			action = [
+					GET: "enums"
+			]
+		}
+
 		"/ws/asset/retrieveBundleChange" {
 			controller = 'wsAsset'
 			action = [
@@ -139,6 +147,21 @@ class UrlMappings {
 			        POST: "deleteAssets"
 			]
 		}
+
+		"/ws/asset/classOptions" {
+			controller = "wsAsset"
+			action = [
+			    GET: "retrieveAssetClassOptions"
+			]
+		}
+
+		"/ws/task/assetCommentCategories" {
+			controller = "wsTask"
+			action = [
+			    GET : 'assetCommentCategories'
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -270,6 +293,25 @@ class UrlMappings {
 		"/ws/qzCertificate" {
 			controller = 'wsApplication'
 			action = [GET:'qzCertificate']
+		}
+
+		/**
+		 * AssetComment CRUD endpoints
+		 */
+
+		"/ws/task/comment/$id" {
+			controller = "wsTask"
+			action = [
+				DELETE:'deleteComment',
+				PUT: 'updateComment'
+			]
+		}
+
+		"/ws/task/comment" {
+			controller = 'wsTask'
+			action = [
+			    POST: 'saveComment'
+			]
 		}
 
 		"/ws/task/generateTasks" {
@@ -767,13 +809,6 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent" {
-			controller = "wsApiAction"
-			action = [
-			        GET: "agentNames"
-			]
-		}
-
 		"/ws/apiAction/agent/$id" {
 			controller = "wsApiAction"
 			action = [
@@ -917,6 +952,44 @@ class UrlMappings {
 			controller = "wsCredential"
 			action = [
 				POST: "checkValidExprSyntax"
+			]
+		}
+
+		"/ws/tag" {
+			controller = "wsTag"
+			action = [
+				GET : "list",
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/$id" {
+			controller = "wsTag"
+			action = [
+				PUT : "update",
+				DELETE: "delete"
+			]
+		}
+
+		"/ws/tag/$targetId/merge/$sourceId" {
+			controller = "wsTagAsset"
+			action = [
+				PUT: "merge",
+			]
+		}
+
+		"/ws/tag/asset" {
+			controller = "wsTagAsset"
+			action = [
+				POST: "create"
+			]
+		}
+
+		"/ws/tag/asset/$id" {
+			controller = "wsTagAsset"
+			action = [
+				GET : "list",
+				DELETE: "delete"
 			]
 		}
 

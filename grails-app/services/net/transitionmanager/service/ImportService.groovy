@@ -6,10 +6,10 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
@@ -62,7 +62,7 @@ class ImportService implements ServiceMethods {
 	// SQL statement that is used to insert values the temporary import table
 	private static final String DTV_INSERT_SQL =
 			"INSERT INTO data_transfer_value " +
-					"(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, field_name, has_error, error_text) VALUES "
+				"(asset_entity_id, import_value,row_id, data_transfer_batch_id, field_name, has_error, error_text) VALUES "
 
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService assetEntityService
@@ -70,7 +70,6 @@ class ImportService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProgressService progressService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	def jdbcTemplate
 	CustomDomainService customDomainService
@@ -81,6 +80,15 @@ class ImportService implements ServiceMethods {
 
 	// Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
 	static final int HIBERNATE_BATCH_SIZE=20
+
+	static final Map LEGACY_DOMAIN_CLASSES = [
+			( ETLDomain.Application.name() ) : ETLDomain.Application,
+			( ETLDomain.Database.name() ) : ETLDomain.Database,
+			( ETLDomain.Device.name() ) : ETLDomain.Device,
+			( 'AssetEntity' ) : ETLDomain.Device,
+			( 'Files' ) : ETLDomain.Files,
+			( ETLDomain.Storage.name() ) : ETLDomain.Storage
+		]
 
 	/**
 	 * Used to lookup and validate a batch id exists and is associated to the current project
@@ -141,7 +149,7 @@ class ImportService implements ServiceMethods {
 			throw new InvalidParamException('Unable to find the specified batch')
 		}
 
-		if (dataTransferBatch.eavEntityType?.domainName != domainNameFor(assetClass)) {
+		if (AssetClass.domainNameFor(dataTransferBatch.assetClass) != domainNameFor(assetClass)) {
 			throw new InvalidParamException("Specified batch is not for the asset class $assetClass")
 		}
 
@@ -264,7 +272,7 @@ class ImportService implements ServiceMethods {
 		}
 
 		// <SL> TODO: requires to update tables (data_transfer_batch, eav_entity_type) to use AssetClass instead
-		boolean batchIsForDevices = dtb.eavEntityType?.domainName == "AssetEntity"
+		boolean batchIsForDevices = AssetClass.domainNameFor(dtb.assetClass) == "AssetEntity"
 
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
@@ -555,7 +563,8 @@ class ImportService implements ServiceMethods {
 
 					if (!errorMsg) {
 						// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
-						String domainName = dtb.eavEntityType?.domainName
+						// String domainName = AssetClass.domainNameFor(dbt.assetClass)
+						String domainName = AssetClass.domainNameFor(dtb.assetClass)
 						assert domainName
 						String servicMethodName = 'process' + domainName + 'Import'
 
@@ -747,7 +756,12 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			application = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+			application = assetEntityAttributeLoaderService.findAndValidateAsset(
+				project, userLogin,
+				domainClass, assetEntityId, dataTransferBatch, dtvList,
+				errorCount, errorConflictCount,
+				ignoredAssets, rowNum, fieldSpecs)
+
 			if (application == null) {
 				continue
 			}
@@ -1030,7 +1044,9 @@ class ImportService implements ServiceMethods {
 				dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 				Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-				asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+				asset = assetEntityAttributeLoaderService.findAndValidateAsset(
+					project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList,
+					errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
 				if (!asset) {
 					continue
 				}
@@ -1409,12 +1425,15 @@ class ImportService implements ServiceMethods {
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(
-				project, userLogin, domainClass,
-				assetEntityId, dataTransferBatch, dtvList,
-				eavAttributeSet, errorCount, errorConflictCount,
+				project, userLogin,
+				domainClass, assetEntityId,
+				dataTransferBatch, dtvList,
+				errorCount, errorConflictCount,
 				ignoredAssets, rowNum, fieldSpecs)
-			if (!asset)
+
+			if (!asset) {
 				continue
+			}
 
 			dtvList.each {
 				String attribName = it.fieldName
@@ -1546,10 +1565,15 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(
+				project, userLogin, domainClass,
+				assetEntityId, dataTransferBatch, dtvList,
+				errorCount, errorConflictCount,
+				ignoredAssets, rowNum, fieldSpecs)
 
-			if (asset == null)
+			if (asset == null) {
 				continue
+			}
 
 			dtvList.each {
 				String attribName = it.fieldName
@@ -2652,9 +2676,16 @@ class ImportService implements ServiceMethods {
 	 * @references formatDate
 	 * @return An error message if it failed to add the value to the buffer
 	 */
-	private String rowToImportValues(Map sheetInfo, StringBuilder sqlStrBuff, Sheet sheetRef, Integer rowOffset,
-									 Integer colOffset, Map<String, ?> dtaMapField, String entityId,
-									 Long dtBatchId) {
+	private String rowToImportValues(
+		Map sheetInfo,
+		StringBuilder sqlStrBuff,
+		Sheet sheetRef,
+		Integer rowOffset,
+		Integer colOffset,
+		Map<String, ?> dtaMapField,
+		String entityId,
+		Long dtBatchId
+	) {
 		String cellValue = null
 		String errorMsg = ""
 		// Get the Excel column code (e.g. column 0 = A, column 1 = B)
@@ -2701,7 +2732,7 @@ class ImportService implements ServiceMethods {
 				sqlStrBuff.append(SqlUtil.STRING_QUOTE).append(cellValue).append(SqlUtil.STRING_QUOTE).append(SqlUtil.COMMA)
 				sqlStrBuff.append(rowOffset).append(SqlUtil.COMMA)
 				sqlStrBuff.append(dtBatchId).append(SqlUtil.COMMA)
-				sqlStrBuff.append(SqlUtil.NULL).append(SqlUtil.COMMA)
+				// sqlStrBuff.append(SqlUtil.NULL).append(SqlUtil.COMMA)
 				sqlStrBuff.append(SqlUtil.STRING_QUOTE).append(dtaMapField["field"]).append(SqlUtil.STRING_QUOTE).append(SqlUtil.COMMA)
 				sqlStrBuff.append(errorMsg ? 1 : 0).append(SqlUtil.COMMA)
 				sqlStrBuff.append(SqlUtil.STRING_QUOTE).append(errorMsg).append(SqlUtil.STRING_QUOTE)
@@ -2744,14 +2775,26 @@ class ImportService implements ServiceMethods {
 	 * @param exportTime - The datetime that the spreadsheet was originally exported
 	 * @return The DataTransferBatch object if successfully created otherwise null
 	 */
-	private DataTransferBatch createTransferBatch(Project project, DataTransferSet dataTransferSet,
-												  String entityClassName, int numOfAssets, Date exportTime) {
+	private DataTransferBatch createTransferBatch(
+		Project project,
+		DataTransferSet dataTransferSet,
+		String entityClassName,
+		int numOfAssets,
+		Date exportTime ) {
+
+		Class<?> clazz = LEGACY_DOMAIN_CLASSES[entityClassName]?.getClazz()
+		AssetClass assetClass = AssetClass.lookup(clazz)
 
 		def dtb = new DataTransferBatch(
-				statusCode: "PENDING", transferMode: "I", dataTransferSet: dataTransferSet,
-				project: project, userLogin: securityService.loadCurrentUserLogin(),
+				statusCode: "PENDING",
+				transferMode: "I",
+				dataTransferSet: dataTransferSet,
+				project: project,
+				userLogin: securityService.loadCurrentUserLogin(),
 				// exportDatetime: GormUtil.convertInToGMT(exportTime, tzId),
-				exportDatetime: exportTime, eavEntityType: EavEntityType.findByDomainName(entityClassName))
+				exportDatetime: exportTime,
+				assetClass:assetClass
+			)
 
 		if (!dtb.save()) {
 			log.error "createTransferBatch() failed save - ${GormUtil.allErrorsString(dtb)}"
@@ -2877,7 +2920,7 @@ class ImportService implements ServiceMethods {
 			DataTransferBatch dataTransferBatch = createTransferBatch(project, dataTransferSet, domainName,
 					sheetInfo.assetCount, timeOfExport)
 			if (!dataTransferBatch) {
-				throw new InvalidParamException("Failed to create import batch for the '$assetSheetName' tab. Please contact support if the problem persists.")
+				throw new InvalidParamException("Failed to create import batch for the '$sheetName' tab. Please contact support if the problem persists.")
 			}
 
 			sheetInfo << sheetConf

@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div class="modal-content tds-angular-component-content">
+<div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Edit</h4>
@@ -26,7 +26,7 @@
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
 											<td colspan="3">
-												<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${asset.description}" ngmodel="model.asset.description" tooltipDataPlacement="bottom"/>
+												<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${asset.description}" ngmodel="model.asset.description" />
 											</td>
 										</tr>
 										<tr>
@@ -35,16 +35,14 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType"/>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset?.environment}"/>
-											<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-												<tdsAngular:tooltipSpan field="${standardFieldSpecs.environment}">
-													<kendo-dropdownlist
-															class="select"
-															name="modelAssetEnvironment"
-															[(ngModel)]="model.asset.environment"
-															[defaultItem]="'Please Select'"
-															[data]="model.environmentOptions">
-													</kendo-dropdownlist>
-												</tdsAngular:tooltipSpan>
+											<td>
+												<kendo-dropdownlist
+														class="select"
+														name="modelAssetEnvironment"
+														[(ngModel)]="model.asset.environment"
+														[defaultItem]="'Please Select'"
+														[data]="model.environmentOptions">
+												</kendo-dropdownlist>
 											</td>
 										</tr>
 										<tr>
@@ -55,17 +53,15 @@
 											</td>
 											<td nowrap="nowrap" class="sizeScale">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
-												<tdsAngular:tooltipSpan field="${standardFieldSpecs.scale}">
-													<kendo-dropdownlist
-															class="select"
-															name="modelAssetScaleName"
-															[data]="${SizeScale.getAsJsonList() as JSON}"
-															[(ngModel)]="model.asset.scale.name"
-															[defaultItem]="''"
-															[textField]="'text'"
-															[valueField]="'value'">
-													</kendo-dropdownlist>
-												</tdsAngular:tooltipSpan>
+												<kendo-dropdownlist
+														class="select"
+														name="modelAssetScaleName"
+														[data]="${SizeScale.getAsJsonList() as JSON}"
+														[(ngModel)]="model.asset.scale.name"
+														[defaultItem]="''"
+														[textField]="'text'"
+														[valueField]="'value'">
+												</kendo-dropdownlist>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
@@ -79,16 +75,14 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
 											<td>
-												<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-													<kendo-dropdownlist
-															class="select"
-															name="modelAssetMoveBundle"
-															[data]="model.moveBundleList"
-															[(ngModel)]="model.asset.moveBundle"
-															[textField]="'name'"
-															[valueField]="'id'">
-													</kendo-dropdownlist>
-												</tdsAngular:tooltipSpan>
+												<kendo-dropdownlist
+														class="select"
+														name="modelAssetMoveBundle"
+														[data]="model.moveBundleList"
+														[(ngModel)]="model.asset.moveBundle"
+														[textField]="'name'"
+														[valueField]="'id'">
+												</kendo-dropdownlist>
 											</td>
 										</tr>
 										<tr>
@@ -108,14 +102,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
 											<td>
-												<tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">
-													<kendo-dropdownlist
-															class="select"
-															name="modelAssetPlanStatus"
-															[data]="model.planStatusOptions"
-															[(ngModel)]="model.asset.planStatus">
-													</kendo-dropdownlist>
-												</tdsAngular:tooltipSpan>
+												<kendo-dropdownlist
+														class="select"
+														name="modelAssetPlanStatus"
+														[data]="model.planStatusOptions"
+														[(ngModel)]="model.asset.planStatus">
+												</kendo-dropdownlist>
 											</td>
 										</tr>
 										<tr>
@@ -126,14 +118,12 @@
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
 											<td>
-												<tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">
-													<kendo-dropdownlist
-															class="select"
-															name="modelAssetValidation"
-															[data]="${asset.constraints.validation.inList as JSON}"
-															[(ngModel)]="model.asset.validation">
-													</kendo-dropdownlist>
-												</tdsAngular:tooltipSpan>
+												<kendo-dropdownlist
+														class="select"
+														name="modelAssetValidation"
+														[data]="${asset.constraints.validation.inList as JSON}"
+														[(ngModel)]="model.asset.validation">
+												</kendo-dropdownlist>
 											</td>
 										</tr>
 										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
@@ -145,7 +135,7 @@
 					<!-- Dependencies -->
 					<tr id="deps">
 						<td valign="top" colspan="2">
-							<tds-supports-depends [(model)]="model"></tds-supports-depends>
+							<tds-supports-depends [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 						</td>
 					</tr>
 				</table>
@@ -153,7 +143,7 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>

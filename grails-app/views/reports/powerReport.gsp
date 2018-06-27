@@ -65,33 +65,6 @@
                 return true
             }
         }
-        $(document).ready(function () {
-            $("#editDialog").dialog({autoOpen: false})
-            $("#cablingDialogId").dialog({autoOpen: false})
-        })
-        function openAssetEditDialig(id) {
-            $("#editFormId").val(id)
-            ${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( XMLHttpRequest , 'edit')")}
-        }
-        function showEditAsset(e) {
-            var assetEntityAttributes = eval('(' + e.responseText + ')')
-            if (assetEntityAttributes != "") {
-                $("#editDialog").dialog("close")
-                $("#cablingDialogId").dialog("close")
-                submitForm($('form [name=rackLayoutCreate]'));
-            } else {
-                alert("Asset is not updated, Please check the required fields")
-            }
-        }
-        // Script to get the combined rack list
-        function getRackDetails(objId) {
-            var bundles = new Array()
-            $("#" + objId + " option:selected").each(function () {
-                bundles.push($(this).val())
-            });
-
-            ${remoteFunction(controller:'rackLayouts', action:'retrieveRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(XMLHttpRequest)')}
-        }
     </script>
 </head>
 

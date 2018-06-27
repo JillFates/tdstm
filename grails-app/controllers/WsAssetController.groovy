@@ -326,6 +326,13 @@ class WsAssetController implements ControllerMethods {
 				asset: asset
 			]
 			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+            // prepare value names as well (needed for UI)
+            if (model.asset.manufacturer) {
+                model.manufacturerName = model.asset.manufacturer.name;
+            }
+            if (model.asset.model) {
+                model.modelName = model.asset.model.modelName;
+            }
 			if (mode == 'show') {
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
 			} else {
@@ -456,6 +463,14 @@ class WsAssetController implements ControllerMethods {
 		Project project = getProjectForWs()
 		List rackOptions = assetEntityService.getRackSelectOptions(project, id, true)
 		renderSuccessJson(rackOptions)
+	}
+
+	/**
+	 * Return a list with all the Asset Class Options
+	 */
+	@HasPermission(Permission.AssetView)
+	def retrieveAssetClassOptions() {
+		renderSuccessJson(AssetClass.classOptions)
 	}
 
 

@@ -9,7 +9,6 @@ import { HttpServiceProvider } from '../shared/providers/http-interceptor.provid
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
 import { PreferenceService } from '../shared/services/preference.service';
-import { UserService } from '../shared/services/user.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
@@ -39,6 +38,7 @@ import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
 import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
+import { AddPersonComponent } from './components/add-person/add-person.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -84,13 +84,13 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,
-		UIModalDecoratorDirective
+		UIModalDecoratorDirective,
+		AddPersonComponent
 	],
 	providers: [
 		AuthService,
 		PermissionService,
 		PreferenceService,
-		UserService,
 		NotifierService,
 		UILoaderService,
 		HttpServiceProvider,
@@ -123,7 +123,8 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,
-		UIModalDecoratorDirective
+		UIModalDecoratorDirective,
+		AddPersonComponent
 	],
 	entryComponents: [
 		DynamicComponent,

@@ -58,7 +58,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	 */
 	ngOnChanges(changes: SimpleChanges) {
 		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
-		if (changes['model'].currentValue !== changes['model'].previousValue) {
+		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
 			this.firstChange = changes['model'].firstChange;
 			if (this.firstChange) {
 				let model = changes['model'].currentValue;

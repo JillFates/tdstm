@@ -1,5 +1,3 @@
-grails.plugin.location.'eav-model' = './pluginscustom/eav-model-0.1'
-
 grails.servlet.version = '3.0'
 grails.project.work.dir = 'target'
 grails.project.target.level = 1.7
@@ -18,6 +16,7 @@ grails.project.dependency.resolution = {
 		inherits true
 		mavenLocal()
 
+		// mavenRepo 'http://repo.novus.com/releases/'
 		//mavenRepo 'http://repo.grails.org/grails/plugins'
 		//mavenRepo 'https://repo.grails.org/grails/core'
 		//grailsPlugins()
@@ -25,9 +24,6 @@ grails.project.dependency.resolution = {
 		grailsCentral()
 		mavenCentral()
 	}
-
-//	String camelVersion = '2.15.0'
-	String camelVersion = '2.13.2'
 
 	dependencies {
 		compile 'com.google.guava:guava:16.0.1'
@@ -42,25 +38,20 @@ grails.project.dependency.resolution = {
 		runtime 'mysql:mysql-connector-java:5.1.40'
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
-		runtime "org.apache.camel:camel-aws:${camelVersion}"
-		runtime "org.apache.camel:camel-http4:${camelVersion}"
+		// HTTP Client used on integration agents e.g. HttpAgent, ServiceNow, VMware
+		runtime 'org.apache.httpcomponents:httpclient:4.5.5'
+		runtime 'commons-httpclient:commons-httpclient:3.1'
 
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
 		// GETL Groovy ETL - https://github.com/ascrus/getl/
-		runtime 'net.sourceforge.getl:getl:1.2.05'
+		// NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
+		// TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
+		runtime 'net.sourceforge.getl:getl:1.2.11'
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
-
-		/*
-		//testRuntime ("org.apache.camel:camel-test:${camelVersion}") {
-		test ("org.apache.camel:camel-test:${camelVersion}") {
-			excludes( [name: 'junit'] )//
-
-		*/
-
 	}
 
 	plugins {
@@ -69,9 +60,6 @@ grails.project.dependency.resolution = {
 //		compile ':filterpane:2.5.0', {
 //			excludes 'asset-pipeline'
 //		}
-
-//		compile 'org.grails.plugins:routing:1.4.1'
-		compile 'org.grails.plugins:routing:1.4.0'
 
 		compile ':jasper:1.11.0'
 		compile ':quartz:1.0.2'

@@ -9,9 +9,9 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.InvalidParamException
+import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
-import com.tdsops.common.lang.ExceptionUtil
 
 @CompileStatic
 @Slf4j(value='logger')
@@ -23,12 +23,7 @@ class JsonUtil {
      * @return
      */
     static JSONObject parseJson(String json) {
-        try {
-            JsonSlurper jsonSlurper = new JsonSlurper()
-            return jsonSlurper.parseText(json) as JSONObject
-        } catch (JsonException e) {
-            throw new InvalidParamException("Invalid JSON : ${e.message}")
-        }
+        return parseJsonObject(json) as JSONObject
     }
 
     /**
@@ -40,10 +35,13 @@ class JsonUtil {
      * @return a list after parsing the text
      */
     static List parseJsonList(String jsonText) {
-        // TODO : JPM 2/2018 : Need to add try/catch
+        return parseJsonObject(jsonText) as List
+    }
+
+    static Object parseJsonObject(String jsonText) {
         try {
             JsonSlurper jsonSlurper = new JsonSlurper()
-            return jsonSlurper.parseText(jsonText) as List
+            return jsonSlurper.parseText(jsonText)
         } catch (e) {
             throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
@@ -133,9 +131,12 @@ class JsonUtil {
      * @return
      */
     static JSONObject parseFile(String fileName) {
-        // TODO : JPM 2/2018 : Need to add try/catch
-
-        return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
+        try {
+            return (JSONObject) JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
     }
 
     /**
@@ -144,9 +145,12 @@ class JsonUtil {
      * @return JSON
      */
     static JSONObject parseFile(InputStream inputStream) {
-        // TODO : JPM 2/2018 : Need to add try/catch
-
-        return (JSONObject)JSON.parse(inputStream.text)
+        try {
+            return (JSONObject) JSON.parse(IOUtils.toString(inputStream))
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
     }
 
     /**
@@ -187,4 +191,47 @@ class JsonUtil {
         return mapToObject(jsonStr, target)
     }
 
+    /**
+     * Parse a file by fully qualified filename
+     * @param fileName
+     * @return JSONElement
+     */
+    static Object parseFilePath(String fileName) {
+        File file = new File(fileName)
+        // return JSON.parse(file.text)
+        return JsonUtil.parseJsonObject(file.text)
+    }
+
+    /**
+     * method from Maps to let use GPATH like access in a String
+     * e.g.
+     * <PRE>
+     *       assert gpathAt(result, "person.name") == "Guillaume"
+     *       assert gpathAt(result, "")            == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     *       assert gpathAt(result, ".")           == [person:[name:Guillaume, age:33, pets:[dog, cat]]]
+     * </PRE>
+     * @param Map
+     * @param gpath
+     * @param separator
+     * @return
+     */
+    static Object gpathAt(Object obj, String gpath, String separator = '.') {
+        def parts = gpath.tokenize(separator)
+        Object property = obj
+
+        for (String key in parts) {
+            key = key.trim()
+            if (key) {
+                if (property instanceof Map && (property as Map).containsKey(key)) {
+                    property = property[key]
+                } else if (property.hasProperty(key)) {
+                    property = property[key]
+                } else {
+                    property = null
+                    break
+                }
+            }
+        }
+        return property
+    }
 }

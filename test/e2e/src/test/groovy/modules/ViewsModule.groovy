@@ -29,9 +29,17 @@ class ViewsModule extends Module {
         voidStars         (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star-o")}
         yellowStars       (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star")}
         createdBy         {viewList.find("td:nth-child(4)")}
-        ticks              {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
-        common                      { module CommonsModule}
+        ticks             (required: false) {viewList.find(".glyphicon-ok")}// unchecked views will not have a span
+        common            { module CommonsModule}
     }
+
+    def openRandomView(){
+        def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
+        def editedViewName = viewsListed[willSelect].text()
+        waitFor{viewsListed[willSelect].click()}
+        editedViewName
+    }
+
     def clickCreateView(){
         createViewButton.click()
     }
@@ -39,6 +47,7 @@ class ViewsModule extends Module {
     def moduleTitleIsCorrect(String title){
         waitFor{moduleTitle.text()==title}
     }
+
     def validateAuthor(){
         createdBy.each{
             def validation=true
@@ -47,13 +56,16 @@ class ViewsModule extends Module {
             }
         }
     }
+
     def clickOnFirstDelete(){
         deleteButtons[0].click()
     }
+
     def confirmationRequiredIsDisplayed(){
         waitFor{($("h4.modal-title")).isDisplayed()}
         closeDeleteModal.click()
     }
+
     def closeDeleteModal(){
         closeDeleteModal.click()
     }
@@ -80,7 +92,7 @@ class ViewsModule extends Module {
      * This method validates the the condition of equal number of ticks and rows is met.
      */
     def systemViewsOnly(){
-       // createdBy.text()==""
+        // createdBy.text()==""
         ticks.size()==viewsListed.size()
     }
     /**
@@ -190,10 +202,20 @@ class ViewsModule extends Module {
             count++
         }
     }
+
     def favRandomFavs(){
         def initializeCommonActions = new CommonActions()
         waitFor{initializeCommonActions.getRandomOption(voidStars).click()}
         common.waitForLoader(3)
+    }
+
+    /**
+     * Clicks on the first non-shared view
+     * @return
+     */
+    def clickOnNonSharedView(){
+        def nonSharedView=vwGridRows.find(":nth-child(7)").hasNot(".glyphicon-ok")[0]
+        nonSharedView.siblings().find("[uisref]").click()
     }
 
 }

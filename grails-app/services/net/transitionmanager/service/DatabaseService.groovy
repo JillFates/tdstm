@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
@@ -13,7 +12,6 @@ import net.transitionmanager.domain.Project
 class DatabaseService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
-	SecurityService securityService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a database asset
