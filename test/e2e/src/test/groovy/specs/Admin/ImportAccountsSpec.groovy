@@ -8,7 +8,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Ignore
 
-
+@Ignore
 class ImportAccountsSpec extends GebReportingSpec {
     def testKey
     static testCount
