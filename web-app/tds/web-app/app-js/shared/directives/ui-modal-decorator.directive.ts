@@ -20,7 +20,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	private decoratorOptions: DecoratorOptions;
 	private initialWindowSettings: WindowSettings;
 	private parentModal: any;
-	@Output() resizeEvent = new EventEmitter<string>();
+	@Output() resizeEvent = new EventEmitter<any>();
 
 	@Input()
 	set isWindowMaximized(isWindowMaximized: boolean) {
@@ -151,12 +151,42 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 		const element = jQuery(this.el.nativeElement);
 
 		if (enable) {
-			element.resizable();
+			element.resizable({
+				resize: (event: any, ui: any) => this.resizeWindow(event, ui),
+				start: (event: any, ui: any) => this.startResize(event, ui),
+				stop: (event: any, ui: any) => this.stopResize(event, ui),
+			});
 		} else {
 			element.resizable('destroy');
 		}
 
 		return;
+	}
+
+	/**
+	 * Listen to the Resize Event (in progress)
+	 * http://api.jqueryui.com/resizable/#event-resize
+	 */
+	private resizeWindow(event: any, ui: any): void {
+		console.log(event);
+		console.log(ui);
+		this.resizeEvent.emit({type: 'resizing', event: event, ui: ui});
+	}
+
+	/**
+	 * Listen to the Resize Event Start
+	 * http://api.jqueryui.com/resizable/#event-start
+	 */
+	private startResize(event: any, ui: any): void {
+		// this.resizeEvent.emit({type: 'start', event: event, ui: ui});
+	}
+
+	/**
+	 * Listen to the Resize Event Stop
+	 * http://api.jqueryui.com/resizable/#event-stop
+	 */
+	private stopResize(event: any, ui: any): void {
+		// this.resizeEvent.emit({type: 'stop', event: event, ui: ui});
 	}
 
 	/**

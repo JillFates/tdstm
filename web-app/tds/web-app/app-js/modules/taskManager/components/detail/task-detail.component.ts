@@ -33,7 +33,14 @@ export class TaskDetailComponent extends UIExtraDialog {
 	public hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
 
-	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, private dialogService: UIDialogService, public promptService: UIPromptService, public userPreferenceService: PreferenceService, private permissionService: PermissionService) {
+	constructor(
+		public taskDetailModel: TaskDetailModel,
+		public taskManagerService: TaskService,
+		private dialogService: UIDialogService,
+		public promptService: UIPromptService,
+		public userPreferenceService: PreferenceService,
+		private permissionService: PermissionService) {
+
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
 		this.loadTaskDetail();
@@ -111,6 +118,10 @@ export class TaskDetailComponent extends UIExtraDialog {
 				}
 			})
 			.catch((error) => console.log(error));
+	}
+
+	protected resizeWindow(resize: any): void {
+		console.log(resize);
 	}
 
 	/**
