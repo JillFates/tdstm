@@ -2979,7 +2979,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					with(data[1], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
-						rowNum == 1
+						rowNum == 2
 						errorCount == 1
 						warn == false
 						duplicate == false
