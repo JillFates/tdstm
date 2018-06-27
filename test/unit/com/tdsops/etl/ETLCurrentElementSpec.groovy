@@ -256,7 +256,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					with(data[0]) {
-						op == ImportOperationEnum.INSERT
+						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false
@@ -326,7 +326,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					with(data[0]) {
-						op == ImportOperationEnum.INSERT
+						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false

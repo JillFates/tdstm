@@ -332,19 +332,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-	void '17. can find a Device by its alternateKey'() {
-
-		given:
-			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-
-		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [id: device.assetName])
-
-		then:
-			results.size() == 1
-			results.first() == device.id
-	}
-
 	void '18. can find a Room by a by id'() {
 
 		given:
@@ -358,13 +345,13 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == room.id
 	}
 
-	void '19. can find a Room by a by alternateKey'() {
+	void '19. can find a Room by a by id as String value'() {
 
 		given:
 			Room room = roomTestHelper.createRoom(project)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.roomName])
+			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.id])
 
 		then:
 			results.size() == 1

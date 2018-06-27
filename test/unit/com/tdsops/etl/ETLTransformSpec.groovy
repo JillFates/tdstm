@@ -864,7 +864,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
 					with(data[0]) {
-						op == ImportOperationEnum.INSERT
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -893,7 +893,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == ImportOperationEnum.INSERT
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []

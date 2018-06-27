@@ -399,7 +399,7 @@ class DomainResult {
 @ConfigureMarshalling
 class RowResult {
 
-	ImportOperationEnum op = ImportOperationEnum.INSERT
+	String op = ImportOperationEnum.INSERT
 	Integer rowNum
 	Integer errorCount = 0
 	Boolean warn = false
