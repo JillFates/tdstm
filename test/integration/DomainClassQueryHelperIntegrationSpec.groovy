@@ -1,6 +1,7 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessorException
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
@@ -345,16 +346,29 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == room.id
 	}
 
-	void '19. can find a Room by a by id as String value'() {
+	void '19. can find a Room by id with id as String value'() {
 
 		given:
 			Room room = roomTestHelper.createRoom(project)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.id])
+			List results = DomainClassQueryHelper.where(ETLDomain.Room, project, [id: room.id.toString()])
 
 		then:
 			results.size() == 1
 			results.first() == room.id
+	}
+
+	void '20. can throws an Exception if find a Room by id with a negative String value'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+			Long negativeId = room.id * -1
+		when:
+			DomainClassQueryHelper.where(ETLDomain.Room, project, [id: (negativeId).toString()])
+
+		then: 'It throws an Exception because find command is incorrect'
+			Exception e = thrown Exception
+			e.message == 'java.lang.String cannot be cast to java.lang.Long'
 	}
 }

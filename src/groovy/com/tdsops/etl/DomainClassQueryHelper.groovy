@@ -166,7 +166,6 @@ class DomainClassQueryHelper {
 	 * </pre>
 	 * @param clazz
 	 * @param fieldName
-	 * @param value
 	 * @return a property value for a HQL query.
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
@@ -255,8 +254,8 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				if(entry.key == 'id' && NumberUtil.isLong(entry.value)) {
-					hqlParams[namedParameter] = NumberUtil.toLong(entry.value)
+				if(entry.key == 'id' && NumberUtil.isPositiveLong(entry.value)) {
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(entry.value)
 				} else {
 					hqlParams[namedParameter] = entry.value
 				}
