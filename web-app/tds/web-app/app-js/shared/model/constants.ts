@@ -11,6 +11,15 @@ export const PROGRESSBAR_INTERVAL_TIME = 1 * 1000; // Seconds
 export const MAX_OPTIONS = [25, 50, 100, 250, 500, 1000];
 export const MAX_DEFAULT = 25;
 
+// KENDO UPLOAD FILE
+export const REMOVE_FILENAME_PARAM = 'filename';
+export const FILE_UPLOAD_REMOVE_URL = 'removeUrl'
+export const SAVE_FILENAME_PARAM = 'file';
+export const FILE_UPLOAD_SAVE_URL = 'saveUrl'
+export const FILE_UPLOAD_TYPE_PARAM = 'uploadType';
+export const ETL_SCRIPT_FILE_UPLOAD_TYPE = 'ETLScript';
+export const ASSET_IMPORT_FILE_UPLOAD_TYPE = 'assetImport';
+
 // Intervals
 export enum INTERVAL {
 	SECONDS = 'Seconds',
