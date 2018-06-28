@@ -92,7 +92,7 @@ class CommentService implements ServiceMethods {
 
 			// if assetEntity is passed, then validate that it's valid and that the user has access to it (belongs to the current project)
 			if (params.assetEntity && params.assetEntity != 'NaN') {
-				if (params.assetEntity != 'null' &&  !params.assetEntity.isNumber()) {
+				if (!NumberUtil.isPositiveLong(params.assetEntity)) {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id ($params.assetEntity)"
 					errorMsg = "An unexpected asset id was received"
 					break
