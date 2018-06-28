@@ -22,4 +22,12 @@ export class TagService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	getTag(tagId: number): Observable<any> {
+		return this.http.get(`${this.tagURL}/${tagId}`)
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
 }

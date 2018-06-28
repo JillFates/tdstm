@@ -25,7 +25,10 @@
                         (pageChange)="gridSettings.pageChange($event)"
                         [resizable]="true"
                         (sortChange)="gridSettings.sortChange($event)"
-                        (add)="addHandler($event)">
+                        (add)="addHandler($event)"
+                        (cancel)="cancelHandler($event)"
+                        (edit)="editHandler($event)"
+                        (save)="saveHandler($event)">
 
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -39,29 +42,63 @@
                     </ng-template>
 
                     <!-- Action -->
-                    <kendo-grid-column title="Action" [locked]="true" [filterable]="false" [width]="130">
+                    <kendo-grid-command-column [width]="100">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="text-center">
                                 <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
                             </div>
                         </ng-template>
-                        <ng-template kendoGridCellTemplate let-dataItem>
+                        <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
                             <div class="k-grid-ignore-click text-center" style="cursor: default">
-                                <button (click)="onEdit(dataItem)"
+                                <button kendoGridEditCommand
                                         class="btn btn-action btn-default" title="Edit">
                                     <i class="fa fa-pencil"></i>
                                 </button>
-                                <button (click)="onDelete(dataItem)"
+                                <button kendoGridRemoveCommand
                                         class="btn btn-action btn-default" title="Delete">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <button (click)="onMerge(dataItem)"
-                                        class="btn btn-action btn-default" title="Merge">
-                                    <i class="fa fa-exchange"></i>
+                                <button kendoGridSaveCommand=""
+                                        class="btn btn-action btn-default" title="Save">
+                                    <i class="fa fa-save"></i>
                                 </button>
+                                <button kendoGridCancelCommand
+                                        class="btn btn-action btn-default" title="Cancel">
+                                    <i class="glyphicon glyphicon-ban-circle"></i>
+                                </button>
+                                <div *ngIf="!isNew">
+                                    <button (click)="onMerge(dataItem)"
+                                            class="btn btn-action btn-default" title="Merge">
+                                        <i class="fa fa-exchange"></i>
+                                    </button>
+                                </div>
                             </div>
                         </ng-template>
-                    </kendo-grid-column>
+                    </kendo-grid-command-column>
+
+                    <!--<kendo-grid-column title="Action" [locked]="true" [filterable]="false" [width]="130">-->
+                        <!--<ng-template kendoGridHeaderTemplate>-->
+                            <!--<div class="text-center">-->
+                                <!--<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>-->
+                            <!--</div>-->
+                        <!--</ng-template>-->
+                        <!--<ng-template kendoGridCellTemplate let-dataItem>-->
+                            <!--<div class="k-grid-ignore-click text-center" style="cursor: default">-->
+                                <!--<button (click)="onEdit(dataItem)"-->
+                                        <!--class="btn btn-action btn-default" title="Edit">-->
+                                    <!--<i class="fa fa-pencil"></i>-->
+                                <!--</button>-->
+                                <!--<button (click)="onDelete(dataItem)"-->
+                                        <!--class="btn btn-action btn-default" title="Delete">-->
+                                    <!--<i class="fa fa-trash"></i>-->
+                                <!--</button>-->
+                                <!--<button (click)="onMerge(dataItem)"-->
+                                        <!--class="btn btn-action btn-default" title="Merge">-->
+                                    <!--<i class="fa fa-exchange"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                        <!--</ng-template>-->
+                    <!--</kendo-grid-column>-->
 
                     <!-- Columns -->
                     <kendo-grid-column *ngFor="let column of gridColumns.columns"
@@ -95,11 +132,12 @@
                             {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                         </ng-template>
 
-                        <ng-template kendoGridEditTemplate let-dataItem *ngIf="column.property === 'Name'">
+                        <!-- Edit Templates -->
+                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Name'">
                                 <input [(ngModel)]="dataItem.Name" autofocus
                                        type="text" name="name" class="form-control" required/>
                         </ng-template>
-                        <ng-template kendoGridEditTemplate let-dataItem *ngIf="column.property === 'Description'">
+                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Description'">
                             <input [(ngModel)]="dataItem.Description"
                                    type="text" name="description" class="form-control"/>
                         </ng-template>

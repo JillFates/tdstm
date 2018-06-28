@@ -18,6 +18,8 @@ export class TagListComponent {
 
 	protected gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
+	private editedRowIndex: number;
+	private editedTag: TagModel;
 
 	constructor(
 		private tagService: TagService,
@@ -31,33 +33,6 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document
-	 * @param {any} sender
-	 */
-	protected addHandler({sender}) {
-		// this.closeEditor(sender);
-
-		sender.addRow(new TagModel());
-	}
-
-	public cancelHandler({sender, rowIndex}) {
-		// call the helper method
-		this.closeEditor(sender, rowIndex);
-	}
-
-	private closeEditor(grid, rowIndex = this.editedRowIndex) {
-		// close the editor
-		grid.closeRow(rowIndex);
-
-		// revert the data item to original state
-		// this.editService.resetItem(this.editedProduct, rowIndex);
-		//
-		// // reset the helpers
-		// this.editedRowIndex = undefined;
-		// this.editedProduct = undefined;
-	}
-
-	/**
 	 * TODO: document.
 	 */
 	private onLoad(): void {
@@ -68,5 +43,65 @@ export class TagListComponent {
 				{ mode: 'single', checkboxOnly: false}, // selectable config.
 				{ useColumn: 'id' }); // checkbox config.
 		});
+	}
+
+	/**
+	 * TODO: document
+	 * @param {any} sender
+	 */
+	protected addHandler({sender}) {
+		this.closeEditor(sender);
+
+		sender.addRow(new TagModel());
+	}
+
+	protected editHandler({sender, rowIndex, dataItem}) {
+		console.log(dataItem);
+		// close the previously edited item
+		this.closeEditor(sender);
+
+		// track the most recently edited row
+		// it will be used in `closeEditor` for closing the previously edited row
+		this.editedRowIndex = rowIndex;
+
+		// clone the current - `[(ngModel)]` will modify the original item
+		// use this copy to revert changes
+		this.editedTag = Object.assign({}, dataItem);
+
+		// edit the row
+		sender.editRow(rowIndex);
+	}
+
+	protected saveHandler({sender, rowIndex, dataItem, isNew}) {
+		// this.editService.save(dataItem, isNew);
+
+		sender.closeRow(rowIndex);
+
+		this.editedRowIndex = undefined;
+		this.editedTag = undefined;
+	}
+
+	protected cancelHandler({sender, rowIndex}) {
+		// call the helper method
+		this.closeEditor(sender, rowIndex);
+	}
+
+	private closeEditor(grid, rowIndex = this.editedRowIndex) {
+		// close the editor
+		grid.closeRow(rowIndex);
+
+		// revert the data item to original state
+		if (this.editedTag) {
+			this.tagService.getTag(this.editedTag.id).subscribe( (result: TagModel) => {
+				let match = this.gridSettings.resultSet.find( (item: TagModel) => {
+					return item.id === result.id;
+				});
+				Object.assign(result, match);
+			});
+		}
+
+		// reset the helpers
+		this.editedRowIndex = undefined;
+		this.editedTag = undefined;
 	}
 }
