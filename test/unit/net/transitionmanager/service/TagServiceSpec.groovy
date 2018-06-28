@@ -60,7 +60,7 @@ class TagServiceSpec extends Specification {
 	void 'Test get'() {
 		when: 'Calling get with an id of a tag'
 			service.create(project, 'tag1', 'description1', Color.Red)
-			Tag tag = service.get(Tag,1, project)
+			Tag tag = service.get(Tag, 1, project)
 
 		then: 'The tag is returned'
 			tag.name == 'tag1'

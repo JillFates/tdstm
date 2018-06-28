@@ -86,8 +86,6 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
-
-
 	}
 
 	/**
