@@ -350,20 +350,20 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData for no find.query specified'() {
+    void 'Test fetchEntityByFieldMetaData for no find.query specified'() {
         setup:
 			String property = 'asset'
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
 
         when: 'called with no id and an empty query section'
-			def entity = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
         then: 'no entity should be returned'
 			! entity
 		and: 'a particular error message should be recorded in the fieldsInfo'
 			dataImportService.NO_FIND_QUERY_SPECIFIED_MSG == fieldsInfo[property].errors[0]
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData for find by field.value set to asset ID number'() {
+    void 'Test fetchEntityByFieldMetaData for find by field.value set to asset ID number'() {
         setup:
 			String property = 'asset'
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
@@ -371,14 +371,14 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field value contains the asset id as a numeric value'
 			fieldsInfo[property].value = device.id
 		and: 'the method is called'
-			def entity = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the asset should be found'
 			entity
 		and: 'the asset should match the one attempting to be found'
 			device.id == entity.id
 	}
 
-	void 'Test lookupDomainRecordByFieldMetaData for find by field.value set to alternate key'() {
+	void 'Test fetchEntityByFieldMetaData for find by field.value set to alternate key'() {
         setup:
 			String property = 'asset'
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
@@ -386,14 +386,14 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field value contains the alternate key value (assetName)'
 			fieldsInfo[property].value = device.assetName
 		and: 'the method is called'
-			def result = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the asset should be found'
 			result
 		and: 'the asset should match the one attempting to be found'
 			device.id == result.id
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData for find by query'() {
+    void 'Test fetchEntityByFieldMetaData for find by query'() {
         setup:
 			String property = 'asset'
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
@@ -410,12 +410,12 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'field.value is empty'
 			fieldsInfo[property].value = ''
 		and: 'the method is called'
-			def result = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData for caching'() {
+    void 'Test fetchEntityByFieldMetaData for caching'() {
         setup:
 			String property = 'asset'
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
@@ -432,7 +432,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				]
 			]
 		and: 'the method is called'
-			def result = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 			String cacheKey = context.cache.lastKey
 		then: 'no result should be returned'
 			null == result
@@ -448,7 +448,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			device3.assetType = assetType
 			device3.save(flush:true)
 		and: 'the method is called again'
-			result = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+			result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the asset should be returned'
 			device3 == result
 		and: 'the cache should still have a single entry'
@@ -460,13 +460,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// 	Long overwritten = 324
 		// 	Set keys = context.cache.keySet()
 		// 	keys.each { key -> context.cache[key] = overwritten }
-		// and: 'lookupDomainRecordByFieldMetaData is called again with the same query'
-		// 	result = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+		// and: 'fetchEntityByFieldMetaData is called again with the same query'
+		// 	result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		// then: 'the object returned should by the override number indicating that the cache is working correctly'
 		// 	overwritten == result
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData method finding duplicates'() {
+    void 'Test fetchEntityByFieldMetaData method finding duplicates'() {
 		setup:
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
 			String property = 'asset'
@@ -483,23 +483,23 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 					]
 				]
 			]
-		and: 'the lookupDomainRecordByFieldMetaData method is called'
-			def entity = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+		and: 'the fetchEntityByFieldMetaData method is called'
+			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the return negative value indicating an error'
 			NumberUtil.isaNumber(entity)
 		and: 'the property should have an error message abouth there being multiple references'
 			dataImportService.FIND_FOUND_MULTIPLE_REFERENCES_MSG == fieldsInfo[property].errors[0]
 	}
 
-    void 'Test lookupDomainRecordByFieldMetaData method with id reference to another project asset'() {
+    void 'Test fetchEntityByFieldMetaData method with id reference to another project asset'() {
 		setup:
 			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
 			String property = 'asset'
 
 		when: 'the ETL field.value contains a numeric id of a domain entity belonging to another project'
 			fieldsInfo[property].value = otherProjectDevice.id
-		and: 'the lookupDomainRecordByFieldMetaData method is called'
-			def entity = dataImportService.lookupDomainRecordByFieldMetaData(property, fieldsInfo, context)
+		and: 'the fetchEntityByFieldMetaData method is called'
+			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'a -1 should be returned indicating that an explicit ID lookup failed'
 			-1 == entity
     }

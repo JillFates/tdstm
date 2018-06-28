@@ -196,6 +196,17 @@ public class GormUtil {
 
 	/**
 	 * Used to access individual constraints from a domain object
+	 * @param domainInstance - a domain instance to get the constraint from
+	 * @param property - the name of the property to be accessed
+	 * @param constraintName - the individual constraint to access
+	 * @return the constraint value
+	 */
+	public static getConstraint(Object domainInstance, String property, String constraintName) {
+		getConstraint(domainInstance.getClass(), property, constraintName)
+	}
+
+	/**
+	 * Used to access individual constraints from a domain object
 	 * @param domainClass - the domain class to get the constraint from
 	 * @param property - the name of the property to be accessed
 	 * @param constraintName - the individual constraint to access
@@ -1256,11 +1267,12 @@ public class GormUtil {
 
 			if (extraCriteria) {
 				for (criteria in extraCriteria) {
-					hql.append(" and x.${criteria.key} = :${criteria.key}")
-					params.put(criteria.key, criteria.value)
+					String paramName = criteria.key.replaceAll(/\./, '_')
+					hql.append(" and x.${criteria.key} = :${paramName}")
+					params.put(paramName, criteria.value)
 				}
 			}
-			// println "hql = ${hql.toString()}, params=$params"
+			println "hql = ${hql.toString()}, params=$params"
 			// Try finding the entity or more...
 			entities = domainClass.findAll(hql.toString(), params)
 		}
