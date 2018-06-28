@@ -70,7 +70,9 @@ class BootStrap {
 
 		// Warm up AESCodec
 		AESCodec.getInstance()
-
+		
+		// ETLProcessorResult marshaller.
+		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 		//
 		// NOTHING NEEDED IN PRODUCTION SHOULD BE PLACED BELOW HERE
 		//
@@ -82,9 +84,6 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
-
-		// ETLProcessorResult marshaller.
-		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 
 	}
 

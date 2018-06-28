@@ -121,6 +121,7 @@ export class AssetExplorerViewGridComponent {
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
 	}
+
 	private getPreferences(): Observable<any> {
 		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
 	}

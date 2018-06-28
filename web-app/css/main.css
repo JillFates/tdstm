@@ -613,15 +613,13 @@ td[data-for].O .select2-choice,
 
 /* NORMAL */
 td[data-for].N.label,
-td.N.label,
-.N {
+td.N.label {
 	background-color: #ddd !important;
 	background-image: none !important;
 }
 /* UNIMPORTANT */
-td[data-for].U label,
-td.U label,
-.U {
+td[data-for].U.label,
+td.U.label {
     background-color: #F4F4F4 !important;
     background-image: none !important;
 }

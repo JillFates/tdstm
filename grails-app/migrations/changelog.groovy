@@ -246,6 +246,7 @@ databaseChangeLog = {
 	include file: '20180606-import-batch-record-drop-ignored-flag.groovy'
 	include file: '20180612-datascript-create-unique-index-on-name-project-and-provider.groovy'
 	include file: '20180612-add-field-label-map-property-to-import-batch.groovy'
+	include file: '20180618-create-user-login-project-access-table.groovy'
 	include file: '20180601-create-tag-and-tagLink.groovy'
 	include file: '20180620-rename-etl-permissions.groovy'
 	include file: '20180613-add-http-method-api-action-table.groovy'

@@ -162,6 +162,27 @@ class UrlMappings {
 			]
 		}
 
+
+		'/ws/bulkChange' {
+			controller = 'wsBulkAssetChange'
+			action = [
+			    PUT:'change'
+			]
+		}
+
+		'/ws/bulkChange/fields' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				GET: 'fields'
+			]
+		}
+
+		'/ws/bulkChange/actions' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				GET: 'actions'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
