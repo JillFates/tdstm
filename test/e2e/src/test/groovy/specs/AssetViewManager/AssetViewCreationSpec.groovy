@@ -118,7 +118,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
     def "10. Validate created View is listed"() {
         testKey = "TM-8500"
         given: "User saves the created view"
-            waitFor{createViewModule.clickSave()}
+            waitFor{createViewModule.firstSave()}
             at SaveViewPage
             waitFor{enterName(viewName)}
             waitFor{clickSave()}
