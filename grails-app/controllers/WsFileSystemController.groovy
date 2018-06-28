@@ -60,7 +60,7 @@ class WsFileSystemController implements ControllerMethods{
      */
     @HasPermission(Permission.UserGeneralAccess)
     def uploadFile(UploadFileCommand fileUploadCommand) {
-        doFileUpload(fileUploadCommand)
+	    doFileUpload(fileUploadCommand)
     }
 
     /**

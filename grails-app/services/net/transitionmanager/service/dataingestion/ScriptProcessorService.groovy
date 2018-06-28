@@ -30,11 +30,14 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Slf4j
 class ScriptProcessorService {
 
-    CustomDomainService customDomainService
+	CustomDomainService customDomainService
 	FileSystemService fileSystemService
 	SecurityService securityService
 	ProgressService progressService
 	Scheduler quartzScheduler
+
+	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
+	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -88,7 +91,7 @@ class ScriptProcessorService {
 
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
+		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
 		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
 		os.close()
 
@@ -270,7 +273,7 @@ class ScriptProcessorService {
 		}
 
 		// create test script temporary file
-		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile('testETLScript')
+		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile(TEST_SCRIPT_PREFIX)
 		IOUtils.write(command.script, os)
 		os.flush()
 		os.close()
