@@ -40,6 +40,28 @@ class WsFileSystemController implements ControllerMethods{
     }
 
     /**
+     * Endpoint for uploading a file from the ETLDesigner to the server.
+     * @param fileUploadCommand
+     * @return
+     */
+    @HasPermission(Permission.UserGeneralAccess)
+    def uploadFileETLDesigner(UploadFileCommand fileUploadCommand) {
+        fileUploadCommand.prefix = "EtlSampleData_" // TODO: This should be in a Constant
+        doFileUpload(fileUploadCommand)
+    }
+
+	/**
+	 * Endpoint for uploading a file from the Asset Import (ETL) to the server.
+	 * @param fileUploadCommand
+	 * @return
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadFileETLAssetImport(UploadFileCommand fileUploadCommand) {
+		fileUploadCommand.prefix = "EtlSourceData_" // TODO: This should be in a Constant
+		doFileUpload(fileUploadCommand)
+	}
+
+    /**
      * Do the actual uploading of a file to the file system.
      *
      * @param fileCommand

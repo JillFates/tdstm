@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile
 class UploadFileCommand implements FileCommand{
 
     MultipartFile file
+    // prefix to add when uploading Files
+    String prefix = ""
 
     static constraints = {
 

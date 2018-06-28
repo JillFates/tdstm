@@ -358,11 +358,12 @@ class FileSystemService implements InitializingBean {
      * @return
      */
     private String writeFileFromCommand(UploadFileCommand uploadFileCommand) {
+	     String prefix = uploadFileCommand.prefix
         String extension = FileSystemUtil.getFileExtension(uploadFileCommand.file.getOriginalFilename())
         OutputStream os
         String temporaryFileName
         try {
-            (temporaryFileName, os) = createTemporaryFile('', extension)
+            (temporaryFileName, os) = createTemporaryFile( prefix, extension)
             os.write(uploadFileCommand.file.getBytes())
             os.close()
         } catch (Exception e) {
