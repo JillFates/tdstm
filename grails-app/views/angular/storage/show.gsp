@@ -9,9 +9,9 @@
 	</div>
 	<div class="modal-body">
 		<div>
-			<table style="border: 0">
+			<table>
 				<tr>
-					<td colspan="2">
+					<td colspan="2" class="dialog-container">
 						<div class="dialog">
 						<g:if test="${errors}">
 							<div id="messageDivId" class="message">${errors}</div>

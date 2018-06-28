@@ -15,7 +15,7 @@
 			<form name="databaseEditForm">
 				<table style="border: 0">
 					<tr>
-						<td colspan="2">
+						<td colspan="2" class="dialog-container">
 							<div class="dialog">
 								<table>
 									<tbody>
@@ -131,6 +131,9 @@
 								</table>
 							</div>
 						</td>
+					</tr>
+					<tr>
+						<td colspan="2">&nbsp;</td>
 					</tr>
 					<!-- Dependencies -->
 					<tr id="deps">
