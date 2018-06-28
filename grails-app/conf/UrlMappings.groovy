@@ -528,6 +528,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/fileSystem/uploadTextETLDesigner" {
+			controller = "wsFileSystem"
+			action = [
+					  POST: "uploadTextETLDesigner"
+			]
+		}
+
+		"/ws/fileSystem/uploadTextETLAssetImport" {
+			controller = "wsFileSystem"
+			action = [
+					  POST: "uploadTextETLAssetImport"
+			]
+		}
+
 		"/ws/fileSystem/uploadFile" {
 			controller = "wsFileSystem"
 			action = [
