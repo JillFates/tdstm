@@ -5,18 +5,17 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div class="modal-content tds-angular-component-content" style="width: 111%" tabindex="0">
+<div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
 				aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
 	<div class="modal-body">
-		<div>
-			<form name="storageEditForm">
-				<table style="border: 0">
+			<form name="applicationEditForm">
+				<table>
 					<tr>
-						<td colspan="2">
+						<td>
 							<div class="dialog">
 								<table>
 									<tbody>
@@ -262,7 +261,6 @@
 					</tr>
 				</table>
 			</form>
-		</div>
 	</div>
 	<div class="modal-footer form-group-center">
 		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
