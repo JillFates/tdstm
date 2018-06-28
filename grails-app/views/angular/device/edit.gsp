@@ -16,7 +16,7 @@
         <table style="border: 0" class="ui-widget">
             <!-- Fields -->
             <tr>
-                <td colspan="2">
+                <td colspan="2" class="dialog-container">
                     <div class="dialog">
                         <table>
                             <tbody>
@@ -32,7 +32,7 @@
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value="${asset.assetType}"/>
-                                    <td class="${standardFieldSpecs.assetType.imp ?: ''}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                    <td class="${standardFieldSpecs.assetType.imp ?: ''}" data-for="model">
                                         <tds-combobox
                                                 [(model)]="model.asset.assetTypeSelectValue"
                                                 [serviceRequest]="searchAssetTypes"
@@ -62,7 +62,7 @@
                                             <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
                                         </label>
                                     </td>
-                                    <td class="${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                    <td class="${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"
                                                 [serviceRequest]="searchManufacturers"
@@ -121,7 +121,7 @@
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
-                                    <td class="${standardFieldSpecs.model.imp ?: ''}" data-for="assetType" style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                    <td class="${standardFieldSpecs.model.imp ?: ''}" data-for="assetType">
                                         <tds-combobox
                                                 [(model)]="model.asset.modelSelectValue"
                                                 [serviceRequest]="searchModels"
@@ -339,6 +339,7 @@
                     </div>
                 </td>
             </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
             <!-- Dependencies -->
             <tr id="deps">
                 <td valign="top" colspan="2">

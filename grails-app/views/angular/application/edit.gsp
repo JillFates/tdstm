@@ -15,7 +15,7 @@
 			<form name="applicationEditForm">
 				<table>
 					<tr>
-						<td>
+						<td class="dialog-container">
 							<div class="dialog">
 								<table>
 									<tbody>
@@ -215,7 +215,7 @@
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 											<td>
-												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
+												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''} duration" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
 											</td>
 										</tr>
 										<tr>
@@ -243,7 +243,7 @@
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
 											<td>
-												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
+												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''} duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
 											</td>
 										</tr>
 									</tbody>
