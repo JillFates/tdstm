@@ -37,6 +37,8 @@ import javax.management.RuntimeErrorException
 @Transactional(readOnly = true)
 @Slf4j
 class FileSystemService implements InitializingBean {
+	public static final String ETL_SAMPLE_DATA_PREFIX = 'EtlSampleData_'
+	public static final String ETL_SOURCE_DATA_PREFIX = 'EtlSourceData_'
 
 	/*
      * These are the accepted file extensions when uploading ETL files

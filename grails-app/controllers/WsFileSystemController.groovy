@@ -90,7 +90,7 @@ class WsFileSystemController implements ControllerMethods{
 	 * @return
 	 */
 	private def doFileUploadETLDesigner(FileCommand fileCommand) {
-		doFileUpload(fileCommand, "EtlSampleData_") // TODO: This should be in a Constant
+		doFileUpload(fileCommand,  FileSystemService.ETL_SAMPLE_DATA_PREFIX)
 	}
 
 	/**
@@ -100,7 +100,7 @@ class WsFileSystemController implements ControllerMethods{
 	 * @return
 	 */
 	private def doFileUploadETLAssetImport(FileCommand fileCommand) {
-		doFileUpload(fileCommand, "EtlSourceData_") // TODO: This should be in a Constant
+		doFileUpload(fileCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX) // TODO: This should be in a Constant
 	}
 
     /**
