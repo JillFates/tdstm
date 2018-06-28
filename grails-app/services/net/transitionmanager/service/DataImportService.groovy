@@ -89,6 +89,15 @@ class DataImportService implements ServiceMethods {
 		'version', 'assetClass', 'createdBy', 'updatedBy', 'project', 'dateCreated', 'lastUpdated'
 	]
 
+	// A map of exceptions that the Import Field Process logic uses to deal with exceptions
+	//    ignore - fields may appear in ETL import but not directly updated (e.g. Room Locations)
+	static final Map DOMAIN_FIELD_EXCEPTIONS = [
+		'AssetEntity': [
+			'locationSource': [ ignore:true ],
+			'locationTarget': [ ignore:true ],
+		]
+	]
+
 	/**
 	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
 	 *
@@ -734,8 +743,8 @@ class DataImportService implements ServiceMethods {
 			specifiedRecordIds = []
 		}
 		log.info "processBatch() for batch $batchId of project $project started with requested ids=$specifiedRecordIds"
-		def stopwatch = new StopWatch()
-		stopwatch.start()
+		//StopWatch stopwatch = new StopWatch()
+		//stopwatch.start()
 
 		int rowsProcessed = 0
 
@@ -810,7 +819,7 @@ class DataImportService implements ServiceMethods {
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
 
-		log.info "processBatch({}) finished in {} and processed {} records", batchId, stopwatch.endDuration(), rowsProcessed
+		//log.info "processBatch({}) finished in {} and processed {} records", batchId, stopwatch.endDuration(), rowsProcessed
 
 		// TODO : JPM 3/2018 : Fix the batch status update after processing
 		// It occurred to me that throwing the Exception is going to rollback the changes but that the
@@ -1074,6 +1083,7 @@ class DataImportService implements ServiceMethods {
 		Object entity = findOrCreateEntity(fieldsInfo, context)
 
 		if (entity) {
+			log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
 			// Now add/update the remaining properties on the domain entity appropriately
 			Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
 
@@ -1198,7 +1208,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsToIgnore - a List of field names that should not be bound
 	 * @return true if binding did not encounter any errors
 	 */
-	private Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
+	private Boolean bindFieldsInfoValuesToEntity(Object domain, JSONObject fieldsInfo, Map context, List fieldsToIgnore=[]) {
 		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
 		Boolean noErrorsEncountered = true
 
@@ -1208,18 +1218,29 @@ class DataImportService implements ServiceMethods {
 			fieldsToIngnore = []
 		}
 		fieldsToIgnore.addAll(['id'])
+
 		fieldNames =  fieldNames - fieldsToIgnore
+
+		String domainShortName = GormUtil.domainShortName(domain)
 
 		// Assignment Logic (TBD 6/2018)
 		// 		If no new value and init contains value and entity property has no value
 		// 		Then set the property to the init value
 		// 		Else if new value and current value not equal new value
 		// 		Then set new value
-	// fieldNames = ['manufacturer', 'model']
+
+		// fieldNames = ['manufacturer', 'model']
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
 				noErrorsEncountered = false
 				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Modifying the field is not allowed')
+				continue
+			}
+
+			log.debug 'bindFieldsInfoValuesToEntity() Checking ignore for {}.{}', domainShortName, fieldName
+
+			// Check for exception fields that should be ignored
+			if (DOMAIN_FIELD_EXCEPTIONS."$domainShortName"?."$fieldName"?.'ignore') {
 				continue
 			}
 
@@ -1330,6 +1351,7 @@ class DataImportService implements ServiceMethods {
 								}
 							}
 							break
+
 
 						case Enum:
 							try {

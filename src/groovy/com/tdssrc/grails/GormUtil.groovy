@@ -1219,6 +1219,17 @@ public class GormUtil {
 	}
 
 	/**
+	 * Used to get the short name of the domain class for an instance
+	 *    assert domainShortName(personInstance) == 'Person'
+	 *
+	 * @param domainInstance
+	 * @return the short name of the class name
+	 */
+	static String domainShortName(Object domainInstance) {
+		domainShortName(domainInstance.getClass())
+	}
+
+	/**
 	 * Used to get the short name of the domain class
 	 *    domainShortName(net.transitionmanager.domain.Person) == 'Person'
 	 *
