@@ -8,10 +8,7 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TagService} from '../../service/tag.service';
 import {TagModel} from '../../model/tag.model';
 import {TagListColumnsModel} from '../../model/tag-list-columns.model';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {send} from 'q';
-import {Tag} from '@angular/compiler/src/i18n/serializers/xml_helper';
 import {PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -24,6 +21,7 @@ export class TagListComponent {
 
 	protected gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
+	protected colorList: Array<string>;
 	protected duplicateName = false;
 	private editedRowIndex: number;
 	private editedTag: TagModel;
@@ -44,6 +42,7 @@ export class TagListComponent {
 	 * TODO: document.
 	 */
 	private onLoad(): void {
+		this.colorList = this.tagService.getColorList();
 		this.gridColumns = new TagListColumnsModel();
 		this.tagService.getTags().subscribe( (result: Array<TagModel>) => {
 			this.gridSettings = new DataGridOperationsHelper(result,

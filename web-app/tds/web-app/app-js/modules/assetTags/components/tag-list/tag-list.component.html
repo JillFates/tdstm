@@ -8,6 +8,15 @@
     .form-control.ng-invalid {
         border: 1px #f00 solid;
     }
+    .k-button {
+        border-color: #ddd;
+        background-color: #f4f4f4;
+        color: #444;
+        border-radius: 3px;
+        padding: 6px 12px;
+        font-size: 12px;
+        align-items: flex-start;
+    }
 </style>
 <!-- Main content -->
 <div class="content body tds-kendo-grid without-selectabe-rows">
@@ -37,7 +46,7 @@
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                         <button kendoGridAddCommand class="btn btn-default" type="button">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="margin-right: 4px;"></span>
                             {{ 'GLOBAL.CREATE' | translate }} Tag
                         </button>
                         <label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
@@ -55,7 +64,7 @@
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
                             <div class="k-grid-ignore-click text-center" style="cursor: default">
                                 <button kendoGridEditCommand class="btn btn-action btn-default" title="Edit">
-                                    <i class="fa fa-pencil"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
                                 </button>
                                 <button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
                                     <i class="fa fa-trash"></i>
@@ -76,30 +85,6 @@
                             </div>
                         </ng-template>
                     </kendo-grid-command-column>
-
-                    <!--<kendo-grid-column title="Action" [locked]="true" [filterable]="false" [width]="130">-->
-                        <!--<ng-template kendoGridHeaderTemplate>-->
-                            <!--<div class="text-center">-->
-                                <!--<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>-->
-                            <!--</div>-->
-                        <!--</ng-template>-->
-                        <!--<ng-template kendoGridCellTemplate let-dataItem>-->
-                            <!--<div class="k-grid-ignore-click text-center" style="cursor: default">-->
-                                <!--<button (click)="onEdit(dataItem)"-->
-                                        <!--class="btn btn-action btn-default" title="Edit">-->
-                                    <!--<i class="fa fa-pencil"></i>-->
-                                <!--</button>-->
-                                <!--<button (click)="onDelete(dataItem)"-->
-                                        <!--class="btn btn-action btn-default" title="Delete">-->
-                                    <!--<i class="fa fa-trash"></i>-->
-                                <!--</button>-->
-                                <!--<button (click)="onMerge(dataItem)"-->
-                                        <!--class="btn btn-action btn-default" title="Merge">-->
-                                    <!--<i class="fa fa-exchange"></i>-->
-                                <!--</button>-->
-                            <!--</div>-->
-                        <!--</ng-template>-->
-                    <!--</kendo-grid-column>-->
 
                     <!-- Columns -->
                     <kendo-grid-column *ngFor="let column of gridColumns.columns"
@@ -144,8 +129,13 @@
                                    type="text" name="description" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Color'">
-                            <input [(ngModel)]="dataItem.Color" required
-                                   type="text" name="color" class="form-control"/>
+                            <kendo-dropdownlist required name="color"
+                                                class="form-control" style="width: 98%; margin: 0 auto 0 auto;"
+                                                [data]="colorList"
+                                                [(ngModel)]="dataItem.Color">
+                            </kendo-dropdownlist>
+                            <!--<input [(ngModel)]="dataItem.Color" required-->
+                                   <!--type="text" name="color" class="form-control"/>-->
                         </ng-template>
 
                         <!-- Filter Template -->

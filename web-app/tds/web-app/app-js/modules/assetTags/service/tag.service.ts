@@ -85,4 +85,23 @@ export class TagService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	/**
+	 * TODO: document
+	 * @returns {Array<string>}
+	 */
+	getColorList(): Array<string> {
+		return [
+			'Black',
+			'Brown',
+			'Red',
+			'Orange',
+			'Yellow',
+			'Green',
+			'Cyan',
+			'Blue',
+			'Purple',
+			'Pink',
+		];
+	}
 }
