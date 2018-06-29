@@ -28,6 +28,7 @@
 <!-- Kendo UI Material Theme -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.common-material.min.css')}">
 <link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.material.min.css')}">
+<link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.material.mobile.min.css')}">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>

@@ -1,6 +1,7 @@
 tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
+						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" />
 						<select class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -13,6 +14,10 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					</div>`,
 		restrict: 'E',
 		controller: function ($scope) {
+			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+				onLabel: "AND",
+				offLabel: "OR"
+			});
 			$(".asset-tag-selector").kendoMultiSelect({
 				itemTemplate: $("#asset-tag-selector-item").html(),
 				tagTemplate: $("#asset-tag-selector-tag").html(),

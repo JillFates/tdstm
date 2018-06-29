@@ -3,6 +3,12 @@
   margin: 0 5% 0 0
   position: relative
   display: inline-block
+  max-width: 350px
+  .k-multiselect
+    width: 287px
+    .k-multiselect-wrap
+      ul
+        max-width: 222px
   label
     position: relative
     top: -12px
@@ -31,6 +37,30 @@
           padding-right: 22px
       .k-select
         position: absolute
+  .km-switch
+    position: absolute
+    right: 5px
+    z-index: 2
+    top: 4px
+    font-size: 11px
+    background: unset
+    .km-switch-wrapper
+      border-radius: 14px
+      background-color: unset
+      .km-switch-background
+        background: unset
+    .km-switch-container
+      border-radius: 14px
+      .km-switch-handle
+        border-radius: 50%
+        background-color: $baseColor !important
+      .km-switch-handle,
+      .km-switch-off
+        -webkit-box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important
+        box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important
+        span
+          color: $black
+
 /*Move into colors after merge with David Branch*/
 .tag-black
   background-color: black !important
