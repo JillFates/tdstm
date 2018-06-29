@@ -246,6 +246,8 @@
 												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''} duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
 											</td>
 										</tr>
+
+										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 									</tbody>
 								</table>
 							</div>
