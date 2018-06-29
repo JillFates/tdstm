@@ -62,12 +62,12 @@ class TagService implements ServiceMethods {
 		List<Map> tags = Tag.executeQuery("""
 			SELECT new Map(
 				t.id as id,
-				t.name as Name,
-				t.description as Description,
-				t.color as Color,
-				COUNT(tl) as Assets,
-				t.dateCreated as DateCreated,
-				t.lastUpdated as LastModified)
+				t.name as name,
+				t.description as description,
+				t.color as color,
+				COUNT(tl) as assets,
+				t.dateCreated as dateCreated,
+				t.lastUpdated as lastModified)
 			FROM Tag t
 			LEFT OUTER JOIN t.tagAssets tl
 			$eventBundleJoins
