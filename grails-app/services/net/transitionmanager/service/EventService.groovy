@@ -46,15 +46,12 @@ class EventService implements ServiceMethods {
 	 * @param useForPlanning - a boolean to filter by the useForPlanning property of the move event
 	 * @return the list of bundles associated with the event
 	 */
-	def listBundles(eventId, useForPlanning) {
+	def listBundles(Long eventId, Boolean useForPlanning) {
 		Project project = controllerService.requiredProject
 
-		if (eventId != null && !eventId.isNumber()) {
-			throw new IllegalArgumentException('Not a eventId number')
-		}
-		eventId = eventId.toInteger()
-		def moveEvent
-		if (eventId > 0) {
+		MoveEvent moveEvent
+
+		if (eventId) {
 			moveEvent = MoveEvent.get(eventId)
 			if (moveEvent != null) {
 				securityService.assertCurrentProject moveEvent.project

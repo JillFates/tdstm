@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
@@ -31,6 +32,9 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	FileSystemService fileSystemService
 
 	@Shared
+	test.helper.MoveEventTestHelper moveEventTestHelper = new test.helper.MoveEventTestHelper()
+
+	@Shared
 	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
 
 	@Shared
@@ -41,6 +45,12 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	Project otherProject = projectTestHelper.createProject()
+
+	@Shared
+	MoveEvent moveEvent
+
+	@Shared
+	MoveEvent moveEvent2
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -100,6 +110,15 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
 
+		moveEvent = moveEventTestHelper.createMoveEvent(project)
+		moveEvent2 = moveEventTestHelper.createMoveEvent(project)
+
+		moveBundle.moveEvent = moveEvent
+		moveBundle.save()
+
+		moveBundle2.moveEvent = moveEvent2
+		moveBundle2.save()
+
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle2)
@@ -113,7 +132,11 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
 		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
 
-		tagService.securityService = [getUserCurrentProject: { -> project }, assertCurrentProject : { Project project -> }] as SecurityService
+		tagService.securityService = [
+			getUserCurrentProject: { -> project },
+			assertCurrentProject : { Project project -> }
+		] as SecurityService
+
 		now = TimeUtil.nowGMT().clearTime()
 	}
 
