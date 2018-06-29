@@ -286,7 +286,7 @@ class Element implements RangeChecker {
 	 */
 	Element sanitize() {
 		value = transformStringObject('sanitize', value) {
-			StringUtil.sanitizeAndStripSpaces(it)
+			StringUtil.sanitize(it)
 		}
 		return this
 	}
