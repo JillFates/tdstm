@@ -42,7 +42,7 @@ export class TagService {
 	 * @param {number} tagId
 	 * @returns {Observable<any>}
 	 */
-	saveTag(tagModel: TagModel): Observable<any> {
+	updateTag(tagModel: TagModel): Observable<any> {
 		const request: any = {
 			name: tagModel.Name,
 			description: tagModel.Description,
@@ -67,6 +67,19 @@ export class TagService {
 			color: tagModel.Color
 		};
 		return this.http.post(this.tagURL, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * DELETE - Save/Update existing tag.
+	 * @param {number} tagId
+	 * @returns {Observable<any>}
+	 */
+	deleteTag(tagId: number): Observable<any> {
+		return this.http.delete(`${this.tagURL}/${tagId}`)
 			.map((res: Response) => {
 				return res.json();
 			})

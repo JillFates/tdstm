@@ -12,15 +12,19 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {send} from 'q';
 import {Tag} from '@angular/compiler/src/i18n/serializers/xml_helper';
+import {PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tag-list',
-	templateUrl: '../tds/web-app/app-js/modules/assetTags/components/tag-list/tag-list.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetTags/components/tag-list/tag-list.component.html',
+	providers: [TranslatePipe]
 })
 export class TagListComponent {
 
 	protected gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
+	protected duplicateName = false;
 	private editedRowIndex: number;
 	private editedTag: TagModel;
 
@@ -29,6 +33,7 @@ export class TagListComponent {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
 		private userPreferenceService: PreferenceService) {
 
@@ -46,6 +51,23 @@ export class TagListComponent {
 				{ mode: 'single', checkboxOnly: false}, // selectable config.
 				{ useColumn: 'id' }); // checkbox config.
 		}, error => this.handleError(error));
+	}
+
+	/**
+	 * TODO: document
+	 * @param {any} sender
+	 */
+	protected removeHandler({dataItem}): void {
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			'Are you sure you want to delete this item?',
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.tagService.deleteTag(dataItem.id).subscribe( result => {
+					this.reloadTagList();
+				}, error => this.handleError(error));
+			}
+		}, (reason: any) => console.log('confirm rejected', reason));
 	}
 
 	/**
@@ -98,6 +120,38 @@ export class TagListComponent {
 
 	/**
 	 * * TODO: document.
+	 * @param {any} sender
+	 * @param {any} rowIndex
+	 */
+	protected cancelHandler({sender, rowIndex}): void {
+		// call the helper method
+		this.closeEditor(sender, rowIndex);
+	}
+
+	/**
+	 * * TODO: document.
+	 * @param grid
+	 * @param {number} rowIndex
+	 */
+	private closeEditor(grid, rowIndex = this.editedRowIndex): void {
+		// close the editor
+		grid.closeRow(rowIndex);
+
+		// revert the data item to original state
+		if (this.editedTag) {
+			let match = this.gridSettings.resultSet.find( (item: TagModel) => {
+				return item.id === this.editedTag.id;
+			});
+			Object.assign(match, this.editedTag);
+		}
+
+		// reset the helpers
+		this.editedRowIndex = undefined;
+		this.editedTag = undefined;
+	}
+
+	/**
+	 * * TODO: document.
 	 * @param {TagModel} tagModel
 	 * @param sender
 	 * @param rowIndex
@@ -120,7 +174,7 @@ export class TagListComponent {
 	 * @param rowIndex
 	 */
 	private updateTag(tagModel: TagModel, sender, rowIndex): void {
-		this.tagService.saveTag(tagModel).subscribe( (result: any) => {
+		this.tagService.updateTag(tagModel).subscribe( (result: any) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
@@ -160,42 +214,9 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
-	 * @param {any} sender
-	 * @param {any} rowIndex
-	 */
-	protected cancelHandler({sender, rowIndex}): void {
-		// call the helper method
-		this.closeEditor(sender, rowIndex);
-	}
-
-	/**
-	 * * TODO: document.
-	 * @param grid
-	 * @param {number} rowIndex
-	 */
-	private closeEditor(grid, rowIndex = this.editedRowIndex): void {
-		// close the editor
-		grid.closeRow(rowIndex);
-
-		// revert the data item to original state
-		if (this.editedTag) {
-			let match = this.gridSettings.resultSet.find( (item: TagModel) => {
-				return item.id === this.editedTag.id;
-			});
-			Object.assign(match, this.editedTag);
-		}
-
-		// reset the helpers
-		this.editedRowIndex = undefined;
-		this.editedTag = undefined;
-	}
-
-	/**
 	 * TODO: document.
 	 * @param {string} name
 	 */
-	private duplicateName = false;
 	protected validateUniqueName(dataItem: TagModel): void {
 		this.duplicateName = false;
 		const match: TagModel = this.gridSettings.resultSet.find( item => item.Name.toLowerCase() === dataItem.Name.trim().toLocaleLowerCase());
