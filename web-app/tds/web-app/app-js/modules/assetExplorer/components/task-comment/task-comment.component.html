@@ -18,7 +18,7 @@
 			</label>
 
 			<label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
-				<input class="form-check-input aligned-checkbox " [(ngModel)]="viewUnpublishedValue" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadGrid()">
+				<input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadGrid()">
 				View Unpublished Tasks
 			</label>
 

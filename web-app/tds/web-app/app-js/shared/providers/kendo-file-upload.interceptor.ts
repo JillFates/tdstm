@@ -5,6 +5,12 @@ import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
 import {DataIngestionService} from '../../modules/dataIngestion/service/data-ingestion.service';
 import {FileRestrictions} from '@progress/kendo-angular-upload';
+import {
+	ASSET_IMPORT_FILE_UPLOAD_TYPE,
+	ETL_SCRIPT_FILE_UPLOAD_TYPE, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL,
+	FILE_UPLOAD_TYPE_PARAM,
+	REMOVE_FILENAME_PARAM, SAVE_FILENAME_PARAM
+} from '../model/constants';
 
 /**
  * Mainly used by Kendo Upload Component.
@@ -14,31 +20,32 @@ import {FileRestrictions} from '@progress/kendo-angular-upload';
 @Injectable()
 export class KendoFileUploadInterceptor implements HttpInterceptor {
 
-	public static readonly SAVE_URL = 'saveUrl';
-	public static readonly REMOVE_URL = 'removeUrl';
-
 	constructor(private dataIngestionService: DataIngestionService) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		if (req.url === KendoFileUploadInterceptor.SAVE_URL) {
+		if (req.url === FILE_UPLOAD_SAVE_URL) {
 			let events: Observable<HttpEvent<any>>[] = [100].map((x) => Observable.of(<HttpProgressEvent>{
 				type: HttpEventType.UploadProgress,
 				loaded: x,
 				total: 100
 			}).delay(1000));
-			events.push(this.dataIngestionService.uploadFile(req.body));
+			if (req.body.get(FILE_UPLOAD_TYPE_PARAM) === ETL_SCRIPT_FILE_UPLOAD_TYPE) {
+				events.push(this.dataIngestionService.uploadETLScriptFile(req.body));
+			} else if (req.body.get(FILE_UPLOAD_TYPE_PARAM) === ASSET_IMPORT_FILE_UPLOAD_TYPE) {
+				events.push(this.dataIngestionService.uploadAssetImportFile(req.body));
+			} else {
+				events.push(this.dataIngestionService.uploadFile(req.body));
+			}
 			return Observable.concat(...events);
 		}
-		if (req.url === KendoFileUploadInterceptor.REMOVE_URL) {
-			let filename = req.body.get(KendoFileUploadBasicConfig.REMOVE_FIELD);
+		if (req.url === FILE_UPLOAD_REMOVE_URL) {
+			let filename = req.body.get(REMOVE_FILENAME_PARAM);
 			return this.dataIngestionService.deleteFile(filename);
 		}
 	}
 }
 
 export class KendoFileUploadBasicConfig {
-
-	public static readonly REMOVE_FIELD = 'filename';
 
 	uploadRestrictions: FileRestrictions;
 	uploadSaveUrl: string;
@@ -51,11 +58,11 @@ export class KendoFileUploadBasicConfig {
 
 	constructor() {
 		this.uploadRestrictions = { allowedExtensions: ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'] };
-		this.uploadSaveUrl = KendoFileUploadInterceptor.SAVE_URL;
-		this.uploadDeleteUrl = KendoFileUploadInterceptor.REMOVE_URL;
+		this.uploadSaveUrl = FILE_UPLOAD_SAVE_URL;
+		this.uploadDeleteUrl = FILE_UPLOAD_REMOVE_URL;
 		this.autoUpload = false;
-		this.saveField = 'file';
-		this.removeField = KendoFileUploadBasicConfig.REMOVE_FIELD;
+		this.saveField =  SAVE_FILENAME_PARAM;
+		this.removeField = REMOVE_FILENAME_PARAM;
 		this.multiple = false;
 	}
 }

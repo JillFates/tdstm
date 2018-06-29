@@ -13,14 +13,22 @@ class SaveViewPage extends Page{
         nameField                    {$("input", id:"name")}
         saveBtn                      {$("button",text:"Save").not(id:"btnSave")}
         menuModule                   { module MenuModule }
+        sharedView                   {$("input", name:"shared")}
     }
 
     def enterName(String value){
-        nameField.click()
+        waitFor{nameField.click()}
         nameField=value
     }
     def clickSave(){
-        saveBtn.click()
+        waitFor{saveBtn.click()}
+    }
+
+    def setViewAsShared(){
+        if(sharedView.value()!="on"){
+            sharedView.click()
+        }
+        clickSave()
     }
 
 }

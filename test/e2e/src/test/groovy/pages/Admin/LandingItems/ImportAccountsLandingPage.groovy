@@ -1,19 +1,18 @@
-package pages.Admin
+package pages.Admin.LandingItems
 
 import geb.Page
 import modules.AdminModule
 
-class RolePermissionAdminPage extends Page{
+class ImportAccountsLandingPage extends Page{
 
     static at = {
-        title == "Show Role Permissions"
-        pageHeaderName.text() == "Role Permissions"
+        title == "Import Accounts"
+        pageHeaderName.text() == "Import Accounts"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
-
 
 }
