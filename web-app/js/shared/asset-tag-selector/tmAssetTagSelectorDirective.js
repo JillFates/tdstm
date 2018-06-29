@@ -5,7 +5,11 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						<select class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
-							<div class="#:data.css#">#:data.Name#</div>
+							<div class="asset-tag-selector-single-item">
+								<div class="asset-tag-selector-single-item  #:data.css#">
+									<i class="fa fa-fw fa-check"></i> #:data.Name#
+								</div>
+							</div>
 						</script>
 						
 						<script id="asset-tag-selector-tag" type="text/x-kendo-template">
@@ -30,6 +34,13 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 								return e.success([]);
 							});
 						}
+					}
+				},
+				select: function (e) {
+					if($(e.item).hasClass("asset-tag-selector-item-selected")) {
+						$(e.item).removeClass("asset-tag-selector-item-selected");
+					} else {
+						$(e.item).addClass("asset-tag-selector-item-selected");
 					}
 				}
 			});
