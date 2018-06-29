@@ -72,6 +72,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
         given: "I am creating a view"
             createViewModule.displayed
         when: "I select random fields (checkboxes) and filter the selected ones"
+            createViewModule.clickSpecificCheckbox("Name")
             createViewModule.selectRandomCheckboxes()
             createViewModule.filterFields("Selected")
         then: "Only the selected checkboxes are displayed"

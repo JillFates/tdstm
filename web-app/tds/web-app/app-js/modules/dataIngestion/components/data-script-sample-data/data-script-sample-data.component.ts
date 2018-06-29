@@ -1,11 +1,22 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import { FileRestrictions, RemoveEvent, SuccessEvent, UploadComponent } from '@progress/kendo-angular-upload';
+import {
+	FileRestrictions,
+	RemoveEvent,
+	SuccessEvent,
+	UploadComponent,
+	UploadEvent
+} from '@progress/kendo-angular-upload';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+import {
+	ETL_SCRIPT_FILE_UPLOAD_TYPE,
+	FILE_UPLOAD_TYPE_PARAM,
+	REMOVE_FILENAME_PARAM
+} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -115,7 +126,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * On Upload button click.
 	 */
 	private onUploadFileText(): void {
-		this.dataIngestionService.uploadText(this.csv.fileContent, this.csv.selected.text).subscribe( result => {
+		this.dataIngestionService.uploadETLScriptFileText(this.csv.fileContent, this.csv.selected.text).subscribe( result => {
 			if (result.status === 'success' && result.data.filename) {
 				this.csv.filename = result.data.filename;
 				this.csv.state = 'success';
@@ -163,6 +174,12 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		}
 	}
 
+	protected onUploadFile(e: UploadEvent): void {
+		e.data = {};
+		e.data[FILE_UPLOAD_TYPE_PARAM] = ETL_SCRIPT_FILE_UPLOAD_TYPE;
+		this.clearFilename();
+	}
+
 	/**
 	 * Upload File action.
 	 * On clear file name.
@@ -179,7 +196,8 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * @param {RemoveEvent} e
 	 */
 	private onRemoveFile(e: RemoveEvent) {
-		e.data = { filename: this.file.uploadedFilename};
+		e.data = {};
+		e.data[REMOVE_FILENAME_PARAM] = this.file.uploadedFilename;
 	}
 
 	/**

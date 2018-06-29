@@ -37,6 +37,8 @@ import javax.management.RuntimeErrorException
 @Transactional(readOnly = true)
 @Slf4j
 class FileSystemService implements InitializingBean {
+	public static final String ETL_SAMPLE_DATA_PREFIX = 'EtlSampleData_'
+	public static final String ETL_SOURCE_DATA_PREFIX = 'EtlSourceData_'
 
 	/*
      * These are the accepted file extensions when uploading ETL files
@@ -327,12 +329,13 @@ class FileSystemService implements InitializingBean {
      * implementations of writeFileFromCommand.
      *
      * @param fileCommand
+     * @param prefix for the uploaded file name
      * @return the filename for the temporary file that was created.
      */
-    String transferFileToFileSystem(FileCommand fileCommand) {
+    String transferFileToFileSystem(FileCommand fileCommand, String prefix = '') {
         String temporaryFileName = null
         if (fileCommand && fileCommand.validate()) {
-            temporaryFileName = writeFileFromCommand(fileCommand)
+            temporaryFileName = writeFileFromCommand(fileCommand, prefix)
         }
         return temporaryFileName
     }
@@ -341,11 +344,12 @@ class FileSystemService implements InitializingBean {
      * Write a file to the temporary directory using the extension and the content
      * given in the command object.
      * @param uploadTextCommand
+     * @param prefix for the uploaded file name
      * @return
      */
-    private String writeFileFromCommand(UploadTextCommand uploadTextCommand) {
+    private String writeFileFromCommand(UploadTextCommand uploadTextCommand, String prefix = '') {
         String extension = FileSystemUtil.formatExtension(uploadTextCommand.extension)
-        def (String filename, OutputStream os) = createTemporaryFile('', extension)
+        def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
         os << uploadTextCommand.content
         os.close()
         return filename
@@ -355,14 +359,15 @@ class FileSystemService implements InitializingBean {
      * Copy an uploaded file to the temporary directory.
      *
      * @param uploadFileCommand
+     * @param prefix for the uploaded file name
      * @return
      */
-    private String writeFileFromCommand(UploadFileCommand uploadFileCommand) {
+    private String writeFileFromCommand(UploadFileCommand uploadFileCommand, String prefix = '') {
         String extension = FileSystemUtil.getFileExtension(uploadFileCommand.file.getOriginalFilename())
         OutputStream os
         String temporaryFileName
         try {
-            (temporaryFileName, os) = createTemporaryFile('', extension)
+            (temporaryFileName, os) = createTemporaryFile(prefix, extension)
             os.write(uploadFileCommand.file.getBytes())
             os.close()
         } catch (Exception e) {
