@@ -798,7 +798,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	}
 
-	// Disabled - see TM-11017
 	void '14. test transformData method'() {
 		setup: 'Create a DataScript, a Provider and other required data'
 			String etlSourceCode = """
@@ -835,9 +834,8 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			println "Calling dataImportService.transformEtlData()  -- THIS FAILS SILENTLY when running the test"
+			println "Calling dataImportService.transformEtlData()"
 			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
-			println "If we get here then the issue has been solved"
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
 			transformResults.containsKey('filename')
