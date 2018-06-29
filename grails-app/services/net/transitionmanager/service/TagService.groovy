@@ -143,4 +143,49 @@ class TagService implements ServiceMethods {
 		Tag tag = get(Tag, id, currentProject)
 		tag.delete(failOnError: true)
 	}
+
+	/**
+	 * Clone the existing tags associated to sourceProject (if any),
+	 * then associate those newly created tags to project.
+	 *
+	 * @param sourceProject  The project from which the existing tags will be cloned.
+	 * @param targetProject  The project to which the new tags will be associated.
+	 */
+	void cloneProjectTags(Project sourceProject, Project targetProject) {
+
+		List<Long> tagIds = Tag.where {
+			project == sourceProject
+		}.projections { property 'id' }.list()
+
+		if (!tagIds.isEmpty()) {
+			cloneTagsToProject(tagIds, targetProject)
+		}
+	}
+
+	/**
+	 * Clone the tags corresponding to the tagIds parameter,
+	 * then associate those newly created tags to project.
+	 *
+	 * @param tagIds  The ids of the tags to be cloned to project.
+	 * @param project  The project to which the new cloned tags will be associated.
+	 * @throws InvalidParamException when one or more tags for the tagIds are not found.
+	 */
+	void cloneTagsToProject(List<Long> tagIds, Project project) {
+		List<Tag> tags = Tag.where {id in tagIds }.list()
+
+		if(tags.size() != tagIds.size()){
+			throw new InvalidParamException('One or more tags specified were not found')
+		}
+
+		tags.each { Tag tag ->
+			Tag newTag = new Tag(
+					name: tag.name,
+					description: tag.description,
+					color: tag.color,
+					project: project
+			)
+			newTag.save()
+			log.debug "Cloned tag ${tag.name} for project ${project.id}"
+		}
+	}
 }

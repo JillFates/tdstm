@@ -59,7 +59,6 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -76,6 +75,7 @@ class ProjectService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
 	LicenseAdminService licenseAdminService
+	TagService tagService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -528,6 +528,9 @@ class ProjectService implements ServiceMethods {
 			}
 			log.debug "Created field spec ${spec.key} for project ${project.id}"
 		}
+		// Clone the Default Project Tags (if it has any) and add them to the new project
+		tagService.cloneProjectTags(defProject, project)
+
 	}
 
 	/**
