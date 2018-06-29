@@ -78,13 +78,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'retire date', alias: 'RETIRE DATE', type: "STRING", isNull: false)
 
 		new Flow().writeTo(dest: simpleDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'retire date': '2018-06-25'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'retire date': '2018/06/25'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'retire date': '06/25/2018'])
-			updater(['device id': '152257', 'model name': 'Blaster', 'manufacturer name': 'SUN', 'retire date': '22/44/2018'])
+			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
+			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
+			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
+			updater(['device id': '152257', 'model name': 'Blaster', 'manufacturer name': 'SUN'])
 		}
 
 		File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
@@ -1335,7 +1334,18 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can transform a field value using to date transformation'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+					id,retire date
+					1,2018-06-25
+					2,2018/06/25
+					3,06/25/2018
+					4,99/99/2018
+					5,
+					6, 
+					7,abc-123
+					""".stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -1348,9 +1358,95 @@ class ETLTransformSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Every column for every row is transformed with toDate transformation'
-			etlProcessor.getElement(0, 3).value == new Date(2018 - 1900, 6 - 1, 25)
-			etlProcessor.getElement(1, 3).value == new Date(2018 - 1900, 6 - 1, 25)
-			etlProcessor.getElement(2, 3).value == new Date(2018 - 1900, 6 - 1, 25)
-			etlProcessor.getElement(3, 3).value == '22/44/2018'
+			with(etlProcessor.finalResult()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 7
+					with(data[0], RowResult) {
+						rowNum == 1
+						errorCount == 0
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '2018-06-25'
+							init == null
+							errors == []
+						}
+					}
+					with(data[1], RowResult) {
+						rowNum == 2
+						errorCount == 1
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '2018/06/25'
+							init == null
+							errors == ['Not able to transform date: 2018/06/25, pattern: yyyy-MM-dd']
+						}
+					}
+					with(data[2], RowResult) {
+						rowNum == 3
+						errorCount == 2
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '06/25/2018'
+							init == null
+							errors[0] == 'Not able to transform date: 06/25/2018, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: 06/25/2018, pattern: yyyy/MM/dd'
+						}
+					}
+					with(data[3], RowResult) {
+						rowNum == 4
+						errorCount == 3
+						with(fields.retireDate, FieldResult) {
+							value == '99/99/2018'
+							originalValue == '99/99/2018'
+							init == null
+							errors[0] == 'Not able to transform date: 99/99/2018, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: 99/99/2018, pattern: yyyy/MM/dd'
+							errors[2] == 'Not able to transform date: 99/99/2018, pattern: MM/dd/yyyy'
+						}
+					}
+					with(data[4], RowResult) {
+						rowNum == 5
+						errorCount == 1
+						with(fields.retireDate, FieldResult) {
+							value == null
+							originalValue == null
+							init == null
+							errors == ['Not able to transform blank or null date: null']
+						}
+					}
+					with(data[5], RowResult) {
+						rowNum == 6
+						errorCount == 1
+						with(fields.retireDate, FieldResult) {
+							value == ''
+							originalValue == ' '
+							init == null
+							errors == ['Not able to transform blank or null date: ']
+						}
+					}
+					with(data[6], RowResult) {
+						rowNum == 7
+						errorCount == 3
+						with(fields.retireDate, FieldResult) {
+							value == 'abc-123'
+							originalValue == 'abc-123'
+							init == null
+							errors[0] == 'Not able to transform date: abc-123, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: abc-123, pattern: yyyy/MM/dd'
+							errors[2] == 'Not able to transform date: abc-123, pattern: MM/dd/yyyy'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+
 	}
 }

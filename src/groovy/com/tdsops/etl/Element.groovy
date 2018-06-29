@@ -41,6 +41,10 @@ class Element implements RangeChecker {
 	 * ETL Field defined by the label and field name
 	 */
 	ETLFieldDefinition fieldDefinition
+	/**
+	 * ETL field convertion or transformation errors
+	 */
+	List<String> errors
 
 	/**
 	 * Defines if an Element instance was created by:
@@ -293,6 +297,12 @@ class Element implements RangeChecker {
 			return this
 		}
 
+		// if value is blank or null then log an error
+		if (StringUtil.isBlank(value)) {
+			addToErrors("Not able to transform blank or null date: ${value}")
+			return this
+		}
+
 		for (String pattern : format) {
 			try {
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
@@ -300,8 +310,7 @@ class Element implements RangeChecker {
 				value = simpleDateFormat.parse(value)
 				break
 			} catch (Exception e) {
-				// log error
-				processor?.debugConsole?.info "Not able to transform date: ${value}, pattern: ${pattern}"
+				addToErrors("Not able to transform date: ${value}, pattern: ${pattern}")
 			}
 		}
 
@@ -641,6 +650,19 @@ class Element implements RangeChecker {
 		}
 
 		return retVal
+	}
+
+	/**
+	 *
+	 * @param err
+	 * @return
+	 */
+	private addToErrors(String err) {
+		if (!errors) {
+			errors = new ArrayList<>()
+		}
+		processor?.debugConsole?.info err
+		errors.add err
 	}
 
 	@Override

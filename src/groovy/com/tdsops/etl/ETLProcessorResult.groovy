@@ -404,8 +404,8 @@ class RowResult {
 	 */
 	void addLoadElement(Element element){
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
-		fieldData.originalValue = element.originalValue
-		fieldData.value = element.value
+		fieldData.addLoadElement(element)
+		this.errorCount = fieldData.errors.size()
 	}
 
 	/**
@@ -525,6 +525,15 @@ class FieldResult {
 		if(errors){
 			this.errors.addAll(errors)
 		}
+	}
+
+	/**
+	 * Set field result values obtained from Element
+	 */
+	void addLoadElement(Element element) {
+		this.value = element.value
+		this.originalValue = element.originalValue
+		this.addErrors(element.errors)
 	}
 
 	/**
