@@ -78,11 +78,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
 		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'retire date', alias: 'RETIRE DATE', type: "STRING", isNull: false)
 
 		new Flow().writeTo(dest: simpleDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
+			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'retire date': '2018-06-25'])
+			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'retire date': '2018/06/25'])
+			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'retire date': '06/25/2018'])
+			updater(['device id': '152257', 'model name': 'Blaster', 'manufacturer name': 'SUN', 'retire date': '22/44/2018'])
 		}
 
 		File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
@@ -1327,5 +1329,28 @@ class ETLTransformSpec extends ETLBaseSpec {
 			','			|	['one', 'two', ['three', 'four']]		|	'one,two,three,four'
 			','			|	['one', 'two', ['three', 'four', null]]	|	'one,two,three,four'
 
+	}
+
+	@See('TM-11233')
+	void 'test can transform a field value using to date transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						domain Device
+						read labels
+						iterate {
+							extract 'retire date' transform with toDate('yyyy-MM-dd','yyyy/MM/dd','MM/dd/yyyy') load 'Retire Date'
+						}
+					""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			etlProcessor.getElement(0, 3).value == new Date(2018 - 1900, 6 - 1, 25)
+			etlProcessor.getElement(1, 3).value == new Date(2018 - 1900, 6 - 1, 25)
+			etlProcessor.getElement(2, 3).value == new Date(2018 - 1900, 6 - 1, 25)
+			etlProcessor.getElement(3, 3).value == '22/44/2018'
 	}
 }

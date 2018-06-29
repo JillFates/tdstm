@@ -3,12 +3,18 @@ package com.tdsops.etl
 import spock.lang.Specification
 
 class ElementSpec extends Specification {
+
 	void 'test Element String functions' () {
 		given:
 			String strValue = "Test String"
 			String trimableStr = """
 				TRIM ME
 			"""
+			String strBlankDate = ''
+			String strDateValue = 'Date Value'
+			String strDateYYYYMMDD = '2018-06-25'
+			String strDateMMDDYYYY = '06-25-2018'
+			String strAbcDate = 'abc-123'
 
 		expect:
 			new Element(value: strValue).sanitize().value == 'Test+String'
@@ -23,6 +29,11 @@ class ElementSpec extends Specification {
 			new Element(value: strValue).replaceFirst('t', 'X').value == 'TesX String'
 			new Element(value: strValue).replaceLast('t', 'X').value == 'Test SXring'
 			new Element(value: trimableStr).trim().value == 'TRIM ME'
+			new Element(value: strBlankDate).toDate('yyyy-MM-dd').value == ''
+			new Element(value: strDateValue).toDate('yyyy-MM-dd').value == 'Date Value'
+			new Element(value: strDateYYYYMMDD).toDate('yyyy-MM-dd').value == new Date(2018 - 1900, 6 - 1, 25)
+			new Element(value: strDateMMDDYYYY).toDate('yyyy-MM-dd','MM-dd-yyyy').value == new Date(2018 - 1900, 6 - 1, 25)
+			new Element(value: strAbcDate).toDate('yyyy-MM-dd').value == 'abc-123'
 	}
 
 	void 'test Element String functions with null values' () {
@@ -36,6 +47,7 @@ class ElementSpec extends Specification {
 			new Element(value: null).sanitize().value == ''
 			new Element(value: null).trim().value == ''
 			new Element(value: null).uppercase().value == ''
+			new Element(value: null).toDate('yyyy-MM-dd').value == null
 	}
 
 	void 'test Exception if String function applied to Non String Element' () {

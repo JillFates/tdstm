@@ -1,7 +1,10 @@
 package com.tdsops.etl
 
+import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+
+import java.text.SimpleDateFormat
 
 /**
  * Element represents extract/transform/load ETL command
@@ -273,6 +276,35 @@ class Element implements RangeChecker {
 	 */
 	Element toInteger() {
 		value = NumberUtil.toInteger(value)
+		return this
+	}
+
+	/**
+	 * Transform current value in this Element instance to a Date
+	 * <code>
+	 *     extract ... transform with toDate('yyyy-mm-dd', 'yyyy/mm/dd', 'mm/dd/yyyy') load ...
+	 * </code>
+	 *
+	 * @param format - an array of possible date formats to use
+	 * @return - a date instance
+	 */
+	Element toDate(String... format) {
+		if (CollectionUtils.isEmpty(format)) {
+			return this
+		}
+
+		for (String pattern : format) {
+			try {
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
+				simpleDateFormat.setLenient(false)
+				value = simpleDateFormat.parse(value)
+				break
+			} catch (Exception e) {
+				// log error
+				processor?.debugConsole?.info "Not able to transform date: ${value}, pattern: ${pattern}"
+			}
+		}
+
 		return this
 	}
 
