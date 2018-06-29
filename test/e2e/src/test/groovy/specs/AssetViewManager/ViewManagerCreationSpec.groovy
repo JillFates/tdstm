@@ -11,7 +11,7 @@ import jodd.util.RandomString
 
 
 @Stepwise
-class AssetViewCreationSpec extends GebReportingSpec {
+class ViewManagerCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
