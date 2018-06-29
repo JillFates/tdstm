@@ -1,13 +1,16 @@
 <style>
-    .tds-kendo-grid .k-grid-content .k-grid-table tbody td {
+    .tds-kendo-grid td {
         cursor: default;
     }
     .btn i.fa {
         padding-right: 0px;
     }
+    .form-control.ng-invalid {
+        border: 1px #f00 solid;
+    }
 </style>
 <!-- Main content -->
-<div class="content body tds-kendo-grid">
+<div class="content body tds-kendo-grid without-selectabe-rows">
     <section>
         <div class="box-body box-with-empty-header">
             <form novalidate #myForm="ngForm">
@@ -36,7 +39,7 @@
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             {{ 'GLOBAL.CREATE' | translate }} Tag
                         </button>
-                        <label class="reload-grid-button pull-right" title="Reload List" (click)="onReload()">
+                        <label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
                             <span class="glyphicon glyphicon-repeat"></span>
                         </label>
                     </ng-template>
@@ -50,23 +53,20 @@
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
                             <div class="k-grid-ignore-click text-center" style="cursor: default">
-                                <button kendoGridEditCommand
-                                        class="btn btn-action btn-default" title="Edit">
+                                <button kendoGridEditCommand class="btn btn-action btn-default" title="Edit">
                                     <i class="fa fa-pencil"></i>
                                 </button>
-                                <button kendoGridRemoveCommand
-                                        class="btn btn-action btn-default" title="Delete">
+                                <button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <button kendoGridSaveCommand=""
-                                        class="btn btn-action btn-default" title="Save">
+                                <button kendoGridSaveCommand class="btn btn-action btn-default" title="Save"
+                                        [disabled]="myForm.invalid || duplicateName">
                                     <i class="fa fa-save"></i>
                                 </button>
-                                <button kendoGridCancelCommand
-                                        class="btn btn-action btn-default" title="Cancel">
+                                <button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
                                     <i class="glyphicon glyphicon-ban-circle"></i>
                                 </button>
-                                <div *ngIf="!isNew">
+                                <div *ngIf="!isNew" style="display: inline;">
                                     <button (click)="onMerge(dataItem)"
                                             class="btn btn-action btn-default" title="Merge">
                                         <i class="fa fa-exchange"></i>
@@ -134,12 +134,17 @@
 
                         <!-- Edit Templates -->
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Name'">
-                                <input [(ngModel)]="dataItem.Name" autofocus
+                                <input [(ngModel)]="dataItem.Name" autofocus (input)="validateUniqueName(dataItem)"
+                                       [ngClass]="{'ng-invalid': duplicateName}"
                                        type="text" name="name" class="form-control" required/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Description'">
                             <input [(ngModel)]="dataItem.Description"
                                    type="text" name="description" class="form-control"/>
+                        </ng-template>
+                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Color'">
+                            <input [(ngModel)]="dataItem.Color" required
+                                   type="text" name="color" class="form-control"/>
                         </ng-template>
 
                         <!-- Filter Template -->

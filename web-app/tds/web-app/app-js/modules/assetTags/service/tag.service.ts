@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Observable';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Headers, RequestOptions, Response} from '@angular/http';
+import {TagModel} from '../model/tag.model';
 
 @Injectable()
 export class TagService {
@@ -23,8 +24,49 @@ export class TagService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * GET - Tag by ID
+	 * @param {number} tagId
+	 * @returns {Observable<any>}
+	 */
 	getTag(tagId: number): Observable<any> {
 		return this.http.get(`${this.tagURL}/${tagId}`)
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PUT - Save/Update existing tag.
+	 * @param {number} tagId
+	 * @returns {Observable<any>}
+	 */
+	saveTag(tagModel: TagModel): Observable<any> {
+		const request: any = {
+			name: tagModel.Name,
+			description: tagModel.Description,
+			color: tagModel.Color
+		};
+		return this.http.put(`${this.tagURL}/${tagModel.id}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * POST - Creates a new tag.
+	 * @param {number} tagId
+	 * @returns {Observable<any>}
+	 */
+	createTag(tagModel: TagModel): Observable<any> {
+		const request: any = {
+			name: tagModel.Name,
+			description: tagModel.Description,
+			color: tagModel.Color
+		};
+		return this.http.post(this.tagURL, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
