@@ -5,18 +5,17 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div class="modal-content tds-angular-component-content" style="width: 111%" tabindex="0">
+<div class="modal-content tds-angular-component-content" tabindex="0">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
 				aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
 	<div class="modal-body">
-		<div>
-			<form name="storageEditForm">
-				<table style="border: 0">
+			<form name="applicationEditForm">
+				<table>
 					<tr>
-						<td colspan="2">
+						<td class="dialog-container">
 							<div class="dialog">
 								<table>
 									<tbody>
@@ -216,7 +215,7 @@
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 											<td>
-												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
+												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''} duration" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
 											</td>
 										</tr>
 										<tr>
@@ -244,9 +243,11 @@
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
 											<td>
-												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
+												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''} duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
 											</td>
 										</tr>
+
+										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 									</tbody>
 								</table>
 							</div>
@@ -262,7 +263,6 @@
 					</tr>
 				</table>
 			</form>
-		</div>
 	</div>
 	<div class="modal-footer form-group-center">
 		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
