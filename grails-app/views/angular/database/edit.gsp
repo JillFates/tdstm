@@ -35,7 +35,7 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType"/>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset?.environment}"/>
-											<td>
+											<td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
 												<kendo-dropdownlist
 														class="select"
 														name="modelAssetEnvironment"
@@ -51,7 +51,7 @@
 													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 												</label>
 											</td>
-											<td nowrap="nowrap" class="sizeScale">
+											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
 												<kendo-dropdownlist
 														class="select"
@@ -65,7 +65,7 @@
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
-											<td valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')}">
+											<td data-for="retireDate"  valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
 												<kendo-datepicker
 														name="modelAssetRetireDate"
 														[format]="dateFormat"
@@ -74,7 +74,7 @@
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
-											<td>
+											<td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
 												<kendo-dropdownlist
 														class="select"
 														name="modelAssetMoveBundle"
@@ -92,7 +92,7 @@
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
-											<td valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')}">
+											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
 												<kendo-datepicker
 														name="modelAssetMainExpDate"
 														[format]="dateFormat"
@@ -101,7 +101,7 @@
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
-											<td>
+											<td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
 												<kendo-dropdownlist
 														class="select"
 														name="modelAssetPlanStatus"
@@ -117,7 +117,7 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="22"/>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
-											<td>
+											<td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
 												<kendo-dropdownlist
 														class="select"
 														name="modelAssetValidation"

@@ -13,9 +13,9 @@ class ApplicationDetailsPage extends Page{
     static content = {
         adModalWindow                   (wait:true) { $("div","aria-describedby":"showEntityView","aria-labelledby":"ui-id-7")}
         adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title")}
-
+        adModalPlanningContainer { adModalWindow.find(".dialog .planning-application-table")}
         // TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
-        adModalAppName                  { adModalWindow.find("tr:nth-child(1) td:nth-child(2).C span")[0]}
+        adModalAppName                  { adModalPlanningContainer.find("tr:nth-child(1) td span")[2]}
         adModalDescription              { adModalWindow.find("span","data-content":"Description")}
         adModalSME1                     { adModalWindow.find("span","data-content":"SME1")}
         adModalSME2                     { adModalWindow.find("span","data-content":"SME2")}

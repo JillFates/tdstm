@@ -11,7 +11,7 @@ import jodd.util.RandomString
 
 
 @Stepwise
-class AssetViewCreationSpec extends GebReportingSpec {
+class ViewManagerCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -72,6 +72,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
         given: "I am creating a view"
             createViewModule.displayed
         when: "I select random fields (checkboxes) and filter the selected ones"
+            createViewModule.clickSpecificCheckbox("Name")
             createViewModule.selectRandomCheckboxes()
             createViewModule.filterFields("Selected")
         then: "Only the selected checkboxes are displayed"
@@ -118,7 +119,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
     def "10. Validate created View is listed"() {
         testKey = "TM-8500"
         given: "User saves the created view"
-            waitFor{createViewModule.clickSave()}
+            waitFor{createViewModule.firstSave()}
             at SaveViewPage
             waitFor{enterName(viewName)}
             waitFor{clickSave()}

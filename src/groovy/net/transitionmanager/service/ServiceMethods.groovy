@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
@@ -18,8 +19,6 @@ trait ServiceMethods {
 	MessageSourceService messageSourceService
 	SecurityService securityService
 
-
-
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can
 	 * be the correct type (e.g. Long) or a String/GString (CharSequence) since
@@ -34,9 +33,10 @@ trait ServiceMethods {
 	 * instance is found, otherwise return null
 	 * @return  the instance
 	 */
-	def <T> T get(Class<T> type, id, Project currentProject, boolean throwException = true) {
+	@CompileStatic
+	<T> T get(Class<T> type, Object id, Project currentProject, boolean throwException = true) {
 		T t
-		if (!id){
+		if (id == null){
 			throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
 		}
 
@@ -61,7 +61,7 @@ trait ServiceMethods {
 			t = doGet(type, ((Number)id).longValue(), throwException)
 		}
 
-		if(!t) {
+		if(t == null) {
 			throw new InvalidParamException("Unable to retrieve an instance of $type.name with unsupported id type $id (${id?.getClass()?.name})")
 		}
 
@@ -201,7 +201,7 @@ trait ServiceMethods {
 	 * @param args - message arguments to interpolate, e.g. `{0}` marks
 	 * @param defaultMessage - default message if message code is not found
 	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
-	 */	
+	 */
 	void throwException(Class exception, String messageCode, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
 		throwException(exception, messageCode, [] as Object[], defaultMessage, locale)
 	}
@@ -212,7 +212,7 @@ trait ServiceMethods {
 	 * @param args - message arguments to interpolate, e.g. `{0}` marks
 	 * @param defaultMessage - default message if message code is not found
 	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
-	 */	
+	 */
 	void throwException(Class exception, String messageCode, List args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
 		String i18nMsg = i18nMessage(messageCode, args as Object[], defaultMessage, locale)
 		Exception ex = exception.newInstance(i18nMsg)

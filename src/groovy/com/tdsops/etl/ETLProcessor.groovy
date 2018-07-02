@@ -1004,7 +1004,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	private void initializeDefaultGlobalTransformations(){
 		globalTransformers.add(Trimmer)
-		//  globalTransformers.add(Sanitizer)
+		globalTransformers.add(Sanitizer)
 	}
 
 	/**

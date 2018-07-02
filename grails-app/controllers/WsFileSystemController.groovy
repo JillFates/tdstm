@@ -29,6 +29,30 @@ class WsFileSystemController implements ControllerMethods{
         doFileUpload(uploadTextCommand)
     }
 
+	/**
+	 * Endpoint for creating a temporary file in the system from a text input and file extension
+	 * from the ETLDesigner to the server.
+	 * @param extension
+	 * @param content
+	 * @return temporary file's name
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadTextETLDesigner(UploadTextCommand uploadTextCommand) {
+		doFileUploadETLDesigner(uploadTextCommand)
+	}
+
+	/**
+	 * Endpoint for creating a temporary file in the system from a text input and file extension
+	 * from the Asset Import (ETL) to the server.
+	 * @param extension
+	 * @param content
+	 * @return temporary file's name
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadTextETLAssetImport(UploadTextCommand uploadTextCommand) {
+		doFileUploadETLAssetImport(uploadTextCommand)
+	}
+
     /**
      * Endpoint for uploading a file to the server.
      * @param fileUploadCommand
@@ -36,17 +60,58 @@ class WsFileSystemController implements ControllerMethods{
      */
     @HasPermission(Permission.UserGeneralAccess)
     def uploadFile(UploadFileCommand fileUploadCommand) {
-        doFileUpload(fileUploadCommand)
+	    doFileUpload(fileUploadCommand)
     }
+
+    /**
+     * Endpoint for uploading a file from the ETLDesigner to the server.
+     * @param fileUploadCommand
+     * @return
+     */
+    @HasPermission(Permission.UserGeneralAccess)
+    def uploadFileETLDesigner(UploadFileCommand fileUploadCommand) {
+	    doFileUploadETLDesigner(fileUploadCommand)
+    }
+
+	/**
+	 * Endpoint for uploading a file from the Asset Import (ETL) to the server.
+	 * @param fileUploadCommand
+	 * @return
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadFileETLAssetImport(UploadFileCommand fileUploadCommand) {
+		doFileUploadETLAssetImport(fileUploadCommand)
+	}
+
+	/**
+	 * Do the actual uploading of a file to the file system for the ETLDesigner.
+	 *
+	 * @param fileCommand
+	 * @return
+	 */
+	private def doFileUploadETLDesigner(FileCommand fileCommand) {
+		doFileUpload(fileCommand,  FileSystemService.ETL_SAMPLE_DATA_PREFIX)
+	}
+
+	/**
+	 * Do the actual uploading of a file to the file system for the Asset Import (ETL).
+	 *
+	 * @param fileCommand
+	 * @return
+	 */
+	private def doFileUploadETLAssetImport(FileCommand fileCommand) {
+		doFileUpload(fileCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX) // TODO: This should be in a Constant
+	}
 
     /**
      * Do the actual uploading of a file to the file system.
      *
      * @param fileCommand
+     * @param prefix for the uploaded file name
      * @return
      */
-    private def doFileUpload(FileCommand fileCommand) {
-        String fileName = fileSystemService.transferFileToFileSystem(fileCommand)
+    private def doFileUpload(FileCommand fileCommand, String prefix = '') {
+        String fileName = fileSystemService.transferFileToFileSystem(fileCommand, prefix)
         if (fileCommand.hasErrors()) {
             renderErrorJson(errorsInValidation(fileCommand.errors))
         } else {
