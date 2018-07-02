@@ -40,7 +40,7 @@ class MockETLController implements ControllerMethods {
         iterate {
             domain Application
         
-            extract 1 transform with toLong() load 'id' set applicationIdVar
+            extract 1 load 'id' set applicationIdVar
             extract 'model name' transform with lowercase() load 'Name'
             extract 3 transform with uppercase() load 'description'
         
@@ -57,7 +57,7 @@ class MockETLController implements ControllerMethods {
             }
             
             domain Device
-            extract 1 transform with toLong() load 'id' set deviceIdVar
+            extract 1 load 'id' set deviceIdVar
             extract 'model name' transform with uppercase() load 'Name'
             find Device by 'id' with deviceIdVar into 'id'
         }\

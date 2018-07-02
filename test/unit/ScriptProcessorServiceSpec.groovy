@@ -4,6 +4,7 @@ import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.etl.TDSExcelDriver
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
@@ -83,7 +84,7 @@ class ScriptProcessorServiceSpec extends Specification {
 			fieldSpecsMap
 		}
 
-		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
+		ETLProcessorResult.registerObjectMarshaller()
 	}
 
 	def cleanup() {
