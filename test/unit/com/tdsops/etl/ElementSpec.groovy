@@ -17,7 +17,7 @@ class ElementSpec extends Specification {
 			String strAbcDate = 'abc-123'
 
 		expect:
-			new Element(value: strValue).sanitize().value == 'Test+String'
+			new Element(value: strValue).sanitize().value == 'Test String'
 			new Element(value: strValue).left(4).value == 'Test'
 			new Element(value: strValue).right(4).value == 'ring'
 			new Element(value: strValue).middle(6, 3).value == 'Str'
