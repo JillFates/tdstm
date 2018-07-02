@@ -17,10 +17,21 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						</script>
 					</div>`,
 		restrict: 'E',
+		scope: {
+			selectedTags: '=',
+		},
 		controller: function ($scope) {
+			$scope.selectedTags = {
+				tags: [],
+				operator: ($(".asset-tag-selector-operator-switch").attr('checked'))? 'AND' : 'OR'
+			};
+
 			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
 				onLabel: "AND",
-				offLabel: "OR"
+				offLabel: "OR",
+				change: function(e) {
+					$scope.selectedTags.operator = ($(".asset-tag-selector-operator-switch").attr('checked'))? 'OR' : 'AND'
+				}
 			});
 			$(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "Name",
@@ -44,10 +55,12 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				open: selectTags,
 			});
 
-			function selectTags() {
+			function selectTags(e) {
 				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
 				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
+
+				$scope.selectedTags.tags = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 			}
 		}
 	};
