@@ -6,7 +6,7 @@ import geb.waiting.WaitTimeoutException
 class CommonsModule extends Module {
 
     static content = {
-        modalBackdrop {$('div[data-backdrop]')}
+        modalDialog {$('div#tdsUiDialog')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -45,7 +45,7 @@ class CommonsModule extends Module {
     }
 
     def waitForEtlScriptsModalHidden(){
-        waitFor{!$('div[data-backdrop]').jquery.attr("class").contains("in")}
+        waitFor{!modalDialog.jquery.attr("class").contains("in")}
     }
 
     def waitForTaskModal() {
