@@ -23,9 +23,13 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				offLabel: "OR"
 			});
 			$(".asset-tag-selector").kendoMultiSelect({
+				dataTextField: "Name",
+				dataValueField: "id",
+				filter: "startswith",
 				itemTemplate: $("#asset-tag-selector-item").html(),
 				tagTemplate: $("#asset-tag-selector-tag").html(),
 				dataSource: {
+					serverFiltering: false,
 					transport: {
 						read: (e) => {
 							$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
@@ -36,18 +40,15 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						}
 					}
 				},
-				change: function(e) {
-					// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
-					$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
-					$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
-				},
-				filter: "startswith",
-				filtering: function(e) {
-					//get filter descriptor
-					var filter = e.filter;
-					e.preventDefault();
-				}
+				change: selectTags,
+				open: selectTags,
 			});
+
+			function selectTags() {
+				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
+				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
+				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
+			}
 		}
 	};
 }
