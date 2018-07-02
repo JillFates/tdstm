@@ -2,7 +2,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
 						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" />
-						<select class="asset-tag-selector"></select>
+						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
 							<div class="asset-tag-selector-single-item">
@@ -36,12 +36,16 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						}
 					}
 				},
-				select: function (e) {
-					if($(e.item).hasClass("asset-tag-selector-item-selected")) {
-						$(e.item).removeClass("asset-tag-selector-item-selected");
-					} else {
-						$(e.item).addClass("asset-tag-selector-item-selected");
-					}
+				change: function(e) {
+					// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
+					$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
+					$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
+				},
+				filter: "startswith",
+				filtering: function(e) {
+					//get filter descriptor
+					var filter = e.filter;
+					e.preventDefault();
 				}
 			});
 		}
