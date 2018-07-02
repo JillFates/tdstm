@@ -251,4 +251,6 @@ databaseChangeLog = {
 	include file: '20180620-rename-etl-permissions.groovy'
 	include file: '20180613-add-http-method-api-action-table.groovy'
 	include file: '20180625-update-importance-values-for-c-and-i.groovy'
+	include file: '20180628-update-supportType-label-for-DEVICE-keys-in-Setting.groovy'
+
 }
