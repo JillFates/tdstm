@@ -9,7 +9,6 @@ import { HttpServiceProvider } from '../shared/providers/http-interceptor.provid
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
 import { PreferenceService } from '../shared/services/preference.service';
-import { UserService } from '../shared/services/user.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
@@ -92,7 +91,6 @@ import { DictionaryService } from './services/dictionary.service';
 		AuthService,
 		PermissionService,
 		PreferenceService,
-		UserService,
 		NotifierService,
 		UILoaderService,
 		HttpServiceProvider,

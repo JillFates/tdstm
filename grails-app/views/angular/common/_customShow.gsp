@@ -4,9 +4,7 @@
 	</g:if>
 		<tds:inputLabel field="${custom}" value="${asset.(custom.field)}"/>
 		<td class="valueNW ${custom.imp?:''} custom-label" width="60">
-			<span data-toggle="popover" data-trigger="hover" data-content="${custom.tip}" ${raw(j % 4 == 3 ? 'data-placement="bottom"': '')}>
-				<tds:textAsLink text="${asset?.(custom.field)}" target="_new"/>
-			</span>
+			<span><tds:textAsLink text="${asset?.(custom.field)}" target="_new"/></span>
 		</td>
 	<g:if test="${j % 4 == 3}">
 		</tr>

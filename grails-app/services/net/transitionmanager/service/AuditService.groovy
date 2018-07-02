@@ -28,8 +28,6 @@ class AuditService implements InitializingBean, ServiceMethods {
 	private static final Map AUDITED_PARAMS = [username: true, id: true, _action_Delete: true, moveBundleId: true,
 	                                           assetEntityId: true, moveEventId: true]
 
-	SecurityService securityService
-
 	void afterPropertiesSet() {
 		AUDIT_TYPE = grailsApplication.config.tdstm.security.auditLogging ?: AUDIT_TYPE_ACCESS
 		AUDIT_ACTIVITY = AUDIT_TYPE == AUDIT_TYPE_ACTIVITY

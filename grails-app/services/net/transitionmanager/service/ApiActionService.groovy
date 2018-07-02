@@ -8,6 +8,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
@@ -35,8 +36,6 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.codehaus.groovy.control.ErrorCollector
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -50,7 +49,6 @@ class ApiActionService implements ServiceMethods {
 	]
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	SecurityService securityService
 	CustomDomainService customDomainService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
@@ -66,6 +64,7 @@ class ApiActionService implements ServiceMethods {
 	 * Get a list of agent names
 	 * @return
 	 */
+	@NotTransactional()
 	List<String> agentNamesList () {
 		List<Map> agents = new ArrayList<>()
 
@@ -88,6 +87,7 @@ class ApiActionService implements ServiceMethods {
 	 * @return the method dictionary for the specified agent code
 	 * @throws InvalidParamException when
 	 */
+	@NotTransactional()
 	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []

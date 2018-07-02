@@ -30,11 +30,14 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Slf4j
 class ScriptProcessorService {
 
-    CustomDomainService customDomainService
+	CustomDomainService customDomainService
 	FileSystemService fileSystemService
 	SecurityService securityService
 	ProgressService progressService
 	Scheduler quartzScheduler
+
+	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
+	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -70,6 +73,7 @@ class ScriptProcessorService {
 	 */
 	def executeAndSaveResultsInFile(
 		Project project,
+		Long dataScriptId,
 		String scriptContent,
 		String filename,
 		ProgressCallback progressCallback = null,
@@ -81,10 +85,14 @@ class ScriptProcessorService {
 			new DebugConsole(buffer: new StringBuffer()),
 			createFieldsSpecValidator(project))
 
+		if(dataScriptId){
+			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
+		}
+
 		etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
 
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'json')
-		os << (etlProcessor.resultsMap(includeConsoleLog) as JSON)
+		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
 		os.close()
 
 		progressCallback.reportProgress(
@@ -151,7 +159,7 @@ class ScriptProcessorService {
 
 	     if (etlProcessor) {
 		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.resultsMap()
+		     result.data = etlProcessor.finalResult()
 	     }
 
         return result
@@ -186,6 +194,7 @@ class ScriptProcessorService {
 		Boolean includeConsoleLog = true
 		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
 			project,
+			null,
 			scriptContent,
 			sampleDataFullFilename,
 			updateProgressClosure,
@@ -264,7 +273,7 @@ class ScriptProcessorService {
 		}
 
 		// create test script temporary file
-		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile('testETLScript')
+		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile(TEST_SCRIPT_PREFIX)
 		IOUtils.write(command.script, os)
 		os.flush()
 		os.close()

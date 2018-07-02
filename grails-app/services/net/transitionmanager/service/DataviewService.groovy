@@ -27,8 +27,6 @@ class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
 
-	SecurityService securityService
-
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
@@ -300,6 +298,32 @@ class DataviewService implements ServiceMethods {
         DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
         return previewQuery(project, dataviewSpec)
     }
+
+	/**
+	 * Gets the hql for filtering by asset ids, based of the filters from the all asset views.
+	 *
+	 * @param project The current project used to limit the query.
+	 * @param dataViewId The id of the dataview used in generating the DataviewSpec.
+	 * @param userParams the user parameters from the front end that are used in generating the DataviewSpec.
+	 *
+	 * @return a map containing the hql query string, and the parameters needed to run the query.
+	 */
+	Map getAssetIdsHql (Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
+		Dataview dataview = get(Dataview,dataViewId, project)
+		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
+		Map whereInfo = hqlWhere(dataviewSpec, project)
+	    String conditions = whereInfo.conditions
+	    String hqlJoins = hqlJoins(dataviewSpec)
+
+	    String query = """
+	        SELECT AE.id
+	        FROM AssetEntity AE
+	        $hqlJoins
+	        WHERE AE.project = :project AND $conditions
+	    """
+
+		return [query: query, params: whereInfo.params]
+	}
 
     /**
      * Perform a query against one or domains specified in the DataviewSpec passed into the method

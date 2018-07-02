@@ -17,7 +17,6 @@ class NoticeService implements ServiceMethods {
 
 	MessageSource messageSource
 	PersonService personService
-	SecurityService securityService
 
 	/**
 	 * Set Acknowledment of a Note for a User

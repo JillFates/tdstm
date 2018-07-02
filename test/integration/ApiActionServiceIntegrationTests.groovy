@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.JsonUtil
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
@@ -21,9 +22,9 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-//import spock.lang.Specification
-import spock.lang.*
+import spock.lang.Ignore
+import spock.lang.Specification
+import spock.lang.Title
 import test.helper.ProviderTestHelper
 
 @Title('Tests for the ApiActionService class')
@@ -44,16 +45,19 @@ class ApiActionServiceIntegrationTests extends Specification {
 		[ { "param": "taskId",
 			"desc": "The id of the task",
 			"context": "${ContextType.TASK.name()}",
-			"property": "id"
+			"paramName": "taskId",
+			"fieldName": "id"
 		  },
 		  {	"param": "serverRefId",
 			"desc": "The unique id used to reference the server in the API",
 			"context": "${ContextType.ASSET.name()}",
-			"property": "assetName"
+			"paramName": "serverRefId",
+			"fieldName": "assetName"
 		  },
 		  {	"param": "groupRefCode",
 			"context": "${ContextType.USER_DEF.name()}",
-			"value": "xk324-kj1i2-23ks-9sdl"
+			"value": "xk324-kj1i2-23ks-9sdl",
+			"paramName": "groupRefCode"
 		  }
 		]
 	"""
@@ -61,20 +65,22 @@ class ApiActionServiceIntegrationTests extends Specification {
 	void setup() {
 		project = projectHelper.createProject()
 		project.save(flush:true)
-		// println "projct ${project.hasErrors()}, ${project.id}"
 
 		action = new ApiAction(
 			name:'testAction',
 			description: 'This is a bogus action for testing',
-			agentClass: AgentClass.AWS,
-			agentMethod: 'sendSnsNotification',
+			agentClass: AgentClass.HTTP,
+			agentMethod: 'callEndpoint',
 			methodParams: paramsJson,
 			asyncQueue: 'test_outbound_queue',
 			callbackMethod: 'updateTaskState',
 			callbackMode: CallbackMode.MESSAGE,
+			httpMethod: ApiActionHttpMethod.GET,
 			project: project
 		)
-		if (action.hasErrors()) println "action has errors: ${GormUtil.allErrorsString(action)}"
+		if (action.hasErrors()) {
+			println "action has errors: ${GormUtil.allErrorsString(action)}"
+		}
 		action.save(flush:true)
 
 		asset = new AssetEntity(
@@ -101,15 +107,17 @@ class ApiActionServiceIntegrationTests extends Specification {
 		when: 'calling agentClassForAction to get an implemented ApiAction'
 			clazz = apiActionService.agentClassForAction(action)
 		then: 'the specified class should be returned'
-			clazz == net.transitionmanager.agent.AwsAgent
+			clazz == net.transitionmanager.agent.HttpAgent
 
 		when: 'the method is called referencing an unimplemented Agent'
 			action.agentClass = AgentClass.RACIME
 			clazz = apiActionService.agentClassForAction(action)
 		then: 'an exception should be thrown'
-			thrown InvalidRequestException
+			thrown MissingPropertyException
 	}
 
+	@Ignore
+	// TODO : SL 6/2018 : Test being ignored until AWS Agent will be reestablished
 	def '2. Tests for the agentInstanceForAction method'() {
 		setup: 'requires an Object to hold the Agent instance so that'
 			Object aws
@@ -137,96 +145,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 			methodDef
 			(methodDef instanceof DictionaryItem)
 		and: 'the method name is the one expected'
-			methodDef.name == action.agentMethod
+			methodDef.agentMethod == action.agentMethod
 
 		when: 'the ApiAction has an unimplemented Agent'
-			action.agentClass = AgentClass.RACIME
+			action.agentClass = AgentClass.VCENTER
 			clazz = apiActionService.methodDefinition(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
 	}
 
-	def '4. Tests for ApiAction.methodParamsList'() {
-		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
-		setup:
-			List paramsList
-
-		when: 'accessing the methodParamsList property a.k.a. methodParamsList()'
-			paramsList = action.methodParamsList
-		then: 'a list containing a map representing each of the method params should be returned'
-			paramsList
-			paramsList.size() == 3
-		and: 'the first map in the list should be the taskId as defined paramsJson above'
-			paramsList[0].param == 'taskId'
-			paramsList[0].context == 'TASK'
-			paramsList[0].property == 'id'
-			paramsList[0].desc
-	}
-
-
-	def '4.2 Tests for ApiAction.listMethodParams'() {
-		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
-		setup:
-			List paramsList
-
-		when: 'accessing the methodParamsList property a.k.a. methodParamsList()'
-			paramsList = action.listMethodParams
-		then: 'a list containing a map representing each of the method params should be returned'
-			paramsList
-			paramsList.size() == 3
-		and: 'the first map in the list should be the taskId as defined paramsJson above'
-			paramsList[0].param == 'taskId'
-			paramsList[0].context == 'TASK'
-			paramsList[0].property == 'id'
-			paramsList[0].desc
-	}
-
-	def '5. Test for AssetComment.actionInvocable'() {
-		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
-
-		when: 'the apiActionInvokedAt property is set'
-			task.status = AssetCommentStatus.READY
-			task.apiActionInvokedAt = new Date()
-		then: 'the task action should not be invocable because it was already invoked'
-			! task.isActionInvocable()
-
-		when: 'the apiActionCompletedAt property is set'
-			task.apiActionInvokedAt = null
-			task.apiActionCompletedAt = new Date()
-		then: 'the task action should not be invocable because it was already invoked and completed'
-			! task.isActionInvocable()
-
-		when: 'the task status is not Ready or Started'
-			task.status = AssetCommentStatus.PENDING
-			task.apiActionInvokedAt = null
-			task.apiActionCompletedAt = null
-		then: 'the task action should not be invocable'
-			! task.isActionInvocable()
-
-		when: 'the task status is READY and has not been previously invoked'
-			task.status = AssetCommentStatus.READY
-			task.apiActionInvokedAt = null
-			task.apiActionCompletedAt = null
-		then: 'the task action should be invocable'
-			task.isActionInvocable()
-
-		when: 'the task status is set to STARTED'
-			task.status = AssetCommentStatus.STARTED
-		then: 'the task action should still be invocable'
-			task.isActionInvocable()
-
-		when: 'the task status is set to COMPLETED'
-			task.status = AssetCommentStatus.COMPLETED
-		then: 'the task action should not be invocable since people may jump directly to COMPLETED'
-			! task.isActionInvocable()
-
-		when: 'the task apiAction property is not set'
-			task.apiAction = null
-		then: 'the task action should not be invocable'
-			! task.isActionInvocable()
-	}
-
-	def '6. Tests for buildMethodParamsWithContext'() {
+	def '4. Tests for buildMethodParamsWithContext'() {
 		setup:
 			Map methodParamsMap
 		when: 'calling the method with the AwsAgent and the above mocked task'
@@ -241,7 +169,9 @@ class ApiActionServiceIntegrationTests extends Specification {
 			asset.assetName == methodParamsMap.serverRefId
 	}
 
-	def '7. Test the invoke method'() {
+	@Ignore
+	// TODO : SL 6/2018 : Test being ignored until AWS Agent will be reestablished
+	def '5. Test the invoke method'() {
 		setup: 'will inject a mock awsService into the AwsAgent class to stub out calls to AWS so that'
 			AwsService awsService = Mock()
 			AwsAgent awsAgent = AwsAgent.instance
@@ -253,17 +183,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
 	}
 
-	@Ignore
-	def "8. tests not yet implemented"() {
-		//		expect: 'when calling invoke without a valid context that an exception occurs'
-		//			false
-		//		expect: 'when calling invoke with a defined parameter that references an undefined property that an an exception occurs'
-		//			false
-		expect:
-				true
-	}
-
-	def "9. tests deleting an ApiAction and other related methods"() {
+	def "6. tests deleting an ApiAction and other related methods"() {
 		setup: "Create an API Action"
 			ApiAction apiAction = apiActionHelper.createApiAction(project)
 		when: "Looking up this API Action"
@@ -278,7 +198,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			apiActionService.list(project).size() == 0
 	}
 
-	def "10. tests deleting an API Action for a different project"() {
+	def "7. tests deleting an API Action for a different project"() {
 		setup: "Create a API Action for different projects"
 			Project project2 = projectHelper.createProject()
 			ApiAction apiAction1 = apiActionHelper.createApiAction(project)
@@ -321,7 +241,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	}
 
-	def "11. Test validateApiActionName with different values"() {
+	def "8. Test validateApiActionName with different values"() {
 		given: "Two projects with an API Action each."
 			Project project1 = projectHelper.createProject()
 			Project project2 = projectHelper.createProject()
@@ -342,7 +262,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	}
 
-	def "12. Test Create ApiActions with valid and invalid data"() {
+	def "9. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
 			Provider provider1 = providerHelper.createProvider(project)
 			String apiName = RSU.randomAlphabetic(10)
@@ -351,7 +271,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				name = apiName
 				description = "some description"
 				provider = provider1
-				agentClass = "AWS"
+				agentClass = "HTTP"
 				agentMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
@@ -365,6 +285,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				pollingStalledAfter = 0
 				useWithTask = 0
 				useWithAsset = 0
+				httpMethod = ApiActionHttpMethod.GET
 				methodParams = """
 						[ {
 							"param":"assetId",
@@ -378,96 +299,97 @@ class ApiActionServiceIntegrationTests extends Specification {
 			}
 
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The operation succeeded"
 			apiAction != null
 		when: "Trying to create a second API Action with the same name"
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "A ValidationException is thrown"
-			thrown ValidationException
+			thrown InvalidParamException
 		when: "Trying to create an ApiAction with missing params"
 			cmd.agentMethod = null
 			cmd.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The missing field causes the validation step to fail with a ValidationException."
 			thrown ValidationException
 		when: "Trying to assign a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
 			cmd.provider = provider2
-			cmd.agentClass = "AWS"
-			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			cmd.agentClass = "HTTP"
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The invalid reference makes the validation fail with a ValidationException."
 			thrown ValidationException
 
 		when: "methodParams contains an invalid JSON "
 			cmd.methodParams = """
 				[ {
-					'param':"assetId"
+					'param':"assetId",
 				} ]
 			"""
-			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The invalid JSON makes the validation fail with a ValidationException."
-			thrown ValidationException
+			thrown InvalidParamException
 	}
 
-	def "13. Test Create ApiActions with valid and invalid data"() {
+	def "10. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
-		Provider provider1 = providerHelper.createProvider(project)
-		String apiName = RSU.randomAlphabetic(10)
-		ApiActionCommand cmd = new ApiActionCommand()
-		cmd.with {
-			name = apiName
-			description = "some description"
-			provider = provider1
-			agentClass = "AWS"
-			agentMethod = "X"
-			callbackMode = "NA"
-			callbackMethod = "Y"
-			asyncQueue = "AQ"
-			producesData = 0
-			pollingInterval = 0
-			timeout = 0
-			reactionScripts = "{\"SUCCESS\": \"success\",\"STATUS\": \"status\",\"ERROR\": \"error\"}"
-			isPolling = 0
-			pollingLapsedAfter = 0
-			pollingStalledAfter = 0
-			useWithTask = 0
-			useWithAsset = 0
-		}
+			Provider provider1 = providerHelper.createProvider(project)
+			String apiName = RSU.randomAlphabetic(10)
+			ApiActionCommand cmd = new ApiActionCommand()
+			cmd.with {
+				name = apiName
+				description = "some description"
+				provider = provider1
+				agentClass = "HTTP"
+				agentMethod = "X"
+				callbackMode = "NA"
+				callbackMethod = "Y"
+				asyncQueue = "AQ"
+				producesData = 0
+				pollingInterval = 0
+				timeout = 0
+				reactionScripts = "{\"SUCCESS\": \"success\",\"STATUS\": \"status\",\"ERROR\": \"error\"}"
+				isPolling = 0
+				pollingLapsedAfter = 0
+				pollingStalledAfter = 0
+				useWithTask = 0
+				useWithAsset = 0
+				httpMethod = ApiActionHttpMethod.GET
+			}
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The operation succeeded"
 			apiAction != null
 		when: "Trying to update the API Action with a different name"
 			String newName =  RSU.randomAlphabetic(10)
 			cmd.name = newName
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, project)
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, 0, project)
 		then: "the name was updated"
 			apiAction2.name == newName
 		and: "the id didn't change (the action was updated)"
 			apiAction.id == apiAction2.id
 		when: "we try to update the name to that of an existing Action"
 			cmd.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd,null, project)
-			apiAction = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, project)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
+			apiAction = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, 0, project)
 		then: "The name fails the validations throwing a ValidationException"
-			thrown ValidationException
+			thrown InvalidParamException
 		when: "Trying to update with a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
 			cmd.name = RSU.randomAlphabetic(10)
 			cmd.provider = provider2
-			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction2.id, project)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction2.id, 0, project)
 		then: "A ValidationException is thrown"
 			thrown ValidationException
 	}
 
-	def "14. Test parseEnum with different valid and invalid inputs"(){
+	def "11. Test parseEnum with different valid and invalid inputs"(){
 		when: "Trying to parse a valid value"
-			AgentClass agentClass = apiActionService.parseEnum(AgentClass, "someField", "AWS")
+			AgentClass agentClass = apiActionService.parseEnum(AgentClass, "someField", "HTTP")
 		then: "The correct value was parsed"
-			agentClass == AgentClass.AWS
+			agentClass == AgentClass.HTTP
 		when: "Trying with an invalid value"
 			agentClass = apiActionService.parseEnum(AgentClass, "someField", RSU.randomAlphabetic(10), true, true)
 		then: "An InvalidParamException is thrown"
@@ -481,12 +403,12 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: "An InvalidParamException is thrown"
 			thrown InvalidParamException
 		when: "Trying with a null class.	"
-			agentClass = apiActionService.parseEnum(null, "someField", "AWS")
+			agentClass = apiActionService.parseEnum(null, "someField", "HTTP")
 		then: "An NullPointerException is thrown"
 			thrown NullPointerException
 	}
 
-	def "15. Test reactionScripts for The API Action in different scenarios" () {
+	def "12. Test reactionScripts for The API Action in different scenarios" () {
 		setup: "Create a valid ApiActionCommand"
 			Provider provider1 = providerHelper.createProvider(project)
 			ApiAction apiAction = new ApiAction(project: project)
@@ -494,7 +416,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				name = RSU.randomAlphabetic(10)
 				description = "some description"
 				provider= provider1
-				agentClass = "AWS"
+				agentClass = "HTTP"
 				agentMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"

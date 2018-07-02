@@ -55,14 +55,21 @@ export class DataScriptListComponent implements OnInit {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		dataScripts.subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.resultSet.forEach(x => {
-					x['modeFormat'] = (x.mode as any) ? 'Export' : 'Import';
-				});
-				this.gridData = process(this.resultSet, this.state);
-			},
+			(result) => this.setDataGrid(result),
 			(err) => console.log(err));
+	}
+
+	/**
+	 * Set the grid data, mapping the modeFormat column
+	 * @param {DataScriptModel[]} result
+	 */
+	setDataGrid(result: DataScriptModel[]): void {
+		this.resultSet = result;
+		this.resultSet.forEach(item => {
+			item['modeFormat'] = item.mode ? 'Export' : 'Import'
+		});
+
+		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
@@ -162,10 +169,7 @@ export class DataScriptListComponent implements OnInit {
 
 	protected reloadDataScripts(): void {
 		this.dataIngestionService.getDataScripts().subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-			},
+			(result: DataScriptModel[]) => { this.setDataGrid(result); },
 			(err) => console.log(err));
 	}
 

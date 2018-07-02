@@ -1,7 +1,10 @@
 package com.tdsops.etl
 
+import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+
+import java.text.SimpleDateFormat
 
 /**
  * Element represents extract/transform/load ETL command
@@ -38,6 +41,10 @@ class Element implements RangeChecker {
 	 * ETL Field defined by the label and field name
 	 */
 	ETLFieldDefinition fieldDefinition
+	/**
+	 * ETL field convertion or transformation errors
+	 */
+	List<String> errors
 
 	/**
 	 * Defines if an Element instance was created by:
@@ -159,6 +166,22 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Try to get a property from the content we delegate to the value in case that it is a Map
+	 * <code>
+	 *      load 'custom2' with attribsVar.cpu
+	 * 		load 'custom3' with attribsVar.storage.size()
+	 * <code>
+	 * The get is called when the parser evalates the attribs.* and passes the .propertyName to the
+	 * method. The get method then return's that property (e.g. cpu and storage)
+	 *
+	 * @param name
+	 * @return
+	 */
+	Object get(String name) {
+		return value."$name"
+	}
+
+	/**
 	 * Middle transformation. It takes <code>n</code> characters from position  <code>m</code>
 	 * <code>
 	 *      load ... transformation with take(n, m)
@@ -261,6 +284,40 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Transform current value in this Element instance to a Date
+	 * <code>
+	 *     extract ... transform with toDate('yyyy-mm-dd', 'yyyy/mm/dd', 'mm/dd/yyyy') load ...
+	 * </code>
+	 *
+	 * @param format - an array of possible date formats to use
+	 * @return - a date instance
+	 */
+	Element toDate(String... format) {
+		if (CollectionUtils.isEmpty(format)) {
+			return this
+		}
+
+		// if value is blank or null then log an error
+		if (StringUtil.isBlank(value)) {
+			addToErrors("Not able to transform blank or null date: ${value}")
+			return this
+		}
+
+		for (String pattern : format) {
+			try {
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
+				simpleDateFormat.setLenient(false)
+				value = simpleDateFormat.parse(value)
+				break
+			} catch (Exception e) {
+				addToErrors("Not able to transform date: ${value}, pattern: ${pattern}")
+			}
+		}
+
+		return this
+	}
+
+	/**
 	 * Replace all of the escape characters
 	 * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
 	 * and replaces any non-printable, control and special unicode character
@@ -270,7 +327,7 @@ class Element implements RangeChecker {
 	 */
 	Element sanitize() {
 		value = transformStringObject('sanitize', value) {
-			StringUtil.sanitizeAndStripSpaces(it)
+			StringUtil.sanitize(it)
 		}
 		return this
 	}
@@ -280,12 +337,18 @@ class Element implements RangeChecker {
 	 * <code>
 	 *      load ... transformation with trim()
 	 * <code>
+	 * @param safe this parameter defines if it is necessary to check the Element#value type
 	 * @return the element instance that received this command
 	 */
-	Element trim() {
-		value = transformStringObject('trim', value) {
-			it.trim()
+	Element trim(Boolean safe = false) {
+		if (safe){
+			value = (value instanceof CharSequence) ? value.trim() : value
+		} else {
+			value = transformStringObject('trim', value) {
+				it.trim()
+			}
 		}
+
 		return this
 	}
 
@@ -587,6 +650,19 @@ class Element implements RangeChecker {
 		}
 
 		return retVal
+	}
+
+	/**
+	 *
+	 * @param err
+	 * @return
+	 */
+	private addToErrors(String err) {
+		if (!errors) {
+			errors = new ArrayList<>()
+		}
+		processor?.debugConsole?.info err
+		errors.add err
 	}
 
 	@Override

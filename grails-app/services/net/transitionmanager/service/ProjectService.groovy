@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-import com.tdssrc.grails.TimeUtil
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -60,6 +59,7 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -71,7 +71,6 @@ class ProjectService implements ServiceMethods {
 	AuditService auditService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	SecurityService securityService
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
@@ -1331,31 +1330,26 @@ class ProjectService implements ServiceMethods {
 	private void fillUsersMetrics(metricsByProject, List<Project> projects, sqlSearchDate) {
 
 		def projectDailyMetric
-		def companyIds = [0]
-		Map projectsMapByCompanyId = [:]
-
-		projects.each { p ->
-			companyIds << p.client.id
-			projectsMapByCompanyId[p.client.id] = p
-		}
 
 		String personsCountsQuery = '''
-			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons,
-			       count(u.username) as totalUserLogins, count(u_active.username) as activeUserLogins
-			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
-			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
-			LEFT OUTER JOIN user_login u_active on p.person_id=u_active.person_id AND u_active.last_modified > (? - INTERVAL 1 DAY)
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE pg.party_group_id in (''' + companyIds.collect { NumberUtil.toLong(it) }.join(',') + ''')
-			GROUP BY pg.party_group_id
+			SELECT
+			  pr.party_id_from_id projectId,
+			  COUNT(distinct party_id_to_id) as totalPersons,
+			  COUNT(distinct u.username) as totalUserLogins,
+			  COUNT(distinct ulpa.user_login_id, ulpa.date) as activeUserLogins
+			FROM party_relationship pr
+			  LEFT OUTER JOIN user_login u ON pr.party_id_to_id = u.person_id
+			  LEFT OUTER JOIN user_login_project_access ulpa ON PR.party_id_from_id = ulpa.project_id and ulpa.date = ?
+			WHERE
+			  pr.role_type_code_from_id='PROJECT' AND
+			  pr.party_relationship_type_id='PROJ_STAFF' AND
+			  pr.role_type_code_to_id='STAFF'
+			  AND pr.party_id_from_id in (''' + (projects*.id).join(',') + ''')
+			GROUP BY pr.party_id_from_id
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
-			def project = projectsMapByCompanyId[it.companyId]
-			projectDailyMetric = metricsByProject[project.id]
+			projectDailyMetric = metricsByProject[it.projectId]
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins

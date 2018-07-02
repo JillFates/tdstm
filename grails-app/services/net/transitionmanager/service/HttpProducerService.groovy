@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialStatus
@@ -73,8 +74,8 @@ import java.util.regex.Pattern
 class HttpProducerService {
     private static final String FILENAME_PREFIX = 'download-'
     private static final String HTTP_METHOD = 'HttpMethod'
-    private static final String VALID_HTTP_METHODS = /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$/
-    private static final String DEFAULT_HTTP_METHOD = HttpMethod.GET.name()
+//    private static final String VALID_HTTP_METHODS = /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$/
+//    private static final String DEFAULT_HTTP_METHOD = HttpMethod.GET.name()
     private static final String DEFAULT_CONTENT_TYPE_HEADER = MediaType.APPLICATION_JSON_VALUE
     private static final String DEFAULT_ACCEPT_HEADER = MediaType.APPLICATION_JSON_VALUE
     private static final int DEFAULT_REQUEST_TIMEOUT = -1
@@ -398,11 +399,13 @@ class HttpProducerService {
      */
     @Transactional(noRollbackFor = [RuntimeException])
     private HttpResponse invokeActionRequest(ActionRequest actionRequest) {
-        // set http method if provided, else, default
-        String method = DEFAULT_HTTP_METHOD
+        // set http method from the ApiAction
+        String method = actionRequest.options.apiAction.httpMethod
+
+        // override http method if provided in the pre script
         if (actionRequest.config.hasProperty(HTTP_METHOD)) {
             String httpMethod = actionRequest.config.getProperty(HTTP_METHOD)
-            if (httpMethod ==~ VALID_HTTP_METHODS) {
+            if (ApiActionHttpMethod.isValidHttpMethod(httpMethod)) {
                 method = actionRequest.config.getProperty(HTTP_METHOD)
             } else {
                 throw new RuntimeException("Invalid HTTPMethod ${httpMethod} has not been provided in the PRE script")

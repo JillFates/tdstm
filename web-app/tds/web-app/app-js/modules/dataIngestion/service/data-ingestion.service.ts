@@ -32,6 +32,9 @@ export class DataIngestionService {
 	private dataScriptUrl = '../ws/dataScript';
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
+	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
+	private ETLScriptUploadTextURL = '../ws/fileSystem/uploadTextETLDesigner';
+	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
 
 	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
 	}
@@ -116,12 +119,10 @@ export class DataIngestionService {
 		}
 	}
 
-	getAgents(): Observable<AgentModel[]> {
-		return this.http.get(`${this.dataApiActionUrl}/agent`)
+	getAPIActionEnums(): Observable<any> {
+		return this.http.get(`${this.dataApiActionUrl}/enums`)
 			.map((res: Response) => {
-				let result = res.json();
-				let agentModels = result;
-				return agentModels;
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}
@@ -339,6 +340,7 @@ export class DataIngestionService {
 			provider: { id: model.provider.id },
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
+			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
 			docUrl: model.docUrl,
 			producesData: (model.producesData) ? 1 : 0,
@@ -639,10 +641,44 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
+	uploadETLScriptFileText(content: string, extension: string): Observable<any> {
+		let postRequest = {
+			content: content,
+			extension: extension
+		};
+		return this.http.post(this.ETLScriptUploadTextURL, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
 		const headers = new Headers({});
 		const options = new RequestOptions({ headers: headers });
 		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
+			.map((res: Response) => {
+				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadETLScriptFile(formdata: any): Observable<any | HttpResponse<any>> {
+		const headers = new Headers({});
+		const options = new RequestOptions({ headers: headers });
+		return this.http.post(this.ETLScriptUploadURL, formdata, options)
+			.map((res: Response) => {
+				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadAssetImportFile(formdata: any): Observable<any | HttpResponse<any>> {
+		const headers = new Headers({});
+		const options = new RequestOptions({ headers: headers });
+		return this.http.post(this.assetImportUploadURL, formdata, options)
 			.map((res: Response) => {
 				let response = res.json().data;
 				return new HttpResponse({status: 200, body: { data : response } });

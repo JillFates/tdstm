@@ -1,5 +1,7 @@
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -12,9 +14,9 @@ import spock.lang.Ignore
 
 class DataviewServiceIntegrationSpec extends IntegrationSpec {
 
-	DataviewService dataviewService
+	DataviewService               dataviewService
 	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
-	test.helper.PersonTestHelper personHelper = new test.helper.PersonTestHelper()
+	test.helper.PersonTestHelper  personHelper      = new test.helper.PersonTestHelper()
 
 	void '1. test create dataview without project throws exception'() {
 		setup:
@@ -49,11 +51,11 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 			Project project = projectTestHelper.createProject()
 			Person person = personHelper.createPerson()
 			dataviewService.securityService = [
-					hasPermission: { return true },
-					getUserCurrentProject: { return project },
-					loadCurrentPerson: { return person },
-					isLoggedIn: { return true },
-					getCurrentPersonId: { return person.id }] as SecurityService
+				hasPermission        : { return true },
+				getUserCurrentProject: { return project },
+				loadCurrentPerson    : { return person },
+				isLoggedIn           : { return true },
+				getCurrentPersonId   : { return person.id }] as SecurityService
 
 			JSONObject dataviewJson1 = createDataview(null)
 			JSONObject dataviewJson2 = createDataview(null)
@@ -95,13 +97,49 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 
 	private JSONObject createDataview(String name) {
 		Map<String, ?> dataviewMap = [
-		        'name': name == null ? RandomStringUtils.randomAlphabetic(10) : name,
-				'schema': ['key': 'value'],
-				'isShared': false,
-				'isSystem': false
+			'name'    : name == null ? RandomStringUtils.randomAlphabetic(10) : name,
+			'schema'  : ['key': 'value'],
+			'isShared': false,
+			'isSystem': false
 		]
 
 		String dataviewJson = JsonUtil.convertMapToJsonString(dataviewMap)
 		return JsonUtil.parseJson(dataviewJson)
+	}
+
+	void '6. test getAssetIdsHql'() {
+		setup: 'given a project, a dataview, and a DataviewUserParamsCommand'
+			Project project = projectTestHelper.createProject()
+			Person person = personHelper.createPerson()
+
+			dataviewService.securityService = [
+				hasPermission        : { return true },
+				getUserCurrentProject: { return project },
+				loadCurrentPerson    : { return person },
+				isLoggedIn           : { return true },
+				getCurrentPersonId   : { return person.id }] as SecurityService
+
+			JSONObject dataviewJson1 = createDataview(null)
+			Dataview dataview = dataviewService.create(person, project, dataviewJson1)
+			dataview.reportSchema = '{"key":"value"}'
+
+			DataviewUserParamsCommand dataviewUserParamsCommand = [
+				sortDomain  : 'device',
+				sortProperty: 'id',
+				filters     : ['domains': ['device']]
+			] as DataviewUserParamsCommand
+
+		when: 'calling getAssetIdHQL'
+			Map hql = dataviewService.getAssetIdsHql(project, dataview.id, dataviewUserParamsCommand)
+
+		then: 'a map is returned, with the hql query, and its parameters.'
+			hql.query.stripIndent() == '''
+				SELECT AE.id
+				FROM AssetEntity AE
+
+				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
+			'''.stripIndent()
+
+			hql.params == [project: project, assetClasses: [AssetClass.DEVICE]]
 	}
 }

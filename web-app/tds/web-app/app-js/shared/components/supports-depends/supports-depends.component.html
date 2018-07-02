@@ -1,6 +1,6 @@
 <kendo-grid
         *ngIf="dataGridSupportsOnHelper"
-        class="dependents-grid supports-on"
+        class="dependents-grid"
         [data]="dataGridSupportsOnHelper.gridData"
         [sort]="dataGridSupportsOnHelper.state.sort"
         [sortable]="{mode:'single'}"
@@ -9,9 +9,9 @@
 
     <!-- Toolbar Template -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">
-        <label class="pad-top-7 pad-left-10">Supports</label>
-        <button (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
-            <i class="fa fa-fw fa-plus-circle"></i> Add
+        <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
+        <button (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
+            <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
         </button>
     </ng-template>
 
@@ -32,17 +32,17 @@
         <!-- Action -->
         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
             <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-                <button (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)"
-                        class="btn btn-action btn-default btn-delete"
-                        title="Delete">
-                    <span class="fa fa-fw fa-trash"></span>
-                </button>
                 <button (click)="onAddEditComment(dataItem)"
                         class="btn btn-action btn-default btn-comment"
                         title="Comments">
                     <i class="fa fa-fw fa-comment-o"></i>
                     <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
                     <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
+                </button>
+                <button (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)"
+                        class="btn btn-action btn-default btn-delete"
+                        title="Delete">
+                    <span class="fa fa-fw fa-trash"></span>
                 </button>
             </div>
         </ng-template>
@@ -122,9 +122,9 @@
 
     <!-- Toolbar Template -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">
-        <label class="pad-top-7 pad-left-10">Is Dependent On </label>
-        <button (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
-            <i class="fa fa-fw fa-plus-circle"></i> Add
+        <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
+        <button (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
+            <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
         </button>
     </ng-template>
 
@@ -145,17 +145,17 @@
         <!-- Action -->
         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
             <div class="k-grid-ignore-click action-button-list" style="cursor: default;">
-                <button (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)"
-                        class="btn btn-action btn-default"
-                        title="Delete">
-                    <span class="fa fa-fw fa-trash"></span>
-                </button>
                 <button (click)="onAddEditComment(dataItem)"
                         class="btn btn-action btn-default btn-comment"
                         title="Comments">
                     <i class="fa fa-fw fa-comment-o"></i>
                     <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
                     <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
+                </button>
+                <button (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)"
+                        class="btn btn-action btn-default btn-delete"
+                        title="Delete">
+                    <span class="fa fa-fw fa-trash"></span>
                 </button>
             </div>
         </ng-template>

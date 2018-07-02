@@ -14,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -89,9 +90,9 @@ class CommentService implements ServiceMethods {
 				break
 			}
 
-			// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
+			// if assetEntity is passed, then validate that it's valid and that the user has access to it (belongs to the current project)
 			if (params.assetEntity && params.assetEntity != 'NaN') {
-				if (!params.assetEntity.isNumber() && params.assetEntity != 'null') {
+				if (!NumberUtil.isPositiveLong(params.assetEntity)) {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id ($params.assetEntity)"
 					errorMsg = "An unexpected asset id was received"
 					break
@@ -753,5 +754,59 @@ class CommentService implements ServiceMethods {
 	 */
 	def findAllByAssetEntity(def assetEntity) {
 		AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
+	}
+
+
+	/**
+	 * Delete an AssetComment based on its id and the user's project.
+	 * @param project
+	 * @param assetCommentId
+	 */
+	void deleteComment(Project project, Long assetCommentId) {
+		// Fetch the asset comment
+		AssetComment comment = GormUtil.findInProject(project, AssetComment, assetCommentId, true)
+		// Delete Task Dependencies.
+		TaskDependency.where {
+			assetComment == comment || predecessor == comment
+		}.deleteAll()
+		// Delete the comment.
+		comment.delete()
+	}
+
+	/**
+	 * Create or Update an AssetComment
+	 * @param project
+	 * @param command
+	 */
+	void saveOrUpdateAssetComment(Project project, AssetCommentSaveUpdateCommand command) {
+
+		// Fetch the corresponding asset.
+		AssetEntity asset = GormUtil.findInProject(project, AssetEntity, command.assetEntityId, true)
+
+		// Fetch the person updating/creating the comment.
+		Person currentPerson = securityService.loadCurrentPerson()
+
+		AssetComment assetComment
+
+		if (!command.id) {
+			assetComment = new AssetComment(project: project)
+			assetComment.createdBy = currentPerson
+		} else {
+			assetComment = GormUtil.findInProject(project, AssetComment, command.id, true)
+		}
+		assetComment.with {
+			assetEntity = asset
+			isResolved = command.isResolved ? 1 : 0
+			commentType = AssetCommentType.COMMENT
+			comment = command.comment
+			category = command.category
+			if (command.status) {
+				status = command.status
+			} else{
+				status = 'Ready'
+			}
+		}
+
+		assetComment.save(failOnError: true)
 	}
 }

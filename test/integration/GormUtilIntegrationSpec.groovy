@@ -632,7 +632,7 @@ class GormUtilIntegrationSpec extends Specification {
 	}
 
 	@Ignore
-	void '25. knock the crap out of this new bindMapToDomain method'() {
+	void 'knock the crap out of this new bindMapToDomain method'() {
 
 	}
 

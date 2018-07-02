@@ -38,7 +38,6 @@ class AccountImportExportService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	static final String LOGIN_OPT_ALL = 'A'

@@ -27,7 +27,6 @@ class AdminModule extends Module{
 
     }
 
-
     static content = {
         menuContainer { $("div", class: "container menu-top-container menu-top-container-full-menu") }
         menuBar { menuContainer.find("div#navbar-collapse") }
@@ -50,7 +49,6 @@ class AdminModule extends Module{
         adminModelsItem { adminMenu.find("li.menu-list-models") }
         adminExportManModItem { adminMenu.find("li.menu-sync-libraries") }
     }
-
 
     def selectMenu(menuItem) {
         if (menuItem.present) {

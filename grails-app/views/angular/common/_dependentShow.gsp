@@ -3,7 +3,7 @@
 	<td valign="top">
 		<div>
 			<h1>Supports:</h1>
-			<table style="min-width: 400px;" class="planning-application-table table-responsive">
+			<table style="min-width: 400px;" class="planning-application-table table-responsive dialog-container">
 				<thead>
 					<tr>
 						<th>Class</th>
@@ -63,7 +63,7 @@
 	<td valign="top">
 		<div>
 			<h1>Is dependent on:</h1>
-			<table style="min-width: 400px;" class="planning-application-table table-responsive">
+			<table style="min-width: 400px;" class="planning-application-table table-responsive dialog-container">
 				<thead>
 					<tr>
 						<th>Class</th>

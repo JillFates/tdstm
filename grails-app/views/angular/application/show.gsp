@@ -14,11 +14,23 @@
 			<table style="border: 0">
 				<tr>
 
-					<td colspan="2"><div class="dialog">
+					<td colspan="2" class="dialog-container"><div class="dialog">
 							<g:if test="${errors}">
 								<div id="messageDivId" class="message">${errors}</div>
 							</g:if>
 							<g:render template="/angular/application/show" model="[asset:applicationInstance]" ></g:render>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div class="dates-info-container">
+							<table class="dates-info">
+								<tr>
+									<td class="date-created">Date created: ${dateCreated}</td>
+									<td class="last-updated">Last updated: ${lastUpdated}</td>
+								</tr>
+							</table>
 						</div>
 					</td>
 				</tr>
@@ -39,6 +51,6 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Close</button>
-		<button class="btn btn-default pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
 	</div>
 </div>

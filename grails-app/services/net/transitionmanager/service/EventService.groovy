@@ -14,7 +14,6 @@ class EventService implements ServiceMethods {
 	static transactional = false
 
 	ControllerService controllerService
-	SecurityService securityService
 
 	/**
 	 * Provides a list all bundles associated to a specified project

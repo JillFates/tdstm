@@ -20,6 +20,7 @@ import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
 import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -31,6 +32,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS
 import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
+import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
 
 /**
  * Class that receives all the ETL initial commands.
@@ -135,7 +137,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Set globalTransformers = [] as Set
 
 	static Trimmer = { Element element ->
-		element.trim()
+		element.trim(true)
 	}
 
 	static Sanitizer = { Element element ->
@@ -182,6 +184,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
+		this.initializeDefaultGlobalTransformations()
 	}
 
 	// ------------------------------------
@@ -325,6 +328,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
 		reportRowProgress(rowNum, totalNumRows)
+		result.endRow()
 	}
 
 	/**
@@ -998,6 +1002,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 	}
 
+	private void initializeDefaultGlobalTransformations(){
+		globalTransformers.add(Trimmer)
+		globalTransformers.add(Sanitizer)
+	}
+
 	/**
 	 * Add an Element as CURR_ELEMENT_VARNAME value as variable within the binding script context.
 	 * @param element a selected Element
@@ -1151,11 +1160,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *    domains - Data structure with each of the domains processed in DataScript
 	 *    consoleLog - A String containing the console log output (optional)
 	 *
+	 * An instance of ETLProcessorResult will be returned and it needs to be converted to JSON using
+	 * com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 * @param includeConsoleLog - flag if the console log should appear in the results (default false)
-	 * @return Map - the results
+	 * @return an instance of ETLProcessorResult
+	 * @see com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 */
-	Map<String, ?> resultsMap(Boolean includeConsoleLog=false) {
-		this.result.toMap(includeConsoleLog)
+	ETLProcessorResult finalResult(Boolean includeConsoleLog = false){
+		this.result.addFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
+		if (includeConsoleLog) {
+			this.result.consoleLog = this.debugConsole.content()
+		} else {
+			this.result.consoleLog = ''
+		}
+		return this.result
 	}
 
 	List<String> getAvailableMethods () {
@@ -1204,7 +1222,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			tokensWhitelist = [
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
+				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL,
+				LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [

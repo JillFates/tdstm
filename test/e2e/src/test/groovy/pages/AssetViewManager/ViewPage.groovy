@@ -69,3 +69,4 @@ class ViewPage extends Page{
         gearBtn.click()
     }
 }
+

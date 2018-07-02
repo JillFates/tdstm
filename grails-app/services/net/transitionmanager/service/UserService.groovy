@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.TransactionDefinition
@@ -33,10 +34,10 @@ class UserService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AuditService auditService
+	MetricReportingService metricReportingService
 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
@@ -636,7 +637,6 @@ class UserService implements ServiceMethods {
 	 * - Current Bundle
 	 * - Current Room
 	 *
-	 * @param user - a given UserLogin
 	 * @param projectId - the id of the project to be assigned to the user.
 	 *
 	 * @return true: context updated / false: unable to update.
@@ -649,6 +649,8 @@ class UserService implements ServiceMethods {
 		}
 
 		userPreferenceService.setCurrentProjectId(projectId)
+		// create a new UserLoginProjectAccess to account later for user logins on metric recollection
+		createUserLoginProjectAccess(securityService.getUserLogin())
 		true
 	}
 
@@ -683,5 +685,32 @@ class UserService implements ServiceMethods {
 		setLockedOutUntil(userLogin, lockedOutUntil)
 		updateLastLogin(userLogin)
 		securityService.logoutCurrentUser()
+	}
+
+	/**
+	 * Creates a new record of a UserLoginProjectAccess, if it does not exist already.
+	 * If there is another record for the same UserLogin and same Project in the same day,
+	 * do nothing. Otherwise create a new record for this day.
+	 * This entities will be used to collect metrics of logged users.
+	 * See TM-10119
+	 * @param userLogin  The UserLogin that will be associated to the new UserLoginProjectAccess
+	 */
+	boolean createUserLoginProjectAccess(UserLogin userLogin) {
+		Date date = TimeUtil.nowGMT().clearTime()
+		Project project = userLogin.getCurrentProject()
+		// Make sure that is unique
+		int count = UserLoginProjectAccess.where {
+			userLogin == userLogin
+			project == project
+			date == date
+		}.count()
+		if (count == 0) {
+			UserLoginProjectAccess userLoginProjectAccess = new UserLoginProjectAccess(
+					userLogin: userLogin,
+					project: project,
+					date: date
+			)
+			userLoginProjectAccess.save(failOnError: true)
+		}
 	}
 }

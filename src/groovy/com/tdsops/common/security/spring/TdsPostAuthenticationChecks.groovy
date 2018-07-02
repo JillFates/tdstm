@@ -35,7 +35,6 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 			// no exception, just set the flag to force a password update
 			securityService.forcePasswordChange(userLogin)
 		}
-
 		// checkPasswordAge
 
 		Long maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays

@@ -16,7 +16,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Ignore
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -79,7 +78,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -108,7 +107,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -134,7 +133,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -177,7 +176,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -294,7 +293,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
@@ -340,10 +339,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -366,7 +365,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
 				{
-					"Applications": [ 
+					"Applications": [
 						{
 							"application id":152254,
 							"vendor name": {
@@ -394,19 +393,20 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'Applications'
-						read labels
-						iterate {
-							domain Application
-							extract 'vendor name' load 'Vendor'
-						}
-						""".stripIndent())
+				sanitize off
+				rootNode 'Applications'
+				read labels
+				iterate {
+					domain Application
+					extract 'vendor name' load 'Vendor'
+				}
+			""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -424,18 +424,27 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	@Ignore
 	void 'test can read JSONObject fields for complex JSON DataSet'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
 				{
 					"devices": [
-					   { 
+					   {
 					      "app id": 123,
 					      "attribs": {
 					         "memory": 4096,
-					         "cpu": 2
+					         "cpu": 2,
+					         "storage":[
+					            {
+					               "type": "IDE",
+					               "size": "1T"
+					            },
+					            {
+					               "type": "SSD",
+					               "size": "500G"
+					            }
+					         ]
 					      }
 					   }
 					]
@@ -448,25 +457,30 @@ class ETLJSONSpec extends ETLBaseSpec {
 					  debugConsole,
 					  validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'devices'
-						read labels
-						iterate {
-							 domain Device
-						    extract 'app id' load 'id'
-						    extract 'attribs' set attribsVar
-						    load 'custom1' with attribsVar.memory  //['memory']
-						    load 'custom2' with attribsVar.cpu  
-						}
-						""".stripIndent())
+				console on
+				sanitize off
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'app id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    load 'custom3' with attribsVar.storage.size()
+				    load 'custom4' with attribsVar.storage.collect { it.type }
+				    load 'custom5' with attribsVar.propNotFound
+				}
+				""".stripIndent())
 
-		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
 
-		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
-				domain == ETLDomain.Application.name()
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0]) {
+				domain == ETLDomain.Device.name()
 				data.size() == 1
 				with(data[0].fields.custom1) {
 					originalValue == 4096
@@ -477,10 +491,27 @@ class ETLJSONSpec extends ETLBaseSpec {
 					originalValue == 2
 					value == 2
 				}
+
+				with(data[0].fields.custom3) {
+					originalValue == 2
+					value == 2
+				}
+
+				with(data[0].fields.custom4) {
+					originalValue == ["IDE", "SSD"]
+					value == ["IDE", "SSD"]
+				}
+
+				with(data[0].fields.custom5) {
+					originalValue == null
+					value == null
+				}
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 
 
@@ -508,10 +539,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 
@@ -557,10 +588,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DATASET was modified by the ETL script'
-			etlProcessor.resultsMap().domains.size() == 2
+			etlProcessor.finalResult().domains.size() == 2
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -574,7 +605,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.resultsMap().domains[1]) {
+			with(etlProcessor.finalResult().domains[1]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 2
 				with(data[0].fields.assetName) {
@@ -612,7 +643,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
 			etlProcessor.column('application id') != null
@@ -658,10 +689,10 @@ class ETLJSONSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.resultsMap().domains[0]) {
+			with(etlProcessor.finalResult().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {
@@ -690,13 +721,13 @@ class ETLJSONSpec extends ETLBaseSpec {
 				}
 			],
 			"Devices": [
-				{  
+				{
 					"name": "xraysrv01",
 					"mfg": "Dell",
 					"model": "PE2950",
 					"type": "Server",
 				},
-				{  
+				{
 					"name": "zuludb01",
 					"mfg": "HP",
 					"model": "BL380",
@@ -715,7 +746,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					"location":"ACME Data Center"
 				}
 			],
-		}	
+		}
 	""".stripIndent().trim()
 
 }

@@ -21,9 +21,6 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 
 @Slf4j
 class UserPreferenceService implements ServiceMethods {
-
-	def securityService
-
 	// defaults holds global defaults for certain values
 	// TODO - load these from application settings
 	protected static final Map<String, Object> defaults = [

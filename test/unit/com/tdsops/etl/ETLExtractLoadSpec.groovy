@@ -6,6 +6,8 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -16,6 +18,8 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -25,7 +29,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import com.tdssrc.grails.StringUtil
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -40,6 +43,7 @@ import spock.lang.Shared
  *     <li><b>ignore record</b></li>
  * </ul>
  */
+@TestMixin(ControllerUnitTestMixin)
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLExtractLoadSpec extends ETLBaseSpec {
@@ -183,8 +187,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()) {
-				ETLInfo.originalFilename == fileName
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -215,8 +218,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()){
-				ETLInfo.originalFilename == fileName
+			with (etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -258,7 +260,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 3
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -295,7 +297,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and: 'A new result was added in the result'
 
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -500,7 +502,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -512,6 +514,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 					data.size() == 2
 					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
@@ -527,6 +530,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 
 					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						fields.keySet().size() == 2
 						with(fields.appVendor, FieldResult) {
@@ -567,7 +571,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -578,7 +582,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'This is a Microsoft Application'
@@ -586,7 +591,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							value == 'This is not a Microsoft Application'
@@ -623,7 +629,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -634,7 +640,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -650,7 +657,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -695,7 +703,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -706,7 +714,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -722,7 +731,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -767,7 +777,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -780,7 +790,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						appVendor: 'Vendor'
 						environment: 'Environment'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -788,7 +799,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Mozilla'
@@ -818,7 +830,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -826,7 +838,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						description == 'Description'
 					}
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == "Microsoft"
@@ -834,7 +847,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.description) {
 							originalValue == "Microsoft"
@@ -842,7 +856,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.appVendor) {
 							originalValue == "Mozilla"
@@ -850,7 +865,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.description) {
 							originalValue == "Mozilla"
@@ -938,7 +954,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -946,7 +962,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						id == 'Id'
 						appVendor == 'Vendor'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == "Microsoft"
@@ -954,7 +971,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.appVendor) {
 							originalValue == "Mozilla"
@@ -994,7 +1012,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1003,7 +1021,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						manufacturer == 'Manufacturer'
 						model == 'Model'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							originalValue == "xraysrv01"
@@ -1019,7 +1038,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							originalValue == "oradbsrv02"
@@ -1035,7 +1055,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[2]) {
+					with(data[2], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 3
 						with(fields.assetName) {
 							originalValue == "oradbsrv03"
@@ -1085,7 +1106,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1093,7 +1114,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(fieldLabelMap){
 						appVendor == 'Vendor'
 					}
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Production'
@@ -1101,7 +1123,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1109,7 +1132,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == 'Microsoft'
@@ -1117,7 +1141,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Production'
@@ -1125,7 +1150,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1133,7 +1159,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							originalValue == 'Microsoft'
@@ -1147,7 +1174,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1155,7 +1183,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.description) {
 							originalValue == 'Development'
@@ -1163,7 +1192,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							originalValue == '152254'
@@ -1171,7 +1201,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.description) {
 							originalValue == 'Development'
@@ -1220,7 +1251,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Room domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 			}
 
@@ -1275,7 +1306,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.resultsMap().domains.size() == 1
+			etlProcessor.finalResult().domains.size() == 1
 
 		cleanup:
 			if(fileName){
@@ -1307,12 +1338,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.appVendor) {
 							value == 'Microsoft'
@@ -1320,7 +1352,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							value == 'Production'
@@ -1328,7 +1361,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.appVendor) {
 							value == 'Mozilla'
@@ -1336,7 +1370,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Development'
@@ -1441,7 +1476,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1530,13 +1565,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1554,7 +1590,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1605,13 +1642,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.id) {
 							value == '152254'
@@ -1685,7 +1723,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1719,7 +1757,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results will ignore a row'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
@@ -1756,7 +1794,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Third row was removed from the domain results'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
@@ -1804,13 +1842,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -1818,7 +1857,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -1862,13 +1902,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -1876,7 +1917,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'zuludb01'
@@ -1921,13 +1963,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['environment', 'assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							value == 'Server'
@@ -1939,7 +1982,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							value == 'Blade'
@@ -1993,13 +2037,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -2019,7 +2064,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'zuludb01'
@@ -2080,10 +2126,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate(scriptContent)
 
 		then:
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						with(fields, Map){
 
 							with(assetName, FieldResult) {
@@ -2135,13 +2182,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -2149,7 +2197,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							value == 'Custom Name'
@@ -2268,14 +2317,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							value == 'xraysrv01'
@@ -2284,7 +2334,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						}
 					}
 
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.model) {
 							value == 'PE2950'
@@ -2328,7 +2379,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
@@ -2336,6 +2387,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
 					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
 							value == ''
@@ -2378,7 +2430,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
@@ -2429,7 +2481,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			with(etlProcessor.resultsMap()){
+			with(etlProcessor.finalResult()){
 				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
@@ -2437,6 +2489,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
 					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName, FieldResult) {
 							value == null
@@ -2479,20 +2532,22 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Microsoft,ACME Data Center'
 							value == 'Microsoft,ACME Data Center'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							originalValue == 'Mozilla,ACME Data Center'
@@ -2525,20 +2580,22 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.environment) {
 							originalValue == 'Microsoft'
 							value == 'Microsoft-Prod'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.environment) {
 							originalValue == 'Mozilla'
@@ -2587,13 +2644,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application vendor name and location domain fields concatenated'
-			with (etlProcessor.resultsMap()) {
+			with (etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					with(data[0]) {
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						with(fields.assetName) {
 							originalValue == 'x'
@@ -2604,7 +2662,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							value == '1.2.3.4, 1.3.5.1'
 						}
 					}
-					with(data[1]) {
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						with(fields.assetName) {
 							originalValue == 'y'
@@ -2615,7 +2674,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							value == '4.5.4.2'
 						}
 					}
-					with(data[2]) {
+					with(data[2], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 4
 						with(fields.assetName) {
 							originalValue == 'z'

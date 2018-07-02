@@ -85,7 +85,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Domain',
-				property: 'domainClassName.name',
+				property: 'domainClassName',
 				type: 'text',
 				width: 130,
 				locked: false
@@ -98,8 +98,8 @@ export class DependencyBatchColumnsModel {
 				locked: false
 			},
 			{
-				label: 'DataScript',
-				property: 'datascript.name',
+				label: 'ETL Script',
+				property: 'dataScript.name',
 				type: 'text',
 				width: 130,
 				locked: false

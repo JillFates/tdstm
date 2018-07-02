@@ -20,7 +20,6 @@ class ApplicationService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
 	ControllerService controllerService
-	SecurityService securityService
 	PartyRelationshipService partyRelationshipService
 
 	/**
