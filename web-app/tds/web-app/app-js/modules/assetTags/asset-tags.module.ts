@@ -11,6 +11,7 @@ import {UIRouterModule} from '@uirouter/angular';
 import {TagService} from './service/tag.service';
 import {TagListComponent} from './components/tag-list/tag-list.component';
 import {ASSET_TAGS_STATES} from './asset-tags-routing.states';
+import {TagMergeDialogComponent} from './components/tag-merge/tag-merge-dialog.component';
 
 @NgModule({
 	imports: [
@@ -26,6 +27,7 @@ import {ASSET_TAGS_STATES} from './asset-tags-routing.states';
 	],
 	declarations: [
 		TagListComponent,
+		TagMergeDialogComponent
 	],
 	providers: [
 		TagService
@@ -33,7 +35,9 @@ import {ASSET_TAGS_STATES} from './asset-tags-routing.states';
 	exports: [
 		TagListComponent
 	],
-	entryComponents: []
+	entryComponents: [
+		TagMergeDialogComponent
+	]
 })
 
 export class AssetTagsModule {

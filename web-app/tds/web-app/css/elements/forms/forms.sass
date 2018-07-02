@@ -10,6 +10,10 @@ form
             &.sub-option-50
                 padding-left: 50px
 
+.form-group
+  label.label-detail
+    font-weight: normal
+
 .has-danger .form-control-feedback,
 .has-danger .form-control-label,
 .has-danger .control-label,
@@ -164,3 +168,10 @@ div.error, span.error
 
 .text-capitalize
   text-transform: capitalize
+
+
+// Kendo components on forms
+kendo-dropdownlist
+  &.form-control
+    &.error, &.has-error
+      border: 1px #f00 solid

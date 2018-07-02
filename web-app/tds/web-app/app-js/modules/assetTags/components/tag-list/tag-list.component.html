@@ -45,8 +45,8 @@
 
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button kendoGridAddCommand class="btn btn-default" type="button">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="margin-right: 4px;"></span>
+                        <button kendoGridAddCommand class="btn btn-default" type="button" style="margin-left: 15px;">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="margin-right: 5px;"></span>
                             {{ 'GLOBAL.CREATE' | translate }} Tag
                         </button>
                         <label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
@@ -76,7 +76,7 @@
                                 <button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
                                     <i class="glyphicon glyphicon-ban-circle"></i>
                                 </button>
-                                <div *ngIf="!isNew" style="display: inline;">
+                                <div *ngIf="!isNew && !editedTag" style="display: inline;">
                                     <button (click)="onMerge(dataItem)"
                                             class="btn btn-action btn-default" title="Merge">
                                         <i class="fa fa-exchange"></i>

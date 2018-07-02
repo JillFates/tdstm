@@ -9,8 +9,11 @@ import {TagService} from '../../service/tag.service';
 import {TagModel} from '../../model/tag.model';
 import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DependencyBatchDetailDialogComponent} from '../../../dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
+import {ImportBatchModel} from '../../../dependencyBatch/model/import-batch.model';
+import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 
 @Component({
 	selector: 'tag-list',
@@ -42,7 +45,7 @@ export class TagListComponent {
 	 * TODO: document.
 	 */
 	private onLoad(): void {
-		this.colorList = this.tagService.getColorList();
+		this.colorList = this.tagService.getTagColorList();
 		this.gridColumns = new TagListColumnsModel();
 		this.tagService.getTags().subscribe( (result: Array<TagModel>) => {
 			this.gridSettings = new DataGridOperationsHelper(result,
@@ -53,13 +56,28 @@ export class TagListComponent {
 	}
 
 	/**
+	 * TODO: document.
+	 */
+	protected onMerge(dataItem: TagModel): void {
+		this.dialogService.open(TagMergeDialogComponent, [
+			{ provide: TagModel, useValue: dataItem}
+		], DIALOG_SIZE.MD).then(result => {
+			if (result) {
+				this.reloadTagList();
+			}
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	/**
 	 * TODO: document
 	 * @param {any} sender
 	 */
 	protected removeHandler({dataItem}): void {
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
-			'Are you sure you want to delete this item?',
+			'Confirmation Required',
+			'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
 				this.tagService.deleteTag(dataItem.id).subscribe( result => {

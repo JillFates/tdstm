@@ -87,10 +87,23 @@ export class TagService {
 	}
 
 	/**
+	 * PUT - Merge two tags into one.
+	 * @param {number} tagIdOne
+	 * @param {number} tagIdTwo
+	 */
+	mergeTags(tagIdOne: number, tagIdTwo: number): Observable<any> {
+		return this.http.put(`${this.tagURL}/${tagIdOne}/merge/${tagIdTwo}`, null)
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * TODO: document
 	 * @returns {Array<string>}
 	 */
-	getColorList(): Array<string> {
+	getTagColorList(): Array<string> {
 		return [
 			'Black',
 			'Brown',
