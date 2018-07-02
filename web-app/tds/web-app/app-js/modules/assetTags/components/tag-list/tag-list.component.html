@@ -55,7 +55,7 @@
                     </ng-template>
 
                     <!-- Action -->
-                    <kendo-grid-command-column [width]="100">
+                    <kendo-grid-command-column [width]="110">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="text-center">
                                 <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -105,9 +105,9 @@
                         <!-- Cell Templates -->
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'Color'" let-dataItem>
                             <div class="text-center">
-                                <span [style.background-color]="dataItem[column.property]"
-                                      class="label"
-                                      style="width: 30px;
+                                <!--<span [style.background-color]="dataItem[column.property]"-->
+                                <span [ngClass]="dataItem.css"
+                                      class="label" style="width: 30px;
                                       height: 25px;
                                       display: block;
                                       margin: 0 auto 0 auto;"
@@ -121,11 +121,11 @@
                         <!-- Edit Templates -->
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Name'">
                                 <input [(ngModel)]="dataItem.Name" autofocus (input)="validateUniqueName(dataItem)"
-                                       [ngClass]="{'ng-invalid': duplicateName}"
-                                       type="text" name="name" class="form-control" required/>
+                                       [ngClass]="{'ng-invalid': duplicateName}" required
+                                       type="text" name="name" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Description'">
-                            <input [(ngModel)]="dataItem.Description"
+                            <input [(ngModel)]="dataItem.Description" required
                                    type="text" name="description" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Color'">
