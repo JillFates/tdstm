@@ -19,7 +19,7 @@ class DatascriptListSpec extends GebReportingSpec{
     static E2E = "E2E DS"
     static datascriptName = randStr + E2E + " Name"
     static datascriptDescription = randStr + E2E + " Description"
-    static datascriptDateCreated = new Date().format("EEEE, MMMM dd, yyyy")// this format is required for kendo date picker
+    static datascriptDateCreated = new Date().format("EEEE, MMMM d, yyyy")// this format is required for kendo date picker
     static datascriptProvider
     static firstDSInformation
 

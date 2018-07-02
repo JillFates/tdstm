@@ -7,7 +7,7 @@ class CommonsModule extends Module {
 
     static content = {
         filterCalendarIcons { $('.k-i-calendar')}
-        kendoDateFilter { $('kendo-popup td[role=gridcell]')}//
+        kendoDateFilter { $('kendo-popup td[role=gridcell]')}
         removeKendoDateFilterIcons { $('kendo-datepicker + span.fa-times')}
         allFilters { $('input + span.fa-times')}
     }
@@ -48,7 +48,7 @@ class CommonsModule extends Module {
     }
 
     /*
-    * date: string formatted date required by kendo picker. "EEEE, MMMM dd, yyyy"//Friday, June 1, 2018
+    * date: string formatted date required by kendo picker. "EEEE, MMMM d, yyyy"//Friday, June 1, 2018
     * calendarIconIndex: NOT REQUIRED if one date filter, number because is possible to have more than one inputs
     * */
     def setKendoDateFilter(date, calendarIconIndex = null){
