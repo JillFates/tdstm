@@ -18,11 +18,12 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
-import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'data-script-etl-builder',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-etl-builder/data-script-etl-builder.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-etl-builder/data-script-etl-builder.component.html',
+	providers: [TranslatePipe]
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
@@ -53,14 +54,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		currentProgress: 0,
 	};
 	private testScripInterval: any;
+	public messageFieldWillInitialized: string;
 
 	ngAfterViewInit(): void {
+		this.messageFieldWillInitialized =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
 	}
 
 	constructor(
+		private translatePipe: TranslatePipe,
 		private dialogService: UIDialogService,
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
@@ -304,5 +308,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected restoreWindow() {
 		this.isWindowMaximized = false;
+	}
+
+	/**
+	 * if init is present return init, otherwise return value
+	 */
+	public getInitOrValue(dataItem): void {
+		return dataItem.init || (dataItem.value || '');
 	}
 }

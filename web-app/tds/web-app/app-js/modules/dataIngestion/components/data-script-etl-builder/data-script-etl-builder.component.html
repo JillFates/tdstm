@@ -140,7 +140,14 @@
                                                                let columnIndex = index;"
                                                                        title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
                                                         <ng-template kendoGridCellTemplate let-dataItem>
-                                                            {{dataItem.fields[column] ? dataItem.fields[column].value : '' }}
+	                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
+	                                                             [ngClass]="{'has-init': dataItem.fields[column].init}">
+		                                                        {{getInitOrValue(dataItem.fields[column])}}
+		                                                        <i *ngIf="dataItem.fields[column].init"
+		                                                           [title]="messageFieldWillInitialized"
+		                                                           class="fa fa-info-circle pull-right"></i>
+	                                                        </div>
+
                                                         </ng-template>
                                                     </kendo-grid-column>
                                                 </kendo-grid>
