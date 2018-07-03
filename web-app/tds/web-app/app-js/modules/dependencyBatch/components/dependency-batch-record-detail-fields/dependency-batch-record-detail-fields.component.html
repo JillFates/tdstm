@@ -33,11 +33,23 @@
                            title="Current Value" field="currentValue">
         </kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.status.code === BatchStatus.COMPLETED"
-                           title="Imported Value" field="importValue">
+                           title="Imported Value" [class]="'import-value'">
+	        <ng-template kendoGridCellTemplate let-dataItem>
+		        <div class="import-item-container">
+			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
+			        <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue"/>
+			        <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="messageFieldWillInitialized" class="fa fa-info-circle pull-right"></i>
+		        </div>
+	        </ng-template>
         </kendo-grid-column>
+
         <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [class]="'import-value'">
             <ng-template kendoGridCellTemplate let-dataItem>
-                <input type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
+                <div class="import-item-container">
+                    <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
+	                <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue"/>
+	                <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="messageFieldWillInitialized" class="fa fa-info-circle pull-right"></i>
+                </div>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">

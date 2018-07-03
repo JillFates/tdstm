@@ -7,6 +7,7 @@ import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -24,6 +25,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		name: string,
 		currentValue: string,
 		importValue: string,
+		initValue: string,
 		errors: Array<string>,
 		errorsAsString: string,
 		overridedValue: string
@@ -59,8 +61,9 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	protected BatchStatus = BatchStatus;
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
+	public messageFieldWillInitialized: string;
 
-	constructor(private dependencyBatchService: DependencyBatchService) {
+	constructor(private dependencyBatchService: DependencyBatchService, private translatePipe: TranslatePipe) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 			this.processStatus.state = CHECK_ACTION.NONE;
 			this.saveStatus.state = CHECK_ACTION.NONE;
@@ -70,6 +73,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Init Load Record Field details.
 	 */
 	ngOnInit(): void {
+		this.messageFieldWillInitialized =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		this.loadRecordFieldDetails();
 	}
 
@@ -112,6 +116,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 					? fields[fieldName].originalValue : '(null)',
 				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
 					? fields[fieldName].value : '',
+				initValue: !ValidationUtils.isEmptyObject(fields[fieldName].init)
+					? fields[fieldName].init : '',
 				errors: fields[fieldName].errors,
 				errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
 				overridedValue: null
