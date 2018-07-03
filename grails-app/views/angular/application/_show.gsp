@@ -139,12 +139,5 @@
 	</tbody>
 </table>
 
-<div class="dates-info-container">
-	<table class="dates-info">
-		<tr>
-			<td class="date-created">Date created: ${dateCreated}</td>
-			<td class="last-updated">Last updated: ${lastUpdated}</td>
-		</tr>
-	</table>
-</div>
+
 
