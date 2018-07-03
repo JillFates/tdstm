@@ -76,6 +76,7 @@ class DatascriptListSpec extends GebReportingSpec{
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Date Create'
+            scrollRight()
             filterByDateCreated datascriptDateCreated
         then: 'At least one datascript row should be displayed'
             getDSRowsSize() >= 1
@@ -86,6 +87,7 @@ class DatascriptListSpec extends GebReportingSpec{
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Description'
+            scrollLeft()
             filterByDescription datascriptDescription
         then: 'One datascript row should be displayed'
             getDSRowsSize() == 1
@@ -149,7 +151,9 @@ class DatascriptListSpec extends GebReportingSpec{
         when: 'The user removes some filters'
             removeDescriptionFilter()
             removeNameFilter()
+            scrollRight()
             removeDateCreateFilter()
+            scrollLeft()
         and: 'The User cleans adds Filter Provider'
             filterByProvider datascriptProvider
         then: 'At least one datascript row should be displayed'

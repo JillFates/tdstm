@@ -2,6 +2,7 @@ package pages.Datascripts
 
 import geb.Page
 import modules.CommonsModule
+import geb.Browser
 
 class DatascriptsPage extends Page {
     static at = {
@@ -99,5 +100,13 @@ class DatascriptsPage extends Page {
         } else {
             waitFor{nameGridHeader.find("span.k-i-sort-desc-sm").displayed}
         }
+    }
+
+    def scrollRight(){
+        browser.driver.executeScript('$(".k-grid-content").scrollLeft(500)')
+    }
+
+    def scrollLeft(){
+        browser.driver.executeScript('$(".k-grid-content").scrollLeft(0)')
     }
 }
