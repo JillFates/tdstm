@@ -61,7 +61,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	protected BatchStatus = BatchStatus;
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
-	public messageFieldWillInitialized: string;
+	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 
 	constructor(private dependencyBatchService: DependencyBatchService, private translatePipe: TranslatePipe) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
@@ -73,7 +73,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Init Load Record Field details.
 	 */
 	ngOnInit(): void {
-		this.messageFieldWillInitialized =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
+		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		this.loadRecordFieldDetails();
 	}
 

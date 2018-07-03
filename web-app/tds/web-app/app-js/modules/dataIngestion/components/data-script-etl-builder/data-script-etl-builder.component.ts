@@ -54,10 +54,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		currentProgress: 0,
 	};
 	private testScripInterval: any;
-	public messageFieldWillInitialized: string;
+	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 
 	ngAfterViewInit(): void {
-		this.messageFieldWillInitialized =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
+		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
