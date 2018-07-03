@@ -24,13 +24,10 @@ class Recipe {
 
 	Boolean archived = false
 
-	Integer defaultAssetId
 
 	static constraints = {
-		// TODO : Switch the context property to ENUM RecipeContext
-		context blank: false, inList: ['Event', 'Bundle', 'Application'], size: 1..45
+		context nullable: true
 		dateCreated nullable: true
-		defaultAssetId nullable: true
 		description nullable: true
 		lastUpdated nullable: true
 		name blank: false, size: 1..40

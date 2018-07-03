@@ -1,6 +1,7 @@
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
@@ -94,10 +95,11 @@ class WsCookbookController implements ControllerMethods {
 		Map result = cookbookService.getRecipe(id, version)
 		Recipe recipe = result.recipe
 		RecipeVersion rv = result.recipeVersion
+
 		renderSuccessJson(recipeId: recipe.id,
 			name: recipe.name,
 			description: recipe.description,
-			context: recipe.context,
+			context: result.context,
 			createdBy: result.person.firstName + ' ' + result.person.lastName,
 			lastUpdated: rv.lastUpdated,
 			versionNumber: rv.versionNumber,
@@ -106,10 +108,7 @@ class WsCookbookController implements ControllerMethods {
 			hasWIP: result.wip != null,
 			sourceCode: rv.sourceCode,
 			changelog: rv.changelog,
-			clonedFrom: (rv.clonedFrom ?: '').toString(),
-			eventId: result.eventId,
-			bundleId: result.bundleId,
-			applicationId: result.applicationId)
+			clonedFrom: (rv.clonedFrom ?: '').toString())
 	}
 
 	@HasPermission(Permission.RecipeView)
@@ -156,14 +155,14 @@ class WsCookbookController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.RecipeEdit)
-	def defineRecipeContext() {
-		cookbookService.defineRecipeContext(params.recipeId, params.contextId)
+	def defineRecipeContext(Long recipeId, ContextCommand context) {
+		cookbookService.defineRecipeContext(recipeId, context)
 		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
-	def deleteRecipeContext() {
-		cookbookService.deleteRecipeContext(params.recipeId)
+	def deleteRecipeContext(Long recipeId) {
+		cookbookService.deleteRecipeContext(recipeId)
 		renderSuccessJson()
 	}
 }

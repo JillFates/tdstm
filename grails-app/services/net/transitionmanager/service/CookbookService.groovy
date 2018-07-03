@@ -1,24 +1,25 @@
 package net.transitionmanager.service
 
-
-import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.security.Permission
 import org.springframework.dao.IncorrectResultSizeDataAccessException
@@ -29,13 +30,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.sql.ResultSet
 import java.sql.SQLException
 
-import com.tdsops.tm.enums.domain.ContextType
-import static com.tdsops.tm.enums.domain.ContextType.A
-import static com.tdsops.tm.enums.domain.ContextType.B
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
 import static com.tdsops.tm.enums.domain.ProjectStatus.COMPLETED
 import static net.transitionmanager.domain.Project.DEFAULT_PROJECT_ID
-
 /**
  * Handles the logic for creating recipes and running the cookbook
  *
@@ -168,8 +165,13 @@ class CookbookService implements ServiceMethods {
 	private RecipeVersion createRecipeAndRecipeVersion(String name, String description, String context, Project project,
 	                                                   String sourceCode, String changelog, RecipeVersion recipeVersion) {
 
-		def newRecipe = new Recipe(name: name, description: description, context: context, project: project,
-				archived: false, defaultAssetId: null).save(flush:true, failOnError: true)
+		def newRecipe = new Recipe(
+			name: name,
+			description: description,
+			context: context,
+			project: project,
+			archived: false
+		).save(flush:true, failOnError: true)
 
 		new RecipeVersion(sourceCode: sourceCode, changelog: changelog, clonedFrom: recipeVersion,
 				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save(failOnError: true)
@@ -479,37 +481,15 @@ class CookbookService implements ServiceMethods {
 		}
 
 		//checkAccess(`recipe.project`)
-		Long eventId
-		Long bundleId
-		Integer applicationId
 
-		if (recipe.defaultAssetId != null) {
-			switch (recipe.context) {
-				case 'Application':
-					Application app = A.getObject(recipe.defaultAssetId)
-					if (app) {
-						eventId = app.moveBundle.moveEventId
-						bundleId = app.moveBundleId
-						applicationId = recipe.defaultAssetId
-					}
-					break
-				case 'Bundle':
-					MoveBundle mb = B.getObject(recipe.defaultAssetId)
-					if (mb) {
-						eventId = mb.moveEventId
-						bundleId = recipe.defaultAssetId
-					}
-					break
-				case 'Event':
-					eventId = recipe.defaultAssetId
-					break
-				default :
-					throw new IllegalArgumentException('Invalid context')
-			}
+		Map context = recipe.context ? JsonUtil.convertJsonToMap(recipe.context) : [:]
+
+		context.tag.each{Map tag->
+			boolean tagExists = Tag.where{id == tag.id}.count()
+			tag.strike = !tagExists
 		}
 
-		[recipe: recipe, recipeVersion: recipeVersion, person: recipeVersion.createdBy, wip: wip,
-		 eventId: eventId, bundleId: bundleId, applicationId: applicationId]
+		[recipe: recipe, recipeVersion: recipeVersion, person: recipeVersion.createdBy, wip: wip, context: context]
 	}
 
 	/**
@@ -1426,39 +1406,45 @@ class CookbookService implements ServiceMethods {
 		}
 	}
 
-	void defineRecipeContext(recipeId, contextId) {
+	void defineRecipeContext(Long recipeId, ContextCommand contextCommand) {
 		securityService.requirePermission Permission.RecipeEdit
 
 		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
-		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId')
+		checkAccess(project)
+		Map context = [
+			eventId : contextCommand.eventId,
+			bundleId: contextCommand.bundleId,
+			and     : contextCommand.and,
+			tag     : []
+		]
+
+		contextCommand.tag.each { Long tagId ->
+			Tag tag = get(Tag, tagId, project)
+
+			context.tag << [
+				id    : tag.id,
+				label : tag.name,
+				strike: false,
+				css   : tag.color.css
+			]
 		}
 
-		contextId = contextId.toInteger()
+		recipe.context = JsonUtil.convertMapToJsonString(context)
 
-		checkAccess(project)
-
-		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
-
-		/*if (!checkAccess(contextId, recipe.context, project)) {
-			throw new UnauthorizedException('''The client doesn't own this context''')
-		}*/
-
-		recipe.defaultAssetId = contextId
 		recipe.save(flush:true, failOnError: true)
 	}
 
-	void deleteRecipeContext(recipeId) {
+	void deleteRecipeContext(Long recipeId) {
 		securityService.requirePermission Permission.RecipeEdit
 
 		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
+		recipe.context = null
 
-		recipe.defaultAssetId = null
 		recipe.save(flush:true, failOnError: true)
 	}
 
