@@ -67,7 +67,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
         given: 'The user is on the Datascripts landing page'
             at DatascriptsPage
         and: 'Opens the Create Datascript pop up'
-            createBtn.click()
+            waitFor{createBtn.click()}
             at CreateDatascriptPage
         when: 'The user fills the necessary data to create a Datascript'
             waitFor{providerDropdown.click()}
