@@ -12,7 +12,6 @@ import net.transitionmanager.domain.TagAsset
  */
 @Transactional
 class TagAssetService implements ServiceMethods {
-	TagService tagService
 
 	/**
 	 * Gets a list of tagAssets for an asset.

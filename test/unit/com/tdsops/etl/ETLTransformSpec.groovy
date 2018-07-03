@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -864,7 +865,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -893,7 +894,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []

@@ -12,6 +12,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
@@ -19,7 +20,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
-class ETLProcessorFindCommandIntegrationTests extends Specification {
+class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -58,12 +59,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 		GMDEMO = projectTestHelper.createProject(null)
 		TMDEMO = projectTestHelper.createProject(null)
 
-		validator = new ETLFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -818,14 +814,13 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
                     
                     whenNotFound 'asset' create {
-                        assetClass Application
                         assetName primaryNameVar
-                        assetType primaryTypeVar
-                        "SN Last Seen" NOW
+                        assetClass primaryTypeVar
+                        "Modified Date" NOW
                     }
 				}
 			""".stripIndent())
@@ -855,7 +850,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 						with(find.query[1]) {
 							domain == ETLDomain.Application.name()
 							kv.assetName == 'ACMEVMPROD01'
-							kv.assetType == 'VM'
+							kv.assetClass == 'VM'
 						}
 
 						with(find.query[2]) {
@@ -864,10 +859,9 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 						}
 
 						// whenNotFound create command assertions
-						create.assetClass == ETLDomain.Application.name()
 						create.assetName == 'ACMEVMPROD01'
-						create.assetType == 'VM'
-						!!create."SN Last Seen"
+						create.assetClass == 'VM'
+						!!create.lastUpdated
 					}
 				}
 			}
@@ -936,7 +930,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
                     
                     whenNotFound 'asset' update {
@@ -1017,7 +1011,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
                     
                     whenFound 'asset' create {
@@ -1095,7 +1089,7 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset' 
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
                     
 					whenNotFound 'asset' create {
@@ -1178,11 +1172,11 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset' 
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
                     
                     whenFound 'asset' update {
-                        "TN Last Seen" NOW
+                        assetName primaryNameVar
                     }
 				}
 			""".stripIndent())
@@ -1212,16 +1206,13 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 						with(find.query[1]) {
 							domain == ETLDomain.Application.name()
 							kv.assetName == 'ACMEVMPROD01'
-							kv.assetType == 'VM'
+							kv.assetClass == 'VM'
 						}
 
 						with(find.query[2]) {
 							domain == ETLDomain.Application.name()
 							kv.assetName == 'VMWare Vcenter'
 						}
-
-						// whenFound update command assertions
-						!!update."TN Last Seen"
 					}
 				}
 			}
@@ -1362,65 +1353,6 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			rack
 		}
 	}
-	/**
-	 * Helper method to create Fields Specs based on 'asset' definition
-	 * @param asset
-	 * @return
-	 */
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
-
-		List<Map<String, ?>> fieldSpecs = []
-		switch(asset){
-			case AssetClass.APPLICATION:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('appVendor', 'Vendor'),
-					buildFieldSpec('environment', 'Environment'),
-					buildFieldSpec('description', 'Description'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('assetName', 'Name'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case AssetClass.DATABASE:
-
-				break
-			case AssetClass.DEVICE:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('location', 'Location'),
-					buildFieldSpec('name', 'Name'),
-					buildFieldSpec('environment', 'Environment'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case CustomDomainService.COMMON:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('assetName', 'Name'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case ETLDomain.Dependency:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetName', 'AssetName'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('asset', 'Asset'),
-					buildFieldSpec('comment', 'Comment'),
-					buildFieldSpec('status', 'Status'),
-					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
-				]
-				break
-			case AssetClass.STORAGE:
-
-				break
-		}
-
-		return fieldSpecs
-	}
 
 	/**
 	 * Builds a spec structure used to validate 'asset' fields
@@ -1466,4 +1398,196 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 
 		return [fileName, new DataSetFacade(dataSet)]
 	}
+
+	/**
+	 * Creates an instance of DomainClassFieldsValidator with all the fields spec correctly set.
+	 * @return an intance of DomainClassFieldsValidator
+	 */
+	protected ETLFieldsValidator createDomainClassFieldsValidator(){
+		ETLFieldsValidator validator = new ETLFieldsValidator()
+		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
+
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency) + commonFieldsSpec)
+
+		return validator
+	}
+
+	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
+
+		List<Map<String, ?>> fieldSpecs = []
+		switch(asset){
+			case AssetClass.APPLICATION:
+				fieldSpecs = [
+					buildFieldSpec('appFunction', 'Function', 'String'),
+					buildFieldSpec('appOwner', 'App Owner', 'Person'),
+					buildFieldSpec('appSource', 'Source', 'String'),
+					buildFieldSpec('appTech', 'Technology', 'String'),
+					buildFieldSpec('appVendor', 'Vendor', 'String'),
+					buildFieldSpec('appVersion', 'Version', 'String'),
+					buildFieldSpec('businessUnit', 'Business Unit', 'String'),
+					buildFieldSpec('criticality', 'Criticality', 'InList'),
+					buildFieldSpec('drRpoDesc', 'DR RPO', 'String'),
+					buildFieldSpec('drRtoDesc', 'DR RTO', 'String'),
+					buildFieldSpec('latency', 'Latency OK', 'YesNo'),
+					buildFieldSpec('license', 'License', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('shutdownBy', 'Shutdown By', 'String'),
+					buildFieldSpec('shutdownDuration', 'Shutdown Duration', 'Number'),
+					buildFieldSpec('shutdownFixed', 'Shutdown Fixed', 'Number'),
+					buildFieldSpec('sme', 'SME1', 'Person'),
+					buildFieldSpec('sme2', 'SME2', 'Person'),
+					buildFieldSpec('startupBy', 'Startup By', 'String'),
+					buildFieldSpec('startupDuration', 'Startup Duration', 'Number'),
+					buildFieldSpec('startupFixed', 'Startup Fixed', 'Number'),
+					buildFieldSpec('startupProc', 'Startup Proc OK', 'YesNo'),
+					buildFieldSpec('testingBy', 'Testing By', 'String'),
+					buildFieldSpec('testingDuration', 'Testing Duration', 'Number'),
+					buildFieldSpec('testingFixed', 'Testing Fixed', 'Number'),
+					buildFieldSpec('testProc', 'Test Proc OK', 'YesNo'),
+					buildFieldSpec('url', 'URL', 'String'),
+					buildFieldSpec('useFrequency', 'Use Frequency', 'String'),
+					buildFieldSpec('userCount', 'User Count', 'String'),
+					buildFieldSpec('userLocations', 'User Locations', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
+			case AssetClass.DATABASE:
+				fieldSpecs = [
+					buildFieldSpec('dbFormat', 'Format', 'String'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('size', 'Size', 'String'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
+				break
+			case AssetClass.DEVICE:
+				fieldSpecs = [
+					buildFieldSpec('assetTag', 'Asset Tag', 'String'),
+					buildFieldSpec('assetType', 'Device Type', 'AssetType'),
+					buildFieldSpec('cart', 'Cart', 'String'),
+					buildFieldSpec('ipAddress', 'IP Address', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('manufacturer', 'Manufacturer', 'String'),
+					buildFieldSpec('model', 'Model', 'String'),
+					buildFieldSpec('os', 'OS', 'String'),
+					buildFieldSpec('priority', 'Priority', 'Options.Priority'),
+					buildFieldSpec('railType', 'Rail Type', 'InList'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('serialNumber', 'Serial #', 'String'),
+					buildFieldSpec('shelf', 'Shelf', 'String'),
+					buildFieldSpec('shortName', 'Alternate Name', 'String'),
+					buildFieldSpec('size', 'Size', 'Number'),
+					buildFieldSpec('sourceBladePosition', 'Source Blade Position', 'Number'),
+					buildFieldSpec('sourceChassis', 'Source Chassis', 'Chassis.S'),
+					buildFieldSpec('locationSource', 'Source Location', 'Location.S'),
+					buildFieldSpec('rackSource', 'Source Rack', 'Rack.S'),
+					buildFieldSpec('sourceRackPosition', 'Source Position', 'Number'),
+					buildFieldSpec('roomSource', 'Source Room', 'Room.S'),
+					buildFieldSpec('targetBladePosition', 'Target Blade Position', 'Number'),
+					buildFieldSpec('targetChassis', 'Target Chassis', 'Chassis.T'),
+					buildFieldSpec('locationTarget', 'Target Location', 'Location.T'),
+					buildFieldSpec('rackTarget', 'Target Rack', 'Rack.T'),
+					buildFieldSpec('targetRackPosition', 'Target Position', 'Number'),
+					buildFieldSpec('roomTarget', 'Target Room', 'Room.T'),
+					buildFieldSpec('truck', 'Truck', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
+			case ETLDomain.Dependency:
+				fieldSpecs = [
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('assetName', 'AssetName'),
+					buildFieldSpec('assetType', 'AssetType'),
+					buildFieldSpec('asset', 'Asset'),
+					buildFieldSpec('comment', 'Comment'),
+					buildFieldSpec('status', 'Status'),
+					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
+					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
+				]
+				break
+			case CustomDomainService.COMMON:
+				fieldSpecs = [
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('assetName', 'Name', 'String'),
+					buildFieldSpec('description', 'Description', 'String'),
+					buildFieldSpec('environment', 'Environment', 'Options.Environment'),
+					buildFieldSpec('externalRefId', 'External Ref Id', 'String'),
+					buildFieldSpec('lastUpdated', 'Modified Date', 'String'),
+					buildFieldSpec('moveBundle', 'Bundle', 'String'),
+					buildFieldSpec('planStatus', 'Plan Status', 'Options.PlanStatus'),
+					buildFieldSpec('supportType', 'Support', 'String'),
+					buildFieldSpec('validation', 'Validation', 'InList'),
+					buildFieldSpec('assetClass', 'Asset Class', 'String'),
+				]
+				break
+			case AssetClass.STORAGE:
+				fieldSpecs = [
+					buildFieldSpec('LUN', 'LUN', 'String'),
+					buildFieldSpec('fileFormat', 'Format', 'String'),
+					buildFieldSpec('size', 'Size', 'String'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
+		}
+
+		return fieldSpecs
+	}
+
 }
