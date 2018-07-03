@@ -492,7 +492,8 @@ class ProjectService implements ServiceMethods {
 
 
     /**
-	 * Used to determine if a company is associated with a project
+	 * Used to clone the default settings and add them to the project parameter,
+	 * including fieldSpecs and default Tags.
 	 * @param project - the project to update with default settings
 	 */
 	void cloneDefaultSettings(Project project) {
