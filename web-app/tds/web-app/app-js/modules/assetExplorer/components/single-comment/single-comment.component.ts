@@ -137,7 +137,7 @@ export class SingleCommentComponent extends UIExtraDialog {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}

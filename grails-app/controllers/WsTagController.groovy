@@ -22,7 +22,17 @@ class WsTagController implements ControllerMethods {
 			return
 		}
 
-		renderAsJson(tagService.list(projectForWs, filter.name, filter.description, filter.dateCreated, filter.lastUpdated))
+		List<Map> tags = tagService.list(
+			projectForWs,
+			filter.name,
+			filter.description,
+			filter.dateCreated,
+			filter.lastUpdated,
+			filter.moveBundleId,
+			filter.moveEventId
+		)
+
+		renderSuccessJson(tags)
 	}
 
 	@HasPermission(Permission.TagCreate)
@@ -56,7 +66,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagDelete)
 	def delete(Long id) {
-			tagService.delete(id, projectForWs)
-			return renderSuccessJson()
+		tagService.delete(id, projectForWs)
+		return renderSuccessJson()
 	}
 }

@@ -32,12 +32,12 @@ class Tag {
 	Map toMap() {
 		[
 			id          : id,
-			Name        : name,
-			Description : description,
-			Color       : color.name(),
+			name        : name,
+			description : description,
+			color       : color.name(),
 			css         : color.css,
-			DateCreated : dateCreated,
-			LastModified: lastUpdated
+			dateCreated : dateCreated,
+			lastModified: lastUpdated
 		]
 	}
 }

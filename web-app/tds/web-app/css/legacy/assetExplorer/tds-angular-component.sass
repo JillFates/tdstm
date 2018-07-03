@@ -5,8 +5,12 @@
 @import "../../web-app/css/shared-legacy-angular/dates-info.sass"
 
 .tds-angular-component-content
-  .modal-body
-    padding: 6px 18px
+  .dialog-container
+    border: 1px solid #63a242
+    padding: 0
+    table
+      tr + tr
+        border-top: 2px solid #fff
   .prop
     padding: 5px
   .prop .name
@@ -32,12 +36,7 @@
   .prop a
     color: #00E
   table
-    border-collapse: separate
-    border-spacing: 2px
-    border-collapse: separate
-    padding: 5px 0
     width: 100%
-    /* border: 1px solid #63a242 */
     th
       background: #CCCCCC
       color: #000
@@ -48,14 +47,14 @@
     th, td
       font-size: 13px
       line-height: 12px
-      padding: 0px 2px
+      padding: 0px 4px
       text-align: left
       input
         border: 1px solid #ccc
         margin: 2px 0
         padding: 2px 4px
-    td.sizeScale .select
-      width: 112px
+    td.sizeScale
+      width: 110px
     td .select
       width: 120px
     td.sizeScale input
@@ -69,6 +68,8 @@
         margin-bottom: 4px
     td .label_sm
       background: none repeat scroll 0% 0% #f3f4f6
+    td.valueNW
+      border: 2px solid #fff
     div
       .highField
         label
@@ -92,6 +93,10 @@
         width: 100%
       input
         height: 27px
+        width: 100%
+      input.duration
+        width: 90%
+        margin-right: 2px
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,
@@ -120,7 +125,7 @@
     td[data-for].B .select2-choice,
     td[data-for].B .k-widget span,
     .B
-      background-color:$color-field-blue !important
+      background-color: $color-field-blue !important
       background-image: none !important
 
     /* PINK */
@@ -227,7 +232,6 @@
     margin: .8em 0 .3em 0 !important
   #deps, .deps, #commentListId
     table
-      padding: 0px
       tr
         &.even
           background: #fff
@@ -246,6 +250,14 @@
             background: #EEE
           &.dep-Future
 	          background: #EEE
+  #deps
+    .k-grid
+      border: 1px solid #63a242
+      padding: 0
+
+  #commentListId
+    .k-grid
+      border-width: 0
 .url-field
   text-overflow: ellipsis
   overflow: hidden
@@ -281,5 +293,4 @@
     height: 29.2px !important
   li.move-bundle-item .k-state-selected
     font-weight: bold !important
-
 
