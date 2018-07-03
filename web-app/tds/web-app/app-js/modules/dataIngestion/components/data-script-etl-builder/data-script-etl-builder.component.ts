@@ -18,6 +18,7 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
