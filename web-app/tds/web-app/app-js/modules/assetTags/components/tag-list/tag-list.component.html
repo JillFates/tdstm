@@ -85,9 +85,7 @@
                         <!-- Cell Templates -->
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'Color'" let-dataItem>
                             <div class="text-center">
-                                <span [ngClass]="dataItem.css" class="label tag">
-                                    {{dataItem.Color}}
-                                </span>
+                                <span [ngClass]="dataItem.css" class="label tag"></span>
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
@@ -111,14 +109,10 @@
                                                 [valueField]="'id'"
                                                 [valuePrimitive]="true">
                                 <ng-template kendoDropDownListValueTemplate let-dataItem>
-                                        <span *ngIf="dataItem" [ngClass]="dataItem.css" class="label tag" style="margin: auto; margin-left: 10px;">
-                                            {{dataItem.id}}
-                                        </span>
+                                        <span *ngIf="dataItem" [ngClass]="dataItem.css" class="label tag" style="margin: auto; margin-left: 10px;"></span>
                                 </ng-template>
                                 <ng-template kendoDropDownListItemTemplate let-dataItem>
-                                    <span [ngClass]="dataItem.css" class="label tag">
-                                        {{dataItem.id}}
-                                    </span>
+                                    <span [ngClass]="dataItem.css" class="label tag"></span>
                                 </ng-template>
                             </kendo-dropdownlist>
                         </ng-template>

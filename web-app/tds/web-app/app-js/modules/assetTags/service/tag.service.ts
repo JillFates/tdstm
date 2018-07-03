@@ -105,7 +105,6 @@ export class TagService {
 	 */
 	getTagColorList(): Array<any> {
 		return [
-			{id: 'Black', css: 'tag-black'},
 			{id: 'Brown', css: 'tag-brown'},
 			{id: 'Red', css: 'tag-red'},
 			{id: 'Orange', css: 'tag-orange'},
