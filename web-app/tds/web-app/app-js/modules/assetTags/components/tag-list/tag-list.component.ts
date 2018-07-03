@@ -49,11 +49,15 @@ export class TagListComponent {
 	private onLoad(): void {
 		this.colorList = this.tagService.getTagColorList();
 		this.gridColumns = new TagListColumnsModel();
-		this.tagService.getTags().subscribe( (result: Array<TagModel>) => {
-			this.gridSettings = new DataGridOperationsHelper(result,
-				[{ dir: 'asc', field: 'Name'}], // initial sort config.
-				{ mode: 'single', checkboxOnly: false}, // selectable config.
-				{ useColumn: 'id' }); // checkbox config.
+		this.tagService.getTags().subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
+				this.gridSettings = new DataGridOperationsHelper(result.data,
+					[{ dir: 'asc', field: 'name'}], // initial sort config.
+					{ mode: 'single', checkboxOnly: false}, // selectable config.
+					{ useColumn: 'id' }); // checkbox config.
+			} else {
+				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while loading the tag list.');
+			}
 		}, error => this.handleError(error));
 	}
 
@@ -83,8 +87,12 @@ export class TagListComponent {
 			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
-				this.tagService.deleteTag(dataItem.id).subscribe( result => {
-					this.reloadTagList();
+				this.tagService.deleteTag(dataItem.id).subscribe( (result: ApiResponseModel) => {
+					if (result.status === ApiResponseModel.API_SUCCESS) {
+						this.reloadTagList();
+					} else {
+						this.handleError(result.errors ? result.errors[0] : 'an error ocurred while deleting the tag.');
+					}
 				}, error => this.handleError(error));
 			}
 		}, (reason: any) => console.log('confirm rejected', reason));
@@ -177,7 +185,7 @@ export class TagListComponent {
 	 * @param rowIndex
 	 */
 	private createTag(tagModel: TagModel, sender, rowIndex): void {
-		this.tagService.createTag(tagModel).subscribe( (result: any) => {
+		this.tagService.createTag(tagModel).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
@@ -194,7 +202,7 @@ export class TagListComponent {
 	 * @param rowIndex
 	 */
 	private updateTag(tagModel: TagModel, sender, rowIndex): void {
-		this.tagService.updateTag(tagModel).subscribe( (result: any) => {
+		this.tagService.updateTag(tagModel).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
@@ -220,8 +228,12 @@ export class TagListComponent {
 	 * Reloads the current tag list from grid.
 	 */
 	private reloadTagList(): void {
-		this.tagService.getTags().subscribe((result: Array<TagModel>) => {
-			this.gridSettings.reloadData(result);
+		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
+				this.gridSettings.reloadData(result.data);
+			} else {
+				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while loading the tag list.');
+			}
 		}, error => this.handleError(error));
 	}
 
@@ -239,7 +251,7 @@ export class TagListComponent {
 	 */
 	protected validateUniqueName(dataItem: TagModel): void {
 		this.duplicateName = false;
-		const match: TagModel = this.gridSettings.resultSet.find( item => item.Name.toLowerCase() === dataItem.Name.trim().toLocaleLowerCase());
+		const match: TagModel = this.gridSettings.resultSet.find( (item: TagModel) => item.name.toLowerCase() === dataItem.name.trim().toLocaleLowerCase());
 		if (match) {
 			this.duplicateName = dataItem.id ? dataItem.id !== match.id : true;
 		}

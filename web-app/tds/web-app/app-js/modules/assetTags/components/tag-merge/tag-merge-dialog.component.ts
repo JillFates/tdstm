@@ -35,12 +35,16 @@ export class TagMergeDialogComponent {
 	 * Load necessary lists to render the view.
 	 */
 	private onLoad(): void {
-		this.tagService.getTags().subscribe( (result: Array<TagModel>) => {
-			let defaultEmptyItem = new TagModel();
-			defaultEmptyItem.Name = 'Select...';
-			this.mergeTag = defaultEmptyItem;
-			this.tagList.push(defaultEmptyItem);
-			this.tagList.push(...result.filter( item => item.id !== this.tagModel.id ));
+		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
+				let defaultEmptyItem = new TagModel();
+				defaultEmptyItem.name = 'Select...';
+				this.mergeTag = defaultEmptyItem;
+				this.tagList.push(defaultEmptyItem);
+				this.tagList.push(...result.data.filter( item => item.id !== this.tagModel.id ));
+			} else {
+				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while loading the tag list.');
+			}
 		}, error => this.handleError(error));
 	}
 
@@ -55,7 +59,7 @@ export class TagMergeDialogComponent {
 			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
 				// Do the merge, then close popup
-				this.tagService.mergeTags(this.tagModel.id, this.mergeTag.id).subscribe( result => {
+				this.tagService.mergeTags(this.tagModel.id, this.mergeTag.id).subscribe( (result: ApiResponseModel) => {
 					if (result.status === ApiResponseModel.API_SUCCESS) {
 						this.activeDialog.close(true);
 					} else {

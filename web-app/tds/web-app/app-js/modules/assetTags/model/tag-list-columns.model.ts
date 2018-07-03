@@ -8,28 +8,28 @@ export class TagListColumnsModel {
 		this.columns = [
 			{
 				label: 'Name',
-				property: 'Name',
+				property: 'name',
 				type: 'text',
 				width: 200,
 				locked: false
 			},
 			{
 				label: 'Description',
-				property: 'Description',
+				property: 'description',
 				type: 'text',
 				width: 200,
 				locked: false
 			},
 			{
 				label: 'Color',
-				property: 'Color',
+				property: 'color',
 				type: 'text',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Assets',
-				property: 'Assets',
+				property: 'assets',
 				type: 'number',
 				width: 130,
 				locked: false,
@@ -37,21 +37,21 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Dependencies',
-				property: 'Dependencies',
+				property: 'dependencies',
 				type: 'number',
 				width: 130,
 				locked: false
 			},
 			{
 				label: 'Tasks',
-				property: 'Tasks',
+				property: 'tasks',
 				type: 'number',
 				width: 130,
 				locked: false
 			},
 			{
 				label: 'Date Created',
-				property: 'DateCreated',
+				property: 'dateCreated',
 				type: 'date',
 				format: '{0:d}',
 				width: 160,
@@ -59,7 +59,7 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Last Modified',
-				property: 'LastModified',
+				property: 'lastModified',
 				type: 'date',
 				format: '{0:d}',
 				width: 160,

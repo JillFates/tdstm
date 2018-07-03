@@ -1,12 +1,12 @@
 export class TagModel {
 	id: number;
-	Name: string;
-	Description: string;
-	Assets: number;
-	Dependencies: number;
-	Tasks: number;
-	Color: string;
+	name: string;
+	description: string;
+	assets: number;
+	dependencies: number;
+	tasks: number;
+	color: string;
 	css: string;
-	DateCreated: Date;
-	LastModified: Date;
+	dateCreated: Date;
+	lastModified: Date;
 }
