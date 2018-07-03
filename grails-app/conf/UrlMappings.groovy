@@ -260,7 +260,7 @@ class UrlMappings {
 			controller = 'wsDepAnalyzer'
 		}
 
-		"/ws/event/listBundles/$id" {
+		"/ws/event/listBundles/$id?" {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
 		}

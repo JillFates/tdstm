@@ -261,12 +261,6 @@ export class ManualImportComponent implements OnInit {
 	 * Clears out most of results peformed on the page.
 	 */
 	private onClear(): void {
-		this.fetchResult = null;
-		this.fetchFileContent = null;
-		this.transformResult = null;
-		this.transformFileContent = null;
-		this.viewDataType = null;
-		this.importResult = null;
 		this.removeFileByUID();
 	}
 
@@ -288,7 +282,23 @@ export class ManualImportComponent implements OnInit {
 		if (!this.fetchResult || !this.fetchResult.filename) {
 			return;
 		}
-		e.data = { filename: this.fetchResult.filename };
+		// delete temporary server uploaded file
+		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+
+		// delete temporary transformed file
+		if (this.transformResult) {
+			tempServerFilesToDelete.push(this.transformResult.data.filename)
+		}
+
+		// get the coma separated file names to delete
+		e.data = { filename: tempServerFilesToDelete.join(',') };
+
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.viewDataType = null;
+		this.importResult = null;
 	}
 
 	private onUploadFile(e: UploadEvent): void {

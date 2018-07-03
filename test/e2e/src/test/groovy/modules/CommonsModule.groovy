@@ -70,4 +70,8 @@ class CommonsModule extends Module {
     def waitForEtlScriptsModalHidden(){
         waitFor{!modalDialog.jquery.attr("class").contains("in")}
     }
+
+    def waitForTaskModal() {
+        waitFor { !$('div.modal-task') }
+    }
 }

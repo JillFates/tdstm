@@ -21,11 +21,11 @@ class TagAsset {
 		[
 			id          : id,
 			tagId       : tag.id,
-			Name        : tag.name,
-			Description : tag.description,
-			Color       : tag.color.name(),
+			name        : tag.name,
+			description : tag.description,
+			color       : tag.color.name(),
 			css         : tag.color.css,
-			DateCreated : dateCreated,
+			dateCreated : dateCreated,
 		]
 	}
 }
