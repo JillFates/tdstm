@@ -103,18 +103,18 @@ export class TagService {
 	 * TODO: document
 	 * @returns {Array<string>}
 	 */
-	getTagColorList(): Array<string> {
+	getTagColorList(): Array<any> {
 		return [
-			'Black',
-			'Brown',
-			'Red',
-			'Orange',
-			'Yellow',
-			'Green',
-			'Cyan',
-			'Blue',
-			'Purple',
-			'Pink',
+			{id: 'Black', css: 'tag-black'},
+			{id: 'Brown', css: 'tag-brown'},
+			{id: 'Red', css: 'tag-red'},
+			{id: 'Orange', css: 'tag-orange'},
+			{id: 'Yellow', css: 'tag-yellow'},
+			{id: 'Green', css: 'tag-green'},
+			{id: 'Cyan', css: 'tag-cyan'},
+			{id: 'Blue', css: 'tag-blue'},
+			{id: 'Purple', css: 'tag-purple'},
+			{id: 'Pink', css: 'tag-pink'}
 		];
 	}
 }

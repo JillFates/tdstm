@@ -9,7 +9,7 @@ import {TagService} from '../../service/tag.service';
 import {TagModel} from '../../model/tag.model';
 import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DependencyBatchDetailDialogComponent} from '../../../dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {ImportBatchModel} from '../../../dependencyBatch/model/import-batch.model';
@@ -28,6 +28,9 @@ export class TagListComponent {
 	protected duplicateName = false;
 	private editedRowIndex: number;
 	private editedTag: TagModel;
+	protected userPreferenceService;
+
+	private readonly REMOVE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.REMOVE_CONFIRMATION';
 
 	constructor(
 		private tagService: TagService,
@@ -35,14 +38,13 @@ export class TagListComponent {
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
-		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService) {
-
-		this.onLoad();
+		userPreferenceService: PreferenceService) {
+			this.userPreferenceService = userPreferenceService;
+			this.onLoad();
 	}
 
 	/**
-	 * TODO: document.
+	 * Load necessary lists to render the view.
 	 */
 	private onLoad(): void {
 		this.colorList = this.tagService.getTagColorList();
@@ -56,7 +58,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document.
+	 * On Merge button click.
 	 */
 	protected onMerge(dataItem: TagModel): void {
 		this.dialogService.open(TagMergeDialogComponent, [
@@ -71,14 +73,15 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document
+	 * Handles the Remove action on Remove/Delete button click.
 	 * @param {any} sender
 	 */
 	protected removeHandler({dataItem}): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
-			'Confirm', 'Cancel').then(result => {
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(this.REMOVE_CONFIRMATION),
+			this.translatePipe.transform(PROMPT_CONFIRM),
+			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
 				this.tagService.deleteTag(dataItem.id).subscribe( result => {
 					this.reloadTagList();
@@ -88,7 +91,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document
+	 * Handles the Add process.
 	 * @param {any} sender
 	 */
 	protected addHandler({sender}): void {
@@ -98,7 +101,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Handles the Update process.
 	 * @param {any} sender
 	 * @param {any} rowIndex
 	 * @param {any} dataItem
@@ -120,7 +123,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Handles the Save action on button click.
 	 * @param {any} sender
 	 * @param {any} rowIndex
 	 * @param {any} dataItem
@@ -136,7 +139,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Handles the Cancel action on Cancel button click.
 	 * @param {any} sender
 	 * @param {any} rowIndex
 	 */
@@ -146,7 +149,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Closes the current row in edition.
 	 * @param grid
 	 * @param {number} rowIndex
 	 */
@@ -168,7 +171,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Creates a new tag.
 	 * @param {TagModel} tagModel
 	 * @param sender
 	 * @param rowIndex
@@ -179,13 +182,13 @@ export class TagListComponent {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
 			} else {
-				this.handleError(result.errors ? result.errors[0] : null);
+				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while creating the tag');
 			}
 		}, error => this.handleError(error) );
 	}
 
 	/**
-	 * TODO: document.
+	 * Updates an existing tag.
 	 * @param {TagModel} tagModel
 	 * @param sender
 	 * @param rowIndex
@@ -196,13 +199,13 @@ export class TagListComponent {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
 			} else {
-				this.handleError(result.errors ? result.errors[0] : null);
+				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while updating the tag');
 			}
 		}, error => this.handleError(error) );
 	}
 
 	/**
-	 * * TODO: document.
+	 * Common logic for create and update processes.
 	 * @param sender
 	 * @param rowIndex
 	 */
@@ -214,7 +217,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * * TODO: document.
+	 * Reloads the current tag list from grid.
 	 */
 	private reloadTagList(): void {
 		this.tagService.getTags().subscribe((result: Array<TagModel>) => {
@@ -223,7 +226,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document this.
+	 * Generic error handler function.
 	 * @param error
 	 */
 	private handleError(error): void {
@@ -231,7 +234,7 @@ export class TagListComponent {
 	}
 
 	/**
-	 * TODO: document.
+	 * Validates the current name on form is unique.
 	 * @param {string} name
 	 */
 	protected validateUniqueName(dataItem: TagModel): void {

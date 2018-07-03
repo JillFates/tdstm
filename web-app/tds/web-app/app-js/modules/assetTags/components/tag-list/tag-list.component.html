@@ -1,23 +1,3 @@
-<style>
-    .tds-kendo-grid td {
-        cursor: default;
-    }
-    .btn i.fa {
-        padding-right: 0px;
-    }
-    .form-control.ng-invalid {
-        border: 1px #f00 solid;
-    }
-    .k-button {
-        border-color: #ddd;
-        background-color: #f4f4f4;
-        color: #444;
-        border-radius: 3px;
-        padding: 6px 12px;
-        font-size: 12px;
-        align-items: flex-start;
-    }
-</style>
 <!-- Main content -->
 <div class="content body tds-kendo-grid without-selectabe-rows">
     <section>
@@ -45,9 +25,9 @@
 
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button kendoGridAddCommand class="btn btn-default" type="button" style="margin-left: 15px;">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="margin-right: 5px;"></span>
-                            {{ 'GLOBAL.CREATE' | translate }} Tag
+                        <button kendoGridAddCommand class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            {{ 'GLOBAL.CREATE' | translate }} {{'ASSET_TAGS.TAG' | translate}}
                         </button>
                         <label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
                             <span class="glyphicon glyphicon-repeat"></span>
@@ -62,7 +42,7 @@
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
-                            <div class="k-grid-ignore-click text-center" style="cursor: default">
+                            <div class="text-center">
                                 <button kendoGridEditCommand class="btn btn-action btn-default" title="Edit">
                                     <span class="glyphicon glyphicon-pencil"></span>
                                 </button>
@@ -76,7 +56,7 @@
                                 <button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
                                     <i class="glyphicon glyphicon-ban-circle"></i>
                                 </button>
-                                <div *ngIf="!isNew && !editedTag" style="display: inline;">
+                                <div class="extra-actions" *ngIf="(!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)">
                                     <button (click)="onMerge(dataItem)"
                                             class="btn btn-action btn-default" title="Merge">
                                         <i class="fa fa-exchange"></i>
@@ -105,13 +85,9 @@
                         <!-- Cell Templates -->
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'Color'" let-dataItem>
                             <div class="text-center">
-                                <!--<span [style.background-color]="dataItem[column.property]"-->
-                                <span [ngClass]="dataItem.css"
-                                      class="label" style="width: 30px;
-                                      height: 25px;
-                                      display: block;
-                                      margin: 0 auto 0 auto;"
-                                ></span>
+                                <span [ngClass]="dataItem.css" class="label tag">
+                                    {{dataItem.Color}}
+                                </span>
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
@@ -129,30 +105,40 @@
                                    type="text" name="description" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'Color'">
-                            <kendo-dropdownlist required name="color"
-                                                class="form-control" style="width: 98%; margin: 0 auto 0 auto;"
+                            <kendo-dropdownlist required name="color" class="form-control"
                                                 [data]="colorList"
-                                                [(ngModel)]="dataItem.Color">
+                                                [(ngModel)]="dataItem.Color"
+                                                [valueField]="'id'"
+                                                [valuePrimitive]="true">
+                                <ng-template kendoDropDownListValueTemplate let-dataItem>
+                                        <span *ngIf="dataItem" [ngClass]="dataItem.css" class="label tag" style="margin: auto; margin-left: 10px;">
+                                            {{dataItem.id}}
+                                        </span>
+                                </ng-template>
+                                <ng-template kendoDropDownListItemTemplate let-dataItem>
+                                    <span [ngClass]="dataItem.css" class="label tag">
+                                        {{dataItem.id}}
+                                    </span>
+                                </ng-template>
                             </kendo-dropdownlist>
-                            <!--<input [(ngModel)]="dataItem.Color" required-->
-                                   <!--type="text" name="color" class="form-control"/>-->
                         </ng-template>
 
                         <!-- Filter Template -->
                         <ng-template kendoGridFilterCellTemplate let-filter>
-                            <div class="has-feedback" style="margin-bottom:0px;"
+                            <div class="has-feedback"
                                  *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'Color' )">
                                 <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
                                 <ng-template #dateFilter>
                                     <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"
                                                       [ngModelOptions]="{standalone: true}"></kendo-datepicker>
                                     <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
-                                          style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                          class="fa fa-times form-control-feedback"></span>
                                 </ng-template>
                                 <ng-template #stringFilter>
                                     <input [(ngModel)]="column.filter" (keyup)="gridSettings.onFilter(column)"
                                            type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
+                                          class="fa fa-times form-control-feedback"></span>
                                 </ng-template>
                             </div>
                         </ng-template>

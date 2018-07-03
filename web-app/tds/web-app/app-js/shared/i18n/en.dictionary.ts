@@ -32,6 +32,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
+		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Confirmation Required',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
@@ -72,8 +73,13 @@ export const en_DICTIONARY: Object = {
 		'SYSTEM_VIEW': 'System View'
 	},
 	'ASSET_TAGS': {
+		'TAG': 'Tag',
 		'MANAGE_TAGS': 'Manage Tags',
-		'CREATE_TAG': 'Create Tag'
+		'CREATE_TAG': 'Create Tag',
+		'TAG_LIST': {
+			'REMOVE_CONFIRMATION': 'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
+			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
+		}
 	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',

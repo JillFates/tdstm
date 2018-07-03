@@ -3,31 +3,36 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {TagService} from '../../service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TagModel} from '../../model/tag.model';
-import {KEYSTROKE} from '../../../../shared/model/constants';
+import {KEYSTROKE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tag-merge-dialog',
 	templateUrl: '../tds/web-app/app-js/modules/assetTags/components/tag-merge/tag-merge-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
-	}
+	},
+	providers: [TranslatePipe]
 })
 export class TagMergeDialogComponent {
 
 	protected tagList: Array<TagModel> = [];
 	protected mergeTag: TagModel;
 
+	private readonly MERGE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.MERGE_CONFIRMATION';
+
 	constructor(
 		protected tagModel: TagModel,
 		private tagService: TagService,
 		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService) {
+		private activeDialog: UIActiveDialogService,
+		private translatePipe: TranslatePipe) {
 			this.onLoad();
 	}
 
 	/**
-	 * TODO: document.
+	 * Load necessary lists to render the view.
 	 */
 	private onLoad(): void {
 		this.tagService.getTags().subscribe( (result: Array<TagModel>) => {
@@ -39,18 +44,22 @@ export class TagMergeDialogComponent {
 		}, error => this.handleError(error));
 	}
 
+	/**
+	 * On Merge button click, prompts a confirmation, then does the merge operation if confirmed.
+	 */
 	protected onMerge(): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'Confirm merging of Tags. There is no undo for this action.',
-			'Confirm', 'Cancel').then(result => {
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(this.MERGE_CONFIRMATION),
+			this.translatePipe.transform(PROMPT_CONFIRM),
+			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
 				// Do the merge, then close popup
 				this.tagService.mergeTags(this.tagModel.id, this.mergeTag.id).subscribe( result => {
 					if (result.status === ApiResponseModel.API_SUCCESS) {
 						this.activeDialog.close(true);
 					} else {
-						this.handleError(result.errors ? result.errors[0] : 'Error ocurred when merging tags.')
+						this.handleError(result.errors ? result.errors[0] : 'error ocurred while merging tags.')
 					}
 				}, error => this.handleError(error));
 			}
@@ -75,7 +84,7 @@ export class TagMergeDialogComponent {
 	}
 
 	/**
-	 * TODO: document this.
+	 * Generic error handler function.
 	 * @param error
 	 */
 	private handleError(error): void {
