@@ -36,6 +36,7 @@ class DatascriptsPage extends Page {
     }
 
     def filterByName(name){
+        scrollLeft()
         nameFilter = name
     }
 
@@ -44,14 +45,17 @@ class DatascriptsPage extends Page {
     }
 
     def filterByDescription(description){
+        scrollLeft()
         descriptionFilter = description
     }
 
     def filterByMode(name){
+        scrollRight()
         modeFilter = name
     }
 
     def filterByProvider(name){
+        scrollLeft()
         providerFilter = name
     }
 
@@ -64,29 +68,53 @@ class DatascriptsPage extends Page {
     }
 
     def clickOnFirstGridRow(){
+        scrollLeft()
         waitFor{firstDSName.click()}
     }
 
     def clickOnNameHeader(){
-        nameGridHeader.click()
+        scrollLeft()
+        waitFor{nameGridHeader.click()}
     }
 
     def collectFirstDSInfoDisplayedInGrid(){
         def dsInfo = [:]
         dsInfo.putAll([
-                "name": firstDSName.text().trim(),
-                "description": firstDSDescription.text().trim(),
-                "provider": firstDSProvider.text().trim(),
-                "mode": firstDSMode.text().trim()
+                "name": getFirstRowDSName(),
+                "description": getFirstRowDSDescription(),
+                "provider": getFirstRowDSProvider(),
+                "mode": getFirstRowDSMode()
         ])
         dsInfo
     }
 
+    def getFirstRowDSName(){
+        scrollLeft()
+        firstDSName.text().trim()
+    }
+
+    def getFirstRowDSDescription(){
+        scrollRight()
+        firstDSDescription.text().trim()
+    }
+
+    def getFirstRowDSProvider(){
+        scrollLeft()
+        firstDSProvider.text().trim()
+    }
+
+    def getFirstRowDSMode(){
+        scrollRight()
+        firstDSMode.text().trim()
+    }
+
     def removeNameFilter(){
+        scrollLeft()
         removeFilterNameIcon.click()
     }
 
     def removeDescriptionFilter(){
+        scrollRight()
         removeFilterDescriptionIcon.click()
     }
 
@@ -103,10 +131,11 @@ class DatascriptsPage extends Page {
     }
 
     def scrollRight(){
-        browser.driver.executeScript('$(".k-grid-content").scrollLeft(500)')
+        def gridWidth = browser.driver.executeScript('return $("kendo-grid").width()')
+        browser.driver.executeScript("\$('.k-grid-header-wrap').scrollLeft($gridWidth)")
     }
 
     def scrollLeft(){
-        browser.driver.executeScript('$(".k-grid-content").scrollLeft(0)')
+        browser.driver.executeScript('$(".k-grid-header-wrap").scrollLeft(0)')
     }
 }

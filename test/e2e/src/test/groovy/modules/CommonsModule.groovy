@@ -2,14 +2,13 @@ package modules
 
 import geb.Module
 import geb.waiting.WaitTimeoutException
+import geb.Browser
 
 class CommonsModule extends Module {
 
     static content = {
-        filterCalendarIcons { $('.k-i-calendar')}
+        modalDialog {$('div#tdsUiDialog')}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
-        removeKendoDateFilterIcons { $('kendo-datepicker + span.fa-times')}
-        allFilters { $('input + span.fa-times')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -53,18 +52,22 @@ class CommonsModule extends Module {
     * */
     def setKendoDateFilter(date, calendarIconIndex = null){
         if (calendarIconIndex != null) {
-            filterCalendarIcons[calendarIconIndex].click()
+            browser.driver.executeScript("\$('.k-i-calendar')[$calendarIconIndex].click()")
         } else {
-            filterCalendarIcons.click()
+            browser.driver.executeScript("\$('.k-i-calendar').click()")
         }
         waitFor{kendoDateFilter.find{it.@title.contains(date)}.click()}
     }
 
     def removeKendoDateFilter(calendarIconIndex = null){
         if (calendarIconIndex != null) {
-            removeKendoDateFilterIcons[calendarIconIndex].click()
+            browser.driver.executeScript("\$('kendo-datepicker + span.fa-times')[$calendarIconIndex].click()")
         } else {
-            removeKendoDateFilterIcons.click()
+            browser.driver.executeScript("\$('kendo-datepicker + span.fa-times').click()")
         }
+    }
+
+    def waitForEtlScriptsModalHidden(){
+        waitFor{!modalDialog.jquery.attr("class").contains("in")}
     }
 }

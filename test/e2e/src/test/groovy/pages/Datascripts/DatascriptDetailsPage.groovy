@@ -1,6 +1,7 @@
 package pages.Datascripts
 
 import geb.Page
+import modules.CommonsModule
 
 class DatascriptDetailsPage extends Page{
 
@@ -19,8 +20,8 @@ class DatascriptDetailsPage extends Page{
         dsName {$('.label-detail')[1]}
         dsMode {$('.label-detail')[2]}
         dsDescription {$('.label-detail')[3]}
-        modalBackdrop {$('div.modal-backdrop')}
         dsDesignerButton {$("data-script-view-edit").find("button", text: contains("ETL Script Designer"))}
+        commonsModule { module CommonsModule }
     }
 
     def clickOnDesignerButton(){
@@ -29,7 +30,7 @@ class DatascriptDetailsPage extends Page{
 
     def clickOnXButton(){
         waitFor{dsDetailXIcon.click()}
-        waitFor{!modalBackdrop.jquery.attr("class").contains("in")}
+        commonsModule.waitForEtlScriptsModalHidden()
     }
 
     def getDSNameLabelText(){
