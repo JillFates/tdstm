@@ -35,6 +35,7 @@ class TaskDeletionSpec extends GebReportingSpec {
         tcModalTaskName = taskName
         tcModalEventSelector = taskEvent
         waitFor { tcModalSaveBtn.click() }
+        commonsModule.waitForTaskModal()
         at TaskManagerPage
     }
 
