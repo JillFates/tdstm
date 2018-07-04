@@ -130,7 +130,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
         at ViewPage
         expectedColumns = createViewModule.getListOfSelectedFields()
         when: "User saves the changes made"
-        waitFor { createViewModule.clickSave() }
+        createViewModule.clickSave()
         waitFor { clickViewManagerBreadCrumb() }
         at AssetViewsPage
         waitFor { allViewsModule.openViewByName(selectedView) }
