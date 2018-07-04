@@ -40,7 +40,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 												<kendo-dropdownlist #controlSme
-														class="person-list"
+														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="model.asset.sme.id"
 														[defaultItem]="defaultItem"
@@ -52,7 +52,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
 											<td data-for="environment" class="${standardFieldSpecs.environment.imp?:''}">
 												<kendo-dropdownlist
-														class="person-list"
+														class="tm-input-control person-list"
 														name="modelAssetEnvironment"
 														[(ngModel)]="model.asset.environment"
 														[defaultItem]="'Please Select'"
@@ -68,7 +68,7 @@
 											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 												<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 												<kendo-dropdownlist  #controlSme2
-													class="person-list"
+													class="tm-input-control person-list"
 													name="modelAssetSme2"
 													[(ngModel)]="model.asset.sme2.id"
 													[defaultItem]="defaultItem"
@@ -80,10 +80,11 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
 											<td data-for="criticality" class="${standardFieldSpecs.criticality.imp?:''}">
 												<kendo-dropdownlist
-														name="modelAssetCriticality"
-														[(ngModel)]="model.asset.criticality"
-														[defaultItem]="'Please Select'"
-														[data]="${asset.constraints.criticality.inList as JSON}">
+													class="tm-input-control"
+													name="modelAssetCriticality"
+													[(ngModel)]="model.asset.criticality"
+													[defaultItem]="'Please Select'"
+													[data]="${asset.constraints.criticality.inList as JSON}">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${asset.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="44" tooltipDataPlacement="bottom"/>
@@ -94,7 +95,7 @@
 											<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 												<kendo-dropdownlist
-														class=""
+														class="tm-input-control"
 														name="modelAssetappOwner"
 														[(ngModel)]="model.asset.appOwner.id"
 														[defaultItem]="defaultItem"
@@ -106,11 +107,12 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 											<td data-for="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}">
 												<kendo-dropdownlist
-														name="modelAssetMoveBundle"
-														[data]="model.moveBundleList"
-														[(ngModel)]="model.asset.moveBundle"
-														[textField]="'name'"
-														[valueField]="'id'">
+													class="tm-input-control"
+													name="modelAssetMoveBundle"
+													[data]="model.moveBundleList"
+													[(ngModel)]="model.asset.moveBundle"
+													[textField]="'name'"
+													[valueField]="'id'">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="45" tooltipDataPlacement="bottom"/>
@@ -121,9 +123,10 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 											<td data-for="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}">
 												<kendo-dropdownlist
-														name="modelAssetPlanStatus"
-														[(ngModel)]="model.asset.planStatus"
-														[data]="model.planStatusOptions">
+													class="tm-input-control"
+													name="modelAssetPlanStatus"
+													[(ngModel)]="model.asset.planStatus"
+													[data]="model.planStatusOptions">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="46" tooltipDataPlacement="bottom"/>
@@ -135,14 +138,16 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 											<td data-for="retireDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}  ${standardFieldSpecs.retireDate.imp?:''}">
 												<kendo-datepicker
-														name="modelAssetRetireDate"
-														[format]="dateFormat"
-														[(value)]="model.asset.retireDate">
+													class="tm-input-control"
+													name="modelAssetRetireDate"
+													[format]="dateFormat"
+													[(value)]="model.asset.retireDate">
 												</kendo-datepicker>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 											<td data-for="validation" class="${standardFieldSpecs.validation.imp?:''}">
 												<kendo-dropdownlist
+														class="tm-input-control"
 														name="modelAssetValidation"
 														[data]="${asset.constraints.validation.inList as JSON}"
 														[(ngModel)]="model.asset.validation">
@@ -153,6 +158,7 @@
 											<td data-for="testProc" class="${standardFieldSpecs.testProc.imp?:''}">
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.testProc}">
 												<kendo-dropdownlist
+														class="tm-input-control"
 														name="modelAssetTestProc"
 														[(ngModel)]="model.asset.testProc"
 														[defaultItem]="'?'"
@@ -167,6 +173,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 											<td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}  ${standardFieldSpecs.maintExpDate.imp?:''} ">
 												<kendo-datepicker
+														class="tm-input-control"
 														name="modelAssetMaintExpDate"
 														[format]="dateFormat"
 														[(value)]="model.asset.maintExpDate">
@@ -175,6 +182,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
 											<td data-for="latency" class="${standardFieldSpecs.latency.imp?:''}">
 												<kendo-dropdownlist
+														class="tm-input-control"
 														name="modelAssetLatency"
 														[(ngModel)]="model.asset.latency"
 														[defaultItem]="'?'"
@@ -185,6 +193,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}"/>
 											<td data-for="startupProc" class="${standardFieldSpecs.startupProc.imp?:''}">
 												<kendo-dropdownlist
+														class="tm-input-control"
 														name="modelAssetStartupProc"
 														[(ngModel)]="model.asset.startupProc"
 														[defaultItem]="'?'"
@@ -203,7 +212,7 @@
 													</tdsAngular:tooltipSpan>
 												</label>
 											</td>
-											<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
+											<td class="tm-input-control-container ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
 														(modelChange)="model.asset.shutdownBy = $event"
@@ -220,7 +229,7 @@
 										</tr>
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control-container ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
 														(modelChange)="model.asset.startupBy = $event"
@@ -231,7 +240,7 @@
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control-container ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
 														(modelChange)="model.asset.testingBy = $event"
