@@ -38,7 +38,7 @@
 		        <div class="import-item-container">
 			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
 			        <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue"/>
-			        <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-info-circle pull-right"></i>
+			        <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
 		        </div>
 	        </ng-template>
         </kendo-grid-column>
@@ -48,7 +48,7 @@
                 <div class="import-item-container">
                     <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
 	                <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue"/>
-	                <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-info-circle pull-right"></i>
+	                <i [ngClass]="{'has-init-value': dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
                 </div>
             </ng-template>
         </kendo-grid-column>
