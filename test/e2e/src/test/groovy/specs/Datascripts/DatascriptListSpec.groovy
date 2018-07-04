@@ -111,7 +111,7 @@ class DatascriptListSpec extends GebReportingSpec{
             firstDSInformation = collectFirstDSInfoDisplayedInGrid()
         and: 'The user clicks on datascript row'
             clickOnFirstGridRow()
-        when: 'Datascript details modal is opned'
+        when: 'Datascript details modal is opened'
             at DatascriptDetailsPage
         then: 'Datascript information is properly displayed'
             getDSProviderLabelText() == firstDSInformation.provider
