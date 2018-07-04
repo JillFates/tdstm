@@ -311,9 +311,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * if init is present return init, otherwise return value
+	 * if value is present return value otherwise returns init
 	 */
-	public getInitOrValue(dataItem): void {
-		return dataItem.init || (dataItem.value || '');
+	public getInitOrValue(dataItem): string {
+		if (dataItem.value) {
+			return dataItem.value;
+		}
+		return (dataItem.init || '');
 	}
 }
