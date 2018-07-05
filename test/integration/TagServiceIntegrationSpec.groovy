@@ -298,7 +298,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
-			List results = tagService.list(project, null, null, null, null, moveBundle.id)
+			List results = tagService.list(project, null, null, null, null, [moveBundle.id])
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
@@ -318,14 +318,14 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with other moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
-			List results = tagService.list(project, null, null, null, null, moveBundle2.id)
+			List results = tagService.list(project, null, null, null, null, [moveBundle2.id])
 		then: 'We get a list of map results'
 			!results.size()
 	}
 
 	void "test list with all parameters plus moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
-			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle.id)
+			List results = tagService.list(project, 'group', 'this is', now, now, [moveBundle.id])
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
@@ -338,7 +338,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test list with all parameters plus moveBundleId that will filter out all results"() {
 		when: 'Calling the list method with all parameters set'
-			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle2.id)
+			List results = tagService.list(project, 'group', 'this is', now, now, [moveBundle2.id])
 		then: 'We get a list of map results'
 			!results
 	}
