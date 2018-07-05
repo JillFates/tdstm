@@ -73,7 +73,7 @@ class TaskCreationSpec extends GebReportingSpec {
             tcModalTeamSelector = taskTeam
         and: 'The User clicks the "Save" Button'
             waitFor { tcModalSaveBtn.click() }
-
+            commonsModule.waitForTaskModal()
         then: 'The User should be redirected to the Task Manager Section'
             at TaskManagerPage
     }
