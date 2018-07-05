@@ -340,13 +340,9 @@ class Element implements RangeChecker {
 	 * @param safe this parameter defines if it is necessary to check the Element#value type
 	 * @return the element instance that received this command
 	 */
-	Element trim(Boolean safe = false) {
-		if (safe){
-			value = (value instanceof CharSequence) ? value.trim() : value
-		} else {
-			value = transformStringObject('trim', value) {
-				it.trim()
-			}
+	Element trim() {
+		value = transformStringObject('trim', value) {
+			it.trim()
 		}
 
 		return this

@@ -18,6 +18,7 @@ import {DependencyBatchModule} from '../modules/dependencyBatch/dependency-batch
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
+import {AssetTagsModule} from '../modules/assetTags/asset-tags.module';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -34,6 +35,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 		DataIngestionModule,
 		ImportAssetsModule,
 		DependencyBatchModule,
+		AssetTagsModule,
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,
