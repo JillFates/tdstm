@@ -9,7 +9,7 @@ import grails.validation.Validateable
 class ContextCommand {
 
 	Long eventId
-	Long bundleId
+	List<Long> bundleId
 	List <Long> tag = []
 	boolean and = true
 

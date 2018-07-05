@@ -1012,6 +1012,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/tag/search" {
+			controller = "wsTag"
+			action = [
+				POST: "search"
+			]
+		}
+
 		"/ws/tag/$id" {
 			controller = "wsTag"
 			action = [
