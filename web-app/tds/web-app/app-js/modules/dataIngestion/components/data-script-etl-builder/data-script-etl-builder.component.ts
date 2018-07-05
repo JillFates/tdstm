@@ -19,6 +19,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -53,14 +54,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		currentProgress: 0,
 	};
 	private testScripInterval: any;
+	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 
 	ngAfterViewInit(): void {
+		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
 	}
 
 	constructor(
+		private translatePipe: TranslatePipe,
 		private dialogService: UIDialogService,
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
@@ -304,5 +308,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected restoreWindow() {
 		this.isWindowMaximized = false;
+	}
+
+	/**
+	 * if value is present return value otherwise returns init
+	 */
+	public getInitOrValue(dataItem): string {
+		if (dataItem.value) {
+			return dataItem.value;
+		}
+		return (dataItem.init || '');
 	}
 }
