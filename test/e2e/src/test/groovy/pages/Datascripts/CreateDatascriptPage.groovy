@@ -1,6 +1,7 @@
 package pages.Datascripts
 
 import geb.Page
+import modules.CommonsModule
 
 class CreateDatascriptPage extends Page{
 
@@ -26,7 +27,7 @@ class CreateDatascriptPage extends Page{
         latestProvider {$("div", class:"k-list-scroller").find("li", class:"k-item")[1]}
         datascriptNameField   { $('input#dataScriptName')}
         datascriptDescField   { $('textarea#dataScriptDescription')}
-
+        commonsModule { module CommonsModule }
     }
 
 }

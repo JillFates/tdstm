@@ -49,6 +49,7 @@ class TaskEditionSpec extends GebReportingSpec {
         tcModalEventSelector = taskEvent
         tcModalStatusSelector = taskOldStatus
         waitFor { tcModalSaveBtn.click() }
+        commonsModule.waitForTaskModal()
         at TaskManagerPage
     }
 
