@@ -603,7 +603,8 @@ class DataviewService implements ServiceMethods {
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
 						filter: filterFor(column),
-						type: typeFor(column)
+						type: typeFor(column),
+						whereProperty: wherePropertyFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -753,6 +754,19 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String filterFor(Map column) {
 		return column.filter
+	}
+
+	/**
+	 * Return the expression that needs to be used when constructing the 'where'
+	 * clause for the given field.
+	 *
+	 * This is added to catch scenarios, such as tags, where the expression for projecting the field
+	 * and for filtering it are different.
+	 * @param column
+	 * @return
+	 */
+	private static String wherePropertyFor(Map column) {
+		return transformations[column.property].whereProperty?: propertyFor(column)
 	}
 
 
@@ -973,7 +987,8 @@ class DataviewService implements ServiceMethods {
 			join: """
 				left outer join AE.tagAssets TA
 				left outer join TA.tag T
-			"""
+			""",
+			whereProperty: 'TA.tag'
 		],
 
     ].withDefault {

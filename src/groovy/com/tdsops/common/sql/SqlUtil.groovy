@@ -416,7 +416,7 @@ class SqlUtil {
 			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
 
-		fieldSearchData.sqlSearchExpression = fieldSearchData.column + ' ' + inOp + ' (' + values.join(', ') + ')'
+		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
 	}
 
 	/**
@@ -435,7 +435,7 @@ class SqlUtil {
 			String namedParameter = "${fieldSearchData.columnAlias}__" + index
 			// Parse the string parameter considering user wildcards.
 			String parsedParameter = parseStringParameter(value, fieldSearchData.useWildcards)
-			String sqlExpression = getSingleValueExpression(fieldSearchData.column, namedParameter, likeOp )
+			String sqlExpression = getSingleValueExpression(fieldSearchData.whereProperty, namedParameter, likeOp )
 			fieldSearchData.addSqlSearchParameter(namedParameter, parsedParameter)
 			expressions << sqlExpression
 		}
@@ -459,7 +459,7 @@ class SqlUtil {
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
-		String searchColumn = fieldSearchData.column
+		String searchColumn = fieldSearchData.whereProperty
 		Object paramValue
 
 		if (isNumericField(fieldSearchData)) {

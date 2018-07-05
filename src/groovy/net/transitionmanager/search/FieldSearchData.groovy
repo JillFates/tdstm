@@ -36,7 +36,8 @@ class FieldSearchData {
                     column : column,
                     columnAlias : columnAlias?: column,
                     useWildcards : false,
-                    type: type
+                    type: type,
+                    whereProperty: whereProperty
             ]
         }
 
@@ -151,5 +152,9 @@ class FieldSearchData {
 
     Class getType() {
         return searchInfo.type
+    }
+
+    String getWhereProperty() {
+        return searchInfo.whereProperty?: column
     }
 }
