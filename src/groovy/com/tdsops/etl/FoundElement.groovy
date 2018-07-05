@@ -170,6 +170,10 @@ abstract class FoundElement {
 	private def calculateValue(def args) {
 
 		if(args.size() == 1) {
+			//TODO: DMC. Review with John. TM-11182 Application Description field not loading during asset posting when using a variable
+			if(processor.binding.isValidETLVariableName(args[0]?.toString())){
+				throw ETLProcessorException.missingPropertyException(args[0])
+			}
 			return ETLValueHelper.valueOf(args[0])
 		} else {
 			return args.collect{ ETLValueHelper.valueOf(it) }

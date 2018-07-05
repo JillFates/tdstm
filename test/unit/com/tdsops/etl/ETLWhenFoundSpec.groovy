@@ -560,7 +560,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	}
 
     @See('TM-11182')
-    void 'test can create throw an Exception when script tries to use a non existing variable '() {
+    void 'test can create throw an Exception when script tries to use a non existing variable'() {
 
 	    given:
 		    def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -633,7 +633,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 	    then: 'It throws an Exception because variable in not defined'
 		    ETLProcessorException e = thrown ETLProcessorException
-		    e.message == "Undefined variable: unknownVar"
+		    e.message == 'No such property: unknownVar'
 
 	    cleanup:
 		    if (fileName) {
