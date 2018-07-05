@@ -2,6 +2,7 @@ package pages.Datascripts
 
 import geb.Page
 import utils.CommonActions
+import modules.CommonsModule
 
 class EditDatascriptPage extends Page{
 
@@ -26,7 +27,7 @@ class EditDatascriptPage extends Page{
         providers { $("div", class:"k-list-scroller").find("li", class:"k-item")}
         datascriptNameField { $('input#dataScriptName')}
         datascriptDescField { $('textarea#dataScriptDescription')}
-        modalBackdrop {$('div.modal-backdrop')}
+        commonsModule { module CommonsModule }
     }
 
     static commonActions = new CommonActions()
@@ -57,6 +58,6 @@ class EditDatascriptPage extends Page{
 
     def clickOnSaveButton(){
         waitFor{datascriptSaveBtn.click()}
-        waitFor{!modalBackdrop.jquery.attr("class").contains("in")}
+        commonsModule.waitForEtlScriptsModalHidden()
     }
 }
