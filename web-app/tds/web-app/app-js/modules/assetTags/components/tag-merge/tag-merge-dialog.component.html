@@ -1,0 +1,56 @@
+<style>
+    /* TODO: Apply this style as a general style for all forms. */
+
+</style>
+<div class="modal-content" tabIndex="0">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close" tds-autofocus>
+            <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">Tag Merge</h4>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow: auto;">
+        <div class="modal-body-container">
+            <!-- -->
+            <form name="providerForm" class="form-horizontal left-alignment">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Name: </label>
+                                <div class="col-sm-9">
+                                    <label class="control-label label-detail">{{tagModel.name}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mergeTag" class="col-sm-2 control-label">
+                                    Merge to: <span class="error">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <kendo-dropdownlist required name="mergeTag" id="mergeTag"
+                                                        class="form-control"
+                                                        [data]="tagList"
+                                                        [textField]="'name'"
+                                                        [valueField]="'id'"
+                                                        [(ngModel)]="mergeTag"
+                                                        [ngClass]="{'error': !mergeTag || !mergeTag.id}">
+                                    </kendo-dropdownlist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button [disabled]="!mergeTag || !mergeTag.id" (click)="onMerge()"
+                type="button" class="btn btn-primary pull-left text-center">
+            <span class="fa fa-exchange"></span> Merge
+        </button>
+        <button (click)="cancelCloseDialog()"
+                type="button" class="btn btn-default text-center">
+            <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
+        </button>
+    </div>
+</div>

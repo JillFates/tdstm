@@ -3,13 +3,13 @@ package specs.AssetViewManager
 import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Stepwise
+import spock.lang.Ignore
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import jodd.util.RandomString
 import pages.Downloads.HomeUserDownloadsPage
 
-@Stepwise
+@Ignore
 class ExportViewSpec extends GebReportingSpec {
 
     def testKey

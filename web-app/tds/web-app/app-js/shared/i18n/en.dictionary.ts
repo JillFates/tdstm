@@ -3,6 +3,43 @@
  */
 
 export const en_DICTIONARY: Object = {
+	'GLOBAL': {
+		'OK': 'Ok',
+		'ADD': 'Add',
+		'ACTION': 'Action',
+		'ARCHIVE': 'Archive',
+		'CANCEL': 'Cancel',
+		'CREATE': 'Create',
+		'CLOSE': 'Close',
+		'DELETE': 'Delete',
+		'EDIT': 'Edit',
+		'FILTER': 'Filter',
+		'LIST': 'List',
+		'LEGEND': 'Legend',
+		'LOAD': 'Load',
+		'SAVE': 'Save',
+		'SAVE_ALL': 'Save All',
+		'SAVE_AS': 'Save As',
+		'DEFAULT': 'Default',
+		'SORT': 'Sort',
+		'ADD_FAVORITES': 'Add to Favorites',
+		'SHARE_WITH_USERS': 'Share with other users',
+		'CLEAR_FILTERS': 'Clear filters',
+		'FREEZE': 'Freeze',
+		'CLEAR': 'Clear',
+		'PLEASE_SELECT': 'Please Select..',
+		'CONTINUE': 'Continue',
+		'PROJECTS': 'Projects',
+		'UPLOAD': 'Upload',
+		'FETCH': 'Fetch',
+		'CONFIRM': 'Confirm',
+		'CONFIRMATION_PROMPT' : {
+			'CONFIRMATION_REQUIRED': 'Confirmation Required',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
+			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
+		}
+	},
 	'ASSETS': {
 		'APPLICATION': 'Application',
 		'DATABASE': 'Database',
@@ -34,6 +71,15 @@ export const en_DICTIONARY: Object = {
 			'SYSTEM': 'System',
 		},
 		'SYSTEM_VIEW': 'System View'
+	},
+	'ASSET_TAGS': {
+		'TAG': 'Tag',
+		'MANAGE_TAGS': 'Manage Tags',
+		'CREATE_TAG': 'Create Tag',
+		'TAG_LIST': {
+			'REMOVE_CONFIRMATION': 'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
+			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
+		}
 	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
@@ -129,40 +175,6 @@ export const en_DICTIONARY: Object = {
 		'DETAIL': {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
-		}
-	},
-	'GLOBAL': {
-		'OK': 'Ok',
-		'ADD': 'Add',
-		'ARCHIVE': 'Archive',
-		'CANCEL': 'Cancel',
-		'CREATE': 'Create',
-		'CLOSE': 'Close',
-		'DELETE': 'Delete',
-		'EDIT': 'Edit',
-		'FILTER': 'Filter',
-		'LIST': 'List',
-		'LEGEND': 'Legend',
-		'LOAD': 'Load',
-		'SAVE': 'Save',
-		'SAVE_ALL': 'Save All',
-		'SAVE_AS': 'Save As',
-		'DEFAULT': 'Default',
-		'SORT': 'Sort',
-		'ADD_FAVORITES': 'Add to Favorites',
-		'SHARE_WITH_USERS': 'Share with other users',
-		'CLEAR_FILTERS': 'Clear filters',
-		'FREEZE': 'Freeze',
-		'CLEAR': 'Clear',
-		'PLEASE_SELECT': 'Please Select..',
-		'CONTINUE': 'Continue',
-		'UPLOAD': 'Upload',
-		'FETCH': 'Fetch',
-		'CONFIRMATION_PROMPT' : {
-			'CONFIRMATION_REQUIRED': 'Confirmation Required',
-			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
-			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
-			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		}
 	},
 	'TASK_MANAGER': {
