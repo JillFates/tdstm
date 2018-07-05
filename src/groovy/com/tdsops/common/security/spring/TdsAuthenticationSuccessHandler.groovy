@@ -15,11 +15,11 @@ import net.transitionmanager.service.UserService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
 import org.springframework.util.Assert
-
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
+
 
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
@@ -52,6 +52,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				userService.updateLastLogin(userLogin)
 				userService.resetFailedLoginAttempts(userLogin)
 				userService.setLockedOutUntil(userLogin, null)
+				// create a new UserLoginProjectAccess to account later for user logins on metric recollection
+				userService.createUserLoginProjectAccess(userLogin)
 
 				String userAgent = authentication.userAgent
 				boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')

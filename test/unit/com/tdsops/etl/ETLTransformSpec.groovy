@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -83,6 +84,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
 			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
 			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
+			updater(['device id': '152257', 'model name': 'Blaster', 'manufacturer name': 'SUN'])
 		}
 
 		File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
@@ -678,12 +680,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					with(data[0].fields.appVendor) {
 						originalValue.contains('Microsoft\b\nInc')
-						value == 'Microsoft\b\nIncorporated'
+						value == 'Microsoft~+Incorporated'
 					}
 
 					with(data[1].fields.appVendor) {
 						originalValue.contains('Mozilla\t\t\0Inc')
-						value == 'Mozilla\t\t\0Incorporated'
+						value == 'Mozilla++~Incorporated'
 					}
 				}
 			}
@@ -710,12 +712,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain == ETLDomain.Application.name()
 					with(data[0].fields.appVendor) {
 						originalValue.contains('Microsoft\b\nInc')
-						value == "Mirosoft\b\nIn"
+						value == "Mirosoft~+In"
 					}
 
 					with(data[1].fields.appVendor) {
 						originalValue.contains('Mozilla\t\t\0Inc')
-						value == "Mozill\t\t\0In"
+						value == "Mozill++~In"
 					}
 				}
 			}
@@ -863,7 +865,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -892,7 +894,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1148,10 +1150,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
+			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
 			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
-			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
+			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
 			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
@@ -1172,10 +1174,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
+			etlProcessor.getElement(0, 1).value == "Microsoft~+Incorporated"
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
-			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
+			etlProcessor.getElement(1, 1).value == "Mozilla++~Incorporated"
 			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
@@ -1195,7 +1197,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
@@ -1214,10 +1216,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
-			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
+			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
 			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
@@ -1237,10 +1239,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
 			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
-			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
+			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
 			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
@@ -1326,6 +1328,126 @@ class ETLTransformSpec extends ETLBaseSpec {
 			','			|	['one', null, 'three', true]			|	'one,,three'
 			','			|	['one', 'two', ['three', 'four']]		|	'one,two,three,four'
 			','			|	['one', 'two', ['three', 'four', null]]	|	'one,two,three,four'
+
+	}
+
+	@See('TM-11233')
+	void 'test can transform a field value using to date transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+					id,retire date
+					1,2018-06-25
+					2,2018/06/25
+					3,06/25/2018
+					4,99/99/2018
+					5,
+					6, 
+					7,abc-123
+					""".stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						domain Device
+						read labels
+						iterate {
+							extract 'retire date' transform with toDate('yyyy-MM-dd','yyyy/MM/dd','MM/dd/yyyy') load 'Retire Date'
+						}
+					""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			with(etlProcessor.finalResult()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 7
+					with(data[0], RowResult) {
+						rowNum == 1
+						errorCount == 0
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '2018-06-25'
+							init == null
+							errors == []
+						}
+					}
+					with(data[1], RowResult) {
+						rowNum == 2
+						errorCount == 1
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '2018/06/25'
+							init == null
+							errors == ['Not able to transform date: 2018/06/25, pattern: yyyy-MM-dd']
+						}
+					}
+					with(data[2], RowResult) {
+						rowNum == 3
+						errorCount == 2
+						with(fields.retireDate, FieldResult) {
+							value == new Date(2018 - 1900, 6 - 1, 25)
+							originalValue == '06/25/2018'
+							init == null
+							errors[0] == 'Not able to transform date: 06/25/2018, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: 06/25/2018, pattern: yyyy/MM/dd'
+						}
+					}
+					with(data[3], RowResult) {
+						rowNum == 4
+						errorCount == 3
+						with(fields.retireDate, FieldResult) {
+							value == '99/99/2018'
+							originalValue == '99/99/2018'
+							init == null
+							errors[0] == 'Not able to transform date: 99/99/2018, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: 99/99/2018, pattern: yyyy/MM/dd'
+							errors[2] == 'Not able to transform date: 99/99/2018, pattern: MM/dd/yyyy'
+						}
+					}
+					with(data[4], RowResult) {
+						rowNum == 5
+						errorCount == 1
+						with(fields.retireDate, FieldResult) {
+							value == null
+							originalValue == null
+							init == null
+							errors == ['Not able to transform blank or null date: null']
+						}
+					}
+					with(data[5], RowResult) {
+						rowNum == 6
+						errorCount == 1
+						with(fields.retireDate  , FieldResult) {
+							value == ''
+							originalValue == ' '
+							init == null
+							errors == ['Not able to transform blank or null date: ']
+						}
+					}
+					with(data[6], RowResult) {
+						rowNum == 7
+						errorCount == 3
+						with(fields.retireDate, FieldResult) {
+							value == 'abc-123'
+							originalValue == 'abc-123'
+							init == null
+							errors[0] == 'Not able to transform date: abc-123, pattern: yyyy-MM-dd'
+							errors[1] == 'Not able to transform date: abc-123, pattern: yyyy/MM/dd'
+							errors[2] == 'Not able to transform date: abc-123, pattern: MM/dd/yyyy'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 
 	}
 }

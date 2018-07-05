@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e0e75c50-68f9-d482-4683-7691c867a99d",
+		"_postman_id": "58d21faf-d1e1-4169-8cc4-184fd4556815",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -102,7 +102,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/provider/list",
 					"host": [
@@ -143,7 +146,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
 					"host": [
@@ -240,7 +246,10 @@
 			"request": {
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/provider/validateUnique/{{createProvider}}",
 					"host": [
@@ -337,13 +346,17 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{host}}tdstm/ws/dataingestion/provider/{{providerID}}",
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
 					"host": [
-						"{{host}}tdstm"
+						"{{host}}"
 					],
 					"path": [
+						"tdstm",
 						"ws",
 						"dataingestion",
 						"provider",

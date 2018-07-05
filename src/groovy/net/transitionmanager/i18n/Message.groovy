@@ -11,20 +11,20 @@ package net.transitionmanager.i18n
  */
 interface Message {
 
-	String 	ApiActionNotBoundProperty 			= 'apiAction.not.bound.property.exception',
-			ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
-			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
-			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
-			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
-			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
-			ApiActionTaskMessageByPassed 		= 'apiAction.task.message.bypassed',
-			DomainFailureBulk					= 'domain.failure.bulk',
-			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
-			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
-			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
-			InvalidURLFormat					= 'typeMismatch.java.net.URL',
-			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
-			ValidationMissingIds                = 'validation.missing.ids'
+	String ApiActionNotBoundProperty 			= 'apiAction.not.bound.property.exception',
+	       ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
+	       ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
+	       ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
+	       ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
+	       ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+	       ApiActionTaskMessageByPassed 		= 'apiAction.task.message.bypassed',
+	       DomainFailureBulk					= 'domain.failure.bulk',
+	       FileSystemFilesDeleted               = 'fileSystem.files.deleted',
+	       FileSystemFilesCannotBeDeleted       = 'fileSystem.files.cannotdelete',
+	       FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
+	       InvalidURLFormat					= 'typeMismatch.java.net.URL',
+	       ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
+	       ValidationMissingIds                = 'validation.missing.ids'
 
 	/*
 		i18N messages for working with API Action endpoints.

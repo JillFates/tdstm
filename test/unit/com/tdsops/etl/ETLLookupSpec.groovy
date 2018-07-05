@@ -218,7 +218,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with (etlProcessor.result.toMap()){
+			with (etlProcessor.finalResult()){
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Device.name()

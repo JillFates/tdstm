@@ -10,6 +10,10 @@ form
             &.sub-option-50
                 padding-left: 50px
 
+.form-group
+  label.label-detail
+    font-weight: normal
+
 .has-danger .form-control-feedback,
 .has-danger .form-control-label,
 .has-danger .control-label,
@@ -26,7 +30,10 @@ form
     border-color: $color-danger--red
 
 .form-control
-    height: 31px
+  height: 31px
+
+  &.ng-invalid
+    border: 1px $color-danger--red solid
 
 .mar-left-15
     margin-left: 15px !important
@@ -72,6 +79,8 @@ form
     padding-top: 20px
 .pad-top-30
     padding-top: 30px
+.pad-bot-6
+  padding-bottom: 6px
 .text-left
     text-align: left
 .text-right
@@ -162,3 +171,20 @@ div.error, span.error
 
 .text-capitalize
   text-transform: capitalize
+
+
+// Kendo components on forms
+.k-button
+ &.btn-default
+  border-color: #ddd
+  background-color: #f4f4f4
+  color: #444
+  border-radius: 3px
+  padding: 6px 12px
+  font-size: 12px
+  align-items: flex-start
+
+kendo-dropdownlist
+  &.form-control
+    &.error, &.has-error
+      border: 1px #f00 solid

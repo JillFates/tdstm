@@ -152,7 +152,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidSheetCommand () {
-        new ETLProcessorException('You cannot sheet command without an spreadsheet file')
+        new ETLProcessorException('You cannot use the sheet command without a corresponding spreadsheet file')
     }
 
     static ETLProcessorException invalidSheetName (String sheetName) {

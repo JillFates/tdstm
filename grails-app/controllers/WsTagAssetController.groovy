@@ -12,7 +12,7 @@ class WsTagAssetController implements ControllerMethods {
 
 	@HasPermission(Permission.TagView)
 	def list(Long id) {
-		renderAsJson(tagAssetService.list(projectForWs, id)*.toMap())
+		renderSuccessJson(tagAssetService.list(projectForWs, id)*.toMap())
 	}
 
 	@HasPermission(Permission.TagCreate)

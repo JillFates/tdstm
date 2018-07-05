@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
@@ -31,6 +32,9 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	FileSystemService fileSystemService
 
 	@Shared
+	test.helper.MoveEventTestHelper moveEventTestHelper = new test.helper.MoveEventTestHelper()
+
+	@Shared
 	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
 
 	@Shared
@@ -41,6 +45,12 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	Project otherProject = projectTestHelper.createProject()
+
+	@Shared
+	MoveEvent moveEvent
+
+	@Shared
+	MoveEvent moveEvent2
 
 	/**
 	 * A move bundle that is usedForPlanning = 1
@@ -100,6 +110,15 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
 
+		moveEvent = moveEventTestHelper.createMoveEvent(project)
+		moveEvent2 = moveEventTestHelper.createMoveEvent(project)
+
+		moveBundle.moveEvent = moveEvent
+		moveBundle.save()
+
+		moveBundle2.moveEvent = moveEvent2
+		moveBundle2.save()
+
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle2)
@@ -113,7 +132,11 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
 		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
 
-		tagService.securityService = [getUserCurrentProject: { -> project }, assertCurrentProject : { Project project -> }] as SecurityService
+		tagService.securityService = [
+			getUserCurrentProject: { -> project },
+			assertCurrentProject : { Project project -> }
+		] as SecurityService
+
 		now = TimeUtil.nowGMT().clearTime()
 	}
 
@@ -121,43 +144,46 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		when: 'Calling the list method with no parameters'
 			List results = tagService.list(project)
 		then: 'We get a list of map results'
+			results.size() == 2
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue.name()
+			results[1].color == Color.Blue.name()
 			results[1].css == Color.Blue.css
-			results[1].Name == 'some assets'
-			results[1].Description == 'Another description'
-			results[1].Assets == 1
+			results[1].name == 'some assets'
+			results[1].description == 'Another description'
+			results[1].assets == 1
 	}
 
 	void "test list with full name"() {
 		when: 'Calling the list method with the full name of a tag'
 			List results = tagService.list(project, 'grouping assets')
 		then: 'We get a list of map results'
+			results.size() == 1
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
 	}
 
 	void "test list with partial name"() {
 		when: 'Calling the list method with a partial name of a tag'
 			List results = tagService.list(project, 'group')
 		then: 'We get a list of map results'
+			results.size() == 1
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
 	}
 
 	void "test list with a name not in the db"() {
@@ -172,24 +198,26 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		when: 'Calling the list method with a full description parameter'
 			List results = tagService.list(project, '', 'Another description')
 		then: 'We get a list of map results'
+			results.size() == 1
 			results[0].id == tag2.id
-			results[0].Color == Color.Blue.name()
+			results[0].color == Color.Blue.name()
 			results[0].css == Color.Blue.css
-			results[0].Name == 'some assets'
-			results[0].Description == 'Another description'
-			results[0].Assets == 1
+			results[0].name == 'some assets'
+			results[0].description == 'Another description'
+			results[0].assets == 1
 	}
 
 	void "test list with partial description"() {
 		when: 'Calling the list method with a partial description parameter'
 			List results = tagService.list(project, '', 'Anot')
 		then: 'We get a list of map results'
+			results.size() == 1
 			results[0].id == tag2.id
-			results[0].Color == Color.Blue.name()
+			results[0].color == Color.Blue.name()
 			results[0].css == Color.Blue.css
-			results[0].Name == 'some assets'
-			results[0].Description == 'Another description'
-			results[0].Assets == 1
+			results[0].name == 'some assets'
+			results[0].description == 'Another description'
+			results[0].assets == 1
 	}
 
 	void "test list with a description not in the db"() {
@@ -204,19 +232,20 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		when: 'Calling the list method with a date created parameter'
 			List results = tagService.list(project, '', '', now)
 		then: 'We get a list of map results'
+			results.size() == 2
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue.name()
+			results[1].color == Color.Blue.name()
 			results[1].css == Color.Blue.css
-			results[1].Name == 'some assets'
-			results[1].Description == 'Another description'
-			results[1].Assets == 1
+			results[1].name == 'some assets'
+			results[1].description == 'Another description'
+			results[1].assets == 1
 	}
 
 	void "test list with dateCreated tomorrow"() {
@@ -230,19 +259,20 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		when: '\'Calling the list method with a lastUpdated parameter'
 			List results = tagService.list(project, '', '', null, now)
 		then: 'We get a list of map results'
+			results.size() == 2
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
 
 			results[1].id == tag2.id
-			results[1].Color == Color.Blue.name()
+			results[1].color == Color.Blue.name()
 			results[1].css == Color.Blue.css
-			results[1].Name == 'some assets'
-			results[1].Description == 'Another description'
-			results[1].Assets == 1
+			results[1].name == 'some assets'
+			results[1].description == 'Another description'
+			results[1].assets == 1
 	}
 
 	void "test list with lastUpdated tomorrow"() {
@@ -257,11 +287,106 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now)
 		then: 'We get a list of map results'
+			results.size() == 1
 			results[0].id == tag1.id
-			results[0].Color == Color.Black.name()
+			results[0].color == Color.Black.name()
 			results[0].css == Color.Black.css
-			results[0].Name == 'grouping assets'
-			results[0].Description == 'This is a description'
-			results[0].Assets == 2
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
+	}
+
+	void "test list with moveBundleId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, null, null, null, null, moveBundle.id)
+		then: 'We get a list of map results'
+			results.size() == 2
+			results[0].id == tag1.id
+			results[0].color == Color.Black.name()
+			results[0].css == Color.Black.css
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
+
+			results[1].id == tag2.id
+			results[1].color == Color.Blue.name()
+			results[1].css == Color.Blue.css
+			results[1].name == 'some assets'
+			results[1].description == 'Another description'
+			results[1].assets == 1
+	}
+
+	void "test list with other moveBundleId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, null, null, null, null, moveBundle2.id)
+		then: 'We get a list of map results'
+			!results.size()
+	}
+
+	void "test list with all parameters plus moveBundleId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle.id)
+		then: 'We get a list of map results'
+			results.size() == 1
+			results[0].id == tag1.id
+			results[0].color == Color.Black.name()
+			results[0].css == Color.Black.css
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
+	}
+
+	void "test list with all parameters plus moveBundleId that will filter out all results"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle2.id)
+		then: 'We get a list of map results'
+			!results
+	}
+
+	void "test list with moveEventId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, null, null, null, null, null, moveEvent.id)
+		then: 'We get a list of map results'
+			results.size() == 2
+			results[0].id == tag1.id
+			results[0].color == Color.Black.name()
+			results[0].css == Color.Black.css
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
+
+			results[1].id == tag2.id
+			results[1].color == Color.Blue.name()
+			results[1].css == Color.Blue.css
+			results[1].name == 'some assets'
+			results[1].description == 'Another description'
+			results[1].assets == 1
+	}
+
+	void "test list with other moveEventId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, null, null, null, null, null, moveEvent2.id)
+		then: 'We get a list of map results'
+			!results
+	}
+
+	void "test list with all parameters plus moveEventId"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, 'group', 'this is', now, now, null, moveEvent.id)
+		then: 'We get a list of map results'
+			results.size() == 1
+			results[0].id == tag1.id
+			results[0].color == Color.Black.name()
+			results[0].css == Color.Black.css
+			results[0].name == 'grouping assets'
+			results[0].description == 'This is a description'
+			results[0].assets == 2
+	}
+
+	void "test list with all parameters plus moveEventId that will filter out all results"() {
+		when: 'Calling the list method with all parameters set'
+			List results = tagService.list(project, 'group', 'this is', now, now, null, moveEvent2.id)
+		then: 'We get a list of map results'
+			!results
 	}
 }

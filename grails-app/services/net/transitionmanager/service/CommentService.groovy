@@ -56,6 +56,7 @@ class CommentService implements ServiceMethods {
 	Scheduler quartzScheduler
 	SecurityService securityService
 	TaskService taskService
+	SequenceService sequenceService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -89,9 +90,9 @@ class CommentService implements ServiceMethods {
 				break
 			}
 
-			// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
+			// if assetEntity is passed, then validate that it's valid and that the user has access to it (belongs to the current project)
 			if (params.assetEntity && params.assetEntity != 'NaN') {
-				if (!params.assetEntity.isNumber() && params.assetEntity != 'null') {
+				if (params.assetEntity != 'null' &&  !params.assetEntity.isNumber()) {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id ($params.assetEntity)"
 					errorMsg = "An unexpected asset id was received"
 					break

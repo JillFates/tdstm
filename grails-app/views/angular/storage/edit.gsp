@@ -14,9 +14,9 @@
     <div class="modal-body">
         <div>
             <form name="storageEditForm">
-                <table style="border: 0;">
+                <table>
                     <tr>
-                        <td colspan="2">
+                        <td colspan="2" class="dialog-container">
                             <div class="dialog">
                                 <table>
                                     <tbody>
@@ -35,7 +35,7 @@
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${asset.LUN}" ngmodel="model.asset.LUN" tabindex="22"/>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}"  ngmodel="model.asset.supportType" tabindex="32"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
-                                        <td>
+                                        <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="modelAssetMoveBundle"
@@ -52,7 +52,7 @@
                                                 ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
                                             </label>
                                         </td>
-                                        <td nowrap="nowrap" class="sizeScale">
+                                        <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
                                             <kendo-dropdownlist
                                                     class="select"
@@ -66,7 +66,7 @@
                                         </td>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="23" ngmodel="model.asset.externalRefId"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
-                                        <td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
+                                        <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="modelAssetEnvironment"
@@ -76,7 +76,7 @@
                                             </kendo-dropdownlist>
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
-                                        <td>
+                                        <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="modelAssetPlanStatus"
@@ -93,7 +93,7 @@
                                         <td colspan="2">
                                         <td colspan="2">
                                             <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
-                                        <td>
+                                        <td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="modelAssetValidation"
@@ -108,6 +108,9 @@
                                 </table>
                             </div>
                         </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&nbsp;</td>
                     </tr>
                     <!-- Dependencies -->
                     <tr id="deps">

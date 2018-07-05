@@ -26,7 +26,7 @@ class WsEventController implements ControllerMethods {
 	 * for the user's current project
 	 */
 	@HasPermission(Permission.BundleView)
-	def listBundles() {
-		renderSuccessJson(list: eventService.listBundles(params.id, params.useForPlanning))
+	def listBundles(Long id, Boolean useForPlanning) {
+		renderSuccessJson(list: eventService.listBundles(id, useForPlanning))
 	}
 }

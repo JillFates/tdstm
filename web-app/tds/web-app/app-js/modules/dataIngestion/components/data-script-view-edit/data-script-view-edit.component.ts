@@ -171,6 +171,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected changeToEditDataScript(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.modalTitle = 'ETL Script Edit';
 		this.focusForm();
 	}
 

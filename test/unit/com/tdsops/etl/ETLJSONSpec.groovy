@@ -393,13 +393,14 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						rootNode 'Applications'
-						read labels
-						iterate {
-							domain Application
-							extract 'vendor name' load 'Vendor'
-						}
-						""".stripIndent())
+				sanitize off
+				rootNode 'Applications'
+				read labels
+				iterate {
+					domain Application
+					extract 'vendor name' load 'Vendor'
+				}
+			""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 1
@@ -458,20 +459,21 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		when: 'the ETL script is evaluated'
 			etlProcessor.evaluate("""
-						console on
-						rootNode 'devices'
-						read labels
-						domain Device
-						iterate {
-						    extract 'app id' load 'id'
-						    extract 'attribs' set attribsVar
-						    load 'custom1' with attribsVar['memory']
-						    load 'custom2' with attribsVar.cpu
-						    load 'custom3' with attribsVar.storage.size()
-						    load 'custom4' with attribsVar.storage.collect { it.type }
-						    load 'custom5' with attribsVar.propNotFound
-						}
-						""".stripIndent())
+				console on
+				sanitize off
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'app id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    load 'custom3' with attribsVar.storage.size()
+				    load 'custom4' with attribsVar.storage.collect { it.type }
+				    load 'custom5' with attribsVar.propNotFound
+				}
+				""".stripIndent())
 
 		then: 'results should have one domain'
 			etlProcessor.finalResult().domains.size() == 1

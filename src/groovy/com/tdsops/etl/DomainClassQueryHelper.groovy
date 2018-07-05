@@ -4,6 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
@@ -228,8 +229,8 @@ class DomainClassQueryHelper {
 	 * @param mapParams key/value pair use for preparing where and params in the HQL sentence.
 	 * @return a alist with 2 values: first the where sentence part for an HQL query using Clazz
 	 *          and second the hql params for an HQL query..
-	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
+	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 */
 	static List hqlWhereAndHqlParams(Project project, Class clazz, Map<String, ?> mapParams) {
 
@@ -240,7 +241,7 @@ class DomainClassQueryHelper {
 			String property = getPropertyForField(clazz, entry.key)
 			String namedParameter = getNamedParameterForField(clazz, entry.key)
 
-			if (shouldQueryById(clazz, entry.key, entry.value) ) {
+			if (shouldQueryByReferenceId(clazz, entry.key, entry.value) ) {
 				hqlParams[namedParameter] = entry.value
 				String where = " ${property}.id = :${namedParameter}\n"
 
@@ -253,7 +254,14 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				hqlParams[namedParameter] = entry.value
+				if(entry.key == 'id' && NumberUtil.isPositiveLong(entry.value)) {
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(entry.value)
+				} else {
+					hqlParams[namedParameter] = entry.value
+				}
+
+
+
 				return " ${property} = :${namedParameter}\n"
 			}
 
@@ -269,7 +277,7 @@ class DomainClassQueryHelper {
 	 * @param value - value to query with
 	 * @return true if should query using the ID
 	 */
-	static private boolean shouldQueryById(clazz, field, value) {
+	static private boolean shouldQueryByReferenceId(clazz, field, value) {
 		return (value instanceof Long) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 	}
 

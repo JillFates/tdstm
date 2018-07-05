@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -255,7 +256,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false
@@ -325,7 +326,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						errorCount == 0
 						warn == false
 						duplicate == false
