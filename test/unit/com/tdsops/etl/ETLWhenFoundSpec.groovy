@@ -560,54 +560,54 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	}
 
     @See('TM-11182')
-	void 'test can create throw an Exception when script tries to use a non existing variable '() {
+    void 'test can create throw an Exception when script tries to use a non existing variable '() {
 
-		given:
-		def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+	    given:
+		    def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
-		and:
-		List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+	    and:
+		    List<AssetEntity> assetEntities = [
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				    [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				    [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
-		].collect {
-			AssetEntity mock = Mock()
-			mock.getId() >> it.id
-			mock.getAssetClass() >> it.assetClass
-			mock.getAssetName() >> it.assetName
-			mock.getEnvironment() >> it.environment
-			mock.getMoveBundle() >> it.moveBundle
-			mock.getProject() >> it.project
-			mock
-		}
+		    ].collect {
+			    AssetEntity mock = Mock()
+			    mock.getId() >> it.id
+			    mock.getAssetClass() >> it.assetClass
+			    mock.getAssetName() >> it.assetName
+			    mock.getEnvironment() >> it.environment
+			    mock.getMoveBundle() >> it.moveBundle
+			    mock.getProject() >> it.project
+			    mock
+		    }
 
-		and:
-		GroovySpy(AssetEntity, global: true)
-		AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-			assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-		}
+	    and:
+		    GroovySpy(AssetEntity, global: true)
+		    AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			    assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+		    }
 
-		and:
-		ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+	    and:
+		    ETLProcessor etlProcessor = new ETLProcessor(
+				    GMDEMO,
+				    dataSet,
+				    debugConsole,
+				    validator)
 
-		when: 'The ETL script is evaluated'
-		etlProcessor.evaluate("""
+	    when: 'The ETL script is evaluated'
+		    etlProcessor.evaluate("""
             console on
             read labels
             domain Dependency
@@ -629,16 +629,16 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
                     "Modified Date" NOW
                 }
             }
-						""".stripIndent())
+        """.stripIndent())
 
-        then: 'It throws an Exception because variable in not defined'
-        ETLProcessorException e = thrown ETLProcessorException
-        e.message == "Undefined variable: unknownVar"
+	    then: 'It throws an Exception because variable in not defined'
+		    ETLProcessorException e = thrown ETLProcessorException
+		    e.message == "Undefined variable: unknownVar"
 
-        cleanup:
-        if(fileName){
-            service.deleteTemporaryFile(fileName)
-        }
-	}
+	    cleanup:
+		    if (fileName) {
+			    service.deleteTemporaryFile(fileName)
+		    }
+    }
 
 }
