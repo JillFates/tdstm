@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -58,6 +59,7 @@ import { DictionaryService } from './services/dictionary.service';
 		PopupModule,
 		DropDownsModule,
 		GridModule,
+		InputsModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [

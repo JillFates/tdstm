@@ -1,5 +1,12 @@
 <div class="asset-tag-selector-component">
+    <kendo-switch
+            class="asset-tag"
+            [(ngModel)]="checked"
+            [onLabel]="'AND'"
+            [offLabel]="'OR'"
+    ></kendo-switch>
     <kendo-multiselect
+            id="asset-tag-selector-component"
             [data]="tagList"
             [(ngModel)]="value"
             [textField]="'name'"
