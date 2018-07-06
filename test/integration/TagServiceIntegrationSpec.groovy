@@ -123,7 +123,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
 
@@ -146,8 +146,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -166,8 +166,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -179,8 +179,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -234,8 +234,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -261,8 +261,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -289,8 +289,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -302,8 +302,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -329,8 +329,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -349,8 +349,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 2
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2
@@ -376,8 +376,8 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		then: 'We get a list of map results'
 			results.size() == 1
 			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
+			results[0].color == Color.Green.name()
+			results[0].css == Color.Green.css
 			results[0].name == 'grouping assets'
 			results[0].description == 'This is a description'
 			results[0].assets == 2

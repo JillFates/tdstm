@@ -1449,7 +1449,7 @@ class CookbookService implements ServiceMethods {
 	}
 
 	private void assertProject(Recipe recipe, Project project) {
-		if (recipe.projectId == project.id || recipe.project == project) {
+		if (recipe.project.id == project.id || recipe.project == project) {
 			return
 		}
 
