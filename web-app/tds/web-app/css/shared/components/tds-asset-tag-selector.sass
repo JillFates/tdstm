@@ -1,3 +1,83 @@
 /* Exclusive for Angular*/
 .asset-tag-selector-component
-  select
+  .k-widget
+    div.k-multiselect-wrap
+      min-height: 30px
+      kendo-taglist
+        ul
+          width: 90%
+          li.k-button
+            background: unset
+            background-color: unset
+            border: unset
+            padding: 0px
+            margin-right: -8px
+            span
+              div
+                height: 26px
+                padding-left: 10px
+                padding-right: 22px
+                text-transform: uppercase
+                font-size: 13px
+                padding-top: 5px
+                font-weight: 600
+                margin-top: 1px
+                margin-left: 1px
+            span.k-select
+              span.k-i-close
+                margin-left: -26px
+      .k-searchbar
+        .k-input
+          width: 13px
+      span.k-clear-value
+        display: none !important
+/* Global, but protected by the scope */
+.asset-tag-selector-single-container
+  margin-left: 21px
+  margin-top: -6px
+  width: 100%
+  .asset-tag-selector-single-item
+    height: 30px
+    padding-top: 6px
+    font-size: 14px
+    margin-top: 4px
+    padding-left: 15px
+    i.fa-check
+      display: none
+
+.asset-tag-selector-item-selected
+  background-color: unset !important
+  .asset-tag-selector-single-container
+    .asset-tag-selector-single-item
+      i.fa-check
+        display: inline-block
+        margin-left: -37px
+        margin-right: 16px
+.asset-tag-selector-item-selected.k-state-focused
+  background-color: $color--grey2 !important
+  box-shadow: unset !important
+
+.tag-black
+  background-color: black !important
+.tag-grey
+  background-color: #e6e6e6 !important
+.tag-red
+  background-color: #f2d9e1 !important
+.tag-orange
+  background-color: #f2e8d9 !important
+.tag-yellow
+  background-color: #eaf2d9 !important
+.tag-green
+  background-color: #d9f2d9 !important
+.tag-cyan
+  background-color: #d9f2ec !important
+.tag-blue
+  background-color: #d9e8f2 !important
+.tag-purple
+  background-color: #dad9f2 !important
+.tag-pink
+  background-color: #efd9f2 !important
+.tag-white
+  background-color: white !important
+.tag-unselected
+  background-color: unset !important
