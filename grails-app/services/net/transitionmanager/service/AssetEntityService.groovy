@@ -43,6 +43,7 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Tag
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
@@ -160,6 +161,8 @@ class AssetEntityService implements ServiceMethods {
 	def userPreferenceService
     def assetService
     def commentService
+	def tagService
+	def tagAssetService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -3071,6 +3074,11 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
+					// clone asset Tags
+					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
+					List<Tag> clonedTags = tagService.cloneTags(sourceTagIds, assetToClone.project)
+					tagAssetService.applyTags(assetToClone.project, clonedTags*.id, clonedAsset.id)
+
 					return clonedAsset.id
 				}
 			}

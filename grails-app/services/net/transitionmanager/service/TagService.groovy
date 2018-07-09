@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
+import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
@@ -226,5 +227,32 @@ class TagService implements ServiceMethods {
 	void delete(Long id, Project currentProject) {
 		Tag tag = get(Tag, id, currentProject)
 		tag.delete(failOnError: true)
+	}
+
+	/**
+	 * Clone the list of tags given as a parameter, saves them and
+	 * returns them into a list of Tags.
+	 *
+	 * @param tags  The list of ids of the tags to be cloned.
+	 * @return  The list of cloned Tags.
+	 */
+	List<Tag> cloneTags(List<Long> tagIds, Project currentProject) {
+		List<Tag> clonedTags =
+				tagIds.collect { Long tagId ->
+					Tag tag = get(Tag, tagId, currentProject)
+					Tag newTag = new Tag(
+							name: tag.name,
+							description: tag.description,
+							color: tag.color,
+							project: tag.project
+					)
+					if (!newTag.save(flush: true)){
+						log.error 'cloneTags failed : ' + GormUtil.allErrorsString(newTag)
+						throw new DomainUpdateException('An error occurred while cloning Tag')
+					}
+					log.debug "Cloned tag ${tag.name}"
+					newTag
+				}
+        clonedTags
 	}
 }
