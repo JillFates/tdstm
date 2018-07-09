@@ -73,7 +73,7 @@ export class TagService {
 	updateTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
 			name: tagModel.name,
-			description: tagModel.description,
+			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
 		return this.http.put(`${this.tagURL}/${tagModel.id}`, JSON.stringify(request))
@@ -91,7 +91,7 @@ export class TagService {
 	createTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
 			name: tagModel.name,
-			description: tagModel.description,
+			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
 		return this.http.post(this.tagURL, JSON.stringify(request))
@@ -119,8 +119,8 @@ export class TagService {
 	 * @param {number} tagIdOne
 	 * @param {number} tagIdTwo
 	 */
-	mergeTags(tagIdOne: number, tagIdTwo: number): Observable<ApiResponseModel> {
-		return this.http.put(`${this.tagURL}/${tagIdOne}/merge/${tagIdTwo}`, null)
+	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
+		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})

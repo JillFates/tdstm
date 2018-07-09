@@ -17,6 +17,8 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'List',
 		'LEGEND': 'Legend',
 		'LOAD': 'Load',
+		'NAME': 'Name',
+		'MERGE': 'Merge',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
@@ -77,6 +79,8 @@ export const en_DICTIONARY: Object = {
 		'MANAGE_TAGS': 'Manage Tags',
 		'CREATE_TAG': 'Create Tag',
 		'TAG_LIST': {
+			'TAG_MERGE': 'Tag Merge',
+			'MERGE_INTO': 'Merge into',
 			'REMOVE_CONFIRMATION': 'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
