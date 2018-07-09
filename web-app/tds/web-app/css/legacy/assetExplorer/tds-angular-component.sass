@@ -11,6 +11,8 @@
     table
       tr + tr
         border-top: 2px solid #fff
+  .tm-input-control, .tm-input-control-container
+    max-width: 120px
   .prop
     padding: 5px
   .prop .name
@@ -35,6 +37,10 @@
     width: 50%
   .prop a
     color: #00E
+  .prop
+    td.label
+      max-width: 130px
+      overflow: hidden
   table
     width: 100%
     th
@@ -87,16 +93,13 @@
           font-size: 13px
           font-style: normal
           font-weight: normal
-      input#assetName
-        width: 100%
-      input#description
-        width: 100%
       input
         height: 27px
+      input#assetName, input#description
         width: 100%
+        max-width: 100%
       input.duration
         width: 90%
-        margin-right: 2px
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,
@@ -211,10 +214,8 @@
         margin-left: 5px
   .dependents-grid.is-dependent-on
     margin-top: 10px
-  .person-list
-    width: 100%
   .swapper-image
-    width: 100%
+    width: 120px
     &::before
       content: ''
       cursor: pointer
