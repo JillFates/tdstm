@@ -38,6 +38,34 @@ export class TagService {
 	}
 
 	/**
+	 * GET - Tag by Move Bundle Id
+	 * @param {number} moveBundleId
+	 * @returns {Observable<any>}
+	 */
+	getTagByMoveBundleId(moveBundleId: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.tagURL}?moveBundleId=${moveBundleId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET - Tag by Move Event Id
+	 * @param {number} moveEventId
+	 * @returns {Observable<any>}
+	 */
+	getTagByMoveEventId(moveEventId: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.tagURL}?moveEventId=${moveEventId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * PUT - Save/Update existing tag.
 	 * @param {number} tagId
 	 * @returns {Observable<any>}

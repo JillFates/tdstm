@@ -255,4 +255,31 @@ class TagService implements ServiceMethods {
 				}
         clonedTags
 	}
+
+	/**
+	 * Clone any existing tags associated to sourceProject (if any),
+	 * then associate those newly created tags to targetProject.
+	 *
+	 * @param sourceProject  The project from which the existing tags will be cloned.
+	 * @param targetProject  The project to which the new tags will be associated.
+	 */
+	void cloneProjectTags(Project sourceProject, Project targetProject) {
+
+		List<Tag> tags = Tag.where {
+			project == sourceProject
+		}.list()
+
+		if (!tags.isEmpty()) {
+			tags.each { Tag tag ->
+				Tag newTag = new Tag(
+						name: tag.name,
+						description: tag.description,
+						color: tag.color,
+						project: targetProject
+				)
+				newTag.save()
+				log.debug "Cloned tag ${tag.name} for project ${targetProject.toString()}"
+			}
+		}
+	}
 }
