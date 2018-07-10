@@ -21,7 +21,12 @@ databaseChangeLog = {
 
 					switch (recipe.context.trim()) {
 						case 'Bundle':
-							sqlStatement = """UPDATE recipe set context = '{"bundleId": [$recipe.default_asset_id], "tag":[], "and":true}' where recipe_id = $recipe.recipe_id;"""
+							if (recipe.default_asset_id) {
+								sqlStatement = """UPDATE recipe set context = '{"bundleId": [$recipe.default_asset_id], "tag":[], "and":true}' where recipe_id = $recipe.recipe_id;"""
+							} else{
+								sqlStatement = """UPDATE recipe set context = '{"bundleId": [], "tag":[], "and":true}' where recipe_id = $recipe.recipe_id;"""
+							}
+
 							break
 						case 'Event':
 							sqlStatement = """UPDATE recipe set context = '{"eventId": $recipe.default_asset_id, "tag":[], "and":true}' where recipe_id = $recipe.recipe_id;"""
