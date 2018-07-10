@@ -1,3 +1,131 @@
+/* adds a static constant with the given identifier to a "class" (target) with a given value.
+ * this is kind of a hack but currently I don't know of any better way to define static constants in javascript. */
+function addStaticConstant (target, identifier, value) {
+	Object.defineProperty(target, identifier, {
+		configurable: false,
+		enumerable: false,
+		writable: false,
+		value: value
+	})
+}
+
+// represents a point in the graph space
+class Point {
+	constructor (x, y) {
+		this.x = x
+		this.y = y
+	}
+	update (newX, newY) {
+		this.x = newX
+		this.y = newY
+	}
+	copy () {
+		return new Point(this.x, this.y)
+	}
+	inverted () {
+		return new Point(this.x,-1 * this.y)
+	}
+	salt () {
+		this.x = GraphUtil.saltValue(this.x)
+		this.y = GraphUtil.saltValue(this.y)
+	}
+	salted () {
+		var newPoint = new Point(this.x, this.y)
+		newPoint.salt()
+		return newPoint
+	}
+	distanceTo (other) {
+		if (other instanceof GraphPoint)
+			return this.distanceTo(other.graphPos)
+		else
+			return GraphUtil.getDistance(this.x, this.y, other.x, other.y)
+	}
+	getRasterization () {
+		let tl = zoomBehavior.translate()
+		let zoom = zoomBehavior.scale()
+		let newX = this.x + (tl[0] * zoom) 
+		let newY = this.y + (tl[1] * zoom) 
+	}
+	toString () {
+		return '(' + this.x + ',' + this.y + ')'
+	}
+}
+
+// same as a point but it keeps track of both the rasterized (gloabal) position and the internal graph (local) position
+class GraphPoint {
+	constructor (screenX, screenY) {
+		this.screenPos = new Point()
+		this.graphPos = new Point()
+		this.setScreenCoordinates(screenX, screenY)
+	}
+	copy () {
+		return new GraphPoint(this.screenPos.x, this.screenPos.y)
+	}
+	// sets the x and y graph coordinates of the point then calculates the screen coordinates based on that
+	setGraphCoordinates (coordinates) {
+		if (coordinates instanceof Point)
+			this.setGraphCoordinates(coordinates.x, coordinates.y)
+		else if (coordinates.length > 1)
+			this.setGraphCoordinates(coordinates[0], coordinates[1])
+	}
+	setGraphCoordinates (x, y) {
+		this.graphPos.update(x, y)
+		this.screenPos = this.rasterize(new Point(x,y))
+	}
+	// sets the x and y screen coordinates of the point then calculates the graph coordinates based on that
+	setScreenCoordinates (coordinates) {
+		if (coordinates instanceof Point)
+			this.setScreenCoordinates(coordinates.x, coordinates.y)
+		else if (coordinates.length > 1)
+			this.setScreenCoordinates(coordinates[0], coordinates[1])
+	}
+	setScreenCoordinates (x, y) {
+		this.screenPos.update(x, y)
+		this.graphPos = this.derasterize(new Point(x,y))
+	}
+	rasterize (p) {
+		let tf = this.getTransformData()
+		var raster = p.copy()
+		raster.x = (p.x * tf.zoom) + tf.tl[0]
+		raster.y = (p.y * tf.zoom) + tf.tl[1]
+		return raster
+		
+	}
+	derasterize (p) {
+		let tf = this.getTransformData()
+		var deraster = p.copy()
+		deraster.x = (p.x - tf.tl[0]) / tf.zoom
+		deraster.y = (p.y - tf.tl[1]) / tf.zoom
+		return deraster
+		
+	}
+	update () {
+		setScreenCoordinates(this.screenPos)
+	}
+	getTransformData () {
+		return {
+			tl: zoomBehavior.translate(),
+			zoom: zoomBehavior.scale()
+		}
+	}
+	toString () {
+		return '{' + this.screenPos.toString() + '-->' + this.graphPos.toString() + '}'
+	}
+}
+
+// represents a node in the force graph
+class Node extends Point {
+	constructor (params) {
+		super(0,0)
+		this.insideRegion = false
+		// set all the members sent from the server using the parameters list
+		if (params)
+			for (let prop of Node.INITIAL_PARAMS)
+				this[prop] = params[prop]
+	}
+}
+addStaticConstant(Node, 'INITIAL_PARAMS', ['id','name','type','depBundleId','moveBundleId','moveEventId','shape','size','title','color','dependsOn','supports','assetClass','cutGroup','colorByProperties'])
+
 /*
  * Javascript functions used by the graph view utilizing d3
  */
@@ -13,27 +141,45 @@ var GraphUtil = (function ($) {
 		MINUS: KeyEvent.DOM_VK_DASH,
 		PLUS: KeyEvent.DOM_VK_EQUALS,
 		RETURN: KeyEvent.DOM_VK_RETURN,
-		ENTER: KeyEvent.DOM_VK_ENTER
+		ENTER: KeyEvent.DOM_VK_ENTER,
+		SHIFT: KeyEvent.DOM_VK_SHIFT,
+		CTRL: KeyEvent.DOM_VK_CONTROL
 	}
 	const ARROW_KEYS = [KEY_CODES.LEFT, KEY_CODES.UP, KEY_CODES.RIGHT, KEY_CODES.DOWN]
 	const ZOOM_KEYS = [KEY_CODES.MINUS, KEY_CODES.PLUS]
 	const SUBMIT_TEXT_KEYS = [KEY_CODES.RETURN, KEY_CODES.ENTER]
 	const IGNORE_KEY_EVENT_TAGS = ['INPUT', 'TEXTAREA']
+	const KEY_STATE_DOWN = 1
+	const KEY_STATE_UP = 2
+	const SALT_MULTIPLIER = 0.0000001
 
 	// public functions
 	var public = {};
 
-	// public constants
+	// public constants and enums
 	public.NO_TRANSFORM = 'translate(0 0)scale(1)';
 	public.NO_TRANSFORM_CSS = 'translate(0px 0px) scale(1)';
-	var PANELS = {
+	const PANELS = {
 		CONTROL: 1,
 		DEPENDENCY: 2,
 		LEGEND: 3,
 		NONE: 4
 	}
 	public.PANELS = PANELS;
-
+	const SELECT_MODES = {
+		ADD: 1,
+		SUB: 2,
+		REPLACE: 3,
+		REPLACE_NO_TOGGLE: 4 
+	}
+	public.SELECT_MODES = SELECT_MODES;
+	const SELECTION_STATES = {
+		NOT_SELECTED: 0,
+		SELECTED_SECONDARY: 1,
+		SELECTED_PRIMARY: 2
+	}
+	public.SELECTION_STATES = SELECTION_STATES
+	
 	// public member variables
 	public.force = null;
 	public.nodeBindings = null;
@@ -50,6 +196,18 @@ var GraphUtil = (function ($) {
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
+	public.selectionElements = {
+		layer: null,
+		regionPath: null,
+		regionProjection: null
+	} // stores the svg elements associated with the region selection feature
+	public.selectionPathString = ''; // the svg path 'd' attribute string for the current selection path
+	public.tempPathString = ''; // the svg path 'd' attribute string for the current selection path including the current temporary point
+	var lastSelectionPoint; // the last point selected, this is a helper variable
+	public.selectionPath = []; // the list of points in the current selection path
+	public.preselectionList = []; // stores the nodes that were already selected before a region select began
+	public.SELECTION_MIN_EDGE_LENGTH = 20; // the minimum distance between stored points in a selection path, lower values increase path resolution but decrease speed
+	public.realtimeSelectionHighlighting = false; // set to true if the region select should highlight selected nodes in real time as it is being drawn
 	// Stored only on the current page session
 	public.dependencyPanelConfig = {
 		dependencyStatus: {
@@ -67,7 +225,9 @@ var GraphUtil = (function ($) {
 			groupingControl: []
 		}
 	};
-
+	
+	
+	
 	// ############################################################## graph UI functions ##############################################################
 
 	// returns true if the graph is loaded
@@ -393,19 +553,19 @@ var GraphUtil = (function ($) {
 	public.populateTeamSelect = function (data) {
 		// get the select element and clear whatever options were in it before
 		teamSelect = $("#teamSelectId");
-        teamSelect.children('option').remove();
-
+		teamSelect.children('option').remove();
+		
 		// add the default values
 		teamSelect.append('<option value="ALL">All Teams</option>');
 		teamSelect.append('<option value="NONE">No Team Assignment</option>');
 		teamSelect.append('<option disabled>──────────</option>');
 		teamSelect.val('ALL');
-
+		
 		// add all the roles from the data
 		$.each(data.roles, function (index, team) {
 			teamSelect.append('<option value="' + team + '">' + team + '</option>');
 		});
-
+		
 		return teamSelect;
 	}
 
@@ -439,9 +599,36 @@ var GraphUtil = (function ($) {
 			public.enableFreeze();
 		}
 	}
-
+	
+	// updates the cursor style for the graph based on input
+	public.updateCursorStyle = function (key, state) {
+		var className = ''
+		if (key == KEY_CODES.SHIFT)
+			className = 'shift_key'
+		else if (key == KEY_CODES.CTRL)
+			className = 'ctrl_key'
+		
+		var target = canvas[0][0]
+		if (state == KEY_STATE_DOWN)
+			target.classList.add(className)
+		else if (state == KEY_STATE_UP)
+			target.classList.remove(className)
+		
+		public.forceReflow(canvas)
+	}
+	
 	// ############################################################## graph data and control functions ##############################################################
-
+	
+	// gets the complete list of nodes applied to the force layout
+	public.getNodes = function () {
+		return GraphUtil.force.nodes()
+	}
+	
+	// gets the complete list of links applied to the force layout
+	public.getLinks = function () {
+		return GraphUtil.force.links()
+	}
+	
 	// calculates node families
 	public.setNodeFamilies = function (nodes) {
 		var uncheckedNodes = nodes.clone();
@@ -534,12 +721,12 @@ var GraphUtil = (function ($) {
 
 
 	// sets the class list for every node in the graph
-	public.updateNodeClasses = function () {
+	public.updateNodeClasses = function (changedNodes) {
 		var bundle = public.getFilteredBundle();
 		public.nodeBindings.attr("class", function(d) {
 			return 'node'
-				+ ((d.selected == 1) ? ' selected selectedChild' : '')
-				+ ((d.selected == 2) ? ' selected selectedParent' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_SECONDARY) ? ' selected selectedChild' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_PRIMARY) ? ' selected selectedParent' : '')
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && ! d.hasMoveEvent) ? ' noEvent' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
@@ -549,10 +736,10 @@ var GraphUtil = (function ($) {
 		});
 	}
 	// sets the class list for every link in the graph
-	public.updateLinkClasses = function () {
+	public.updateLinkClasses = function (changedLinks) {
 		public.linkBindings.attr("class", function(d) {
 			return 'link'
-				+ ((d.selected == 1) ? ' selected' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_PRIMARY) ? ' selected' : '')
 				+ ((d.unresolved) ? ' unresolved' : '')
 				+ ((d.notApplicable) ? ' notApplicable' : '')
 				+ ((d.future) ? ' future' : '')
@@ -569,7 +756,7 @@ var GraphUtil = (function ($) {
 		});
 	}
 	// sets the class list for every label in the graph
-	public.updateLabelClasses = function () {
+	public.updateLabelClasses = function (changedNodes) {
 		var bundle = public.getFilteredBundle();
 		public.labelBindings.attr("class", function(d) {
 
@@ -578,7 +765,7 @@ var GraphUtil = (function ($) {
 			else
 				$(this).children().attr('dy', '0.35em')
 			return 'label'
-				+ ((d.selected > 0) ? ' selected' : '')
+				+ ((d.selected > SELECTION_STATES.NOT_SELECTED) ? ' selected' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
 				+ ((! d.showLabel) ? ' hidden' : '')
@@ -587,7 +774,7 @@ var GraphUtil = (function ($) {
 	}
 
 	// updates the class list for ever graph element
-	public.updateAllClasses = function (callback) {
+	public.updateAllClasses = function (callback, changedNodes, changedLinks) {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
@@ -974,7 +1161,7 @@ var GraphUtil = (function ($) {
 
 		// perform the transform, only animating the transition if an SVG element is used
 		if (transformElement[0][0].tagName == 'DIV')
-			transformElement.style('transform', transformString(translate[0], translate[1], scale, 'px'))
+			transformElement.style('transform', public.getTransformString(translate[0], translate[1], scale, 'px'))
 		else
 			transformElement
 				.transition()
@@ -982,7 +1169,7 @@ var GraphUtil = (function ($) {
 				.ease(function (t) {
 					return Math.min(t, 1)
 				})
-				.attr('transform', transformString(translate[0], translate[1], scale))
+				.attr('transform', public.getTransformString(translate[0], translate[1], scale))
 	}
 
 	// zooms in or out of the timeline, calling displayCallback when finished
@@ -998,7 +1185,147 @@ var GraphUtil = (function ($) {
 		brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
 		displayCallback(true)
 	}
-
+	
+	// sets the current position for the new selection temp path (connecting the current cursor position to the origin)
+	public.setTempSelectionPath = function (next) {
+		let nextRaster = next.screenPos.copy()
+		public.tempPathString = ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+	}
+	
+	// initiallizes all the variables/elements for a new selection path starting at the given point, performing a multiselection if the multiselect parameter is true
+	public.initializeSelectionPath = function (next, multiselect) {
+		let nextRaster = next.screenPos.copy()
+		let nextPos = next.graphPos.copy()
+		lastSelectionPoint = next.copy()
+		public.tempPathString = ''
+		public.selectionPath = [lastSelectionPoint]
+		public.selectionPathString = 'M ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+		// update the selection path elements
+		public.selectionElements.regionPath.attr('d', public.selectionPathString)
+		public.selectionElements.regionProjection.attr('d', public.selectionPathString + 'Z')
+		// initialize node variables
+		for (let n of nodes) {
+			n.insideRegion = false
+			n.leftRegionEdges = 0
+		}
+		// depending on if multiselect is true, either deselect all nodes or set the current selection list as the "preselection list"
+		if (!multiselect)
+			modifyNodeSelection([], SELECT_MODES.REPLACE)
+		else
+			public.preselectionList = selectedNodes
+	}
+	
+	// updates the selection path based on the new given cursor position. it will be added to the selection path if it is far enough from the last point to meet the distance threshold or the forceAdd parameter is given
+	public.updateSelectionPath = function (next, forceAdd) {
+		let nextRaster = next.screenPos.copy()
+		let nextPos = next.graphPos.copy()
+		var prev = lastSelectionPoint
+		
+		// only add the point to the region path if it is far enough from the previous one
+		if (forceAdd || prev.screenPos.distanceTo(nextRaster) > public.SELECTION_MIN_EDGE_LENGTH) {
+			public.selectionPathString += ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+			lastSelectionPoint = next.copy()
+			public.selectionPath.push(lastSelectionPoint)
+			
+			// TODO : rmacfarlane 7/2018 : add some quadtree and heuristic based pruning here to decreases the search space for large graphs
+			// check if any new nodes should be selected
+			var newSelection = []
+			var startPoint = public.selectionPath[0]
+			var nodes = public.force.nodes()
+			for (let node of nodes) {
+				let isLeftOfNewEdge = isLeftOfEdge(node, prev.graphPos, lastSelectionPoint.graphPos)		// is this node left of the new edge?
+				let isLeftOfProjection = isLeftOfEdge(node, lastSelectionPoint.graphPos, startPoint.graphPos)	// is this node left of the projected edge of the new point to the start point?
+				
+				let tempLeftEdges = node.leftRegionEdges
+				if (isLeftOfNewEdge) {
+					++node.leftRegionEdges
+					++tempLeftEdges
+				}
+				if (isLeftOfProjection) {
+					++tempLeftEdges
+				}
+				
+				node.insideRegion = (tempLeftEdges % 2 == 1)
+				if (node.insideRegion)
+					newSelection.push(node)
+			}
+			
+			// if realtime highlighting is enabled, update the selection now
+			if (public.realtimeSelectionHighlighting) {
+				newSelection = _.union(newSelection, public.preselectionList)
+				modifyNodeSelection(newSelection, SELECT_MODES.REPLACE_NO_TOGGLE)
+			}
+		}
+		
+		// update the selection path elements
+		public.selectionElements.regionPath.attr('d', public.selectionPathString + public.tempPathString)
+		public.selectionElements.regionProjection.attr('d', public.selectionPathString + public.tempPathString + 'Z')
+	}
+	
+	// filters the node selection list based on the current region select path
+	public.filterRegionSelection = function () {
+		var selectionPoints = []
+		for (var i = 0; i < public.selectionPath.length; ++i) {
+			var point = public.selectionPath[i].graphPos
+			selectionPoints.push(point)
+		}
+		
+		var newSelectionList = []
+		var nodes = public.force.nodes()
+		for (var n = 0; n < nodes.length; ++n) {
+			var node = nodes[n]
+			var intersections = 0
+			for (var e = 0; e < selectionPoints.length; ++e) {
+				var v1 = selectionPoints[e]
+				var v2 = selectionPoints[(e+1)%(selectionPoints.length)]
+				
+				if (isLeftOfEdge(node, v1, v2))
+					intersections++
+			}
+			if (intersections % 2 == 1)
+				newSelectionList.push(node)
+		}
+		newSelectionList = _.union(newSelectionList, public.preselectionList)
+		public.preselectionList = []
+		modifyNodeSelection(newSelectionList, SELECT_MODES.REPLACE_NO_TOGGLE)
+	}
+	
+	// returns true if a ray starting at the given node and going right would intersect with the edge defined by the two given vertices
+	function isLeftOfEdge (node, v1, v2) {
+		// salt the xy values so we don't have to worry about the edge cases of matching xy coordinates causing 0/inifinite slope
+		v1 = v1.salted()
+		v2 = v2.salted()
+		
+		// to simplify things always make the leftmost vertex v1
+		if (v1.x > v2.x) {
+			var temp = v2
+			v2 = v1
+			v1 = temp
+		}
+		
+		// negate the y values to make the math easier to follow
+		v1 = v1.inverted()
+		v2 = v2.inverted()
+		node = new Point(node.x, -1*node.y)
+		
+		// if the node is above or below both vertices they cannot intersect so if either of these cases are true we should stop here
+		var nodeIsBelow = Math.min(v1.y, v2.y) > node.y
+		var nodeIsAbove = Math.max(v1.y, v2.y) < node.y
+		if (nodeIsBelow || nodeIsAbove)
+			return false
+		
+		// calculate the slope/intercept of the line and use f(x)=mx+b to get the projected y value of the function when given the node's x
+		var slope = (v2.y - v1.y) / (v2.x - v1.x)
+		var offset = -1 * (slope * v1.x - v1.y)
+		var projectedY = slope*node.x + offset
+		
+		// make final calculations and checks to see if the node is left of the edge
+		var nodeIsLess = projectedY > node.y		// true if y valvue of the node is less than the projected y on the edge
+		var positiveSlope = (slope > 0)			// true if the slope of the edge is positive
+		var isLeft = (nodeIsLess != positiveSlope)	// true if the node is left of the edge
+		return isLeft
+	}
+	
 	// ############################################################## key binding functions ##############################################################
 
 	// add key listeners for zooming and panning
@@ -1393,13 +1720,46 @@ var GraphUtil = (function ($) {
 	Math.degrees = function (radians) {
 		return radians * 180 / Math.PI;
 	};
+	
+	public.getDistance = function (x1, y1, x2, y2) {
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		var distance = Math.sqrt(dx * dx + dy * dy);
+		return distance;
+	}
 
-	// constructs a string for
-	function transformString (x, y, scale, unit) {
+	// constructs a string for a svg transformation attribute
+	public.getTransformString = function (x, y, scale, unit) {
 		unit = unit ? unit : ''
 		return 'translate(' + x + unit + ',' + y + unit  + ')scale(' + scale + ')'
 	}
+	
+	// adds a negligible tiny value to a given number for the sole purpose of preventing matches when it would be inconvenient
+	public.saltValue = function (value) {
+		var salt = Math.random() * SALT_MULTIPLIER
+		return value + salt
+	}
+	
+	// why doesn't javascript have XOR???
+	public.xor = function (a, b) {
+		return (a || b) && (a != b)
+	}
+	
+	// prevents any further propagation or default behaviors from triggering off of the given event
+	public.captureEvent = function (event) {
+		event = event ? event : d3.event.sourceEvent
+		if (event) {
+			event.preventDefault()
+			event.stopImmediatePropagation()
+			event.stopPropagation()
+		}
+	}
 
+	// ############################################################## meta functions ##############################################################
+	
+	 
+	
+	// ############################################################## return object ##############################################################
 	// return the public object to make the public functions accessable
 	return public;
 

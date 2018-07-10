@@ -87,7 +87,20 @@ div.content-wrapper
         height: 0px
         svg.chart
           overflow: visible !important
-    
+      
+      // graph region selection styles
+      .selectionLayer 
+        path
+          stroke: rgb(80,80,255)
+          stroke-width: 3px
+        .selectionPath
+          fill: none
+        .selectionProjection
+          fill: rgb(80,80,255)
+          fill-opacity: 0.2
+          stroke-width: 2px
+          stroke-dasharray: 4,4
+
     .containsSpinner
       background-image: url(../images/spinner.gif)
       background-position: center
