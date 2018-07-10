@@ -1,5 +1,5 @@
 <div class="content body">
-	<section class="page-asset-explorer-config">
+	<section class="page-asset-explorer-config field-setting-component">
 		<div>
 			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
 				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
