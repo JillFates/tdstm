@@ -133,10 +133,10 @@ export class DateUtils {
 	 * @returns {string}
 	 */
 	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
-		const defaultFormat = 'MMM/dd/yyy';
+		const defaultFormat = 'MM/dd/yyy';
 
 		const dateFormats = {
-			'DD/MM/YYYY' : 'dd/MMM/yyyy',
+			'DD/MM/YYYY' : 'dd/MM/yyyy',
 			'MM/DD/YYYY' : defaultFormat
 		};
 
@@ -158,17 +158,17 @@ export class DateUtils {
 		let durationDate = moment.duration(endDate.diff(startDate)), durationResult = '';
 
 		let days = durationDate.asDays();
-		if (days > 0) {
+		if (days >= 1) {
 			durationResult += days + ' day' + ((days > 1) ? 's ' : ' ');
 		}
 
 		let hours = durationDate.hours();
-		if (hours > 0) {
+		if (hours >= 1) {
 			durationResult += hours + ' hr' + ((hours > 1) ? 's ' : ' ');
 		}
 
 		let minutes = durationDate.minutes();
-		if (minutes > 0) {
+		if (minutes >= 1) {
 			durationResult += minutes + ' min' + ((minutes > 1) ? 's ' : ' ');
 		}
 

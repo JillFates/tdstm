@@ -7,7 +7,7 @@ import modules.CommonsModule
 class DatascriptDesignerPage extends Page{
 
     static at = {
-        modalTitle.text().trim().contains("DataScript Designer")
+        modalTitle.text().trim().contains("ETL Script Designer")
     }
 
     static content = {

@@ -134,19 +134,34 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * A set of Global transformations that will be apply over each iteration
 	 */
-	Set globalTransformers = [] as Set
+	Set<Closure> globalTransformers = new HashSet<Closure>()
 
+	/**
+	 * Safe Global transformation that checks the type before applying a transformation
+	 */
 	static Trimmer = { Element element ->
-		element.trim(true)
+		if(element.value instanceof CharSequence) {
+			element.trim()
+		}
 	}
 
+	/**
+	 * Safe Global transformation that checks the type before applying a transformation
+	 */
 	static Sanitizer = { Element element ->
-		element.sanitize()
+		if(element.value instanceof CharSequence) {
+			element.sanitize()
+		}
 	}
 
+	/**
+	 * Safe Global transformation that checks the type before applying a transformation
+	 */
 	static Replacer = { String regex, String replacement ->
-		{ Element element ->
-			element.replace(regex, replacement)
+		return { Element element ->
+			if (element.value instanceof CharSequence) {
+			  element.replace(regex, replacement)
+			}
 		}
 	}
 
@@ -1004,7 +1019,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	private void initializeDefaultGlobalTransformations(){
 		globalTransformers.add(Trimmer)
-		//  globalTransformers.add(Sanitizer)
+		globalTransformers.add(Sanitizer)
 	}
 
 	/**
@@ -1366,3 +1381,4 @@ class IterateIndex {
 		return this.pos == size
 	}
 }
+

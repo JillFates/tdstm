@@ -1,12 +1,13 @@
 package pages.Datascripts
 
 import geb.Page
+import modules.CommonsModule
 
 class CreateDatascriptPage extends Page{
 
     static at = {
-        title == "DataScripts"
-        modaltitle.text() == "Create DataScript"
+        title == "ETL Scripts"
+        modaltitle.text() == "Create ETL Script"
         providerDdownName.text() == "Provider: *"
         datascriptDesc.text() == "Description:"
         datascriptName.text() == "Name: *"
@@ -26,7 +27,7 @@ class CreateDatascriptPage extends Page{
         latestProvider {$("div", class:"k-list-scroller").find("li", class:"k-item")[1]}
         datascriptNameField   { $('input#dataScriptName')}
         datascriptDescField   { $('textarea#dataScriptDescription')}
-
+        commonsModule { module CommonsModule }
     }
 
 }

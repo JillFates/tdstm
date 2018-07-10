@@ -1,13 +1,13 @@
-package pages.Admin
+package pages.Admin.LandingItems
 
 import geb.Page
 import modules.AdminModule
 
-class ListWorkflowsPage extends Page{
+class ListManufacturersLandingPage extends Page{
 
     static at = {
-        title == "Workflows"
-        pageHeaderName.text() == "Workflows"
+        title == "Manufacturer List"
+        pageHeaderName.text() == "Manufacturer List"
     }
 
     static content = {

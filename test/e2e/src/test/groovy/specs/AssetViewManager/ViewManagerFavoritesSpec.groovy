@@ -3,14 +3,14 @@ package specs.AssetViewManager
 import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Stepwise
+import spock.lang.Ignore
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import pages.AssetViewManager.SaveViewPage
 import jodd.util.RandomString
 
 
-@Stepwise
+@Ignore
 class ViewManagerFavoritesSpec extends GebReportingSpec {
 
     def testKey
@@ -44,8 +44,9 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
                 waitFor { allViewsModule.clickCreateView() }
                 waitFor { createViewModule.selectApplication() }
                 waitFor { createViewModule.clickNext() }
+                createViewModule.clickSpecificCheckbox("Name")
                 createViewModule.selectRandomCheckboxes()
-                waitFor { createViewModule.clickSave() }
+                waitFor { createViewModule.firstSave() }
                 at SaveViewPage
                 waitFor { enterName(RandomString.getInstance().randomAlphaNumeric(10)) }
                 waitFor { clickSave() }

@@ -2,11 +2,13 @@ package modules
 
 import geb.Module
 import geb.waiting.WaitTimeoutException
+import geb.Browser
 
 class CommonsModule extends Module {
 
     static content = {
-
+        modalDialog {$('div#tdsUiDialog')}
+        kendoDateFilter { $('kendo-popup td[role=gridcell]')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -27,8 +29,49 @@ class CommonsModule extends Module {
 
     }
 
+    def waitForLoadingMessage() {
+        try {
+            // Try and wait that the loading message on the grid is displayed and then gone so it loads the page content.
+            // There are big pages where a lot of information is loaded
+            waitFor { $('div#load_applicationIdGrid').displayed }
+            waitFor { !$('div#load_applicationIdGrid').displayed }
+        } catch (WaitTimeoutException e) {
+            // Nothing to do here, in case the server quickly manages the page info
+            // and the loading message on the grid isn't detected, then prevent that the test fails
+        }
+    }
+
     def waitForGlobalProgressBarModal(){
         waitFor{$('div#globalProgressBar')}
         waitFor{!$('div#globalProgressBar')}
+    }
+
+    /*
+    * date: string formatted date required by kendo picker. "EEEE, MMMM d, yyyy"//Friday, June 1, 2018
+    * calendarIconIndex: NOT REQUIRED if one date filter, number because is possible to have more than one inputs
+    * */
+    def setKendoDateFilter(date, calendarIconIndex = null){
+        if (calendarIconIndex != null) {
+            browser.driver.executeScript("\$('.k-i-calendar')[$calendarIconIndex].click()")
+        } else {
+            browser.driver.executeScript("\$('.k-i-calendar').click()")
+        }
+        waitFor{kendoDateFilter.find{it.@title.contains(date)}.click()}
+    }
+
+    def removeKendoDateFilter(calendarIconIndex = null){
+        if (calendarIconIndex != null) {
+            browser.driver.executeScript("\$('kendo-datepicker + span.fa-times')[$calendarIconIndex].click()")
+        } else {
+            browser.driver.executeScript("\$('kendo-datepicker + span.fa-times').click()")
+        }
+    }
+
+    def waitForEtlScriptsModalHidden(){
+        waitFor{!modalDialog.jquery.attr("class").contains("in")}
+    }
+
+    def waitForTaskModal() {
+        waitFor { !$('div.modal-task') }
     }
 }

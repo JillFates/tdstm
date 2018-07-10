@@ -31,6 +31,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
+import { TagService } from '../assetTags/service/tag.service';
 
 @NgModule({
 	imports: [
@@ -60,7 +61,12 @@ import { DependecyService } from './service/dependecy.service';
 		SingleCommentComponent,
 		TaskDetailComponent
 	],
-	providers: [AssetExplorerService, TaskCommentService, DependecyService],
+	providers: [
+		AssetExplorerService,
+		TaskCommentService,
+		DependecyService,
+		TagService
+	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,

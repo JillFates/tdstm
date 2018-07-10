@@ -1,5 +1,7 @@
 package com.tdsops.common.lang
 
+import org.springframework.util.ObjectUtils
+
 /**
  * CollectionUtils class provides some useful collection related manipulation and testing methods
  */
@@ -71,6 +73,24 @@ class CollectionUtils {
 	 */
 	static boolean isNotEmpty(Collection<?> collection) {
 		return !isEmpty(collection)
+	}
+
+	/**
+	 * Return {@code true} if the supplied Array is {@code null} or empty.
+	 * @param array
+	 * @return
+	 */
+	static boolean isEmpty(Object... array) {
+		return ObjectUtils.isEmpty(array)
+	}
+
+	/**
+	 * Return {@code false} if the supplied Array is not {@code null} or not empty.
+	 * @param array
+	 * @return
+	 */
+	static boolean isNotEmpty(Object... array) {
+		return !isEmpty(array)
 	}
 
 	/**
