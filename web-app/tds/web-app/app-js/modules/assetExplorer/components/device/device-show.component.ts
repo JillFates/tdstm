@@ -5,6 +5,9 @@ import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.c
 import { DependecyService } from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetEditComponent} from '../asset/asset-edit.component';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
@@ -14,8 +17,14 @@ export function DeviceShowComponent(template, modelId: number) {
 		template: template
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
+		protected assetTags: Array<TagModel> = [];
 
-		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		constructor(
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetService: DependecyService,
+			private tagService: TagService) {
+				this.onLoad();
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -29,6 +38,21 @@ export function DeviceShowComponent(template, modelId: number) {
 		 */
 		ngOnInit(): void {
 			jQuery('[data-toggle="popover"]').popover();
+		}
+
+		private onLoad(): void {
+			this.tagService.getAssetTags(this.mainAsset).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.assetTags = result.data;
+				} else {
+					this.assetTags = [];
+					this.handleError(result.errors ? result.errors[0] : 'Error on tags by asset id call');
+				}
+			}, error => this.handleError(error) );
+		}
+
+		private handleError(error: string): void {
+			console.log(error);
 		}
 
 		cancelCloseDialog(): void {

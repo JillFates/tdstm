@@ -132,6 +132,20 @@
                                     <td>&nbsp;</td>
                                 </tr>
                                 <g:render template="/angular/common/customShow"></g:render>
+                                <tr>
+                                    <td class="label N" nowrap="nowrap">
+                                        <label for="tags">
+                                            Tags
+                                        </label>
+                                    </td>
+                                    <td nowrap="nowrap" class="N" colspan="4">
+                                        <span *ngFor="let tag of assetTags" class="label tag"
+                                              [ngClass]="tag.css"
+                                              style="display: inline-block; margin-right: 5px; vertical-align: baseline; text-align: center; font-weight: bold;">
+                                            {{tag.name}}
+                                        </span>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>

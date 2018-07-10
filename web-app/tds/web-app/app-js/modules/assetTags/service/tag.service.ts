@@ -128,6 +128,18 @@ export class TagService {
 	}
 
 	/**
+	 * GET - Get the list of all tags linked/associated to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	getAssetTags(assetId: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.tagURL}/asset/${assetId}`)
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * TODO: document
 	 * @returns {Array<string>}
 	 */
