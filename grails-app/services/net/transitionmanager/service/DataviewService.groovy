@@ -604,7 +604,9 @@ class DataviewService implements ServiceMethods {
 						domain: domainFor(column),
 						filter: filterFor(column),
 						type: typeFor(column),
-						whereProperty: wherePropertyFor(column)
+						whereProperty: wherePropertyFor(column),
+						manyToManyQuery: manyToManyQueryFor(column),
+						manyToManyParameterName: manyToManyParameterNameFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -767,6 +769,24 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String wherePropertyFor(Map column) {
 		return transformations[column.property].whereProperty?: propertyFor(column)
+	}
+
+	/**
+	 * Return the complementary query to be used in cases of many to many relationships.
+	 * @param column
+	 * @return
+	 */
+	private static String manyToManyQueryFor(Map column) {
+		return transformations[column.property].manyToManyQuery
+	}
+
+	/**
+	 * Return the parameter to be used when filtering many to many relationships.
+	 * @param column
+	 * @return
+	 */
+	private static String manyToManyParameterNameFor(Map column) {
+		return transformations[column.property].manyToManyParameterName
 	}
 
 
@@ -988,7 +1008,15 @@ class DataviewService implements ServiceMethods {
 				left outer join AE.tagAssets TA
 				left outer join TA.tag T
 			""",
-			whereProperty: 'TA.tag'
+			whereProperty: 'AE.id',
+			manyToManyQuery: """
+				SELECT AE.id 
+				FROM AssetEntity AE
+				LEFT OUTER JOIN AE.tagAssets TA
+				LEFT OUTER JOIN TA.tag T
+				WHERE T.id = :tagId
+			""",
+			manyToManyParameterName: "tagId"
 		],
 
     ].withDefault {

@@ -37,7 +37,9 @@ class FieldSearchData {
                     columnAlias : columnAlias?: column,
                     useWildcards : false,
                     type: type,
-                    whereProperty: whereProperty
+                    whereProperty: whereProperty,
+	                manyToManyQuery: manyToManyQuery,
+                    manyToManyParameterName: manyToManyParameterName
             ]
         }
 
@@ -156,5 +158,17 @@ class FieldSearchData {
 
     String getWhereProperty() {
         return searchInfo.whereProperty?: column
+    }
+
+	String getManyToManyQuery() {
+		return searchInfo.manyToManyQuery
+	}
+
+	String getManyToManyParameterName() {
+		return searchInfo.manyToManyParameterName
+	}
+
+    boolean isManyToMany() {
+        return searchInfo.manyToManyQuery != null
     }
 }
