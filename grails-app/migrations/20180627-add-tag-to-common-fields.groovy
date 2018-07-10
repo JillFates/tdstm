@@ -23,7 +23,7 @@ databaseChangeLog = {
                         'constraints': [
                                 'required': 1
                         ],
-                        'control': 'String',
+                        'control': 'asset-tag-selector',
                         'default': '',
                         'field': 'tags',
                         'imp': 'N',
