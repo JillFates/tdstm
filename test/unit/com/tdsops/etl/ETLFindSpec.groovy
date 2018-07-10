@@ -749,11 +749,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
-			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1339,11 +1334,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
-			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1432,12 +1422,6 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
 				}
-			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
 			}
 
 		cleanup:

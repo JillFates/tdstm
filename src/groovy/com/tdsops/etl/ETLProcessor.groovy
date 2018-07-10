@@ -75,10 +75,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
-	 * Initial size of LRU cache
-	 */
-	static final Integer INITIAL_SIZE_CACHE = 10000
-	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -208,7 +204,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
-		this.cache = new ETLFindCache(INITIAL_SIZE_CACHE)
+		this.cache = new ETLFindCache()
 		this.initializeDefaultGlobalTransformations()
 	}
 

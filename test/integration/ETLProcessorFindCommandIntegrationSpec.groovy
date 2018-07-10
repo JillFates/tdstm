@@ -303,6 +303,21 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					}
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 48
+				get('Dependency', [id: '1']) == []
+				get('Application', [id: 151954l]) == []
+				get('Application', [assetName: 'ACMEVMPROD01', assetType: 'VM']) == []
+				get('Application', [assetName: 'VMWare Vcenter']) == []
+				get('Dependency', [id: '2']) == []
+				get('Application', [id: 151971l]) == []
+				get('Application', [assetName: 'ACMEVMPROD18', assetType: 'VM']) == []
+				get('Dependency', [id: '3']) == []
+				get('Application', [id: 151974l]) == []
+				get('Application', [assetName: 'ACMEVMPROD21', assetType: 'VM']) == []
+			}
+
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -394,6 +409,14 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					data[0..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 14
+				[1..14].each {
+					get('Dependency', [id: it.toString()]) == []
+				}
+			}
+
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -463,6 +486,12 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						value == '152255'
 					}
 				}
+			}
+
+			with(etlProcessor.cache){
+				size() == 2
+				get('Application', [id: '152254']) == [152254l]
+				get('Application', [id: '152255']) == [152255l]
 			}
 
 		cleanup:
@@ -552,7 +581,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
-					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }
+					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 				} else{
 					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
 				}
@@ -628,6 +657,13 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						fields.id.warn
 					}
 				}
+			}
+
+			with(etlProcessor.cache){
+				size() == 3
+				get('Application', [id: '152254']) == [152254l]
+				get('Application', [id: '152255']) == []
+				get('Application', [appVendor: 'Mozilla']) == [152253l]
 			}
 
 		cleanup:
@@ -852,6 +888,15 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					}
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 12
+				get('Application', [id: '152254']) == [152254l]
+				get('Application', [id: '151971']) == [151971l]
+				get('Application', [id: '151974']) == [151974l]
+				get('Application', [id: '151975']) == [151975l]
+			}
+
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -1203,6 +1248,20 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					}
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 22
+				get('Application', [id: '151954']) == []
+				get('Application', [assetName: 'VMWare Vcenter']) == []
+				get('Application', [id: '151971']) == []
+				get('Application', [id: '151974']) == []
+				get('Application', [id: '151975']) == []
+				get('Application', [id: '151978']) == []
+				get('Application', [assetName: 'V Cluster Prod']) == []
+				get('Application', [id: '151990']) == []
+				get('Application', [assetName: 'VMWare Vcenter Test']) == []
+			}
+
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -1283,6 +1342,12 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						find.query.size() == 0
 					}
 				}
+			}
+
+			with(etlProcessor.cache){
+				size() == 4
+				get('Application', [id: 152254l]) == [152254l]
+				get('Application', [id: 152255l]) == [152255l]
 			}
 
 		cleanup:

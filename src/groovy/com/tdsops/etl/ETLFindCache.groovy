@@ -4,15 +4,46 @@ import com.tdssrc.grails.StringUtil
 import org.codehaus.groovy.runtime.memoize.LRUProtectionStorage
 
 /**
- * A custom LRU cache for ETL find command results..
+ * A custom LRU cache for ETL find command results.<br>
+ * Following some considerations from java documentations, this cache uses
+ * an instance of LinkedHashMap and {@code LinkedHashMap#removeEldestEntry} method
+ * that includes a way to remove the least-recently accessed entries automatically.
  *
+ * @link https://docs.oracle.com/javase/tutorial/collections/implementations/map.html
  */
 class ETLFindCache {
 
 	Map<String, List<?>> cache
+	/**
+	 * Initial size of LRU cache
+	 */
+	static final Integer MAX_ENTRIES = 10000
 
-	ETLFindCache(int maxCacheSize) {
-		cache = new LRUProtectionStorage(maxCacheSize)
+	ETLFindCache() {
+
+		cache = new LinkedHashMap<String, List<?>>(MAX_ENTRIES + 1, 0.75F, true) {
+			/**
+			 * Overrides a default implementation in LinkedHashMap and is where
+			 * we determine the policy for removing the oldest entry.
+			 * In this case, we return true when the cache has
+			 * more entries than our defined capacity.
+			 * @param    eldest The least recently inserted entry in the map, or if
+			 *           this is an access-ordered map, the least recently accessed
+			 *           entry.  This is the entry that will be removed it this
+			 *           method returns <tt>true</tt>.  If the map was empty prior
+			 *           to the <tt>put</tt> or <tt>putAll</tt> invocation resulting
+			 *           in this invocation, this will be the entry that was just
+			 *           inserted; in other words, if the map contains a single
+			 *           entry, the eldest entry is also the newest.
+			 *
+			 * @return  <tt>true</tt> if the eldest entry should be removed
+			 *          from the map; <tt>false</tt> if it should be retained.
+			 */
+			@Override
+			protected boolean removeEldestEntry(Map.Entry eldest) {
+				return size() > MAX_ENTRIES
+			}
+		}
 	}
 
 	/**
