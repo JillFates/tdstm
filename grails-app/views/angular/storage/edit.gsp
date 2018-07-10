@@ -5,7 +5,7 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
                 aria-hidden="true">×</span></button>
