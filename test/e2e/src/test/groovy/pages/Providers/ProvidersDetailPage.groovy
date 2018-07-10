@@ -1,6 +1,7 @@
 package pages.Providers
 
 import geb.Page
+import modules.CommonsModule
 
 class ProvidersDetailPage extends Page{
     static at = {
@@ -17,6 +18,16 @@ class ProvidersDetailPage extends Page{
         editBtn {$("button", class:"btn btn-primary pull-left" , type:"button")}
         deleteBtn {$("button", class:"btn btn-danger")}
         closeXIcon {$("button", "aria-label":"Close" , class:"close" , type:"button").find("span", "aria-hidden":"true")[0]}
+        commonsModule { module CommonsModule }
+    }
+
+    def clickDeleteButton(){
+        waitFor{deleteBtn.click()}
+    }
+
+    def clickOnXButton(){
+        waitFor{closeXIcon.click()}
+        commonsModule.waitForDialogModalHidden()
     }
 
 }

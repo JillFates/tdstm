@@ -30,7 +30,7 @@ class DatascriptDetailsPage extends Page{
 
     def clickOnXButton(){
         waitFor{dsDetailXIcon.click()}
-        commonsModule.waitForEtlScriptsModalHidden()
+        commonsModule.waitForDialogModalHidden()
     }
 
     def clickOnEditButton(){
