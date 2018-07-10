@@ -1002,7 +1002,7 @@ class DataviewService implements ServiceMethods {
 					']'
 				)""",
 			type: String,
-			namedParameter: 'tags',
+			namedParameter: 'assetId',
 			alias: 'tags',
 			join: """
 				left outer join AE.tagAssets TA
