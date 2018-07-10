@@ -35,7 +35,8 @@ export class TagListColumnsModel {
 				locked: false,
 				cellStyle: {'text-align': 'center'}
 			},
-			{
+			// Disable these two when data available on API.
+			/*{
 				label: 'Dependencies',
 				property: 'dependencies',
 				type: 'number',
@@ -48,7 +49,7 @@ export class TagListColumnsModel {
 				type: 'number',
 				width: 130,
 				locked: false
-			},
+			},*/
 			{
 				label: 'Date Created',
 				property: 'dateCreated',

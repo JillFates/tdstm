@@ -15,7 +15,7 @@ class UpdateCommand {
 
 	static constraints = {
 		name nullable: true
-		description nullable: true
+		description nullable: true, blank: true
 		color nullable: true, inList: Color.values().toList()
 	}
 }
