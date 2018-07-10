@@ -141,7 +141,7 @@ class ETLFindElement implements ETLStackableCommand{
 	/**
 	 * Find results using DomainClassQueryHelper class.
 	 * It saves results in the current results.objects values based on
-	 * an instance of ETLFindLRUCache
+	 * an instance of ETLFindCache
 	 * <pre>
 	 * currentFind.objects = findResultsInCache()
 	 * </pre>
@@ -184,7 +184,7 @@ class ETLFindElement implements ETLStackableCommand{
 	}
 
 	/**
-	 * Use an instance of ETLFindLRUCache to cache queries in fond command.
+	 * Use an instance of ETLFindCache to cache queries in fond command.
 	 * For example:
 	 * <pre>
 	 *      find 'Application' by 'id' with 1555345l into 'id'

@@ -133,7 +133,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * Last Recently used cachec
 	 */
-	ETLFindLRUCache cache
+	ETLFindCache cache
 
 	/**
 	 * List of command that needs to be completed.
@@ -208,7 +208,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
-		this.cache = new ETLFindLRUCache(INITIAL_SIZE_CACHE)
+		this.cache = new ETLFindCache(INITIAL_SIZE_CACHE)
 		this.initializeDefaultGlobalTransformations()
 	}
 
