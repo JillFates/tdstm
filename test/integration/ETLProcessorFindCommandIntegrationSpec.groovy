@@ -89,7 +89,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -149,6 +149,13 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					}
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 2
+				get('Application', [id: 152254l]) == [152254l]
+				get('Application', [id: 152255l]) == [152255l]
+			}
+
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -211,7 +218,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -337,26 +344,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 
 		and:
-			List<AssetDependency> assetDependencies = [
-				[id: 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
-				[id: 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
-				[id: 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
-			].collect {
-				AssetDependency mock = Mock()
-				mock.getId() >> it.id
-				mock.getType() >> it.type
-				mock.getAsset() >> it.asset
-				mock.getDependent() >> it.dependent
-				mock
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
@@ -438,7 +425,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -506,7 +493,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.assetName == namedParams.assetName && it.project.id == namedParams.project.id }
+				applications.findAll { it.assetName == namedParams.assetName && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -567,7 +554,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				if(namedParams.containsKey('id')){
 					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }
 				} else{
-					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }
+					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
 				}
 			}
 
@@ -710,9 +697,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
 				} else if(namedParams.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }*.getId()
 				}
 			}
 
@@ -791,7 +778,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -907,7 +894,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -988,7 +975,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -1066,7 +1053,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -1149,7 +1136,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.getName() { 'AssetEntity' }
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
 		and:
@@ -1239,12 +1226,13 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-${racks[0].id},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
-13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-${racks[1].id},${rooms[0].id},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
-13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+				rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				${racks[0].id},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+				${racks[1].id},${rooms[0].id},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+				${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+				13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L
+				""".stripIndent())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1294,7 +1282,6 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 					with(data[4].fields.room) {
 						find.query.size() == 0
 					}
-
 				}
 			}
 

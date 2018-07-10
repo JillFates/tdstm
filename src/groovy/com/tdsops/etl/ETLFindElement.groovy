@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import com.tdssrc.grails.GormUtil
-
 /**
  * ETL find command implementation.
  * <code>
@@ -61,6 +58,8 @@ class ETLFindElement implements ETLStackableCommand{
 	 * List of references to each one in a sequence of find/elseFind commands
 	 */
 	List<Map<String, ?>> findings = []
+
+
 
 	/**
 	 * ETLFindElement instances creation defined by the ETLProcessor instance and a particular value of ETL Domain
@@ -141,16 +140,25 @@ class ETLFindElement implements ETLStackableCommand{
 
 	/**
 	 * Find results using DomainClassQueryHelper class.
-	 * It saves results in the current results.objects values.
+	 * It saves results in the current results.objects values based on
+	 * an instance of ETLFindLRUCache
+	 * <pre>
+	 * currentFind.objects = findResultsInCache()
+	 * </pre>
+	 * And the prepares final structure for results:
+	 * <pre>
+	 * results = [
+	 * 	objects: [],
+	 * 	matchOn: null
+	 * ]
+	 * </pre>
 	 * In case of error it saves error messages using currentFind.errors field.
+	 * @see com.tdsops.etl.ETLFindElement#lookupResultsInCache()
 	 */
 	private void findDomainObjectResults() {
 
 		try{
-			currentFind.objects = DomainClassQueryHelper.where(
-				ETLDomain.lookup(currentFind.domain),
-				processor.project,
-				currentFind.kv)
+			currentFind.objects = lookupResultsInCache()
 		} catch (all){
 
 			processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
@@ -173,6 +181,34 @@ class ETLFindElement implements ETLStackableCommand{
 				currentFind.errors = ['The find/elseFind command(s) found multiple records']
 			}
 		}
+	}
+
+	/**
+	 * Use an instance of ETLFindLRUCache to cache queries in fond command.
+	 * For example:
+	 * <pre>
+	 *      find 'Application' by 'id' with 1555345l into 'id'
+	 * </pre>
+	 * is converted in:
+	 * <pre>
+	 *     cache.get('Application', [id: 1555345l])
+	 * </pre>
+	 * @return a list of results based on cache results
+	 *          or after querying database using a DomainClassQueryHelper
+	 */
+	private List lookupResultsInCache() {
+		List cacheResults = processor.cache.get(currentFind.domain, currentFind.kv)
+
+		if (cacheResults == null) {
+			cacheResults = DomainClassQueryHelper.where(
+					ETLDomain.lookup(currentFind.domain),
+					processor.project,
+					currentFind.kv)
+
+			processor.cache.put(currentFind.domain, currentFind.kv, cacheResults)
+		}
+
+		return cacheResults
 	}
 
 	/**
