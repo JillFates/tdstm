@@ -164,7 +164,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
             commonsModule.clickOnDeleteNoPromptModal()
         when: 'Providers list page is displayed'
             at ProvidersPage
-        and: 'Filters by the first provider Name'
+        and: 'Filters by the second provider Name'
             filterByName provName2
         then: 'Provider should be displayed'
             getFirstRowProviderGridName() == provName2
