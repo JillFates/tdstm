@@ -50,13 +50,14 @@ grails.project.dependency.resolution = {
 		 * NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
 		 * TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
 		 */
-		runtime ('net.sourceforge.getl:getl:1.2.11') {
+		runtime 'net.sourceforge.getl:getl:1.2.11'
+		// runtime ('net.sourceforge.getl:getl:1.2.11') {
 			/*
 			 * removing the library that can cause a loop in the Log4J configuration
 			 * @see  http://www.slf4j.org/legacy.html#log4j-over-slf4j
 			 */
-			excludes 'org.slf4j:slf4j-log4j12'
-		}
+		//	excludes 'org.slf4j:slf4j-log4j12'
+		// }
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
@@ -84,7 +85,13 @@ grails.project.dependency.resolution = {
 		compile (':spring-security-rest:1.5.4') {
 			// Remove old Guava files packed in spring-security-rest plugin
 			excludes 'guava-io'
+			/*
+			 * removing the library that can cause a loop in the Log4J configuration
+			 * @see  http://www.slf4j.org/legacy.html#log4j-over-slf4j
+			 */
+			excludes 'org.slf4j:log4j-over-slf4j'
 		}
+
 		compile ":rest-client-builder:2.1.0"
 
 		compile "org.grails.plugins:cascade-validation:0.1.5"
