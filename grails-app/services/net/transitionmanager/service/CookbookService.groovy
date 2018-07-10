@@ -77,7 +77,7 @@ class CookbookService implements ServiceMethods {
 	 * @param context the context
 	 * @param cloneFrom the id of the recipe to be cloned from
 	 */
-	RecipeVersion createRecipe(String recipeName, String description, String recipeContext, cloneFrom) {
+	RecipeVersion createRecipe(String recipeName, String description, cloneFrom) {
 		securityService.requirePermission Permission.RecipeCreate
 
 		Project project = securityService.getUserCurrentProjectOrException()
@@ -115,8 +115,7 @@ class CookbookService implements ServiceMethods {
 			}
 		}
 
-		return createRecipeAndRecipeVersion(recipeName, description, recipeContext, project, defaultSourceCode,
-				defaultChangelog, clonedReleasedVersion)
+		return createRecipeAndRecipeVersion(recipeName, description, project, defaultSourceCode, defaultChangelog, clonedReleasedVersion)
 	}
 
 	/**
@@ -162,13 +161,19 @@ class CookbookService implements ServiceMethods {
 	 * @param recipeVersion original recipeVersion
 	 * @return the new RecipeVersion created with a new Recipe
 	 */
-	private RecipeVersion createRecipeAndRecipeVersion(String name, String description, String context, Project project,
-	                                                   String sourceCode, String changelog, RecipeVersion recipeVersion) {
+	private RecipeVersion createRecipeAndRecipeVersion(
+		String name,
+		String description,
+		Project project,
+		String sourceCode,
+		String changelog,
+		RecipeVersion recipeVersion,
+		String context = null) {
 
 		def newRecipe = new Recipe(
 			name: name,
 			description: description,
-			context: context,
+			context: context ?: '{}',
 			project: project,
 			archived: false
 		).save(flush:true, failOnError: true)

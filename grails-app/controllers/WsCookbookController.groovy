@@ -20,8 +20,8 @@ class WsCookbookController implements ControllerMethods {
 	CookbookService cookbookService
 
 	@HasPermission(Permission.RecipeCreate)
-	def createRecipe(String name, String description, String context, Long clonedFrom) {
-		def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
+	def createRecipe(String name, String description, Long clonedFrom) {
+		def recipeVersion = cookbookService.createRecipe(name, description, clonedFrom)
 		renderSuccessJson(recipeId: recipeVersion.recipe.id)
 	}
 
