@@ -193,6 +193,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -259,15 +260,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-			with(etlProcessor.cache){
-				size() == 12
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
-			}
-
 		then: 'Results should contain Application domain results associated'
 			with(etlProcessor.finalResult()) {
 				domains.size() == 1
@@ -305,6 +297,17 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 			}
+
+			with(etlProcessor.cache){
+				size() == 12
+				hitCountRate() == 14.29
+				get('Application', [id: '151954']) == [151954l]
+				get('Application', [id: '151971']) == [151971l]
+				get('Application', [id: '151971']) == [151971l]
+				get('Application', [id: '151974']) == [151974l]
+				get('Application', [id: '151975']) == [151975l]
+			}
+
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -638,6 +641,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 12
+				hitCountRate() == 7.14
 				get('Application', [id: '151954']) == [151954l]
 				get('Application', [id: '151971']) == [151971l]
 				get('Application', [id: '151974']) == [151974l]
@@ -802,6 +806,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -1008,6 +1013,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 4
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
 				get('Application', [id: '152255']) == []
 			}
@@ -1580,6 +1586,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -1678,6 +1685,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -1777,6 +1785,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
 				get('Application', [id: '152255']) == []
 			}
@@ -1890,6 +1899,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -2003,6 +2013,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
 				get('Application', [id: '152255']) == [152255l, 152255l]
 			}
@@ -2389,6 +2400,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -2519,6 +2531,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -2649,6 +2662,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -2764,6 +2778,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -2879,6 +2894,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -2984,6 +3000,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
 				get('Application', [appVendor: 'Mozilla']) == []
 			}
@@ -3104,6 +3121,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 0
+				hitCountRate() == 0
 			}
 
 		cleanup:
@@ -3246,6 +3264,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			with(etlProcessor.cache){
 				size() == 2
+				hitCountRate() == 33.33
 				get('Application', [id: 152254l]) == []
 				get('Application', [id: 152255l]) == [152255l]
 			}

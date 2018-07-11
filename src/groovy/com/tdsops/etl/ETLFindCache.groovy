@@ -1,12 +1,11 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.StringUtil
-import org.codehaus.groovy.runtime.memoize.LRUProtectionStorage
 
 /**
  * A custom LRU cache for ETL find command results.<br>
  * Following some considerations from java documentations, this cache uses
- * an instance of LinkedHashMap and {@code LinkedHashMap#removeEldestEntry} method
+ * an instance of LinkedHashMap and {@code LinkedHashMap # removeEldestEntry} method
  * that includes a way to remove the least-recently accessed entries automatically.
  *
  * @link https://docs.oracle.com/javase/tutorial/collections/implementations/map.html
@@ -18,6 +17,14 @@ class ETLFindCache {
 	 * Initial size of LRU cache
 	 */
 	static final Integer MAX_ENTRIES = 10000
+	/**
+	 * Counter for the number of accesses
+	 */
+	private long accessCount = 0
+	/**
+	 * Counter for the number of hits
+	 */
+	private long hitCount = 0
 
 	ETLFindCache() {
 
@@ -27,7 +34,7 @@ class ETLFindCache {
 			 * we determine the policy for removing the oldest entry.
 			 * In this case, we return true when the cache has
 			 * more entries than our defined capacity.
-			 * @param    eldest The least recently inserted entry in the map, or if
+			 * @param eldest The least recently inserted entry in the map, or if
 			 *           this is an access-ordered map, the least recently accessed
 			 *           entry.  This is the entry that will be removed it this
 			 *           method returns <tt>true</tt>.  If the map was empty prior
@@ -36,7 +43,7 @@ class ETLFindCache {
 			 *           inserted; in other words, if the map contains a single
 			 *           entry, the eldest entry is also the newest.
 			 *
-			 * @return  <tt>true</tt> if the eldest entry should be removed
+			 * @return <tt>true</tt> if the eldest entry should be removed
 			 *          from the map; <tt>false</tt> if it should be retained.
 			 */
 			@Override
@@ -78,8 +85,11 @@ class ETLFindCache {
 	 *          it returns {@code null}.  (There can be at most one such mapping.)
 	 */
 	List<?> get(String domainClassName, Map fieldsInfo) {
+		accessCount++
 		String key = generateMd5Key(domainClassName, fieldsInfo)
-		return cache.get(key)
+		List<?> value = cache.get(key)
+		hitCount = (value == null) ? hitCount : hitCount + 1
+		return value
 	}
 
 	/**
@@ -104,5 +114,25 @@ class ETLFindCache {
 	 */
 	Long size() {
 		return cache.size()
+	}
+
+	Long getAccessCount() {
+		return accessCount
+	}
+
+	Long getHitCount() {
+		return hitCount
+	}
+
+	/**
+	 * Returns how many cache accesses are "hits" - that is,
+	 * how many times the required data was found in the cache
+	 * for a given number of accesses.
+	 * Hit rate is usually expressed as a percentage
+	 * @return
+	 */
+	Double hitCountRate(){
+		double percent = (hitCount / accessCount ) * 100
+		return percent.round(2)
 	}
 }

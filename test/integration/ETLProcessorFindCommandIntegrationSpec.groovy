@@ -1,13 +1,7 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tdsops.etl.DataSetFacade
-import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.ETLFieldsValidator
-import com.tdsops.etl.ETLDomain
-
-import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.*
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -18,7 +12,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Specification
 
 class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
@@ -32,7 +25,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 	FileSystemService fileSystemService
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 
-	def setup() {
+	def setup(){
 
 		assetDependencyDataSetContent = """
 			AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
@@ -64,16 +57,16 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value'() {
+	void 'test can find a domain Property Name with loaded Data Value'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -94,10 +87,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -150,8 +143,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 2
+				hitCountRate() == 33.33
 				get('Application', [id: 152254l]) == [152254l]
 				get('Application', [id: 152255l]) == [152255l]
 			}
@@ -162,27 +156,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
+	void 'test can find a domain Property Name with loaded Data Value using elseFind command'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -197,15 +191,15 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-				[id: 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
-				[id: 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
-				[id: 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-					it.getId() == 152402l
-				}, type: 'Hosts'],
+					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -230,10 +224,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -267,8 +261,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
 					data.collect { it.fields.asset.value } == [
-						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
 					// Validates command: find Application by 'id' with DOMAIN.asset
@@ -304,8 +298,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 48
+				hitCountRate() == 33.33
 				get('Dependency', [id: '1']) == []
 				get('Application', [id: 151954l]) == []
 				get('Application', [assetName: 'ACMEVMPROD01', assetType: 'VM']) == []
@@ -324,27 +319,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can grab the reference to the FINDINGS to be used later'() {
+	void 'test can grab the reference to the FINDINGS to be used later'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -360,10 +355,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -410,8 +405,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 14
+				hitCountRate() == 33.33
 				[1..14].each {
 					get('Dependency', [id: it.toString()]) == []
 				}
@@ -423,16 +419,16 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
+	void 'test can find a domain Property Name with loaded Data Value for a dependent'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -453,10 +449,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -488,8 +484,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 2
+				hitCountRate() == 33.33
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -500,16 +497,16 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
+	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -522,15 +519,17 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.assetName == namedParams.assetName && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll {
+					it.assetName == namedParams.assetName && it.project.id == namedParams.project.id
+				}*.getId()
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				debugConsole,
-				validator)
+					GroovyMock(Project),
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -554,15 +553,15 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
+	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<Application> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
+					[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
 			].collect {
 				Application mock = Mock()
 				mock.getId() >> it.id
@@ -581,18 +580,22 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
-					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
-				} else{
-					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
+					applications.findAll {
+						it.getId() == namedParams.id && it.project.id == namedParams.project.id
+					}*.getId()
+				} else {
+					applications.findAll {
+						it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id
+					}*.getId()
 				}
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -659,8 +662,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 3
+				hitCountRate() == 33.33
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == []
 				get('Application', [appVendor: 'Mozilla']) == [152253l]
@@ -672,7 +676,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
+	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -700,20 +704,20 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			TMDEMO.getId() >> 125612l
 
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -735,16 +739,18 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				if(namedParams.containsKey('id')){
 					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
 				} else if(namedParams.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }*.getId()
+					return assetEntities.findAll {
+						it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName
+					}*.getId()
 				}
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
+					GMDEMO,
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -778,27 +784,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can create a domain when not found a instance with find command'() {
+	void 'test can create a domain when not found a instance with find command'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -819,10 +825,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -858,8 +864,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
 					data.collect { it.fields.asset.value } == [
-						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
 					with(data[0].fields.asset) {
@@ -889,9 +895,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 12
-				get('Application', [id: '152254']) == [152254l]
+				hitCountRate() == 33.33
+				get('Application', [id: '151954']) == [151954l]
 				get('Application', [id: '151971']) == [151971l]
 				get('Application', [id: '151974']) == [151974l]
 				get('Application', [id: '151975']) == [151975l]
@@ -903,27 +910,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can throw an Exception if whenNotFound command defines an update action'() {
+	void 'test can throw an Exception if whenNotFound command defines an update action'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -944,10 +951,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -984,27 +991,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can throw an Exception if whenFound command defines a create action'() {
+	void 'test can throw an Exception if whenFound command defines a create action'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -1025,10 +1032,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1062,27 +1069,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
+	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -1103,10 +1110,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1144,27 +1151,27 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can update a domain when found a instance with find command'() {
+	void 'test can update a domain when found a instance with find command'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -1186,10 +1193,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1223,8 +1230,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
 					data.collect { it.fields.asset.value } == [
-						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+							'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+							'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 
 					with(data[0].fields.asset) {
@@ -1249,8 +1256,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 22
+				hitCountRate() == 33.33
 				get('Application', [id: '151954']) == []
 				get('Application', [assetName: 'VMWare Vcenter']) == []
 				get('Application', [id: '151971']) == []
@@ -1268,19 +1276,19 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
-	void 'test can load Rack domain instances and find Rooms associated'() {
+	void 'test can load Rack domain instances and find Rooms associated'(){
 
 		given:
 			List<Room> rooms = buildRooms([
-				[GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
-				[GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+					[GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+					[GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
 			])
 
 		and:
 			List<Rack> racks = buildRacks([
-				[GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
-				[GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
-				[GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
+					[GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
+					[GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
+					[GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
 			])
 
 		and:
@@ -1295,10 +1303,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1322,20 +1330,20 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					fieldNames == ['id', 'location', 'room'] as Set
 
 					data.collect { it.fields.id.value } == [
-						racks[0].id.toString(), '13145',
-						racks[1].id.toString(),
-						racks[2].id.toString(), '13358'
+							racks[0].id.toString(), '13145',
+							racks[1].id.toString(),
+							racks[2].id.toString(), '13358'
 					]
 
 					data.collect { it.fields.location.value } == [
-						'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
-						'ACME Data Center', 'New Colo Provider'
+							'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
+							'ACME Data Center', 'New Colo Provider'
 					]
 
 					data.collect { it.fields.room.value } == [
-						'ACME Data Center / DC1', 'ACME Data Center / DC1',
-						'ACME Data Center / DC1', 'ACME Data Center / DC1',
-						'New Colo Provider / ACME Room 1'
+							'ACME Data Center / DC1', 'ACME Data Center / DC1',
+							'ACME Data Center / DC1', 'ACME Data Center / DC1',
+							'New Colo Provider / ACME Room 1'
 					]
 
 					with(data[4].fields.room) {
@@ -1344,10 +1352,13 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.cache) {
 				size() == 4
-				get('Application', [id: 152254l]) == [152254l]
-				get('Application', [id: 152255l]) == [152255l]
+				hitCountRate() == 33.33
+				get('Room', [id: '100']) == []
+				get('Room', [id: '102']) == []
+//				get('Room', [id: '741']) == [741l]
+//				get('Room', [id: '742']) == [742l]
 			}
 
 		cleanup:
@@ -1362,7 +1373,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 	 * @param valuesList
 	 * @return a list of Mock(Room)
 	 */
-	List<Room> buildRooms(List<List<?>> valuesList) {
+	List<Room> buildRooms(List<List<?>> valuesList){
 		return valuesList.collect { List<?> values ->
 			Room room = new Room()
 			room.project = values[0]
@@ -1385,7 +1396,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 	 * @param valuesList
 	 * @return a list of Mock(Rack)
 	 */
-	List<Rack> buildRacks(List<List<?>> valuesList) {
+	List<Rack> buildRacks(List<List<?>> valuesList){
 		return valuesList.collect { List<?> values ->
 			Rack rack = new Rack()
 			rack.project = values[0]
@@ -1414,21 +1425,21 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 	 * @param required
 	 * @return a map with the correct fieldSpec format
 	 */
-	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
+	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0){
 		return [
-			constraints: [
-				required: required
-			],
-			control: type,
-			default: '',
-			field: field,
-			imp: 'U',
-			label: label,
-			order: 0,
-			shared: 0,
-			show: 0,
-			tip: "",
-			udf: 0
+				constraints: [
+						required: required
+				],
+				control    : type,
+				default    : '',
+				field      : field,
+				imp        : 'U',
+				label      : label,
+				order      : 0,
+				shared     : 0,
+				show       : 0,
+				tip        : "",
+				udf        : 0
 		]
 	}
 
@@ -1437,7 +1448,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 	 * @param csvContent
 	 * @return
 	 */
-	private List buildCSVDataSet(String csvContent) {
+	private List buildCSVDataSet(String csvContent){
 
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetOS << csvContent
@@ -1469,172 +1480,172 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		return validator
 	}
 
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
+	private List<Map<String, ?>> buildFieldSpecsFor(def asset){
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch(asset){
+		switch(asset) {
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
-					buildFieldSpec('appFunction', 'Function', 'String'),
-					buildFieldSpec('appOwner', 'App Owner', 'Person'),
-					buildFieldSpec('appSource', 'Source', 'String'),
-					buildFieldSpec('appTech', 'Technology', 'String'),
-					buildFieldSpec('appVendor', 'Vendor', 'String'),
-					buildFieldSpec('appVersion', 'Version', 'String'),
-					buildFieldSpec('businessUnit', 'Business Unit', 'String'),
-					buildFieldSpec('criticality', 'Criticality', 'InList'),
-					buildFieldSpec('drRpoDesc', 'DR RPO', 'String'),
-					buildFieldSpec('drRtoDesc', 'DR RTO', 'String'),
-					buildFieldSpec('latency', 'Latency OK', 'YesNo'),
-					buildFieldSpec('license', 'License', 'String'),
-					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-					buildFieldSpec('shutdownBy', 'Shutdown By', 'String'),
-					buildFieldSpec('shutdownDuration', 'Shutdown Duration', 'Number'),
-					buildFieldSpec('shutdownFixed', 'Shutdown Fixed', 'Number'),
-					buildFieldSpec('sme', 'SME1', 'Person'),
-					buildFieldSpec('sme2', 'SME2', 'Person'),
-					buildFieldSpec('startupBy', 'Startup By', 'String'),
-					buildFieldSpec('startupDuration', 'Startup Duration', 'Number'),
-					buildFieldSpec('startupFixed', 'Startup Fixed', 'Number'),
-					buildFieldSpec('startupProc', 'Startup Proc OK', 'YesNo'),
-					buildFieldSpec('testingBy', 'Testing By', 'String'),
-					buildFieldSpec('testingDuration', 'Testing Duration', 'Number'),
-					buildFieldSpec('testingFixed', 'Testing Fixed', 'Number'),
-					buildFieldSpec('testProc', 'Test Proc OK', 'YesNo'),
-					buildFieldSpec('url', 'URL', 'String'),
-					buildFieldSpec('useFrequency', 'Use Frequency', 'String'),
-					buildFieldSpec('userCount', 'User Count', 'String'),
-					buildFieldSpec('userLocations', 'User Locations', 'String'),
-					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-					buildFieldSpec('custom2', 'SLA Name', 'String'),
-					buildFieldSpec('custom3', 'Cost Basis', 'String'),
-					buildFieldSpec('custom4', 'OPS Manual', 'String'),
-					buildFieldSpec('custom5', 'DR Plan', 'String'),
-					buildFieldSpec('custom6', 'App Code', 'String'),
-					buildFieldSpec('custom7', 'Latency Timing', 'String'),
-					buildFieldSpec('custom8', 'App ID', 'String'),
-					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-					buildFieldSpec('custom10', 'Custom10', 'String'),
-					buildFieldSpec('custom11', 'Custom11', 'String'),
-					buildFieldSpec('custom12', 'Custom12', 'String'),
+						buildFieldSpec('appFunction', 'Function', 'String'),
+						buildFieldSpec('appOwner', 'App Owner', 'Person'),
+						buildFieldSpec('appSource', 'Source', 'String'),
+						buildFieldSpec('appTech', 'Technology', 'String'),
+						buildFieldSpec('appVendor', 'Vendor', 'String'),
+						buildFieldSpec('appVersion', 'Version', 'String'),
+						buildFieldSpec('businessUnit', 'Business Unit', 'String'),
+						buildFieldSpec('criticality', 'Criticality', 'InList'),
+						buildFieldSpec('drRpoDesc', 'DR RPO', 'String'),
+						buildFieldSpec('drRtoDesc', 'DR RTO', 'String'),
+						buildFieldSpec('latency', 'Latency OK', 'YesNo'),
+						buildFieldSpec('license', 'License', 'String'),
+						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+						buildFieldSpec('shutdownBy', 'Shutdown By', 'String'),
+						buildFieldSpec('shutdownDuration', 'Shutdown Duration', 'Number'),
+						buildFieldSpec('shutdownFixed', 'Shutdown Fixed', 'Number'),
+						buildFieldSpec('sme', 'SME1', 'Person'),
+						buildFieldSpec('sme2', 'SME2', 'Person'),
+						buildFieldSpec('startupBy', 'Startup By', 'String'),
+						buildFieldSpec('startupDuration', 'Startup Duration', 'Number'),
+						buildFieldSpec('startupFixed', 'Startup Fixed', 'Number'),
+						buildFieldSpec('startupProc', 'Startup Proc OK', 'YesNo'),
+						buildFieldSpec('testingBy', 'Testing By', 'String'),
+						buildFieldSpec('testingDuration', 'Testing Duration', 'Number'),
+						buildFieldSpec('testingFixed', 'Testing Fixed', 'Number'),
+						buildFieldSpec('testProc', 'Test Proc OK', 'YesNo'),
+						buildFieldSpec('url', 'URL', 'String'),
+						buildFieldSpec('useFrequency', 'Use Frequency', 'String'),
+						buildFieldSpec('userCount', 'User Count', 'String'),
+						buildFieldSpec('userLocations', 'User Locations', 'String'),
+						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+						buildFieldSpec('custom2', 'SLA Name', 'String'),
+						buildFieldSpec('custom3', 'Cost Basis', 'String'),
+						buildFieldSpec('custom4', 'OPS Manual', 'String'),
+						buildFieldSpec('custom5', 'DR Plan', 'String'),
+						buildFieldSpec('custom6', 'App Code', 'String'),
+						buildFieldSpec('custom7', 'Latency Timing', 'String'),
+						buildFieldSpec('custom8', 'App ID', 'String'),
+						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+						buildFieldSpec('custom10', 'Custom10', 'String'),
+						buildFieldSpec('custom11', 'Custom11', 'String'),
+						buildFieldSpec('custom12', 'Custom12', 'String'),
 				]
 				break
 			case AssetClass.DATABASE:
 				fieldSpecs = [
-					buildFieldSpec('dbFormat', 'Format', 'String'),
-					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-					buildFieldSpec('size', 'Size', 'String'),
-					buildFieldSpec('scale', 'Scale', 'String'),
-					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-					buildFieldSpec('custom2', 'SLA Name', 'String'),
-					buildFieldSpec('custom3', 'Cost Basis', 'String'),
-					buildFieldSpec('custom4', 'OPS Manual', 'String'),
-					buildFieldSpec('custom5', 'DR Plan', 'String'),
-					buildFieldSpec('custom6', 'App Code', 'String'),
-					buildFieldSpec('custom7', 'Latency Timing', 'String'),
-					buildFieldSpec('custom8', 'App ID', 'String'),
-					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-					buildFieldSpec('custom10', 'Custom10', 'String'),
-					buildFieldSpec('custom11', 'Custom11', 'String'),
-					buildFieldSpec('custom12', 'Custom12', 'String'),
+						buildFieldSpec('dbFormat', 'Format', 'String'),
+						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+						buildFieldSpec('size', 'Size', 'String'),
+						buildFieldSpec('scale', 'Scale', 'String'),
+						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+						buildFieldSpec('custom2', 'SLA Name', 'String'),
+						buildFieldSpec('custom3', 'Cost Basis', 'String'),
+						buildFieldSpec('custom4', 'OPS Manual', 'String'),
+						buildFieldSpec('custom5', 'DR Plan', 'String'),
+						buildFieldSpec('custom6', 'App Code', 'String'),
+						buildFieldSpec('custom7', 'Latency Timing', 'String'),
+						buildFieldSpec('custom8', 'App ID', 'String'),
+						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+						buildFieldSpec('custom10', 'Custom10', 'String'),
+						buildFieldSpec('custom11', 'Custom11', 'String'),
+						buildFieldSpec('custom12', 'Custom12', 'String'),
 				]
 				break
 				break
 			case AssetClass.DEVICE:
 				fieldSpecs = [
-					buildFieldSpec('assetTag', 'Asset Tag', 'String'),
-					buildFieldSpec('assetType', 'Device Type', 'AssetType'),
-					buildFieldSpec('cart', 'Cart', 'String'),
-					buildFieldSpec('ipAddress', 'IP Address', 'String'),
-					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-					buildFieldSpec('manufacturer', 'Manufacturer', 'String'),
-					buildFieldSpec('model', 'Model', 'String'),
-					buildFieldSpec('os', 'OS', 'String'),
-					buildFieldSpec('priority', 'Priority', 'Options.Priority'),
-					buildFieldSpec('railType', 'Rail Type', 'InList'),
-					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-					buildFieldSpec('scale', 'Scale', 'String'),
-					buildFieldSpec('serialNumber', 'Serial #', 'String'),
-					buildFieldSpec('shelf', 'Shelf', 'String'),
-					buildFieldSpec('shortName', 'Alternate Name', 'String'),
-					buildFieldSpec('size', 'Size', 'Number'),
-					buildFieldSpec('sourceBladePosition', 'Source Blade Position', 'Number'),
-					buildFieldSpec('sourceChassis', 'Source Chassis', 'Chassis.S'),
-					buildFieldSpec('locationSource', 'Source Location', 'Location.S'),
-					buildFieldSpec('rackSource', 'Source Rack', 'Rack.S'),
-					buildFieldSpec('sourceRackPosition', 'Source Position', 'Number'),
-					buildFieldSpec('roomSource', 'Source Room', 'Room.S'),
-					buildFieldSpec('targetBladePosition', 'Target Blade Position', 'Number'),
-					buildFieldSpec('targetChassis', 'Target Chassis', 'Chassis.T'),
-					buildFieldSpec('locationTarget', 'Target Location', 'Location.T'),
-					buildFieldSpec('rackTarget', 'Target Rack', 'Rack.T'),
-					buildFieldSpec('targetRackPosition', 'Target Position', 'Number'),
-					buildFieldSpec('roomTarget', 'Target Room', 'Room.T'),
-					buildFieldSpec('truck', 'Truck', 'String'),
-					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-					buildFieldSpec('custom2', 'SLA Name', 'String'),
-					buildFieldSpec('custom3', 'Cost Basis', 'String'),
-					buildFieldSpec('custom4', 'OPS Manual', 'String'),
-					buildFieldSpec('custom5', 'DR Plan', 'String'),
-					buildFieldSpec('custom6', 'App Code', 'String'),
-					buildFieldSpec('custom7', 'Latency Timing', 'String'),
-					buildFieldSpec('custom8', 'App ID', 'String'),
-					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-					buildFieldSpec('custom10', 'Custom10', 'String'),
-					buildFieldSpec('custom11', 'Custom11', 'String'),
-					buildFieldSpec('custom12', 'Custom12', 'String'),
+						buildFieldSpec('assetTag', 'Asset Tag', 'String'),
+						buildFieldSpec('assetType', 'Device Type', 'AssetType'),
+						buildFieldSpec('cart', 'Cart', 'String'),
+						buildFieldSpec('ipAddress', 'IP Address', 'String'),
+						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+						buildFieldSpec('manufacturer', 'Manufacturer', 'String'),
+						buildFieldSpec('model', 'Model', 'String'),
+						buildFieldSpec('os', 'OS', 'String'),
+						buildFieldSpec('priority', 'Priority', 'Options.Priority'),
+						buildFieldSpec('railType', 'Rail Type', 'InList'),
+						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+						buildFieldSpec('scale', 'Scale', 'String'),
+						buildFieldSpec('serialNumber', 'Serial #', 'String'),
+						buildFieldSpec('shelf', 'Shelf', 'String'),
+						buildFieldSpec('shortName', 'Alternate Name', 'String'),
+						buildFieldSpec('size', 'Size', 'Number'),
+						buildFieldSpec('sourceBladePosition', 'Source Blade Position', 'Number'),
+						buildFieldSpec('sourceChassis', 'Source Chassis', 'Chassis.S'),
+						buildFieldSpec('locationSource', 'Source Location', 'Location.S'),
+						buildFieldSpec('rackSource', 'Source Rack', 'Rack.S'),
+						buildFieldSpec('sourceRackPosition', 'Source Position', 'Number'),
+						buildFieldSpec('roomSource', 'Source Room', 'Room.S'),
+						buildFieldSpec('targetBladePosition', 'Target Blade Position', 'Number'),
+						buildFieldSpec('targetChassis', 'Target Chassis', 'Chassis.T'),
+						buildFieldSpec('locationTarget', 'Target Location', 'Location.T'),
+						buildFieldSpec('rackTarget', 'Target Rack', 'Rack.T'),
+						buildFieldSpec('targetRackPosition', 'Target Position', 'Number'),
+						buildFieldSpec('roomTarget', 'Target Room', 'Room.T'),
+						buildFieldSpec('truck', 'Truck', 'String'),
+						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+						buildFieldSpec('custom2', 'SLA Name', 'String'),
+						buildFieldSpec('custom3', 'Cost Basis', 'String'),
+						buildFieldSpec('custom4', 'OPS Manual', 'String'),
+						buildFieldSpec('custom5', 'DR Plan', 'String'),
+						buildFieldSpec('custom6', 'App Code', 'String'),
+						buildFieldSpec('custom7', 'Latency Timing', 'String'),
+						buildFieldSpec('custom8', 'App ID', 'String'),
+						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+						buildFieldSpec('custom10', 'Custom10', 'String'),
+						buildFieldSpec('custom11', 'Custom11', 'String'),
+						buildFieldSpec('custom12', 'Custom12', 'String'),
 				]
 				break
 			case ETLDomain.Dependency:
 				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetName', 'AssetName'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('asset', 'Asset'),
-					buildFieldSpec('comment', 'Comment'),
-					buildFieldSpec('status', 'Status'),
-					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
+						buildFieldSpec('id', 'Id', 'Number'),
+						buildFieldSpec('assetName', 'AssetName'),
+						buildFieldSpec('assetType', 'AssetType'),
+						buildFieldSpec('asset', 'Asset'),
+						buildFieldSpec('comment', 'Comment'),
+						buildFieldSpec('status', 'Status'),
+						buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
+						buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
 				]
 				break
 			case CustomDomainService.COMMON:
 				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetName', 'Name', 'String'),
-					buildFieldSpec('description', 'Description', 'String'),
-					buildFieldSpec('environment', 'Environment', 'Options.Environment'),
-					buildFieldSpec('externalRefId', 'External Ref Id', 'String'),
-					buildFieldSpec('lastUpdated', 'Modified Date', 'String'),
-					buildFieldSpec('moveBundle', 'Bundle', 'String'),
-					buildFieldSpec('planStatus', 'Plan Status', 'Options.PlanStatus'),
-					buildFieldSpec('supportType', 'Support', 'String'),
-					buildFieldSpec('validation', 'Validation', 'InList'),
-					buildFieldSpec('assetClass', 'Asset Class', 'String'),
+						buildFieldSpec('id', 'Id', 'Number'),
+						buildFieldSpec('assetName', 'Name', 'String'),
+						buildFieldSpec('description', 'Description', 'String'),
+						buildFieldSpec('environment', 'Environment', 'Options.Environment'),
+						buildFieldSpec('externalRefId', 'External Ref Id', 'String'),
+						buildFieldSpec('lastUpdated', 'Modified Date', 'String'),
+						buildFieldSpec('moveBundle', 'Bundle', 'String'),
+						buildFieldSpec('planStatus', 'Plan Status', 'Options.PlanStatus'),
+						buildFieldSpec('supportType', 'Support', 'String'),
+						buildFieldSpec('validation', 'Validation', 'InList'),
+						buildFieldSpec('assetClass', 'Asset Class', 'String'),
 				]
 				break
 			case AssetClass.STORAGE:
 				fieldSpecs = [
-					buildFieldSpec('LUN', 'LUN', 'String'),
-					buildFieldSpec('fileFormat', 'Format', 'String'),
-					buildFieldSpec('size', 'Size', 'String'),
-					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-					buildFieldSpec('scale', 'Scale', 'String'),
-					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-					buildFieldSpec('custom2', 'SLA Name', 'String'),
-					buildFieldSpec('custom3', 'Cost Basis', 'String'),
-					buildFieldSpec('custom4', 'OPS Manual', 'String'),
-					buildFieldSpec('custom5', 'DR Plan', 'String'),
-					buildFieldSpec('custom6', 'App Code', 'String'),
-					buildFieldSpec('custom7', 'Latency Timing', 'String'),
-					buildFieldSpec('custom8', 'App ID', 'String'),
-					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-					buildFieldSpec('custom10', 'Custom10', 'String'),
-					buildFieldSpec('custom11', 'Custom11', 'String'),
-					buildFieldSpec('custom12', 'Custom12', 'String'),
+						buildFieldSpec('LUN', 'LUN', 'String'),
+						buildFieldSpec('fileFormat', 'Format', 'String'),
+						buildFieldSpec('size', 'Size', 'String'),
+						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+						buildFieldSpec('scale', 'Scale', 'String'),
+						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+						buildFieldSpec('custom2', 'SLA Name', 'String'),
+						buildFieldSpec('custom3', 'Cost Basis', 'String'),
+						buildFieldSpec('custom4', 'OPS Manual', 'String'),
+						buildFieldSpec('custom5', 'DR Plan', 'String'),
+						buildFieldSpec('custom6', 'App Code', 'String'),
+						buildFieldSpec('custom7', 'Latency Timing', 'String'),
+						buildFieldSpec('custom8', 'App ID', 'String'),
+						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+						buildFieldSpec('custom10', 'Custom10', 'String'),
+						buildFieldSpec('custom11', 'Custom11', 'String'),
+						buildFieldSpec('custom12', 'Custom12', 'String'),
 				]
 				break
 		}
