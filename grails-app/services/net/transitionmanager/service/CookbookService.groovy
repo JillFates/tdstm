@@ -433,7 +433,7 @@ class CookbookService implements ServiceMethods {
 			def recipe = recipeVersion.recipe
 			assertProject recipe, project
 
-			contextTypeValue = recipe.context
+			context = recipe.context()
 			sourceCode = recipeVersion.sourceCode
 		} else {
 			contextTypeValue = predContextType
@@ -487,7 +487,7 @@ class CookbookService implements ServiceMethods {
 
 		//checkAccess(`recipe.project`)
 
-		Map context = recipe.context ? JsonUtil.convertJsonToMap(recipe.context) : [:]
+		Map context = recipe.context()
 
 		context.tag.each{Map tag->
 			boolean tagExists = Tag.where{id == tag.id}.count()
