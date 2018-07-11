@@ -145,7 +145,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 2
-				hitCountRate() == 33.33
+				hitCountRate() == 0
 				get('Application', [id: 152254l]) == [152254l]
 				get('Application', [id: 152255l]) == [152255l]
 			}
@@ -300,7 +300,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 48
-				hitCountRate() == 33.33
+				hitCountRate() == 14.29
 				get('Dependency', [id: '1']) == []
 				get('Application', [id: 151954l]) == []
 				get('Application', [assetName: 'ACMEVMPROD01', assetType: 'VM']) == []
@@ -407,7 +407,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 14
-				hitCountRate() == 33.33
+				hitCountRate() == 0
 				[1..14].each {
 					get('Dependency', [id: it.toString()]) == []
 				}
@@ -486,7 +486,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 2
-				hitCountRate() == 33.33
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == [152255l]
 			}
@@ -664,7 +664,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 3
-				hitCountRate() == 33.33
+				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
 				get('Application', [id: '152255']) == []
 				get('Application', [appVendor: 'Mozilla']) == [152253l]
@@ -897,7 +897,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 12
-				hitCountRate() == 33.33
+				hitCountRate() == 14.29
 				get('Application', [id: '151954']) == [151954l]
 				get('Application', [id: '151971']) == [151971l]
 				get('Application', [id: '151974']) == [151974l]
@@ -1258,7 +1258,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 22
-				hitCountRate() == 33.33
+				hitCountRate() == 14.29
 				get('Application', [id: '151954']) == []
 				get('Application', [assetName: 'VMWare Vcenter']) == []
 				get('Application', [id: '151971']) == []
@@ -1354,7 +1354,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 			with(etlProcessor.cache) {
 				size() == 4
-				hitCountRate() == 33.33
+				hitCountRate() == 0
 				get('Room', [id: '100']) == []
 				get('Room', [id: '102']) == []
 //				get('Room', [id: '741']) == [741l]

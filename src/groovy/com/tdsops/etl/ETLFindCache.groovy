@@ -129,7 +129,7 @@ class ETLFindCache {
 	 * how many times the required data was found in the cache
 	 * for a given number of accesses.
 	 * Hit rate is usually expressed as a percentage
-	 * @return
+	 * @return percentage of hit counts over access count
 	 */
 	Double hitCountRate(){
 		double percent = (hitCount / accessCount ) * 100
