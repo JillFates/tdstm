@@ -804,6 +804,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/datascript/$id/source" {
+			controller = "wsDataScript"
+			action = [
+					  GET: "getDataScriptSourceCode"
+			]
+		}
+
 		/*
 		 * Get the sample filename related to a DataScript Object
 		 */
