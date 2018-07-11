@@ -71,6 +71,18 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     }
 
     /**
+     * Endpoint for getting the SourceCode of a DataScript.
+     *
+     * @param id - DataScript id
+     * @return
+     */
+    @HasPermission(Permission.ETLScriptView)
+    def getDataScriptSourceCode (Long id) {
+        DataScript dataScript = dataScriptService.getDataScript(id)
+        renderSuccessJson([dataScript: dataScript.toMap(DataScript.SOURCE_CODE)])
+    }
+
+    /**
      * Endpoint to query if a given name is unique across provider and project. Along with the
      * name to look up, this method also expects:
      *
