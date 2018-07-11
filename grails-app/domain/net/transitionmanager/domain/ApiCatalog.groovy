@@ -1,9 +1,9 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.InvalidParamException
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 class ApiCatalog {
 	// The project this Api Catalog belongs to
@@ -48,11 +48,12 @@ class ApiCatalog {
 		String dictionaryJson = null
 		try {
 			dictionaryJson = JsonUtil.validateJson(dictionaryJsonString)
+
+			// Add additional validations on dictionaryJson
+			ApiCatalogUtil.validateDictionaryHasPrimaryKeys(dictionaryJson)
 		} catch(InvalidParamException e) {
 			return Message.InvalidFieldForDomain
 		}
-
-		// Add additional validations on dictionaryJson???
 
 		// Set to true, otherwise the validation fails.
 		return true

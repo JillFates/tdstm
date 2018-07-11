@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
@@ -10,6 +11,7 @@ import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.hibernate.criterion.CriteriaSpecification
 
 @Slf4j
 @Transactional
@@ -58,7 +60,7 @@ class ApiCatalogService implements ServiceMethods {
 		JSONObject jsonDictionary = JsonUtil.parseJson(jsonDictionaryTransformed)
 
 		Project currentProject = securityService.userCurrentProject
-		Provider provider = providerService.findOrCreateProvider(jsonDictionary.info.provider, currentProject)
+		Provider provider = providerService.findOrCreateProvider(jsonDictionary.dictionary.info.provider, currentProject)
 		ApiCatalog apiCatalog
 
 		if (command.id) {
@@ -66,14 +68,14 @@ class ApiCatalogService implements ServiceMethods {
 			if (command.version != apiCatalog.version) {
 				throw new DomainUpdateException("The version of the Api Catalog you are trying to update was already updated by another user")
 			}
-			apiCatalog.name = jsonDictionary.info.name
+			apiCatalog.name = jsonDictionary.dictionary.info.name
 			apiCatalog.dictionary = unPrettyDictionaryJson
 		} else {
-			apiCatalog = new ApiCatalog(project: currentProject, provider: provider, name: jsonDictionary.info.name, dictionary: unPrettyDictionaryJson)
+			apiCatalog = new ApiCatalog(project: currentProject, provider: provider, name: jsonDictionary.dictionary.info.name, dictionary: unPrettyDictionaryJson)
 		}
 
 		// validate is unique api catalog, and if not, let's update current
-		if (!validateUnique(jsonDictionary.info.name, command.id, currentProject, provider)) {
+		if (!validateUnique(jsonDictionary.dictionary.info.name, command.id, currentProject, provider)) {
 			throw new DomainUpdateException("Cannot update or create Api Catalog because the name is not unique for this project and provider.")
 		}
 
@@ -111,9 +113,47 @@ class ApiCatalogService implements ServiceMethods {
 	 * List all api catalogs for the current user project sorted by name ascending
 	 * @return a list of ApiCatalog instances for the current user project
 	 */
+	@NotTransactional
 	List<ApiCatalog> list() {
 		ApiCatalog.where {
 			project == securityService.userCurrentProject
 		}.list([sort: 'name', order: 'asc'])
+	}
+
+	/**
+	 * List all catalogs names and ids for the current user project sorted by name ascending.
+	 * This is used by the ApiAction CRUD when creating ApiActions
+	 *
+	 * @return a List containing Maps of catalogs like <id, name>
+	 */
+	@NotTransactional
+	List listCatalogNames() {
+		def catalogs = ApiCatalog.withCriteria {
+			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+			eq('project', securityService.userCurrentProject)
+			projections {
+				property('id', 'id')
+				property('name', 'name')
+			}
+			order('name', 'asc')
+		}
+		return catalogs
+	}
+
+	/**
+	 * Get a list of catalog dictionary methods expected by the ApiAction CRUD
+	 * @param catalogId a api catalog id
+	 * @return a Map containing a dictionary methods where the key is the "apiMethod" and the value is the
+	 * method definition details
+	 * @throws InvalidParamException
+	 */
+	@NotTransactional
+	Map getCatalogMethods(Long catalogId) {
+		ApiCatalog apiCatalog = findById(catalogId)
+		if (!apiCatalog) {
+			throw new InvalidParamException("Api Catalog with ID $catalogId, not found")
+		}
+
+		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionary)
 	}
 }

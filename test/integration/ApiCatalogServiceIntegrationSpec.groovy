@@ -22,7 +22,7 @@ class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
 	private static final String DICTIONARY = '''{
   "dictionary": {
     "info": {
-      "provider": "VMware test",
+      "provider": "VMware",
       "name": "vCenter-CSI v1",
       "description": "blah blah blah",
       "providerVersion": {
@@ -91,7 +91,18 @@ class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
         "required": 1,
         "readonly": "$readOnly",
         "encoded": 1
-      }
+      },
+      "CSV_PARAM": {
+		"paramName": "CSV",
+		"description": "Indicate the list format as CSV",
+		"type": "String",
+		"context": "USER_DEF",
+		"fieldName": null,
+		"value": "true",
+		"required": 1,
+		"readonly": 1,
+		"encoded": 1
+	  }
     },
     "paramGroup": {
       "FOO_GRP": [
@@ -108,7 +119,6 @@ class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
         "docUrl": "http://about.com/docs#appList",
         "method": "fetchAssetList",
         "producesData": 1,
-        "results": "invokeResults()",
         "params": [
           "$paramGroup.FOO_GRP$",
           "$paramDef.SYSPARM_DISPLAY_VALUE$",
@@ -121,6 +131,19 @@ class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
           "b",
           "z",
           "aa"
+        ]
+      },
+      {
+        "apiMethod": "DatabaseList",
+        "name": "Database List (cmdb_ci_database)",
+        "description": "List of databases",
+        "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
+        "docUrl": "http://about.com/docs#appList",
+        "method": "fetchAssetList",
+        "producesData": 1,
+        "params": [
+          "$paramGroup.FOO_GRP$",
+          "$paramDef.CSV_PARAM$"
         ]
       }
     ]

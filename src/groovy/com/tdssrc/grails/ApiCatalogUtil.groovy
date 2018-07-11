@@ -1,6 +1,5 @@
 package com.tdssrc.grails
 
-import groovy.json.JsonOutput
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.service.InvalidParamException
@@ -80,6 +79,7 @@ import java.util.regex.Pattern
 class ApiCatalogUtil {
 
 	private static final String DICTIONARY_ROOT_ELEMENT = 'dictionary'
+	private static final String[] DICTIONARY_PRIMARY_KEYS = ['info', 'variable', 'credential', 'paramDef', 'paramGroup', 'method']
 	private static final String DOT = '.'
 	private static final Pattern BETWEEN_PARENTHESIS = ~/\((.*?)\)/
 
@@ -89,12 +89,28 @@ class ApiCatalogUtil {
 	 * @param jsonDictionary - the json dictionary
 	 * @return a parsed and transformed api catalog dictionary
 	 */
-	private static def parseObject(JSONObject jsonDictionary) {
-		if (jsonDictionary.dictionary instanceof Map) {
-			return parseMap(jsonDictionary.dictionary, jsonDictionary)
-		} else {
-			return parseArray(jsonDictionary.dictionary, jsonDictionary)
+	private static def transformJsonDictionary(JSONObject jsonDictionary) {
+		if (!jsonDictionary.dictionary instanceof Map) {
+			 throw new Exception('Dictionary must be a Map structure.')
 		}
+
+		// transform json dictionary in using the desired order of primary keys
+		DICTIONARY_PRIMARY_KEYS.each {key ->
+			def element = jsonDictionary.dictionary.get(key)
+			if (element instanceof Map) {
+				element = transformMap(element, jsonDictionary)
+			} else if (element instanceof List) {
+				element = transformArray(element, jsonDictionary)
+			} else {
+				// do element placeholder replacement if needed
+				if (element ==~ /^\$.*\$$/) {
+					element = getParam(element, jsonDictionary)
+				}
+			}
+			jsonDictionary.dictionary.put(key, element)
+		}
+
+		return jsonDictionary
 	}
 
 	/**
@@ -105,12 +121,12 @@ class ApiCatalogUtil {
 	 * @param jsonDictionary - the json dictionary
 	 * @return a parsed and transformed map elements
 	 */
-	private static def parseMap(Object map, JSONObject jsonDictionary) {
+	private static def transformMap(Object map, JSONObject jsonDictionary) {
 		map.each {
 			if (it.value instanceof Map) {
-				it.value = parseMap(it.value, jsonDictionary)
+				it.value = transformMap(it.value, jsonDictionary)
 			} else if (it.value instanceof List) {
-				it.value = parseArray(it.value, jsonDictionary)
+				it.value = transformArray(it.value, jsonDictionary)
 			} else {
 				// do element placeholder replacement if needed
 				if (it.value ==~ /^\$.*\$$/) {
@@ -127,14 +143,14 @@ class ApiCatalogUtil {
 	 *
 	 * @param array - an array
 	 * @param jsonDictionary - the json dictionary
-	 * @return
+	 * @return a parsed and transformed array elements
 	 */
-	private static def parseArray(Object array, JSONObject jsonDictionary) {
+	private static def transformArray(Object array, JSONObject jsonDictionary) {
 		array.eachWithIndex { e, i ->
 			if (e instanceof Map) {
-				return parseMap(e, jsonDictionary)
+				return transformMap(e, jsonDictionary)
 			} else if (e instanceof List) {
-				return parseArray(e, jsonDictionary)
+				return transformArray(e, jsonDictionary)
 			} else {
 				// do element placeholder replacement if needed
 				if (e ==~ /^\$.*\$$/) {
@@ -210,24 +226,35 @@ class ApiCatalogUtil {
 	}
 
 	/**
+	 * Verify if given JSONObject contains expected key
+	 * @param jsonObject a JSONObject
+	 * @param key a expected key
+	 * @throws InvalidParamException
+	 */
+	private static void containsKey(JSONObject jsonObject, String key) {
+		if (!jsonObject.containsKey(key)) {
+			throw new InvalidParamException('Dictionary is missing key: ' + key)
+		}
+	}
+
+	/**
 	 * Transform a api catalog dictionary placeholders to the corresponding values as params definition indicates.
 	 *
 	 * @param dictionary - a json string containing the dictionary definition
 	 * @return a json string with json dictionary transformed
 	 */
 	static String transformDictionary(String dictionary) {
-
 		try {
-			def jsonDictionary = JsonUtil.parseJson(dictionary)
-			def jsonDictionaryParsed = parseObject(jsonDictionary)
-			def jsonDictionaryTransformed = JsonUtil.toJson(jsonDictionaryParsed)
-			return JsonOutput.prettyPrint(jsonDictionaryTransformed)
+			JSONObject jsonDictionaryParsed = JsonUtil.parseJson(dictionary)
+			validateDictionaryHasPrimaryKeys(jsonDictionaryParsed)
+
+			JSONObject jsonDictionaryTransformed = transformJsonDictionary(jsonDictionaryParsed)
+			return JsonUtil.toPrettyJson(jsonDictionaryTransformed)
 		} catch (Exception e) {
 			String error = String.format('Error transforming ApiCatalog dictionary. %s', e.message)
 			log.info(error)
 			throw new InvalidParamException(error)
 		}
-
 	}
 
 	/**
@@ -240,4 +267,55 @@ class ApiCatalogUtil {
 		return transformDictionary(command.dictionary)
 	}
 
+	/**
+	 * Validate that json dictionary contains expected primary keys
+	 * @param dictionary an api catalog json dictionary as String
+	 * @throws InvalidParamException
+	 */
+	static void validateDictionaryHasPrimaryKeys(String dictionary) {
+		JSONObject jsonDictionary = JsonUtil.parseJson(dictionary)
+
+		validateDictionaryHasPrimaryKeys(jsonDictionary)
+	}
+
+	/**
+	 * Validate that json dictionary contains expected primary keys
+	 * @param jsonDictionary an api catalog json dictionary as JSONObject
+	 * @throws InvalidParamException
+	 */
+	static void validateDictionaryHasPrimaryKeys(JSONObject jsonDictionary) {
+		// validate root element
+		containsKey(jsonDictionary, DICTIONARY_ROOT_ELEMENT)
+
+		// validate primary keys
+		jsonDictionary = jsonDictionary.get(DICTIONARY_ROOT_ELEMENT)
+		DICTIONARY_PRIMARY_KEYS.each { key ->
+			containsKey(jsonDictionary, key)
+		}
+	}
+
+	/**
+	 * Get a list of catalog dictionary methods expected by the ApiAction CRUD
+	 * @param dictionary a catalog json dictionary
+	 * @return a Map containing a dictionary methods where the key is the "apiMethod" and the value is the
+	 * method definition details
+	 * @throws InvalidParamException
+	 */
+	static Map<String, ?> getCatalogMethods(String dictionary) {
+		try {
+			JSONObject jsonDictionaryParsed = JsonUtil.parseJson(dictionary)
+			validateDictionaryHasPrimaryKeys(jsonDictionaryParsed)
+			JSONObject jsonDictionaryTransformed = transformJsonDictionary(jsonDictionaryParsed)
+
+			Map methods = [:]
+			jsonDictionaryTransformed.dictionary.method.each { entry ->
+				methods.put(entry.apiMethod, entry)
+			}
+			return methods
+		} catch (Exception e) {
+			String error = String.format('Error transforming ApiCatalog dictionary. %s', e.message)
+			log.info(error)
+			throw new InvalidParamException(error)
+		}
+	}
 }

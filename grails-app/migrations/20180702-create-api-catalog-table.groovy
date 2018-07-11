@@ -18,7 +18,7 @@ databaseChangeLog = {
 				constraints(nullable: 'false')
 			}
 
-			column(name: 'dictionary', type: 'TEXT') {
+			column(name: 'dictionary', type: 'JSON') {
 				constraints(nullable: 'false')
 			}
 

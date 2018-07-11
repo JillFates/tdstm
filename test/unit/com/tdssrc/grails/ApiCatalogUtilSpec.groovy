@@ -80,7 +80,18 @@ class ApiCatalogUtilSpec extends Specification {
         "required": 1,
         "readonly": "$readOnly",
         "encoded": 1
-      }
+      },
+      "CSV_PARAM": {
+		"paramName": "CSV",
+		"description": "Indicate the list format as CSV",
+		"type": "String",
+		"context": "USER_DEF",
+		"fieldName": null,
+		"value": "true",
+		"required": 1,
+		"readonly": 1,
+		"encoded": 1
+	  }
     },
     "paramGroup": {
       "FOO_GRP": [
@@ -97,7 +108,6 @@ class ApiCatalogUtilSpec extends Specification {
         "docUrl": "http://about.com/docs#appList",
         "method": "fetchAssetList",
         "producesData": 1,
-        "results": "invokeResults()",
         "params": [
           "$paramGroup.FOO_GRP$",
           "$paramDef.SYSPARM_DISPLAY_VALUE$",
@@ -110,6 +120,19 @@ class ApiCatalogUtilSpec extends Specification {
           "b",
           "z",
           "aa"
+        ]
+      },
+      {
+        "apiMethod": "DatabaseList",
+        "name": "Database List (cmdb_ci_database)",
+        "description": "List of databases",
+        "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
+        "docUrl": "http://about.com/docs#appList",
+        "method": "fetchAssetList",
+        "producesData": 1,
+        "params": [
+          "$paramGroup.FOO_GRP$",
+          "$paramDef.CSV_PARAM$"
         ]
       }
     ]
@@ -125,28 +148,68 @@ class ApiCatalogUtilSpec extends Specification {
 			JSONObject dictionaryTransformed = JsonUtil.parseJson(jsonDictionaryTransformed)
 		and: 'transformed dictionary contains expected elements'
 			dictionaryTransformed
-			dictionaryTransformed.method
-			dictionaryTransformed.method.size() == 1
-			dictionaryTransformed.method[0].params
-			dictionaryTransformed.method[0].params.size() == 4
+			dictionaryTransformed.dictionary
+			dictionaryTransformed.dictionary.method
+			dictionaryTransformed.dictionary.method.size() == 2
+			dictionaryTransformed.dictionary.method[0].params
+			dictionaryTransformed.dictionary.method[0].params.size() == 4
+			dictionaryTransformed.dictionary.method[1].params
+			dictionaryTransformed.dictionary.method[1].params.size() == 3
 	}
 
 	@See('TM-10608')
 	def 'test cannot transform invalid json dictionary'() {
-		when: 'try to parse an invalid json dictionary'
-			String dictionary =  '{"key": "value","key"}'
-			def jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
+		setup:
+			def dictionary
+			def jsonDictionaryTransformed
+		when: 'try to tramsform an invalid json dictionary'
+			dictionary =  '{"key": "value","key"}'
+			jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
+		then:
+			thrown InvalidParamException
+		when: 'try to transform json missing primary keys'
+			dictionary = '{"dictionary": {"key": "value"}}'
+			jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
 		then:
 			thrown InvalidParamException
 	}
 
 	@See('TM-10608')
-	def 'test transform json dictionary'() {
-		when: 'valid json dictionary with no placeholders'
-			String dictionary = '{"dictionary": {"key": "value"}}'
-			def jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
-		then:
-			'{\n    "key": "value"\n}' == jsonDictionaryTransformed
-	}
+	def 'test get catalog methods return expected list of methods'() {
+		when:
+			Map methods = ApiCatalogUtil.getCatalogMethods(DICTIONARY)
+		then: 'transformed dictionary contains expected methods and parameters placeholders transformed'
+			methods
+			methods.size() == 2
+			methods.containsKey('ApplicationList')
+			methods.containsKey('DatabaseList')
 
+			with(methods['ApplicationList']) {
+				apiMethod == 'ApplicationList'
+				params.size() == 4
+				with(params[0]) {
+					paramName == 'HOSTNAME'
+				}
+				with(params[1]) {
+					paramName == 'TABLE'
+				}
+				with(params[2]) {
+					paramName == 'sysparm_display_value'
+				}
+			}
+
+		with(methods['DatabaseList']) {
+			apiMethod == 'DatabaseList'
+			params.size() == 3
+			with(params[0]) {
+				paramName == 'HOSTNAME'
+			}
+			with(params[1]) {
+				paramName == 'TABLE'
+			}
+			with(params[2]) {
+				paramName == 'CSV'
+			}
+		}
+	}
 }
