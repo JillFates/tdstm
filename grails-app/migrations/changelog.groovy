@@ -253,4 +253,6 @@ databaseChangeLog = {
 	include file: '20180625-update-importance-values-for-c-and-i.groovy'
 	include file: '20180702-create-default-tags-for-default-project-and-existing-projects.groovy'
 	include file: '20180628-update-supportType-label-for-DEVICE-keys-in-Setting.groovy'
+	include file: '20180629-add-sampleFilename-and-originalSampleFilename-to-Datascript-table.groovy'
+
 }
