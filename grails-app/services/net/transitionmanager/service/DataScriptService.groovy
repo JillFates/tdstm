@@ -282,11 +282,16 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (String fileName, Long maxRows) throws EmptyResultException{
+	Map parseDataFromFile (Long id, String fileName, Long maxRows) throws EmptyResultException{
 		try{
+
+			if ( id ) {
+				saveSampleFile(id, fileName)
+			}
+
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
-        switch (extension) {
+         switch (extension) {
             case 'JSON':
                 return parseDataFromJSON(fileName)
 
@@ -452,5 +457,24 @@ class DataScriptService implements ServiceMethods{
 				  rows  : data
 		]
 
+	}
+
+	/**
+	 * Store the sampleFileName, if changed in the DataScript object
+	 * @param id DataScript identifier
+	 * @param tmpFileName filename to store
+	 */
+	private void saveSampleFile(Long id, String tmpFileName) {
+		DataScript ds = DataScript.get(id)
+
+		String extension = FilenameUtils.getExtension(tmpFileName)
+
+		String fileOriginalName = tmpFileName.substring(0, tmpFileName.lastIndexOf('_')) + '.' + extension
+
+		if ( !fileOriginalName.equalsIgnoreCase(ds.originalSampleFilename) ) {
+			ds.originalSampleFilename = fileOriginalName
+			ds.sampleFilename = tmpFileName
+			ds.save()
+		}
 	}
 }
