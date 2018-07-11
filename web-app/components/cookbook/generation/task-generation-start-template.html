@@ -11,7 +11,7 @@
 					</select>
 				</div>
 			</div>
-			<div class="col-sm-4 col-md-3 col-lg-3" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+			<div class="col-sm-4 col-md-3 col-lg-3">
 				<div class="form-group">
 					<label class="col-title" for="bundleSelect">Bundle:</label>
 					<select class="form-control" name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
@@ -27,10 +27,10 @@
 					</select>
 				</div>
 			</div>
-			<!-- <div class="col-sm-4 col-md-3 col-lg-3 tm-asset-tag-selector-container">
+			<div class="col-sm-4 col-md-3 col-lg-3 tm-asset-tag-selector-container">
 				<label class="col-title">Tag:</label>
 				<tm-asset-tag-selector selected-tags="contexts.selectedTags" selected-event="contexts.selectedEvent" selected-bundle="contexts.selectedBundle"></tm-asset-tag-selector>
-			</div> -->
+			</div>
 			<div class="col-sm-2 col-md-2 col-lg-2 settings-container">
 				<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
 					Set as Default
@@ -41,8 +41,6 @@
 			</div>
 		</div>
 	</div>
-
-
 
 	<div>
 		<label for="autoPublishTasks">

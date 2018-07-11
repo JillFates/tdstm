@@ -33,7 +33,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				onLabel: "AND",
 				offLabel: "OR",
 				change: function (e) {
-					$scope.selectedTags.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'OR' : 'AND'
+					$scope.selectedTags.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
 				}
 			});
 

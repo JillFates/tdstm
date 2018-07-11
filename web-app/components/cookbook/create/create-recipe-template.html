@@ -21,27 +21,10 @@
 					<textarea class="form-control" rows="3" id="textareaDescription" placeholder="" ng-model="newRecipe.description"></textarea>
 				</div>
 			</div>
-			<div class="form-group">
-				<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context*</label>
-				<div class="col-sm-10">
-					<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" required>
-						<option value="">Select context</option>
-						<option ng-selected="{{d == newRecipe.context}}" value={{d}} ng-repeat="d in ['Event', 'Bundle', 'Application']">{{d}}</option>
-					</select>
-				</div>
-			</div>							
 		</tab>
 
 		<tab heading="Clone An Existing Recipe" active="clone.activeTabs.clone" ng-click="refreshGrid()">
 			<div class="cloneSelectors">
-				<div class="form-group">
-					<label class="col-sm-2 control-label" for="eventSelect">Context</label>
-					<div class="col-sm-10">
-						<select class="form-control" name="contextSelect" id="cloneContextSelect" ng-model="clone.selectedContext" ng-change="optionsSelected('context')">
-							<option ng-value="$index" ng-repeat="item in clone.contextArray">{{item.name}}</option>
-						</select>
-					</div>
-				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label" for="projectSelect">Project</label>
 					<div class="col-sm-10">
