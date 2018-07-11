@@ -1,8 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ContextType
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
-
 /**
  * Recipe Domain Object
  *
@@ -55,6 +55,10 @@ class Recipe {
 	}
 
 	String toString() { name }
+
+	Map context(){
+		context ? JsonUtil.convertJsonToMap(context) : [:]
+	}
 
 	ContextType asContextType() {
 		switch (context) {

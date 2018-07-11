@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -413,19 +412,20 @@ class CookbookService implements ServiceMethods {
 	 * @param contextId the id of the context
 	 * @return the list of groups
 	 */
-	def getGroups(recipeVersionId, contextId, predContextType, predSourceCode) {
+	def getGroups(Long recipeVersionId, context, String predSourceCode) {
 		boolean validRecipeId = recipeVersionId != null && recipeVersionId.isNumber()
+
 		if (!validRecipeId && predSourceCode == null) {
 			throw new EmptyResultException('Invalid recipeVersionId')
 		}
 
 		RecipeVersion recipeVersion
 		def sourceCode
-		String contextTypeValue
 
 		Project project = securityService.userCurrentProject
 		if (validRecipeId) {
 			recipeVersion = RecipeVersion.get(recipeVersionId)
+
 			if (recipeVersion == null) {
 				throw new EmptyResultException('Recipe version does not exists')
 			}
@@ -433,29 +433,15 @@ class CookbookService implements ServiceMethods {
 			def recipe = recipeVersion.recipe
 			assertProject recipe, project
 
-			contextTypeValue = recipe.context
+			context = recipe.context()
 			sourceCode = recipeVersion.sourceCode
 		} else {
-			contextTypeValue = predContextType
 			sourceCode = predSourceCode ?: ''
 		}
-		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId')
-		}
-
-		contextId = contextId.toInteger()
 
 		checkAccess(project)
 
-		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
-		/*def context = checkAccess(contextId, contextTypeKey, project)
-		if (context == null) {
-			throw new UnauthorizedException('The client does not own this context')
-		}*/
-		ContextType ct = ContextType.getByValue(contextTypeValue)
-		def context = ct.getObject(contextId)
-
-		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder())
+		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder(), project)
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }
 			[name: k, assets: assets]
@@ -487,7 +473,7 @@ class CookbookService implements ServiceMethods {
 
 		//checkAccess(`recipe.project`)
 
-		Map context = recipe.context ? JsonUtil.convertJsonToMap(recipe.context) : [:]
+		Map context = recipe.context()
 
 		context.tag.each{Map tag->
 			boolean tagExists = Tag.where{id == tag.id}.count()

@@ -43,7 +43,8 @@ class AssetEntity {
 		'priority',
 		'planStatus',
 		'supportType',
-		'validation'
+		'validation',
+		'tags'
 	]
 
 	static final List<String> RAIL_TYPES = [
