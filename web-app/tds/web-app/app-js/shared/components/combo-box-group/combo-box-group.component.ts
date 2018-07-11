@@ -10,7 +10,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	@Output() modelChange = new EventEmitter<string>();
 	@Output() isFixedChange = new EventEmitter<number>();
 	@Input('model') model: any;
-	@Input('people') people: any;
+	@Input('namedStaff') namedStaff: any;
 	@Input('team') team: any;
 	@Input('isFixed') isFixed: number;
 
@@ -25,15 +25,15 @@ export class TDSComboBoxGroupComponent implements OnInit {
 		const sme = [
 				{ id: '#SME1',   text: 'SME 1' },
 				{ id: '#SME2',   text: 'SME 2' },
-				{ id: '##Owner', text: 'Owner' }
+				{ id: '#Owner', text: 'Owner' }
 			];
-		const people = this.people.map( (item) => ({ id: item.personId, text: item.fullName }));
+		const namedStaff = this.namedStaff.map( (item) => ({ id: item.personId.toString(), text: item.fullName }));
 		const team = this.team.map( (item) => ({ id: `@${item.id}`, text: item.description }));
 
 		// concat the array categories to build the final data set
 		this.source = this.source.concat( this.addCategoryToArray(sme, this.CATEGORY_BY_REFERENCE) );
-		this.source = this.source.concat( this.addCategoryToArray(people, this.CATEGORY_BY_TEAM) );
-		this.source = this.source.concat( this.addCategoryToArray(team, this.CATEGORY_BY_NAMED_STAFF) );
+		this.source = this.source.concat( this.addCategoryToArray(team, this.CATEGORY_BY_TEAM) );
+		this.source = this.source.concat( this.addCategoryToArray(namedStaff, this.CATEGORY_BY_NAMED_STAFF) );
 		this.data = [...this.source];
 	}
 
@@ -42,12 +42,12 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	 * @param {any[]} items array to work with
 	 * @param {string} category name to add to the array
 	 */
-	addCategoryToArray(items: any[], category: string): any[] {
+	private addCategoryToArray(items: any[], category: string): any[] {
 		return items.map((item, index) => Object.assign({},  item, { category, index } ))
 	}
 
 	/**
-	 * On filter change regenerate the index in order to group properly the cagetories
+	 * On filter change regenerate the index in order to group properly the categories
 	 * @param {string} search string to filter only items matching
 	 */
 	public onFilterChange(search: string): void {
@@ -55,8 +55,8 @@ export class TDSComboBoxGroupComponent implements OnInit {
 
 		const sme = this.setIndex(this.data, this.CATEGORY_BY_REFERENCE);
 		const team = this.setIndex(this.data, this.CATEGORY_BY_TEAM);
-		const people = this.setIndex(this.data, this.CATEGORY_BY_NAMED_STAFF);
-		this.data = [...sme, ...team, ...people];
+		const namedStaff = this.setIndex(this.data, this.CATEGORY_BY_NAMED_STAFF);
+		this.data = [...sme, ...team, ...namedStaff];
 	}
 
 	/**
@@ -64,7 +64,14 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	 * @param {any} event with  current model value
 	 */
 	public onValueChange(event: any): void {
-		this.modelChange.next(event.id || null);
+		const id = event && event.id || null;
+		this.modelChange.next(id);
+
+		if (!id || event.category === this.CATEGORY_BY_TEAM) {
+			// reset is fixed
+			this.isFixed = 0;
+			this.isFixedChange.next(this.isFixed);
+		}
 	}
 
 	/**
@@ -72,7 +79,8 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	 * @param {any} event with checkbox current value
 	 */
 	public onChangeFixed(event: any): void {
-		this.isFixedChange.next(event.target.checked ? 1 : 0);
+		this.isFixed = event.target.checked ? 1 : 0;
+		this.isFixedChange.next(this.isFixed);
 	}
 
 	/**
