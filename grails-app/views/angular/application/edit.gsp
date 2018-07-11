@@ -262,9 +262,8 @@
 							</div>
 						</td>
 					</tr>
-					<%-- Dependency Edit Block --%>
-					<tr id="applicationDependentId" class="assetDependent">
-						<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
+					<tr>
+						<td colspan="2">&nbsp;</td>
 					</tr>
 					<!-- Dependencies -->
 					<tr id="deps">
