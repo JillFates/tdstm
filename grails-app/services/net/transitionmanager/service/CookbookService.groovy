@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -413,19 +412,20 @@ class CookbookService implements ServiceMethods {
 	 * @param contextId the id of the context
 	 * @return the list of groups
 	 */
-	def getGroups(recipeVersionId, contextId, predContextType, predSourceCode) {
+	def getGroups(Long recipeVersionId, context, String predSourceCode) {
 		boolean validRecipeId = recipeVersionId != null && recipeVersionId.isNumber()
+
 		if (!validRecipeId && predSourceCode == null) {
 			throw new EmptyResultException('Invalid recipeVersionId')
 		}
 
 		RecipeVersion recipeVersion
 		def sourceCode
-		String contextTypeValue
 
 		Project project = securityService.userCurrentProject
 		if (validRecipeId) {
 			recipeVersion = RecipeVersion.get(recipeVersionId)
+
 			if (recipeVersion == null) {
 				throw new EmptyResultException('Recipe version does not exists')
 			}

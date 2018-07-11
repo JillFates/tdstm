@@ -2,6 +2,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.cookbook.ContextCommand
+import net.transitionmanager.command.cookbook.GroupCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
@@ -150,7 +151,8 @@ class WsCookbookController implements ControllerMethods {
 
 	@HasPermission(Permission.RecipeView)
 	def groups() {
-		def groups = cookbookService.getGroups(params.recipeVersionId, params.contextId, params.contextType, params.sourceCode)
+		GroupCommand group = populateCommandObject(GroupCommand)
+		def groups = cookbookService.getGroups(group.recipeVersionId, group.context, group.sourceCode)
 		renderSuccessJson(groups: groups)
 	}
 
