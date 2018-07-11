@@ -3076,8 +3076,7 @@ class AssetEntityService implements ServiceMethods {
 					}
 					// clone asset Tags
 					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
-					List<Tag> clonedTags = tagService.cloneTags(sourceTagIds, assetToClone.project)
-					tagAssetService.applyTags(assetToClone.project, clonedTags*.id, clonedAsset.id)
+					tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
 
 					return clonedAsset.id
 				}

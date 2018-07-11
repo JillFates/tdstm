@@ -17,7 +17,7 @@ class Tag {
 	static hasMany = [tagAssets: TagAsset]
 
 	static constraints = {
-		name size: 1..50
+		name size: 1..50, unique: 'project'
 		description size: 0..255
 		color inList: Color.values().toList()
 		dateCreated nullable: true
