@@ -71,7 +71,7 @@
 								</div>
 								<div class="col-md-4">
 									<div class="form-check">
-										<label class="form-check-label aligned-label control-label" for="singleCommentArchive" *ngIf="singleCommentModel.modal.type === modalType.EDIT || singleCommentModel.modal.type === modalType.VIEW">
+										<label class="form-check-label aligned-label control-label" for="singleCommentArchive" *ngIf="singleCommentModel.modal.type != modalType.CREATE">
 											<input type="checkbox" id="singleCommentArchive" name="singleCommentArchive" [(ngModel)]="singleCommentModel.archive" [disabled]="singleCommentModel.modal.type === modalType.VIEW" class="form-check-input aligned-checkbox">
 											Archived
 										</label>
