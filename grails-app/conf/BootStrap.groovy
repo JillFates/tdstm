@@ -75,6 +75,13 @@ class BootStrap {
 		// ETLProcessorResult marshaller.
 		ETLProcessorResult.registerObjectMarshaller()
 
+		// enforce JSON slurper to preserve keys original order
+		// instruct json slurper to preserve order
+		// https://stackoverflow.com/questions/33018236/how-to-maintain-jsons-order-in-groovys-jsonslurper
+		// https://docs.oracle.com/javase/7/docs/technotes/guides/collections/changes7.html
+		// https://docs.oracle.com/javase/8/docs/technotes/guides/collections/changes8.html
+		System.setProperty('jdk.map.althashing.threshold', '512')
+
 		//
 		// NOTHING NEEDED IN PRODUCTION SHOULD BE PLACED BELOW HERE
 		//

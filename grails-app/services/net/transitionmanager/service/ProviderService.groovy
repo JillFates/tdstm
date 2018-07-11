@@ -129,4 +129,41 @@ class ProviderService implements ServiceMethods {
             provider.delete()
         }
     }
+
+    /**
+     * Fetch a Provider from database by name
+     * @param providerName - provider name
+     * @param project - project
+     * @param throwException - whether to throw or not an exception if provider is not found
+     * @return a provider instance
+     */
+    Provider getProvider(String name, Project project = null, boolean throwException = false) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
+        // Find a provider with the given name for this project.
+        Provider provider = Provider.where{
+            name == name
+            project == project
+        }.find()
+
+        if (!provider && throwException) {
+            throw new EmptyResultException("No Provider with name ${name} exists for this project.")
+        }
+        return provider
+    }
+
+    /**
+     * Create new provider for api catalog
+     * @param providerName new or existing provider name
+     * @return a provider instance
+     */
+    Provider findOrCreateProvider(String providerName, Project project) {
+        Provider provider = getProvider(providerName, project, false)
+        if (!provider) {
+            JSONObject jsonObject = new JSONObject([name: providerName, description: '', comment: ''])
+            provider = saveOrUpdateProvider(jsonObject)
+        }
+        return provider
+    }
 }
