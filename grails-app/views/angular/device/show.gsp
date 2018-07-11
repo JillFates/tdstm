@@ -13,6 +13,7 @@
     <div class="modal-body">
         <div>
             <table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
+
                 <tr>
                     <td colspan="2" class="dialog-container">
                         <div class="dialog">
@@ -134,14 +135,14 @@
                                 <g:render template="/angular/common/customShow"></g:render>
                                 <tr>
                                     <td class="label N" nowrap="nowrap">
-                                        <label for="tags">
+                                        <label>
                                             Tags
                                         </label>
                                     </td>
                                     <td nowrap="nowrap" class="N" colspan="4">
                                         <span *ngFor="let tag of assetTags" class="label tag"
                                               [ngClass]="tag.css"
-                                              style="display: inline-block; margin-right: 5px; vertical-align: baseline; text-align: center; font-weight: bold;">
+                                              style="">
                                             {{tag.name}}
                                         </span>
                                     </td>
@@ -162,7 +163,6 @@
                         </table>
                     </td>
                 </tr>
-
 
                 <tr id="deps">
                     <g:render template="/angular/common/dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
