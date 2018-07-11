@@ -4339,7 +4339,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
 						}
 
-						if(contextObject.tag.size()){
+						if(contextObject.tag){
 							String tagOp = contextObject.and ? '&' : '|'
 							String tagFilter = contextObject.tag.join(tagOp)
 //TODO tap into what Augusto did for asset filtering...
