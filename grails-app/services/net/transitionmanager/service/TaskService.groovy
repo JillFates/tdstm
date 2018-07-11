@@ -4340,9 +4340,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						if(contextObject.tag.size()){
-							sb.append('LEFT OUTER JOIN a.tagAsset as ta')
-							sb.append('LEFT OUTER JOIN ta.tag as t')
-//TODO add join where condition for tag OR more likely replace this with what Augusto did for asset filtering...
+							String tagOp = contextObject.and ? '&' : '|'
+							String tagFilter = contextObject.tag.join(tagOp)
+//TODO tap into what Augusto did for asset filtering...
 						}
 
 						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${where ? ' and ' + where : ''}")
