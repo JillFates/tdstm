@@ -436,26 +436,12 @@ class CookbookService implements ServiceMethods {
 			context = recipe.context()
 			sourceCode = recipeVersion.sourceCode
 		} else {
-			contextTypeValue = predContextType
 			sourceCode = predSourceCode ?: ''
 		}
-		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId')
-		}
-
-		contextId = contextId.toInteger()
 
 		checkAccess(project)
 
-		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
-		/*def context = checkAccess(contextId, contextTypeKey, project)
-		if (context == null) {
-			throw new UnauthorizedException('The client does not own this context')
-		}*/
-		ContextType ct = ContextType.getByValue(contextTypeValue)
-		def context = ct.getObject(contextId)
-
-		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder())
+		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder(), project)
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }
 			[name: k, assets: assets]

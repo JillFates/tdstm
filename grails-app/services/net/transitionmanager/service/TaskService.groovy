@@ -2105,7 +2105,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.info "taskSpecIdList=$taskSpecIdList"
 
 			// Load the groups with the corresponding assets from the recipe group/filters
-			groups = fetchGroups(recipe, contextObj, exceptions)
+			groups = fetchGroups(recipe, contextObj, exceptions, project)
 
 			out.append('Assets in Groups:<ul>')
 			groups.each { n, l ->
@@ -2452,7 +2452,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Track what tasks were created by the taskSpec
 								taskSpecTasks[taskSpec.id] = []
 
-								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions)
+								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions, project)
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each { t ->
@@ -2489,7 +2489,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							exceptCnt++
 						}
 
-						assetsForTask = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions)
+						assetsForTask = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions, project)
 						log.info "Found ${assetsForTask?.size()} assets for taskSpec ${taskSpec.id}-$taskSpec.description"
 						if (!assetsForTask || assetsForTask.size()==0)
 							return // aka continue
@@ -3963,12 +3963,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param cid - the id of the context
 	 * @return A map of each group name where each value is a List<AssetEntity, Application, Database, File> based on the filter
 	 */
-	Map<String,List> fetchGroups(recipe, contextObject, exceptions) {
+	Map<String,List> fetchGroups(recipe, contextObject, exceptions, project) {
 		def groups = [:]
-
-		if ( (contextObject instanceof MoveEvent) && ! contextObject.moveBundles) {
-			throw new InvalidParamException('The currently selected event has no assigned bundles')
-		}
 
 		if (!(recipe instanceof Map)) {
 			throw new InvalidParamException('The recipe must be of the LinkedHashMap type')
@@ -3983,26 +3979,21 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def gCount = 0
 			recipe.groups.each { g ->
 				gCount++
-				if (! g.name || g.name.size() == 0) {
+				if (!g.name || g.name.size() == 0) {
 					msg = "Group specification #$gCount missing required 'name' property"
 					throw new InvalidParamException(msg)
 				}
 
-				if (contextObject instanceof Application) {
-					// If it is an application then we just stuff it into the list - screw the filtering for now...
-					groups[g.name] = [contextObject]
-				} else {
-					if (g.filter?.containsKey('taskSpec')) {
-						msg = "Group specification ($g.name) references a taskSpec which is not supported"
-						throw new InvalidParamException(msg)
-					}
+				if (g.filter?.containsKey('taskSpec')) {
+					msg = "Group specification ($g.name) references a taskSpec which is not supported"
+					throw new InvalidParamException(msg)
+				}
 
-					groups[g.name] = findAllAssetsWithFilter(contextObject, g, groups, exceptions)
-					if (groups[g.name].size() == 0) {
-						// exceptions.append("Found zero (0) assets for group $g.name<br>")
-					} else {
-						log.info "Group $g.name contains: ${groups[g.name].size()} assets"
-					}
+				groups[g.name] = findAllAssetsWithFilter(contextObject, g, groups, exceptions, project)
+				if (groups[g.name].size() == 0) {
+					// exceptions.append("Found zero (0) assets for group $g.name<br>")
+				} else {
+					log.info "Group $g.name contains: ${groups[g.name].size()} assets"
 				}
 			}
 		}
@@ -4019,7 +4010,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return List<AssetEntity, Application, Database, File> based on the filter
 	 * @throws RuntimeException if query fails or there is invalid specifications in the filter criteria
 	 */
-	def findAllAssetsWithFilter(contextObject, groupOrTaskSpec, loadedGroups, exceptions) {
+	def findAllAssetsWithFilter(contextObject, groupOrTaskSpec, loadedGroups, exceptions, project) {
 		def assets = []
 		def msg
 		def addFilters = true
@@ -4179,14 +4170,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
 
-			// Now find the bundles if the contextObject is a MoveEvent otherwise we can just use the existing bundle id
-			if (contextObject instanceof MoveEvent) {
-				def bundleList = contextObject.moveBundles
-				def bundleIds = bundleList*.id
+			// Now find the bundles if the contextObject had an event id, but not bundle ids
+			if (!contextObject.bundleId && contextObject.eventId) {
+				List bundleIds = MoveBundle.where{moveEvent.id == contextObject.eventId}.projections {
+				    property 'id'
+				}.list()
 
 				// See if they are trying to filter on the Bundle Name
 				if (filter?.asset?.containsKey('bundle')) {
-					def moveBundle = MoveBundle.findByProjectAndName(contextObject.project, filter.asset.bundle)
+					def moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
 					if (moveBundle) {
 						bundleIds = [moveBundle.id]
 					} else {
@@ -4195,12 +4187,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 
 				map.bIds = bundleIds
-			} else if (contextObject instanceof MoveBundle) {
+			} else if (contextObject.bundleId) {
 				// Pretty simple, we're just searching the current bundle
-				map.bIds = [contextObject.id]
-			} else {
-				throw new InvalidParamException("The context for findAllAssetsWithFilter must be a MoveBundle or MoveEvent ${contextObject.getClass().name}")
+				map.bIds = contextObject.bundleId
 			}
+
 			// log.info "bundleIds=[$bundleIds]"
 
             /**
@@ -4270,8 +4261,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
-            if (filter?.asset && contextObject.project) {
-                def fieldSpecs = customDomainService.fieldSpecs(contextObject.project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
+            if (filter?.asset && project) {
+                def fieldSpecs = customDomainService.fieldSpecs(project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
                 if (fieldSpecs) {
                     // Add WHERE clauses based on the field specs (custom fields) configured by project asset.
                     addWhereConditionsForFieldSpecs(fieldSpecs)
@@ -4332,17 +4323,26 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
 							addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
 						}
+
 						if (filter?.asset?.find { it == 'sourceRack' }) {
 							sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
 							addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
 						}
+
 						if (filter?.asset?.find {['targetLocation', 'targetRoom'].contains(it)}) {
 							sb.append('LEFT OUTER JOIN a.roomtarget as roomTgt ')
 							addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
 						}
+
 						if (filter?.asset?.find { it == 'targetRack' }) {
 							sb.append('LEFT OUTER JOIN a.racktarget as rackTgt ')
 							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
+						}
+
+						if(contextObject.tag.size()){
+							sb.append('LEFT OUTER JOIN a.tagAsset as ta')
+							sb.append('LEFT OUTER JOIN ta.tag as t')
+//TODO add join where condition for tag OR more likely replace this with what Augusto did for asset filtering...
 						}
 
 						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${where ? ' and ' + where : ''}")
@@ -4510,14 +4510,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions) {
+	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions, project) {
 		def taskList = []
 		String loc 			// used for racks
 		def msg
 
 
 		// Get all the assets
-		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions)
+		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions, project)
 
 		// If there were no assets we can bail out of this method
 		if (assetsForAction.size() == 0) {
