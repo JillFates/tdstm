@@ -6,19 +6,20 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.command.DataviewUserParamsCommand
+import groovy.json.JsonSlurper
 import net.transitionmanager.command.DataviewNameValidationCommand
+import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
-
 /**
  * Service class with main database operations for Dataview.
  * @see net.transitionmanager.domain.Dataview
@@ -320,6 +321,7 @@ class DataviewService implements ServiceMethods {
 	        FROM AssetEntity AE
 	        $hqlJoins
 	        WHERE AE.project = :project AND $conditions
+			group by AE.id
 	    """
 
 		return [query: query, params: whereInfo.params]
@@ -376,8 +378,9 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $conditions  
-          order by $hqlOrder  
+             where AE.project = :project and $conditions
+		  group by AE.id
+          order by $hqlOrder
         """
 
 		String countHql = """
@@ -385,6 +388,7 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $conditions
+			 group by AE.id
         """
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
@@ -503,6 +507,10 @@ class DataviewService implements ServiceMethods {
 				Map row = [:]
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
+					if(dataviewSpec.columns[index].property == 'tags'){
+						handleTags(cell)
+					}
+
 					if (dataviewSpec.columns[index]) {
 						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
 					}
@@ -512,6 +520,17 @@ class DataviewService implements ServiceMethods {
 			}
         ]
     }
+
+	private void handleTags(cell) {
+		JsonSlurper slurper = new JsonSlurper()
+		def json = slurper.parseText(cell)
+
+		json.each { Map tag ->
+			tag.css = Color.valueOfParam(tag.color).css
+		}
+
+		cell = json
+	}
 
     /**
 	 * Used to prepare the left outer join sentence based on
@@ -584,7 +603,10 @@ class DataviewService implements ServiceMethods {
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
 						filter: filterFor(column),
-						type: typeFor(column)
+						type: typeFor(column),
+						whereProperty: wherePropertyFor(column),
+						manyToManyQuery: manyToManyQueryFor(column),
+						manyToManyParameterName: manyToManyParameterNameFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -734,6 +756,37 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String filterFor(Map column) {
 		return column.filter
+	}
+
+	/**
+	 * Return the expression that needs to be used when constructing the 'where'
+	 * clause for the given field.
+	 *
+	 * This is added to catch scenarios, such as tags, where the expression for projecting the field
+	 * and for filtering it are different.
+	 * @param column
+	 * @return
+	 */
+	private static String wherePropertyFor(Map column) {
+		return transformations[column.property].whereProperty?: propertyFor(column)
+	}
+
+	/**
+	 * Return the complementary query to be used in cases of many to many relationships.
+	 * @param column
+	 * @return
+	 */
+	private static String manyToManyQueryFor(Map column) {
+		return transformations[column.property].manyToManyQuery
+	}
+
+	/**
+	 * Return the parameter to be used when filtering many to many relationships.
+	 * @param column
+	 * @return
+	 */
+	private static String manyToManyParameterNameFor(Map column) {
+		return transformations[column.property].manyToManyParameterName
 	}
 
 
@@ -935,6 +988,36 @@ class DataviewService implements ServiceMethods {
 		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
 		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
 		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
+		'tags': [
+			property: """
+				CONCAT(
+					'[',
+					if(
+						TA.id,
+						group_concat(
+							json_object('id', TA.id, 'tagId', T.id, 'name', T.name, 'description', T.description, 'color', T.color)
+						),
+						''
+					), 
+					']'
+				)""",
+			type: String,
+			namedParameter: 'assetId',
+			alias: 'tags',
+			join: """
+				left outer join AE.tagAssets TA
+				left outer join TA.tag T
+			""",
+			whereProperty: 'AE.id',
+			manyToManyQuery: """
+				SELECT AE.id 
+				FROM AssetEntity AE
+				LEFT OUTER JOIN AE.tagAssets TA
+				LEFT OUTER JOIN TA.tag T
+				WHERE T.id = :tagId
+			""",
+			manyToManyParameterName: "tagId"
+		],
 
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]

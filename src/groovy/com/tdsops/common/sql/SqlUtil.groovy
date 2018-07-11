@@ -1,5 +1,6 @@
 package com.tdsops.common.sql
 
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
@@ -270,6 +271,12 @@ class SqlUtil {
 
 		int filterSize = originalFilter.size()
 
+		// Check for many-to-many before attempting one of the standard filterings.
+		if (fieldSearchData.isManyToMany()) {
+			handleManyToMany(fieldSearchData)
+			return
+		}
+
 		/* We're handling 1-char long filters individually because the
 		* switch below has cases where it asks for the second char, which
 		* would break the app. */
@@ -416,7 +423,7 @@ class SqlUtil {
 			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
 
-		fieldSearchData.sqlSearchExpression = fieldSearchData.column + ' ' + inOp + ' (' + values.join(', ') + ')'
+		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
 	}
 
 	/**
@@ -435,7 +442,7 @@ class SqlUtil {
 			String namedParameter = "${fieldSearchData.columnAlias}__" + index
 			// Parse the string parameter considering user wildcards.
 			String parsedParameter = parseStringParameter(value, fieldSearchData.useWildcards)
-			String sqlExpression = getSingleValueExpression(fieldSearchData.column, namedParameter, likeOp )
+			String sqlExpression = getSingleValueExpression(fieldSearchData.whereProperty, namedParameter, likeOp )
 			fieldSearchData.addSqlSearchParameter(namedParameter, parsedParameter)
 			expressions << sqlExpression
 		}
@@ -459,7 +466,7 @@ class SqlUtil {
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
-		String searchColumn = fieldSearchData.column
+		String searchColumn = fieldSearchData.whereProperty
 		Object paramValue
 
 		if (isNumericField(fieldSearchData)) {
@@ -590,6 +597,97 @@ class SqlUtil {
 					COALESCE(${propertyName}lastName,'')
 				)
 				"""
+	}
+
+	/**
+	 * Handle the filtering of many to many relationships.
+	 * @param fieldSearchData
+	 * @return
+	 */
+	private static void handleManyToMany(FieldSearchData fieldSearchData) {
+		List<Long> manyToManyMatches = getManyToManyMatches(fieldSearchData)
+		if (!manyToManyMatches) {
+			manyToManyMatches.add(-1)
+		}
+		List<Long> values = []
+		for (int i = 0; i < manyToManyMatches.size(); i++) {
+			String namedParameter = "${fieldSearchData.columnAlias}__" + i
+			values << ':' + namedParameter
+			fieldSearchData.addSqlSearchParameter(namedParameter, manyToManyMatches[i].toLong())
+		}
+
+		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' IN '  + ' (' + values.join(', ') + ')'
+
+	}
+
+	/**
+	 * Build a list of the ids of the assets that match the given criteria in a many-to-many relationship
+	 * context, such as with tags.
+	 * @param FieldSearchData
+	 * @return
+	 */
+	private static List<Long> getManyToManyMatches(FieldSearchData fieldSearchData) {
+		boolean isAnd = fieldSearchData.filter.contains("&")
+		List<List<Long>> matchingRelationships = getMatchingRelationships(fieldSearchData, isAnd)
+
+		List<Long> matches = []
+		if (matchingRelationships) {
+			// If it's an 'and' filtering, the same asset must appear in every list (intersection)
+			if (isAnd) {
+				matches = matchingRelationships[0]
+				for (int i = 1; i < matchingRelationships.size(); i++) {
+					matches = matches.intersect(matchingRelationships[i])
+					if (matches.size() == 0) {
+						break
+					}
+				}
+			// If it's an 'or' filter, the list of asset needs to be the union of the lists (without duplicates).
+			} else {
+
+				Set set = []
+				for (matchingRelationship in matchingRelationships) {
+					set.addAll(matchingRelationship)
+				}
+				matches.addAll(set)
+			}
+
+
+		}
+		return matches
+	}
+
+	/**
+	 * For every value in filter expression for a many-to-many relationship, build a list
+	 * with the matching ids.
+	 *
+	 * @param fieldSearchData
+	 * @param isAnd
+	 * @return
+	 */
+	private static List<List<Long>> getMatchingRelationships(FieldSearchData fieldSearchData, boolean isAnd) {
+		List<List<Long>> matchings = []
+		String[] filters
+		if (isAnd) {
+			filters = fieldSearchData.filter.split("&")
+		} else {
+			filters = fieldSearchData.filter.split("\\|")
+		}
+
+		String paramName = fieldSearchData.manyToManyParameterName
+		for (String filter in filters) {
+			Map<String, String> queryParam = [:]
+			queryParam[paramName] = filter.toLong()
+			List<Long> results = AssetEntity.executeQuery(fieldSearchData.manyToManyQuery, queryParam)
+			if (results) {
+				matchings << results
+			}
+		}
+
+		if (isAnd && filters.length != matchings.size()) {
+			matchings = []
+		}
+
+		return matchings
 	}
 
 }

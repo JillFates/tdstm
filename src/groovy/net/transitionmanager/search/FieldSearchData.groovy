@@ -36,7 +36,10 @@ class FieldSearchData {
                     column : column,
                     columnAlias : columnAlias?: column,
                     useWildcards : false,
-                    type: type
+                    type: type,
+                    whereProperty: whereProperty,
+	                manyToManyQuery: manyToManyQuery,
+                    manyToManyParameterName: manyToManyParameterName
             ]
         }
 
@@ -151,5 +154,21 @@ class FieldSearchData {
 
     Class getType() {
         return searchInfo.type
+    }
+
+    String getWhereProperty() {
+        return searchInfo.whereProperty?: column
+    }
+
+	String getManyToManyQuery() {
+		return searchInfo.manyToManyQuery
+	}
+
+	String getManyToManyParameterName() {
+		return searchInfo.manyToManyParameterName
+	}
+
+    boolean isManyToMany() {
+        return searchInfo.manyToManyQuery != null
     }
 }
