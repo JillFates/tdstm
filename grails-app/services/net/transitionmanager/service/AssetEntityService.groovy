@@ -161,7 +161,6 @@ class AssetEntityService implements ServiceMethods {
 	def userPreferenceService
     def assetService
     def commentService
-	def tagService
 	def tagAssetService
 
 	/**
