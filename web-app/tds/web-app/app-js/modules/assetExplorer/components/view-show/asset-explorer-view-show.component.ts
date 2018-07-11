@@ -130,7 +130,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		]).then(result => {
 			console.log(result);
 		}).catch(result => {
-			console.log('error');
+			console.log('error:', result);
 		});
 	}
 
