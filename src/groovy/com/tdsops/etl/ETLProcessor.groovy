@@ -2,7 +2,9 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StopWatch
 import getl.data.Field
+import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -12,27 +14,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
 
-import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
-import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
-import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
-import static org.codehaus.groovy.syntax.Types.DIVIDE
-import static org.codehaus.groovy.syntax.Types.EQUALS
-import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
-import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
-import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
-import static org.codehaus.groovy.syntax.Types.MINUS
-import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
-import static org.codehaus.groovy.syntax.Types.MOD
-import static org.codehaus.groovy.syntax.Types.MULTIPLY
-import static org.codehaus.groovy.syntax.Types.NOT
-import static org.codehaus.groovy.syntax.Types.PLUS
-import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
-import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
-import static org.codehaus.groovy.syntax.Types.POWER
-import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.*
 
 /**
  * Class that receives all the ETL initial commands.
@@ -75,7 +57,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
-	 * Project used in some commands.
+	 * Static {@code Profiler} key name for ETL
 	 */
 	Project project
 	/**
@@ -129,7 +111,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * Last Recently used cachec
 	 */
-	ETLFindCache cache
+	FindResultsCache cache
+	/**
+	 * {@code StopWatch} used for measurement.
+	 */
+	StopWatch stopWatch
 
 	/**
 	 * List of command that needs to be completed.
@@ -204,7 +190,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
-		this.cache = new ETLFindCache()
+		this.cache = new FindResultsCache()
+		this.stopWatch = new StopWatch()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -768,6 +755,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * <b>Cache ETL command.</b><br>
+	 * ETL Script evaluation is using internally a cache of find command results.
+	 * This commands enables user to define the initial size of that cache.
+	 * <br>
+	 * If size is greater than zero it creates an instance of {@code FindResultsCache}
+	 * otherwise cache is set as a null
+	 * <pre>
+	 *  cache 0 // It disables cache in find results
+	 *  cache 100
+	 * </pre>
+	 * @param size initial size of cache
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor cache(Integer size){
+
+		if(size > 0){
+			this.cache = new FindResultsCache(size)
+		} else {
+			this.cache = null
+		}
+		return this
+	}
+
+	/**
 	 * Add a message in console for an element from dataSource by its index in the row
 	 * @param index
 	 * @return current instance of ETLProcessor
@@ -1292,11 +1303,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		setUpProgressIndicator(script, progressCallback)
-		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ETLProcessor.class.name)
+
+		String tag = this.dataSetFacade.fileName()
+		this.stopWatch.begin(tag)
+
+		Object result = new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				configuration
+		).evaluate(script, ETLProcessor.class.name)
+
+		logMeasurements(this.stopWatch.lap(tag))
+
 		return result
 	}
 
+	/**
+	 * Logs metrics related with evaluation time and cache hit ratio
+	 *
+	 * @param timeDuration
+	 */
+	private void logMeasurements(TimeDuration timeDuration){
+		debugConsole.info("Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
+		debugConsole.info("Cache hit count rate ${cache?cache.hitCountRate():0}%")
+	}
 	/**
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
 	 * using this instance of the ETLProcessor.

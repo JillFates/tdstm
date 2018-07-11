@@ -10,7 +10,7 @@ import com.tdssrc.grails.StringUtil
  *
  * @link https://docs.oracle.com/javase/tutorial/collections/implementations/map.html
  */
-class ETLFindCache {
+class FindResultsCache {
 
 	Map<String, List<?>> cache
 	/**
@@ -26,9 +26,9 @@ class ETLFindCache {
 	 */
 	private long hitCount = 0
 
-	ETLFindCache() {
+	FindResultsCache(Integer initialSize = MAX_ENTRIES) {
 
-		cache = new LinkedHashMap<String, List<?>>(MAX_ENTRIES + 1, 0.75F, true) {
+		cache = new LinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true) {
 			/**
 			 * Overrides a default implementation in LinkedHashMap and is where
 			 * we determine the policy for removing the oldest entry.

@@ -369,12 +369,12 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				domain Device
 			""".stripIndent())
 
-		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			etlProcessor.debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
+		then: 'A console content could be recovered after processing an ETL Script'
+			etlProcessor.debugConsole.buffer.toString().startsWith(new StringBuffer("INFO - Console status changed: on")
 				.append(System.lineSeparator())
 				.append("INFO - Selected Domain: Device")
 				.append(System.lineSeparator())
-				.toString()
+				.toString())
 	}
 
 	@Ignore

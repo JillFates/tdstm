@@ -141,7 +141,7 @@ class ETLFindElement implements ETLStackableCommand{
 	/**
 	 * Find results using DomainClassQueryHelper class.
 	 * It saves results in the current results.objects values based on
-	 * an instance of ETLFindCache
+	 * an instance of FindResultsCache
 	 * <pre>
 	 * currentFind.objects = findResultsInCache()
 	 * </pre>
@@ -184,7 +184,7 @@ class ETLFindElement implements ETLStackableCommand{
 	}
 
 	/**
-	 * Use an instance of ETLFindCache to cache queries in fond command.
+	 * Use an instance of FindResultsCache to cache queries in fond command.
 	 * For example:
 	 * <pre>
 	 *      find 'Application' by 'id' with 1555345l into 'id'
@@ -197,7 +197,7 @@ class ETLFindElement implements ETLStackableCommand{
 	 *          or after querying database using a DomainClassQueryHelper
 	 */
 	private List lookupResultsInCache() {
-		List cacheResults = processor.cache.get(currentFind.domain, currentFind.kv)
+		List cacheResults = processor.cache?.get(currentFind.domain, currentFind.kv)
 
 		if (cacheResults == null) {
 			cacheResults = DomainClassQueryHelper.where(
@@ -205,7 +205,7 @@ class ETLFindElement implements ETLStackableCommand{
 					processor.project,
 					currentFind.kv)
 
-			processor.cache.put(currentFind.domain, currentFind.kv, cacheResults)
+			processor.cache?.put(currentFind.domain, currentFind.kv, cacheResults)
 		}
 
 		return cacheResults
