@@ -71,6 +71,18 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     }
 
     /**
+     * Endpoint for getting the SourceCode of a DataScript.
+     *
+     * @param id - DataScript id
+     * @return
+     */
+    @HasPermission(Permission.ETLScriptView)
+    def getDataScriptSourceCode (Long id) {
+        DataScript dataScript = dataScriptService.getDataScript(id)
+        renderSuccessJson([dataScript: dataScript.toMap(DataScript.SOURCE_CODE)])
+    }
+
+    /**
      * Endpoint to query if a given name is unique across provider and project. Along with the
      * name to look up, this method also expects:
      *
@@ -97,7 +109,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     def list() {
         Long providerId = NumberUtil.toLong(request.JSON.providerId)
         List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)?.sort {it.name}
-        renderSuccessJson(dataScripts*.toMap())
+        renderSuccessJson(dataScripts*.toMap(DataScript.BASE_INFO))
     }
 
     /**
@@ -175,7 +187,8 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.ETLScriptCreate)
     def sampleData (String filename) {
-        Map jsonMap = dataScriptService.parseDataFromFile(filename, paginationMaxRowValue())
+        Long id = params.id?.toLong()
+        Map jsonMap = dataScriptService.parseDataFromFile(id, filename, paginationMaxRowValue())
         renderSuccessJson(jsonMap)
     }
 

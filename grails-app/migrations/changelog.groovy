@@ -254,6 +254,7 @@ databaseChangeLog = {
 	include file: '20180702-create-default-tags-for-default-project-and-existing-projects.groovy'
 	include file: '20180628-update-supportType-label-for-DEVICE-keys-in-Setting.groovy'
 	include file: '20180627-add-tag-to-common-fields.groovy'
+	include file: '20180629-add-sampleFilename-and-originalSampleFilename-to-Datascript-table.groovy'
 	include file: '20180702-create-api-catalog-table.groovy'
 
 }
