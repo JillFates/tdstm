@@ -29,30 +29,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 
 	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
-		this.loadAssetClass();
 		this.loadCommentCategories();
-	}
-
-	/**
-	 * Load All Asset Class and Retrieve
-	 */
-	private loadAssetClass(): void {
-		this.assetExplorerService.getAssetClassOptions().subscribe((res) => {
-			this.assetClassOptions = [];
-			for (let prop in res) {
-				if (res[prop]) {
-					this.assetClassOptions.push({id: prop, text: res[prop]});
-				}
-			}
-			if (!this.singleCommentModel.assetClass || this.singleCommentModel.assetClass.id === '') {
-				this.singleCommentModel.assetClass = this.assetClassOptions[0];
-			} else {
-				this.singleCommentModel.assetClass = this.assetClassOptions.find((res) => {
-					return res.id === this.singleCommentModel.assetClass.text.toUpperCase();
-				});
-			}
-			this.dataSignature = JSON.stringify(this.singleCommentModel);
-		});
 	}
 
 	/**
@@ -66,34 +43,6 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 			}
 			this.dataSignature = JSON.stringify(this.singleCommentModel);
 		});
-	}
-
-	/**
-	 * Pass Service as Reference
-	 * @param {ComboBoxSearchModel} searchParam
-	 * @returns {Observable<any>}
-	 */
-	public getAssetListForComboBox = (searchParam: ComboBoxSearchModel): Observable<any> => {
-		return this.assetExplorerService.getAssetListForComboBox(searchParam);
-	}
-
-	/**
-	 * Change the Asset selected since the class has changed
-	 * @param assetClass
-	 */
-	public onAssetClassChange(): void {
-		this.singleCommentModel.asset = {
-			id: '',
-			text: ''
-		};
-	}
-
-	/**
-	 *  Change the Asset Selection
-	 * @param asset
-	 */
-	public onAssetChange(asset: any): void {
-		this.singleCommentModel.asset = asset;
 	}
 
 	/**
