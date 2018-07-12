@@ -738,12 +738,14 @@ function modifyNodeSelection (delta, mode, skipRender) {
 				link.selected = GraphUtil.SELECTION_STATES.SELECTED_PRIMARY
 			})
 		})
-	// if we in toggle mode, toggle the state of the given nodes
+		
+	// if we are in toggle mode, toggle the state of the given nodes
 	} else if (mode == GraphUtil.SELECT_MODES.TOGGLE) {
 		toDeselect = _.intersection(delta, selectedNodes)
 		toSelect = _.difference(delta, selectedNodes)
 		modifyNodeSelection(toDeselect, GraphUtil.SELECT_MODES.SUB, true)
 		modifyNodeSelection(toSelect, GraphUtil.SELECT_MODES.ADD, true)
+
 	// if an unknown mode is given, output a warning to the console
 	} else {
 		console.warn('[WARNING] - Invalid mode: "%o"', mode)
