@@ -165,20 +165,21 @@ var GraphUtil = (function ($) {
 		LEGEND: 3,
 		NONE: 4
 	}
-	public.PANELS = PANELS;
+	public.PANELS = PANELS; // represents the options for which panel is currently openned
 	const SELECT_MODES = {
 		ADD: 1,
 		SUB: 2,
 		REPLACE: 3,
-		REPLACE_NO_TOGGLE: 4 
+		REPLACE_NO_TOGGLE: 4 ,
+		TOGGLE: 5
 	}
-	public.SELECT_MODES = SELECT_MODES;
+	public.SELECT_MODES = SELECT_MODES; // represents the diferent modes that are used internally as arguments for the selection function
 	const SELECTION_STATES = {
 		NOT_SELECTED: 0,
 		SELECTED_SECONDARY: 1,
 		SELECTED_PRIMARY: 2
 	}
-	public.SELECTION_STATES = SELECTION_STATES
+	public.SELECTION_STATES = SELECTION_STATES // represents the selection state of any given node or link
 	
 	// public member variables
 	public.force = null;
