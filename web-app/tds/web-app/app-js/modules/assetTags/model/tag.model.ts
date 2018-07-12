@@ -1,3 +1,5 @@
+const TAG_DEFAULT_COLOR = 'White';
+
 export class TagModel {
 	id: number;
 	name: string;
@@ -9,4 +11,8 @@ export class TagModel {
 	css: string;
 	dateCreated: Date;
 	lastModified: Date;
+
+	constructor() {
+		this.color = TAG_DEFAULT_COLOR;
+	}
 }

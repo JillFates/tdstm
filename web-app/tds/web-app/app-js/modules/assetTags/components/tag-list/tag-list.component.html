@@ -99,7 +99,7 @@
                                        type="text" name="name" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'description'">
-                            <input [(ngModel)]="dataItem.description" required
+                            <input [(ngModel)]="dataItem.description"
                                    type="text" name="description" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'color'">

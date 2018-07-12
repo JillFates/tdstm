@@ -104,7 +104,6 @@ export class TagListComponent {
 	 */
 	protected addHandler({sender}): void {
 		this.closeEditor(sender);
-
 		sender.addRow(new TagModel());
 	}
 

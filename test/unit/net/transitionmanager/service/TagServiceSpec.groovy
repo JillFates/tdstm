@@ -96,7 +96,7 @@ class TagServiceSpec extends Specification {
 	void 'Test update name'() {
 		when: 'Calling update with a new name.'
 			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
-			tag = service.update(tag.id, project, 'new name')
+			tag = service.update(tag.id, project, 'new name', null)
 
 		then: 'The updated tag is returned with the new name.'
 			tag.name == 'new name'
@@ -120,11 +120,11 @@ class TagServiceSpec extends Specification {
 	void 'Test update color'() {
 		when: 'Calling update with a new color.'
 			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
-			tag = service.update(tag.id, project, null, null, Color.Blue)
+			tag = service.update(tag.id, project, null, '', Color.Blue)
 
 		then: 'The updated tag is returned with the new color.'
 			tag.name == 'tag1'
-			tag.description == 'description1'
+			tag.description == ''
 			tag.color == Color.Blue
 			tag.project == project
 	}

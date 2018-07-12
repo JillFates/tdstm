@@ -5,7 +5,7 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
                 aria-hidden="true">×</span></button>
@@ -37,7 +37,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
                                         <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetMoveBundle"
                                                     [data]="model.moveBundleList"
                                                     [(ngModel)]="model.asset.moveBundle"
@@ -55,7 +55,7 @@
                                         <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetScaleName"
                                                     [data]="${SizeScale.getAsJsonList() as JSON}"
                                                     [(ngModel)]="model.asset.scale.name"
@@ -68,7 +68,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                         <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetEnvironment"
                                                     [(ngModel)]="model.asset.environment"
                                                     [defaultItem]="'Please Select'"
@@ -78,7 +78,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
                                         <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetPlanStatus"
                                                     [data]="model.planStatusOptions"
                                                     [(ngModel)]="model.asset.planStatus">
@@ -95,7 +95,7 @@
                                             <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
                                         <td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetValidation"
                                                     [data]="${asset.constraints.validation.inList as JSON}"
                                                     [(ngModel)]="model.asset.validation">

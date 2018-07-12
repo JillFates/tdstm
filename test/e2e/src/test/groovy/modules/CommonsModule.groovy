@@ -8,6 +8,10 @@ class CommonsModule extends Module {
 
     static content = {
         modalDialog {$('div#tdsUiDialog')}
+        prompDialog {$('div#tdsUiPrompt')}
+        deleteAlertMessage {prompDialog.find(".box-body p")}
+        deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
+        deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
     }
 
@@ -67,11 +71,34 @@ class CommonsModule extends Module {
         }
     }
 
-    def waitForEtlScriptsModalHidden(){
+    def waitForDialogModalHidden(){
         waitFor{!modalDialog.jquery.attr("class").contains("in")}
     }
 
     def waitForTaskModal() {
         waitFor { !$('div.modal-task') }
+    }
+
+    def waitForPromptModalHidden(){
+        waitFor{!prompDialog.jquery.attr("class").contains("in")}
+    }
+
+    def waitForPromptModalDisplayed(){
+        waitFor{prompDialog.jquery.attr("class").contains("in")}
+    }
+
+    def clickOnDeleteYesPromptModal(){
+        waitFor{deleteAlertYesButton.click()}
+        waitForPromptModalHidden()
+    }
+
+    def clickOnDeleteNoPromptModal(){
+        waitFor{deleteAlertNoButton.click()}
+        waitForPromptModalHidden()
+    }
+
+    def getDeleteAlertMessageText(){
+        waitFor{deleteAlertMessage.displayed}
+        deleteAlertMessage.text()
     }
 }

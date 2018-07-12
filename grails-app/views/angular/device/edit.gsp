@@ -7,7 +7,7 @@
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
-<div class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
         <h4 class="modal-title">Device Edit</h4>
@@ -32,7 +32,7 @@
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value="${asset.assetType}"/>
-                                    <td class="${standardFieldSpecs.assetType.imp ?: ''}" data-for="model">
+                                    <td class="tm-input-control-container  ${standardFieldSpecs.assetType.imp ?: ''}" data-for="model">
                                         <tds-combobox
                                                 [(model)]="model.asset.assetTypeSelectValue"
                                                 [serviceRequest]="searchAssetTypes"
@@ -44,7 +44,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                     <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetEnvironment"
                                                 [(ngModel)]="model.asset.environment"
                                                 [defaultItem]="'Please Select'"
@@ -62,7 +62,7 @@
                                             <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
                                         </label>
                                     </td>
-                                    <td class="${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer">
+                                    <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"
                                                 [serviceRequest]="searchManufacturers"
@@ -74,7 +74,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.priority}" value="${asset.priority}"/>
                                     <td class="${standardFieldSpecs.priority.imp ?: ''}" data-for="priority">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="priorityAssetEnvironment"
                                                 [(ngModel)]="model.asset.priority"
                                                 [defaultItem]="'Please Select'"
@@ -86,7 +86,7 @@
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="roomSourceId"
                                                 [(ngModel)]="model.asset.roomSource"
                                                 [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -103,7 +103,7 @@
                                     </td>
                                     <td class="${standardFieldSpecs.roomTarget.imp ?: ''}" data-for="roomTarget" style="vertical-align: text-top;">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="roomTargetId"
                                                 [(ngModel)]="model.asset.roomTarget"
                                                 [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -121,7 +121,7 @@
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
-                                    <td class="${standardFieldSpecs.model.imp ?: ''}" data-for="assetType">
+                                    <td class="tm-input-control-container ${standardFieldSpecs.model.imp ?: ''}" data-for="assetType">
                                         <tds-combobox
                                                 [(model)]="model.asset.modelSelectValue"
                                                 [serviceRequest]="searchModels"
@@ -139,7 +139,7 @@
                                     <td  *ngIf="showRackFields"  data-for="rackSource"  class="rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}">
                                         <div *ngIf="showRackSourceInput === 'select'">
                                             <kendo-dropdownlist
-                                                    class="select useRackS"
+                                                    class="tm-input-control useRackS"
                                                     name="modelAssetRackSource"
                                                     [(ngModel)]="model.asset.rackSource"
                                                     [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -158,7 +158,7 @@
                                     <td *ngIf="showRackFields" data-for="rackTarget" class="rackLabel ${standardFieldSpecs.rackTarget.imp ?: ''}">
                                         <div *ngIf="showRackTargetInput === 'select'">
                                             <kendo-dropdownlist
-                                                    class="select useRackT"
+                                                    class="tm-input-control useRackT"
                                                     name="modelAssetRackTarget"
                                                     [(ngModel)]="model.asset.rackTarget"
                                                     [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -185,7 +185,7 @@
                                     <td *ngIf="showBladeFields" data-for="sourceChassis" class="bladeLabel ${standardFieldSpecs.sourceChassis.imp ?: ''}">
                                         <div *ngIf="showBladeSourceInput === 'select'">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetBladeSource"
                                                     [(ngModel)]="model.asset.sourceChassis"
                                                     [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -198,7 +198,7 @@
                                     <td *ngIf="showBladeFields" data-for="targetChassis" class="bladeLabel ${standardFieldSpecs.targetChassis.imp ?: ''}">
                                         <div *ngIf="showBladeTargetInput === 'select'">
                                             <kendo-dropdownlist
-                                                    class="select"
+                                                    class="tm-input-control"
                                                     name="modelAssetBladeTarget"
                                                     [(ngModel)]="model.asset.targetChassis"
                                                     [defaultItem]="{id: -2, value: 'Please Select'}"
@@ -244,7 +244,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
                                     <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetMoveBundle"
                                                 [data]="model.moveBundleList"
                                                 [(ngModel)]="model.asset.moveBundle"
@@ -264,7 +264,7 @@
 											[(ngModel)]="model.asset.size">
 										</kendo-numerictextbox>
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetScaleName"
                                                 [data]="${SizeScale.getAsJsonList() as JSON}"
                                                 [(ngModel)]="model.asset.scale.name"
@@ -279,15 +279,16 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <kendo-datepicker
-                                                name="modelAssetRetireDate"
-                                                [format]="dateFormat"
-                                                [(value)]="model.asset.retireDate">
+                                            class="tm-input-control"
+                                            name="modelAssetRetireDate"
+                                            [format]="dateFormat"
+                                            [(value)]="model.asset.retireDate">
                                         </kendo-datepicker>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
                                     <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetPlanStatus"
                                                 [data]="model.planStatusOptions"
                                                 [(ngModel)]="model.asset.planStatus">
@@ -299,7 +300,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.railType}" value="${asset.railType}"/>
                                     <td class="${standardFieldSpecs.railType.imp ?: ''}" data-for="railType">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetRailType"
                                                 [data]="model.railTypeOption"
                                                 [(ngModel)]="model.asset.railType">
@@ -308,6 +309,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
                                         <kendo-datepicker
+												class="tm-input-control"
                                                 name="modelAssetMaintExpDate"
                                                 [format]="dateFormat"
                                                 [(value)]="model.asset.maintExpDate">
@@ -316,7 +318,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
                                     <td colspan="2" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
-                                                class="select"
+                                                class="tm-input-control"
                                                 name="modelAssetValidation"
                                                 [data]="${asset.constraints.validation.inList as JSON}"
                                                 [(ngModel)]="model.asset.validation">

@@ -136,11 +136,15 @@
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
                                                <kendo-grid [data]="domain.data" [resizable]="true" class="test-results">
-                                                    <kendo-grid-column *ngFor="let column of domain.fieldNames;
+                                                    <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames;
                                                                let columnIndex = index;"
                                                                        title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
                                                         <ng-template kendoGridCellTemplate let-dataItem>
-                                                            {{dataItem.fields[column] ? dataItem.fields[column].value : '' }}
+	                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
+	                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
+		                                                        {{getInitOrValue(dataItem.fields[column])}}
+		                                                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+	                                                        </div>
                                                         </ng-template>
                                                     </kendo-grid-column>
                                                 </kendo-grid>

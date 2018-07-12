@@ -1,27 +1,48 @@
 <p>Select appropriate context to generate tasks using the {{editor.selectedRecipe.name}} recipe:</p>
-<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.start">
-	<label class="inline" for="eventSelect" style="margin-right: 4px;">Event:</label>
-	<select style="margin-right: 5%;" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
-		<option value="">Please select</option>
-	</select>
-	<label class="inline" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="bundleSelect">Bundle:
-		<select name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
-			<option value="">Please select</option>
-		</select>
-	</label>
-	<label class="inline" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="applicationSelect">Application:
-		<select name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
-			<option value="">Please select</option>
-		</select>
-	</label>
+<form action="#" class="taskGeneration clearfix" ng-show="tasks.show.start">
 
-	<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
-		Set as Default
-	</a>
+	<div class="container-fluid task-generation-container">
+		<div class="row">
+			<div class="col-sm-4 col-md-3 col-lg-3">
+				<div class="form-group">
+					<label class="col-title" for="eventSelect">Event:</label>
+					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
+						<option value="">Please select</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-sm-4 col-md-3 col-lg-3" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+				<div class="form-group">
+					<label class="col-title" for="bundleSelect">Bundle:</label>
+					<select class="form-control" name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
+						<option value="">Please select</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-sm-4 col-md-3 col-lg-3 application-container" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+				<div class="form-group">
+					<label class="col-title" for="bundleSelect">Application:</label>
+					<select class="form-control" name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
+						<option value="">Please select</option>
+					</select>
+				</div>
+			</div>
+			<!-- <div class="col-sm-4 col-md-3 col-lg-3 tm-asset-tag-selector-container">
+				<label class="col-title">Tag:</label>
+				<tm-asset-tag-selector selected-tags="contexts.selectedTags" selected-event="contexts.selectedEvent" selected-bundle="contexts.selectedBundle"></tm-asset-tag-selector>
+			</div> -->
+			<div class="col-sm-2 col-md-2 col-lg-2 settings-container">
+				<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
+					Set as Default
+				</a>
+				<a id="clearDefaultContext" ng-show="contexts.enableClearDefaultContext" ng-click="contexts.clearRecipeDefaultContext()">
+					Clear Default
+				</a>
+			</div>
+		</div>
+	</div>
 
-	<a id="clearDefaultContext" ng-show="contexts.enableClearDefaultContext" ng-click="contexts.clearRecipeDefaultContext()">
-		Clear Default
-	</a>
+
 
 	<div>
 		<label for="autoPublishTasks">

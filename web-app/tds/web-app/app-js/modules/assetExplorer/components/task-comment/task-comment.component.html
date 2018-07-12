@@ -66,8 +66,12 @@
 				<label class="font-normal pad-left-7 pad-top-8">{{getAssignedTo(dataItem)}}</label>
 			</ng-template>
 
-			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-				<div class="pad-left-7 pad-top-8">{{dataItem[column.property]}}</div>
+            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
+                <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.status}}</div>
+            </ng-template>
+
+			<ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
+				<div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
 			</ng-template>
 
 		</kendo-grid-column>

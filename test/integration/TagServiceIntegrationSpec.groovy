@@ -12,6 +12,7 @@ import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagService
+import spock.lang.See
 import spock.lang.Shared
 import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
@@ -140,27 +141,52 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 		now = TimeUtil.nowGMT().clearTime()
 	}
 
-	void "test list with no parameters"() {
+	void "1. Test list with no parameters"() {
 		when: 'Calling the list method with no parameters'
 			List results = tagService.list(project)
 		then: 'We get a list of map results'
-			results.size() == 2
-			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
+
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Black.name()
+			results[4].css == Color.Black.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
-	void "test list with full name"() {
+	void "2. Test list with full name"() {
 		when: 'Calling the list method with the full name of a tag'
 			List results = tagService.list(project, 'grouping assets')
 		then: 'We get a list of map results'
@@ -173,7 +199,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 2
 	}
 
-	void "test list with partial name"() {
+	void "3. Test list with partial name"() {
 		when: 'Calling the list method with a partial name of a tag'
 			List results = tagService.list(project, 'group')
 		then: 'We get a list of map results'
@@ -186,7 +212,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 2
 	}
 
-	void "test list with a name not in the db"() {
+	void "4. Test list with a name not in the db"() {
 		when: 'Calling the list method with a tag name not in the db'
 			List results = tagService.list(project, '!@#@$!')
 		then: 'We get an empty list'
@@ -194,7 +220,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void "test list with full description"() {
+	void "5. Test list with full description"() {
 		when: 'Calling the list method with a full description parameter'
 			List results = tagService.list(project, '', 'Another description')
 		then: 'We get a list of map results'
@@ -207,7 +233,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 1
 	}
 
-	void "test list with partial description"() {
+	void "6. Test list with partial description"() {
 		when: 'Calling the list method with a partial description parameter'
 			List results = tagService.list(project, '', 'Anot')
 		then: 'We get a list of map results'
@@ -220,7 +246,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 1
 	}
 
-	void "test list with a description not in the db"() {
+	void "7. Test list with a description not in the db"() {
 		when: 'Calling the list method with a description that does not match any in the db'
 			List results = tagService.list(project, '', 'This will not match.')
 		then: 'We get an empty list'
@@ -228,54 +254,104 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void "test list with dateCreated"() {
+	void "8. Test list with dateCreated"() {
 		when: 'Calling the list method with a date created parameter'
 			List results = tagService.list(project, '', '', now)
 		then: 'We get a list of map results'
-			results.size() == 2
-			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
+
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Black.name()
+			results[4].css == Color.Black.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
-	void "test list with dateCreated tomorrow"() {
+	void "9. Test list with dateCreated tomorrow"() {
 		when: 'Calling the list method with a date created parameter that does not match any tag'
 			List results = tagService.list(project, '', '', now + 1)
 		then: 'We get an empty list'
 			!results
 	}
 
-	void "test list with lastUpdated"() {
-		when: '\'Calling the list method with a lastUpdated parameter'
+	void "10. Test list with lastUpdated"() {
+		when: 'Calling the list method with a lastUpdated parameter'
 			List results = tagService.list(project, '', '', null, now)
 		then: 'We get a list of map results'
-			results.size() == 2
-			results[0].id == tag1.id
-			results[0].color == Color.Black.name()
-			results[0].css == Color.Black.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
+
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Black.name()
+			results[4].css == Color.Black.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
-	void "test list with lastUpdated tomorrow"() {
+	void "11. Test list with lastUpdated tomorrow"() {
 		when: 'Calling the list method with a last updated parameter that does not match any tag '
 			List results = tagService.list(project, '', '', null, now + 1)
 		then: 'We get an empty list'
@@ -283,7 +359,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 
-	void "test list with all parameters"() {
+	void "12. Test list with all parameters"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now)
 		then: 'We get a list of map results'
@@ -296,7 +372,7 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 2
 	}
 
-	void "test list with moveBundleId"() {
+	void "13. Test list with moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, null, null, null, null, moveBundle.id)
 		then: 'We get a list of map results'
@@ -316,14 +392,14 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].assets == 1
 	}
 
-	void "test list with other moveBundleId"() {
+	void "14. Test list with other moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, null, null, null, null, moveBundle2.id)
 		then: 'We get a list of map results'
 			!results.size()
 	}
 
-	void "test list with all parameters plus moveBundleId"() {
+	void "15. Test list with all parameters plus moveBundleId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle.id)
 		then: 'We get a list of map results'
@@ -336,14 +412,14 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 2
 	}
 
-	void "test list with all parameters plus moveBundleId that will filter out all results"() {
+	void "16. Test list with all parameters plus moveBundleId that will filter out all results"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now, moveBundle2.id)
 		then: 'We get a list of map results'
 			!results
 	}
 
-	void "test list with moveEventId"() {
+	void "17. Test list with moveEventId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, null, null, null, null, null, moveEvent.id)
 		then: 'We get a list of map results'
@@ -363,14 +439,14 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[1].assets == 1
 	}
 
-	void "test list with other moveEventId"() {
+	void "18. Test list with other moveEventId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, null, null, null, null, null, moveEvent2.id)
 		then: 'We get a list of map results'
 			!results
 	}
 
-	void "test list with all parameters plus moveEventId"() {
+	void "19. Test list with all parameters plus moveEventId"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now, null, moveEvent.id)
 		then: 'We get a list of map results'
@@ -383,10 +459,23 @@ class TagServiceIntegrationSpec extends IntegrationSpec {
 			results[0].assets == 2
 	}
 
-	void "test list with all parameters plus moveEventId that will filter out all results"() {
+	void "20. Test list with all parameters plus moveEventId that will filter out all results"() {
 		when: 'Calling the list method with all parameters set'
 			List results = tagService.list(project, 'group', 'this is', now, now, null, moveEvent2.id)
 		then: 'We get a list of map results'
 			!results
+	}
+
+	@See('TM-10847')
+	void "21. Test Include Tags from the Default Project when creating a New Project"() {
+		when: 'A new Project is created'
+			Project newProject = projectTestHelper.createProject()
+		then: 'the new Project gets cloned Tag copies from the Default Project Tags'
+			Project defaultProject = Project.get(Project.DEFAULT_PROJECT_ID)
+			List newProjectTags = tagService.list(newProject)
+			List defaultProjectTags = tagService.list(defaultProject)
+
+			newProjectTags.size() == defaultProjectTags.size()
+			newProjectTags*.name.sort{} == defaultProjectTags*.name.sort{}
 	}
 }
