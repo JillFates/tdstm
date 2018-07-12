@@ -5,7 +5,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
-							<div class="asset-tag-selector-single-item">
+							<div class="asset-tag-selector-single-item #:(data.strike !== undefined)? 'hidden-tag-item': ''#">
 								<div class="asset-tag-selector-single-item  #:data.css#">
 									<i class="fa fa-fw fa-check"></i> #:data.name#
 								</div>
@@ -13,7 +13,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						</script>
 						
 						<script id="asset-tag-selector-tag" type="text/x-kendo-template">
-							<div class="#:data.css#">#:data.name#</div>
+							<div class="#:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
 						</script>
 					</div>`,
 		restrict: 'E',
@@ -81,9 +81,27 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			function preSelectTags() {
 				if($scope.preAssetSelector && $scope.preAssetSelector.tag) {
 					var selectedTags = [];
+					var widget = $("#asset-tag-selector").getKendoMultiSelect();
+					var dataSource = widget.dataSource;
+
 					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
+
+						var elementExist = dataSource.data().filter((e) => {
+							return e.id === $scope.preAssetSelector.tag[i].id
+						});
+						if (elementExist.length === 0) {
+							dataSource.add({
+								name: $scope.preAssetSelector.tag[i].label,
+								css: $scope.preAssetSelector.tag[i].css,
+								id: $scope.preAssetSelector.tag[i].id,
+								strike: true
+							});
+						}
+
 						selectedTags.push($scope.preAssetSelector.tag[i].id);
+
 					}
+					dataSource.sync();
 
 					var operator = ($(".asset-tag-selector-operator-switch").attr('checked')? true: false);
 					if(operator !== $scope.preAssetSelector.and) {
@@ -123,6 +141,8 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			}
 
 			function selectTags(e) {
+				//
+				$("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
 				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
 				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
