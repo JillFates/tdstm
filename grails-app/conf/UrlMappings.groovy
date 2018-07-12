@@ -804,6 +804,9 @@ class UrlMappings {
 			]
 		}
 
+		/*
+		 * Get the ETL Script Source Code and sample file of a DataScript
+		 */
 		"/ws/dataingestion/datascript/$id/source" {
 			controller = "wsDataScript"
 			action = [
