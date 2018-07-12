@@ -142,6 +142,7 @@ var GraphUtil = (function ($) {
 		PLUS: KeyEvent.DOM_VK_EQUALS,
 		RETURN: KeyEvent.DOM_VK_RETURN,
 		ENTER: KeyEvent.DOM_VK_ENTER,
+		SPACE: KeyEvent.DOM_VK_SPACE,
 		SHIFT: KeyEvent.DOM_VK_SHIFT,
 		CTRL: KeyEvent.DOM_VK_CONTROL
 	}
@@ -1349,6 +1350,7 @@ var GraphUtil = (function ($) {
 					case KEY_CODES.DOWN:  public.translateDown(modifier); break;
 					case KEY_CODES.PLUS:  performZoom('in', modifier); break;
 					case KEY_CODES.MINUS: performZoom('out', modifier); break;
+					case KEY_CODES.SPACE: public.toggleFreeze(); break;
 				}
 			}
 		})
