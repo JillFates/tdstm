@@ -18,13 +18,14 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					</div>`,
 		restrict: 'E',
 		scope: {
-			selectedTags: '=',
+			assetSelector: '=',
+			preAssetSelector: '=',
 			selectedEvent: '=',
 			selectedBundle: '=',
 		},
 		controller: function ($scope) {
 
-			$scope.selectedTags = {
+			$scope.assetSelector = {
 				tags: [],
 				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
 			};
@@ -33,7 +34,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				onLabel: "AND",
 				offLabel: "OR",
 				change: function (e) {
-					$scope.selectedTags.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
+					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
 				}
 			});
 
@@ -46,6 +47,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				setNewDataSource([]);
 				getAssetTags();
 			}, true);
+
 
 			$(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
@@ -68,6 +70,23 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				}));
 				widget.dataSource.sync();
 				widget.refresh();
+				setTimeout(preSelectTags, 500);
+
+			}
+
+			/**
+			 * Pre Select Assets
+			 */
+			function preSelectTags() {
+				if($scope.preAssetSelector && $scope.preAssetSelector.tag) {
+					var selectedTags = [];
+					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
+						selectedTags.push($scope.preAssetSelector.tag[i].id);
+					}
+					if(selectedTags !== '') {
+						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
+					}
+				}
 			}
 
 			function getAssetTags() {
@@ -99,7 +118,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
-				$scope.selectedTags.tags = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+				$scope.assetSelector.tags = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 			}
 		}
 	};

@@ -622,8 +622,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		if (scope.recipeId > 0) {
 			var dataToSend = {
 				'context': {
-					'and': (scope.contexts.selectedTags.operator === 'AND')? true : false,
-					'tag': getTagsIds(scope.contexts.selectedTags.tags)
+					'and': (scope.contexts.assetSelector.operator === 'AND')? true : false,
+					'tag': getTagsIds(scope.contexts.assetSelector.tags)
 				}
 			};
 			if (scope.contexts && scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
@@ -727,6 +727,10 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.getRecipeData = function(defaultView) {
 		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			scope.editor.selectedRVersion = (data.data) ? data.data : null;
+			scope.contexts.preAssetSelector = {
+				'tag': scope.editor.selectedRVersion.context.tag,
+				'and': scope.editor.selectedRVersion.context['and']
+			};
 			if ((defaultView == 'release') && (scope.editor.selectedRVersion.versionNumber <= 0)) {
 				defaultView = 'wip';
 			}
