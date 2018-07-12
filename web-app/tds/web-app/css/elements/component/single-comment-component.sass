@@ -13,3 +13,28 @@
     .k-dropdown-wrap .k-input
       padding: 1.5rem 0.75rem
       text-transform: capitalize
+
+  *[class*="modal-type"]
+    *[class*="visible-on"],
+    .delete-button
+      display: none
+
+  .modal-type-edit,
+  .modal-type-create
+    .visible-on-edit
+      display: unset
+
+  .modal-type-view
+    .visible-on-view
+      display: unset
+
+  .modal-type-create
+    .visible-on-create
+      display: unset
+
+  .modal-type-edit,
+  .modal-type-view
+    .delete-button
+      display: unset
+
+

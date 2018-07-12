@@ -22,6 +22,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	public assetClassOptions: any[];
 	public commentCategories: string[];
 	private dataSignature: string;
+	public modalTypeClass: string;
 
 	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
 		super('#single-comment-component');
@@ -29,7 +30,16 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 
 	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
+		this.setModalTypeClass();
 		this.loadCommentCategories();
+	}
+
+	private setModalTypeClass(): void {
+		const modalType = this.singleCommentModel.modal.type;
+
+		if (modalType === ModalType.CREATE) { this.modalTypeClass = 'modal-type-create' }
+		if (modalType === ModalType.EDIT) { this.modalTypeClass = 'modal-type-edit' }
+		if (modalType === ModalType.VIEW) { this.modalTypeClass = 'modal-type-view' }
 	}
 
 	/**
@@ -59,6 +69,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	protected onEdit(): void {
 		this.singleCommentModel.modal.title = 'Edit Comment';
 		this.singleCommentModel.modal.type = ModalType.EDIT;
+		this.setModalTypeClass();
 	}
 
 	protected onSave(): void {
