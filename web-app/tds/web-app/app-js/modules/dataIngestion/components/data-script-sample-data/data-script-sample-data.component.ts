@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {
 	FileRestrictions,
@@ -17,6 +17,7 @@ import {
 	FILE_UPLOAD_TYPE_PARAM,
 	REMOVE_FILENAME_PARAM
 } from '../../../../shared/model/constants';
+import {DataScriptModel} from '../../model/data-script.model';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -62,6 +63,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	private apiActionOptions = [];
 
 	constructor(
+		@Inject('etlScript') protected etlScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
