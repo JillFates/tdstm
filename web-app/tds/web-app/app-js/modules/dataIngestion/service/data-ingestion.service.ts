@@ -211,8 +211,8 @@ export class DataIngestionService {
 	 * @param {string} fileName
 	 * @returns {Observable<SampleDataModel>}
 	 */
-	getSampleData(fileName: string): Observable<SampleDataModel> {
-		return this.http.get(`${this.dataScriptUrl}/sampleData/${fileName}`)
+	getSampleData(id: number, fileName: string): Observable<SampleDataModel> {
+		return this.http.get(`../ws/dataingestion/datascript/${id}/sampleData/${fileName}`)
 			.map((res: Response) => {
 				let result = res.json();
 				let data: any = (result && result.status === 'success' && result.data);
@@ -594,6 +594,14 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success';
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getETLScript(id: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.dataIngestionUrl}/datascript/${id}`)
+			.map((res: Response) => {
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}
