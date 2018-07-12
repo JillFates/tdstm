@@ -1160,10 +1160,13 @@ var GraphUtil = (function ($) {
 		translate = (translate != null) ? translate : zoomBehavior.translate()
 		scale = (scale != null) ? scale : zoomBehavior.scale()
 		transformElement = (transformElement != null) ? transformElement : transformContainer
-
+		var oldTransformString = public.getTransformString(transformElement)
+		var newTransformString = public.constructTransformString(translate[0], translate[1], scale, 'px')
+		var transformInterpolation = d3.interpolateString(oldTransformString, newTransformString)
+		
 		// perform the transform, only animating the transition if an SVG element is used
 		if (transformElement[0][0].tagName == 'DIV')
-			transformElement.style('transform', public.getTransformString(translate[0], translate[1], scale, 'px'))
+			transformElement.style('transform', newTransformString)
 		else
 			transformElement
 				.transition()
@@ -1171,7 +1174,9 @@ var GraphUtil = (function ($) {
 				.ease(function (t) {
 					return Math.min(t, 1)
 				})
-				.attr('transform', public.getTransformString(translate[0], translate[1], scale))
+				.styleTween('transform', function (d) {
+					return transformInterpolation
+				})
 	}
 
 	// zooms in or out of the timeline, calling displayCallback when finished
@@ -1330,30 +1335,34 @@ var GraphUtil = (function ($) {
 	
 	// ############################################################## key binding functions ##############################################################
 
-	// add key listeners for zooming and panning
-	public.addKeyListeners = function (modifier) {
-		$(window).on('keydown', function (e) {
-			// ignore keystrokes while the user is typing in an text field
-			if ( ! IGNORE_KEY_EVENT_TAGS.contains(e.target.tagName) ) {
-				// handle modifier keys
-				var modifier = 1
-				if (e.shiftKey)
-					modifier = 2
-				if (e.ctrlKey)
-					modifier = 0.5
+	// add key listeners for graph features such as zooming, panning, and freezing
+	public.addKeyListeners = function () {
+		$(window).off('keydown', public.handleKeyEvent)
+		$(window).on('keydown', public.handleKeyEvent)
+	}
+	
+	// triggers the appropriate graph behavior for a given keyboard event
+	public.handleKeyEvent = function (event) {
+		// ignore keystrokes while the user is typing in an text field
+		if ( ! IGNORE_KEY_EVENT_TAGS.contains(event.target.tagName) ) {
+			// handle modifier keys
+			var modifier = 1
+			if (event.shiftKey)
+				modifier = 2
+			if (event.ctrlKey)
+				modifier = 0.5
 
-				// perform action based on key code
-				switch (e.keyCode) {
-					case KEY_CODES.LEFT:  public.translateLeft(modifier); break;
-					case KEY_CODES.RIGHT: public.translateRight(modifier); break;
-					case KEY_CODES.UP:    public.translateUp(modifier); break;
-					case KEY_CODES.DOWN:  public.translateDown(modifier); break;
-					case KEY_CODES.PLUS:  performZoom('in', modifier); break;
-					case KEY_CODES.MINUS: performZoom('out', modifier); break;
-					case KEY_CODES.SPACE: public.toggleFreeze(); break;
-				}
+			// perform action based on key code
+			switch (event.keyCode) {
+				case KEY_CODES.LEFT:  public.translateLeft(modifier); break;
+				case KEY_CODES.RIGHT: public.translateRight(modifier); break;
+				case KEY_CODES.UP:    public.translateUp(modifier); break;
+				case KEY_CODES.DOWN:  public.translateDown(modifier); break;
+				case KEY_CODES.PLUS:  performZoom('in', modifier); break;
+				case KEY_CODES.MINUS: performZoom('out', modifier); break;
+				case KEY_CODES.SPACE: public.toggleFreeze(); break;
 			}
-		})
+		}
 	}
 
 	// add key listeners for zooming and panning
@@ -1732,9 +1741,14 @@ var GraphUtil = (function ($) {
 	}
 
 	// constructs a string for a svg transformation attribute
-	public.getTransformString = function (x, y, scale, unit) {
+	public.constructTransformString = function (x, y, scale, unit) {
 		unit = unit ? unit : ''
 		return 'translate(' + x + unit + ',' + y + unit  + ')scale(' + scale + ')'
+	}
+	
+	// gets the correctly formatted transform string of an element in a d3 selection
+	public.getTransformString = function (d3Element) {
+		return d3Element[0][0].style.transform.replace(/ /g,'')
 	}
 	
 	// adds a negligible tiny value to a given number for the sole purpose of preventing matches when it would be inconvenient
