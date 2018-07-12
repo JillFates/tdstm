@@ -84,6 +84,13 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
 						selectedTags.push($scope.preAssetSelector.tag[i].id);
 					}
+
+					var operator = ($(".asset-tag-selector-operator-switch").attr('checked')? true: false);
+					if(operator !== $scope.preAssetSelector.and) {
+						$(".asset-tag-selector-operator-switch").data('kendoMobileSwitch').toggle();
+						$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR';
+					}
+
 					if(selectedTags !== '') {
 						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
 						selectTags();

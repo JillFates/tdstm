@@ -589,6 +589,12 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return; // dirty
 		}
 
+		var sameOperator = validOperatorStatus();
+		if(!sameOperator) {
+			if (!scope.$$phase) scope.$digest();
+			return; // dirty
+		}
+
 
 		scope.contexts.enableClearDefaultContext = true;
 
@@ -614,6 +620,11 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		var context = scope.editor.selectedRVersion? scope.editor.selectedRVersion.context:'';
 		var diff = scope.contexts.assetSelector.tag.filter(x => !context.tag.find(tag => tag.id === x.id)).concat(context.tag.filter(x => !scope.contexts.assetSelector.tag.find(tag => tag.id === x.id)));
 		return diff.length === 0;
+	};
+
+	var validOperatorStatus = function () {
+		var operator = (scope.contexts.assetSelector.operator == 'AND');
+		return operator === scope.editor.selectedRVersion.context.and;
 	};
 
 	// Put select elements in blank.
