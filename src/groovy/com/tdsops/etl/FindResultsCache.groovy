@@ -20,7 +20,7 @@ class FindResultsCache {
 	/**
 	 * Counter for the number of accesses
 	 */
-	private long accessCount = 1
+	private long accessCount = 0
 	/**
 	 * Counter for the number of hits
 	 */
@@ -132,7 +132,11 @@ class FindResultsCache {
 	 * @return percentage of hit counts over access count
 	 */
 	Double hitCountRate(){
-		double percent = (hitCount / accessCount ) * 100
-		return percent.round(2)
+		if(accessCount == 0){
+			return 0.0
+		} else {
+			double percent = (hitCount / accessCount ) * 100
+			return percent.round(2)
+		}
 	}
 }
