@@ -617,14 +617,22 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	};
 
 	var validTagStatus = function () {
-		var context = scope.editor.selectedRVersion? scope.editor.selectedRVersion.context:'';
-		var diff = scope.contexts.assetSelector.tag.filter(x => !context.tag.find(tag => tag.id === x.id)).concat(context.tag.filter(x => !scope.contexts.assetSelector.tag.find(tag => tag.id === x.id)));
-		return diff.length === 0;
+		try {
+			var context = scope.editor.selectedRVersion? scope.editor.selectedRVersion.context:'';
+			var diff = scope.contexts.assetSelector.tag.filter(x => !context.tag.find(tag => tag.id === x.id)).concat(context.tag.filter(x => !scope.contexts.assetSelector.tag.find(tag => tag.id === x.id)));
+			return diff.length === 0;
+		} catch (e) {
+			return true;
+		}
 	};
 
 	var validOperatorStatus = function () {
-		var operator = (scope.contexts.assetSelector.operator == 'AND');
-		return operator === scope.editor.selectedRVersion.context.and;
+		try {
+			var operator = (scope.contexts.assetSelector.operator == 'AND');
+			return operator === scope.editor.selectedRVersion.context.and;
+		} catch (e) {
+			return true;
+		}
 	};
 
 	// Put select elements in blank.
