@@ -1,3 +1,5 @@
+import {s} from '@angular/core/src/render3';
+
 export const COLUMN_MIN_WIDTH = 360;
 
 export class DataScriptColumnModel {
@@ -59,6 +61,8 @@ export class DataScriptModel {
 	};
 	dateCreated?: Date;
 	lastUpdated?: Date;
+	sampleFilename?: string;
+	originalSampleFilename?: string;
 }
 
 export const Flatten = filter => {
