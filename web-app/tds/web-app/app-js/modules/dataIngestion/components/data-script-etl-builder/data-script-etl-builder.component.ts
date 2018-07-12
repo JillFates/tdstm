@@ -72,8 +72,21 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
 		super('#etlBuilder');
-		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
 		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+		this.loadETLScript();
+	}
+
+	private loadETLScript(): void {
+		this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
+				this.dataScriptModel = result.data.dataScript;
+				this.filename = this.dataScriptModel.sampleFilename;
+				this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
+				if (this.filename && this.filename.length > 0) {
+					this.extractSampleDataFromFile();
+				}
+			}
+		}, error => console.log(error));
 	}
 
 	/**
@@ -201,10 +214,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	private isScriptDirty(): boolean {
-		if (!this.dataScriptModel.etlSourceCode) {
-			return this.script.length > 0;
-		}
-		if (this.dataScriptModel.etlSourceCode !== this.script) {
+		if (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script)) {
 			return true;
 		} else {
 			return false;
@@ -222,7 +232,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected onLoadSampleData(): void {
-		this.dialogService.extra(DataScriptSampleDataComponent, [])
+		this.dialogService.extra(DataScriptSampleDataComponent, [
+			{provide: 'etlScript', useValue: this.dataScriptModel}
+		])
 			.then((filename) => {
 				this.filename = filename;
 				this.extractSampleDataFromFile();
@@ -239,8 +251,14 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * Call API and get the Sample Data based on the FileName already Uploaded
 	 */
 	private extractSampleDataFromFile() {
-		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
+		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename).subscribe((result) => {
 			this.sampleDataModel = result;
+			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
+					this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
+				}
+			}, error => console.log(error));
 		});
 	}
 
