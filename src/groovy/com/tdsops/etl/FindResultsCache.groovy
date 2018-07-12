@@ -20,7 +20,7 @@ class FindResultsCache {
 	/**
 	 * Counter for the number of accesses
 	 */
-	private long accessCount = 0
+	private long accessCount = 1
 	/**
 	 * Counter for the number of hits
 	 */
