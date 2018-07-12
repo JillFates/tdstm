@@ -1,4 +1,4 @@
-import {Component, HostListener} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {SingleCommentModel} from './model/single-comment.model';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
@@ -15,7 +15,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/single-comment/single-comment.component.html',
 	styles: []
 })
-export class SingleCommentComponent extends UIExtraDialog {
+export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 
 	public modalType = ModalType;
 	public dateFormatTime: string;
@@ -25,6 +25,9 @@ export class SingleCommentComponent extends UIExtraDialog {
 
 	constructor(public singleCommentModel: SingleCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
 		super('#single-comment-component');
+	}
+
+	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 		this.loadAssetClass();
 		this.loadCommentCategories();
