@@ -585,13 +585,13 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 		var sameTag = validTagStatus();
 		if(!sameTag) {
+			if (!scope.$$phase) scope.$digest();
 			return; // dirty
 		}
 
 
 		scope.contexts.enableClearDefaultContext = true;
 
-		if (!scope.$$phase) scope.$digest();
 
 		// scope.contexts.contextId = contextId;
 		// scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
