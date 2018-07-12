@@ -164,8 +164,6 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		editableCellTemplate: scope.edittableField},
 	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false,
 		width: '******', editableCellTemplate: scope.edittableField},
-		// TODO: CONTEXT TABLE
-	{field:'context', displayName:'Context', enableCellEdit: false, width: '**'},
 	{field:'createdBy', displayName:'Editor', enableCellEdit: false, width: '***'},
 	{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '****', cellTemplate : scope.dateCellTemplate},
 	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false,
@@ -537,8 +535,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
 			var context = recipe.context;
-			if((context == 'Event' && scope.contexts.selectedEvent) || (context == 'Bundle' &&
-					scope.contexts.selectedBundle)){
+			if((scope.contexts.selectedEvent) || (scope.contexts.selectedBundle)){
 				log.log('matches event, or bundle, or application');
 				return true;
 			}else{
@@ -553,28 +550,71 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		scope.contexts.checkValidSelection();
 	});
 
+	Array.prototype.arrayTagsDiff = function(a) {
+		return this.filter(function(i) {
+			return a.indexOf(i.id) < 0;
+		});
+	};
+
+	scope.contexts.onAssetSelectorChange = function() {
+		scope.contexts.checkValidSelection();
+	};
+
 	scope.contexts.checkValidSelection = function(){
 		var context = scope.editor.selectedRVersion?scope.editor.selectedRVersion.context:'',
 			contextId,
 			recipeId = stateParams.recipeId;
 
 		scope.contexts.enableClearDefaultContext = false;
-		if (context.eventId) {
-			contextId = scope.contexts.selectedEvent?scope.contexts.selectedEvent.id:0;
-			scope.contexts.enableClearDefaultContext = ((!angular.isUndefined(contextId)) && (scope.editor.selectedRVersion.context.eventId == contextId));
-		} else if (context.bundleId) {
-			contextId = scope.contexts.selectedBundle?scope.contexts.selectedBundle.id:0;
-			scope.contexts.enableClearDefaultContext = ((!angular.isUndefined(contextId)) && (scope.editor.selectedRVersion.context.bundleId == contextId));
-		} else {
-			contextId = 0;
+
+		// There is no context available
+		if (_.isEmpty(scope.editor.selectedRVersion.context)) {
+			return;
 		}
 
-		scope.contexts.contextId = contextId;
-		scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
-		if (scope.contexts.validCurrentSelection) {
-			scope.$broadcast('validContextSelection', recipeId, contextId);
+
+		var sameEvent = validEventStatus();
+		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null &&  scope.contexts.selectedEvent != '') || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
+			return; // dirty
 		}
-	}
+
+		var sameBundle = validBundleStatus();
+		if(!sameBundle && (scope.editor.selectedRVersion.context.bundleId == null &&  scope.contexts.selectedBundle != '') || scope.editor.selectedRVersion.context.bundleId != null &&  scope.contexts.selectedBundle == null) {
+			return; // dirty
+		}
+
+		var sameTag = validTagStatus();
+		if(!sameTag) {
+			return; // dirty
+		}
+
+
+		scope.contexts.enableClearDefaultContext = true;
+
+		if (!scope.$$phase) scope.$digest();
+
+		// scope.contexts.contextId = contextId;
+		// scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
+		/* if (scope.contexts.validCurrentSelection) {
+			scope.$broadcast('validContextSelection', recipeId, contextId);
+		} */
+	};
+
+	var validEventStatus = function () {
+		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:0;
+		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
+	};
+
+	var validBundleStatus = function () {
+		var bundleId = scope.contexts.selectedBundle? scope.contexts.selectedBundle.id:0;
+		return ((!angular.isUndefined(bundleId)) && (scope.editor.selectedRVersion.context.bundleId == bundleId));
+	};
+
+	var validTagStatus = function () {
+		var context = scope.editor.selectedRVersion? scope.editor.selectedRVersion.context:'';
+		var diff = scope.contexts.assetSelector.tag.filter(x => !context.tag.find(tag => tag.id === x.id)).concat(context.tag.filter(x => !scope.contexts.assetSelector.tag.find(tag => tag.id === x.id)));
+		return diff.length === 0;
+	};
 
 	// Put select elements in blank.
 	scope.contexts.blankBundles = function(){
@@ -623,7 +663,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			var dataToSend = {
 				'context': {
 					'and': (scope.contexts.assetSelector.operator === 'AND')? true : false,
-					'tag': getTagsIds(scope.contexts.assetSelector.tags)
+					'tag': getTagsIds(scope.contexts.assetSelector.tag)
 				}
 			};
 			if (scope.contexts && scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {

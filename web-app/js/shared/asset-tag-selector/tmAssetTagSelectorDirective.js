@@ -22,11 +22,12 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			preAssetSelector: '=',
 			selectedEvent: '=',
 			selectedBundle: '=',
+			onChange: '&'
 		},
 		controller: function ($scope) {
 
 			$scope.assetSelector = {
-				tags: [],
+				tag: [],
 				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
 			};
 
@@ -34,7 +35,8 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				onLabel: "AND",
 				offLabel: "OR",
 				change: function (e) {
-					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
+					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR';
+					$scope.onChange();
 				}
 			});
 
@@ -70,8 +72,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				}));
 				widget.dataSource.sync();
 				widget.refresh();
-				setTimeout(preSelectTags, 500);
-
+				setTimeout(preSelectTags, 600);
 			}
 
 			/**
@@ -85,6 +86,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					}
 					if(selectedTags !== '') {
 						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
+						selectTags();
 					}
 				}
 			}
@@ -118,7 +120,9 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
-				$scope.assetSelector.tags = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+
+				$scope.onChange();
 			}
 		}
 	};
