@@ -1,10 +1,13 @@
 .single-comment-component
+  .modal-content
+    display: table
   .single-component
     div
       margin-left: 13px
       margin-right: 13px
     textarea
-      max-width: 100%
+      min-width: 450px
+      min-height: 150px
   .single-comment-date-container
     label
       font-size: 11px
@@ -13,7 +16,6 @@
     .k-dropdown-wrap .k-input
       padding: 1.5rem 0.75rem
       text-transform: capitalize
-
   *[class*="modal-type"]
     *[class*="visible-on"],
     .delete-button
@@ -36,5 +38,4 @@
   .modal-type-view
     .delete-button
       display: unset
-
 
