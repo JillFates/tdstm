@@ -168,8 +168,6 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	 * http://api.jqueryui.com/resizable/#event-resize
 	 */
 	private resizeWindow(event: any, ui: any): void {
-		console.log(event);
-		console.log(ui);
 		this.resizeEvent.emit({type: 'resizing', event: event, ui: ui});
 	}
 
