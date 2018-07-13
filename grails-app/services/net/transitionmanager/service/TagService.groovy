@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
-import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
