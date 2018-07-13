@@ -795,6 +795,13 @@ class CommentService implements ServiceMethods {
 		} else {
 			assetComment = GormUtil.findInProject(project, AssetComment, command.id, true)
 		}
+		Integer resolved = command.isResolved ? 1 : 0
+
+		// If the update operation is setting the comment as resolved, set the resolvedDate
+		if (resolved == 1 && assetComment.isResolved == 0) {
+			assetComment.dateResolved = TimeUtil.nowGMT()
+		}
+
 		assetComment.with {
 			assetEntity = asset
 			if(!isResolved() && command.isResolved) {
