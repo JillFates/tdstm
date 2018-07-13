@@ -605,8 +605,7 @@ class DataviewService implements ServiceMethods {
 						filter: filterFor(column),
 						type: typeFor(column),
 						whereProperty: wherePropertyFor(column),
-						manyToManyQuery: manyToManyQueryFor(column),
-						manyToManyParameterName: manyToManyParameterNameFor(column)
+						manyToManyQueries: manyToManyQueriesFor(column),
 				])
 
 				String property = propertyFor(column)
@@ -776,8 +775,8 @@ class DataviewService implements ServiceMethods {
 	 * @param column
 	 * @return
 	 */
-	private static String manyToManyQueryFor(Map column) {
-		return transformations[column.property].manyToManyQuery
+	private static Map manyToManyQueriesFor(Map column) {
+		return transformations[column.property].manyToManyQueries
 	}
 
 	/**
@@ -1009,14 +1008,29 @@ class DataviewService implements ServiceMethods {
 				left outer join TA.tag T
 			""",
 			whereProperty: 'AE.id',
-			manyToManyQuery: """
-				SELECT AE.id 
-				FROM AssetEntity AE
-				LEFT OUTER JOIN AE.tagAssets TA
-				LEFT OUTER JOIN TA.tag T
-				WHERE T.id = :tagId
-			""",
-			manyToManyParameterName: "tagId"
+			manyToManyQueries: [
+			    AND : { String filter ->
+				    List<String> numbers = filter.split('&')
+				    List<Long> tagList = NumberUtil.toPositiveLongList(numbers)
+				    Long listSize = tagList.size() // Assign to long to avoid 'Integer cannot be casted to Long' error.
+				    return [
+				        query: "SELECT asset.id FROM TagAsset WHERE tag.id in (:tagList) GROUP BY asset.id HAVING count(*) = :tagListSize",
+					    params: [
+					        tagList: tagList,
+						    tagListSize: listSize
+					    ]
+				    ]
+			    },
+				OR: { String filter ->
+					List<String> numbers = filter.split('\\|')
+					List<Long> tagList = NumberUtil.toPositiveLongList(numbers)
+					return [
+					    query: "SELECT DISTINCT(ta.asset.id) FROM TagAsset ta WHERE tag.id in (:tagList)",
+						params: [tagList: tagList]
+					]
+
+				}
+			]
 		],
 
     ].withDefault {
