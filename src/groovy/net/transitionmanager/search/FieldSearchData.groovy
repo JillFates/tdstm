@@ -38,8 +38,7 @@ class FieldSearchData {
                     useWildcards : false,
                     type: type,
                     whereProperty: whereProperty,
-	                manyToManyQuery: manyToManyQuery,
-                    manyToManyParameterName: manyToManyParameterName
+	                manyToManyQueries: manyToManyQueries
             ]
         }
 
@@ -160,15 +159,11 @@ class FieldSearchData {
         return searchInfo.whereProperty?: column
     }
 
-	String getManyToManyQuery() {
-		return searchInfo.manyToManyQuery
-	}
-
-	String getManyToManyParameterName() {
-		return searchInfo.manyToManyParameterName
+	Map getManyToManyQueries() {
+		return searchInfo.manyToManyQueries
 	}
 
     boolean isManyToMany() {
-        return searchInfo.manyToManyQuery != null
+        return searchInfo.manyToManyQueries != null
     }
 }

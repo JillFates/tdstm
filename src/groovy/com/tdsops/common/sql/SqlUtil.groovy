@@ -628,66 +628,15 @@ class SqlUtil {
 	 */
 	private static List<Long> getManyToManyMatches(FieldSearchData fieldSearchData) {
 		boolean isAnd = fieldSearchData.filter.contains("&")
-		List<List<Long>> matchingRelationships = getMatchingRelationships(fieldSearchData, isAnd)
-
 		List<Long> matches = []
-		if (matchingRelationships) {
-			// If it's an 'and' filtering, the same asset must appear in every list (intersection)
-			if (isAnd) {
-				matches = matchingRelationships[0]
-				for (int i = 1; i < matchingRelationships.size(); i++) {
-					matches = matches.intersect(matchingRelationships[i])
-					if (matches.size() == 0) {
-						break
-					}
-				}
-			// If it's an 'or' filter, the list of asset needs to be the union of the lists (without duplicates).
-			} else {
-
-				Set set = []
-				for (matchingRelationship in matchingRelationships) {
-					set.addAll(matchingRelationship)
-				}
-				matches.addAll(set)
-			}
-
-
+		String key = isAnd ? 'AND' : 'OR'
+		Closure queryBuilder = fieldSearchData.manyToManyQueries[key]
+		Map queryInfo = queryBuilder(fieldSearchData.filter)
+		if (queryInfo) {
+			matches = AssetEntity.executeQuery(queryInfo.query, queryInfo.params)
 		}
+
 		return matches
-	}
-
-	/**
-	 * For every value in filter expression for a many-to-many relationship, build a list
-	 * with the matching ids.
-	 *
-	 * @param fieldSearchData
-	 * @param isAnd
-	 * @return
-	 */
-	private static List<List<Long>> getMatchingRelationships(FieldSearchData fieldSearchData, boolean isAnd) {
-		List<List<Long>> matchings = []
-		String[] filters
-		if (isAnd) {
-			filters = fieldSearchData.filter.split("&")
-		} else {
-			filters = fieldSearchData.filter.split("\\|")
-		}
-
-		String paramName = fieldSearchData.manyToManyParameterName
-		for (String filter in filters) {
-			Map<String, String> queryParam = [:]
-			queryParam[paramName] = filter.toLong()
-			List<Long> results = AssetEntity.executeQuery(fieldSearchData.manyToManyQuery, queryParam)
-			if (results) {
-				matchings << results
-			}
-		}
-
-		if (isAnd && filters.length != matchings.size()) {
-			matchings = []
-		}
-
-		return matchings
 	}
 
 }
