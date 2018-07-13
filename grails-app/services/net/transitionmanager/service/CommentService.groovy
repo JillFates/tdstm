@@ -796,7 +796,9 @@ class CommentService implements ServiceMethods {
 		}
 		assetComment.with {
 			assetEntity = asset
-			isResolved = command.isResolved ? 1 : 0
+			if(command.isResolved) {
+				dateResolved = TimeUtil.nowGMT()
+			}
 			commentType = AssetCommentType.COMMENT
 			comment = command.comment
 			category = command.category

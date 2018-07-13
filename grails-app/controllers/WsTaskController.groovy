@@ -174,7 +174,7 @@ class WsTaskController implements ControllerMethods {
 		Project project = getProjectForWs()
 		// Delete the comment
 		commentService.deleteComment(project, id)
-		renderSuccessJson("AssetComment deleted.")
+		renderSuccessJson()
 
 	}
 
@@ -185,7 +185,7 @@ class WsTaskController implements ControllerMethods {
 	def updateComment(Long id) {
 		// Update the comment.
 		saveOrUpdateComment()
-		renderSuccessJson("AssetComment updated.")
+		renderSuccessJson()
 	}
 
 	/**
@@ -195,7 +195,7 @@ class WsTaskController implements ControllerMethods {
 	def saveComment() {
 		// Save the comment.
 		saveOrUpdateComment()
-		renderSuccessJson("AssetComment created.")
+		renderSuccessJson()
 
 	}
 
