@@ -1271,7 +1271,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			def pattern = (str =~ /ETLCustomScript.(\d+)./)
 			errors.add([
 					message  : exception.getMessage(),
-					lineNumber: pattern.matches()?pattern[0][1]:-1
+					lineNumber: pattern[0][1]
 			])
 		}
 		return result
