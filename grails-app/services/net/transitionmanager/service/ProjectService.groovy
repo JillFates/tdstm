@@ -1339,7 +1339,7 @@ class ProjectService implements ServiceMethods {
 			  COUNT(distinct ulpa.user_login_id, ulpa.date) as activeUserLogins
 			FROM party_relationship pr
 			  LEFT OUTER JOIN user_login u ON pr.party_id_to_id = u.person_id
-			  LEFT OUTER JOIN user_login_project_access ulpa ON PR.party_id_from_id = ulpa.project_id and ulpa.date = ?
+			  LEFT OUTER JOIN user_login_project_access ulpa ON pr.party_id_from_id = ulpa.project_id and ulpa.date = ?
 			WHERE
 			  pr.role_type_code_from_id='PROJECT' AND
 			  pr.party_relationship_type_id='PROJ_STAFF' AND
