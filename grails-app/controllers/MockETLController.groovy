@@ -64,77 +64,53 @@ class MockETLController implements ControllerMethods {
     """.stripIndent().trim()
 
 
-	def index () {
+	def index(){
 
-        Project project = securityService.userCurrentProject
-        ErrorCollector errorCollector
-        String missingPropertyError
-        Integer lineNumber
+		Project project = securityService.userCurrentProject
+		ETLProcessor etlProcessor
 
-        ETLProcessor etlProcessor
+		String dataSet
+		String script
 
-        String dataSet
-        String script
+			String.mixin StringAppendElement
 
-        try {
+			if(params.fetch && params.file){
 
-            String.mixin StringAppendElement
+				URLConnection connection = new URL(params.file).openConnection()
+				String userpass = "Dcorrea:boston2004"
+				String basicAuth = "Basic " + userpass.encodeAsBase64()
+				connection.setRequestProperty("Authorization", basicAuth)
+				connection.setRequestProperty('Accept', 'application/csv')
 
-            if (params.fetch && params.file) {
+				dataSet = connection.inputStream.text?.replace('"', '')
+				script = "console on"
 
-                URLConnection connection = new URL(params.file).openConnection()
-                String userpass = "Dcorrea:boston2004"
-                String basicAuth = "Basic " + userpass.encodeAsBase64()
-                connection.setRequestProperty("Authorization", basicAuth)
-                connection.setRequestProperty('Accept', 'application/csv')
+			} else {
+				dataSet = params.dataSet ?: exampleDataSet
+				script = params.script ?: exampleScript
+			}
 
-                dataSet = connection.inputStream.text?.replace('"', '')
-                script = "console on"
+			String fileType = 'csv'
+			if(params.filetype){
+				fileType = params.filetype
+			}
 
-            } else {
-                dataSet = params.dataSet ?: exampleDataSet
-                script = params.script ?: exampleScript
-            }
+			log.debug("Filetype to use: {}", fileType)
 
-	         String fileType = 'csv'
-	         if ( params.filetype ) {
-		         fileType = params.filetype
-	         }
+			def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', fileType)
+			fileSystemService.initFile(fileName, os, dataSet)
 
-	         log.debug("Filetype to use: {}", fileType)
-
-				def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', fileType)
-
-
-	         fileSystemService.initFile(fileName, os, dataSet)
-
-
-            etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
-
-            fileSystemService.deleteTemporaryFile(fileName)
-
-        } catch (MultipleCompilationErrorsException cfe) {
-            errorCollector = cfe.getErrorCollector()
-        } catch (MissingPropertyException mpe) {
-            lineNumber = mpe.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber
-            missingPropertyError = mpe.getMessage()
-        } catch (ETLProcessorException pe) {
-            missingPropertyError = pe.getMessage()
-        } catch (Exception ioe) {
-	        log.error(ioe.message, ioe)
-	        missingPropertyError = ioe.getMessage()
-        }
+			etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
+			fileSystemService.deleteTemporaryFile(fileName)
 
         [
                 dataSet             : dataSet,
                 script              : script?.trim(),
                 lineNumbers         : Math.max(script.readLines().size(), 10),
                 etlProcessor        : etlProcessor,
-                errorCollector      : errorCollector,
-                lineNumber          : lineNumber,
+                errors              : etlProcessor.errors,
                 availableMethods    : (etlProcessor?.availableMethods as JSON).toString(),
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
-                missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
                 jsonResult          : (etlProcessor?.finalResult()?.domains as JSON),
                 dataScriptId        : params.dataScriptId,

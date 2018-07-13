@@ -12,27 +12,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
 
-import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
-import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
-import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
-import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
-import static org.codehaus.groovy.syntax.Types.DIVIDE
-import static org.codehaus.groovy.syntax.Types.EQUALS
-import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
-import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
-import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
-import static org.codehaus.groovy.syntax.Types.MINUS
-import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
-import static org.codehaus.groovy.syntax.Types.MOD
-import static org.codehaus.groovy.syntax.Types.MULTIPLY
-import static org.codehaus.groovy.syntax.Types.NOT
-import static org.codehaus.groovy.syntax.Types.PLUS
-import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
-import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
-import static org.codehaus.groovy.syntax.Types.POWER
-import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.*
 
 /**
  * Class that receives all the ETL initial commands.
@@ -125,6 +105,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	SelectedDomain selectedDomain
 	ETLFindElement currentFindElement
+
+	List<Map<String, String>> errors = []
 
 	/**
 	 * List of command that needs to be completed.
@@ -1270,6 +1252,29 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, ProgressCallback progressCallback = null){
 		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
+	}
+
+	@TimedInterrupt(600l)
+	Object execute(String script){
+		Object result
+
+		try {
+			errors.clear()
+			result = new GroovyShell(
+					this.class.classLoader,
+					this.binding,
+					defaultCompilerConfiguration())
+					.evaluate(script, 'ETLCustomScript')
+
+		} catch(Throwable exception) {
+			String str = exception.getStackTrace().toString()
+			def pattern = (str =~ /ETLCustomScript.(\d+)./)
+			errors.add([
+					message  : exception.getMessage(),
+					lineNumber: pattern.matches()?pattern[0][1]:-1
+			])
+		}
+		return result
 	}
 
 	/**
