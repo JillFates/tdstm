@@ -13,8 +13,9 @@ import * as R from 'ramda';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
-export function ApplicationEditComponent(template: string, editModel: any): any {
+export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
 		selector: 'application-edit',
 		template: template,
@@ -23,6 +24,9 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		]
 	})
 	class ApplicationShowComponent implements OnInit {
+
+		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected tagList: Array<TagModel> = metadata.tagList;
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
 		private dateFormat: string;
@@ -60,6 +64,14 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			console.log($event);
 		}
 
 		/**

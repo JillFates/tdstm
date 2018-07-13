@@ -17,10 +17,11 @@ import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function DeviceEditComponent(template, editModel) {
+export function DeviceEditComponent(template, editModel, metadata: any) {
 
 	@Component({
 		selector: `device-edit`,
@@ -30,13 +31,15 @@ export function DeviceEditComponent(template, editModel) {
 		]
 	}) class DeviceEditComponent implements OnInit {
 
+		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected tagList: Array<TagModel> = metadata.tagList;
 		private isDependenciesValidForm = true;
 		private dateFormat: string;
 		private showRackFields = true;
 		private showRackSourceInput: 'none'|'new'|'select' = 'none';
 		private showRackTargetInput: 'none'|'new'|'select' = 'none';
 		private rackSourceOptions: Array<any> = [];
-		private rackTargetOptions: Array<any> = [];
+		private rackTargetOptions: Array<any> =   [];
 		private showBladeFields = true;
 		private showBladeSourceInput: 'none'|'new'|'select' = 'none';
 		private showBladeTargetInput: 'none'|'new'|'select' = 'none';
@@ -55,6 +58,14 @@ export function DeviceEditComponent(template, editModel) {
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 			this.initModel();
 			this.toggleAssetTypeFields();
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			console.log($event);
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

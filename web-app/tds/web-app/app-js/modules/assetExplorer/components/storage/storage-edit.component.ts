@@ -12,10 +12,11 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function StorageEditComponent(template: string, editModel: any): any {
+export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
 		selector: 'storage-edit',
 		template: template,
@@ -24,6 +25,9 @@ export function StorageEditComponent(template: string, editModel: any): any {
 		]
 	})
 	class StorageShowComponent implements  OnInit {
+
+		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected tagList: Array<TagModel> = metadata.tagList;
 		private isDependenciesValidForm = true;
 		constructor(
 			@Inject('model') private model: any,
@@ -32,6 +36,14 @@ export function StorageEditComponent(template: string, editModel: any): any {
 			private assetExplorerService: AssetExplorerService,
 			private dialogService: UIDialogService,
 			private notifierService: NotifierService) {
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			console.log($event);
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

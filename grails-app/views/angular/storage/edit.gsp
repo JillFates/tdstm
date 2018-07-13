@@ -102,9 +102,8 @@
                                             </kendo-dropdownlist>
                                         </td>
                                     </tr>
-                                    %{--<tbody class="customTemplate">--}%
                                     <g:render template="/angular/common/customEdit" model="[assetEntityInstance: filesInstance]"></g:render>
-                                    %{--</tbody>--}%
+                                    <g:render template="/angular/common/assetTagsEdit"></g:render>
                                 </table>
                             </div>
                         </td>

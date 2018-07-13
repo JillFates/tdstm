@@ -13,10 +13,11 @@ import {AssetShowComponent} from '../asset/asset-show.component';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function DatabaseEditComponent(template, editModel) {
+export function DatabaseEditComponent(template, editModel, metadata: any) {
 
 	@Component({
 		selector: `database-edit`,
@@ -26,6 +27,8 @@ export function DatabaseEditComponent(template, editModel) {
 		]
 	}) class DatabaseShowComponent implements OnInit {
 
+		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected tagList: Array<TagModel> = metadata.tagList;
 		private dateFormat: string;
 		private isDependenciesValidForm = true;
 
@@ -49,6 +52,14 @@ export function DatabaseEditComponent(template, editModel) {
 					name: ''
 				};
 			}
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			console.log($event);
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

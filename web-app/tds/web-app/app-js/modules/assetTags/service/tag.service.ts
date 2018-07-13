@@ -122,7 +122,21 @@ export class TagService {
 	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
 		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
 			.map((res: Response) => {
-				return res.json();
+				let result = res.json();
+				if (result.data) {
+					let data = result.data.map(item => {
+						let tagModel: TagModel = new TagModel();
+						tagModel.id = item.tagId;
+						tagModel.name = item.name;
+						tagModel.description = item.description;
+						tagModel.color = item.color;
+						tagModel.css = item.css;
+						tagModel.dateCreated = item.dateCreated;
+						return tagModel;
+					});
+					result.data = data;
+				}
+				return result;
 			})
 			.catch((error: any) => error.json());
 	}
