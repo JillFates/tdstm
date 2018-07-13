@@ -63,6 +63,7 @@
                                         <td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">${asset.validation}</td>
                                     </tr>
                                     <g:render template="/angular/common/customShow" model="[asset:asset, project:project]"></g:render>
+                                    <g:render template="/angular/common/assetTags"></g:render>
                                 </tbody>
                             </table>
                         </div>

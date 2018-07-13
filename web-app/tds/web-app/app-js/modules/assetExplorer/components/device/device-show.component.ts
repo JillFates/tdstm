@@ -22,8 +22,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		constructor(
 			private activeDialog: UIActiveDialogService,
 			private dialogService: UIDialogService,
-			private assetService: DependecyService,
-			private tagService: TagService) {
+			private assetService: DependecyService) {
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

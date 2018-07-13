@@ -42,22 +42,21 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			console.log('metadata', metadata);
 			this.http.get(`../ws/asset/showTemplate/${this.modelId}`).subscribe(res => {
 				let template = res.text();
 				const additionalImports = [AssetExplorerModule];
 				switch (this.asset) {
 					case 'APPLICATION':
-						this.registerAndCreate(ApplicationShowComponent(template, this.modelId), this.view, additionalImports);
+						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'DATABASE':
-						this.registerAndCreate(DatabaseShowComponent(template, this.modelId), this.view, additionalImports);
+						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'DEVICE':
 						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 					case 'STORAGE':
-						this.registerAndCreate(StorageShowComponent(template, this.modelId), this.view, additionalImports);
+						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view, additionalImports);
 						break;
 				}
 			});
