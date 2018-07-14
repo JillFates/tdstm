@@ -549,9 +549,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	};
 
 	scope.contexts.checkValidSelection = function(){
-		var context = scope.editor.selectedRVersion?scope.editor.selectedRVersion.context:'',
-			contextId,
-			recipeId = stateParams.recipeId;
+		var context = scope.editor.selectedRVersion?scope.editor.selectedRVersion.context:'';
+		var recipeId = stateParams.recipeId;
 
 		scope.contexts.enableClearDefaultContext = false;
 
@@ -574,12 +573,10 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 		scope.contexts.enableClearDefaultContext = true;
 
-
-		// scope.contexts.contextId = contextId;
-		// scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
-		/* if (scope.contexts.validCurrentSelection) {
-			scope.$broadcast('validContextSelection', recipeId, contextId);
-		} */
+		scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
+		if (scope.contexts.validCurrentSelection) {
+			// scope.$broadcast('validContextSelection', recipeId);
+		}
 		if (!scope.$$phase) scope.$digest();
 	};
 
@@ -1097,8 +1094,8 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		return scope.tasks.generation.exceptions;
 	}
 
-	scope.$on('validContextSelection', function(evt, recipeId, contextId) {
-		scope.tasks.getTaskBatchInfo({recipeId: recipeId, contextId: contextId, logs: false});
+	scope.$on('validContextSelection', function(evt, recipeId) {
+		scope.tasks.getTaskBatchInfo({recipeId: recipeId, logs: false});
 	});
 
 	if (state.is("recipes.detail.gentasks")) {
