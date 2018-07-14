@@ -582,9 +582,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 	var validEventStatus = function () {
 		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:0;
-		if(scope.editor.selectedRVersion.context.eventId) {
-
-		}
 		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
 	};
 
@@ -1396,7 +1393,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 
 			scope.tasks.colDef = (data.data.list.length > 0) ? [
 				// {field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
-				{field:'contextName', displayName:'Context Target', enableCellEdit: false, width: '***'},
+				{field:'contextName', displayName:'Event', enableCellEdit: false, width: '***'},
 				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
 				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center',
