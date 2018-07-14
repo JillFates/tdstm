@@ -1,7 +1,7 @@
 databaseChangeLog = {
 
 	changeSet(author: 'slopez', id: '20180702 TM-10608-1') {
-		comment("Create tag table")
+		comment("Create api_catalog table")
 
 		preConditions(onFail: 'MARK_RAN') {
 			not {
@@ -19,6 +19,10 @@ databaseChangeLog = {
 			}
 
 			column(name: 'dictionary', type: 'JSON') {
+				constraints(nullable: 'false')
+			}
+
+			column(name: 'dictionary_transformed', type: 'JSON') {
 				constraints(nullable: 'false')
 			}
 
@@ -71,6 +75,35 @@ databaseChangeLog = {
 			column(name: 'project_id')
 			column(name: 'provider_id')
 		}
+
+	}
+
+	changeSet(author: 'slopez', id: '20180713 TM-10608-2') {
+		comment("Alter api_action table")
+
+		preConditions(onFail: 'MARK_RAN') {
+			tableExists(tableName: 'api_action')
+		}
+
+		sql('UPDATE asset_comment SET api_action_id = NULL WHERE api_action_id IS NOT NULL;')
+		sql('DELETE FROM api_action;')
+
+		dropColumn(tableName: 'api_action', columnName: 'agent_class')
+
+		addColumn(tableName: 'api_action') {
+			column(name: 'api_catalog_id', type: 'BIGINT(20)') {
+				constraints(nullable: 'false')
+			}
+		}
+
+		addForeignKeyConstraint(
+				constraintName: 'fk_api_action_catalog',
+				onDelete: 'CASCADE',
+				baseTableName: 'api_action',
+				baseColumnNames: 'api_catalog_id',
+				referencedTableName: 'api_catalog',
+				referencedColumnNames: 'api_catalog_id'
+		)
 
 	}
 

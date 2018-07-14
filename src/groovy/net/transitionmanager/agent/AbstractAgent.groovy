@@ -70,23 +70,25 @@ class AbstractAgent {
 
 	/**
 	 * Used to trigger the invocation of the particular method on the agent
-	 * @param methodName - the name of the Agent method identified in the Dictionary
+	 *
+	 * @param dictionaryItem - api catalog dictionary item
 	 * @param actionRequest - the container class that contains all we need to know about the call
+	 * @return the result of the action invocation
+	 * @throws InvalidRequestException
 	 */
 	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
-	ApiActionResponse invoke(String methodName, ActionRequest actionRequest) {
-		if (dict.containsKey(methodName)) {
-			DictionaryItem dictItem = (DictionaryItem) dict[methodName]
-			if (dictItem.method) {
-				log.debug 'invoke({}) about to invoke method {}', methodName, dictItem.method
-				return "${dictItem.method}"(actionRequest)
+	ApiActionResponse invoke(DictionaryItem dictionaryItem, ActionRequest actionRequest) {
+		if (dictionaryItem) {
+			if (dictionaryItem.method) {
+				log.debug 'invoke({}) about to invoke method {}', dictionaryItem.apiMethod, dictionaryItem.method
+				return "${dictionaryItem.method}"(actionRequest)
 			} else {
-				String msg = "The Action Agent $name for method $methodName is incorrectly configured"
+				String msg = "The Action Agent $name is missing method name to invoke"
 				log.error msg
 				throw new InvalidRequestException(msg)
 			}
 		} else {
-			String msg = "The agent $name does not have method $methodName defined"
+			String msg = "The agent $name does not have a dictionary defined"
 			log.error msg
 			throw new InvalidRequestException(msg)
 		}

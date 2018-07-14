@@ -23,54 +23,54 @@ class AwsAgent extends AbstractAgent {
 		// TODO : JPM 3/2018 : Need to reenable this line once AWS is implemented TM-9903
 		// setInfo(AgentClass.AWS, 'Amazon AWS API')
 
-		setDictionary( [
-			PublishSNS: new DictionaryItem( [
-				agentMethod: 'PublishSNS',
-				name: 'Publish SNS Notification',
-				description: 'Used to publish Simple Notification Service (SNS) messages',
-				endpointUrl: 'https://sns.{region}.amazonaws.com/',
-				docUrl: 'https://docs.aws.amazon.com/sns/latest/api/Welcome.html',
-				method: 'publishSnsNotification',
-				producesData: 0,
-				results: invokeResults(),
-				params: [
-					[
-						paramName: 'region',
-						desc: 'The AWS Region to publish the SNS notifications (e.g. us-east-1, us-west-2)',
-						type: 'String',
-						context: ContextType.USER_DEF,
-						fieldName: null,
-						value: '',
-						required:1,
-						readonly:0,
-						encoded: 1
-					]
-				] + queueParams()
-			] ),
-			SendSQS: new DictionaryItem([
-				agentMethod: 'SendSQS',
-				name: 'Send SQS Message',
-				description: 'Used to send Simple Queue Service (SQS) messages',
-				endpointUrl: 'https://sqs.{region}.amazonaws.com/',
-				docUrl: '',
-				method: 'sendSqsMessage',
-				producesData: 0,
-				results: invokeResults(),
-				params: [
-					[
-						paramName: 'region',
-						desc: 'The AWS Region to publish the SQS message (e.g. us-east-1, us-west-2)',
-						type: 'String',
-						context: ContextType.USER_DEF,
-						fieldName: null,
-						value: '',
-						required:1,
-						readonly:0,
-						encoded: 1
-					]
-				] + queueParams()
-			])
-		] )
+//		setDictionary( [
+//			PublishSNS: new DictionaryItem( [
+//				agentMethod: 'PublishSNS',
+//				name: 'Publish SNS Notification',
+//				description: 'Used to publish Simple Notification Service (SNS) messages',
+//				endpointUrl: 'https://sns.{region}.amazonaws.com/',
+//				docUrl: 'https://docs.aws.amazon.com/sns/latest/api/Welcome.html',
+//				method: 'publishSnsNotification',
+//				producesData: 0,
+//				results: invokeResults(),
+//				params: [
+//					[
+//						paramName: 'region',
+//						desc: 'The AWS Region to publish the SNS notifications (e.g. us-east-1, us-west-2)',
+//						type: 'String',
+//						context: ContextType.USER_DEF,
+//						fieldName: null,
+//						value: '',
+//						required:1,
+//						readonly:0,
+//						encoded: 1
+//					]
+//				] + queueParams()
+//			] ),
+//			SendSQS: new DictionaryItem([
+//				agentMethod: 'SendSQS',
+//				name: 'Send SQS Message',
+//				description: 'Used to send Simple Queue Service (SQS) messages',
+//				endpointUrl: 'https://sqs.{region}.amazonaws.com/',
+//				docUrl: '',
+//				method: 'sendSqsMessage',
+//				producesData: 0,
+//				results: invokeResults(),
+//				params: [
+//					[
+//						paramName: 'region',
+//						desc: 'The AWS Region to publish the SQS message (e.g. us-east-1, us-west-2)',
+//						type: 'String',
+//						context: ContextType.USER_DEF,
+//						fieldName: null,
+//						value: '',
+//						required:1,
+//						readonly:0,
+//						encoded: 1
+//					]
+//				] + queueParams()
+//			])
+//		] )
 
 		awsService = (AwsService) ApplicationContextHolder.getBean('awsService')
 	}

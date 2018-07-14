@@ -5,10 +5,22 @@
 
 	<title>Api Catalog Manager</title>
 	<link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css"/>
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
 	<style type="text/css">
         div#dictionaryView {
             overflow: scroll;
             height: 600px;
+        }
+        .CodeMirror {
+            border: 1px solid #d2d6de;
+            height: auto;
+        }
+        .CodeMirror-scroll {
+            overflow: auto;
+            height: 600px;
+            /* This is needed to prevent an IE[67] bug where the scrolled content
+			   is visible outside of the scrolling box. */
+            position: relative;
         }
 	</style>
 </head>
@@ -16,9 +28,42 @@
 <tds:subHeader title="Api Catalog Manager" crumbs="['Admin','Api Catalog Manager']"/>
 
 <div class="row">
-    <div class="col-md-12">
-        Select an Api Catalog to view or edit:
-        <select id="apiCatalogs" name="apiCatalogs"></select>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="col-sm-3 col-form-label text-right" for="apiCatalogs" style="margin-top: 4px">
+                Api Catalog actions:
+            </label>
+            <div class="col-sm-9">
+                <select id="apiCatalogs" name="apiCatalogs" class="form-control"></select>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 text-right">
+        <div class="btn-group" role="group" aria-label="">
+            <button type="button" class="btn btn-primary collapse">
+                <span class="glyphicon glyphicon-resize-small" aria-hidden="true"></span>
+                Collapse
+            </button>
+            <button type="button" class="btn btn-primary expand">
+                <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+                Expand
+            </button>
+            <button type="button" class="btn btn-primary toggle">
+                <span class="glyphicon glyphicon-random" aria-hidden="true"></span>
+                &nbsp;
+                Toggle
+            </button>
+            <button type="button" class="btn btn-primary toggle-1">
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+                &nbsp;
+                Toggle 1
+            </button>
+            <button type="button" class="btn btn-primary toggle-2">
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+                &nbsp;
+                Toggle 2
+            </button>
+        </div>
     </div>
 </div>
 <div class="row">
@@ -54,15 +99,17 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
 <script type="text/javascript" src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
+<g:javascript src="codemirror/codemirror.js" />
 <script>
+    // dictionary editor code mirror instance
+    var editor = null;
 
     function viewMergedDictionaryJson() {
         try {
-            //$('div#dictionaryView').JSONView($('textarea#dictionary').val(), {collapsed: true});
             var payload = {
                 id: null,
                 version: 0,
-                dictionary: $('textarea#dictionary').val()
+                dictionary: editor.getValue()
             };
 
             $.ajax('/tdstm/apiCatalog/viewMerged', {
@@ -76,7 +123,7 @@
                         return
                     }
 
-                    $('div#dictionaryView').JSONView(data.dictionary, {collapsed: true});
+                    showJson(data.model.dictionaryTransformed)
                 },
                 error      : function (xhr, status, text) {
 
@@ -108,7 +155,7 @@
             var payload = {
                 id: $('input#id').val() === '' ? null : $('input#id').val(),
                 version: $('input#version').val() === '' ? 0 : $('input#version').val(),
-                dictionary: $('textarea#dictionary').val()
+                dictionary: editor.getValue()
             };
 
             $.ajax('/tdstm/apiCatalog/save', {
@@ -121,9 +168,10 @@
                         $('div#dictionaryView').html(data.errors);
                         return
                     }
-
-                    $('div#dictionaryView').JSONView(data.model.dictionary, {collapsed: true});
-                    refreshCatalogsDropDown()
+                    refreshCatalogsDropDown(data.model.id)
+                    showJson(data.model.dictionaryTransformed)
+                    $('input#id').val(data.model.id);
+                    $('input#version').val(data.model.version)
                 },
                 error      : function (xhr, status, text) {
 
@@ -152,10 +200,7 @@
 
     function viewPretty(id) {
         if (id === '-1') {
-            $('textarea#dictionary').val('');
-            $('div#dictionaryView').html('');
-            $('input#id').val('');
-            $('input#version').val('');
+            cleanFields()
             return;
         }
         try {
@@ -171,10 +216,10 @@
                         return
                     }
 
-                    $('textarea#dictionary').val(data.dictionary);
-                    $('div#dictionaryView').JSONView(data.jsonDictionaryTransformed, {collapsed: true});
-                    $('input#id').val(data.id);
-                    $('input#version').val(data.version);
+                    showDictionary(data.model.dictionary)
+                    showJson(data.model.dictionaryTransformed);
+                    $('input#id').val(data.model.id);
+                    $('input#version').val(data.model.version);
 
                 },
                 error      : function (xhr, status, text) {
@@ -210,10 +255,7 @@
     function deleteSelectedOne() {
         var id = $('input#id').val();
         if (id === '-1' || id === '') {
-            $('textarea#dictionary').val('');
-            $('div#dictionaryView').html('');
-            $('input#id').val('');
-            $('input#version').val('');
+            cleanFields()
             return;
         }
 
@@ -227,27 +269,19 @@
                 accept     : 'application/json; charset=utf-8',
                 success    : function (data) {
                     if (data.status === 'error') {
+                        cleanFields()
                         $('div#dictionaryView').html(data.errors);
-                        $('textarea#dictionary').val('');
-                        $('input#id').val('');
-                        $('input#version').val('');
 
                         return
                     }
 
-                    $('textarea#dictionary').val('');
-                    $('div#dictionaryView').html('');
-                    $('input#id').val('');
-                    $('input#version').val('');
+                    cleanFields()
                     refreshCatalogsDropDown()
 
                 },
                 error      : function (xhr, status, text) {
 
-                    $('textarea#dictionary').val('');
-                    $('div#dictionaryView').html('');
-                    $('input#id').val('');
-                    $('input#version').val('');
+                    cleanFields();
 
                     if (xhr.status == '400') {
                         var response = JSON.parse(xhr.responseText);
@@ -268,15 +302,12 @@
                 }
             });
         } catch (e) {
-            $('textarea#dictionary').val('');
-            $('div#dictionaryView').html('');
-            $('input#id').val('');
-            $('input#version').val('');
+            cleanFields()
             alert(e)
         }
     }
 
-    function refreshCatalogsDropDown() {
+    function refreshCatalogsDropDown(id) {
         try {
             $.ajax('/tdstm/apiCatalog/list', {
                 type       : 'GET',
@@ -291,9 +322,11 @@
                     options.empty();
                     options.append(new Option('--- Choose an Api Catalog for viewing or editing ---', '-1'));
                     $.each(data.model, function(key, value) {
-                        console.log('key=', key, 'value=',value);
                         options.append(new Option(value.provider.name + ' - ' + value.name, value.id));
                     });
+
+                    // select option matching id
+                    $(options).val(id);
 
                 },
                 error      : function (xhr, status, text) {
@@ -321,11 +354,33 @@
         }
     }
 
+    function showDictionary(dictionary) {
+        editor.getDoc().setValue(dictionary);
+    }
+
+    function showJson(jsonDictionaryTransformed) {
+        $('div#dictionaryView').JSONView(jsonDictionaryTransformed, {collapsed: true});
+        $('div#dictionaryView').JSONView('expand', 1);
+    }
+
+    function cleanFields() {
+        editor.getDoc().setValue('');
+        $('div#dictionaryView').html('');
+        $('input#id').val('');
+        $('input#version').val('');
+    }
+
     $(document).ready(function() {
+        editor = CodeMirror.fromTextArea(document.getElementById('dictionary'), {lineNumbers: true, viewportMargin: 199});
         $('select#apiCatalogs').on('change', function() {
             viewPretty($(this).val());
         });
         refreshCatalogsDropDown();
+        $('button.collapse').on('click', function() { $('div#dictionaryView').JSONView('collapse'); });
+        $('button.expand').on('click', function() { $('div#dictionaryView').JSONView('expand'); });
+        $('button.toggle').on('click', function() { $('div#dictionaryView').JSONView('toggle'); });
+        $('button.toggle-1').on('click', function() { $('div#dictionaryView').JSONView('toggle', 1); });
+        $('button.toggle-2').on('click', function() { $('div#dictionaryView').JSONView('toggle', 2); });
     });
 
 </script>

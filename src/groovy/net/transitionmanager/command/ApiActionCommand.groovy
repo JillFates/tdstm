@@ -2,8 +2,8 @@ package net.transitionmanager.command
 
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import grails.validation.Validateable
-import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Provider
@@ -17,7 +17,7 @@ class ApiActionCommand implements CommandObject {
     String description=''
     Provider provider
     Credential credential
-    AgentClass agentClass
+    ApiCatalog apiCatalog
     String agentMethod
     String asyncQueue
     String callbackMethod

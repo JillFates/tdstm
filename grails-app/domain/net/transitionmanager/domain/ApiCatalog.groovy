@@ -18,6 +18,9 @@ class ApiCatalog {
 	// Contains the JSON dictionary data
 	String dictionary
 
+	// Contains the JSON dictionary transformed data
+	String dictionaryTransformed
+
 	Long version
 	Date dateCreated
 	Date lastUpdated
@@ -30,6 +33,7 @@ class ApiCatalog {
 	static constraints = {
 		name size: 1..255, unique: ['project', 'provider']
 		dictionary size: 1..65535, blank: false, validator: dictionaryJsonValidator
+		dictionaryTransformed size: 1..65535, blank: false
 
 		provider ofSameProject: true
 	}
@@ -70,6 +74,7 @@ class ApiCatalog {
 				provider				: [id: provider.id, name: provider.name],
 				name					: name,
 				dictionary              : dictionary,
+				dictionaryTransformed   : dictionaryTransformed,
 				dateCreated     		: dateCreated,
 				lastUpdated     		: lastUpdated,
 				version                 : version

@@ -303,9 +303,7 @@ class ApiCatalogUtil {
 	 */
 	static Map<String, ?> getCatalogMethods(String dictionary) {
 		try {
-			JSONObject jsonDictionaryParsed = JsonUtil.parseJson(dictionary)
-			validateDictionaryHasPrimaryKeys(jsonDictionaryParsed)
-			JSONObject jsonDictionaryTransformed = transformJsonDictionary(jsonDictionaryParsed)
+			JSONObject jsonDictionaryTransformed = JsonUtil.parseJson(dictionary)
 
 			Map methods = [:]
 			jsonDictionaryTransformed.dictionary.method.each { entry ->

@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -159,6 +160,10 @@ class ProviderService implements ServiceMethods {
      * @return a provider instance
      */
     Provider findOrCreateProvider(String providerName, Project project) {
+        if (StringUtil.isBlank(providerName)) {
+            throw new EmptyResultException("No Provider name cannot be blank or null.")
+        }
+
         Provider provider = getProvider(providerName, project, false)
         if (!provider) {
             JSONObject jsonObject = new JSONObject([name: providerName, description: '', comment: ''])

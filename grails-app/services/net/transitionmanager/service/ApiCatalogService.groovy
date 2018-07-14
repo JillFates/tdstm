@@ -58,6 +58,9 @@ class ApiCatalogService implements ServiceMethods {
 		String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(unPrettyDictionaryJson)
 		// obtain a dictionary json object
 		JSONObject jsonDictionary = JsonUtil.parseJson(jsonDictionaryTransformed)
+		// remove unused elements in the transformed dictionary
+		jsonDictionary.dictionary.remove('paramDef')
+		jsonDictionary.dictionary.remove('paramGroup')
 
 		Project currentProject = securityService.userCurrentProject
 		Provider provider = providerService.findOrCreateProvider(jsonDictionary.dictionary.info.provider, currentProject)
@@ -68,11 +71,16 @@ class ApiCatalogService implements ServiceMethods {
 			if (command.version != apiCatalog.version) {
 				throw new DomainUpdateException("The version of the Api Catalog you are trying to update was already updated by another user")
 			}
-			apiCatalog.name = jsonDictionary.dictionary.info.name
-			apiCatalog.dictionary = unPrettyDictionaryJson
 		} else {
-			apiCatalog = new ApiCatalog(project: currentProject, provider: provider, name: jsonDictionary.dictionary.info.name, dictionary: unPrettyDictionaryJson)
+			apiCatalog = new ApiCatalog()
+			apiCatalog.project = currentProject
 		}
+
+		// populate api catalog properties
+		apiCatalog.provider = provider
+		apiCatalog.name = jsonDictionary.dictionary.info.name
+		apiCatalog.dictionary = unPrettyDictionaryJson
+		apiCatalog.dictionaryTransformed = JsonUtil.validateJsonAndConvertToString(jsonDictionary)
 
 		// validate is unique api catalog, and if not, let's update current
 		if (!validateUnique(jsonDictionary.dictionary.info.name, command.id, currentProject, provider)) {

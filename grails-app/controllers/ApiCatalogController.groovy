@@ -26,7 +26,7 @@ class ApiCatalogController implements ControllerMethods {
 
 		ApiCatalogUtil.validateDictionaryHasPrimaryKeys(command.dictionary)
 		String transformedJson = ApiCatalogUtil.transformDictionary(command)
-		renderAsJson([dictionary: transformedJson])
+		renderAsJson([model: [dictionaryTransformed: transformedJson]])
 	}
 
 	/**
@@ -38,6 +38,7 @@ class ApiCatalogController implements ControllerMethods {
 		validateCommandObject(command)
 
 		ApiCatalog apiCatalog = apiCatalogService.saveOrUpdate(command)
+
 		renderAsJson([model: apiCatalog.toMap()])
 	}
 
@@ -53,13 +54,12 @@ class ApiCatalogController implements ControllerMethods {
 			return renderErrorJson('ApiCatalog does not exist')
 		}
 
-		String transformedJson = ApiCatalogUtil.transformDictionary(apiCatalog.dictionary)
-		renderAsJson([
+		renderAsJson([model: [
 				id: apiCatalog.id,
 				version: apiCatalog.version,
 				dictionary: JsonUtil.toPrettyJson(JsonUtil.convertJsonToMap(apiCatalog.dictionary)),
-				jsonDictionaryTransformed: transformedJson
-		].asImmutable())
+				dictionaryTransformed: apiCatalog.dictionaryTransformed
+		]].asImmutable())
 	}
 
 	/**
