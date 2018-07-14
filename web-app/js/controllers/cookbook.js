@@ -519,13 +519,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		contextId: 0,
 		eventsArray : [],
 		boundlesArray : [],
-		bundlesArrayUnassigned : [],
-		bundlesArrayAssigned : [],
-		applicationsArray : [],
-		applicationsArrayUnassigned : [],
-		applicationsArrayAssigned : [],
 		selectedEvent : '',
-		selectedBundle : '',
 		validCurrentSelection : false,
 		enableClearDefaultContext: false
 	}
@@ -535,8 +529,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
 			var context = recipe.context;
-			if((scope.contexts.selectedEvent) || (scope.contexts.selectedBundle)){
-				log.log('matches event, or bundle, or application');
+			if(scope.contexts.selectedEvent){
+				log.log('matches event');
 				return true;
 			}else{
 				log.log('not Matching');
@@ -549,12 +543,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.$on("recipeUpdated", function(evt, recipe) {
 		scope.contexts.checkValidSelection();
 	});
-
-	Array.prototype.arrayTagsDiff = function(a) {
-		return this.filter(function(i) {
-			return a.indexOf(i.id) < 0;
-		});
-	};
 
 	scope.contexts.onAssetSelectorChange = function() {
 		scope.contexts.checkValidSelection();
@@ -574,12 +562,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 
 		var sameEvent = validEventStatus();
-		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null &&  scope.contexts.selectedEvent != '') || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
-			return; // dirty
-		}
-
-		var sameBundle = validBundleStatus();
-		if(!sameBundle && (scope.editor.selectedRVersion.context.bundleId == null &&  scope.contexts.selectedBundle != '') || scope.editor.selectedRVersion.context.bundleId != null &&  scope.contexts.selectedBundle == null) {
+		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null && scope.contexts.selectedEvent != '' && scope.contexts.selectedEvent != null) || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
 			return; // dirty
 		}
 
@@ -589,13 +572,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return; // dirty
 		}
 
-		var sameOperator = validOperatorStatus();
-		if(!sameOperator) {
-			if (!scope.$$phase) scope.$digest();
-			return; // dirty
-		}
-
-
 		scope.contexts.enableClearDefaultContext = true;
 
 
@@ -604,16 +580,15 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		/* if (scope.contexts.validCurrentSelection) {
 			scope.$broadcast('validContextSelection', recipeId, contextId);
 		} */
+		if (!scope.$$phase) scope.$digest();
 	};
 
 	var validEventStatus = function () {
 		var eventId = scope.contexts.selectedEvent? scope.contexts.selectedEvent.id:0;
-		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
-	};
+		if(scope.editor.selectedRVersion.context.eventId) {
 
-	var validBundleStatus = function () {
-		var bundleId = scope.contexts.selectedBundle? scope.contexts.selectedBundle.id:0;
-		return ((!angular.isUndefined(bundleId)) && (scope.editor.selectedRVersion.context.bundleId == bundleId));
+		}
+		return ((!angular.isUndefined(eventId)) && (scope.editor.selectedRVersion.context.eventId == eventId));
 	};
 
 	var validTagStatus = function () {
@@ -626,45 +601,16 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		}
 	};
 
-	var validOperatorStatus = function () {
-		try {
-			var operator = (scope.contexts.assetSelector.operator == 'AND');
-			return operator === scope.editor.selectedRVersion.context.and;
-		} catch (e) {
-			return true;
-		}
-	};
-
-	// Put select elements in blank.
-	scope.contexts.blankBundles = function(){
-		scope.contexts.selectedBundle = '';
-		scope.contexts.bundlesArrayAssigned = [];
-		scope.contexts.bundlesArray = scope.contexts.bundlesArrayUnassigned;
-		scope.contexts.applicationsArrayAssigned = [];
-		scope.contexts.applicationsArray = scope.contexts.applicationsArrayUnassigned;
-	};
-
 	/////////////////////////////
 
 	// Events for select elements.
 	scope.contexts.eventSelected = function(){
-		scope.contexts.selectedBundle = '';
-		if (scope.contexts.selectedEvent){
-			scope.getListBundles(scope.contexts.selectedEvent, scope.contexts);
-		}else{
-			scope.contexts.blankBundles();
-		}
-		scope.contexts.checkValidSelection();
-	};
-
-	scope.contexts.bundleSelected = function(){
 		scope.contexts.checkValidSelection();
 	};
 
 	// Reset selects
 	scope.contexts.resetSelects = function(){
 		scope.contexts.selectedEvent = '';
-		scope.contexts.selectedBundle = '';
 	};
 
 	scope.active = function(route){
@@ -688,10 +634,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			if (scope.contexts && scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
 				dataToSend.context.eventId = scope.contexts.selectedEvent.id;
 			}
-			if (scope.contexts && scope.contexts.selectedBundle && scope.contexts.selectedBundle.id) {
-				dataToSend.context.bundleId = scope.contexts.selectedBundle.id;
-			}
-
 			if(window.Prototype) {
 				delete Array.prototype.toJSON;
 			}
@@ -720,7 +662,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 	scope.contexts.getEventsAndBundles = function() {
 		cookbookService.getEventsAndBundles({rand: tdsCommon.randomString(16)}, function(data){
-			log.info('Success on getting Events and Bundles');
+			log.info('Success on getting Events');
 			log.info(data.data.list);
 			scope.contexts.eventsArray = data.data.list;
 			if (scope.editor.selectedRVersion && scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.eventId) {
@@ -730,7 +672,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 				scope.contexts.selectedEvent = scope.findEntityById(scope.contexts.eventsArray, scope.contexts.selectedEvent.id);
 			}
 		}, function(){
-			log.info('Error on getting Events and Bundles');
+			log.info('Error on getting Events');
 		});
 	}
 
@@ -747,14 +689,12 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 	// Get User Preference
 	var getUserPreferences = function() {
-		cookbookService.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE', rand: tdsCommon.randomString(16)}, function(data){
+		cookbookService.getUserPreferences({details: 'MOVE_EVENT', rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting User Preferences');
 			log.info(data.data.preferences);
 			if (data.data.preferences.MOVE_EVENT) {
 				scope.contexts.selectedEvent = {};
-				scope.contexts.selectedBundle = {};
 				scope.contexts.selectedEvent.id = data.data.preferences.MOVE_EVENT;
-				scope.contexts.selectedBundle.id = data.data.preferences.CURR_BUNDLE;
 			}
 		}, function(){
 			log.info('Error on getting User Preferences');
@@ -786,10 +726,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.getRecipeData = function(defaultView) {
 		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			scope.editor.selectedRVersion = (data.data) ? data.data : null;
-			scope.contexts.preAssetSelector = {
-				'tag': scope.editor.selectedRVersion.context.tag,
-				'and': scope.editor.selectedRVersion.context['and']
-			};
 			if ((defaultView == 'release') && (scope.editor.selectedRVersion.versionNumber <= 0)) {
 				defaultView = 'wip';
 			}
@@ -842,50 +778,12 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	// isUnassigned is false.
 	scope.generateOptions = function(opts, scopeContext){
 		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
-		if(opts.isUnassigned){
-			angular.forEach(newArray, function(value, key){
-				value.group = 'unassigned';
-			})
-			scopeContext.bundlesArrayUnassigned = newArray;
-		}else{
+		if(!opts.isUnassigned){
 			angular.forEach(newArray, function(value, key){
 				value.group = opts.groupName;
 			})
 		}
 		return newArray
-	}
-
-	// Get List of Bundles for a given Event
-	scope.getListBundles = function(event, scopeContext){
-		var event = (event == 0) ? {id: 0} : event;
-		cookbookService.getListBundles({details: event.id, rand: tdsCommon.randomString(16)}, function(data){
-			log.info('Success on getting Bundles');
-			log.info(data.data.list);
-			if(event.id == 0){
-				//generate an array to show the select element correctly
-				scopeContext.bundlesArrayUnassigned = scope.generateOptions({
-					isUnassigned: true,
-					unassignedArray: data.data.list,
-					assignedArray: []
-				}, scopeContext);
-			}else{
-				//generate an array to show the select element correctly
-				scopeContext.bundlesArrayAssigned = scope.generateOptions({
-					isUnassigned: false,
-					unassignedArray: angular.copy(scopeContext.bundlesArrayUnassigned),
-					assignedArray: data.data.list,
-					groupName: event.name
-				}, scopeContext);
-			}
-			scopeContext.bundlesArray = angular.copy(scopeContext.bundlesArrayAssigned)
-			.concat(angular.copy(scopeContext.bundlesArrayUnassigned));
-			if (scope.editor.selectedRVersion && scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.bundleId) {
-				scopeContext.selectedBundle = scope.findEntityById(scopeContext.bundlesArray, scope.editor.selectedRVersion.context.bundleId);
-				scopeContext.bundleSelected();
-			}
-		}, function(){
-			log.info('Error on getting Bundles');
-		});
 	}
 
 	scope.getRecipeData('release');
@@ -1147,9 +1045,6 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		switch(scope.currentSelectedRecipe.context) {
 			case 'Event':
 				idSelected = scope.contexts.selectedEvent.id;
-				break;
-			case 'Bundle':
-				idSelected = scope.contexts.selectedBundle.id;
 				break;
 			default:
 		}
@@ -2618,13 +2513,6 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 				params: {
 					section: "event",
 					details: "listEventsAndBundles"
-				}
-			},
-			getListBundles: {
-				method: "GET",
-				params: {
-					domain: "event",
-					section: "listBundles"
 				}
 			},
 			getProgress: {

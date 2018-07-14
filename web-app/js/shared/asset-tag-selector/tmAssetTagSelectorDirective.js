@@ -1,7 +1,7 @@
 tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" />
+						<!--<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" /> -->
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -20,11 +20,12 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 		scope: {
 			assetSelector: '=',
 			preAssetSelector: '=',
-			selectedEvent: '=',
-			selectedBundle: '=',
 			onChange: '&'
 		},
 		controller: function ($scope) {
+
+			// Init the Load
+			getAssetTags();
 
 			$scope.assetSelector = {
 				tag: [],
@@ -39,17 +40,6 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					$scope.onChange();
 				}
 			});
-
-			$scope.$watch('selectedEvent', function (nVal, oVal) {
-				setNewDataSource([]);
-				getAssetTags();
-			}, true);
-
-			$scope.$watch('selectedBundle', function (nVal, oVal) {
-				setNewDataSource([]);
-				getAssetTags();
-			}, true);
-
 
 			$(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
@@ -103,11 +93,8 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					}
 					dataSource.sync();
 
-					var operator = ($(".asset-tag-selector-operator-switch").attr('checked')? true: false);
-					if(operator !== $scope.preAssetSelector.and) {
-						$(".asset-tag-selector-operator-switch").data('kendoMobileSwitch').toggle();
-						$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR';
-					}
+					// Always false on Cookbook context
+					$scope.assetSelector.operator = false;
 
 					if(selectedTags !== '') {
 						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
@@ -117,27 +104,12 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			}
 
 			function getAssetTags() {
-				if (($scope.selectedEvent && $scope.selectedEvent.id) || ($scope.selectedBundle && $scope.selectedBundle.id)) {
-					if ($scope.selectedBundle && $scope.selectedBundle.id !== '') {
-						$http.get(utils.url.applyRootPath('/ws/tag?moveBundleId=' + $scope.selectedBundle.id)).success(function (data, status, headers, config) {
-							if (data && data.status === 'success') {
-								setNewDataSource(data.data);
-							}
-						}).error(function (data, status, headers, config) {});
-					} else {
-						$http.get(utils.url.applyRootPath('/ws/tag?moveEventId=' + $scope.selectedEvent.id)).success(function (data, status, headers, config) {
-							if (data && data.status === 'success') {
-								setNewDataSource(data.data);
-							}
-						}).error(function (data, status, headers, config) {});
+				// At least for Cookbook it will alw
+				$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
+					if (data && data.status === 'success') {
+						setNewDataSource(data.data);
 					}
-				} else if(($scope.selectedEvent === null || $scope.selectedEvent === "") && ($scope.selectedBundle === null || $scope.selectedBundle === "")) {
-					$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
-						if (data && data.status === 'success') {
-							setNewDataSource(data.data);
-						}
-					}).error(function (data, status, headers, config) {});
-				}
+				}).error(function (data, status, headers, config) {});
 			}
 
 			function selectTags(e) {
