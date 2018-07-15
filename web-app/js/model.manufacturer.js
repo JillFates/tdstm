@@ -451,9 +451,15 @@ function mergeModel() {
 				$("#messageId").show()
 			},
 			success: function (data) {
-				$("#spinnerId").hide()
-				$("#messageId").html(data)
-				$(".ui-icon-refresh").click()
+				$("#spinnerId").hide();
+				// Recent change that returns the new status / error / success
+				if(typeof data === 'object' && data.errors && data.errors.length > 0) {
+					$("#messageId").html(data.errors.join('<br/>'));
+				} else {
+					// The UI is expecting a string
+					$("#messageId").html(data);
+				}
+				$(".ui-icon-refresh").click();
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				$("#spinnerId").hide()
