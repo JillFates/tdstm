@@ -71,4 +71,25 @@ class ApplicationListPage extends Page {
     def clickOnCreateButton(){
         waitFor { alCreateAppBtn.click() }
     }
+
+    def filterByName(name){
+        waitFor {alNameFilter.displayed}
+        alNameFilter = name
+    }
+
+    def getFirstAssetRowName(){
+        waitFor{alFirstAppName.text().trim()}
+    }
+
+    def getRowsSize(){
+        alGridRows.size()
+    }
+
+    def clickOnFirstAppName(){
+        waitFor{alFirstAppName.click()}
+    }
+
+    def clickOnFirstAppCloneActionButton(){
+        waitFor{alFirstAppClone.click()}
+    }
 }
