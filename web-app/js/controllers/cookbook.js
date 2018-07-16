@@ -994,7 +994,9 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 		params.rand = tdsCommon.randomString(16);
 		cookbookService.getTaskBatchInfo(params, function(data){
 			log.info('Success on getting Task Batch Info');
-			scope.tasks.activeTaskBatch = data.data.taskBatch;
+			if (data.status !== 'error') {
+				scope.tasks.activeTaskBatch = data.data.taskBatch;
+			}
 			scope.tasks.show.completed = ((scope.tasks.activeTaskBatch != null) && (scope.tasks.activeTaskBatch.status == "Completed"));
 		}, function(){
 			scope.tasks.activeTaskBatch = null;
