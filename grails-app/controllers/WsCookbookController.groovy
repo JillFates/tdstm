@@ -152,7 +152,8 @@ class WsCookbookController implements ControllerMethods {
 	@HasPermission(Permission.RecipeView)
 	def groups() {
 		GroupCommand group = populateCommandObject(GroupCommand)
-		def groups = cookbookService.getGroups(group.recipeVersionId, group.context, group.sourceCode)
+		validateCommandObject(group)
+		def groups = cookbookService.getGroups(group.recipeVersionId, group.contextType, group.sourceCode)
 		renderSuccessJson(groups: groups)
 	}
 
