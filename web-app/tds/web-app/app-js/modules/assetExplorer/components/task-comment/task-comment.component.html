@@ -12,9 +12,14 @@
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
 			<label class="pad-top-2 pad-left-10 mar-bottom-3">Tasks and Comments ({{dataGridTaskCommentOnHelper.gridData.data.length}})</label>
 
-			<label class="form-check-label aligned-label" for="showAll">
-				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAll" id="showAll" name="showAll" type="checkbox" (change)="reloadGrid()">
+			<label class="form-check-label aligned-label" for="showAllTasks">
+				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadGrid()">
 				View All Tasks
+			</label>
+
+			<label class="form-check-label aligned-label" for="showAllComments">
+				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadGrid()">
+				View All Comments
 			</label>
 
 			<label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">

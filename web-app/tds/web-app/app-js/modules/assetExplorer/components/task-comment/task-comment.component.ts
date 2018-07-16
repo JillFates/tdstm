@@ -31,7 +31,8 @@ export class TaskCommentComponent implements OnInit {
 	private modalType = ModalType;
 	private viewUnpublished = false;
 
-	private showAll: boolean;
+	private showAllTasks: boolean;
+	private showAllComments: boolean;
 	private comments: any[] = [];
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
@@ -39,7 +40,8 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.showAll = false;
+		this.showAllTasks = false;
+		this.showAllComments = false;
 		this.getAllComments();
 	}
 
@@ -60,11 +62,18 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		return this.comments
-			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
-			.filter(comment => this.showAll
-				|| (comment.commentInstance.commentType === 'issue' && comment.commentInstance.status !== 'Completed')
-				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
+		const publishedFiltered =  this.comments
+			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished);
+
+		const tasks = publishedFiltered
+			.filter(comment => comment.commentInstance.commentType === 'issue')
+			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
+
+		const comments = publishedFiltered
+			.filter(comment => comment.commentInstance.commentType === 'comment')
+			.filter(comment => this.showAllComments || !comment.commentInstance.isResolved);
+
+		return [...tasks, ...comments];
 	}
 
 	public getAssignedTo(comment): any {
