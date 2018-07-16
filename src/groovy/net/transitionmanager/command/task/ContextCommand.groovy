@@ -12,6 +12,9 @@ class ContextCommand {
 	Long eventId
 	List <Long> tag = []
 	Boolean and = true
+	Boolean deletePrevious
+	Boolean useWIP
+	Boolean autoPublish
 
 	static constraints = {
 		eventId nullable: true

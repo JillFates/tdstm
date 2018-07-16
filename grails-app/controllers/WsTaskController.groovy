@@ -58,8 +58,7 @@ class WsTaskController implements ControllerMethods {
 	def generateTasks() {
 		ContextCommand context = populateCommandObject(ContextCommand)
 		validateCommandObject(context)
-		def result = taskService.initiateCreateTasksWithRecipe(context,
-			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
+		def result = taskService.initiateCreateTasksWithRecipe(context)
 		renderSuccessJson(jobId: result.jobId)
 	}
 
