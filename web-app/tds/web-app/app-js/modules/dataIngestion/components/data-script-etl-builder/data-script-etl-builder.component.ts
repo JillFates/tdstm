@@ -33,7 +33,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		sample: false,
 		transform: false,
 	};
-	private script: string;
+	private script = '';
 	private filename: string;
 	private isWindowMaximized = false;
 	private initialWindowStyle = null;
