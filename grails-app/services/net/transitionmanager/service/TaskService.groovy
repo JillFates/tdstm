@@ -36,6 +36,7 @@ import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.task.ContextCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
@@ -65,7 +66,6 @@ import java.text.DateFormat
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
-
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -1318,6 +1318,7 @@ class TaskService implements ServiceMethods {
 	* @return Map [errMsg, stepTask]
 	*/
    def createTaskBasedOnWorkflow(Map args){
+	   //TODO check if generating by tag and eliminate est dates for tag This currently call from moveBundleController...
 	   def errMsg = ""
 	   def stepTask = new AssetComment(
 			   comment: "$args.workflow.code${args.assetEntity ? '-' + args.assetEntity?.assetName:''}",
@@ -1625,9 +1626,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(Long contextId, Long recipeId, Boolean deletePrevious,
-	                                  Boolean useWIP, Boolean publishTasks) {
-
+	Map initiateCreateTasksWithRecipe(ContextCommand context, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
 		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
@@ -1637,7 +1636,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Find the Recipe Version that the user selected
-		Recipe recipe = getRequired(Recipe, recipeId, 'The selected recipe not found')
+		Recipe recipe = getRequired(Recipe, context.recipeId, 'The selected recipe not found')
 		if (recipe.projectId != currentProjectId) {
 			throw new UnauthorizedException('The recipe version submitted is not associated with current project')
 		}
@@ -1658,7 +1657,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		def contextObj = recipe.context()
+		def contextObj = context
 
 		if (! contextObj) {
 			throw new IllegalArgumentException('Referenced context was not found')
@@ -4215,7 +4214,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.debug "findAllAssetsWithFilter: excluding group(s) [$filter.exclude] that has ${excludes.size()} assets"
 			}
 
-			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
+			where = SqlUtil.appendToWhere(where, 'ForPlanning = true')
 
 			String join = ''
 
