@@ -1835,7 +1835,7 @@ tds.cookbook.controller.RecipeEditorLogsController.$inject = ['$scope', '$state'
 /********************************************************************************
  * Recipe Editor Groups controller
  */
-tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, stateParams, log, timeout, utils, cookbookService) {
+tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $http, stateParams, log, timeout, utils, cookbookService) {
 
 	scope.recipeId = stateParams.recipeId;
 
@@ -1869,23 +1869,27 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		}
 		var data = {
 			recipeVersionId: recVerId,
-			contextId: scope.contexts.contextId,
-			contextType: scope.currentSelectedRecipe.context,
+			context: JSON.parse(scope.currentSelectedRecipe.context),
 			sourceCode: source
 		};
-		dataToSend = $.param(data);
-		cookbookService.getGroups(dataToSend, function(data){
+
+		if(window.Prototype) {
+			delete Object.prototype.toJSON;
+			delete Array.prototype.toJSON;
+			delete Hash.prototype.toJSON;
+			delete String.prototype.toJSON;
+		}
+
+		$http.post(utils.url.applyRootPath('/ws/cookbook/groups?rand='), JSON.stringify(data), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
 			log.info('Success on getting Groups');
-
 			if (data && data.data) {
-                scope.groups.groupsArray = data.data.groups;
-                scope.groups.updateGrid();
-                loadAssets([]);
-                timeout(function(){
-                    scope.enabledGridSelection = true;
-                }, 200)
+				scope.groups.groupsArray = data.data.groups;
+				scope.groups.updateGrid();
+				loadAssets([]);
+				timeout(function(){
+					scope.enabledGridSelection = true;
+				}, 200)
 			}
-
 		}, function(){
 			log.warn('Error on getting Groups');
 			scope.groups.groupsArray = [{'message': 'Unexpected error', 'context': 'none'}];
@@ -1979,7 +1983,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 
 }
 
-tds.cookbook.controller.RecipeEditorGroupsController.$inject = ['$scope', '$state', '$stateParams', '$log', '$timeout', 'utils', 'cookbookService'];
+tds.cookbook.controller.RecipeEditorGroupsController.$inject = ['$scope', '$state', '$http', '$stateParams', '$log', '$timeout', 'utils', 'cookbookService'];
 
 
 /********************************************************************************
