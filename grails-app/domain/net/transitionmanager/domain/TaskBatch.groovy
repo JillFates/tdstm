@@ -1,9 +1,6 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.Application
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
-
 /**
  * Represents a batch that is created when a recipe is executed and tasks are generated. This will provide
  * a way of tracking, updating and possibly deleting tasks that were generate in the cookbook.
@@ -11,9 +8,7 @@ import com.tdssrc.grails.TimeUtil
  * @author John Martin
  */
 class TaskBatch {
-
-	ContextType contextType
-	Integer contextId
+	Long contextId
 	String status
 
 	RecipeVersion recipeVersionUsed       // the recipeVersion used to generate the batch of tasks
@@ -30,6 +25,7 @@ class TaskBatch {
 	Date lastUpdated
 
 	static constraints = {
+		contextId nullable: true
 		dateCreated nullable: true
 		lastUpdated nullable: true
 		recipe nullable: true
@@ -62,23 +58,13 @@ class TaskBatch {
 		executeUpdate('delete AssetComment where taskBatch=?', [this])
 	}
 
-	/**
-	 * Get the name of the object for which the context references
-	 */
-	String contextName() {
-		switch (contextType) {
-			case ContextType.A: return Application.get(contextId)?.assetName ?: ''
-			case ContextType.B: return MoveBundle.get(contextId)?.name ?: ''
-			case ContextType.E: return MoveEvent.get(contextId)?.name ?: ''
-			default:            return ''
-		}
-	}
+
 
 	/**
 	 * Returns informational representation of the task formated as Context + Context Object + batch (# tasks)
 	 * (e.g. Application VSphere 5.0 Cluster - batch (30 tasks) )
 	 */
 	String toString() {
-		(recipe ? recipe.context + ' ' : '') + contextName() + ' - batch of ' + taskCount + ' tasks'
+		(recipe ? recipe.context + ' ' : '') + ' - batch of ' + taskCount + ' tasks'
 	}
 }

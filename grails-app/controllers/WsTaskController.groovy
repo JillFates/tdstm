@@ -61,8 +61,8 @@ class WsTaskController implements ControllerMethods {
 	 * Generates a set of tasks based on a recipe
 	 */
 	@HasPermission(Permission.RecipeGenerateTasks)
-	def generateTasks() {
-		def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
+	def generateTasks(Long contextId, Long recipeId) {
+		def result = taskService.initiateCreateTasksWithRecipe(contextId, recipeId,
 			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
 		renderSuccessJson(jobId: result.jobId)
 	}

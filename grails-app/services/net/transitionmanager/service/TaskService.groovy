@@ -1604,9 +1604,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param contextId - the context id of the context that was used to generate the task batch
 	 * @return the TaskBatch record if found otherwise null
 	 */
-	List findTaskBatchesForRecipeContext(Recipe recipe, Integer contextId) {
+	List findTaskBatchesForRecipeContext(Recipe recipe, Integer eventId) {
 		TaskBatch.createCriteria().list {
-			eq('contextId', contextId)
+			eq('contextId', eventId)
 			eq('contextType', recipe.asContextType())
 			eq('recipe', recipe)
 		}
@@ -1625,7 +1625,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(String contextId, String recipeId, Boolean deletePrevious,
+	Map initiateCreateTasksWithRecipe(Long contextId, Long recipeId, Boolean deletePrevious,
 	                                  Boolean useWIP, Boolean publishTasks) {
 
 		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
@@ -1635,12 +1635,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (publishTasks) {
 			securityService.requirePermission Permission.TaskPublish
 		}
-
-		// Validate that we have a valid recipeVersionId and is associated with the user's project
-		if (!contextId)
-			throw new IllegalArgumentException('Please select a context before attempting to generate')
-		if (!contextId.isInteger())
-			throw new IllegalArgumentException('An invalid context id was recieved')
 
 		// Find the Recipe Version that the user selected
 		Recipe recipe = getRequired(Recipe, recipeId, 'The selected recipe not found')
@@ -1664,14 +1658,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		def contextType = recipeVersion.recipe.asContextType()
-		Integer cid = NumberUtil.toInteger(contextId)
-		def contextObj = getContextObject(contextType, cid)
+		def contextObj = recipe.context()
+
 		if (! contextObj) {
 			throw new IllegalArgumentException('Referenced context was not found')
 		}
-		if (contextObj.projectId != currentProjectId) {
-			throw new UnauthorizedException('Referenced context is not associated with current project')
+
+		if (contextObj.eventId ) {
+			MoveEvent event = getRequired(MoveEvent, contextObj.eventId)
+			if (event.project != currentProjectId) {
+				throw new UnauthorizedException('Referenced context is not associated with current project')
+			}
 		}
 
 		def assets = getAssocAssets(contextObj)
@@ -1679,23 +1676,25 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new EmptyResultException("The selected event doesn't have associated bundles")
 		}
 
-		// Delete previous task batches now if the user specified to delete them
-		def taskBatches = findTaskBatchesForRecipeContext(recipe, cid)
-		if (taskBatches) {
-			if (deletePrevious) {
-				taskBatches*.delete()
-			} else {
-				throw new RuntimeException('Tasks already exist for this recipe and context')
+		if(contextId) {
+			// Delete previous task batches now if the user specified to delete them
+			def taskBatches = findTaskBatchesForRecipeContext(recipe, contextId)
+			if (taskBatches) {
+				if (deletePrevious) {
+					taskBatches*.delete()
+				} else {
+					throw new RuntimeException('Tasks already exist for this recipe and context')
+				}
 			}
 		}
 
-		TaskBatch tb = createTaskBatch(contextType, cid, recipe, recipeVersion, publishTasks)
+		TaskBatch tb = createTaskBatch(contextId, recipe, recipeVersion, publishTasks)
 
 		String key = taskBatchKey(tb.id)
 		progressService.create(key, 'Pending')
 
 		// Kickoff the background job to generate the tasks
-		def jobName = 'TM-GenerateTasks-' + currentProjectId + '-' + contextType + '-' + cid
+		def jobName = "TM-GenerateTasks-${currentProjectId}-${recipe.id}"
 		try {
 			log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks $jobName"
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
@@ -1703,6 +1702,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			trigger.jobDataMap.taskBatchId = tb.id
 			trigger.jobDataMap.publishTasks = publishTasks
 			trigger.jobDataMap.tries = 0
+			trigger.jobDataMap.context = contextObj
 			trigger.setJobName('GenerateTasksJob')
 			trigger.setJobGroup('tdstm-generate-tasks')
 			quartzScheduler.scheduleJob(trigger)
@@ -1724,10 +1724,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param isPublished - a flag that indicates that the tasks generated for the batch have been published
 	 * @return the TaskBatch that was created
 	 */
-	private TaskBatch createTaskBatch(ContextType contextType, Integer contextId,
-	                                  Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
+	private TaskBatch createTaskBatch(Integer eventId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
 		new TaskBatch(project: securityService.loadUserCurrentProject(), createdBy: securityService.loadCurrentPerson(),
-				recipe: recipe, recipeVersionUsed: recipeVersion, contextType: contextType, contextId: contextId,
+				recipe: recipe, recipeVersionUsed: recipeVersion, contextId: eventId,
 				status: "Pending", isPublished: isPublished).save(failOnError: true)
 	}
 
@@ -1741,66 +1740,23 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Returns the object (MoveEvent, MoveBundle or Application) for a given Context Type and ID
-	 * @param contextType - the type of context to fetch
-	 * @param contextId - the record id number of the context
-	 * @param the context object
-	 */
-	def getContextObject(ContextType contextType, int contextId) {
-		switch (contextType) {
-			case ContextType.E: return MoveEvent.get(contextId)
-			case ContextType.B: return MoveBundle.get(contextId)
-			// Get assets that it depends on and supports from AssetDependency along with the application
-			case ContextType.A: return Application.get(contextId)
-			default:
-				def msg = "Unsupported ContextType $contextType in getContextObject()"
-				log.error msg
-				throw new RuntimeException(msg)
-		}
-	}
-
-	/**
-	 * Used to find assets associated with a given contextType and contextId
-	 * @param contextType - the type of context (e.g. MoveEvent, MoveBundle or Application)
-	 * @param contextId - the object id # to reference the context
-	 * @return The list of assets associated to the particular context
-	 */
-	List<AssetEntity> getAssocAssets(ContextType contextType, int contextId) {
-		return getAssocAssets(getContextObject(contextType, contextId))
-	}
-
-	/**
 	 * Used to find assets associated with a given context object
 	 * @param context - the context object to find associated assets for
 	 * @return list of assets
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
-		def bundleIds
+		if (contextObj.tag) {
+			return TagAsset.where { tag.id in contextObj.tag && asset.moveBundle.useForPlanning == true }.projections {
+				property 'asset'
+			}.list()
+		} else {
+			List bundleIds = getBundleIds(contextObj)
 
-		// Load Asset list based on the context
-		switch (contextObj) {
-			case MoveEvent:
-				bundleIds = contextObj.moveBundles*.id
-				break
-			case MoveBundle:
-				bundleIds = [contextObj.id]
-				break
-			case Application:
-				// Get assets that it depends on and supports from AssetDependency along with the application
-				// TODO : need to load the assets associate to the application as supports or requires
-				log.error "getAssocAssets called with Application context but method not fully implemented"
-				assets << contextObj
-				break
-			default:
-				// log error for unhandled case with the context.class
-				break
-		}
-
-		if (bundleIds) {
-			AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds)', [bundleIds: bundleIds])
-		}
-		else {
-			[]
+			if (bundleIds) {
+				AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
+			} else {
+				[]
+			}
 		}
 	}
 
@@ -1905,7 +1861,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = getContextObject(taskBatch.contextType, (int)taskBatch.contextId)
+		def contextObj = taskBatch.recipe.context()
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
@@ -1914,22 +1870,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			bundleIds = assets*.moveBundle*.id.unique()
 		}
 
-		MoveEvent moveEvent
-
-		switch (contextObj) {
-			case MoveEvent:
-				moveEvent = contextObj
-				break
-			case MoveBundle:
-				moveEvent = contextObj.moveEvent
-				break
-			default:
-				bailOnTheGeneration('Task Generation presently does not support the context type ' + contextObj.class)
+		MoveEvent event = null
+		if(contextObj.eventId) {
+			event = getRequired(MoveEvent, contextObj.eventId)
+			settings.event = event
 		}
+
+
 
 		// Determine the start/completion times for the event
 		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
-		def eventTimes = moveEvent ? moveEvent.getEventTimes() : [start:null, completion:null]
+		def eventTimes = event ? event.getEventTimes() : [start:null, completion:null]
 
 		// TODO : Need to change out the categories to support all ???
 		def categories = GormUtil.asQuoteCommaDelimitedString(ACC.moveDayCategories)
@@ -2068,16 +2019,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def recipeTasks 	// The list of Tasks within the recipe
 		def taskSpecIdList 	// The list of the task spec id #s
 		TimeDuration elapsed
-		def failed
-
-		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
-		def noSuccessorsSql = "SELECT t.asset_comment_id AS id \
-			FROM asset_comment t \
-			LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id \
-			WHERE t.move_event_id=$moveEvent.id AND d.asset_comment_id is null \
-			AND t.auto_generated=true \
-			AND t.category IN ($categories) "
-		// log.debug("noSuccessorsSql: $noSuccessorsSql")
 
 		try {
 			recipeVersion = taskBatch.recipeVersionUsed
@@ -2192,7 +2133,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if (predecessor.containsKey('required')) {
 						if (! (predecessor.required instanceof Boolean)) {
 							msg = "TaskSpec ($taskSpec.id) property 'predecessor.required' has invalid value ($predecessor.required) "
-							log.error("$msg for Event $moveEvent")
+							log.error("$msg for Event $event")
 							throw new RuntimeException(msg)
 						} else {
 							isRequired = predecessor.required
@@ -2202,7 +2143,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if (predecessor.containsKey('ignore')) {
 						if (! (predecessor.ignore instanceof Boolean)) {
 							msg = "TaskSpec ($taskSpec.id) property 'predecessor.ignore' has invalid value ($predecessor.ignore), options true|false "
-							log.error("$msg for Event $moveEvent")
+							log.error("$msg for Event $event")
 							throw new RuntimeException(msg)
 						} else {
 							ignorePred = predecessor.ignore
@@ -2221,7 +2162,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if (predecessor.containsKey('inverse')) {
 						if (! (predecessor.inverse instanceof Boolean)) {
 							msg = "TaskSpec ($taskSpec.id) property 'predecessor.inverse' has invalid value ($predecessor.inverse), options: true | false "
-							log.error("$msg for Event $moveEvent")
+							log.error("$msg for Event $event")
 							throw new RuntimeException(msg)
 						} else {
 							isInversed = predecessor.inverse
@@ -2287,18 +2228,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [
-					type:stepType,
-					isRequired:isRequired,
-					isInversed:isInversed,
-					deferPred:deferPred, deferSucc:deferSucc,
-					gatherPred:gatherPred, gatherSucc:gatherSucc,
-					eventTimes:eventTimes,
-					clientId:project.client.id,
-					taskBatch:taskBatch,
-					publishTasks:publishTasks,
-					apiAction:apiAction,
-					teamCodes: teamCodeList,
-					apiAction:apiAction
+					type        : stepType,
+					isRequired  : isRequired,
+					isInversed  : isInversed,
+					deferPred   : deferPred, deferSucc: deferSucc,
+					gatherPred  : gatherPred, gatherSucc: gatherSucc,
+					eventTimes  : eventTimes,
+					clientId    : project.client.id,
+					taskBatch   : taskBatch,
+					publishTasks: publishTasks,
+					apiAction   : apiAction,
+					teamCodes   : teamCodeList,
+					apiAction   : apiAction,
+					event       : event
 				]
 				log.debug "##### settings: $settings"
 
@@ -2322,7 +2264,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						isGroupingSpec = true
 
-						newTask = createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, workflow)
+						newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow)
 						def prevMilestone = latestMilestone
 						latestMilestone = newTask
 
@@ -2392,7 +2334,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							bailOnTheGeneration(msg)
 						}
 
-						newTask = createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, null)
+						newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null)
 
 						// Indicate that the task is funnelling so that predecessor tasks' assets are moved through the task
 						newTask.setTmpIsFunnellingTask(true)
@@ -2420,7 +2362,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 							// RollCall Tasks for each staff involved in the Move Event
 							case 'rollcall':
-								def rcTasks = createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings)
+								def rcTasks = createRollcallTasks(whom, recipeId, taskSpec, settings)
 								if (rcTasks) {
 									rcTasks.each { rct ->
 										taskList[rct.id] = rct
@@ -2453,6 +2395,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								taskSpecTasks[taskSpec.id] = []
 
 								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions, project)
+
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each { t ->
@@ -2500,7 +2443,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						assetsForTask?.each { asset ->
 							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 
-							newTask = createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, workflow, asset)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow, asset)
 
 							tasksNeedingPredecessors << newTask
 							taskSpecTasks[taskSpec.id] << newTask
@@ -2534,7 +2477,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						genTitles.each { gt ->
 							// Replace the potential title:[array] with just the current title
 							taskSpec.title = gt
-							newTask = createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, null, null)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null, null)
 
 							taskSpecTasks[taskSpec.id] << newTask
 
@@ -3579,14 +3522,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param asset - The asset associated with the task if there appropriate
 	 * @return AssetComment (aka Task)
 	 */
-	def createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, workflow=null, asset=null) {
+	def createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow=null, asset=null) {
 		def task = new AssetComment(
 			taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 			taskBatch: settings.taskBatch,
 			isPublished: settings.publishTasks,
 			sendNotification: taskSpec.sendNotification ?: false,
 			project: moveEvent.project,
-			moveEvent: moveEvent,
+			moveEvent: settings.event,
 			assetEntity: asset,
 			commentType: AssetCommentType.TASK,
 			status: ACS.READY,
@@ -3690,7 +3633,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param Map collection of the various taskSpec parameters
 	 * @param Integer - Used to count of the number of recursive iterations that occur
 	 * @return TaskDependency
-	 * @throws RuntimeError if unable to save the dependency
+	 * @throws RuntimeException if unable to save the dependency
 	 */
 	def createTaskDependency(predecessor, successor, taskList, assetsLatestTask, settings, out, count=0) {
 
@@ -4170,27 +4113,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
 
-			// Now find the bundles if the contextObject had an event id, but not bundle ids
-			if (!contextObject.bundleId && contextObject.eventId) {
-				List bundleIds = MoveBundle.where{moveEvent.id == contextObject.eventId}.projections {
-				    property 'id'
-				}.list()
-
-				// See if they are trying to filter on the Bundle Name
-				if (filter?.asset?.containsKey('bundle')) {
-					def moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
-					if (moveBundle) {
-						bundleIds = [moveBundle.id]
-					} else {
-						throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
-					}
-				}
-
-				map.bIds = bundleIds
-			} else if (contextObject.bundleId) {
-				// Pretty simple, we're just searching the current bundle
-				map.bIds = contextObject.bundleId
-			}
+			map.bIds = getBundleIds(contextObject, project, filter)
 
 			// log.info "bundleIds=[$bundleIds]"
 
@@ -4292,6 +4215,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.debug "findAllAssetsWithFilter: excluding group(s) [$filter.exclude] that has ${excludes.size()} assets"
 			}
 
+			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
+
+			String join = ''
+
+			if (contextObject.tag) {
+				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
+				map.tags = contextObject.tag
+				join = 'left outer join a.tagAssets ta left outer join ta.tag t'
+			}
+
 			// Assemble the SQL and attempt to execute it
 			try {
 				switch(queryOn) {
@@ -4340,12 +4273,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						if(contextObject.tag){
-							String tagOp = contextObject.and ? '&' : '|'
-							String tagFilter = contextObject.tag.join(tagOp)
-//TODO tap into what Augusto did for asset filtering...
+							sb.append('left outer join a.tagAssets ta left outer join ta.tag t')
 						}
 
 						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${where ? ' and ' + where : ''}")
+
+						//TODO tap into what Augusto did for asset filtering...
+
 						sql = sb.toString()
 
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
@@ -4356,7 +4290,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions(['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'])
 
-						sql = "from Application a where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "select a from Application a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break
@@ -4364,7 +4298,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['dbFormat','size'])
-						sql = "from Database a where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "select a from Database a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break
@@ -4372,7 +4306,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['fileFormat','size', 'scale', 'LUN'])
-						sql = "from Files a where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "select a from Files a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break
@@ -4495,6 +4429,30 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return assets
 	}
 
+	List getBundleIds(contextObject, project = null, filter = null) {
+		// Now find the bundles if the contextObject had an event id, but not bundle ids
+		if (!contextObject.bundleId && contextObject.eventId) {
+			List bundleIds = MoveBundle.where { moveEvent.id == contextObject.eventId }.projections {
+				property 'id'
+			}.list()
+
+			// See if they are trying to filter on the Bundle Name
+			if (project && filter?.asset?.containsKey('bundle')) {
+				def moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
+				if (moveBundle) {
+					bundleIds = [moveBundle.id]
+				} else {
+					throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
+				}
+			}
+
+			return bundleIds
+		} else if (contextObject.bundleId) {
+			// Pretty simple, we're just searching the current bundle
+			return contextObject.bundleId
+		}
+	}
+
 	/**
 	 * Generates action tasks that optionally linking assets as predecessors. It presently supports (location, room, rack,
 	 * cart and truck) groupings. It will create a task for each unique grouping and inject the list assets in the group into the associatedAssets
@@ -4527,26 +4485,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def tasksToCreate = []	// List of tasks to create
 
 		// Identify the MoveEvent if possible
-		def moveEvent
-		switch (contextObj) {
-			case MoveEvent:
-				moveEvent = contextObj
-				break
-			case MoveBundle:
-				moveEvent = contextObj.moveEvent
-				break
-			case Application:
-				moveEvent = contextObj.moveBundle?.moveEvent
-				break
-
-			default:
-				// log error for unhandled case with the context.class
-				msg = "createAssetActionTasks: called with unsupported context type ${contextObj.getClass().name} - $contextObj"
-				log.error msg
-				throw new RuntimeException(msg)
-				break
-		}
-
+		MoveEvent moveEvent = settings.event
 
 		// We will put all of the assets into the array. Below the unique method will be invoke to create a subset of entries
 		// for which we'll create tasks from.
@@ -4661,7 +4600,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					taskBatch: settings.taskBatch,
 					isPublished: settings.publishTasks,
 					sendNotification: taskSpec.sendNotification ?: false,
-					project: moveEvent.project,
+					project: project,
 					moveEvent: moveEvent,
 					commentType: AssetCommentType.TASK,
 					status: ACS.READY,
@@ -4754,10 +4693,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param category
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	private List createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings) {
+	private List createRollcallTasks(whom, recipeId, taskSpec, settings) {
 
 		def taskList = []
-		def staffList = MoveEventStaff.findAllByMoveEvent(moveEvent, [sort:'person'])
+		def staffList = MoveEventStaff.findAllByMoveEvent(settings.moveEvent, [sort:'person'])
 		log.info("createRollcallTasks: Found ${staffList.size()} MoveEventStaff records")
 
 		def lastPerson = (staffList && staffList[0]) ? staffList[0].person : null
@@ -4778,8 +4717,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				isPublished: settings.publishTasks,
 				sendNotification: taskSpec.sendNotification ?: false,
 				comment: title,
-				project: moveEvent.project,
-				moveEvent: moveEvent,
+				project: settings.moveEvent.project,
+				moveEvent: settings.moveEvent,
 				commentType: AssetCommentType.TASK,
 				status: ACS.READY,
 				createdBy: whom,
@@ -4796,7 +4735,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (taskSpec.containsKey('category')) task.category = taskSpec.category
 
 			if (! (task.validate() && task.save(flush:true))) {
-				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $moveEvent"
+				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $settings.moveEvent"
 				throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
 			}
 
@@ -5271,7 +5210,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param includeLogs - whether to include the logs information or not
 	 * @return A taskBatch map if found or null
 	 */
-	def findTaskBatchByRecipeAndContext(recipeId, contextId, includeLogs) {
+	def findTaskBatchByRecipeAndContext(recipeId, contextId, includeLogs) {//context id become event Id
 		controllerService.getRequiredProject()
 
 		Recipe recipe = getRequired(Recipe, recipeId)
