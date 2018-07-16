@@ -631,6 +631,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			if (scope.contexts && scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
 				dataToSend.context.eventId = scope.contexts.selectedEvent.id;
 			}
+
+			// Partially Remove Prototype
 			if(window.Prototype) {
 				delete Array.prototype.toJSON;
 			}
@@ -1037,16 +1039,8 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 	// Generate Tasks button clicked
 	//
 	scope.tasks.generateTask = function(e){
-		var idSelected = null;
 		var	dataToSend;
-		switch(scope.currentSelectedRecipe.context) {
-			case 'Event':
-				idSelected = scope.contexts.selectedEvent.id;
-				break;
-			default:
-		}
 
-		scope.tasks.generateOpts.contextId = idSelected;
 		scope.tasks.generateOpts.recipeId = stateParams.recipeId;
 
 		dataToSend = $.param(scope.tasks.generateOpts);
@@ -1065,17 +1059,24 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 			return tagIds;
 		};
 
-		/* var innerContext = JSON.parse(scope.currentSelectedRecipe.context);
-		var postData = {
-			recipeVersionId: recVerId,
-			context: {
-				eventId: innerContext.eventId,
-				tag: getTagsIds(innerContext.tag)
-			},
-			sourceCode: source
-		}; */
-
 		if (callCenerateTask) {
+
+			var postData = {
+				recipeId: scope.tasks.generateOpts.recipeId ,
+				recipeVersionId: scope.tasks.generateOpts.recipeVersionId ,
+				useWIP: scope.tasks.generateOpts.useWIP ,
+				autoPublish: scope.tasks.generateOpts.autoPublish ,
+				deletePrevious: scope.tasks.generateOpts.deletePrevious ,
+				eventId: scope.contexts.selectedEvent.id,
+				tag: getTagsIds(scope.contexts.assetSelector.tag)
+			};
+			// Partially Remove Prototype
+			if(window.Prototype) {
+				delete Object.prototype.toJSON;
+				delete Array.prototype.toJSON;
+				delete Hash.prototype.toJSON;
+				delete String.prototype.toJSON;
+			}
 
 			$http.post(utils.url.applyRootPath('/ws/task/generateTasks?rand='), JSON.stringify(postData), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
 				log.info('Success on generating task');
@@ -1888,6 +1889,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 			source = scope.editor.selectedRWip.sourceCode;
 		}
 
+		// Partially Remove Prototype
 		if(window.Prototype) {
 			delete Object.prototype.toJSON;
 			delete Array.prototype.toJSON;
