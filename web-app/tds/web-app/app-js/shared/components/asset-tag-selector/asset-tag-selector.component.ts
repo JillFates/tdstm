@@ -16,6 +16,7 @@ declare var jQuery: any;
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('tagList') tagList: any;
+	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	// Model

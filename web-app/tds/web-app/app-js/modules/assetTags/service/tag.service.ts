@@ -122,6 +122,18 @@ export class TagService {
 	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
 		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
 			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET - Get the list of all tags linked/associated to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	getAssetTags(assetId: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.tagURL}/asset/${assetId}`)
+			.map((res: Response) => {
 				let result = res.json();
 				if (result.data) {
 					let data = result.data.map(item => {
@@ -142,11 +154,31 @@ export class TagService {
 	}
 
 	/**
-	 * GET - Get the list of all tags linked/associated to a particular asset.
+	 * POST - Associate tags to a particular asset.
 	 * @returns {Observable<ApiResponseModel>}
 	 */
-	getAssetTags(assetId: number): Observable<ApiResponseModel> {
-		return this.http.get(`${this.tagURL}/asset/${assetId}`)
+	createAssetTags(assetId: number, tagIds: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			'tagIds': tagIds,
+			'assetId': assetId
+		};
+		return this.http.post(`${this.tagURL}/asset`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * DELETE - Associate tags to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	deleteAssetTags(assetId: number, tagsIds: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			tagIds: tagsIds,
+			assetId: assetId
+		};
+		return this.http.delete(`${this.tagURL}/asset`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})

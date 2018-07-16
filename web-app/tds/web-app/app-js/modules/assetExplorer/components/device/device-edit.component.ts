@@ -18,6 +18,8 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {TagService} from '../../../assetTags/service/tag.service';
 
 declare var jQuery: any;
 
@@ -31,7 +33,8 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		]
 	}) class DeviceEditComponent implements OnInit {
 
-		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected assetTagsModel: any = {tags: metadata.assetTags};
+		protected newAssetTagsSelection: any = {tags: []};
 		protected tagList: Array<TagModel> = metadata.tagList;
 		private isDependenciesValidForm = true;
 		private dateFormat: string;
@@ -52,7 +55,8 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 					private preference: PreferenceService,
 					private assetExplorerService: AssetExplorerService,
 					private dialogService: UIDialogService,
-					private notifierService: NotifierService) {
+					private notifierService: NotifierService,
+					private tagService: TagService) {
 
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
@@ -65,7 +69,8 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 * @param $event
 		 */
 		protected onTagValueChange($event: any): void {
-			console.log($event);
+			this.newAssetTagsSelection.tags = $event.tags;
+			console.log(this.newAssetTagsSelection);
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -205,12 +210,34 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 				}
 			});
 
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+					this.saveAssetTags();
+				}
 			});
+		}
+
+		private saveAssetTags(): void {
+			let tagsToAdd = {tags: []};
+			let tagsToDelete = {...this.assetTagsModel};
+			this.newAssetTagsSelection.tags.forEach((asset: TagModel) => {
+				let foundIndex = this.assetTagsModel.tags.findIndex( item => item.id === asset.id);
+				if (foundIndex === -1) {
+					tagsToAdd.tags.push(asset);
+				} else {
+					// tag remains
+					tagsToDelete.tags.splice(foundIndex, 1);
+				}
+			});
+			console.log('to add', tagsToAdd);
+			console.log('to delete', tagsToDelete);
+			this.tagService.createAssetTags(this.model.assetId, tagsToAdd.tags.map( item => item.id) )
+				.subscribe(result => {
+					this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				}, error => console.log('error when saving asset tags', error));
 		}
 
 		/**

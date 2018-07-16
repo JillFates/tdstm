@@ -9,10 +9,11 @@
             Tags
         </label>
     </td>
-    <td nowrap="nowrap" class="N" colspan="4">
+    <td nowrap="nowrap" class="N" colspan="7">
         <tds-asset-tag-selector *ngIf="tagList"
                                 [model]="assetTagsModel"
                                 [tagList]="tagList"
+                                [showSwitch]="false"
                                 (valueChange)="onTagValueChange($event)">
         </tds-asset-tag-selector>
     </td>
