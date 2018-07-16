@@ -1867,11 +1867,6 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		if (recVerId == null) {
 			source = scope.editor.selectedRWip.sourceCode;
 		}
-		var data = {
-			recipeVersionId: recVerId,
-			context: JSON.parse(scope.currentSelectedRecipe.context),
-			sourceCode: source
-		};
 
 		if(window.Prototype) {
 			delete Object.prototype.toJSON;
@@ -1879,6 +1874,24 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 			delete Hash.prototype.toJSON;
 			delete String.prototype.toJSON;
 		}
+
+		var getTagsIds = function(tags) {
+			var tagIds = [];
+			tags.each( function(a){
+				tagIds.push(new Number(a.id));
+			})
+			return tagIds;
+		}
+
+		var innerContext = JSON.parse(scope.currentSelectedRecipe.context);
+		var data = {
+			recipeVersionId: recVerId,
+			context: {
+				eventId: innerContext.eventId,
+				tag: getTagsIds(innerContext.tag)
+			},
+			sourceCode: source
+		};
 
 		$http.post(utils.url.applyRootPath('/ws/cookbook/groups?rand='), JSON.stringify(data), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
 			log.info('Success on getting Groups');
