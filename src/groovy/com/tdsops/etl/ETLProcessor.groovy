@@ -55,6 +55,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
+	 * Static variable name definition for script name
+	 */
+	static final String ETLScriptName = 'TDSETLScript'
+
+
+	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -105,8 +111,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	SelectedDomain selectedDomain
 	ETLFindElement currentFindElement
-
-	List<Map<String, String>> errors = []
 
 	/**
 	 * List of command that needs to be completed.
@@ -1256,25 +1260,44 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	@TimedInterrupt(600l)
 	Object execute(String script){
-		Object result
+		Object result = new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				defaultCompilerConfiguration())
+				.evaluate(script, ETLScriptName)
 
-		try {
-			errors.clear()
-			result = new GroovyShell(
-					this.class.classLoader,
-					this.binding,
-					defaultCompilerConfiguration())
-					.evaluate(script, 'ETLCustomScript')
-
-		} catch(Throwable exception) {
-			String str = exception.getStackTrace().toString()
-			def pattern = (str =~ /ETLCustomScript.(\d+)./)
-			errors.add([
-					message  : exception.getMessage(),
-					lineNumber: pattern[0][1]
-			])
-		}
 		return result
+	}
+
+	/**
+	 * Calculates an return error message and line number where the ocurred.<br>
+	 * If exception paramter is an instance of {@code MultipleCompilationErrorsException}
+	 * line number is calculated by {@code MultipleCompilationErrorsException#errorCollector}
+	 * and {@code SyntaxErrorMessage#cause#startLine}<br>
+	 * Otherwise, line number is calculated by {@code StackTraceElement#fileName} equals to
+	 * {@code ETLProcessor#ETLScriptName} <br>
+	 * Result map is returned as follow:
+	 * <pre>
+	 * return [
+	 *  message: '...',
+	 *  lineNumber: 4
+	 * ]
+	 * </pre>
+	 * @param exception an instance of {@code Throwable}
+	 * @return a Map with 2 fields: message and lineNumber
+	 */
+	static Map<String, ?> getErrotMessage(Throwable exception){
+
+		Map<String, ?> error = [:]
+		if(exception instanceof MultipleCompilationErrorsException){
+			error.message = exception.getMessage()
+			error.lineNumber = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}?.cause?.startLine
+		}  else{
+			error.message = exception.getMessage()
+			error.lineNumber = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+		}
+		return error
+
 	}
 
 	/**
@@ -1292,7 +1315,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		setUpProgressIndicator(script, progressCallback)
 		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ETLProcessor.class.name)
+			.evaluate(script, ETLScriptName)
 		return result
 	}
 

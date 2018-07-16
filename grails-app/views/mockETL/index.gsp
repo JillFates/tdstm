@@ -59,15 +59,11 @@
                     <textarea id="script" class="form-control" name="script" rows="${lineNumbers}" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
                 </div>
                 <br>
-                <g:if test="${errors}">
+                <g:if test="${error}">
                     <div class="alert alert-danger">
-                        <g:each in="${errors}" var="error">
-                            <th>
-                                Line ${error.lineNumber}: <strong>${error.message}</strong>
-                            </th>
-
-                        </g:each>
-
+                        <th>
+                            Line ${error.lineNumber}: <strong>${error.message}</strong>
+                        </th>
                     </div>
                 </g:if>
                 <br>

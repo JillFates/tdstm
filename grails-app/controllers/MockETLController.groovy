@@ -1,5 +1,4 @@
-  import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.StringAppendElement
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -11,8 +10,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
-import org.codehaus.groovy.control.ErrorCollector
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 @Slf4j(value = 'log', category = 'grails.app.controllers.MockETLController')
 @Secured('isAuthenticated()')
@@ -71,6 +68,9 @@ class MockETLController implements ControllerMethods {
 
 		String dataSet
 		String script
+		Map<String, ?> error
+
+		try {
 
 			String.mixin StringAppendElement
 
@@ -103,22 +103,26 @@ class MockETLController implements ControllerMethods {
 			etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
 			fileSystemService.deleteTemporaryFile(fileName)
 
-        [
-                dataSet             : dataSet,
-                script              : script?.trim(),
-                lineNumbers         : Math.max(script.readLines().size(), 10),
-                etlProcessor        : etlProcessor,
-                errors              : etlProcessor.errors,
-                availableMethods    : (etlProcessor?.availableMethods as JSON).toString(),
-                assetFields         : (etlProcessor?.assetFields as JSON).toString(),
-                logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.finalResult()?.domains as JSON),
-                dataScriptId        : params.dataScriptId,
-                providerName        : params.providerName,
-                dataScriptName      : params.dataScriptName,
-                filename            : params.filename
+		} catch( Throwable t){
+			error = ETLProcessor.getErrotMessage(t)
+		}
 
-        ]
+		[
+			dataSet         : dataSet,
+			script          : script?.trim(),
+			lineNumbers     : Math.max(script.readLines().size(), 10),
+			etlProcessor    : etlProcessor,
+			error           : error,
+			availableMethods: (etlProcessor?.availableMethods as JSON).toString(),
+			assetFields     : (etlProcessor?.assetFields as JSON).toString(),
+			logContent      : etlProcessor?.debugConsole?.content(),
+			jsonResult      : (etlProcessor?.finalResult()?.domains as JSON),
+			dataScriptId    : params.dataScriptId,
+			providerName    : params.providerName,
+			dataScriptName  : params.dataScriptName,
+			filename        : params.filename
+		]
+
     }
 
     /**

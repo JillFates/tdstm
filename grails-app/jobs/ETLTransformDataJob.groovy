@@ -48,7 +48,7 @@ class ETLTransformDataJob {
 			}
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage())
+			progressService.update(progressKey, 100I, ProgressService.FAILED, ETLProcessor.getExcpetionMessage(e.getMessage()))
 		} finally {
 			GormUtil.releaseLocalThreadMemory()
 		}
