@@ -62,14 +62,12 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		const publishedFiltered =  this.comments
-			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished);
-
-		const tasks = publishedFiltered
+		const tasks = this.comments
+			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
 			.filter(comment => comment.commentInstance.commentType === 'issue')
 			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
 
-		const comments = publishedFiltered
+		const comments = this.comments
 			.filter(comment => comment.commentInstance.commentType === 'comment')
 			.filter(comment => this.showAllComments || !comment.commentInstance.isResolved);
 
