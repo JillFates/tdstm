@@ -308,7 +308,7 @@ class ModelService implements ServiceMethods {
 		}
 		
 		if (modelsWithAlias) {
-
+			return false
 		}
 
 		// if all the tests were passes, this is a valid alias
