@@ -1626,12 +1626,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(ContextCommand context, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
+	Map initiateCreateTasksWithRecipe(ContextCommand context) {
 		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
 		securityService.requirePermission Permission.RecipeGenerateTasks
-		if (publishTasks) {
+		if (context.autoPublish) {
 			securityService.requirePermission Permission.TaskPublish
 		}
 
@@ -1644,7 +1644,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def recipeVersion
 
 		// Now check to see if the RecipeVersion that we have is the latest release or if not, are we using WIP?
-		if (! useWIP) {
+		if (! context.useWIP) {
 			if (recipe.releasedVersion) {
 				recipeVersion = recipe.releasedVersion
 			} else {
@@ -1679,7 +1679,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Delete previous task batches now if the user specified to delete them
 			def taskBatches = findTaskBatchesForRecipeContext(recipe, contextObj.eventId)
 			if (taskBatches) {
-				if (deletePrevious) {
+				if (context.deletePrevious) {
 					taskBatches*.delete()
 				} else {
 					throw new RuntimeException('Tasks already exist for this recipe and context')
@@ -1687,7 +1687,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		TaskBatch tb = createTaskBatch(contextObj.eventId, recipe, recipeVersion, publishTasks)
+		TaskBatch tb = createTaskBatch(contextObj.eventId, recipe, recipeVersion, context.autoPublish)
 
 		String key = taskBatchKey(tb.id)
 		progressService.create(key, 'Pending')
@@ -1699,7 +1699,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
 			Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 500))
 			trigger.jobDataMap.taskBatchId = tb.id
-			trigger.jobDataMap.publishTasks = publishTasks
+			trigger.jobDataMap.publishTasks = context.autoPublish
 			trigger.jobDataMap.tries = 0
 			trigger.jobDataMap.context = contextObj
 			trigger.setJobName('GenerateTasksJob')
