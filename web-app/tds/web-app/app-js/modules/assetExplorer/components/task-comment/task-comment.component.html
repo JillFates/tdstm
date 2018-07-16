@@ -17,14 +17,14 @@
 				View All Tasks
 			</label>
 
-			<label class="form-check-label aligned-label" for="showAllComments">
-				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadGrid()">
-				View All Comments
-			</label>
-
 			<label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
 				<input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadGrid()">
 				View Unpublished Tasks
+			</label>
+
+			<label class="form-check-label aligned-label" for="showAllComments">
+				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadGrid()">
+				View All Comments
 			</label>
 
 			<button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
