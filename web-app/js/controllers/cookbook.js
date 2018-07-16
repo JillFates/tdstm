@@ -559,7 +559,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return;
 		}
 
-
 		var sameEvent = validEventStatus();
 		if(!sameEvent && (scope.editor.selectedRVersion.context.eventId == null && scope.contexts.selectedEvent != '' && scope.contexts.selectedEvent != null) || scope.editor.selectedRVersion.context.eventId != null &&  scope.contexts.selectedEvent == null) {
 			return; // dirty
@@ -571,12 +570,13 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			return; // dirty
 		}
 
-		scope.contexts.enableClearDefaultContext = true;
-
 		scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
 		if (scope.contexts.validCurrentSelection) {
-			// scope.$broadcast('validContextSelection', recipeId);
+			scope.$broadcast('validContextSelection', recipeId);
 		}
+
+		scope.contexts.enableClearDefaultContext = true;
+
 		if (!scope.$$phase) scope.$digest();
 	};
 
@@ -1054,6 +1054,24 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 			callCenerateTask = confirm("There are tasks previously created with this recipe for the selected context.\n\nPress Okay to delete or Cancel to abort.");
 		}
 
+		var getTagsIds = function(tags) {
+			var tagIds = [];
+			tags.each( function(a){
+				tagIds.push(new Number(a.id));
+			})
+			return tagIds;
+		};
+
+		/* var innerContext = JSON.parse(scope.currentSelectedRecipe.context);
+		var postData = {
+			recipeVersionId: recVerId,
+			context: {
+				eventId: innerContext.eventId,
+				tag: getTagsIds(innerContext.tag)
+			},
+			sourceCode: source
+		}; */
+
 		if (callCenerateTask) {
 			cookbookService.generateTask({}, dataToSend, function(data){
 				log.info('Success on generating task');
@@ -1092,7 +1110,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	}
 
 	scope.$on('validContextSelection', function(evt, recipeId) {
-		scope.tasks.getTaskBatchInfo({recipeId: recipeId, logs: false});
+		// scope.tasks.getTaskBatchInfo({recipeId: recipeId, logs: false});
 	});
 
 	if (state.is("recipes.detail.gentasks")) {
@@ -1881,14 +1899,13 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 				tagIds.push(new Number(a.id));
 			})
 			return tagIds;
-		}
+		};
 
-		var innerContext = JSON.parse(scope.currentSelectedRecipe.context);
 		var postData = {
 			recipeVersionId: recVerId,
 			context: {
-				eventId: innerContext.eventId,
-				tag: getTagsIds(innerContext.tag)
+				eventId: scope.contexts.selectedEvent.id,
+				tag: getTagsIds(scope.contexts.assetSelector.tag)
 			},
 			sourceCode: source
 		};
