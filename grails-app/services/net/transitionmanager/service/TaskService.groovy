@@ -5335,7 +5335,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 // TODO BB to traits
 	private <T> T getRequired(Class<T> clazz, id, String errorMessage = null) {
-		if (!id?.isInteger()) {
+		if (!(id instanceof Long || id instanceof Integer)) {
 			throw new IllegalArgumentException('An invalid ' + clazz.simpleName + ' id was received: ' + id)
 		}
 		T t = clazz.get(id)
