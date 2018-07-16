@@ -4214,7 +4214,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				log.debug "findAllAssetsWithFilter: excluding group(s) [$filter.exclude] that has ${excludes.size()} assets"
 			}
 
-			where = SqlUtil.appendToWhere(where, 'ForPlanning = true')
+			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
 
 			String join = ''
 
