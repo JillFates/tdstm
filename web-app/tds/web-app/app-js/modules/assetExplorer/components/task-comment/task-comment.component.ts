@@ -213,10 +213,15 @@ export class TaskCommentComponent implements OnInit {
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
-					this.taskManagerService.deleteTaskComment(dataItem.commentInstance.id).subscribe((res) => {
+					const commentId = dataItem.commentInstance.id;
+
+					this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
 						// delete the item
 						this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
 						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
+						// update comments collections
+						this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
+						console.log('clear');
 					});
 				}
 			})
