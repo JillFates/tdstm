@@ -5215,7 +5215,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
 
 		try {
-			def taskBatchs = namedParameterJdbcTemplate.queryForList("select * from task_batch inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id inner join person on task_batch.created_by_id = person.person_id where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId order by task_batch.date_created desc", ['recipeId' : Long.valueOf(recipeId), 'contextId' : contextId.toInteger()])
+			def taskBatchs = namedParameterJdbcTemplate.queryForList("select * from task_batch inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id inner join person on task_batch.created_by_id = person.person_id where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId order by task_batch.date_created desc", ['recipeId' : Long.valueOf(recipeId), 'contextId' : contextId?.toInteger()])
 			def result
 			if (taskBatchs) {
 				//Get latest task batch created

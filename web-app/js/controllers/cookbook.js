@@ -529,8 +529,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
 			var context = recipe.context;
-			if(scope.contexts.selectedEvent){
-				log.log('matches event');
+			if(scope.contexts.selectedEvent || scope.contexts.assetSelector && scope.contexts.assetSelector.tag.length > 0){
+				log.log('matches event or tag');
 				return true;
 			}else{
 				log.log('not Matching');
@@ -554,6 +554,14 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 
 		scope.contexts.enableClearDefaultContext = false;
 
+		if(scope.contexts) {
+			scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
+			if (!scope.$$phase) scope.$digest();
+			if (scope.contexts.validCurrentSelection && scope.contexts.selectedEvent) {
+				scope.$broadcast('validContextSelection', recipeId, scope.contexts.selectedEvent.id);
+			}
+		}
+
 		// There is no context available
 		if (_.isEmpty(scope.editor.selectedRVersion.context)) {
 			return;
@@ -568,11 +576,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		if(!sameTag) {
 			if (!scope.$$phase) scope.$digest();
 			return; // dirty
-		}
-
-		scope.contexts.validCurrentSelection = scope.contexts.validateCurrentSelection();
-		if (scope.contexts.validCurrentSelection) {
-			scope.$broadcast('validContextSelection', recipeId);
 		}
 
 		scope.contexts.enableClearDefaultContext = true;
@@ -952,7 +955,7 @@ tds.cookbook.controller.CreateRecipeController.$inject = ['$scope', '$log', 'coo
 /********************************************************************************
  * Task Generation controller
  */
-tds.cookbook.controller.TaskGenerationController = function(scope, state, stateParams, log, timeout, utils, cookbookService, alerts, recipeManager) {
+tds.cookbook.controller.TaskGenerationController = function(scope, state, $http, stateParams, log, timeout, utils, cookbookService, alerts, recipeManager) {
 
 	scope.applyRootPath = utils.url.applyRootPath;
 
@@ -1073,21 +1076,20 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		}; */
 
 		if (callCenerateTask) {
-			cookbookService.generateTask({}, dataToSend, function(data){
+
+			$http.post(utils.url.applyRootPath('/ws/task/generateTasks?rand='), JSON.stringify(postData), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
 				log.info('Success on generating task');
-				log.info(data);
+				log.info(response.data);
 				// Flip the user to the progress screen
 				//scope.tasks.show.start=false;
 				scope.tasks.show.completed = false;
 
-				if(data.data){
-					var jobId = data.data.jobId;
+				if(response.data.data){
+					var jobId = response.data.data.jobId;
 					state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
 				}
-
-
-			}, function(data, status, headers, config){
-				alerts.addAlert({type: 'danger', msg: 'Unable to generate tasks. ' + data.headers().errormessage});
+			}, function(){
+				alerts.addAlert({type: 'danger', msg: 'Unable to generate tasks. ' + response.data.headers().errormessage});
 				log.info('Error on generating task');
 			});
 		}
@@ -1109,8 +1111,8 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		return scope.tasks.generation.exceptions;
 	}
 
-	scope.$on('validContextSelection', function(evt, recipeId) {
-		// scope.tasks.getTaskBatchInfo({recipeId: recipeId, logs: false});
+	scope.$on('validContextSelection', function(evt, recipeId, contextId) {
+		scope.tasks.getTaskBatchInfo({recipeId: recipeId, contextId: contextId, logs: false});
 	});
 
 	if (state.is("recipes.detail.gentasks")) {
@@ -1122,7 +1124,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 }
 
-tds.cookbook.controller.TaskGenerationController.$inject = ['$scope', '$state', '$stateParams', '$log', '$timeout', 'utils', 'cookbookService', 'alerts', 'recipeManager'];
+tds.cookbook.controller.TaskGenerationController.$inject = ['$scope', '$state', '$http', '$stateParams', '$log', '$timeout', 'utils', 'cookbookService', 'alerts', 'recipeManager'];
 
 
 /********************************************************************************
