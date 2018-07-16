@@ -63,7 +63,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         testKey = "TM-11374"
         given: 'The User is on the Project Create Page'
             at ProjectCreationPage
-        when: 'The user fill all required fields'
+        when: 'The User fills all required fields'
             fillInFields projectInfo
         and: 'The user clicks on Save button'
             clickOnSaveButton()
@@ -75,11 +75,11 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             menuModule.assertProjectName projName
     }
 
-    def "3. User navigates to Tags Page and verifies default tags created"(){
+    def "3. The User navigates to Tags Page and verifies default tags created"(){
         testKey = "TM-11374"
-        given: 'User is in Menu'
+        given: 'The User is in Menu'
             at MenuPage
-        when: 'User clicks on Project > Tags'
+        when: 'The User clicks on Project > Tags'
             menuModule.goToTagsPage()
         then: 'Manage Tags Page should be displayed'
             at TagsPage
@@ -87,31 +87,31 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             getGridRowsSize() == 4
     }
 
-    def "4. User verifies default tags info displayed"(){
+    def "4. The User verifies default tags info displayed"(){
         testKey = "TM-11374"
-        given: 'User is in Manage Tags page'
+        given: 'The User is in Manage Tags page'
             at TagsPage
-        when: 'User filters by GDPR'
+        when: 'The User filters by GDPR'
             filterByName GDPR_Tag.name
         then: 'User verifies row info displayed is correct'
             getTagNameText() == GDPR_Tag.name
             getTagDescriptionText() == GDPR_Tag.description
             getTagColorHexText() == GDPR_Tag.color
-        when: 'User filters by HIPPA'
+        when: 'The User filters by HIPPA'
             filterByName HIPPA_Tag.name
-        then: 'User verifies row info displayed is correct'
+        then: 'The User verifies row info displayed is correct'
             getTagNameText() == HIPPA_Tag.name
             getTagDescriptionText() == HIPPA_Tag.description
             getTagColorHexText() == HIPPA_Tag.color
         when: 'User filters by PCI'
             filterByName PCI_Tag.name
-        then: 'User verifies row info displayed is correct'
+        then: 'The User verifies row info displayed is correct'
             getTagNameText() == PCI_Tag.name
             getTagDescriptionText() == PCI_Tag.description
             getTagColorHexText() == PCI_Tag.color
-        when: 'User filters by SOX'
+        when: 'The User filters by SOX'
             filterByName SOX_Tag.name
-        then: 'User verifies row info displayed is correct'
+        then: 'The User verifies row info displayed is correct'
             getTagNameText() == SOX_Tag.name
             getTagDescriptionText() == SOX_Tag.description
             getTagColorHexText() == SOX_Tag.color
