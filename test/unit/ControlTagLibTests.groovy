@@ -381,7 +381,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 					tip        : 'the tip',
 					udf        : 1,
 					shared     : 1,
-					imp        : 'G',
+					imp        : 'Y',
 					show       : 1,
 					order      : 1,
 					default: '',
@@ -410,7 +410,7 @@ class ControlTagLibTests extends AbstractUnitSpec {
 			!label.contains(emptyImpCritClass)
 
 		when: "generating InputLabel for an empty important field"
-			field.imp = "Y"
+			field.imp = "G"
 			label = tagLib.inputLabel([field:field, value: null])
 		then: "the label should have the appropriate CSS class"
 			label.contains(emptyImpCritClass)
