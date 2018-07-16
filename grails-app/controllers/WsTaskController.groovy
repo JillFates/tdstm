@@ -1,23 +1,17 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdssrc.grails.GormUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
+import net.transitionmanager.command.task.ContextCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UnauthorizedException
-import com.tdsops.common.security.spring.HasPermission
 
 /**
  * Handles WS calls of the TaskService.
@@ -61,8 +55,10 @@ class WsTaskController implements ControllerMethods {
 	 * Generates a set of tasks based on a recipe
 	 */
 	@HasPermission(Permission.RecipeGenerateTasks)
-	def generateTasks(Long contextId, Long recipeId) {
-		def result = taskService.initiateCreateTasksWithRecipe(contextId, recipeId,
+	def generateTasks() {
+		ContextCommand context = populateCommandObject(ContextCommand)
+		validateCommandObject(context)
+		def result = taskService.initiateCreateTasksWithRecipe(context,
 			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
 		renderSuccessJson(jobId: result.jobId)
 	}
