@@ -802,6 +802,11 @@ class CommentService implements ServiceMethods {
 			assetComment.dateResolved = TimeUtil.nowGMT()
 		}
 
+		// on unset archived reset dateResolved
+		if (resolved == 0 && assetComment.dateResolved != null) {
+			assetComment.dateResolved = null
+		}
+
 		assetComment.with {
 			assetEntity = asset
 			if(!isResolved() && command.isResolved) {
