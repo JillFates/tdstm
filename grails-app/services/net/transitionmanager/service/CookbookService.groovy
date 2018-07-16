@@ -1407,7 +1407,6 @@ class CookbookService implements ServiceMethods {
 		checkAccess(project)
 		Map context = [
 			eventId : contextCommand.eventId,
-			bundleId: contextCommand.bundleId,
 			and     : contextCommand.and,
 			tag     : []
 		]
