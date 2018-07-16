@@ -11,6 +11,7 @@ class GroupCommand {
 	ContextCommand context
 
 	static constraints = {
+		recipeVersionId nullable: true
 		context cascade: true
 		sourceCode nullable: true
 	}
