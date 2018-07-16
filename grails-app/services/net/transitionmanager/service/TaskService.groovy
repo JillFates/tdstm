@@ -1676,9 +1676,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new EmptyResultException("The selected event doesn't have associated bundles")
 		}
 
-		if(contextId) {
+		if(contextObj.eventId) {
 			// Delete previous task batches now if the user specified to delete them
-			def taskBatches = findTaskBatchesForRecipeContext(recipe, contextId)
+			def taskBatches = findTaskBatchesForRecipeContext(recipe, contextObj.eventId)
 			if (taskBatches) {
 				if (deletePrevious) {
 					taskBatches*.delete()
@@ -1688,7 +1688,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		TaskBatch tb = createTaskBatch(contextId, recipe, recipeVersion, publishTasks)
+		TaskBatch tb = createTaskBatch(contextObj.eventId, recipe, recipeVersion, publishTasks)
 
 		String key = taskBatchKey(tb.id)
 		progressService.create(key, 'Pending')
