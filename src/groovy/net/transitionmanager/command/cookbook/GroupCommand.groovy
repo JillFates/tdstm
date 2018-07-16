@@ -12,5 +12,6 @@ class GroupCommand {
 
 	static constraints = {
 		context cascade: true
+		sourceCode nullable: true
 	}
 }
