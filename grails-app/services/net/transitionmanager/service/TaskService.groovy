@@ -23,7 +23,6 @@ import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -46,6 +45,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -4278,8 +4278,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${where ? ' and ' + where : ''}")
 
-						//TODO tap into what Augusto did for asset filtering...
-
 						sql = sb.toString()
 
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
@@ -4290,7 +4288,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions(['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'])
 
-						sql = "select a from Application a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Application a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break
@@ -4298,7 +4296,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['dbFormat','size'])
-						sql = "select a from Database a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Database a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break
@@ -4306,7 +4304,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['fileFormat','size', 'scale', 'LUN'])
-						sql = "select a from Files a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Files a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break
@@ -4431,7 +4429,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 	List getBundleIds(contextObject, project = null, filter = null) {
 		// Now find the bundles if the contextObject had an event id, but not bundle ids
-		if (!contextObject.bundleId && contextObject.eventId) {
+		if (contextObject.eventId) {
 			List bundleIds = MoveBundle.where { moveEvent.id == contextObject.eventId }.projections {
 				property 'id'
 			}.list()
@@ -4447,9 +4445,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			return bundleIds
-		} else if (contextObject.bundleId) {
-			// Pretty simple, we're just searching the current bundle
-			return contextObject.bundleId
+		} else {
+			return []
 		}
 	}
 
