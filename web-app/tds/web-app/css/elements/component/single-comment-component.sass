@@ -16,24 +16,32 @@
     .k-dropdown-wrap .k-input
       padding: 1.5rem 0.75rem
       text-transform: capitalize
+
+  // By default hide all modal-type* descendant elements
   *[class*="modal-type"]
     *[class*="visible-on"],
     .delete-button
       display: none
 
+  // depending of the presence of combined classes make visible the descendant elements
+
+  // display edit/create components
   .modal-type-edit,
   .modal-type-create
     .visible-on-edit
       display: unset
 
+  // display view only components
   .modal-type-view
     .visible-on-view
       display: unset
 
+  // display create components
   .modal-type-create
     .visible-on-create
       display: unset
 
+  // display delete related components
   .modal-type-edit,
   .modal-type-view
     .delete-button
