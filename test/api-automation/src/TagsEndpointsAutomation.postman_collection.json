@@ -1,0 +1,567 @@
+{
+	"info": {
+		"_postman_id": "8797f77d-7119-4555-bdae-08f2f35058e7",
+		"name": "Tags",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign In",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "289e044f-4ca6-412d-b329-06e51b4da370",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Dashboard page\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
+							"});",
+							"",
+							"pm.test(\"TDS Login\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					},
+					{
+						"key": "username",
+						"value": "tdsadmin"
+					},
+					{
+						"key": "password",
+						"value": "zelda123!"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set current project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "61811bcc-2082-41cd-842f-dde12dba00ee",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Project Details is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Details\");",
+							"});",
+							"",
+							"pm.test(\"Proj Name is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Name\");",
+							"});",
+							"",
+							"pm.test(\"Proj Description is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Description\");",
+							"});",
+							"pm.test(\"Proj Client is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Client\");",
+							"});",
+							"",
+							"pm.test(\"Proj Code is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Code:\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Proj Type is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Type:\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Comment is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Comment:\");",
+							"});",
+							"pm.test(\"Start Date is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Start Date:\");",
+							"});",
+							"",
+							"pm.test(\"Completion Date is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Completion Date:\");",
+							"});",
+							"",
+							"pm.test(\"Associated partner is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Associated Partner(s):\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{projectId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d9446cbf-5b79-46db-b1aa-63fd1a48c14b",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"A new Tag with the expected values is created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"   ",
+							"    pm.expect(data.name).to.include(pm.variables.get(\"tagName\"));",
+							"    pm.expect(data.description).to.eql('Description of a new tag.');",
+							"    pm.expect(data.color).to.eql('Black');",
+							"    pm.expect(data.css).to.eql('tag-black');",
+							"    postman.setGlobalVariable(\"tag_id\", data.id);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description of a new tag.\",\n  \"color\":\"Black\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tags after create tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1b8394dd-ea6d-49db-b9cf-7bdf4db19d2e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"The new tag show up in the list and its data is as expected\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var tagIsPresent=false;",
+							"    var lastIndex=jsonData.data.length-1;",
+							"    ",
+							"    pm.expect(jsonData.data[lastIndex].name).to.include(pm.variables.get(\"tagName\"));",
+							"    pm.expect(jsonData.data[lastIndex].description).to.eql('Description of a new tag.');",
+							"    pm.expect(jsonData.data[lastIndex].color).to.eql('Black');",
+							"    pm.expect(jsonData.data[lastIndex].css).to.eql('tag-black');",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tags",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1bedc79c-8a2f-4929-a9e8-2ef97543e692",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update tag not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "59748a73-8e1e-4776-964f-2d5e62f53df1",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200 with error\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('error');",
+							"    ",
+							"    pm.expect(jsonData.errors).to.eql(['Requested information was not found']);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"Revenge of the Tag\",\n  \"description\":\"Different Description\",\n  \"color\":\"Blue\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{nonExistentTag}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{nonExistentTag}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2ad6816-a451-4c7b-b1f9-ba5caa76d985",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The tag has been correctly updated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data.name).to.include(pm.variables.get(\"updatedTagName\"))",
+							"    pm.expect(data.description).to.eql('Different Description');",
+							"    pm.expect(data.color).to.eql('Blue');",
+							"    pm.expect(data.css).to.eql('tag-blue');",
+							"    ",
+							"});",
+							"",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"{{updatedTagName}}{{$randomInt}}\",\n  \"description\":\"Different Description\",\n  \"color\":\"Blue\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data).to.eql({});",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "dc3d2011-eef4-43f6-9966-4b7a8f7966b9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "83dc21ab-801b-4b7e-92b9-a8727c709584",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "13f9293e-76e3-4396-9e54-07b60c52f365",
+			"key": "nonExistentTag",
+			"value": "9999999999",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "28e5bee1-9989-47b8-a824-f3a9d0574133",
+			"key": "updatedTagName",
+			"value": "updatedTag",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "160072e7-6724-4618-bee3-70f8feb0be68",
+			"key": "projectId",
+			"value": "2445",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "868af2d7-b1d6-4d38-aec8-42267a7fe928",
+			"key": "tagName",
+			"value": "newTestTag",
+			"type": "string",
+			"description": ""
+		}
+	]
+}
