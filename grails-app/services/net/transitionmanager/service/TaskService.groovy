@@ -4221,7 +4221,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
-				map.tags = contextObject.tag
+				map.tags = contextObject.tag.collect{Map tag -> (Long)tag.id}
 				join = 'left outer join a.tagAssets ta left outer join ta.tag t'
 			}
 
