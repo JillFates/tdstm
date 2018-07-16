@@ -413,7 +413,7 @@ class CookbookService implements ServiceMethods {
 	 * @return the list of groups
 	 */
 	def getGroups(Long recipeVersionId, context, String predSourceCode) {
-		boolean validRecipeId = recipeVersionId != null && recipeVersionId.isNumber()
+		boolean validRecipeId = recipeVersionId != null
 
 		if (!validRecipeId && predSourceCode == null) {
 			throw new EmptyResultException('Invalid recipeVersionId')

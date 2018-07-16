@@ -9,12 +9,10 @@ import grails.validation.Validateable
 class ContextCommand {
 
 	Long eventId
-	List<Long> bundleId
 	List <Long> tag = []
-	boolean and = true
+	Boolean and = true
 
 	static constraints = {
 		eventId nullable: true
-		bundleId nullable: true
 	}
 }
