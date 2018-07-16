@@ -219,7 +219,6 @@ export class TaskCommentComponent implements OnInit {
 						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
 						// update comments collections
 						this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
-						console.log('clear');
 					});
 				}
 			})
