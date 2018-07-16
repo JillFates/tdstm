@@ -59,7 +59,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             at ProjectCreationPage
     }
 
-    def "3. Create Project and certify header name"() {
+    def "2. Create Project and certify header name"() {
         testKey = "TM-11374"
         given: 'The User is on the Project Create Page'
             at ProjectCreationPage
@@ -75,7 +75,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             menuModule.assertProjectName projName
     }
 
-    def "4. User navigates to Tags Page and verifies default tags created"(){
+    def "3. User navigates to Tags Page and verifies default tags created"(){
         testKey = "TM-11374"
         given: 'User is in Menu'
             at MenuPage
@@ -87,7 +87,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             getGridRowsSize() == 4
     }
 
-    def "5. User verifies default tags info displayed"(){
+    def "4. User verifies default tags info displayed"(){
         testKey = "TM-11374"
         given: 'User is in Manage Tags page'
             at TagsPage
@@ -117,7 +117,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             getTagColorHexText() == SOX_Tag.color
     }
 
-    def "6. Workaround to switch to a licensed Project"() {
+    def "5. Workaround to switch to a licensed Project"() {
         testKey = "TM-11374"
         given: 'The user is in Menu'
             at MenuPage
