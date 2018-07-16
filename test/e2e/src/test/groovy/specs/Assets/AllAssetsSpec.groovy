@@ -45,7 +45,6 @@ class AllAssetsSpec extends GebReportingSpec {
         then: 'The All Assets Page loads with no problem'
             at AllAssetsPage
 
-
     }
 
     def "2. The user sets the pagination, clicks the Just Planning checkbox and no TBD bundles are shown "(){
