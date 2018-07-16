@@ -1884,7 +1884,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		}
 
 		var innerContext = JSON.parse(scope.currentSelectedRecipe.context);
-		var data = {
+		var postData = {
 			recipeVersionId: recVerId,
 			context: {
 				eventId: innerContext.eventId,
@@ -1893,10 +1893,10 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 			sourceCode: source
 		};
 
-		$http.post(utils.url.applyRootPath('/ws/cookbook/groups?rand='), JSON.stringify(data), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
+		$http.post(utils.url.applyRootPath('/ws/cookbook/groups?rand='), JSON.stringify(postData), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
 			log.info('Success on getting Groups');
-			if (data && data.data) {
-				scope.groups.groupsArray = data.data.groups;
+			if (response && response.data) {
+				scope.groups.groupsArray = response.data.data.groups;
 				scope.groups.updateGrid();
 				loadAssets([]);
 				timeout(function(){
