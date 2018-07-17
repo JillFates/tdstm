@@ -19,7 +19,7 @@ class GenericHttpAgent extends AbstractAgent {
 	HttpProducerService httpProducerService
 
 	GenericHttpAgent() {
-		setInfo(null, 'Generic Http Agent')
+		setInfo('Generic Http Agent')
 		httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
 	}
 

@@ -26,7 +26,6 @@ class AbstractAgent {
 
 	private Map<String, DictionaryItem> dict = [:]
 
-	AgentClass agentClass
 	String name
 
 	/*
@@ -34,8 +33,7 @@ class AbstractAgent {
 	 * @param clazz - the AgentClass
 	 * @param agentName - a descriptive name for the class
 	 */
-	void setInfo(AgentClass clazz, String agentName) {
-		agentClass = clazz
+	void setInfo(String agentName) {
 		name = agentName
 	}
 

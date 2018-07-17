@@ -3,6 +3,7 @@ import com.tdssrc.grails.JsonUtil
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
@@ -25,6 +26,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Title
+import test.helper.ApiCatalogTestHelper
 import test.helper.ProviderTestHelper
 
 @Title('Tests for the ApiActionService class')
@@ -33,7 +35,11 @@ class ApiActionServiceIntegrationTests extends Specification {
 	ApiActionService apiActionService
 	ApiActionTestHelper apiActionHelper = new ApiActionTestHelper()
 	ProviderService providerService
+	Provider provider
+	ApiCatalog apiCatalog
 	ProviderTestHelper providerHelper = new ProviderTestHelper()
+	ApiCatalogTestHelper apiCatalogHelper = new ApiCatalogTestHelper()
+
 
 	private ApiAction action
 	private AssetComment task
@@ -64,12 +70,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	void setup() {
 		project = projectHelper.createProject()
+		provider = providerHelper.createProvider(project)
+		apiCatalog = apiCatalogHelper.createApiCatalog(project, provider)
+
 		project.save(flush:true)
 
 		action = new ApiAction(
 			name:'testAction',
 			description: 'This is a bogus action for testing',
-			agentClass: AgentClass.HTTP,
+			//agentClass: AgentClass.HTTP,
+			apiCatalog: apiCatalog,
 			agentMethod: 'callEndpoint',
 			methodParams: paramsJson,
 			asyncQueue: 'test_outbound_queue',
@@ -105,13 +115,15 @@ class ApiActionServiceIntegrationTests extends Specification {
 			Class clazz
 
 		when: 'calling agentClassForAction to get an implemented ApiAction'
-			clazz = apiActionService.agentClassForAction(action)
+			clazz = apiActionService.agentInstanceForAction(action).class
 		then: 'the specified class should be returned'
-			clazz == net.transitionmanager.agent.HttpAgent
+			clazz == net.transitionmanager.agent.GenericHttpAgent
 
 		when: 'the method is called referencing an unimplemented Agent'
-			action.agentClass = AgentClass.RACIME
-			clazz = apiActionService.agentClassForAction(action)
+			// SL 07/2018 : Test kept just to preserve structure
+			this.apiActionService = [agentInstanceForAction: { throw new MissingPropertyException('Test') }] as ApiActionService
+
+			clazz = apiActionService.agentInstanceForAction(action).class
 		then: 'an exception should be thrown'
 			thrown MissingPropertyException
 	}
@@ -130,7 +142,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			aws.awsService != null
 
 		when: 'the method is called requesting an unimplemented Agent'
-			action.agentClass = AgentClass.RACIME
+			// action.agentClass = AgentClass.RACIME
 			clazz = apiActionService.agentInstanceForAction(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
@@ -145,10 +157,10 @@ class ApiActionServiceIntegrationTests extends Specification {
 			methodDef
 			(methodDef instanceof DictionaryItem)
 		and: 'the method name is the one expected'
-			methodDef.agentMethod == action.agentMethod
+			methodDef.apiMethod == action.agentMethod
 
 		when: 'the ApiAction has an unimplemented Agent'
-			action.agentClass = AgentClass.VCENTER
+			action.agentMethod = 'DOES-NOT-EXISTS'
 			clazz = apiActionService.methodDefinition(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
@@ -185,7 +197,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	def "6. tests deleting an ApiAction and other related methods"() {
 		setup: "Create an API Action"
-			ApiAction apiAction = apiActionHelper.createApiAction(project)
+			ApiAction apiAction = apiActionHelper.createApiAction(project, provider, apiCatalog)
 		when: "Looking up this API Action"
 			ApiAction apiAction2 = apiActionService.find(apiAction.id, project)
 		then: "It should have been found"
@@ -201,8 +213,8 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def "7. tests deleting an API Action for a different project"() {
 		setup: "Create a API Action for different projects"
 			Project project2 = projectHelper.createProject()
-			ApiAction apiAction1 = apiActionHelper.createApiAction(project)
-			ApiAction apiAction2 = apiActionHelper.createApiAction(project2)
+			ApiAction apiAction1 = apiActionHelper.createApiAction(project, provider, apiCatalog)
+			ApiAction apiAction2 = apiActionHelper.createApiAction(project2, null, apiCatalog)
 		when: "Retrieving all the API Action for both projects"
 			List<Map> actions1 = apiActionService.list(project)
 			List<Map> actions2 = apiActionService.list(project2)
@@ -245,8 +257,8 @@ class ApiActionServiceIntegrationTests extends Specification {
 		given: "Two projects with an API Action each."
 			Project project1 = projectHelper.createProject()
 			Project project2 = projectHelper.createProject()
-			ApiAction apiAction1 = apiActionHelper.createApiAction(project1)
-			ApiAction apiAction2 = apiActionHelper.createApiAction(project2)
+			ApiAction apiAction1 = apiActionHelper.createApiAction(project1, null, apiCatalog)
+			ApiAction apiAction2 = apiActionHelper.createApiAction(project2, null, apiCatalog)
 		expect: "True when querying with no id and a valid name (a create operation.)"
 			apiActionService.validateApiActionName(project1, apiAction2.name)
 		and: "False when entering a duplicate name and no id (a create operation)."
@@ -265,13 +277,14 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def "9. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
 			Provider provider1 = providerHelper.createProvider(project)
+			ApiCatalog apiCatalog1 = apiCatalogHelper.createApiCatalog(project, provider1)
 			String apiName = RSU.randomAlphabetic(10)
 			ApiActionCommand cmd = new ApiActionCommand()
 			cmd.with {
 				name = apiName
 				description = "some description"
 				provider = provider1
-				agentClass = "HTTP"
+				apiCatalog = apiCatalog1
 				agentMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
@@ -316,7 +329,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
 			cmd.provider = provider2
-			cmd.agentClass = "HTTP"
 			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The invalid reference makes the validation fail with a ValidationException."
 			thrown ValidationException
@@ -335,13 +347,14 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def "10. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
 			Provider provider1 = providerHelper.createProvider(project)
+			ApiCatalog apiCatalog1 = apiCatalogHelper.createApiCatalog(project, provider1)
 			String apiName = RSU.randomAlphabetic(10)
 			ApiActionCommand cmd = new ApiActionCommand()
 			cmd.with {
 				name = apiName
 				description = "some description"
 				provider = provider1
-				agentClass = "HTTP"
+				apiCatalog = apiCatalog1
 				agentMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
@@ -385,38 +398,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 			thrown ValidationException
 	}
 
-	def "11. Test parseEnum with different valid and invalid inputs"(){
-		when: "Trying to parse a valid value"
-			AgentClass agentClass = apiActionService.parseEnum(AgentClass, "someField", "HTTP")
-		then: "The correct value was parsed"
-			agentClass == AgentClass.HTTP
-		when: "Trying with an invalid value"
-			agentClass = apiActionService.parseEnum(AgentClass, "someField", RSU.randomAlphabetic(10), true, true)
-		then: "An InvalidParamException is thrown"
-			thrown InvalidParamException
-		when: "Trying with an invalid value"
-			agentClass = apiActionService.parseEnum(AgentClass, "someField", null, true, true)
-		then: "An InvalidParamException is thrown"
-			thrown InvalidParamException
-		when: "Trying with a class that is not an Enum"
-			agentClass = apiActionService.parseEnum(Integer, "someField", "AWS", true, true)
-		then: "An InvalidParamException is thrown"
-			thrown InvalidParamException
-		when: "Trying with a null class.	"
-			agentClass = apiActionService.parseEnum(null, "someField", "HTTP")
-		then: "An NullPointerException is thrown"
-			thrown NullPointerException
-	}
-
-	def "12. Test reactionScripts for The API Action in different scenarios" () {
+	def "11. Test reactionScripts for The API Action in different scenarios" () {
 		setup: "Create a valid ApiActionCommand"
 			Provider provider1 = providerHelper.createProvider(project)
+			ApiCatalog apiCatalog1 = apiCatalogHelper.createApiCatalog(project, provider1)
 			ApiAction apiAction = new ApiAction(project: project)
 			apiAction.with {
 				name = RSU.randomAlphabetic(10)
 				description = "some description"
-				provider= provider1
-				agentClass = "HTTP"
+				provider = provider1
+				apiCatalog = apiCatalog1
 				agentMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"

@@ -334,12 +334,15 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the method name is invalid or the agent is not implemented
 	 */
 	DictionaryItem methodDefinition (ApiAction action) {
-		Map dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
-		DictionaryItem methodDef = new DictionaryItem(dict[action?.agentMethod])
-		if (!methodDef) {
+		Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
+		Map<String, ?> method = dict[action?.agentMethod]
+
+		if (!method) {
 			throw new InvalidRequestException(
 					"Action class ${action?.apiCatalog?.name} method ${action?.agentMethod} not implemented")
 		}
+
+		DictionaryItem methodDef = new DictionaryItem(method)
 		methodDef
 	}
 
