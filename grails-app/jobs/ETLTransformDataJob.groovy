@@ -1,4 +1,5 @@
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.etl.ETLProcessor
 import com.tdssrc.grails.GormUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.DataImportService
@@ -48,7 +49,9 @@ class ETLTransformDataJob {
 			}
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-			progressService.update(progressKey, 100I, ProgressService.FAILED, ETLProcessor.getExcpetionMessage(e.getMessage()))
+			progressService.updateData(progressKey, )
+			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
+
 		} finally {
 			GormUtil.releaseLocalThreadMemory()
 		}

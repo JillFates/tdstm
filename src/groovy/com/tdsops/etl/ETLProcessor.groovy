@@ -1286,7 +1286,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param exception an instance of {@code Throwable}
 	 * @return a Map with 2 fields: message and lineNumber
 	 */
-	static Map<String, ?> getErrotMessage(Throwable exception){
+	static Map<String, ?> getErrorMessage(Throwable exception){
 
 		Map<String, ?> error = [:]
 		if(exception instanceof MultipleCompilationErrorsException){
@@ -1336,7 +1336,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 				this.class.classLoader,
 				this.binding,
 				configuration
-			).parse(script?.trim(), ETLProcessor.class.name)
+			).parse(script?.trim(), ETLScriptName)
 
 		} catch (MultipleCompilationErrorsException cfe) {
 			ErrorCollector errorCollector = cfe.getErrorCollector()

@@ -104,7 +104,7 @@ class MockETLController implements ControllerMethods {
 			fileSystemService.deleteTemporaryFile(fileName)
 
 		} catch( Throwable t){
-			error = ETLProcessor.getErrotMessage(t)
+			error = ETLProcessor.getErrorMessage(t)
 		}
 
 		[

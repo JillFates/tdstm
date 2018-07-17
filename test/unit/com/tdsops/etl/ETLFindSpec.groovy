@@ -6,16 +6,12 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.NumberUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.*
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import com.tdssrc.grails.NumberUtil
 import spock.lang.See
 
 /**
@@ -364,8 +360,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					  validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					  .evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Application
@@ -373,38 +368,41 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetId' load 'id'
 							find Application by 'id' with DOMAIN.id // <-- Missing into keyword
 						}
-						""".stripIndent(),
-					  ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "find/elseFind statement is missing required [into] keyword"
+			ETLProcessor.getErrorMessage(e) == [
+					message   : 'find/elseFind statement is missing required [into] keyword',
+					lineNumber: 6
+			]
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void "test exception when [with, into] keywords are not found"() {
+	void "test exception when [with, into] keywords are not found"(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -419,15 +417,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
-					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
-					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						  it.getId() == 152402l
-					  }, type: 'Hosts'],
+					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -442,20 +440,19 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id }
 			}
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
 				return true
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					  GMDEMO,
-					  dataSet,
-					  debugConsole,
-					  validator)
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					  .evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Application
@@ -463,12 +460,15 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetId' load 'id'
 							find Application by 'id' // <-- Missing [with and into] keyword
 						}
-						""".stripIndent(),
-					  ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "find/elseFind statement is missing required [with, into] keywords"
+			ETLProcessor.getErrorMessage(e) == [
+					message   : 'find/elseFind statement is missing required [with, into] keywords',
+					lineNumber: 6
+			]
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -845,6 +845,10 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'No project selected in the user context'
+			ETLProcessor.getErrorMessage(e) == [
+					message: 'No project selected in the user context',
+					lineNumber: 8
+			]
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -1172,10 +1176,12 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
-
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
-
+			ETLProcessor.getErrorMessage(e) == [
+					message: 'You cannot use isApplication with more than one results in FINDINGS',
+					lineNumber: 14
+			]
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1365,7 +1371,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					console on
 					read labels
@@ -1378,8 +1384,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						
 						find Room by 'id' with SOURCE.RoomId into 'roomSource'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
 			with(etlProcessor.finalResult()) {
@@ -1451,6 +1456,10 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
+			ETLProcessor.getErrorMessage(e) == [
+					message: 'Unrecognized command for with args [room] for the find / elseFind command',
+					lineNumber: 10
+			]
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
