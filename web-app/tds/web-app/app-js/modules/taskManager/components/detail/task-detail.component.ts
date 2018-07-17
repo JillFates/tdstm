@@ -68,7 +68,9 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
 
 			// Get Assigned Team
-			this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
+			if (this.taskDetailModel.detail.assetComment.assignedTo) {
+				this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
+			}
 		});
 	}
 
