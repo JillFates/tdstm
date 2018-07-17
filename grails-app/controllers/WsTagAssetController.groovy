@@ -34,7 +34,7 @@ class WsTagAssetController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.TagDelete)
-	def delete(List<Long> ids) {
+	def delete() {
 		DeleteTagAssetCommand delete = populateCommandObject(DeleteTagAssetCommand)
 		validateCommandObject(delete)
 		tagAssetService.removeTags(projectForWs, delete.ids)
