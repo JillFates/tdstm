@@ -264,11 +264,7 @@ class FileSystemService implements InitializingBean {
 	 */
 	 static File openTempFile(String filename) {
 		  File file = new File(temporaryDirectory, filename)
-		  if (file.exists()) {
-			   // 'Touch' the File
-			   file.setLastModified(System.currentTimeMillis())
-		  }
-
+		  org.apache.commons.io.FileUtils.touch(file)
 		  return file
 	 }
 
