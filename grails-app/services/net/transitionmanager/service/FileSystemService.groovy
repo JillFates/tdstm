@@ -264,8 +264,7 @@ class FileSystemService implements InitializingBean {
 	 */
 	 static File openTempFile(String filename) {
 		  File file = new File(temporaryDirectory, filename)
-		  org.apache.commons.io.FileUtils.touch(file)
-		  return file
+		  return FileSystemUtil.touch(file)
 	 }
 
     /**
