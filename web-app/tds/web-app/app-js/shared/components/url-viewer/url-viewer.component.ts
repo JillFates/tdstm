@@ -33,7 +33,8 @@ export class URLViewerComponent implements OnInit {
 	protected getURLContext(): void {
 		if (this.model && this.model.indexOf('|') !== -1) {
 			let modelContent = this.model.split('|');
-			this.urlLabel = modelContent[0];
+			// if there is no label fall back to url
+			this.urlLabel = modelContent[0] || modelContent[1];
 			this.urlReference = modelContent[1];
 		} else {
 			this.urlReference = this.model;
