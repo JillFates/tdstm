@@ -1,5 +1,6 @@
 package utils
 
+import jodd.util.RandomString
 /*
 * Note: Page including common methods or actions to perform in the system. For example: select options from select.
 * */
@@ -76,5 +77,9 @@ class CommonActions {
             builder.append("0")
         }
         builder.toString()
+    }
+
+    def getRandomString(){
+        RandomString.getInstance().randomAlphaNumeric(8)
     }
 }

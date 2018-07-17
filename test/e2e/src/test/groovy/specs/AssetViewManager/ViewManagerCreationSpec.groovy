@@ -7,7 +7,7 @@ import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.SaveViewPage
 import pages.AssetViewManager.ViewPage
-import jodd.util.RandomString
+import utils.CommonActions
 
 
 @Stepwise
@@ -17,7 +17,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
     static testCount
 
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "TM8500"
     static viewName=  randStr+" "+baseName
     def filteredName=""
