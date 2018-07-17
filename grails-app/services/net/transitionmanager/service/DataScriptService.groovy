@@ -118,6 +118,15 @@ class DataScriptService implements ServiceMethods{
 
         DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
 
+	     // Check if the Sample File is still available, if not delete the temporary data
+	     if ( dataScript.sampleFilename ) {
+		     if ( !FileSystemService.tempFileExists(dataScript.sampleFilename) ) {
+			     dataScript.sampleFilename = ''
+			     dataScript.originalSampleFilename = ''
+			     dataScript.save()
+		     }
+	     }
+
         return dataScript
     }
 
