@@ -1318,7 +1318,7 @@ class TaskService implements ServiceMethods {
 	* @return Map [errMsg, stepTask]
 	*/
    def createTaskBasedOnWorkflow(Map args){
-	   //TODO check if generating by tag and eliminate est dates for tag This currently call from moveBundleController...
+	   //TODO taskGeneration check if generating by tag and eliminate est dates for tag This currently call from moveBundleController...
 	   def errMsg = ""
 	   def stepTask = new AssetComment(
 			   comment: "$args.workflow.code${args.assetEntity ? '-' + args.assetEntity?.assetName:''}",
@@ -4112,10 +4112,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			def queryOn = filter?.containsKey('class') ? filter['class'].toLowerCase() : 'device'
 
-			map.bIds = getBundleIds(contextObject, project, filter)
-
-			// log.info "bundleIds=[$bundleIds]"
-
             /**
              * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
              * WHERE expressions based on the properties passed in the filter
@@ -4216,12 +4212,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			where = SqlUtil.appendToWhere(where, 'a.moveBundle.useForPlanning = true')
 
+			map.bIds = getBundleIds(contextObject, project, filter)
 			String join = ''
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
-				map.tags = contextObject.tag.collect{Map tag -> (Long)tag.id}
+				map.tags = contextObject.tag.collect { Map tag -> (Long) tag.id }
+				map.remove('bIds')
 				join = 'left outer join a.tagAssets ta left outer join ta.tag t'
+			} else if (map.bIds) {
+				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
+			} else {
+				throw new IllegalArgumentException('The selected event has no assigned bundles')
 			}
 
 			// Assemble the SQL and attempt to execute it
@@ -4275,8 +4277,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							sb.append('left outer join a.tagAssets ta left outer join ta.tag t')
 						}
 
-						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${where ? ' and ' + where : ''}")
-
+						sb.append("${where ? ' where ' + where : ''}")
 						sql = sb.toString()
 
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
@@ -4287,7 +4288,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions(['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'])
 
-						sql = "from Application a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Application a $join where $where"
 						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break
@@ -4295,7 +4296,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['dbFormat','size'])
-						sql = "from Database a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Database a $join where $where"
 						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break
@@ -4303,7 +4304,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['fileFormat','size', 'scale', 'LUN'])
-						sql = "from Files a $join where a.moveBundle.id in (:bIds)" + (where ? " and $where" : '')
+						sql = "from Files a $join where $where"
 						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break
@@ -5206,7 +5207,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param includeLogs - whether to include the logs information or not
 	 * @return A taskBatch map if found or null
 	 */
-	def findTaskBatchByRecipeAndContext(recipeId, contextId, includeLogs) {//context id become event Id
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId, includeLogs) {//context id become event Id
 		controllerService.getRequiredProject()
 
 		Recipe recipe = getRequired(Recipe, recipeId)
@@ -5215,7 +5216,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
 
 		try {
-			def taskBatchs = namedParameterJdbcTemplate.queryForList("select * from task_batch inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id inner join person on task_batch.created_by_id = person.person_id where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId order by task_batch.date_created desc", ['recipeId' : Long.valueOf(recipeId), 'contextId' : contextId?.toInteger()])
+			def taskBatchs = namedParameterJdbcTemplate.queryForList("""select * 
+				from task_batch 
+				inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id
+				inner join person on task_batch.created_by_id = person.person_id
+				where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId
+				order by task_batch.date_created desc""", ['recipeId' : recipeId, 'contextId' : contextId])
+
 			def result
 			if (taskBatchs) {
 				//Get latest task batch created
@@ -5252,14 +5259,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param limitDays - the number of days to limit the search
 	 * @return the list of Task batches
 	 */
-	def listTaskBatches(recipeId, limitDays) {
+	def listTaskBatches(Long recipeId, limitDays) {
 		Project currentProject = controllerService.requiredProject
 
-		Recipe recipe
-		if (recipeId?.isNumber()) {
-			recipe = getRequired(Recipe, recipeId)
-			securityService.assertCurrentProject recipe.project
-		}
+		Recipe recipe = getRequired(Recipe, recipeId)
+		securityService.assertCurrentProject recipe.project
 
 		boolean listAll=(limitDays=='All')
 		if (!listAll && (limitDays == null || !limitDays.isNumber())) {

@@ -69,8 +69,8 @@ class WsTaskController implements ControllerMethods {
 	 * @return A taskBatch object if found or null
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def findTaskBatchByRecipeAndContext() {
-		def result = taskService.findTaskBatchByRecipeAndContext(params.recipeId, params.contextId, params.logs)
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId) {
+		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, params.logs)
 		renderSuccessJson(taskBatch: result)
 	}
 
@@ -78,8 +78,8 @@ class WsTaskController implements ControllerMethods {
 	 * List the TaskBatch using the parameters passed in the request
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def listTaskBatches() {
-		renderSuccessJson(list: taskService.listTaskBatches(params.recipeId, params.limitDays))
+	def listTaskBatches(Long recipeId) {
+		renderSuccessJson(list: taskService.listTaskBatches(recipeId, params.limitDays))
 	}
 
 	/**
