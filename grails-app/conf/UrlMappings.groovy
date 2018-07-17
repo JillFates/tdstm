@@ -1030,15 +1030,15 @@ class UrlMappings {
 		"/ws/tag/asset" {
 			controller = "wsTagAsset"
 			action = [
-				POST: "create"
+				POST: "create",
+				DELETE: "delete"
 			]
 		}
 
 		"/ws/tag/asset/$id" {
 			controller = "wsTagAsset"
 			action = [
-				GET : "list",
-				DELETE: "delete"
+				GET : "list"
 			]
 		}
 
