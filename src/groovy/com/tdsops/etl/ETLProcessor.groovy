@@ -1279,8 +1279,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Result map is returned as follow:
 	 * <pre>
 	 * return [
+	 *  startLine: 4,
+	 *  endLine: 4,
+	 *  startColumn: 12,
+	 *  endColumn: 24,
+	 *  fatal: true,
 	 *  message: '...',
-	 *  lineNumber: 4
+	 *
 	 * ]
 	 * </pre>
 	 * @param exception an instance of {@code Throwable}
@@ -1290,11 +1295,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		Map<String, ?> error = [:]
 		if(exception instanceof MultipleCompilationErrorsException){
-			error.message = exception.getMessage()
-			error.lineNumber = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}?.cause?.startLine
+			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}
+			error.message    = syntaxErrorMessage.cause?.message
+			error.startLine  = syntaxErrorMessage.cause?.startLine
+			error.endLine    = syntaxErrorMessage.cause?.endLine
+			error.startColumn= syntaxErrorMessage.cause?.startColumn
+			error.endColumn  = syntaxErrorMessage.cause?.endColumn
+			error.fatal      = syntaxErrorMessage.cause?.fatal
 		}  else{
 			error.message = exception.getMessage()
-			error.lineNumber = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+			error.startLine  = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+			error.endLine    = error.startLine
+			error.startColumn= null
+			error.endColumn  = null
+			error.fatal      = true
 		}
 		return error
 

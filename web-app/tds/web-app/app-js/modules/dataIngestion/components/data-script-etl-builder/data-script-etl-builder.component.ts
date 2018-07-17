@@ -88,6 +88,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private onTestScript(): void {
 		this.clearLogVariables('test');
+        this.codeMirrorComponent.clearSyntaxErrors();
 		this.operationStatus.test.state = CHECK_ACTION.IN_PROGRESS;
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
@@ -120,10 +121,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.scriptTestResult = new ScriptTestResultModel();
 					this.operationStatus.test.state = CHECK_ACTION.INVALID;
 					this.scriptTestResult.isValid = false;
-					this.scriptTestResult.error = response.data.detail;
+					this.scriptTestResult.error = response.data.data.message;
+                    this.codeMirrorComponent.addSyntaxErrors([response.data.data.startLine - 1]);
+
 					// On Success
 				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
 					setTimeout( () => {
+                        this.codeMirrorComponent.clearSyntaxErrors();
 						let scripTestFilename = response.data.detail;
 						this.operationStatus.test.state = CHECK_ACTION.VALID;
 						this.scriptTestResult = new ScriptTestResultModel();
@@ -147,6 +151,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * On Check Script Syntax button.
 	 */
 	private onCheckScriptSyntax(): void {
+        this.codeMirrorComponent.clearSyntaxErrors();
 		this.clearLogVariables('syntax');
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
 			this.scriptValidSyntaxResult = result.data;

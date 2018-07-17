@@ -374,8 +374,12 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "find/elseFind statement is missing required [into] keyword"
 			ETLProcessor.getErrorMessage(e) == [
-					message   : 'find/elseFind statement is missing required [into] keyword',
-					lineNumber: 6
+					message: 'find/elseFind statement is missing required [into] keyword',
+					startLine:6,
+					endLine:6,
+					startColumn:null,
+					endColumn:null,
+					fatal:true
 			]
 
 		cleanup:
@@ -466,8 +470,12 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "find/elseFind statement is missing required [with, into] keywords"
 			ETLProcessor.getErrorMessage(e) == [
-					message   : 'find/elseFind statement is missing required [with, into] keywords',
-					lineNumber: 6
+					message: 'find/elseFind statement is missing required [with, into] keywords', 
+					startLine: 6, 
+					endLine: 6, 
+					startColumn: null, 
+					endColumn: null, 
+					fatal: true
 			]
 
 		cleanup:
@@ -847,7 +855,11 @@ class ETLFindSpec extends ETLBaseSpec {
 			e.message == 'No project selected in the user context'
 			ETLProcessor.getErrorMessage(e) == [
 					message: 'No project selected in the user context',
-					lineNumber: 8
+					startLine: 8,
+					endLine: 8,
+					startColumn: null,
+					endColumn: null,
+					fatal: true
 			]
 
 		cleanup:
@@ -1180,8 +1192,13 @@ class ETLFindSpec extends ETLBaseSpec {
 			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
 			ETLProcessor.getErrorMessage(e) == [
 					message: 'You cannot use isApplication with more than one results in FINDINGS',
-					lineNumber: 14
+					startLine: 14,
+					endLine: 14,
+					startColumn: null,
+					endColumn: null,
+					fatal: true
 			]
+
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1458,7 +1475,11 @@ class ETLFindSpec extends ETLBaseSpec {
 			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
 			ETLProcessor.getErrorMessage(e) == [
 					message: 'Unrecognized command for with args [room] for the find / elseFind command',
-					lineNumber: 10
+					startLine: 10,
+					endLine: 10,
+					startColumn: null,
+					endColumn: null,
+					fatal: true
 			]
 
 		cleanup:

@@ -49,7 +49,6 @@ class ETLTransformDataJob {
 			}
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-			progressService.updateData(progressKey, )
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
 
 		} finally {

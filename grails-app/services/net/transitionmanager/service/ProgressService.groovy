@@ -65,7 +65,10 @@ class ProgressService implements ServiceMethods {
 				info.remainingTime = remainingTime
 				info.detail = detail
 				info.lastUpdated = System.currentTimeMillis()
-				info.data = data
+				if (data) {
+					info.data = data
+				}
+
 			}
 		} else {
 			log.debug("Key not found $key")
@@ -182,7 +185,7 @@ class ProgressService implements ServiceMethods {
 
 		ProgressInfo info = progressInfo.getIfPresent(key)
 
-		if (info == null) {
+			if (info == null) {
 			log.debug("Key not found $key")
 			[:]
 		} else {
@@ -192,7 +195,8 @@ class ProgressService implements ServiceMethods {
 				status: info.status,
 				detail: info.detail,
 				remainingTime: info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
-				lastUpdated: info.lastUpdated
+				lastUpdated: info.lastUpdated,
+				data: info.data
 			]
 		}
 	}
