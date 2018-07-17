@@ -407,4 +407,9 @@ class FileSystemService implements InitializingBean {
 		}
 	}
 
+	static boolean tempFileExists(String fileName) {
+		File inputFile = new File(FileSystemService.temporaryDirectory, fileName)
+		return inputFile.exists()
+	}
+
 }
