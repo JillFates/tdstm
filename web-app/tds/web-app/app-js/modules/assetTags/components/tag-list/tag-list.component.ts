@@ -11,8 +11,6 @@ import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {DependencyBatchDetailDialogComponent} from '../../../dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
-import {ImportBatchModel} from '../../../dependencyBatch/model/import-batch.model';
 import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 
 @Component({

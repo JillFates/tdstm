@@ -72,7 +72,7 @@ export class TagService {
 	 */
 	updateTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
-			name: tagModel.name,
+			name: tagModel.name.toUpperCase(),
 			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
@@ -90,7 +90,7 @@ export class TagService {
 	 */
 	createTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
-			name: tagModel.name,
+			name: tagModel.name.toUpperCase(),
 			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
