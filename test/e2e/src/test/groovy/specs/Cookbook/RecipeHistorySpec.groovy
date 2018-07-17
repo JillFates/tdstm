@@ -24,8 +24,8 @@ class RecipeHistorySpec extends GebReportingSpec {
     static testCount
     static randStr = new CommonActions().getRandomString()
     static baseName = "QAE2E"
-    static recipeName = baseName + " " + randStr + " Geb Recipe Test"
-    static recipeWithTasksName = baseName + " " + randStr + " Geb Recipe with Tasks Test"
+    static recipeName = baseName + " " + randStr + " Recipe"
+    static recipeWithTasksName = baseName + " " + randStr + " Recipe with Tasks"
     static recipeDataMap = [
             name: recipeName,
             context: "Event",
