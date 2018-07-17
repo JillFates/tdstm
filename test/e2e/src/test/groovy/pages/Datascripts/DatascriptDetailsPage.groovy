@@ -14,7 +14,8 @@ class DatascriptDetailsPage extends Page{
     static content = {
         modaltitle(required:false) { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
         datascriptDetail { $('div.modal-header h4[_ngcontent-c7]')}
-        dsDetailXIcon {$("div", class:"modal-header").find("button","aria-label":"Close", class:"close")[0]}
+        dsDetailXIcon {$('div.modal.fade.in button.close')}
+        datascriptEditBtn  { $("button", text: contains("Edit"))}
         dsProvider {$('.label-detail')[0]}
         dsName {$('.label-detail')[1]}
         dsMode {$('.label-detail')[2]}
@@ -29,7 +30,11 @@ class DatascriptDetailsPage extends Page{
 
     def clickOnXButton(){
         waitFor{dsDetailXIcon.click()}
-        commonsModule.waitForEtlScriptsModalHidden()
+        commonsModule.waitForDialogModalHidden()
+    }
+
+    def clickOnEditButton(){
+        waitFor{datascriptEditBtn.click()}
     }
 
     def getDSNameLabelText(){

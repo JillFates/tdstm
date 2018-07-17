@@ -65,4 +65,16 @@ class CommonActions {
             checkbox.click()
         }
     }
+
+    def convertRgbToHex(int r, int g, int b) {
+        "#" + toHexValue(r) + toHexValue(g) + toHexValue(b)
+    }
+
+    def toHexValue(int number) {
+        def builder = new StringBuilder(Integer.toHexString(number & 0xff))
+        while (builder.length() < 2) {
+            builder.append("0")
+        }
+        builder.toString()
+    }
 }

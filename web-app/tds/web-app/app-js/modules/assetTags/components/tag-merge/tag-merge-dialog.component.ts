@@ -18,7 +18,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 export class TagMergeDialogComponent {
 
 	protected tagList: Array<TagModel> = [];
-	protected mergeTag: TagModel;
+	protected mergeToTag: TagModel;
 
 	private readonly MERGE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.MERGE_CONFIRMATION';
 
@@ -39,7 +39,7 @@ export class TagMergeDialogComponent {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				let defaultEmptyItem = new TagModel();
 				defaultEmptyItem.name = 'Select...';
-				this.mergeTag = defaultEmptyItem;
+				this.mergeToTag = defaultEmptyItem;
 				this.tagList.push(defaultEmptyItem);
 				this.tagList.push(...result.data.filter( item => item.id !== this.tagModel.id ));
 			} else {
@@ -59,7 +59,7 @@ export class TagMergeDialogComponent {
 			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
 				// Do the merge, then close popup
-				this.tagService.mergeTags(this.tagModel.id, this.mergeTag.id).subscribe( (result: ApiResponseModel) => {
+				this.tagService.mergeTags(this.tagModel.id, this.mergeToTag.id).subscribe( (result: ApiResponseModel) => {
 					if (result.status === ApiResponseModel.API_SUCCESS) {
 						this.activeDialog.close(true);
 					} else {

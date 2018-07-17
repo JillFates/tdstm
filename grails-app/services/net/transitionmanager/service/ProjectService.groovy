@@ -59,7 +59,6 @@ import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserLoginProjectAccess
 import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -76,6 +75,7 @@ class ProjectService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
 	LicenseAdminService licenseAdminService
+	TagService tagService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -492,7 +492,8 @@ class ProjectService implements ServiceMethods {
 
 
     /**
-	 * Used to determine if a company is associated with a project
+	 * Used to clone the default settings and add them to the project parameter,
+	 * including fieldSpecs and default Tags.
 	 * @param project - the project to update with default settings
 	 */
 	void cloneDefaultSettings(Project project) {
@@ -528,6 +529,9 @@ class ProjectService implements ServiceMethods {
 			}
 			log.debug "Created field spec ${spec.key} for project ${project.id}"
 		}
+		// Clone the Default Project Tags (if it has any) and add them to the new project
+		tagService.cloneProjectTags(defProject, project)
+
 	}
 
 	/**
@@ -1339,7 +1343,7 @@ class ProjectService implements ServiceMethods {
 			  COUNT(distinct ulpa.user_login_id, ulpa.date) as activeUserLogins
 			FROM party_relationship pr
 			  LEFT OUTER JOIN user_login u ON pr.party_id_to_id = u.person_id
-			  LEFT OUTER JOIN user_login_project_access ulpa ON PR.party_id_from_id = ulpa.project_id and ulpa.date = ?
+			  LEFT OUTER JOIN user_login_project_access ulpa ON pr.party_id_from_id = ulpa.project_id and ulpa.date = ?
 			WHERE
 			  pr.role_type_code_from_id='PROJECT' AND
 			  pr.party_relationship_type_id='PROJ_STAFF' AND

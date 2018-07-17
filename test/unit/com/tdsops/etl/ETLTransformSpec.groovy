@@ -1413,16 +1413,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 						rowNum == 5
 						errorCount == 1
 						with(fields.retireDate, FieldResult) {
-							value == ''
+							value == null
 							originalValue == null
 							init == null
-							errors == ['Not able to transform blank or null date: ']
+							errors == ['Not able to transform blank or null date: null']
 						}
 					}
 					with(data[5], RowResult) {
 						rowNum == 6
 						errorCount == 1
-						with(fields.retireDate, FieldResult) {
+						with(fields.retireDate  , FieldResult) {
 							value == ''
 							originalValue == ' '
 							init == null

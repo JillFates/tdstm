@@ -17,6 +17,8 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'List',
 		'LEGEND': 'Legend',
 		'LOAD': 'Load',
+		'NAME': 'Name',
+		'MERGE': 'Merge',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
@@ -77,6 +79,8 @@ export const en_DICTIONARY: Object = {
 		'MANAGE_TAGS': 'Manage Tags',
 		'CREATE_TAG': 'Create Tag',
 		'TAG_LIST': {
+			'TAG_MERGE': 'Tag Merge',
+			'MERGE_INTO': 'Merge into',
 			'REMOVE_CONFIRMATION': 'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
@@ -122,7 +126,8 @@ export const en_DICTIONARY: Object = {
 				'PASTE_CONTENT': 'Paste content (CSV, JSON, XML)',
 				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON, XML)',
 				'FETCH_DATA_FROM_WEBSERVICE': 'Fetch data from web service',
-				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.'
+				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.',
+				'FIELD_WILL_BE_INITIALIZED': 'Field will be initialized with the value shown for new records or existing records where the field has no value.'
 			}
 		}
 	},

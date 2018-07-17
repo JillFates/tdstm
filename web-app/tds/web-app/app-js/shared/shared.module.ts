@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
+import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -22,6 +23,7 @@ import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prom
 import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
+import {UIAutoCenterDirective} from './directives/autocenter-directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -39,6 +41,7 @@ import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 import { AddPersonComponent } from './components/add-person/add-person.component';
+import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -57,6 +60,7 @@ import { DictionaryService } from './services/dictionary.service';
 		PopupModule,
 		DropDownsModule,
 		GridModule,
+		InputsModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
@@ -85,7 +89,9 @@ import { DictionaryService } from './services/dictionary.service';
 		SupportsDependsComponent,
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
-		AddPersonComponent
+		AddPersonComponent,
+		AssetTagSelectorComponent,
+		UIAutoCenterDirective
 	],
 	providers: [
 		AuthService,
@@ -124,11 +130,14 @@ import { DictionaryService } from './services/dictionary.service';
 		SupportsDependsComponent,
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
-		AddPersonComponent
+		AddPersonComponent,
+		AssetTagSelectorComponent,
+		UIAutoCenterDirective
 	],
 	entryComponents: [
 		DynamicComponent,
-		DependentCommentComponent]
+		DependentCommentComponent
+	]
 })
 export class SharedModule {
 	constructor(private notifier: NotifierService) {

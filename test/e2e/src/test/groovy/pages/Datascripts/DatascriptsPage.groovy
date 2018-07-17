@@ -33,11 +33,32 @@ class DatascriptsPage extends Page {
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
+        firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
     }
 
     def filterByName(name){
         scrollLeft()
         nameFilter = name
+    }
+
+    def clickOnEditButtonForFirstDS(){
+        waitFor{firstDSEditButton.click()}
+    }
+
+    def clickOnFirstGridRow(){
+        scrollLeft()
+        waitFor{firstDSName.click()}
+    }
+
+    def collectFirstDSInfoDisplayedInGrid(){
+        def dsInfo = [:]
+        dsInfo.putAll([
+                "name": getFirstRowDSName(),
+                "description": getFirstRowDSDescription(),
+                "provider": getFirstRowDSProvider(),
+                "mode": getFirstRowDSMode()
+        ])
+        dsInfo
     }
 
     def filterByDateCreated(date){
@@ -67,25 +88,9 @@ class DatascriptsPage extends Page {
         waitFor{refreshGridIcon.click()}
     }
 
-    def clickOnFirstGridRow(){
-        scrollLeft()
-        waitFor{firstDSName.click()}
-    }
-
     def clickOnNameHeader(){
         scrollLeft()
         waitFor{nameGridHeader.click()}
-    }
-
-    def collectFirstDSInfoDisplayedInGrid(){
-        def dsInfo = [:]
-        dsInfo.putAll([
-                "name": getFirstRowDSName(),
-                "description": getFirstRowDSDescription(),
-                "provider": getFirstRowDSProvider(),
-                "mode": getFirstRowDSMode()
-        ])
-        dsInfo
     }
 
     def getFirstRowDSName(){

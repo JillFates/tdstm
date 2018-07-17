@@ -72,6 +72,9 @@ class ModelService implements ServiceMethods {
 			def fromModelAlias = ModelAlias.findAllByModel(fromModel)
 			ModelAlias.executeUpdate('DELETE ModelAlias WHERE model=?', [fromModel])
 
+			// Delete model record
+			fromModel.delete(flush: true)
+
 			fromModelAlias.each {
 				//toModel.findOrCreateAliasByName(it.name, true)
 				findOrCreateAliasByName(toModel, it.name, true)
@@ -80,8 +83,6 @@ class ModelService implements ServiceMethods {
 			//toModel.findOrCreateAliasByName(fromModel.modelName, true)
 			findOrCreateAliasByName(toModel, fromModel.modelName, true)
 
-			// Delete model record
-			fromModel.delete()
 
 			String principal = securityService.currentUsername
 			if (principal) {
@@ -272,18 +273,20 @@ class ModelService implements ServiceMethods {
 	 * @return true if the alias is valid for the given parameters
 	 */
 	boolean isValidAlias (String newAlias, Model model, boolean allowLocalDuplicates = false, Manufacturer manufacturer = null, String modelName = null) {
-		
-		// if there wasn't enough information supplied 
-		if (!model && (!modelName || !manufacturer))
+
+		// if there wasn't enough information supplied
+		if (!model && (!modelName || !manufacturer)) {
 			return false
-		
-		modelName = (modelName == null) ? (model.modelName) : (modelName)
+		}
+
+		modelName = modelName ?: model.modelName
 		manufacturer = manufacturer ?: model.manufacturer
-			
+
 		// check if the alias matches the model name
-		if (newAlias == modelName)
+		if (newAlias == modelName) {
 			return false
-		
+		}
+
 		// check if there is another model from the same manufacturer with this alias as their name 
 		def modelsWithName = Model.createCriteria().list {
 			eq('modelName', newAlias)
@@ -292,8 +295,9 @@ class ModelService implements ServiceMethods {
 				ne('modelName', model.modelName)
 		}
 		
-		if (modelsWithName.size() > 0)
+		if (modelsWithName.size() > 0) {
 			return false
+		}
 			
 		// check if there is a model from this manufacturer already using this alias
 		def modelsWithAlias = ModelAlias.createCriteria().list {
@@ -303,8 +307,9 @@ class ModelService implements ServiceMethods {
 				ne('model', model)
 		}
 		
-		if (modelsWithAlias)
+		if (modelsWithAlias) {
 			return false
+		}
 
 		// if all the tests were passes, this is a valid alias
 		return true

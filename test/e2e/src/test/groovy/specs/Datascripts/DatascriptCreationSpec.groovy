@@ -59,7 +59,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
         then: 'The pop up loads with no problem and it is closed again'
             at CreateDatascriptPage
             waitFor{datascriptXIcon.click()}
-            commonsModule.waitForEtlScriptsModalHidden()
+            commonsModule.waitForDialogModalHidden()
     }
 
     def "3. Create a Datascript"() {

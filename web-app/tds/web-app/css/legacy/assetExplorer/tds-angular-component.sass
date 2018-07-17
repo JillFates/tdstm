@@ -5,12 +5,10 @@
 @import "../../web-app/css/shared-legacy-angular/dates-info.sass"
 
 .tds-angular-component-content
+  display: table
   .dialog-container
-    border: 1px solid #63a242
+    border: 1px solid transparent
     padding: 0
-    table
-      tr + tr
-        border-top: 2px solid #fff
   .prop
     padding: 5px
   .prop .name
@@ -30,12 +28,24 @@
   .prop .valueNW
     text-align: left
     padding-left: 5px
+    width: 130px
   .prop .bundle
     text-align: left
     width: 50%
   .prop a
     color: #00E
+  .url + .valueNW
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
+    max-width: 90px
+    a
+      font-weight: bold
+      color: #333!important
   table
+    border-collapse: separate
+    border-spacing: 2px
+    padding: 0
     width: 100%
     th
       background: #CCCCCC
@@ -47,7 +57,7 @@
     th, td
       font-size: 13px
       line-height: 12px
-      padding: 0px 4px
+      padding: 4px 5px
       text-align: left
       input
         border: 1px solid #ccc
@@ -68,8 +78,6 @@
         margin-bottom: 4px
     td .label_sm
       background: none repeat scroll 0% 0% #f3f4f6
-    td.valueNW
-      border: 2px solid #fff
     div
       .highField
         label
@@ -87,16 +95,13 @@
           font-size: 13px
           font-style: normal
           font-weight: normal
-      input#assetName
-        width: 100%
-      input#description
-        width: 100%
-      input
+      input:not([disabled])
         height: 27px
+      input#assetName, input#description
         width: 100%
+        max-width: 100%
       input.duration
         width: 90%
-        margin-right: 2px
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,
@@ -211,10 +216,8 @@
         margin-left: 5px
   .dependents-grid.is-dependent-on
     margin-top: 10px
-  .person-list
-    width: 100%
   .swapper-image
-    width: 100%
+    width: 120px
     &::before
       content: ''
       cursor: pointer
@@ -238,6 +241,7 @@
         &.odd
           background: #e0e0e0
         td
+          height: 30px
           &.dep-Validated
 	          background: LightGreen
           &.dep-Unknown
@@ -252,12 +256,17 @@
 	          background: #EEE
   #deps
     .k-grid
-      border: 1px solid #63a242
+      border: 1px solid transparent
       padding: 0
+  .clickableText
+    color: $color-url-element--blue
+    font-weight: bold
+    cursor: pointer
 
   #commentListId
-    .k-grid
-      border-width: 0
+    table
+      td
+        padding: unset
 .url-field
   text-overflow: ellipsis
   overflow: hidden
