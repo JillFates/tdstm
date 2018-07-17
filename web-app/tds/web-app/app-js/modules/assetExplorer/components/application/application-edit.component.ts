@@ -14,6 +14,8 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -25,7 +27,8 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 	})
 	class ApplicationShowComponent implements OnInit {
 
-		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected assetTagsModel: any = {tags: metadata.assetTags};
+		protected newAssetTagsSelection: any = {tags: []};
 		protected tagList: Array<TagModel> = metadata.tagList;
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
@@ -37,7 +40,8 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			private dialogService: UIDialogService,
 			private assetExplorerService: AssetExplorerService,
 			private notifierService: NotifierService,
-			private preference: PreferenceService) {}
+			private preference: PreferenceService,
+			private tagService: TagService) {}
 
 		ngOnInit(): void {
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
@@ -64,14 +68,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
-		}
-
-		/**
-		 * TODO: Document.
-		 * @param $event
-		 */
-		protected onTagValueChange($event: any): void {
-			console.log($event);
 		}
 
 		/**
@@ -137,12 +133,43 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+					this.saveAssetTags();
+				}
 			});
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			this.newAssetTagsSelection.tags = $event.tags;
+			console.log(this.newAssetTagsSelection);
+		}
+
+		private saveAssetTags(): void {
+			let tagsToAdd = {tags: []};
+			let tagsToDelete = {...this.assetTagsModel};
+			this.newAssetTagsSelection.tags.forEach((asset: TagModel) => {
+				let foundIndex = this.assetTagsModel.tags.findIndex( item => item.id === asset.id);
+				if (foundIndex === -1) {
+					tagsToAdd.tags.push(asset);
+				} else {
+					// tag remains
+					tagsToDelete.tags.splice(foundIndex, 1);
+				}
+			});
+			console.log('to add', tagsToAdd);
+			console.log('to delete', tagsToDelete);
+			this.tagService.createAssetTags(this.model.assetId, tagsToAdd.tags.map( item => item.id) )
+				.subscribe(result => {
+					this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				}, error => console.log('error when saving asset tags', error));
 		}
 
 		/**

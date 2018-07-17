@@ -13,6 +13,8 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 declare var jQuery: any;
 
@@ -26,7 +28,8 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 	})
 	class StorageShowComponent implements  OnInit {
 
-		protected assetTagsModel: any = {operator: 'OR', tags: metadata.assetTags};
+		protected assetTagsModel: any = {tags: metadata.assetTags};
+		protected newAssetTagsSelection: any = {tags: []};
 		protected tagList: Array<TagModel> = metadata.tagList;
 		private isDependenciesValidForm = true;
 		constructor(
@@ -35,15 +38,8 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			private preference: PreferenceService,
 			private assetExplorerService: AssetExplorerService,
 			private dialogService: UIDialogService,
-			private notifierService: NotifierService) {
-		}
-
-		/**
-		 * TODO: Document.
-		 * @param $event
-		 */
-		protected onTagValueChange($event: any): void {
-			console.log($event);
+			private notifierService: NotifierService,
+			private tagService: TagService) {
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -84,12 +80,43 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			// Date Formats
 			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
 			// modelRequest.asset.retireDate
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+					this.saveAssetTags();
+				}
 			});
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			this.newAssetTagsSelection.tags = $event.tags;
+			console.log(this.newAssetTagsSelection);
+		}
+
+		private saveAssetTags(): void {
+			let tagsToAdd = {tags: []};
+			let tagsToDelete = {...this.assetTagsModel};
+			this.newAssetTagsSelection.tags.forEach((asset: TagModel) => {
+				let foundIndex = this.assetTagsModel.tags.findIndex( item => item.id === asset.id);
+				if (foundIndex === -1) {
+					tagsToAdd.tags.push(asset);
+				} else {
+					// tag remains
+					tagsToDelete.tags.splice(foundIndex, 1);
+				}
+			});
+			console.log('to add', tagsToAdd);
+			console.log('to delete', tagsToDelete);
+			this.tagService.createAssetTags(this.model.assetId, tagsToAdd.tags.map( item => item.id) )
+				.subscribe(result => {
+					this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				}, error => console.log('error when saving asset tags', error));
 		}
 
 		private showAssetDetailView(assetClass: string, id: number) {

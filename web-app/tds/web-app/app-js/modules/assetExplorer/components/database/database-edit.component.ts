@@ -58,14 +58,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			}
 		}
 
-		/**
-		 * TODO: Document.
-		 * @param $event
-		 */
-		protected onTagValueChange($event: any): void {
-			console.log($event);
-		}
-
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 			if (event && event.code === KEYSTROKE.ESCAPE) {
 				this.cancelCloseDialog();
@@ -110,6 +102,15 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 					this.saveAssetTags();
 				}
 			});
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			this.newAssetTagsSelection.tags = $event.tags;
+			console.log(this.newAssetTagsSelection);
 		}
 
 		private saveAssetTags(): void {

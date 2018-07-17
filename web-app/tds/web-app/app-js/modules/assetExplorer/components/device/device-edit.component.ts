@@ -64,15 +64,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.toggleAssetTypeFields();
 		}
 
-		/**
-		 * TODO: Document.
-		 * @param $event
-		 */
-		protected onTagValueChange($event: any): void {
-			this.newAssetTagsSelection.tags = $event.tags;
-			console.log(this.newAssetTagsSelection);
-		}
-
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 			if (event && event.code === KEYSTROKE.ESCAPE) {
 				this.cancelCloseDialog();
@@ -218,6 +209,15 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 					this.saveAssetTags();
 				}
 			});
+		}
+
+		/**
+		 * TODO: Document.
+		 * @param $event
+		 */
+		protected onTagValueChange($event: any): void {
+			this.newAssetTagsSelection.tags = $event.tags;
+			console.log(this.newAssetTagsSelection);
 		}
 
 		private saveAssetTags(): void {
