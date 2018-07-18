@@ -4214,7 +4214,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						// Deal with 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom', since these are joins
 
-						def sb = new StringBuffer('FROM AssetEntity a ')
+						def sb = new StringBuffer('select a FROM AssetEntity a ')
 
 						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
 						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)}) {
@@ -4245,32 +4245,32 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						sql = sb.toString()
 
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
-						assets = AssetEntity.findAll(sql, map)
+						assets = AssetEntity.executeQuery(sql, map)
 						break
 
 					case 'application':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions(['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'])
 
-						sql = "from Application a $join where $where"
+						sql = "select a from Application a $join where $where"
 						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
-						assets = Application.findAll(sql, map)
+						assets = Application.executeQuery(sql, map)
 						break
 
 					case 'database':
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['dbFormat','size'])
-						sql = "from Database a $join where $where"
+						sql = "select a from Database a $join where $where"
 						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
-						assets = Database.findAll(sql, map)
+						assets = Database.executeQuery(sql, map)
 						break
 
 					case ~/files|file|storage/:
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['fileFormat','size', 'scale', 'LUN'])
-						sql = "from Files a $join where $where"
+						sql = "select a from Files a $join where $where"
 						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
-						assets = Files.findAll(sql, map)
+						assets = Files.executeQuery(sql, map)
 						break
 
 					default:
