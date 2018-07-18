@@ -22,6 +22,9 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {BulkOperationResult} from '../bulk-change/model/bulk-change.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -339,6 +342,21 @@ export class AssetExplorerViewGridComponent {
 					}
 				});
 		}
+	}
+	onBulkOperationResult(operationResult: BulkOperationResult): void {
+		if (operationResult.success) {
+			this.bulkSelectedItems = [];
+			this.onReload();
+
+			if (operationResult.message) {
+				this.notifier.broadcast({
+					name: AlertType.SUCCESS,
+					message: operationResult.message
+				});
+			}
+
+		}
+
 	}
 
 	/**

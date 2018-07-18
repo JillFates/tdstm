@@ -1,11 +1,37 @@
 <style>
 	.bulk-change-actions-component {
 	}
+		.bulk-change-actions-component .modal-content {
+			margin: 0 auto;
+			width: 352px;
+		}
+		.bulk-change-actions-component .modal-body {
+			font-size: 13px;
+			height: 130px;
+			padding: 5px 30px;
+		}
+		.bulk-change-actions-component .modal-footer {
+			padding: 15px 30px;
+		}
+		.bulk-change-actions-component .modal-header {
+			padding-left: 22px;
+		}
+		.bulk-change-actions-component label {
+			cursor: pointer;
+			font-weight: normal;
+		}
+		.bulk-change-actions-component input[type=radio] {
+			cursor: pointer;
+			margin-right: 5px;
+		}
+		.bulk-change-actions-component .affected-assets-number {
+		}
+
 </style>
 
 <div class="bulk-change-actions-component modal fade in" id="bulk-change-action-component" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content resizable" [style.width.px]="500">
+		<div class="modal-content">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()"  type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
@@ -19,8 +45,21 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group">
-										This action will affect {{selectedItems.length}} Assets
+										This action will affect <span class="affected-assets-number">{{selectedItems.length}}</span> Assets
 									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group">
+										<label>
+											<input type="radio" [value]="ACTION.Edit" name="operation" [(ngModel)]="selectedAction" checked> Edit Assets
+										</label>
+									</div>
+									<div class="form-group">
+										<label>
+											<input type="radio" [value]="ACTION.Delete" name="operation" [(ngModel)]="selectedAction">Delete Assets
+										</label>
+									</div>
+
 								</div>
 							</div>
 						</div>
@@ -28,7 +67,7 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left">
+				<button type="button" class="btn btn-primary pull-left" (click)="onNext()">
 					<span class="glyphicon glyphicon-step-forward"></span> Next
 				</button>
 

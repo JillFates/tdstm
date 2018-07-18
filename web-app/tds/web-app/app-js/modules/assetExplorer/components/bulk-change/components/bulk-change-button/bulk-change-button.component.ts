@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
 import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
-import {BulkChangeModel} from '../../model/bulk-change.model';
+import {BulkChangeModel, BulkOperationResult} from '../../model/bulk-change.model';
 
 @Component({
 	selector: 'tds-bulk-change-button',
@@ -11,7 +11,7 @@ import {BulkChangeModel} from '../../model/bulk-change.model';
 })
 export class BulkChangeButtonComponent {
 	@Input() selectedItems: string[];
-	@Output() operationResult = new EventEmitter<boolean>();
+	@Output() operationResult = new EventEmitter<BulkOperationResult>();
 
 	constructor(private dialogService: UIDialogService) {
 		this.selectedItems = [];
@@ -26,11 +26,12 @@ export class BulkChangeButtonComponent {
 
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}
-		], true, false).then(result => {
-			alert('Finishing');
-		}).catch(result => {
-			console.log(result);
+		], true, false).then(bulkOperationResult => {
+			this.operationResult.emit(bulkOperationResult);
+		}).catch(err => {
+			console.log(err);
 			console.log('Dismissed Dialog');
+			this.operationResult.emit(err);
 		});
 	}
 }
