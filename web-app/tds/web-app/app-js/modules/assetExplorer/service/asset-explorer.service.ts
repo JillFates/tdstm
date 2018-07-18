@@ -359,7 +359,7 @@ export class AssetExplorerService {
 		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.status;
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
