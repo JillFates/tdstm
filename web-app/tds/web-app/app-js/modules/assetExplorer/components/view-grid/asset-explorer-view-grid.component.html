@@ -21,8 +21,6 @@
 				<label>
 					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
-			<button type="button" class="btn btn-default btnDelete pull-left" id="btnDeleteAll" [disabled]="!hasItensSelected()" (click)="onBulkDelete()">
-				<i class="fa fa-fw fa-trash"></i> {{'GLOBAL.DELETE' | translate}}</button>
 			<tds-bulk-change-button [selectedItems]="bulkSelectedItems" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 		</div>
 		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
