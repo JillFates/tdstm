@@ -508,7 +508,7 @@ class DataviewService implements ServiceMethods {
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
 					if(dataviewSpec.columns[index].property == 'tags'){
-						handleTags(cell)
+						cell = handleTags(cell)
 					}
 
 					if (dataviewSpec.columns[index]) {
@@ -521,14 +521,13 @@ class DataviewService implements ServiceMethods {
         ]
     }
 
-	private void handleTags(String cell) {
+	private handleTags(String cell) {
 		def json = JsonUtil.parseJson("""{"tags":$cell}""").tags
 
-		json.each { Map tag ->
+		return json.collect { Map tag ->
 			tag.css = Color.valueOfParam(tag.color).css
+			return tag
 		}
-
-		cell = json
 	}
 
     /**
