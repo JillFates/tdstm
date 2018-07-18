@@ -11,7 +11,7 @@ import spock.lang.Stepwise
 class TagsCreationSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "QAE2E"
     static nowDate = new Date().format("MM/dd/yyyy")
     static customTag = [
