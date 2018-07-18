@@ -49,7 +49,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
                 createViewModule.selectRandomCheckboxes()
                 waitFor { createViewModule.firstSave() }
                 at SaveViewPage
-                waitFor { enterName(RandomString.getInstance().randomAlphaNumeric(10)) }
+                waitFor { enterName(randStr) }
                 waitFor { clickSave() }
                 waitFor { menuModule.goToAssetViewManager() }
                 at AssetViewsPage

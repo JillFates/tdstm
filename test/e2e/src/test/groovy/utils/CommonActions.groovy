@@ -79,7 +79,7 @@ class CommonActions {
         builder.toString()
     }
 
-    def getRandomString(){
-        RandomString.getInstance().randomAlphaNumeric(8)
+    def getRandomString(Integer charNumbers = 5){
+        RandomString.getInstance().randomAlphaNumeric(charNumbers)
     }
 }
