@@ -28,8 +28,10 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	};
 
 	ngOnInit(): void {
-		this.assetSelectorModel.tags = this.model.tags;
-		this.assetSelectorModel.switch = this.model.operator === 'AND' ? true : false;
+		if (this.model) {
+			this.assetSelectorModel.tags = this.model.tags;
+			this.assetSelectorModel.switch = this.model.operator === 'AND' ? true : false;
+		}
 	}
 
 	/**
