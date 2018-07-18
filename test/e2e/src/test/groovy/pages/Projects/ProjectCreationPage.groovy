@@ -33,4 +33,18 @@ class ProjectCreationPage extends Page{
         pcCancelBtn         { $("input", type:"button", class:"cancel", value:"Cancel")} //TODO Cancel Button has no ID
         // pcPlanMethod        {} //TODO Plan Methodology label was wrong 'for='. Also value has no reference
     }
+
+    def fillInFields(projInfoMap){
+        waitFor {pcClientSelector.click()}
+        waitFor {pcClientItem.click()}
+        pcProjectCode = projInfoMap.projName
+        pcProjectName = projInfoMap.projName
+        pcDescription = projInfoMap.projDesc
+        pcComment = projInfoMap.projComment
+        pcCompletionDate = projInfoMap.projCompDate
+    }
+
+    def clickOnSaveButton(){
+        waitFor {pcSaveBtn.click()}
+    }
 }

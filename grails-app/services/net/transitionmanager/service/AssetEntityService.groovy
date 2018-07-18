@@ -160,6 +160,7 @@ class AssetEntityService implements ServiceMethods {
 	def userPreferenceService
     def assetService
     def commentService
+	def tagAssetService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -3071,6 +3072,12 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
+					// clone asset Tags
+					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
+					if (sourceTagIds) {
+						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+					}
+
 					return clonedAsset.id
 				}
 			}

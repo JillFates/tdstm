@@ -362,7 +362,11 @@ export class AssetExplorerViewGridComponent {
 	 */
 	private getCellClass(column: ViewColumn): string {
 		if (['common_assetName', 'common_id'].indexOf(column.domain + '_' + column.property) !== -1) {
-			return 'asset-detail-link';
+			let classColumn = 'asset-detail-link';
+			if (column.property === 'assetName') {
+				classColumn += ' asset-detail-name-column';
+			}
+			return classColumn;
 		}
 		return '';
 	}

@@ -91,9 +91,6 @@
                                 <span [ngClass]="dataItem.css" class="label tag"></span>
                             </div>
                         </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
-                            {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
-                        </ng-template>
 
                         <!-- Edit Templates -->
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'name'">
@@ -127,10 +124,17 @@
                                  *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'color' )">
                                 <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
                                 <ng-template #dateFilter>
-                                    <kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"
-                                                      [ngModelOptions]="{standalone: true}"></kendo-datepicker>
-                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
-                                          class="fa fa-times form-control-feedback"></span>
+                                    <kendo-datepicker [format]="dateFormat"
+                                                      [(ngModel)]="column.filter"
+                                                      [ngModelOptions]="{standalone: true}"
+                                                      (valueChange)="gridSettings.onFilter(column)"
+                                                      style="width: 100%;"></kendo-datepicker>
+                                    <span *ngIf="column.filter" (click)="gridSettings.clearFilter(column)"
+                                          style="margin-right: 25px" class="fa fa-times form-control-feedback"></span>
+                                    <!--<kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"-->
+                                                      <!--[ngModelOptions]="{standalone: true}"></kendo-datepicker>-->
+                                    <!--<span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"-->
+                                          <!--class="fa fa-times form-control-feedback"></span>-->
                                 </ng-template>
                                 <ng-template #stringFilter>
                                     <input [(ngModel)]="column.filter" (keyup)="gridSettings.onFilter(column)"

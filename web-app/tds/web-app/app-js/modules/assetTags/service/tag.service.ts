@@ -19,7 +19,13 @@ export class TagService {
 	getTags(): Observable<ApiResponseModel> {
 		return this.http.get(this.tagURL)
 			.map((res: Response) => {
-				return res.json();
+				let jsonResult = res.json();
+				let models: Array<TagModel> = jsonResult && jsonResult.status === ApiResponseModel.API_SUCCESS && jsonResult.data;
+				models.forEach((model: TagModel) => {
+					model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : null);
+					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
+				});
+				return jsonResult;
 			})
 			.catch((error: any) => error.json());
 	}

@@ -4,7 +4,7 @@ export class TagListColumnsModel {
 
 	public columns: Array<GridColumnModel>;
 
-	constructor() {
+	constructor(dateFormat: string) {
 		this.columns = [
 			{
 				label: 'Name',
@@ -54,7 +54,7 @@ export class TagListColumnsModel {
 				label: 'Date Created',
 				property: 'dateCreated',
 				type: 'date',
-				format: '{0:d}',
+				format: dateFormat,
 				width: 160,
 				locked: false
 			},
@@ -62,7 +62,7 @@ export class TagListColumnsModel {
 				label: 'Last Modified',
 				property: 'lastModified',
 				type: 'date',
-				format: '{0:d}',
+				format: dateFormat,
 				width: 160,
 				locked: false
 			},

@@ -27,13 +27,25 @@ export class ConstraintModel {
 }
 
 export class FieldImportance {
-	public static C = {
-		name: 'critical',
-		color: '#F9FF90'
+	public static Y = {
+		name: 'yellow',
+		color: '#FAFF9B'
 	};
-	public static I = {
-		name: 'important',
+	public static G = {
+		name: 'green',
 		color: '#D4F8D4'
+	};
+	public static B = {
+		name: 'blue',
+		color: '#A9D6F2'
+	};
+	public static P = {
+		name: 'pink',
+		color: '#FFA5B4'
+	};
+	public static O = {
+		name: 'orange',
+		color: '#FFC65E'
 	};
 	public static N = {
 		name: 'normal',
@@ -45,6 +57,6 @@ export class FieldImportance {
 	};
 }
 
-export const FIELD_COLORS = ['Y', 'G', 'B', 'P', 'O', 'N', 'U'];
+export const FIELD_COLORS = ['Y', 'G', 'P', 'B', 'O', 'N', 'U'];
 
 export const FIELD_NOT_FOUND = 'Field Not Found';

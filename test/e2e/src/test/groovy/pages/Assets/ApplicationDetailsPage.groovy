@@ -42,4 +42,12 @@ class ApplicationDetailsPage extends Page{
         waitFor {adModalCloseBtn.click()}
         waitFor {!adModalWindow.displayed}
     }
+
+    def clickOnCloneButton(){
+        waitFor { adModalCloneBtn.click() }
+    }
+
+    def getApplicationName(){
+        adModalAppName.text().trim()
+    }
 }

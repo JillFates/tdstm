@@ -1,6 +1,7 @@
 package pages.Projects
 
 import geb.Page
+import modules.MenuModule
 
 class ProjectDetailsPage extends Page {
 
@@ -20,5 +21,10 @@ class ProjectDetailsPage extends Page {
         pdEditBtn                   { $("input", type:"submit",class:"edit", name:"_action_Edit")}
         pdDeleteBtn                 { $("input", type:"submit",class:"delete", name:"_action_Delete")}
         pdFieldSetBtn               { $("input", type:"button",class:"show")}
+        menuModule { module MenuModule}
+    }
+
+    def waitForProjectCreatedMessage(projName){
+        waitFor {pdPageMessage.text().contains(projName + " was created")}
     }
 }

@@ -27,24 +27,7 @@ import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-View-config',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html',
-	styles: [`
-		.pd-top-5 { padding-top:5px; }
-		.disabled { border-top-color: #777 !important;}
-		.disabled a { color:#777 !important; }
-		.C { background-color: #F9FF90;}
-        .I { background-color: #D4F8D4;}
-        .N { background-color: #FFF;}
-		.U { background-color: #F3F4F6;}
-		li.active a { font-weight:bold;}
-		.drag-icon { padding: 8px 10px 0px 5px; color: #9f9f9f;}
-		.drag-label {
-			padding: 0;
-			overflow: hidden;
-			height: 20px;
-			word-break: break-all;
-		}
-	`]
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html'
 })
 export class AssetExplorerViewConfigComponent implements OnInit {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;

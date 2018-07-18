@@ -34,4 +34,43 @@ class AssetClonePage extends Page {
         asclModalDialogConfirmBtn   { asclModalDialog.find("button",class:"btn btn-primary pull-left accept-confirmation-btn")}
         asclModalDialogCancelbtn    { asclModalDialog.find("button",class:"btn btn-default pull-right cancel-confirmation-btn")}
     }
+
+    def getModalTitle(){
+        waitFor { asclModalTitle.text().trim() }
+    }
+
+    def getValidationModalLegend(){
+        asclModalErrorMsg.text().trim()
+    }
+
+    def getModalInputNameValue(){
+        asclModalAssetCloneName.value()
+    }
+
+    def clickOnCloneButton(){
+        waitFor{asclModalCloneBtn.click()}
+        waitFor {asclModalDialog.displayed}
+    }
+
+    def clickOnCloseInConfirmationDialog(){
+        waitFor {asclModalDialogCancelbtn.click()}
+        waitFor {!asclModalDialog.displayed}
+    }
+
+    def closeModal(){
+        waitFor {asclModalCancelBtn.click()}
+        waitFor {!asclModalWindow.displayed}
+    }
+
+    def clickOnConfirmInConfirmationDialog(){
+        waitFor {asclModalDialogConfirmBtn.click()}
+    }
+
+    def getConfirmationDialogTitle(){
+        asclModalDialogTitle.text().trim()
+    }
+
+    def getConfirmationDialogBodyText(){
+        asclModalDialogText.text().trim()
+    }
 }
