@@ -8,14 +8,14 @@ import pages.Assets.ApplicationCreationPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
-import jodd.util.RandomString
+import utils.CommonActions
 
 @Stepwise
 class ApplicationDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "QAE2E"
     static appName = baseName + " " + randStr + " App For E2E Created"
     static appDesc = baseName + " " + randStr + " App Description Created"

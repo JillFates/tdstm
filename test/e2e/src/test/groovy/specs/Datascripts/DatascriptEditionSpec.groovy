@@ -1,7 +1,7 @@
 package specs.Datascripts
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Datascripts.CreateDatascriptPage
 import pages.Datascripts.DatascriptDetailsPage
 import pages.Datascripts.EditDatascriptPage
@@ -15,7 +15,7 @@ class DatascriptEditionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = new CommonActions().getRandomString() + " "
     static E2E = "E2E DS"
     static datascriptName = randStr + E2E + " Name"
     static datascriptDescription = randStr + E2E + " Description"

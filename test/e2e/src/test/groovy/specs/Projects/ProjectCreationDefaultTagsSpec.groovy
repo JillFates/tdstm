@@ -1,7 +1,7 @@
 package specs.Projects
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Projects.ProjectCreationPage
 import pages.Projects.ProjectDetailsPage
 import pages.Projects.ProjectListPage
@@ -15,7 +15,7 @@ import geb.error.RequiredPageContentNotPresent
 class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "QAE2E"
     static projName = baseName +" "+ randStr
     static licensedProjectName = "TM-Demo"
