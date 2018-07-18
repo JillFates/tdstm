@@ -58,6 +58,6 @@ class EditDatascriptPage extends Page{
 
     def clickOnSaveButton(){
         waitFor{datascriptSaveBtn.click()}
-        commonsModule.waitForEtlScriptsModalHidden()
+        commonsModule.waitForDialogModalHidden()
     }
 }

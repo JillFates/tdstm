@@ -19,7 +19,13 @@ export class TagService {
 	getTags(): Observable<ApiResponseModel> {
 		return this.http.get(this.tagURL)
 			.map((res: Response) => {
-				return res.json();
+				let jsonResult = res.json();
+				let models: Array<TagModel> = jsonResult && jsonResult.status === ApiResponseModel.API_SUCCESS && jsonResult.data;
+				models.forEach((model: TagModel) => {
+					model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : null);
+					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
+				});
+				return jsonResult;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -73,7 +79,7 @@ export class TagService {
 	updateTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
 			name: tagModel.name,
-			description: tagModel.description,
+			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
 		return this.http.put(`${this.tagURL}/${tagModel.id}`, JSON.stringify(request))
@@ -91,7 +97,7 @@ export class TagService {
 	createTag(tagModel: TagModel): Observable<ApiResponseModel> {
 		const request: any = {
 			name: tagModel.name,
-			description: tagModel.description,
+			description: tagModel.description ? tagModel.description : '',
 			color: tagModel.color
 		};
 		return this.http.post(this.tagURL, JSON.stringify(request))
@@ -119,8 +125,8 @@ export class TagService {
 	 * @param {number} tagIdOne
 	 * @param {number} tagIdTwo
 	 */
-	mergeTags(tagIdOne: number, tagIdTwo: number): Observable<ApiResponseModel> {
-		return this.http.put(`${this.tagURL}/${tagIdOne}/merge/${tagIdTwo}`, null)
+	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
+		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})

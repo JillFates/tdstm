@@ -1290,8 +1290,8 @@ class DataImportService implements ServiceMethods {
 		if (info.find?.results?.size() == 1) {
 			// Ignore if the find.query found more than 1
 			id = info.find.results[0]
-		} else if (NumberUtil.isaNumber(info.value)) {
-			id = info.value
+		} else {
+			id = NumberUtil.toLong(info.value)
 		}
 		log.debug 'searchForDomainById() resolved id to {}', id
 
@@ -1400,7 +1400,11 @@ class DataImportService implements ServiceMethods {
 
 		// If the lookup is for a reference field then it is mandatory in the script to account for this via
 		if ( ! fieldsInfo[propertyName].find?.query || fieldsInfo[propertyName].find.query.size() == 0 ) {
-			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, NO_FIND_QUERY_SPECIFIED_MSG)
+			// If the field doesn't have an ID specified then lets error
+			def fieldValue = fieldsInfo[propertyName].value
+			if (NumberUtil.toLong(fieldValue) == null) {
+				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, NO_FIND_QUERY_SPECIFIED_MSG)
+			}
 		} else {
 			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0

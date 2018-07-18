@@ -1,9 +1,9 @@
 package com.tdsops.common.sql
 
-import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
@@ -633,7 +633,13 @@ class SqlUtil {
 		Closure queryBuilder = fieldSearchData.manyToManyQueries[key]
 		Map queryInfo = queryBuilder(fieldSearchData.filter)
 		if (queryInfo) {
-			matches = AssetEntity.executeQuery(queryInfo.query, queryInfo.params)
+			Class domainClass = fieldSearchData.domain
+			// Check the given Class is an actual domain class.
+			if (GormUtil.isDomainClass(domainClass)) {
+				matches = domainClass.executeQuery(queryInfo.query, queryInfo.params)
+			} else {
+				throw new RuntimeException("Invalid domain class ${domainClass.name}.")
+			}
 		}
 
 		return matches

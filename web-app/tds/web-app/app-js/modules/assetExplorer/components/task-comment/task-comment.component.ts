@@ -31,7 +31,8 @@ export class TaskCommentComponent implements OnInit {
 	private modalType = ModalType;
 	private viewUnpublished = false;
 
-	private showAll: boolean;
+	private showAllTasks: boolean;
+	private showAllComments: boolean;
 	private comments: any[] = [];
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
@@ -39,7 +40,8 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.showAll = false;
+		this.showAllTasks = false;
+		this.showAllComments = false;
 		this.getAllComments();
 	}
 
@@ -60,11 +62,16 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		return this.comments
+		const tasks = this.comments
 			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
-			.filter(comment => this.showAll
-				|| (comment.commentInstance.commentType === 'issue' && comment.commentInstance.status !== 'Completed')
-				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
+			.filter(comment => comment.commentInstance.commentType === 'issue')
+			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
+
+		const comments = this.comments
+			.filter(comment => comment.commentInstance.commentType === 'comment')
+			.filter(comment => this.showAllComments || !comment.commentInstance.isResolved);
+
+		return [...tasks, ...comments];
 	}
 
 	public getAssignedTo(comment): any {
@@ -204,10 +211,14 @@ export class TaskCommentComponent implements OnInit {
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
-					this.taskManagerService.deleteTaskComment(dataItem.commentInstance.id).subscribe((res) => {
+					const commentId = dataItem.commentInstance.id;
+
+					this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
 						// delete the item
 						this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
 						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
+						// update comments collections
+						this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
 					});
 				}
 			})

@@ -58,6 +58,7 @@ class MenuModule extends Module {
         projectsCredentials     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/credential/list")}
         projectsDatascripts     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
         projectsActions         { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/action/list")}
+        projectsTags            { projectsMenu.find("li.menu-projects-tags")}
 
         assetsItem              { menuBar.find("li.menu-parent-assets")}
         assetsMenu              { assetsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -177,6 +178,11 @@ class MenuModule extends Module {
 
     def assertProjectName(name){
         projectName.text().contains(name)
+    }
+
+    def goToTagsPage(){
+        selectMenu projectsItem
+        selectItem projectsTags
     }
 
 }

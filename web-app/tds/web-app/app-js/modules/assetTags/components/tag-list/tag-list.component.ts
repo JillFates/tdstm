@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TagService} from '../../service/tag.service';
@@ -11,8 +10,6 @@ import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {DependencyBatchDetailDialogComponent} from '../../../dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
-import {ImportBatchModel} from '../../../dependencyBatch/model/import-batch.model';
 import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 
 @Component({
@@ -28,7 +25,7 @@ export class TagListComponent {
 	protected duplicateName = false;
 	private editedRowIndex: number;
 	private editedTag: TagModel;
-	protected userPreferenceService;
+	protected dateFormat: string;
 
 	private readonly REMOVE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.REMOVE_CONFIRMATION';
 
@@ -39,8 +36,11 @@ export class TagListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		userPreferenceService: PreferenceService) {
-			this.userPreferenceService = userPreferenceService;
-			this.onLoad();
+			userPreferenceService.getUserDatePreferenceAsKendoFormat() .subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+				this.gridColumns = new TagListColumnsModel(`{0:${dateFormat}}`);
+				this.onLoad();
+			});
 	}
 
 	/**
@@ -48,7 +48,6 @@ export class TagListComponent {
 	 */
 	private onLoad(): void {
 		this.colorList = this.tagService.getTagColorList();
-		this.gridColumns = new TagListColumnsModel();
 		this.tagService.getTags().subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.gridSettings = new DataGridOperationsHelper(result.data,
@@ -104,7 +103,6 @@ export class TagListComponent {
 	 */
 	protected addHandler({sender}): void {
 		this.closeEditor(sender);
-
 		sender.addRow(new TagModel());
 	}
 

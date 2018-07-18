@@ -36,4 +36,17 @@ class ProjectListPage extends Page {
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
         projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
     }
+
+    def clickOnCreateButton(){
+        waitFor {createProjectBtn.click()}
+    }
+
+    def filterByName(name){
+        waitFor {projectNameFilter.displayed}
+        projectNameFilter = name
+    }
+
+    def clickOnProjectByName(name){
+        waitFor {projectNameGridField.find("a", text: name).first().click()}
+    }
 }

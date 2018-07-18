@@ -207,7 +207,7 @@ class TagService implements ServiceMethods {
 			tag.name = name
 		}
 
-		if (description) {
+		if(description != null) {
 			tag.description = description
 		}
 

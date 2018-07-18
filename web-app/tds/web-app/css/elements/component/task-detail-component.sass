@@ -4,6 +4,27 @@
     min-width: 769px
     .modal-body
       height: 86%
+      .task-layout
+        display: flex
+        flex-direction: column
+      .full-height
+        height: 100%
+      .grow-container
+        display: flex
+        flex: 1
+        td
+          flex: 1
+          position: relative
+          .k-grid
+            position: relative
+            min-height: 100%
+      .no-grow-container
+        flex: 0
+        .task-details
+          display: flex
+          flex-direction: column
+        .dates-info-container
+          display: flex
   .successor-predecessor-table
     thead
       th.k-header

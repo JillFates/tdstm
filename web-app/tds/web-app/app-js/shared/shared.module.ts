@@ -23,6 +23,7 @@ import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prom
 import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
+import {UIAutoCenterDirective} from './directives/autocenter-directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -89,7 +90,8 @@ import { DictionaryService } from './services/dictionary.service';
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
-		AssetTagSelectorComponent
+		AssetTagSelectorComponent,
+		UIAutoCenterDirective
 	],
 	providers: [
 		AuthService,
@@ -129,7 +131,8 @@ import { DictionaryService } from './services/dictionary.service';
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
-		AssetTagSelectorComponent
+		AssetTagSelectorComponent,
+		UIAutoCenterDirective
 	],
 	entryComponents: [
 		DynamicComponent,
