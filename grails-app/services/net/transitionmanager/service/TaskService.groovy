@@ -1573,7 +1573,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	List findTaskBatchesForRecipeContext(Recipe recipe, Long eventId) {
 		TaskBatch.createCriteria().list {
 			eq('contextId', eventId)
-			eq('contextType', recipe.asContextType())
 			eq('recipe', recipe)
 		}
 	}
@@ -5264,7 +5263,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			id: taskBatch.id,
 			recipeId : taskBatch.recipe?.id ?: 0,
 			recipeName : taskBatch.recipe?.name ?: '',
-			contextName : taskBatch.contextName(),
 			taskCount: taskBatch.taskCount,
 			exceptionCount: taskBatch.exceptionCount,
 			createdBy: taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
@@ -5290,7 +5288,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		securityService.assertCurrentProject taskBatch.recipeVersionUsed.recipe.project
 
 		[id: taskBatch.id,
-		 contextName:    taskBatch.contextName(),
 		 taskCount:      taskBatch.taskCount,
 		 exceptionCount: taskBatch.exceptionCount,
 		 createdBy:      taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
