@@ -31,7 +31,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskPublish)
 	def publish(Long id) {
-		renderSuccessJson(tasksUpdated: taskService.publish(id))
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(tasksUpdated: taskService.publish(id, project))
 	}
 
 	/**
@@ -39,7 +40,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskPublish)
 	def unpublish(Long id) {
-		renderSuccessJson(tasksUpdated: taskService.unpublish(id))
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(tasksUpdated: taskService.unpublish(id, project))
 	}
 
 	/**
@@ -47,7 +49,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskBatchDelete)
 	def deleteBatch(Long id) {
-		taskService.deleteBatch(id)
+		Project project = securityService.userCurrentProject
+		taskService.deleteBatch(id, project)
 		renderSuccessJson()
 	}
 
@@ -58,7 +61,9 @@ class WsTaskController implements ControllerMethods {
 	def generateTasks() {
 		ContextCommand context = populateCommandObject(ContextCommand)
 		validateCommandObject(context)
-		def result = taskService.initiateCreateTasksWithRecipe(context)
+		Project project = securityService.userCurrentProject
+
+		def result = taskService.initiateCreateTasksWithRecipe(context, project)
 		renderSuccessJson(jobId: result.jobId)
 	}
 
@@ -70,7 +75,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskBatchView)
 	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId) {
-		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, params.logs)
+		Project project = securityService.userCurrentProject
+		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, project, params.logs)
 		renderSuccessJson(taskBatch: result)
 	}
 
@@ -79,7 +85,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskBatchView)
 	def listTaskBatches(Long recipeId) {
-		renderSuccessJson(list: taskService.listTaskBatches(recipeId, params.limitDays))
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(list: taskService.listTaskBatches(recipeId, params.limitDays, project))
 	}
 
 	/**
@@ -87,12 +94,14 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskBatchView)
 	def retrieveTaskBatch(Long id) {
-		renderSuccessJson(taskBatch: taskService.getTaskBatch(id))
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(taskBatch: taskService.getTaskBatch(id, project))
 	}
 
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def taskReset(Long id) {
-		taskService.resetTasksOfTaskBatch(id)
+		Project project = securityService.userCurrentProject
+		taskService.resetTasksOfTaskBatch(id, project)
 		renderSuccessJson()
 	}
 

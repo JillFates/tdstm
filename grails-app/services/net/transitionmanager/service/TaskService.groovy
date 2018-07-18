@@ -1590,7 +1590,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(ContextCommand context) {
+	Map initiateCreateTasksWithRecipe(ContextCommand context, Project currentProject) {
 		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
@@ -1600,7 +1600,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Find the Recipe Version that the user selected
-		Recipe recipe = getRequired(Recipe, context.recipeId, 'The selected recipe not found')
+		Recipe recipe = get(Recipe, context.recipeId, currentProject)
 		if (recipe.project.id != currentProjectId) {
 			throw new UnauthorizedException('The recipe version submitted is not associated with current project')
 		}
@@ -1628,7 +1628,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		if (contextObj.eventId ) {
-			MoveEvent event = getRequired(MoveEvent, contextObj.eventId)
+			MoveEvent event = get(MoveEvent, contextObj.eventId, currentProject)
 			if (event.project.id != currentProjectId) {
 				throw new UnauthorizedException('Referenced context is not associated with current project')
 			}
@@ -1666,6 +1666,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			trigger.jobDataMap.publishTasks = context.autoPublish
 			trigger.jobDataMap.tries = 0
 			trigger.jobDataMap.context = contextObj
+			trigger.jobDataMap.project = currentProject
 			trigger.setJobName('GenerateTasksJob')
 			trigger.setJobGroup('tdstm-generate-tasks')
 			quartzScheduler.scheduleJob(trigger)
@@ -1730,7 +1731,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * ProgressService to update the job with the status.
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
 	 */
-	void generateTasks(TaskBatch taskBatch, Boolean publishTasks) {
+	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, Project currentProject) {
 		String progressKey = taskBatchKey(taskBatch.id)
 		Boolean errored = false
 		def detail = ''
@@ -1738,7 +1739,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks) called"
 
 		try {
-			generateTasks(taskBatch, publishTasks, progressKey)
+			generateTasks(taskBatch, publishTasks, progressKey, currentProject)
 		} catch (RuntimeException e) {
 			errored = true
 			detail = e.message
@@ -1754,7 +1755,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * ProgressService to update the job with the status.
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
 	 */
-	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey) {
+	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey, Project currentProject) {
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks, progressKey:$progressKey) called"
 
@@ -1837,7 +1838,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		MoveEvent event = null
 		if(contextObj.eventId) {
-			event = getRequired(MoveEvent, contextObj.eventId)
+			event = get(MoveEvent, contextObj.eventId, currentProject)
 			settings.event = event
 		}
 
@@ -5091,11 +5092,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * Used to reset the default status values for a batch of tasks
 	 * @param taskBatchId - the id of the TaskBatch to be reset
 	 */
-	def resetTasksOfTaskBatch(Long taskBatchId) {
+	def resetTasksOfTaskBatch(Long taskBatchId, Project currentProject) {
 		securityService.requirePermission Permission.TaskPublish
 		controllerService.getRequiredProject()
 
-		resetTaskDataForTaskBatch(getRequired(TaskBatch, taskBatchId))
+		resetTaskDataForTaskBatch(get(TaskBatch, taskBatchId, currentProject))
 	}
 
 	/**
@@ -5104,8 +5105,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskId the task id
 	 * @return the number of affected tasks
 	 */
-	def publish(taskId) {
-		return basicPublish(taskId, true, Permission.TaskPublish)
+	def publish(Long taskId, Project currentProject) {
+		return basicPublish(taskId, true, Permission.TaskPublish, currentProject)
 	}
 
 	/**
@@ -5114,8 +5115,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskId the task id
 	 * @return the number of affected tasks
 	 */
-	def unpublish(taskId) {
-		return basicPublish(taskId, false, Permission.TaskPublish)
+	def unpublish(Long taskId, Project currentProject) {
+		return basicPublish(taskId, false, Permission.TaskPublish, currentProject)
 	}
 
 	/**
@@ -5126,12 +5127,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param permission the requested permission
 	 * @return the number of affected tasks
 	 */
-	private basicPublish(Long taskId, shouldPublish, String permission) {
+	private basicPublish(Long taskId, shouldPublish, String permission, Project currentProject) {
 		securityService.requirePermission permission
 		controllerService.getRequiredProject()
 
-		TaskBatch task = getRequired(TaskBatch, taskId)
-		//TODO check access task, currentProject
+		TaskBatch task = get(TaskBatch, taskId, currentProject)
+
 		if (task.isPublished == shouldPublish) {
 			throw new IllegalArgumentException('The task is already in that state')
 		}
@@ -5150,14 +5151,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param taskBatchId the task id
 	 */
-	def deleteBatch(Long taskBatchId) {
+	def deleteBatch(Long taskBatchId, Project currentProject) {
 		String currentUsername = securityService.currentUsername
 		log.debug "User $currentUsername is attempting to delete TaskBatch $taskBatchId"
 
 		securityService.requirePermission Permission.TaskBatchDelete
 		controllerService.getRequiredProject()
 
-		TaskBatch taskBatch = getRequired(TaskBatch, taskBatchId)
+		TaskBatch taskBatch = get(TaskBatch, taskBatchId, currentProject)
+
 		if (taskBatch.recipe) {
 			securityService.assertCurrentProject taskBatch.recipe.project
 		}
@@ -5175,10 +5177,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param includeLogs - whether to include the logs information or not
 	 * @return A taskBatch map if found or null
 	 */
-	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId, includeLogs) {//context id become event Id
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId, Project currentProject, includeLogs) {//context id become event Id
 		controllerService.getRequiredProject()
 
-		Recipe recipe = getRequired(Recipe, recipeId)
+		Recipe recipe = get(Recipe, recipeId, currentProject)
 		securityService.assertCurrentProject recipe.project
 
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
@@ -5227,10 +5229,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param limitDays - the number of days to limit the search
 	 * @return the list of Task batches
 	 */
-	def listTaskBatches(Long recipeId, limitDays) {
-		Project currentProject = controllerService.requiredProject
+	def listTaskBatches(Long recipeId, limitDays, Project currentProject) {
+		controllerService.requiredProject
 
-		Recipe recipe = getRequired(Recipe, recipeId)
+		Recipe recipe = get(Recipe, recipeId, currentProject)
 		securityService.assertCurrentProject recipe.project
 
 		boolean listAll=(limitDays=='All')
@@ -5286,10 +5288,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskBatchId - the id of the task batch
 	 * @return the task batch
 	 */
-	def getTaskBatch(taskBatchId) {
+	def getTaskBatch(taskBatchId, Project currentProject) {
 		controllerService.getRequiredProject()
 
-		TaskBatch taskBatch = getRequired(TaskBatch, taskBatchId)
+		TaskBatch taskBatch = get(TaskBatch, taskBatchId, currentProject)
 		securityService.assertCurrentProject taskBatch.recipeVersionUsed.recipe.project
 
 		[id: taskBatch.id,
@@ -5304,25 +5306,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		 infoLog:        taskBatch.infoLog]
 	}
 
-// TODO BB to traits
-	private <T> T getRequired(Class<T> clazz, id, String errorMessage = null) {
-		if (!(id instanceof Long || id instanceof Integer)) {
-			throw new IllegalArgumentException('An invalid ' + clazz.simpleName + ' id was received: ' + id)
-		}
-		T t = clazz.get(id)
-		if (t) {
-			t
-		}
-		else {
-			throw new EmptyResultException(errorMessage)
-		}
-	}
-
-	private void assertProject(Project project) {
-		if (project == null) {
-			throw new EmptyResultException('No project selected')
-		}
-	}
 	/**
 	 *
 	 *  Finds All tasks by an assetEntity.

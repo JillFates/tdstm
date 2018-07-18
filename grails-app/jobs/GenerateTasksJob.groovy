@@ -1,5 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.service.TaskService
 import org.quartz.JobDataMap
@@ -22,12 +23,13 @@ class GenerateTasksJob {
 			JobDataMap dataMap = context.mergedJobDataMap
 			long taskBatchId = dataMap.getLongValue('taskBatchId')
 			boolean publishTasks = dataMap.getBoolean('publishTasks')
+			Project currentProject = dataMap.project
 
 			log.info "GenerateTasksJob started for taskBatchId $taskBatchId"
 
 			def taskBatch = TaskBatch.get(taskBatchId)
 			if (taskBatch) {
-				taskService.generateTasks(taskBatch, publishTasks)
+				taskService.generateTasks(taskBatch, publishTasks, currentProject)
 			}
 			else {
 				int tries = dataMap.getIntValue('tries')
