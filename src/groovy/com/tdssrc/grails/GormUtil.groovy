@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
@@ -442,6 +443,7 @@ public class GormUtil {
 	 * @param domainClass
 	 * @return
 	 */
+	@Memoized
 	static GrailsDomainClass getDomainClass(Class domainClass) {
 		if (domainClass == null) {
 			throw new RuntimeException('getDomainClass() called with null class argument')
@@ -476,6 +478,7 @@ public class GormUtil {
 	 * @param propertyName
 	 * @return
 	 */
+	@Memoized
 	static boolean isDomainProperty(Class domainClass, String propertyName) {
 		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
 		return grailsDomainClass.hasPersistentProperty(propertyName) ||
@@ -487,9 +490,16 @@ public class GormUtil {
 	 * @param clazz - the class to evaluate to determine if it is a Domain class
 	 * @return true if the object is a Domain class otherwise false
 	 */
+	@Memoized
 	static boolean isDomainClass(Class domainClass) {
 		return DomainClassArtefactHandler.isDomainClass(domainClass)
+	}
 
+	@Memoized
+	static boolean isDomainClassForTesting(Class domainClass, Closure closure) {
+		Boolean isDomainClass = DomainClassArtefactHandler.isDomainClass(domainClass)
+		closure(isDomainClass)
+		return isDomainClass
 	}
 
 	/**
@@ -668,6 +678,7 @@ public class GormUtil {
 	 * @param property - the domain property to check as being a composite key element
 	 * @return true if property is part of a composite key otherwise false
 	 */
+	@Memoized
 	static boolean isCompositeProperty(Class domainClass, GrailsDomainClassProperty property) {
 		Mapping mapping = getDomainBinderMapping(domainClass)
 		return new GrailsDomainBinder().isCompositeIdProperty(mapping, property)
@@ -1074,6 +1085,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property
 	 * @return the appropriate class
 	 */
+	@Memoized
 	static Class getDomainClassOfProperty(Class domainClass, String propertyName) {
 		if (isReferenceProperty(domainClass, propertyName)) {
 			 return getDomainPropertyType(domainClass, propertyName)
@@ -1151,6 +1163,7 @@ public class GormUtil {
 	 * @param propertyName
 	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
 	 */
+	@Memoized
 	static boolean isReferenceProperty(Class domainClazz, String propertyName) {
 		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
 		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
@@ -1214,6 +1227,7 @@ public class GormUtil {
 	 * @param domainClass
 	 * @return the short name of the class name
 	 */
+	@Memoized
 	static String domainShortName(Class domainClass) {
 		return domainClass.getName().split(/\./)[-1]
 	}
@@ -1223,6 +1237,7 @@ public class GormUtil {
 	 * @param domainClass - the domain class to retrieve the alternate lookup property name
 	 * @return the property name if defined otherwise null
 	 */
+	@Memoized
 	static String getAlternateKeyPropertyName(Class domainClass) {
 		String name = null
 		if (domainClass.metaClass.hasProperty(domainClass,ALTERNATE_PROPERTY_NAME)) {

@@ -14,8 +14,10 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
+import org.apache.xpath.operations.Bool
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.exceptions.GrailsDomainException
+import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -264,5 +266,19 @@ class GormUtilUnitSpec extends Specification {
 			Application			| 'id'			| Application
 			Application			| 'sme'			| Person
 			Application			| 'url'			| Application
+	}
+
+	@See('TM-11461')
+	void '18. test can memoized is a DomainClass method'() {
+		given:
+			Closure closure = Mock(Closure)
+
+		when:
+			(0..10).each {
+				GormUtil.isDomainClassForTesting(AssetEntity, closure)
+			}
+
+		then:
+			1 * closure.call(true)
 	}
 }
