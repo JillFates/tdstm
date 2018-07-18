@@ -1,0 +1,8 @@
+<style>
+	button {
+		margin-top: 5px;
+	}
+</style>
+
+<button type="button" (click)="onClick()" class="btn btn-default btnBulkChange pull-left" id="btnBulkChange" [disabled]="!selectedItems || !selectedItems.length">
+	<span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.TITLE' | translate}}</button>
