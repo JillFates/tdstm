@@ -143,13 +143,14 @@ export class TagService {
 				let result = res.json();
 				if (result.data) {
 					let data = result.data.map(item => {
-						let tagModel: TagModel = new TagModel();
+						let tagModel: any = {};
 						tagModel.id = item.tagId;
 						tagModel.name = item.name;
 						tagModel.description = item.description;
 						tagModel.color = item.color;
 						tagModel.css = item.css;
 						tagModel.dateCreated = item.dateCreated;
+						tagModel.assetTagId = item.id;
 						return tagModel;
 					});
 					result.data = data;
@@ -157,6 +158,21 @@ export class TagService {
 				return result;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * POST, DELETE - Creates and Deletes Assets Tags in a fork join operation.
+	 * @returns {Observable<any>}
+	 */
+	createAndDeleteAssetTags(assetId: number, tagIdsToAdd: Array<number>, idsToDelete: Array<number>): Observable<any> {
+		let operations = [];
+		if (tagIdsToAdd.length > 0) {
+			operations.push(this.createAssetTags(assetId, tagIdsToAdd));
+		}
+		if (idsToDelete.length > 0) {
+			operations.push(this.deleteAssetTags(idsToDelete));
+		}
+		return Observable.forkJoin(operations);
 	}
 
 	/**
@@ -179,12 +195,16 @@ export class TagService {
 	 * DELETE - Associate tags to a particular asset.
 	 * @returns {Observable<ApiResponseModel>}
 	 */
-	deleteAssetTags(assetId: number, tagsIds: Array<number>): Observable<ApiResponseModel> {
-		const request = {
-			tagIds: tagsIds,
-			assetId: assetId
-		};
-		return this.http.delete(`${this.tagURL}/asset`, JSON.stringify(request))
+	deleteAssetTags(idsToDelete: Array<number>): Observable<ApiResponseModel> {
+		let body = JSON.stringify({
+			ids: idsToDelete
+		});
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(`${this.tagURL}/asset`, options)
 			.map((res: Response) => {
 				return res.json();
 			})

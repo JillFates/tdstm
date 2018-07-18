@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, ViewChild, Inject, OnInit } from '@angular/core';
+import { Component, Inject} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
@@ -12,10 +12,9 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AssetShowComponent} from '../asset/asset-show.component';
-import {TagModel} from '../../../assetTags/model/tag.model';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {AssetCommonEdit} from '../asset/asset-common-edit';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -25,28 +24,23 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			{ provide: 'model', useValue: editModel }
 		]
 	})
-	class ApplicationShowComponent implements OnInit {
+	class ApplicationShowComponent extends AssetCommonEdit {
 
-		protected assetTagsModel: any = {tags: metadata.assetTags};
-		protected newAssetTagsSelection: any = {tags: []};
-		protected tagList: Array<TagModel> = metadata.tagList;
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		yesNoList = ['Y', 'N'];
-		private dateFormat: string;
-		private isDependenciesValidForm = true;
-		constructor(
-			@Inject('model') private model: any,
-			private activeDialog: UIActiveDialogService,
-			private dialogService: UIDialogService,
-			private assetExplorerService: AssetExplorerService,
-			private notifierService: NotifierService,
-			private preference: PreferenceService,
-			private tagService: TagService) {}
 
-		ngOnInit(): void {
-			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
-			this.initModel();
+		constructor(
+			@Inject('model') model: any,
+			activeDialog: UIActiveDialogService,
+			preference: PreferenceService,
+			assetExplorerService: AssetExplorerService,
+			dialogService: UIDialogService,
+			notifierService: NotifierService,
+			tagService: TagService) {
+
+				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata);
+
+				this.initModel();
 		}
 
 		/**
@@ -86,19 +80,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			}
 		}
 
-		/***
-		 * Close the Active Dialog
-		 */
-		public cancelCloseDialog(): void {
-			this.activeDialog.close();
-		}
-
-		private showAssetDetailView(assetClass: string, id: number): void {
-			this.dialogService.replace(AssetShowComponent, [
-					{ provide: 'ID', useValue: id },
-					{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
-		}
 		/**
 		 * On Update button click save the current model form.
 		 * Method makes proper model modification to send the correct information to
@@ -141,43 +122,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.saveAssetTags();
 				}
 			});
-		}
-
-		/**
-		 * TODO: Document.
-		 * @param $event
-		 */
-		protected onTagValueChange($event: any): void {
-			this.newAssetTagsSelection.tags = $event.tags;
-			console.log(this.newAssetTagsSelection);
-		}
-
-		private saveAssetTags(): void {
-			let tagsToAdd = {tags: []};
-			let tagsToDelete = {...this.assetTagsModel};
-			this.newAssetTagsSelection.tags.forEach((asset: TagModel) => {
-				let foundIndex = this.assetTagsModel.tags.findIndex( item => item.id === asset.id);
-				if (foundIndex === -1) {
-					tagsToAdd.tags.push(asset);
-				} else {
-					// tag remains
-					tagsToDelete.tags.splice(foundIndex, 1);
-				}
-			});
-			console.log('to add', tagsToAdd);
-			console.log('to delete', tagsToDelete);
-			this.tagService.createAssetTags(this.model.assetId, tagsToAdd.tags.map( item => item.id) )
-				.subscribe(result => {
-					this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
-				}, error => console.log('error when saving asset tags', error));
-		}
-
-		/**
-		 * Validate if the current content of the Dependencies is correct
-		 * @param {boolean} invalidForm
-		 */
-		public onDependenciesValidationChange(validForm: boolean): void {
-			this.isDependenciesValidForm = validForm;
 		}
 	}
 
