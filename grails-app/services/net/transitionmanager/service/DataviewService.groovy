@@ -7,8 +7,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import groovy.json.JsonSlurper
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -521,9 +521,8 @@ class DataviewService implements ServiceMethods {
         ]
     }
 
-	private void handleTags(cell) {
-		JsonSlurper slurper = new JsonSlurper()
-		def json = slurper.parseText(cell)
+	private void handleTags(String cell) {
+		def json = JsonUtil.parseJson("""{"tags":$cell}""").tags
 
 		json.each { Map tag ->
 			tag.css = Color.valueOfParam(tag.color).css
