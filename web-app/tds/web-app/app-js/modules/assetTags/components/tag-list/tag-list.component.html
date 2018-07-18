@@ -83,6 +83,9 @@
                         </ng-template>
 
                         <!-- Cell Templates -->
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
+                            {{dataItem[column.property] | uppercase}}
+                        </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'color'" let-dataItem>
                             <div class="text-center">
                                 <span [ngClass]="dataItem.css" class="label tag"></span>
@@ -91,8 +94,9 @@
 
                         <!-- Edit Templates -->
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'name'">
-                                <input [(ngModel)]="dataItem.name" autofocus (input)="validateUniqueName(dataItem)"
+                                <input [(ngModel)]="dataItem.name" autofocus
                                        [ngClass]="{'ng-invalid': duplicateName}" required
+                                       #input (input)="validateUniqueName(dataItem); input.value=$event.target.value.toUpperCase()"
                                        type="text" name="name" class="form-control"/>
                         </ng-template>
                         <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'description'">

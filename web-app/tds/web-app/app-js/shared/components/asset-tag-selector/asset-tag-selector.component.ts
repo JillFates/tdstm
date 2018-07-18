@@ -4,7 +4,7 @@
  * <tds-asset-tag-selector *ngIf="tagList" [model]="model" [tagList]="tagList" (valueChange)="onTagValueChange($event)"></tds-asset-tag-selector>
  */
 
-import {Component, EventEmitter, Input, Output, SimpleChanges, OnChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, SimpleChanges, OnChanges, OnInit} from '@angular/core';
 
 declare var jQuery: any;
 
@@ -14,8 +14,9 @@ declare var jQuery: any;
 	styles: []
 })
 
-export class AssetTagSelectorComponent implements OnChanges {
+export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('tagList') tagList: any;
+	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	// Model
@@ -25,6 +26,11 @@ export class AssetTagSelectorComponent implements OnChanges {
 		switch: false,
 		tags: []
 	};
+
+	ngOnInit(): void {
+		this.assetSelectorModel.tags = this.model.tags;
+		this.assetSelectorModel.switch = this.model.operator === 'AND' ? true : false;
+	}
 
 	/**
 	 * Catch when the dropdown is opened

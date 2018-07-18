@@ -5,15 +5,17 @@ import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function DatabaseShowComponent(template, modelId: number) {
+export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
 		selector: `database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
 		private mainAsset = modelId;
+		protected assetTags: Array<TagModel> = metadata.assetTags;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 			jQuery('[data-toggle="popover"]').popover();

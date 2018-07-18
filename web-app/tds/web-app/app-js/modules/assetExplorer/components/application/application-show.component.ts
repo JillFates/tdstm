@@ -5,15 +5,17 @@ import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.c
 import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { DOMAIN, DIALOG_SIZE } from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function ApplicationShowComponent(template, modelId: number) {
+export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
 		selector: `application-show`,
 		template: template
 	}) class ApplicationShowComponent implements OnInit {
 		mainAsset = modelId;
+		protected assetTags: Array<TagModel> = metadata.assetTags;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 
