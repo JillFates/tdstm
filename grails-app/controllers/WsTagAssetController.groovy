@@ -1,7 +1,7 @@
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.tag.CreateTagAssetCommand
-import net.transitionmanager.command.tag.DeleteTagAssetCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.security.Permission
@@ -35,7 +35,7 @@ class WsTagAssetController implements ControllerMethods {
 
 	@HasPermission(Permission.TagDelete)
 	def delete() {
-		DeleteTagAssetCommand delete = populateCommandObject(DeleteTagAssetCommand)
+		IdsCommand delete = populateCommandObject(IdsCommand)
 		validateCommandObject(delete)
 		tagAssetService.removeTags(projectForWs, delete.ids)
 		return renderSuccessJson()
