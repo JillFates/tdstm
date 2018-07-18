@@ -1601,7 +1601,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Find the Recipe Version that the user selected
 		Recipe recipe = getRequired(Recipe, context.recipeId, 'The selected recipe not found')
-		if (recipe.projectId != currentProjectId) {
+		if (recipe.project.id != currentProjectId) {
 			throw new UnauthorizedException('The recipe version submitted is not associated with current project')
 		}
 
@@ -1629,7 +1629,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		if (contextObj.eventId ) {
 			MoveEvent event = getRequired(MoveEvent, contextObj.eventId)
-			if (event.project != currentProjectId) {
+			if (event.project.id != currentProjectId) {
 				throw new UnauthorizedException('Referenced context is not associated with current project')
 			}
 		}
@@ -1709,7 +1709,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
 		if (contextObj.tag) {
-			return TagAsset.where { tag.id in contextObj.tag && asset.moveBundle.useForPlanning == true }.projections {
+			List<Long>tagIds = contextObj.tag.collect{tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
+
+			return TagAsset.where { tag.id in tagIds && asset.moveBundle.useForPlanning == true }.projections {
 				property 'asset'
 			}.list()
 		} else {
@@ -1785,7 +1787,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def deferSucc        		// Gets populated with the taskSpec.successor.defer code if defined. It will either be a string if defined or null
 		def gatherPred       		// Gets populated with the taskSpec.predecessor.gather code if defined (it becomes an array) if not null
 		def gatherSucc       		// Gets populated with the taskSpec.successor.gather setting if defined (it becomes an array) if not null
-		def settings				// This will get populated with the properties from the TaskSpec for each iteration
+		def settings = [:]				// This will get populated with the properties from the TaskSpec for each iteration
 		// def waitFor = '' 			// When the predecessor.waitFor is defined then wiring predecessors will wait until a subsequent taskspec with a successor.resumeFor attribute of the same value,
 		// def resumeFor = ''			// Used in conjunction with waitFor
 
@@ -2020,6 +2022,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				out.append("<li><b>$n</b> (contains ${l.size()} assets): ${l*.assetName}")
 			}
+
 			out.append('</ul>')
 
 			def numOfTaskSpec = recipeTasks.size()
@@ -2205,6 +2208,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					apiAction   : apiAction,
 					event       : event
 				]
+
 				log.debug "##### settings: $settings"
 
 				// ------------------------------------------------------------------------------------
@@ -2256,7 +2260,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						//log.info "SQL for noSuccessorsSql: $noSuccessorsSqlFinal"
-						log.info "generateRunbook: Found ${tasksNoSuccessors.size()} tasks with no successors for milestone $taskSpec.id, $moveEvent"
+						log.info "generateRunbook: Found ${tasksNoSuccessors.size()} tasks with no successors for milestone $taskSpec.id, $event"
 
 						if (tasksNoSuccessors.size()==0 && taskList.size() > 1) {
 							if (prevMilestone) {
@@ -3491,7 +3495,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskBatch: settings.taskBatch,
 			isPublished: settings.publishTasks,
 			sendNotification: taskSpec.sendNotification ?: false,
-			project: moveEvent.project,
+			project: settings.event.project,
 			moveEvent: settings.event,
 			assetEntity: asset,
 			commentType: AssetCommentType.TASK,
