@@ -1570,7 +1570,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param contextId - the context id of the context that was used to generate the task batch
 	 * @return the TaskBatch record if found otherwise null
 	 */
-	List findTaskBatchesForRecipeContext(Recipe recipe, Integer eventId) {
+	List findTaskBatchesForRecipeContext(Recipe recipe, Long eventId) {
 		TaskBatch.createCriteria().list {
 			eq('contextId', eventId)
 			eq('contextType', recipe.asContextType())
@@ -1688,7 +1688,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param isPublished - a flag that indicates that the tasks generated for the batch have been published
 	 * @return the TaskBatch that was created
 	 */
-	private TaskBatch createTaskBatch(Integer eventId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
+	private TaskBatch createTaskBatch(Long eventId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
 		new TaskBatch(project: securityService.loadUserCurrentProject(), createdBy: securityService.loadCurrentPerson(),
 				recipe: recipe, recipeVersionUsed: recipeVersion, contextId: eventId,
 				status: "Pending", isPublished: isPublished).save(failOnError: true)
@@ -5088,7 +5088,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * Used to reset the default status values for a batch of tasks
 	 * @param taskBatchId - the id of the TaskBatch to be reset
 	 */
-	def resetTasksOfTaskBatch(taskBatchId) {
+	def resetTasksOfTaskBatch(Long taskBatchId) {
 		securityService.requirePermission Permission.TaskPublish
 		controllerService.getRequiredProject()
 
@@ -5123,7 +5123,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param permission the requested permission
 	 * @return the number of affected tasks
 	 */
-	private basicPublish(taskId, shouldPublish, String permission) {
+	private basicPublish(Long taskId, shouldPublish, String permission) {
 		securityService.requirePermission permission
 		controllerService.getRequiredProject()
 
@@ -5147,7 +5147,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param taskBatchId the task id
 	 */
-	def deleteBatch(taskBatchId) {
+	def deleteBatch(Long taskBatchId) {
 		String currentUsername = securityService.currentUsername
 		log.debug "User $currentUsername is attempting to delete TaskBatch $taskBatchId"
 

@@ -30,24 +30,24 @@ class WsTaskController implements ControllerMethods {
 	 * Publishes a TaskBatch that has been generated before
 	 */
 	@HasPermission(Permission.TaskPublish)
-	def publish() {
-		renderSuccessJson(tasksUpdated: taskService.publish(params.id))
+	def publish(Long id) {
+		renderSuccessJson(tasksUpdated: taskService.publish(id))
 	}
 
 	/**
 	 * Unpublishes a TaskBatch that has been generated before
 	 */
 	@HasPermission(Permission.TaskPublish)
-	def unpublish() {
-		renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
+	def unpublish(Long id) {
+		renderSuccessJson(tasksUpdated: taskService.unpublish(id))
 	}
 
 	/**
 	 * Deletes a TaskBatch.
 	 */
 	@HasPermission(Permission.TaskBatchDelete)
-	def deleteBatch() {
-		taskService.deleteBatch(params.id)
+	def deleteBatch(Long id) {
+		taskService.deleteBatch(id)
 		renderSuccessJson()
 	}
 
@@ -86,13 +86,13 @@ class WsTaskController implements ControllerMethods {
 	 * Gets a TaskBatch based on a id
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def retrieveTaskBatch() {
-		renderSuccessJson(taskBatch: taskService.getTaskBatch(params.id))
+	def retrieveTaskBatch(Long id) {
+		renderSuccessJson(taskBatch: taskService.getTaskBatch(id))
 	}
 
 	@HasPermission(Permission.RecipeGenerateTasks)
-	def taskReset() {
-		taskService.resetTasksOfTaskBatch(params.id)
+	def taskReset(Long id) {
+		taskService.resetTasksOfTaskBatch(id)
 		renderSuccessJson()
 	}
 
