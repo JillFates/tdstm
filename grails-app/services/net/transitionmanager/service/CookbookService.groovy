@@ -889,7 +889,9 @@ class CookbookService implements ServiceMethods {
 					dataFlowDirection: '',
 					type: 0,
 					status: 0
-				]
+				],
+				tag: '',
+				tagJoin: ''
 			]
 		]
 
