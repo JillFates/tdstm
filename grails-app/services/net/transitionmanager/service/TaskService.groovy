@@ -5267,6 +5267,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			id: taskBatch.id,
 			recipeId : taskBatch.recipe?.id ?: 0,
 			recipeName : taskBatch.recipe?.name ?: '',
+			contextName : taskBatch.contextName(),
 			taskCount: taskBatch.taskCount,
 			exceptionCount: taskBatch.exceptionCount,
 			createdBy: taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,

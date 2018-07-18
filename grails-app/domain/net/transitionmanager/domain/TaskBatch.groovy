@@ -58,7 +58,17 @@ class TaskBatch {
 		executeUpdate('delete AssetComment where taskBatch=?', [this])
 	}
 
+	/**
+	 * Get the name of the object for which the context references
+	 */
+	String contextName() {
+		if(contextId){
+			return MoveEvent.get(contextId)?.name ?: ''
+		}
 
+		//TODO need a better context name to send back
+		return "Tag based events"
+	}
 
 	/**
 	 * Returns informational representation of the task formated as Context + Context Object + batch (# tasks)
