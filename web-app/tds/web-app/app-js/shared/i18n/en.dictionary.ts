@@ -72,7 +72,10 @@ export const en_DICTIONARY: Object = {
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
 		},
-		'SYSTEM_VIEW': 'System View'
+		'SYSTEM_VIEW': 'System View',
+		'BULK_CHANGE' : {
+			'TITLE' : 'Bulk Change'
+		}
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',

@@ -20,6 +20,7 @@ import { TaskCommentComponent } from './components/task-comment/task-comment.com
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
 import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
+import { BulkChangeButtonComponent } from './components/bulkChange/components/bulk-change-button/bulk-change-button.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -59,7 +60,8 @@ import { TagService } from '../assetTags/service/tag.service';
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		BulkChangeButtonComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -75,7 +77,8 @@ import { TagService } from '../assetTags/service/tag.service';
 		AssetEditComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		BulkChangeButtonComponent
 	],
 })
 
