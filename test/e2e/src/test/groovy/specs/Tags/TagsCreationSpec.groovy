@@ -1,7 +1,7 @@
 package specs.Tags
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Tags.TagsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
