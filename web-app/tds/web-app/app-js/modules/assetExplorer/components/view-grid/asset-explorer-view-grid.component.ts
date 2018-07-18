@@ -307,6 +307,10 @@ export class AssetExplorerViewGridComponent {
 		this.setSelectedItems();
 	}
 
+    clearSelectAll(): void {
+        this.selectAll = false;
+    }
+
 	setSelectedItems(): void {
 		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;

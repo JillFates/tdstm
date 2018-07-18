@@ -6,7 +6,7 @@ import pages.Login.MenuPage
 import spock.lang.Ignore
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Downloads.HomeUserDownloadsPage
 
 @Ignore
@@ -16,7 +16,7 @@ class ExportViewSpec extends GebReportingSpec {
     static testCount
 
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static fileName = "ExportSystemAllAssets" + randStr
 
     def setupSpec() {

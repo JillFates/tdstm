@@ -10,7 +10,7 @@
 
 		<!-- Toolbar Template -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
-			<label class="pad-top-2 pad-left-10 mar-bottom-3">Tasks and Comments ({{dataGridTaskCommentOnHelper.gridData.data.length}})</label>
+			<label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks and Comments ({{dataGridTaskCommentOnHelper.gridData.data.length}})</label>
 
 			<label class="form-check-label aligned-label" for="showAllTasks">
 				<input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadGrid()">

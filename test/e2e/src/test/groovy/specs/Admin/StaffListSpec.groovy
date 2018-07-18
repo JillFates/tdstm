@@ -1,7 +1,7 @@
 package specs.Admin
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Admin.StaffListPage
 import pages.Admin.LandingItems.ListStaffLandingPage
 import pages.Admin.StaffCreationPage
@@ -15,7 +15,7 @@ import spock.lang.Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4)
+    static randStr = new CommonActions().getRandomString()
 
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"

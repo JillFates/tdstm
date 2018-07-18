@@ -1,7 +1,7 @@
 package specs.Projects
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Projects.ProjectCreationPage
 import pages.Projects.ProjectDetailsPage
 import pages.Projects.ProjectListPage
@@ -14,7 +14,7 @@ import geb.error.RequiredPageContentNotPresent
 class ProjectCreationSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"

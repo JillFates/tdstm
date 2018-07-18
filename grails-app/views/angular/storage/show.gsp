@@ -54,7 +54,7 @@
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 							</tr>
 							<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
-							</tbody>
+                            <g:render template="/angular/common/assetTags"></g:render>
 						</table>
 						</div>
 					</td>

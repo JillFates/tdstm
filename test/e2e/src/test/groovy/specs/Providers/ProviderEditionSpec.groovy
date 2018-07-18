@@ -1,7 +1,7 @@
 package specs.Providers
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Providers.CreateProviderPage
 import pages.Providers.ProvidersPage
 import pages.Providers.ProvidersDetailPage
@@ -15,7 +15,7 @@ class ProviderEditionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = new CommonActions().getRandomString() + " "
     static E2E = "E2E Provider"
     static provName = randStr + E2E + " Name"
     static provDescription = randStr + E2E + " Description"
