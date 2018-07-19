@@ -255,4 +255,6 @@ databaseChangeLog = {
 	include file: '20180628-update-supportType-label-for-DEVICE-keys-in-Setting.groovy'
 	include file: '20180627-add-tag-to-common-fields.groovy'
 	include file: '20180719-asset-comment-table-drop-is-resolved-column.groovy'
+	include file: '20180702-create-api-catalog-table.groovy'
+
 }
