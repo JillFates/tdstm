@@ -67,6 +67,7 @@ export class CheckActionComponent implements DoCheck {
 			case CHECK_ACTION.UNKNOWN: return 'fa fa-thumbs-o-up';
 			case CHECK_ACTION.VALID: return 'fa fa-check green';
 			case CHECK_ACTION.INVALID: return 'fa fa-thumbs-down red';
+			case CHECK_ACTION.IN_PROGRESS: return 'fa fa-fw fa-spinner fast-right-spinner';
 			case CHECK_ACTION.NONE: return this.noneStateIcon;
 			default: return '';
 		}

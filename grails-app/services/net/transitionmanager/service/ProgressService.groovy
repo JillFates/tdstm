@@ -50,7 +50,7 @@ class ProgressService implements ServiceMethods {
 	 * @param detail - any additional information that might be shown in the progress meter such as the sub-task being performed (optional)
 	 * @param remainingTime - an estimate of the remainingTime before the task completes (optional)
 	 */
-	void update(String key, Integer percentComp, String status, String detail='', TimeDuration remainingTime=null) {
+	void update(String key, Integer percentComp, String status, String detail='', TimeDuration remainingTime=null, Map data = null) {
 		log.debug "update() key=$key, percentComp=$percentComp, status=$status"
 		if (key == null) {
 			log.error "update() called with null key"
@@ -65,6 +65,10 @@ class ProgressService implements ServiceMethods {
 				info.remainingTime = remainingTime
 				info.detail = detail
 				info.lastUpdated = System.currentTimeMillis()
+				if (data) {
+					info.data = data
+				}
+
 			}
 		} else {
 			log.debug("Key not found $key")
@@ -181,7 +185,7 @@ class ProgressService implements ServiceMethods {
 
 		ProgressInfo info = progressInfo.getIfPresent(key)
 
-		if (info == null) {
+			if (info == null) {
 			log.debug("Key not found $key")
 			[:]
 		} else {
@@ -191,7 +195,8 @@ class ProgressService implements ServiceMethods {
 				status: info.status,
 				detail: info.detail,
 				remainingTime: info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
-				lastUpdated: info.lastUpdated
+				lastUpdated: info.lastUpdated,
+				data: info.data
 			]
 		}
 	}
