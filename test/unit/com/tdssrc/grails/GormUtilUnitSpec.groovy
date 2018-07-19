@@ -269,16 +269,19 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@See('TM-11461')
-	void '18. test can memoized is a DomainClass method'() {
+	void 'test can memoized is a DomainClass method'() {
 		given:
 			Closure closure = Mock(Closure)
 
 		when:
 			(0..10).each {
+				GormUtil.getDomainPropertyTypeForTesting(AssetEntity, 'assetName', closure)
+
 				GormUtil.isDomainClassForTesting(AssetEntity, closure)
 			}
 
 		then:
 			1 * closure.call(true)
+			1 * closure.call('assetName')
 	}
 }

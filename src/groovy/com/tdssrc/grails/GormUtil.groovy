@@ -502,6 +502,19 @@ public class GormUtil {
 		return isDomainClass
 	}
 
+	@Memoized
+	static boolean isReferencePropertyForTesting(Class domainClazz, String propertyName, Closure closure) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
+		closure(propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
+	}
+
+	@Memoized
+	static Class getDomainPropertyTypeForTesting(Object domainObject, String propertyName, Closure closure) {
+		closure(propertyName)
+		return getDomainPropertyType(domainObject.getClass(), propertyName)
+	}
+
 	/**
 	 * Used to determine if an object is a Domain class
 	 * @param domainInstance - the object to evaluate to determine if it is a Domain class
@@ -585,6 +598,7 @@ public class GormUtil {
 	 * @param propertyName - the name of a property to retrieve
 	 * @return The GrailsDomainClassProperty object
 	 */
+	@Memoized
 	static GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
 		if (!isDomainClass(domainClass)) {
 			throw new RuntimeException('Called with non-domain class parameter')
@@ -1064,6 +1078,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property
 	 * @return the class name of the property as a string
 	 */
+	@Memoized
 	static Class getDomainPropertyType(Object domainObject, String propertyName) {
 		return getDomainPropertyType(domainObject.getClass(), propertyName)
 	}
@@ -1074,6 +1089,7 @@ public class GormUtil {
 	 * @param propertyName - the property to look up
 	 * @return the data type, null if the property doesn't exist
 	 */
+	@Memoized
 	static Class getDomainPropertyType(Class domainClass, String propertyName) {
 		return GrailsClassUtils.getPropertyType(domainClass, propertyName)
 	}
