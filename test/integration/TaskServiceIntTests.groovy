@@ -6,8 +6,8 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
 import groovyx.gpars.GParsPool
-import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -18,7 +18,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
-import spock.lang.Specification
+import test.helper.ApiCatalogTestHelper
 
 import java.util.concurrent.Future
 
@@ -28,6 +28,8 @@ class TaskServiceIntTests extends IntegrationSpec {
     AssetTestHelper assetTestHelper
     PersonTestHelper personTestHelper
     ProjectTestHelper projectTestHelper
+    ProviderTestHelper providerTestHelper
+    ApiCatalogTestHelper apiCatalogTestHelper
     MoveBundleTestHelper moveBundleTestHelper
     GrailsApplication grailsApplication
     SessionFactory sessionFactory
@@ -36,6 +38,8 @@ class TaskServiceIntTests extends IntegrationSpec {
     void setup() {
         personTestHelper = new PersonTestHelper()
         projectTestHelper = new ProjectTestHelper()
+        providerTestHelper = new ProviderTestHelper()
+        apiCatalogTestHelper = new ApiCatalogTestHelper()
         assetTestHelper = new AssetTestHelper()
         moveBundleTestHelper = new MoveBundleTestHelper()
 
@@ -139,9 +143,11 @@ class TaskServiceIntTests extends IntegrationSpec {
         setup: 'giving an api action'
             Person whom = taskService.getAutomaticPerson()
             Project project = projectTestHelper.getProject()
-            Provider provider = new Provider(project: project, name: RandomStringUtils.randomAlphanumeric(10)).save(failOnError: true)
+            Provider provider = providerTestHelper.createProvider(project)
+            ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
+
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), agentClass: AgentClass.RESTFULL, agentMethod: 'executeCall',
+            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, agentMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
             callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
 
@@ -166,9 +172,11 @@ class TaskServiceIntTests extends IntegrationSpec {
         setup: 'giving an api action'
             Person whom = taskService.getAutomaticPerson()
             Project project = projectTestHelper.getProject()
-            Provider provider = new Provider(project: project, name: RandomStringUtils.randomAlphanumeric(10)).save(failOnError: true)
+            Provider provider = providerTestHelper.createProvider(project)
+            ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
+
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), agentClass: AgentClass.RESTFULL, agentMethod: 'executeCall',
+            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, agentMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "task.done()","STATUS": "return SUCCESS","ERROR": "task.error( response.error )", "DEFAULT": "task.error( response.error )"}', reactionScriptsValid: 1,
             callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
 

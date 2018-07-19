@@ -685,6 +685,34 @@ class GormUtilIntegrationSpec extends Specification {
 
 	}
 
+	void '27. bang on the findInProjectByAlternate method'() {
+		setup:
+			Project project = projectHelper.createProject()
+			Project project2 = projectHelper.createProject()
+			Person person = personHelper.createPerson()
+			Application application = assetHelper.createApplication(person, project)
+		when: 'calling findInProjectByAlternate with valid alternate key'
+			Application result = GormUtil.findInProjectByAlternate(project, Application, application.assetName)
+		then: 'the domain entity should be found'
+			result
+		when: 'calling findInProjectByAlternate with bad alternate key'
+			result = GormUtil.findInProjectByAlternate(project, Application, 'nothing should exist with this for a name')
+		then: 'no domain entity should be found'
+			null == result
+		when: 'calling findInProjectByAlternate with bad alternate key and throwException flag is on'
+			result = GormUtil.findInProjectByAlternate(project, Application, 'nothing should exist with this for a name', true)
+		then: 'exception thrown'
+			thrown EmptyResultException
+		when: 'calling findInProjectByAlternate with valid alternate key but different project'
+			result = GormUtil.findInProjectByAlternate(project2, Application, 'nothing should exist with this for a name')
+		then: 'no domain entity should be found'
+			null == result
+		when: 'calling findInProjectByAlternate with domain that does not have an alternate key'
+			PartyRelationship partyRelationship = GormUtil.findInProjectByAlternate(project, PartyRelationship, 'nothing should exist with this for a name')
+		then: 'a null should be returned'
+			null == partyRelationship
+	}
+
 }
 
 /**

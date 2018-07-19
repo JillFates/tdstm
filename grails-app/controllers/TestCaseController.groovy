@@ -14,6 +14,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ApiActionService
+import net.transitionmanager.service.ApiCatalogService
 import net.transitionmanager.service.AwsService
 import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.PartyRelationshipService
@@ -55,6 +56,7 @@ class TestCaseController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	UserService userService
 	ApiActionService apiActionService
+	ApiCatalogService apiCatalogService
 
 	AwsService awsService
 
@@ -63,7 +65,7 @@ class TestCaseController implements ControllerMethods {
 	}
 
 	def agents() {
-		renderAsJson(apiActionService.agentNamesList())
+		renderAsJson(apiCatalogService.listCatalogNames())
 	}
 		
 	def api() {

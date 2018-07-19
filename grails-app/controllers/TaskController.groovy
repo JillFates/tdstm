@@ -35,7 +35,6 @@ import net.transitionmanager.service.RunbookService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
-import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -1122,7 +1121,7 @@ digraph runbook {
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
 			AbstractAgent agent = apiActionService.agentInstanceForAction(assetComment.apiAction)
-			DictionaryItem methodInfo = agent.getMethod( apiAction.agentMethod )
+			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
