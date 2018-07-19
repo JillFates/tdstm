@@ -1016,7 +1016,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 	scope.tasks.viewTaskGraph = function(e, conf){
 		conf = conf || {}
 		var eventsArray = scope.contexts.eventsArray;
-		var eventName = scope.tasks.generation.contextName;
+		var eventName = scope.tasks.generation.eventName;
 		var eventId = null;
 		for (var i=0; i<eventsArray.length;i++) {
 			if (eventsArray[i].name == eventName) {
@@ -1202,7 +1202,7 @@ tds.cookbook.controller.TaskGenerationCompletedController = function(scope, stat
 		scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
 		scope.tasks.generation.exceptionLog = sce.trustAsHtml(data.data.taskBatch.exceptionLog);
 		scope.tasks.generation.infoLog = sce.trustAsHtml(data.data.taskBatch.infoLog);
-		scope.tasks.generation.contextName = data.data.taskBatch.contextName;
+		scope.tasks.generation.eventName = data.data.taskBatch.eventName;
 	}, function(){
 		log.info('Error on getting Task Batch');
 	});
@@ -1416,7 +1416,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 
 			scope.tasks.colDef = (data.data.list.length > 0) ? [
 				// {field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
-				{field:'contextName', displayName:'Event', enableCellEdit: false, width: '***'},
+				{field:'eventName', displayName:'Event', enableCellEdit: false, width: '***'},
 				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
 				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center',
