@@ -120,7 +120,7 @@ class DataScriptService implements ServiceMethods{
 
 	     // Check if the Sample File is still available, if not delete the temporary data
 	     if ( dataScript.sampleFilename ) {
-		     if ( !FileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
+		     if ( ! FileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
 			     dataScript.sampleFilename = ''
 			     dataScript.originalSampleFilename = ''
 			     dataScript.save()
