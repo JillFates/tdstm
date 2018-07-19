@@ -15,7 +15,7 @@ import geb.error.RequiredPageContentNotPresent
 class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static projName = baseName +" "+ randStr
     static licensedProjectName = "TM-Demo"

@@ -15,7 +15,7 @@ class ApplicationDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static appName = baseName + " " + randStr + " App For E2E Created"
     static appDesc = baseName + " " + randStr + " App Description Created"

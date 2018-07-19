@@ -16,7 +16,7 @@ class ExportViewSpec extends GebReportingSpec {
     static testCount
 
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static fileName = "ExportSystemAllAssets" + randStr
 
     def setupSpec() {

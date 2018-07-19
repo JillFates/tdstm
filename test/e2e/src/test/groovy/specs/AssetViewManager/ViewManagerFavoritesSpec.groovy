@@ -7,7 +7,6 @@ import spock.lang.Ignore
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import pages.AssetViewManager.SaveViewPage
-import jodd.util.RandomString
 import utils.CommonActions
 
 
@@ -19,7 +18,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static numberOfRows
     static favView
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
     static minimumNumberOfRows =11

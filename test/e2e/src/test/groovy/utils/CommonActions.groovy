@@ -11,7 +11,7 @@ class CommonActions {
     * Note: returns a random option from select dropdown
     * Parameter: options must be a selector containing option tags in dropdown
     * */
-    def getSelectRandomOption(options){
+    static getSelectRandomOption(options){
         // removing <select value=0> label used to notify user to select a value
         def finalOptions = options.remove(0)
         getRandomOption(finalOptions)
@@ -21,7 +21,7 @@ class CommonActions {
    * Note: returns a random option from given options list
    * Parameter: options must be a list
    * */
-    def getRandomOption(options) {
+    static getRandomOption(options) {
         def random = new Random()
         options.getAt(random.nextInt(options.size()))
     }
@@ -32,7 +32,7 @@ class CommonActions {
     * Parameter: count is number of elements to be returned, if not set it returns a random number of elements
     * based on the given list of elements.
      */
-    def getRandomOptions(options, count) {
+    static getRandomOptions(options, count) {
         def randomSelectionCount = count != null ? count : getRandomNumberFromList(options)
         def option = getRandomOption options
         def finalOptionsList = []
@@ -53,7 +53,7 @@ class CommonActions {
     * Note: returns random number from given list of elements
     * Parameter: elementsList must be a list
      */
-    def getRandomNumberFromList(elementsList) {
+    static getRandomNumberFromList(elementsList) {
         new Random().nextInt(elementsList.size()) + 1 // prevent getting zero
     }
 
@@ -61,17 +61,17 @@ class CommonActions {
     * Note: cleans checkboxes checked from a given elements list
     * Parameter: checkboxes must be a list
      */
-    def uncheckCheckboxes(checkboxes) {
+    static uncheckCheckboxes(checkboxes) {
         checkboxes?.each { checkbox ->
             checkbox.click()
         }
     }
 
-    def convertRgbToHex(int r, int g, int b) {
+    static convertRgbToHex(int r, int g, int b) {
         "#" + toHexValue(r) + toHexValue(g) + toHexValue(b)
     }
 
-    def toHexValue(int number) {
+    static toHexValue(int number) {
         def builder = new StringBuilder(Integer.toHexString(number & 0xff))
         while (builder.length() < 2) {
             builder.append("0")
@@ -79,7 +79,7 @@ class CommonActions {
         builder.toString()
     }
 
-    def getRandomString(Integer charNumbers = 5){
+    static getRandomString(Integer charNumbers = 5){
         RandomString.getInstance().randomAlphaNumeric(charNumbers)
     }
 }

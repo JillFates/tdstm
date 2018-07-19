@@ -16,7 +16,7 @@ class ApplicationCreationSpec extends GebReportingSpec {
     static testCount
 
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static appName = baseName +" "+ randStr + " App For E2E Created"
     static appDesc = baseName +" "+ randStr + " App Description Created"

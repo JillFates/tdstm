@@ -14,8 +14,8 @@ class ProviderDeletionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString() + " "
-    static randStr2 = new CommonActions().getRandomString() + " "
+    static randStr = CommonActions.getRandomString() + " "
+    static randStr2 = CommonActions.getRandomString() + " "
     static E2E = "E2E Provider to be deleted"
     static provName = randStr + E2E
     static provName2 = randStr2 + E2E

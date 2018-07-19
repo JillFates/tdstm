@@ -12,7 +12,7 @@ import utils.CommonActions
 class RecipeDeletionSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static recipeName = baseName + " " + randStr + " Geb Recipe Test"
     static recipeDataMap = [

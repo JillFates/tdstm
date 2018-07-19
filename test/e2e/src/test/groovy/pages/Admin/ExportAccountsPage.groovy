@@ -19,17 +19,13 @@ class ExportAccountsPage extends Page {
         exportButton {$("form button[type=submit]")}
     }
 
-    static initializeCommonActions(){
-        new CommonActions()
-    }
-
     def randomSelectUserLogins(){
-        def randomOption = initializeCommonActions().getSelectRandomOption userLoginsOptions
+        def randomOption = CommonActions.getSelectRandomOption userLoginsOptions
         randomOption.click()
     }
 
     def randomSelectStaffing(){
-        def randomOption = initializeCommonActions().getRandomOption staffingOptions
+        def randomOption = CommonActions.getRandomOption staffingOptions
         randomOption.click()
     }
 
