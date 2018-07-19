@@ -57,7 +57,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1, bundleId: [1, 2, 3], tag: [tag1.id, tag2.id])
-			cookbookService.defineRecipeContext(existingRecipe.id, contextCommand)
+			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
@@ -74,7 +74,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1, bundleId: [1, 2, 3], tag: [tag1.id, tag2.id], and: false)
-			cookbookService.defineRecipeContext(existingRecipe.id, contextCommand)
+			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
@@ -91,7 +91,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(eventId: 1)
-			cookbookService.defineRecipeContext(existingRecipe.id, contextCommand)
+			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
@@ -104,7 +104,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(bundleId: [1, 2, 3])
-			cookbookService.defineRecipeContext(existingRecipe.id, contextCommand)
+			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
@@ -117,7 +117,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			ContextCommand contextCommand = new ContextCommand(tag: [tag1.id, tag2.id])
-			cookbookService.defineRecipeContext(existingRecipe.id, contextCommand)
+			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
