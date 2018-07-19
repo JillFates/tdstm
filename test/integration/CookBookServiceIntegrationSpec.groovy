@@ -56,29 +56,29 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
-			ContextCommand contextCommand = new ContextCommand(eventId: 1, bundleId: [1, 2, 3], tag: [tag1.id, tag2.id])
+			ContextCommand contextCommand = new ContextCommand(eventId: 1, tag: [tag1.id, tag2.id])
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == """{"eventId":1,"bundleId":[1,2,3],"and":true,"tag":[{"id":${
+			recipe.context == """{"eventId":1,"tagMatch":"ANY","tag":[{"id":${
 				tag1.id
 			},"label":"grouping assets","strike":false,"css":"tag-green"},{"id":${
 				tag2.id
 			},"label":"some assets","strike":false,"css":"tag-blue"}]}"""
 	}
 
-	void 'Test recipe AND context'() {
+	void 'Test recipe ANY context'() {
 		given:
 			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
-			ContextCommand contextCommand = new ContextCommand(eventId: 1, bundleId: [1, 2, 3], tag: [tag1.id, tag2.id], and: false)
+			ContextCommand contextCommand = new ContextCommand(eventId: 1, tag: [tag1.id, tag2.id], tagMatch: "ANY")
 			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == """{"eventId":1,"bundleId":[1,2,3],"and":false,"tag":[{"id":${
+			recipe.context == """{"eventId":1,"tagMatch":"ANY","tag":[{"id":${
 				tag1.id
 			},"label":"grouping assets","strike":false,"css":"tag-green"},{"id":${
 				tag2.id
@@ -95,20 +95,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == '{"eventId":1,"bundleId":null,"and":true,"tag":[]}'
-	}
-
-	void 'Test recipe bundle context'() {
-		given:
-			Recipe existingRecipe = new Recipe(name: 'test', context: '{}', project: project, projectId: project.id)
-			existingRecipe.save(failOnError: true, flush: true)
-		when: 'Getting a list of tagAssets by asset'
-			ContextCommand contextCommand = new ContextCommand(bundleId: [1, 2, 3])
-			cookbookService.saveRecipeContext(existingRecipe.id, contextCommand)
-			Recipe recipe = Recipe.get(existingRecipe.id)
-
-		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == '{"eventId":null,"bundleId":[1,2,3],"and":true,"tag":[]}'
+			recipe.context == '{"eventId":1,"tagMatch":"ANY","tag":[]}'
 	}
 
 	void 'Test recipe tag context'() {
@@ -121,7 +108,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			Recipe recipe = Recipe.get(existingRecipe.id)
 
 		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == """{"eventId":null,"bundleId":null,"and":true,"tag":[{"id":${
+			recipe.context == """{"eventId":null,"tagMatch":"ANY","tag":[{"id":${
 				tag1.id
 			},"label":"grouping assets","strike":false,"css":"tag-green"},{"id":${
 				tag2.id
@@ -131,7 +118,7 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test delete recipe context'() {
 		given:
-			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"bundleId":[1,2,3],"and":true,"tag":[]}', project: project, projectId: project.id)
+			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"tagMatch":"ANY","tag":[]}', project: project, projectId: project.id)
 			existingRecipe.save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			cookbookService.deleteRecipeContext(existingRecipe.id)
@@ -146,14 +133,14 @@ class CookBookServiceIntegrationSpec extends IntegrationSpec {
 			PersonTestHelper personHelper = new PersonTestHelper()
 			Person adminPerson = personHelper.createStaff(project.owner)
 			//Person adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
-			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"bundleId":[1,2,3],"and":true,"tag":[]}', project: project, projectId: project.id)
+			Recipe existingRecipe = new Recipe(name: 'test', context: '{"eventId":null,"tagMatch":"ANY","tag":[]}', project: project, projectId: project.id)
 			existingRecipe.save(failOnError: true, flush: true)
 			new RecipeVersion(recipe: existingRecipe, createdBy: adminPerson).save(failOnError: true, flush: true)
 		when: 'Getting a list of tagAssets by asset'
 			Map recipe = cookbookService.getRecipe(existingRecipe.id, 0)
 
 		then: 'a list of tagAssets are returned for the asset'
-			recipe.context == ["eventId":null,"bundleId":[1,2,3],"and":true,"tag":[]]
+			recipe.context == ["eventId":null,"tagMatch":"ANY","tag":[]]
 	}
 
 
