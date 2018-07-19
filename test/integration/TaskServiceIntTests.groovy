@@ -58,7 +58,7 @@ class TaskServiceIntTests extends IntegrationSpec {
                 task.assignedTo != null
                 AssetCommentStatus.STARTED == task.status
                 task.actFinish == null
-                0 == task.isResolved
+                null == task.dateResolved
 
                 // Test bumping status to COMPLETED after STARTED
                 taskService.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
@@ -67,7 +67,7 @@ class TaskServiceIntTests extends IntegrationSpec {
                 !task.assignedTo
                 !task.resolvedBy
                 AssetCommentStatus.COMPLETED == task.status
-                1 == task.isResolved
+                null != task.dateResolved
             }
     }
 

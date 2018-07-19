@@ -597,7 +597,6 @@ class TaskService implements ServiceMethods {
 			if (previousStatus == ACS.COMPLETED) {
 				task.resolvedBy = null
 				task.actFinish = null
-				// isResolved = 0 -- should be set in the domain class automatically
 			}
 			// Clear the actual Start if we're moving back before STARTED
 			if (compareStatus(ACS.STARTED, status) > 0) {
@@ -1066,7 +1065,7 @@ class TaskService implements ServiceMethods {
 			String updateHql = '''
 				UPDATE AssetComment
 				SET status = :status, actStart = null, actStart = null, dateResolved = null,
-				    resolvedBy = null, isResolved = 0, statusUpdated = null
+				    resolvedBy = null, statusUpdated = null
 				WHERE id in (:ids)'''
 
 			if (tasksMap.tasksWithPred) {

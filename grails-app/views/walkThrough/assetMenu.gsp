@@ -323,7 +323,7 @@ function checkComments(type) {
 			</tbody>
 		</table>
 		<div style="MARGIN-TOP: 15px" align=center>
-			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and isResolved = ? and commentCode = ?' ,['issue',0,'ASSET_MISSING'])}">
+			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and dateResolved = ? and commentCode = ?' ,['issue',null,'ASSET_MISSING'])}">
 				<input name="type" value="resolve" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
 			</g:if>
@@ -796,7 +796,7 @@ function checkComments(type) {
 				<g:each in="${AssetComment.findAll('from AssetComment where assetEntity = '+ assetEntity?.id +' order by commentType')}" status="i" var="assetCommentsInstance">
 					<g:if test="${assetCommentsInstance.commentType == 'issue'}">
 					<tr class="comment_font"><td>Iss</td><td>${assetCommentsInstance.comment}</td><td>
-						<g:if test="${assetCommentsInstance.isResolved == 1}">
+						<g:if test="${assetCommentsInstance.isResolved()}">
 							<input type="checkbox" checked disabled/><br/>
 						</g:if>
 						<g:else>
