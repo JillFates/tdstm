@@ -80,6 +80,6 @@ class CommonActions {
     }
 
     static getRandomString(Integer charNumbers = 5){
-        RandomString.getInstance().randomAlphaNumeric(charNumbers)
+        RandomStringUtils.randomAlphanumeric(charNumbers)
     }
 }
