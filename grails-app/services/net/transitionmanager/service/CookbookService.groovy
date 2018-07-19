@@ -87,11 +87,13 @@ class CookbookService implements ServiceMethods {
 		String defaultSourceCode = ''
 		String defaultChangelog = ''
 		RecipeVersion clonedReleasedVersion
+		String context = '{}'
 
 		if (cloneFrom != null) {
 			clonedVersion = Recipe.get(cloneFrom)
 		} else {
 			Recipe defaultRecipe = Recipe.findByNameAndProject('Default', Project.getDefaultProject())
+
 			if (defaultRecipe?.releasedVersion != null) {
 				defaultSourceCode = defaultRecipe.releasedVersion.sourceCode
 				defaultChangelog = defaultRecipe.releasedVersion.changelog
@@ -99,22 +101,26 @@ class CookbookService implements ServiceMethods {
 		}
 
 		if (clonedVersion != null) {
+
+			if(!clonedVersion.project.isDefaultProject()){
+				context = clonedVersion.context
+			}
+
 			if (clonedVersion.releasedVersion != null) {
 				defaultSourceCode = clonedVersion.releasedVersion.sourceCode
-				//defaultChangelog = clonedVersion.releasedVersion.changelog
 				clonedReleasedVersion = clonedVersion.releasedVersion
 			} else {
 				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom)
+
 				if (recipeVersions)  {
 					def wip = recipeVersions[0]
 					defaultSourceCode = wip.sourceCode
-					//defaultChangelog = wip.changelog
 					clonedReleasedVersion = clonedVersion.releasedVersion
 				}
 			}
 		}
 
-		return createRecipeAndRecipeVersion(recipeName, description, project, defaultSourceCode, defaultChangelog, clonedReleasedVersion)
+		return createRecipeAndRecipeVersion(recipeName, description, context, project, defaultSourceCode, defaultChangelog, clonedReleasedVersion)
 	}
 
 	/**
@@ -138,6 +144,7 @@ class CookbookService implements ServiceMethods {
 		RecipeVersion recipeVersion = RecipeVersion.get(recipeVersionId)
 
 		def recipe = recipeVersion.recipe
+		String context = recipe.project.isDefaultProject() ? '{}' : recipe.context()
 		boolean valid = recipe.projectId == DEFAULT_PROJECT_ID ||
 		                recipe.project == project ||
 		                projectService.getUserProjects().find() { recipe.projectId == it.id }
@@ -145,7 +152,7 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		createRecipeAndRecipeVersion(name, description, recipe.context, project, recipeVersion.sourceCode, '', recipeVersion)
+		createRecipeAndRecipeVersion(name, description, context, project, recipeVersion.sourceCode, '', recipeVersion)
 	}
 
 	/**
@@ -163,16 +170,16 @@ class CookbookService implements ServiceMethods {
 	private RecipeVersion createRecipeAndRecipeVersion(
 		String name,
 		String description,
+		String context,
 		Project project,
 		String sourceCode,
 		String changelog,
-		RecipeVersion recipeVersion,
-		String context = null) {
+		RecipeVersion recipeVersion) {
 
 		def newRecipe = new Recipe(
 			name: name,
 			description: description,
-			context: context ?: '{}',
+			context: context,
 			project: project,
 			archived: false
 		).save(flush:true, failOnError: true)
