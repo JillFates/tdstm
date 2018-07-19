@@ -33,7 +33,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		sample: false,
 		transform: false,
 	};
-	private script = '';
+	private script: string = '';
 	private filename: string;
 	private isWindowMaximized = false;
 	private initialWindowStyle = null;
@@ -76,6 +76,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.loadETLScript();
 	}
 
+	/**
+	 * Load the Script from the ETL API
+     */
 	private loadETLScript(): void {
 		this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
@@ -214,11 +217,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	private isScriptDirty(): boolean {
-		if (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
 	}
 
 	private onScriptChange(event: { newValue: string, oldValue: string }) {
