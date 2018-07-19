@@ -1591,7 +1591,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
 	Map initiateCreateTasksWithRecipe(ContextCommand context, Project currentProject) {
-		long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
+		Long currentProjectId = securityService.userCurrentProjectId
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
 		securityService.requirePermission Permission.RecipeGenerateTasks
@@ -1601,9 +1601,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Find the Recipe Version that the user selected
 		Recipe recipe = get(Recipe, context.recipeId, currentProject)
-		if (recipe.project.id != currentProjectId) {
-			throw new UnauthorizedException('The recipe version submitted is not associated with current project')
-		}
 
 		def recipeVersion
 
@@ -1629,9 +1626,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		if (contextObj.eventId ) {
 			MoveEvent event = get(MoveEvent, contextObj.eventId, currentProject)
-			if (event.project.id != currentProjectId) {
-				throw new UnauthorizedException('Referenced context is not associated with current project')
-			}
 		}
 
 		def assets = getAssocAssets(contextObj)
@@ -5234,7 +5228,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		controllerService.requiredProject
 
 		Recipe recipe = get(Recipe, recipeId, currentProject)
-		securityService.assertCurrentProject recipe.project
 
 		boolean listAll=(limitDays=='All')
 		if (!listAll && (limitDays == null || !limitDays.isNumber())) {
@@ -5290,11 +5283,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return the task batch
 	 */
 	def getTaskBatch(taskBatchId, Project currentProject) {
-		controllerService.getRequiredProject()
-
 		TaskBatch taskBatch = get(TaskBatch, taskBatchId, currentProject)
-		securityService.assertCurrentProject taskBatch.recipeVersionUsed.recipe.project
-
 		[id: taskBatch.id,
 		 taskCount:      taskBatch.taskCount,
 		 exceptionCount: taskBatch.exceptionCount,
