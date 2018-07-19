@@ -2207,7 +2207,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					apiAction   : apiAction,
 					teamCodes   : teamCodeList,
 					apiAction   : apiAction,
-					event       : event
+					event       : event,
+					project     : currentProject
 				]
 
 				log.debug "##### settings: $settings"
@@ -3496,7 +3497,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskBatch: settings.taskBatch,
 			isPublished: settings.publishTasks,
 			sendNotification: taskSpec.sendNotification ?: false,
-			project: settings.event.project,
+			project: settings?.event?.project ?: settings.project,
 			moveEvent: settings.event,
 			assetEntity: asset,
 			commentType: AssetCommentType.TASK,
