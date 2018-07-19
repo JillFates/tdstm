@@ -5194,12 +5194,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Used to lookup a TaskBatch by the Context and Recipe regardless of the recipe version
 	 *
-	 * @param contextId - the record id number of the context that the TaskBatch was generated for
+	 * @param eventId - the event id for finding task batches
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @param includeLogs - whether to include the logs information or not
 	 * @return A taskBatch map if found or null
 	 */
-	def findTaskBatchByRecipeAndContext(Long recipeId, Long eventId, Project currentProject, includeLogs) {//context id become event Id
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long eventId, Project currentProject, includeLogs) {
 		controllerService.getRequiredProject()
 
 		Recipe recipe = get(Recipe, recipeId, currentProject)
