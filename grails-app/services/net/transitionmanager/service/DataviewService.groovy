@@ -388,7 +388,6 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $conditions
-			 group by AE.id
         """
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
