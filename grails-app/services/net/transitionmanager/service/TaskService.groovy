@@ -1645,7 +1645,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		TaskBatch tb = createTaskBatch(contextObj.eventId, recipe, recipeVersion, context.autoPublish)
+		TaskBatch tb = createTaskBatch(contextObj, recipe, recipeVersion, context.autoPublish, currentProject)
 
 		String key = taskBatchKey(tb.id)
 		progressService.create(key, 'Pending')
@@ -1682,10 +1682,34 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param isPublished - a flag that indicates that the tasks generated for the batch have been published
 	 * @return the TaskBatch that was created
 	 */
-	private TaskBatch createTaskBatch(Long eventId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
-		new TaskBatch(project: securityService.loadUserCurrentProject(), createdBy: securityService.loadCurrentPerson(),
-					  recipe: recipe, recipeVersionUsed: recipeVersion, eventId: eventId,
-					  status: "Pending", isPublished: isPublished).save(failOnError: true)
+	private TaskBatch createTaskBatch(TaskGenerationCommand context, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true, Project project) {
+		Map taskBatchContext = [
+			eventId : context.eventId,
+			tagMatch: context.tagMatch,
+			tag     : []
+		]
+
+		context.tag.each { Long tagId ->
+			Tag tag = get(Tag, tagId, project)
+
+			context.tag << [
+				id    : tag.id,
+				label : tag.name,
+				strike: false,
+				css   : tag.color.css
+			]
+		}
+
+		new TaskBatch(
+			project: securityService.loadUserCurrentProject(),
+			createdBy: securityService.loadCurrentPerson(),
+			recipe: recipe,
+			recipeVersionUsed: recipeVersion,
+			eventId: context.eventId,
+			context: JsonUtil.convertMapToJsonString(taskBatchContext),
+			status: "Pending",
+			isPublished: isPublished
+		).save(failOnError: true)
 	}
 
 	/**
