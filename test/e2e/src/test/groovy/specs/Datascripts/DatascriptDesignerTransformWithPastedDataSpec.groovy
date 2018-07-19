@@ -8,7 +8,7 @@ import pages.Datascripts.DatascriptDesignerSampleDataPage
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import jodd.util.RandomString
+import utils.CommonActions
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
@@ -17,7 +17,7 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = new CommonActions().getRandomString() + " "
     static E2E = "E2E DS"
     static datascriptName = randStr + E2E + " Name"
     static datascriptDescription = randStr + E2E + " Description"

@@ -8,6 +8,7 @@ import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import pages.AssetViewManager.SaveViewPage
 import jodd.util.RandomString
+import utils.CommonActions
 
 
 @Ignore
@@ -18,7 +19,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static numberOfRows
     static favView
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(6)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
     static minimumNumberOfRows =11
@@ -48,7 +49,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
                 createViewModule.selectRandomCheckboxes()
                 waitFor { createViewModule.firstSave() }
                 at SaveViewPage
-                waitFor { enterName(RandomString.getInstance().randomAlphaNumeric(10)) }
+                waitFor { enterName(randStr) }
                 waitFor { clickSave() }
                 waitFor { menuModule.goToAssetViewManager() }
                 at AssetViewsPage

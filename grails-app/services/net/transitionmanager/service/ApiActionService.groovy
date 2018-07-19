@@ -3,19 +3,18 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
-import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
-import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
-import net.transitionmanager.agent.ContextType
 import net.transitionmanager.agent.DictionaryItem
+import net.transitionmanager.agent.GenericHttpAgent
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
@@ -50,74 +49,6 @@ class ApiActionService implements ServiceMethods {
 	CredentialService credentialService
 	DataScriptService dataScriptService
 	CustomDomainService customDomainService
-
-	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
-	private static Map agentClassMap = [
-		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
-		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent,
-		(AgentClass.VCENTER.name())		: net.transitionmanager.agent.VMwarevCenterAgent
-	].asImmutable()
-		// TODO : JPM 3/2018 : TM-9903 AWS removed until we roll it back in
-		// (AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
-
-	/**
-	 * Get a list of agent names
-	 * @return
-	 */
-	@NotTransactional()
-	List<String> agentNamesList () {
-		List<Map> agents = new ArrayList<>()
-
-		agentClassMap.each { entry ->
-			Class clazz = entry.value
-			AbstractAgent agent = clazz.newInstance()
-			Map info = [
-				id  : agent.agentClass.toString(),
-				name: agent.name
-			]
-			agents << info
-		}
-
-		return agents.sort {it.name}
-	}
-
-	/**
-	 * Generates a detailed map of an agent and associated methods with all properties of the methods
-	 * @param id - the Agent code to look up (e.g. AWS)
-	 * @return the method dictionary for the specified agent code
-	 * @throws InvalidParamException when
-	 */
-	@NotTransactional()
-	Map agentDictionary (String id) throws InvalidParamException {
-		Map dictionary = [:]
-		List<String> agentIds = []
-		agentClassMap.each { entry ->
-			Class clazz = entry.value
-			AbstractAgent agent = clazz.newInstance()
-			String agentId = agent.agentClass.toString()
-			agentIds << agentId
-			if (agentId == id) {
-				dictionary = agent.dictionary()
-			}
-		}
-
-		if (!dictionary) {
-			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
-		} else {
-			// Iterate over the dictionary replacing the enum in params.context with the enum's name
-			for (String key in dictionary.keySet()) {
-				DictionaryItem agentInfo = dictionary[key]
-				if (agentInfo.params) {
-					for (Map paramsMap in agentInfo.params) {
-						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
-							paramsMap.context = paramsMap.context.name()
-						}
-					}
-				}
-			}
-		}
-		return dictionary.sort {it.value.name}
-	}
 
 	/**
 	 * Find an ApiAction by id
@@ -184,7 +115,7 @@ class ApiActionService implements ServiceMethods {
 			//	throw new InvalidRequestException('Task state does not permit action to be invoked')
 			//}
 
-			// Get the method definition of the Agent method
+			// Get the method definition of the Action configured Api Catalog
 			DictionaryItem methodDef = methodDefinition(action)
 
 			// We only need to implement Task for the moment
@@ -303,13 +234,13 @@ class ApiActionService implements ServiceMethods {
 				}
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
-				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
+				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.agentMethod, actionRequest
 				try {
 					if (context?.moveEvent?.apiActionBypass) {
-						log.info('By passing API Action invocation with following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest)
+						log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.agentMethod, actionRequest)
 						taskFacade.byPassed()
 					} else {
-						agent.invoke(action.agentMethod, actionRequest)
+						agent.invoke(methodDef, actionRequest)
 					}
 				} catch (Exception e) {
 					log.warn(e.message)
@@ -336,10 +267,14 @@ class ApiActionService implements ServiceMethods {
 			throw InvalidRequestException('No action was provided to the invoke command')
 		}
 
+		// Get the method definition of the Action configured Api Catalog
+		DictionaryItem methodDef = methodDefinition(action)
+
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
+
 		// methodParams will hold the parameters to pass to the remote method
-		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
+		Map remoteMethodParams = buildMethodParamsWithContext(action, null)
 
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
 		Map optionalRequestParams = [
@@ -368,12 +303,12 @@ class ApiActionService implements ServiceMethods {
 			}
 		}
 
-		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
+		log.debug 'About to invoke the following command: {}.{} with params {}', action.apiCatalog.name, action.agentMethod, remoteMethodParams
 
 		// execute action and return any result that were returned
 		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
 		try {
-			return agent.invoke(action.agentMethod, actionRequest)
+			return agent.invoke(methodDef, actionRequest)
 		} finally {
 			ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 		}
@@ -398,31 +333,17 @@ class ApiActionService implements ServiceMethods {
 	 * @return the method definition
 	 * @throws InvalidRequestException if the method name is invalid or the agent is not implemented
 	 */
-	private DictionaryItem methodDefinition (ApiAction action) {
-		Object agent = agentInstanceForAction(action)
-		Map dict = agent.dictionary()
-		DictionaryItem methodDef = dict[action.agentMethod]
-		if (!methodDef) {
-			throw new InvalidRequestException(
-					"Action class ${action.agentClass} method ${action.agentMethod} not implemented")
-		}
-		methodDef
-	}
+	DictionaryItem methodDefinition (ApiAction action) {
+		Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
+		Map<String, ?> method = dict[action?.agentMethod]
 
-	/**
-	 * Used to retrieve the Agent class that will handle the method
-	 * @param action - the ApiAction to be used to invoke the method
-	 * @return the Agent class to invoke the method on
-	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
-	 */
-	private Class agentClassForAction (ApiAction action) {
-		String clazzName = action.agentClass.name()
-		Class clazz = agentClassMap[clazzName]
-		if (clazz) {
-			return clazz
-		} else {
-			throw new InvalidRequestException("Action class ${clazzName} not implemented")
+		if (!method) {
+			throw new InvalidRequestException(
+					"Action class ${action?.apiCatalog?.name} method ${action?.agentMethod} not implemented")
 		}
+
+		DictionaryItem methodDef = new DictionaryItem(method)
+		methodDef
 	}
 
 	/**
@@ -432,8 +353,8 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
 	AbstractAgent agentInstanceForAction (ApiAction action) {
-		Class clazz = agentClassForAction(action)
-		clazz.instance
+		// for now returning a generic agent instance to be able to re-use all abstract agent methods
+		GenericHttpAgent.newInstance()
 	}
 
 	/**
@@ -713,28 +634,13 @@ class ApiActionService implements ServiceMethods {
 		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
 		if (!minimalInfo) {
 			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.agentClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
 			apiActionMap.version = apiAction.version
 		}
 
 		return apiActionMap
 	}
 
-	List apiActionMethodList(ApiAction apiAction, boolean minimalInfo = false) {
-		Map<String, Object> apiActionMap = null
-		// Load just the minimal or all by setting properties to null
-		List<String> properties = minimalInfo ? ["id", "name"] : null
-		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
-
-		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
-		if (!minimalInfo) {
-			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
-			apiActionMap.version = apiAction.version
-		}
-
-		return apiActionMap
-	}
 	/**
 	 * Add task error message through the task facade
 	 * @param taskFacade - the task facade wrapper

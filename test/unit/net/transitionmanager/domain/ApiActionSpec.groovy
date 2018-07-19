@@ -6,7 +6,6 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.agent.ContextType
 import spock.lang.Specification
@@ -16,6 +15,8 @@ import spock.lang.Title
 class ApiActionSpec extends Specification {
 
 	private Project project
+	private Provider provider
+	private ApiCatalog apiCatalog
 	private ApiAction action
 	private AssetComment task
 	private AssetEntity asset
@@ -40,11 +41,14 @@ class ApiActionSpec extends Specification {
 
 	void setup() {
 		project = new Project()
+		provider = new Provider(project: project)
+		apiCatalog = new ApiCatalog(project: project, provider: provider)
 
 		action = new ApiAction(
 				name:'testAction',
 				description: 'This is a bogus action for testing',
-				agentClass: AgentClass.HTTP,
+				// agentClass: AgentClass.HTTP,
+				apiCatalog: apiCatalog,
 				agentMethod: 'sendSnsNotification',
 				methodParams: paramsJson,
 				asyncQueue: 'test_outbound_queue',
