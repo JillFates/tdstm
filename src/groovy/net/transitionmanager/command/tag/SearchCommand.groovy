@@ -12,14 +12,14 @@ class SearchCommand {
 	String     description
 	Date       dateCreated
 	Date       lastUpdated
-	List<Long> moveBundleIds =[]
-	Long       moveEventId
+	List<Long> bundleIds =[]
+	Long       eventId
 
 	static constraints = {
 		name nullable: true
 		description nullable: true
 		dateCreated nullable: true
 		lastUpdated nullable: true
-		moveEventId nullable: true
+		eventId nullable: true
 	}
 }

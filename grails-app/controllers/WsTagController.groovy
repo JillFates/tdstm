@@ -29,8 +29,8 @@ class WsTagController implements ControllerMethods {
 			filter.description,
 			filter.dateCreated,
 			filter.lastUpdated,
-			filter.moveBundleId ?[filter.moveBundleId] : [],
-			filter.moveEventId
+			filter.bundleId ?[filter.bundleId] : [],
+			filter.eventId
 		)
 
 		renderSuccessJson(tags)
@@ -51,8 +51,8 @@ class WsTagController implements ControllerMethods {
 			filter.description,
 			filter.dateCreated,
 			filter.lastUpdated,
-			filter.moveBundleIds,
-			filter.moveEventId
+			filter.bundleIds,
+			filter.eventId
 		)
 
 		renderSuccessJson(tags)
