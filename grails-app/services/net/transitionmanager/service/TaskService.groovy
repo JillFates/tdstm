@@ -36,7 +36,7 @@ import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.task.ContextCommand
+import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -1567,12 +1567,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Used to locate a TaskBatch for a given recipe and context
 	 * @param recipe - the recipe used to generate a task batch, regardless of the version
-	 * @param contextId - the context id of the context that was used to generate the task batch
+	 * @param event - the event id of the context that was used to generate the task batch
 	 * @return the TaskBatch record if found otherwise null
 	 */
 	List findTaskBatchesForRecipeContext(Recipe recipe, Long eventId) {
 		TaskBatch.createCriteria().list {
-			eq('contextId', eventId)
+			eq('eventId', eventId)
 			eq('recipe', recipe)
 		}
 	}
@@ -1580,7 +1580,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Used to initiate an async task creation job using a specified recipe for a given context
 	 * This is the service method called by the controller to initiate task generation
-	 * @param contextId - the id of the context record being an Application, MoveEvent, MoveBundle or an AssetEntity
+	 * @param context - the context which can include, MoveEvent, and or tags
 	 * @param recipeVersionId - the id number of the RecipeVersion that should be used to generate the tasks
 	 * @param deletePrevious - a flag to indicate that we should delete the previously generated tasks for the recipe if any exist
 	 * @param useWIP - a flag to indicate if the generation should use the WIP or the current release of the recipe
@@ -1590,7 +1590,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(ContextCommand context, Project currentProject) {
+	Map initiateCreateTasksWithRecipe(TaskGenerationCommand context, Project currentProject) {
 		Long currentProjectId = securityService.userCurrentProjectId
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
@@ -1677,15 +1677,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Used to create a task batch
 	 * @param contextType - the type of context that the batch is being generated for
-	 * @param contextId - the id of the context record being an Application, MoveEvent, MoveBundle or an AssetEntity
+	 * @param eventId - the id of the event record
 	 * @param recipeVersion - the reference RecipeVersion that will be used to generate the task batch
 	 * @param isPublished - a flag that indicates that the tasks generated for the batch have been published
 	 * @return the TaskBatch that was created
 	 */
 	private TaskBatch createTaskBatch(Long eventId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished = true) {
 		new TaskBatch(project: securityService.loadUserCurrentProject(), createdBy: securityService.loadCurrentPerson(),
-				recipe: recipe, recipeVersionUsed: recipeVersion, contextId: eventId,
-				status: "Pending", isPublished: isPublished).save(failOnError: true)
+					  recipe: recipe, recipeVersionUsed: recipeVersion, eventId: eventId,
+					  status: "Pending", isPublished: isPublished).save(failOnError: true)
 	}
 
 	/**
@@ -5172,7 +5172,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param includeLogs - whether to include the logs information or not
 	 * @return A taskBatch map if found or null
 	 */
-	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId, Project currentProject, includeLogs) {//context id become event Id
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long eventId, Project currentProject, includeLogs) {//context id become event Id
 		controllerService.getRequiredProject()
 
 		Recipe recipe = get(Recipe, recipeId, currentProject)
@@ -5185,8 +5185,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				from task_batch 
 				inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id
 				inner join person on task_batch.created_by_id = person.person_id
-				where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :contextId
-				order by task_batch.date_created desc""", ['recipeId' : recipeId, 'contextId' : contextId])
+				where recipe_version.recipe_id = :recipeId AND task_batch.context_id = :eventId
+				order by task_batch.date_created desc""", ['recipeId' : recipeId, 'eventId' : eventId])
 
 			def result
 			if (taskBatchs) {
@@ -5195,7 +5195,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				result = [
 					'id': taskBatch.task_batch_id,
 					'contextType': taskBatch.context_type,
-					'contextId': taskBatch.context_id,
+					'eventId': taskBatch.context_id,
 					'recipe': taskBatch.recipe_id,
 					'recipeVersionUsed': taskBatch.recipe_version_id,
 					'status': taskBatch.status,
@@ -5263,7 +5263,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			id: taskBatch.id,
 			recipeId : taskBatch.recipe?.id ?: 0,
 			recipeName : taskBatch.recipe?.name ?: '',
-			contextName : taskBatch.contextName(),
+			eventName : taskBatch.eventName(),
 			taskCount: taskBatch.taskCount,
 			exceptionCount: taskBatch.exceptionCount,
 			createdBy: taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,

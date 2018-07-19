@@ -1,13 +1,11 @@
-import spock.lang.Specification
-
 import com.tds.asset.AssetEntityType
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.SpeedScale
 import com.tdsops.tm.enums.domain.TaskDependencyType
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
+import spock.lang.Specification
 
 class EnumTests extends Specification {
 
@@ -44,11 +42,6 @@ class EnumTests extends Specification {
 	void testSecurityRole() {
 		expect:
 		enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
-	}
-
-	void testContextType() {
-		expect:
-		enumTest ContextType, ContextType.A, 'A', 'Application', 'E', 'Event'
 	}
 
 	/**

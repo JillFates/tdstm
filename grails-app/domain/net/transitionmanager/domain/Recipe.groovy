@@ -1,6 +1,5 @@
 package net.transitionmanager.domain
 
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 /**
@@ -58,14 +57,5 @@ class Recipe {
 
 	Map context(){
 		context ? JsonUtil.convertJsonToMap(context) : [:]
-	}
-
-	ContextType asContextType() {
-		switch (context) {
-			case 'Application': return ContextType.A
-			case 'Bundle':      return ContextType.B
-			case 'Event':       return ContextType.E
-			default: throw new IllegalArgumentException('Invalid context')
-		}
 	}
 }

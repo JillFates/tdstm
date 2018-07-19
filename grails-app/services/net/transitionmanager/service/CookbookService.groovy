@@ -406,13 +406,13 @@ class CookbookService implements ServiceMethods {
 	}
 
 	/**
-	 * Returns a list of groups based on the recipeVersionId and the contextId
+	 * Returns a list of groups based on the recipeVersionId and the context
 	 *
 	 * @param recipeVersionId the id of the RecipeVersion
-	 * @param contextId the id of the context
+	 * @param context the MoveEventId and or tags
 	 * @return the list of groups
 	 */
-	def getGroups(Long recipeVersionId, context, String predSourceCode) {
+	def getGroups(Long recipeVersionId, ContextCommand context, String predSourceCode) {
 		boolean validRecipeId = recipeVersionId != null
 
 		if (!validRecipeId && predSourceCode == null) {
@@ -446,9 +446,6 @@ class CookbookService implements ServiceMethods {
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }
 			[name: k, assets: assets]
 		})
-	}
-
-	private checkAccess(long contextId, String contextTypeKey, Project project) {
 	}
 
 	/**

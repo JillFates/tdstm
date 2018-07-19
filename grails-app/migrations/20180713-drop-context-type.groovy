@@ -14,4 +14,14 @@ databaseChangeLog = {
 
 		dropNotNullConstraint(tableName: 'task_batch', columnName: 'context_id', columnDataType:'BIGINT(20)')
 	}
+
+	changeSet(author: "tpelletier", id: "TM-11077-2-3") {
+		comment("Rename the context_id to event_id for task_batch")
+
+		preConditions(onFail: 'MARK_RAN') {
+			columnExists(tableName: 'task_batch', columnName: 'context_id')
+		}
+
+		renameColumn(tableName: 'task_batch', oldColumnName: 'context_id', newColumnName: 'event_Id', columnDataType: 'BIGINT(20)')
+	}
 }

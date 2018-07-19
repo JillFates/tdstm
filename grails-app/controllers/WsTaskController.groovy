@@ -4,7 +4,7 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
-import net.transitionmanager.command.task.ContextCommand
+import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -59,7 +59,7 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
-		ContextCommand context = populateCommandObject(ContextCommand)
+		TaskGenerationCommand context = populateCommandObject(TaskGenerationCommand)
 		validateCommandObject(context)
 		Project project = securityService.userCurrentProject
 
@@ -69,14 +69,14 @@ class WsTaskController implements ControllerMethods {
 
 	/**
 	 * Used to lookup a TaskBatch by the Context and Recipe regardless of the recipe version
-	 * @param contextId - the record id number of the context that the TaskBatch was generated for
+	 * @param eventId - the record id number of the event that the TaskBatch was generated for
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @return A taskBatch object if found or null
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def findTaskBatchByRecipeAndContext(Long recipeId, Long contextId) {
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long eventId) {
 		Project project = securityService.userCurrentProject
-		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, contextId, project, params.logs)
+		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, eventId, project, params.logs)
 		renderSuccessJson(taskBatch: result)
 	}
 

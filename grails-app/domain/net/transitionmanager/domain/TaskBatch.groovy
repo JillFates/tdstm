@@ -8,7 +8,7 @@ import com.tdssrc.grails.TimeUtil
  * @author John Martin
  */
 class TaskBatch {
-	Long contextId
+	Long   eventId
 	String status
 
 	RecipeVersion recipeVersionUsed       // the recipeVersion used to generate the batch of tasks
@@ -25,7 +25,7 @@ class TaskBatch {
 	Date lastUpdated
 
 	static constraints = {
-		contextId nullable: true
+		eventId nullable: true
 		dateCreated nullable: true
 		lastUpdated nullable: true
 		recipe nullable: true
@@ -61,9 +61,9 @@ class TaskBatch {
 	/**
 	 * Get the name of the object for which the context references
 	 */
-	String contextName() {
-		if(contextId){
-			return MoveEvent.get(contextId)?.name ?: ''
+	String eventName() {
+		if(eventId){
+			return MoveEvent.get(eventId)?.name ?: ''
 		}
 
 		//TODO need a better context name to send back
