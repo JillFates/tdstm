@@ -91,10 +91,7 @@ class ApiCatalogService implements ServiceMethods {
 	 * @return and instance of api catalog
 	 */
 	ApiCatalog findById(Long id) {
-		ApiCatalog.where {
-			project == securityService.userCurrentProject
-			id == id
-		}.get()
+		return GormUtil.findInProject(securityService.userCurrentProject, ApiCatalog, id, false)
 	}
 
 	/**
@@ -148,11 +145,7 @@ class ApiCatalogService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getCatalogMethods(Long catalogId) {
-		ApiCatalog apiCatalog = findById(catalogId)
-		if (!apiCatalog) {
-			throw new EmptyResultException("Api Catalog with ID $catalogId, not found")
-		}
-
-		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionary)
+		ApiCatalog apiCatalog = GormUtil.findInProject(securityService.userCurrentProject, ApiCatalog, catalogId, true)
+		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionaryTransformed)
 	}
 }
