@@ -419,7 +419,7 @@ class CookbookService implements ServiceMethods {
 	 * @param context the MoveEventId and or tags
 	 * @return the list of groups
 	 */
-	def getGroups(Long recipeVersionId, ContextCommand context, String predSourceCode) {
+	List<Map> getGroups(Long recipeVersionId, ContextCommand context, String predSourceCode) {
 		boolean validRecipeId = recipeVersionId != null
 
 		if (!validRecipeId && predSourceCode == null) {
@@ -895,7 +895,7 @@ class CookbookService implements ServiceMethods {
 					status: 0
 				],
 				tag: '',
-				tagJoin: ''
+				tagMatch: 'ANY'
 			]
 		]
 
@@ -1419,7 +1419,7 @@ class CookbookService implements ServiceMethods {
 		checkAccess(project)
 		Map context = [
 			eventId : contextCommand.eventId,
-			and     : contextCommand.and,
+			tagMatch: contextCommand.tagMatch,
 			tag     : []
 		]
 

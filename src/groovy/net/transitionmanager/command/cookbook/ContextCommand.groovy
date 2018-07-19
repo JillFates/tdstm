@@ -10,7 +10,7 @@ class ContextCommand {
 
 	Long eventId
 	List <Long> tag = []
-	Boolean and = true
+	String tagMatch = "ANY"
 
 	static constraints = {
 		eventId nullable: true

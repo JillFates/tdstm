@@ -11,7 +11,7 @@ class TaskGenerationCommand {
 	Long recipeId
 	Long eventId
 	List <Long> tag = []
-	Boolean and = true
+	String tagMatch = "ANY"
 	Boolean deletePrevious
 	Boolean useWIP
 	Boolean autoPublish
