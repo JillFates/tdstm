@@ -1706,8 +1706,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (contextObj.tag) {
 			List<Long>tagIds = contextObj.tag.collect{tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
 
-			return TagAsset.where { tag.id in tagIds && asset.moveBundle.useForPlanning == true }.projections {
-				property 'asset'
+			return TagAsset.where {
+				tag.id in tagIds
+				asset.moveBundle.useForPlanning == true }.projections {
+			}.projections {
+			   property 'asset'
 			}.list()
 		} else {
 			List bundleIds = getBundleIds(contextObj)
