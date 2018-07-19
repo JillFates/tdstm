@@ -9,7 +9,6 @@ import spock.lang.Ignore
 import java.text.SimpleDateFormat
 import pages.Downloads.HomeUserDownloadsPage
 
-@Ignore
 class ExportAccountsSpec extends GebReportingSpec {
     def testKey
     static testCount
