@@ -5,10 +5,11 @@ import pages.Admin.ExportAccountsPage
 import pages.Admin.LandingItems.ExportAccountsLandingPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Ignore
+import spock.lang.Stepwise
 import java.text.SimpleDateFormat
 import pages.Downloads.HomeUserDownloadsPage
 
+@Stepwise
 class ExportAccountsSpec extends GebReportingSpec {
     def testKey
     static testCount
