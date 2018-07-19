@@ -1,7 +1,12 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tdsops.etl.*
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorException
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -143,7 +148,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: 152254l]) == [152254l]
@@ -298,7 +303,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 48
 				hitCountRate() == 14.29
 				get('Dependency', [id: '1']) == []
@@ -405,7 +410,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 14
 				hitCountRate() == 0
 				[1..14].each {
@@ -484,7 +489,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -662,7 +667,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 3
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -895,7 +900,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 14.29
 				get('Application', [id: '151954']) == [151954l]
@@ -1256,7 +1261,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 22
 				hitCountRate() == 14.29
 				get('Application', [id: '151954']) == []
@@ -1352,7 +1357,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.cache) {
+			with(etlProcessor.findCache) {
 				size() == 4
 				hitCountRate() == 0
 				get('Room', [id: '100']) == []

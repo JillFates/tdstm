@@ -14,7 +14,27 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
 
-import static org.codehaus.groovy.syntax.Types.*
+import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
+import static org.codehaus.groovy.syntax.Types.DIVIDE
+import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
+import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
+import static org.codehaus.groovy.syntax.Types.MINUS
+import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
+import static org.codehaus.groovy.syntax.Types.MOD
+import static org.codehaus.groovy.syntax.Types.MULTIPLY
+import static org.codehaus.groovy.syntax.Types.NOT
+import static org.codehaus.groovy.syntax.Types.PLUS
+import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
+import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
+import static org.codehaus.groovy.syntax.Types.POWER
+import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
 
 /**
  * Class that receives all the ETL initial commands.
@@ -109,9 +129,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	ETLFindElement currentFindElement
 
 	/**
-	 * Last Recently used cachec
+	 * Last Recently used findCache
 	 */
-	FindResultsCache cache
+	FindResultsCache findCache
 	/**
 	 * {@code StopWatch} used for measurement.
 	 */
@@ -190,7 +210,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
-		this.cache = new FindResultsCache()
+		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
 		this.initializeDefaultGlobalTransformations()
 	}
@@ -870,24 +890,24 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	/**
 	 * <b>Cache ETL command.</b><br>
-	 * ETL Script evaluation is using internally a cache of find command results.
-	 * This commands enables user to define the initial size of that cache.
+	 * ETL Script evaluation is using internally a findCache of find command results.
+	 * This commands enables user to define the initial size of that findCache.
 	 * <br>
 	 * If size is greater than zero it creates an instance of {@code FindResultsCache}
-	 * otherwise cache is set as a null
+	 * otherwise findCache is set as a null
 	 * <pre>
-	 *  cache 0 // It disables cache in find results
-	 *  cache 100
+	 *  findCache 0 // It disables findCache in find results
+	 *  findCache 100
 	 * </pre>
-	 * @param size initial size of cache
+	 * @param size initial size of findCache
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor cache(Integer size){
 
 		if(size > 0){
-			this.cache = new FindResultsCache(size)
+			this.findCache = new FindResultsCache(size)
 		} else {
-			this.cache = null
+			this.findCache = null
 		}
 		return this
 	}
@@ -1433,13 +1453,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Logs metrics related with evaluation time and cache hit ratio
+	 * Logs metrics related with evaluation time and findCache hit ratio
 	 *
 	 * @param timeDuration
 	 */
 	private void logMeasurements(TimeDuration timeDuration){
 		debugConsole.info("Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
-		debugConsole.info("Cache hit count rate ${cache?cache.hitCountRate():0}%")
+		debugConsole.info("Cache hit count rate ${findCache?findCache.hitCountRate():0}%")
 	}
 	/**
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content

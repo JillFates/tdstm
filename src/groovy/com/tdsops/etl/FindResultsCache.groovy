@@ -3,8 +3,8 @@ package com.tdsops.etl
 import com.tdssrc.grails.StringUtil
 
 /**
- * A custom LRU cache for ETL find command results.<br>
- * Following some considerations from java documentations, this cache uses
+ * A custom LRU findCache for ETL find command results.<br>
+ * Following some considerations from java documentations, this findCache uses
  * an instance of LinkedHashMap and {@code LinkedHashMap # removeEldestEntry} method
  * that includes a way to remove the least-recently accessed entries automatically.
  *
@@ -14,7 +14,7 @@ class FindResultsCache {
 
 	Map<String, List<?>> cache
 	/**
-	 * Initial size of LRU cache
+	 * Initial size of LRU findCache
 	 */
 	static final Integer MAX_ENTRIES = 10000
 	/**
@@ -32,7 +32,7 @@ class FindResultsCache {
 			/**
 			 * Overrides a default implementation in LinkedHashMap and is where
 			 * we determine the policy for removing the oldest entry.
-			 * In this case, we return true when the cache has
+			 * In this case, we return true when the findCache has
 			 * more entries than our defined capacity.
 			 * @param eldest The least recently inserted entry in the map, or if
 			 *           this is an access-ordered map, the least recently accessed
@@ -55,7 +55,7 @@ class FindResultsCache {
 
 	/**
 	 * Associates the specified value with the specified key [MD5(domainClassName + fieldsInfo)]
-	 * in this cache. If the cache previously contained a mapping for the key, the old
+	 * in this findCache. If the findCache previously contained a mapping for the key, the old
 	 * value is replaced.
 	 *
 	 * @param domainClassName class name from a domain class in system
@@ -93,7 +93,7 @@ class FindResultsCache {
 	}
 
 	/**
-	 * Creates a key for this cache converting an string
+	 * Creates a key for this findCache converting an string
 	 * based on domainClassName and fieldsInfo parameters
 	 * in a MD5 string content.
 	 * <pre>
@@ -110,7 +110,7 @@ class FindResultsCache {
 	}
 
 	/**
-	 * Return the # of objects contained in the cache
+	 * Return the # of objects contained in the findCache
 	 */
 	Long size() {
 		return cache.size()
@@ -125,8 +125,8 @@ class FindResultsCache {
 	}
 
 	/**
-	 * Returns how many cache accesses are "hits" - that is,
-	 * how many times the required data was found in the cache
+	 * Returns how many findCache accesses are "hits" - that is,
+	 * how many times the required data was found in the findCache
 	 * for a given number of accesses.
 	 * Hit rate is usually expressed as a percentage
 	 * @return percentage of hit counts over access count

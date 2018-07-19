@@ -190,7 +190,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -298,7 +298,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 14.29
 				get('Application', [id: '151954']) == [151954l]
@@ -640,7 +640,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 7.14
 				get('Application', [id: '151954']) == [151954l]
@@ -823,7 +823,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -1014,7 +1014,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 4
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
@@ -1587,7 +1587,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -1686,7 +1686,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == [152254l]
@@ -1786,7 +1786,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
@@ -1900,7 +1900,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
@@ -2014,7 +2014,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
@@ -2410,7 +2410,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -2540,7 +2540,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -2670,7 +2670,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -2785,7 +2785,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -2900,7 +2900,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -3005,7 +3005,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
 				get('Application', [appVendor: 'Microsoft']) == [152253l]
@@ -3126,7 +3126,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 0
 				hitCountRate() == 0
 			}
@@ -3655,7 +3655,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
+			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 33.33
 				get('Application', [id: 152254l]) == []
@@ -3801,7 +3801,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			etlProcessor.cache == null
+			etlProcessor.findCache == null
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
