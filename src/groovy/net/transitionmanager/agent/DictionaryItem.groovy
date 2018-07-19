@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 @ToString(includes='name,method,description', includeNames=true, includeFields=true)
 @CompileStatic
 class DictionaryItem {
-	String agentMethod
+	String apiMethod
 	String name
 	String description=''
 	String endpointUrl

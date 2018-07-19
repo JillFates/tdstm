@@ -15,6 +15,9 @@ class Provider {
     Date dateCreated
     Date lastUpdated
 
+    // used by GormUtil.findDomainByAlternateKey(...)
+    static String alternateKey = 'name'
+
     static belongsTo = [ project: Project ]
 
     static hasMany = [

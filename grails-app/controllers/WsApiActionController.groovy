@@ -10,12 +10,14 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.integration.ApiActionValidateScriptCommand
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
+import net.transitionmanager.service.ApiCatalogService
 
 @Secured('isAuthenticated()')
 @Slf4j
 class WsApiActionController implements ControllerMethods {
 
     ApiActionService apiActionService
+    ApiCatalogService apiCatalogService
 
     /**
      * Get agent details by agent name
@@ -23,7 +25,7 @@ class WsApiActionController implements ControllerMethods {
      * @return
      */
     def agentDictionary(String id) {
-        renderAsJson(apiActionService.agentDictionary(id))
+        renderAsJson(apiCatalogService.getCatalogMethods(id as Long))
     }
 
     /**
@@ -117,7 +119,7 @@ class WsApiActionController implements ControllerMethods {
     def enums() {
         renderSuccessJson([
                 'httpMethod': ApiActionHttpMethod.names(),
-                'agentNames': apiActionService.agentNamesList()
+                'agentNames': apiCatalogService.listCatalogNames()
         ])
     }
 }
