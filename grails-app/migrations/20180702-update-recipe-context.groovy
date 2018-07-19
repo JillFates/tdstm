@@ -62,4 +62,19 @@ databaseChangeLog = {
 
 		modifyDataType(columnName: 'context', newDataType: 'json', tableName: 'recipe')
 	}
+
+	changeSet(author: 'tpelletier', id: 'TM-11077-5') {
+		comment('Add context to task batch')
+
+		preConditions(onFail: 'MARK_RAN') {
+			not {
+				columnExists(tableName: 'task_batch', columnName: 'context')
+			}
+		}
+		addColumn(tableName: 'task_batch') {
+			column(name: 'context', type: 'json') {
+				constraints(nullable: 'true')
+			}
+		}
+	}
 }
