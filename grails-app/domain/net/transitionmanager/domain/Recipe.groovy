@@ -55,6 +55,11 @@ class Recipe {
 
 	String toString() { name }
 
+	/**
+	 * Gets the context as a map.
+	 *
+	 * @return the context including event id and tags as a map.
+	 */
 	Map context(){
 		context ? JsonUtil.convertJsonToMap(context) : [:]
 	}

@@ -5311,16 +5311,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	def getTaskBatch(taskBatchId, Project currentProject) {
 		TaskBatch taskBatch = get(TaskBatch, taskBatchId, currentProject)
-		[id: taskBatch.id,
-		 taskCount:      taskBatch.taskCount,
-		 exceptionCount: taskBatch.exceptionCount,
-		 createdBy:      taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
-		 dateCreated:    taskBatch.dateCreated,
-		 status:         taskBatch.status,
-		 versionNumber:  taskBatch.recipeVersionUsed.versionNumber,
-		 isPublished:    taskBatch.isPublished,
-		 exceptionLog:   taskBatch.exceptionLog,
-		 infoLog:        taskBatch.infoLog]
+
+		[
+			id            : taskBatch.id,
+			taskCount     : taskBatch.taskCount,
+			exceptionCount: taskBatch.exceptionCount,
+			createdBy     : taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
+			dateCreated   : taskBatch.dateCreated,
+			status        : taskBatch.status,
+			versionNumber : taskBatch.recipeVersionUsed.versionNumber,
+			isPublished   : taskBatch.isPublished,
+			exceptionLog  : taskBatch.exceptionLog,
+			infoLog       : taskBatch.infoLog
+		]
 	}
 
 	/**
