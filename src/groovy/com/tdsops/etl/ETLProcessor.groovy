@@ -12,7 +12,27 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
 
-import static org.codehaus.groovy.syntax.Types.*
+import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
+import static org.codehaus.groovy.syntax.Types.DIVIDE
+import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
+import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
+import static org.codehaus.groovy.syntax.Types.MINUS
+import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
+import static org.codehaus.groovy.syntax.Types.MOD
+import static org.codehaus.groovy.syntax.Types.MULTIPLY
+import static org.codehaus.groovy.syntax.Types.NOT
+import static org.codehaus.groovy.syntax.Types.PLUS
+import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
+import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
+import static org.codehaus.groovy.syntax.Types.POWER
+import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
 
 /**
  * Class that receives all the ETL initial commands.
