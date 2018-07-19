@@ -17,7 +17,6 @@
                 height: 26px
                 padding-left: 10px
                 padding-right: 22px
-                text-transform: uppercase
                 font-size: 13px
                 padding-top: 5px
                 font-weight: 600
@@ -95,6 +94,14 @@
   background-color: $color--grey2 !important
   box-shadow: unset !important
 
+.label.tag
+  width: 60px
+  height: 27px
+  display: block
+  margin: 0 auto 0 auto
+  padding-top: 8px
+  font-size: 11px
+  color: #656565 !important
 .tag-black
   background-color: black !important
 .tag-grey
@@ -119,3 +126,17 @@
   background-color: white !important
 .tag-unselected
   background-color: unset !important
+
+.tds-angular-component-content, asset-explorer-view-grid
+  .label.tag
+    display: inline-block
+    margin-right: 2px
+    margin-bottom: 2px
+    vertical-align: baseline
+    text-align: center
+    width: inherit
+    height: 28px
+    font-weight: 600
+    padding-left: 10px
+    padding-right: 10px
+    font-size: 13px

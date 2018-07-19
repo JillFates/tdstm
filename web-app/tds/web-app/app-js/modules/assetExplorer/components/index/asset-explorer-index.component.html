@@ -60,7 +60,7 @@
 											<button class="btn btn-default" (click)="onEditReport(report)" *ngIf="isEditAvailable(report)" title="Click to edit this view">
 												<span class="fa fa-pencil"></span>
 											</button>
-											<button class="btn btn-default" (click)="onDeleteReport(report)" *ngIf="isDeleteAvailable(report)" title="Click to delete this view">
+											<button class="btn btn-default" (click)="onDeleteReport(report)" *ngIf="isDeleteAvailable(report) && !report.isSystem" title="Click to delete this view">
 												<span class="fa fa-fw fa-trash"></span>
 											</button>
 										</td>

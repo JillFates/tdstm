@@ -5,11 +5,14 @@
         font-weight: bold;
         cursor: pointer;
     }
+    .asset-tag.k-switch {
+        top: 3px !important;
+    }
 </style>
 
 <kendo-grid class="tds-kendo-grid without-selectabe-rows" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+ (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -67,20 +70,38 @@
 				</div>
 			</div>
 		</ng-template>
-		<ng-template kendoGridFilterCellTemplate>
-			<div class=" has-feedback" style="margin-bottom:0px;">
-				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
+
+        <!-- Default Generic Filter Template -->
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tags'">
+            <div class=" has-feedback" style="margin-bottom:0px;">
+                <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
                        [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
-				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
-				 aria-hidden="true"></span>
-			</div>
-		</ng-template>
-        <ng-template kendoGridCellTemplate let-dataItem>
-            <span [ngClass]="getCellClass(column)">
-                {{dataItem[column.domain+'_'+column.property]}}
-            </span>
-     </ng-template>
-	</kendo-grid-column>
+                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+                      aria-hidden="true"></span>
+            </div>
+        </ng-template>
+        <!-- Asset Tags Filter Template -->
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tags'">
+            <tds-asset-tag-selector [tagList]="tagList"
+                                    (valueChange)="onTagFilterChange(column, $event)">
+            </tds-asset-tag-selector>
+        </ng-template>
+
+        <!-- Default Generic Cell Template -->
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tags'">
+           <span [ngClass]="getCellClass(column)">
+               {{dataItem[column.domain+'_'+column.property]}}
+           </span>
+        </ng-template>
+        <!-- Asset Tags Cell Template -->
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tags'">
+            <div>
+               <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
+                     [ngClass]="tag.css">{{tag.name}}</span>
+            </div>
+        </ng-template>
+
+    </kendo-grid-column>
 
     <!-- No Records -->
 	<ng-template kendoGridNoRecordsTemplate>

@@ -159,17 +159,17 @@ export class DateUtils {
 
 		let days = durationDate.asDays();
 		if (days >= 1) {
-			durationResult += parseInt(days.toString(), 2) + ' day' + ((days > 1) ? 's ' : ' ');
+			durationResult += parseInt(days.toString(), 0) + ' day' + ((days > 1) ? 's ' : ' ');
 		}
 
 		let hours = durationDate.hours();
 		if (hours >= 1) {
-			durationResult += parseInt(hours.toString(), 2) + ' hr' + ((hours > 1) ? 's ' : ' ');
+			durationResult += parseInt(hours.toString(), 0) + ' hr' + ((hours > 1) ? 's ' : ' ');
 		}
 
 		let minutes = durationDate.minutes();
 		if (minutes >= 1) {
-			durationResult += parseInt(minutes.toString(), 2) + ' min' + ((minutes > 1) ? 's ' : ' ');
+			durationResult += parseInt(minutes.toString(), 0) + ' min' + ((minutes > 1) ? 's ' : ' ');
 		}
 
 		return durationResult;

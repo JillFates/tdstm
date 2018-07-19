@@ -80,7 +80,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.url}" />
+			<tds:inputLabel field="${standardFieldSpecs.url}" value="${asset.url}" />
 			<td class="valueNW ${standardFieldSpecs.url.imp}" ><tds:textAsLink  text="${asset.url}" target="_new"/></td>
 
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
@@ -136,6 +136,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
+        <g:render template="/angular/common/assetTags"></g:render>
 	</tbody>
 </table>
 

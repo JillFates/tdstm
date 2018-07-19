@@ -2,7 +2,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autofocus class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Logical Storage Detail</h4>
@@ -54,7 +54,7 @@
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 							</tr>
 							<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
-							</tbody>
+                            <g:render template="/angular/common/assetTags"></g:render>
 						</table>
 						</div>
 					</td>

@@ -19,7 +19,13 @@ export class TagService {
 	getTags(): Observable<ApiResponseModel> {
 		return this.http.get(this.tagURL)
 			.map((res: Response) => {
-				return res.json();
+				let jsonResult = res.json();
+				let models: Array<TagModel> = jsonResult && jsonResult.status === ApiResponseModel.API_SUCCESS && jsonResult.data;
+				models.forEach((model: TagModel) => {
+					model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : null);
+					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
+				});
+				return jsonResult;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -121,6 +127,84 @@ export class TagService {
 	 */
 	mergeTags(tagIdFrom: number, tagIdTo: number): Observable<ApiResponseModel> {
 		return this.http.put(`${this.tagURL}/${tagIdTo}/merge/${tagIdFrom}`, null)
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET - Get the list of all tags linked/associated to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	getAssetTags(assetId: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.tagURL}/asset/${assetId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				if (result.data) {
+					let data = result.data.map(item => {
+						let tagModel: any = {};
+						tagModel.id = item.tagId;
+						tagModel.name = item.name;
+						tagModel.description = item.description;
+						tagModel.color = item.color;
+						tagModel.css = item.css;
+						tagModel.dateCreated = item.dateCreated;
+						tagModel.assetTagId = item.id;
+						return tagModel;
+					});
+					result.data = data;
+				}
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * POST, DELETE - Creates and Deletes Assets Tags in a fork join operation.
+	 * @returns {Observable<any>}
+	 */
+	createAndDeleteAssetTags(assetId: number, tagIdsToAdd: Array<number>, idsToDelete: Array<number>): Observable<any> {
+		let operations = [];
+		if (tagIdsToAdd.length > 0) {
+			operations.push(this.createAssetTags(assetId, tagIdsToAdd));
+		}
+		if (idsToDelete.length > 0) {
+			operations.push(this.deleteAssetTags(idsToDelete));
+		}
+		return Observable.forkJoin(operations);
+	}
+
+	/**
+	 * POST - Associate tags to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	createAssetTags(assetId: number, tagIds: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			'tagIds': tagIds,
+			'assetId': assetId
+		};
+		return this.http.post(`${this.tagURL}/asset`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * DELETE - Associate tags to a particular asset.
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	deleteAssetTags(idsToDelete: Array<number>): Observable<ApiResponseModel> {
+		let body = JSON.stringify({
+			ids: idsToDelete
+		});
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(`${this.tagURL}/asset`, options)
 			.map((res: Response) => {
 				return res.json();
 			})

@@ -1,5 +1,6 @@
 package utils
 
+import jodd.util.RandomString
 /*
 * Note: Page including common methods or actions to perform in the system. For example: select options from select.
 * */
@@ -64,5 +65,21 @@ class CommonActions {
         checkboxes?.each { checkbox ->
             checkbox.click()
         }
+    }
+
+    def convertRgbToHex(int r, int g, int b) {
+        "#" + toHexValue(r) + toHexValue(g) + toHexValue(b)
+    }
+
+    def toHexValue(int number) {
+        def builder = new StringBuilder(Integer.toHexString(number & 0xff))
+        while (builder.length() < 2) {
+            builder.append("0")
+        }
+        builder.toString()
+    }
+
+    def getRandomString(Integer charNumbers = 5){
+        RandomString.getInstance().randomAlphaNumeric(charNumbers)
     }
 }

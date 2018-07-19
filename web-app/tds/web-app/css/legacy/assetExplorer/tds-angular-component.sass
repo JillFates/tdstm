@@ -34,6 +34,14 @@
     width: 50%
   .prop a
     color: #00E
+  .url + .valueNW
+    text-overflow: ellipsis
+    overflow: hidden
+    white-space: nowrap
+    max-width: 90px
+    a
+      font-weight: bold
+      color: #333!important
   table
     border-collapse: separate
     border-spacing: 2px
@@ -250,11 +258,17 @@
     .k-grid
       border: 1px solid transparent
       padding: 0
+  .clickableText
+    color: $color-url-element--blue
+    font-weight: bold
+    cursor: pointer
 
   #commentListId
     table
       td
         padding: unset
+    .k-grid
+      border-width: 0
 .url-field
   text-overflow: ellipsis
   overflow: hidden

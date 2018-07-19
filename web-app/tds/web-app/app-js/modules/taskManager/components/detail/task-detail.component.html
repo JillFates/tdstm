@@ -13,11 +13,11 @@
                 <h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
             </div>
             <div class="modal-body">
-                <div>
-                    <table style="border: 0">
-                        <tbody>
-                            <tr>
-                                <td colspan="2">
+                <div class="full-height">
+                    <table style="border: 0;" class="full-height">
+                        <tbody class="full-height task-layout">
+                            <tr class="no-grow-container">
+                                <td class="task-details" colspan="2">
                                     <div class="btn-collapsed-fixed-right">
                                         <button class="btn btn-default" (click)="onCollapseTaskDetail()">
                                             <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
@@ -129,7 +129,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr  *ngIf="!collapsedTaskDetail">
+                            <tr class="no-grow-container"  *ngIf="!collapsedTaskDetail">
                                 <td class="dates-info-container" colspan="2">
                                     <table class="dates-info">
                                         <tbody>
@@ -143,7 +143,7 @@
                                     </table>
                                 </td>
                             </tr>
-                            <tr class="deps">
+                            <tr class="deps no-grow-container">
                                 <table>
                                     <tr>
                                         <td valign="top">
@@ -227,7 +227,7 @@
                                     </tr>
                                 </table>
                             </tr>
-                            <tr  class="deps">
+                            <tr class="deps grow-container">
                                 <td colspan="5">
                                     <kendo-grid
                                         *ngIf="dataGridTaskNotesHelper"

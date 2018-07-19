@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter tds-autofocus class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Edit</h4>
@@ -129,6 +129,7 @@
 											</td>
 										</tr>
 										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
+                                        <g:render template="/angular/common/assetTagsEdit"></g:render>
 									</tbody>
 								</table>
 							</div>

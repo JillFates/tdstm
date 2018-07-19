@@ -70,8 +70,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
 			12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
 			13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-			14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File
-		""".stripIndent()
+			14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent()
 
 		applicationDataSetContent = """
 			application id,vendor name,technology,location
@@ -128,8 +127,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
 		and:
@@ -191,12 +190,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
-			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -297,17 +290,6 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 			}
-
-			with(etlProcessor.cache){
-				size() == 12
-				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -547,14 +529,14 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
 		and:
 			GroovySpy(AssetDependency, global: true)
-			AssetDependency.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetDependencies.findAll { it.id == args.id }*.getId()
+			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
 			}
 
 		and:
@@ -639,15 +621,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 12
-				hitCountRate() == 7.14
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
-			}
-
 		cleanup:
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
@@ -708,8 +681,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assetDependencies.findAll { it.id == namedParams.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
 			}
 
 		and:
@@ -781,8 +754,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
 		and:
@@ -804,12 +777,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 						""".stripIndent())
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
-			}
 		then: 'Results should contain Application domain results associated'
 			with(etlProcessor.finalResult()) {
 				domains.size() == 1
@@ -1011,12 +978,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 4
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
-			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1243,22 +1204,20 @@ class ETLFindSpec extends ETLBaseSpec {
 				152258,Slideaway,ATEN,13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
 
 		and:
+			GroovyMock(Room, global: true)
+			Room.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id }
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
 				debugConsole,
 				validator)
-
-		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(Room) >> { Class<?> clazz->
-				return false
-			}
-
-			GroovySpy(Room, global: true)
-			Room.executeQuery(_, _, _) >> { def query, def namedParams, def metaParams ->
-				rooms.findAll { it.id == namedParams.id }*.getId()
-			}
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -1337,6 +1296,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							value == '13358'
 						}
 					}
+
 				}
 			}
 
@@ -1393,8 +1353,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			Room.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				rooms.findAll { it.id == namedParams.id }*.getId()
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id }
 			}
 
 		and:
@@ -1462,7 +1422,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			Room.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id }
 			}
 
@@ -1520,9 +1480,9 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assert NumberUtil.isaNumber(namedParams.id)
-				applications.findAll { it.id.toInteger() == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isaNumber(args.id)
+				applications.findAll { it.id.toInteger() == args.id && it.project.id == args.project.id }
 			}
 
 		and:
@@ -1584,13 +1544,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1619,9 +1572,9 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				assert NumberUtil.isLong(namedParams.id)
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isLong(args.id)
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
 		and:
@@ -1683,13 +1636,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1704,7 +1650,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				[]
 			}
 
@@ -1782,14 +1728,6 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1896,14 +1834,6 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == [152255l]
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -2011,13 +1941,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == [152255l, 152255l]
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -2049,7 +1972,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
@@ -2074,6 +1997,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Application by 'assetName' with primaryAppVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Application
 						'assetName' primaryAppVar
 					}
 				}
@@ -2084,6 +2008,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Application by 'assetName' with supportAppVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Application
 						'assetName' supportAppVar
 					}
 				}
@@ -2094,6 +2019,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Device by 'assetName' with primaryServerVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Device
 						'assetName' primaryServerVar
 					}
 				}
@@ -2104,12 +2030,15 @@ class ETLFindSpec extends ETLBaseSpec {
 				if (LOOKUP.notFound()) {
 					find Device by 'assetName' with supportServerVar into 'id'
 					whenNotFound 'id' create {
+						assetClass Device
 						'assetName' supportServerVar
 					}
 				}
 
 				// Create App - App Dependency
 				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, supportAppVar
 				load 'asset' with primaryAppVar
 				load 'dependent' with supportAppVar
 				load 'type' with 'Communicates With'
@@ -2118,6 +2047,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 				// Create Primary App - Primary Server
 				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, primaryServerVar
 				load 'asset' with primaryAppVar
 				load 'dependent' with primaryServerVar
 				load 'type' with 'Runs On'
@@ -2126,6 +2057,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 				// Create Supporting App - Supporting Server
 				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with supportAppVar, supportServerVar
 				load 'asset' with supportAppVar
 				load 'dependent' with supportServerVar
 				load 'type' with 'Runs On'
@@ -2398,13 +2331,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
@@ -2527,13 +2453,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -2660,13 +2579,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
@@ -2774,13 +2686,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -2892,13 +2797,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
-			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
@@ -2996,13 +2894,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -3119,47 +3010,19 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.cache){
-				size() == 0
-				hitCountRate() == 0
-			}
-
 		cleanup:
 			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	@See('TM-9493')
-	void 'test can find a domain Property Name with loaded Data Value using an internal cache'() {
+	@See('TM-11262')
+	void 'test can reference domain names by a String value dynamically in domain command'() {
+
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,vendor name,technology,location
-				152254,Microsoft,(xlsx updated),ACME Data Center
-				152255,Microsoft,(xlsx updated),ACME Data Center
-				152255,Mozilla,NGM,ACME Data Center
-			""".stripIndent())
-
-		and:
-			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
-			}
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -3169,141 +3032,103 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-					read labels
-					domain Dependency
-					iterate {
-						extract 'application id' transform with toLong() load 'id' set appIdVar
-						find Application by 'id' with appIdVar into 'id' 
-					}
-					""".stripIndent())
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar.value
+				}
+				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			with(etlProcessor.finalResult()) {
-				domains.size() == 1
+				domains.size() == 2
 				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					data.size() == 3
-
-					with(data[0]) {
-						op == ImportOperationEnum.INSERT.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						with(fields.id) {
-							originalValue == '152254'
-							value == 152254l
-							init == null
-							errors == []
-							warn == false
-							with(find) {
-								results == []
-								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152254l
-									}
-								}
-							}
-						}
-					}
-
-					with(data[1]) {
-						op == ImportOperationEnum.UPDATE.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 2
-						with(fields.id) {
-							originalValue == '152255'
-							value == 152255l
-							init == null
-							errors == []
-							warn == false
-							with(find) {
-								results == [152255l]
-								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
-							}
-						}
-					}
-
-					with(data[2]) {
-						op == ImportOperationEnum.UPDATE.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 3
-						with(fields.id) {
-							originalValue == '152255'
-							value == 152255l
-							init == null
-							errors == []
-							warn == false
-							with(find) {
-								results == [152255l]
-								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
-							}
-						}
-					}
+					domain == ETLDomain.Application.name()
 				}
-			}
 
-			with(etlProcessor.cache){
-				size() == 2
-				hitCountRate() == 33.33
-				get('Application', [id: 152254l]) == []
-				get('Application', [id: 152255l]) == [152255l]
-			}
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+				}
 
+			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	@See('TM-9493')
-	void 'test can disable internal cache using an ETL script command'() {
+	@See('TM-11262')
+	void 'test can reference domain names by an Element value dynamically in domain command'() {
+
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,vendor name,technology,location
-				152254,Microsoft,(xlsx updated),ACME Data Center
-				152255,Microsoft,(xlsx updated),ACME Data Center
-				152255,Mozilla,NGM,ACME Data Center
-			""".stripIndent())
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
 
 		and:
-			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
-				mock
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+				}
+
 			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by a String value dynamically in find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
 				return true
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+				return []
 			}
 
 		and:
@@ -3314,102 +3139,263 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-					read labels
-					cache 0
-					domain Dependency
-					iterate {
-						extract 'application id' transform with toLong() load 'id' set appIdVar
-						find Application by 'id' with appIdVar into 'id' 
-					}
-					""".stripIndent())
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar.value
+					find domainClassVar.value by 'Name' with nameVar into 'id'
+					load 'Name' with nameVar
+				}
+				'''.stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			with(etlProcessor.finalResult()) {
-				domains.size() == 1
+				domains.size() == 2
 				with(domains[0]) {
-					domain == ETLDomain.Dependency.name()
-					data.size() == 3
-
-					with(data[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					with(data[0], RowResult){
 						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						errorCount == 0
 						warn == false
 						duplicate == false
 						errors == []
-						rowNum == 1
-						with(fields.id) {
-							originalValue == '152254'
-							value == 152254l
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'xray'
+							value == 'xray'
 							init == null
-							errors == []
-							warn == false
-							with(find) {
+							create == null
+							update == null
+							with(find, FindResult){
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152254l
-									}
-								}
+								query.size() == 0
 							}
 						}
-					}
 
-					with(data[1]) {
-						op == ImportOperationEnum.UPDATE.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 2
-						with(fields.id) {
-							originalValue == '152255'
-							value == 152255l
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
 							init == null
-							errors == []
-							warn == false
-							with(find) {
-								results == [152255l]
-								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
-							}
-						}
-					}
+							create == null
+							update == null
 
-					with(data[2]) {
-						op == ImportOperationEnum.UPDATE.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 3
-						with(fields.id) {
-							originalValue == '152255'
-							value == 152255l
-							init == null
-							errors == []
-							warn == false
-							with(find) {
-								results == [152255l]
-								matchOn == 0
-								with(query[0]) {
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
 									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
+									kv == [
+											'assetName': 'xray'
+									]
 								}
 							}
 						}
 					}
 				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'zulu'
+							value == 'zulu'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Device.name()
+									kv == [
+											'assetName': 'zulu'
+									]
+								}
+							}
+						}
+					}
+				}
+
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by an Element value dynamically in find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
+			}
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				return []
 			}
 
-			etlProcessor.cache == null
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
 
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar
+					find domainClassVar by 'Name' with nameVar into 'id'
+					load 'Name' with nameVar
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'xray'
+							value == 'xray'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Application.name()
+									kv == [
+											'assetName': 'xray'
+									]
+								}
+							}
+						}
+					}
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'zulu'
+							value == 'zulu'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Device.name()
+									kv == [
+											'assetName': 'zulu'
+									]
+								}
+							}
+						}
+					}
+				}
+
+			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}

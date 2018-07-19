@@ -86,10 +86,7 @@
         <ng-template kendoGridCellTemplate let-dataItem>
             <field-settings-imp *ngIf="!toBeDeleted(dataItem)" [edit]="isEditing" [(model)]="dataItem.imp"></field-settings-imp>
             <div *ngIf="toBeDeleted(dataItem)" [ngClass]="dataItem.imp" class="text-center to-be-deleted" style="cursor: not-allowed">
-                <span style="margin-left: 0px;">C</span>
-                <span style="margin-left: 5px;">I</span>
-                <span style="margin-left: 5px;">N</span>
-                <span style="margin-left: 5px;">U</span>
+                <span *ngFor="let color of colors">{{color}}&nbsp;</span>
             </div>
         </ng-template>
     </kendo-grid-column>

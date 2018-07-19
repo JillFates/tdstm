@@ -5,7 +5,7 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter tds-autofocus class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
 				aria-hidden="true">×</span></button>
@@ -218,7 +218,7 @@
 														(modelChange)="model.asset.shutdownBy = $event"
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${asset.shutdownFixed}"
-														[people]="${personList as JSON}"
+														[namedStaff]="${personList as JSON}"
 														[team]="${availableRoles as JSON}">
 												</tds-combobox-group>
 											</td>
@@ -235,7 +235,7 @@
 														(modelChange)="model.asset.startupBy = $event"
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${asset.startupFixed}"
-														[people]="${personList as JSON}"
+														[namedStaff]="${personList as JSON}"
 														[team]="${availableRoles as JSON}"></tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
@@ -246,7 +246,7 @@
 														(modelChange)="model.asset.testingBy = $event"
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${asset.testingFixed}"
-														[people]="${personList as JSON}"
+														[namedStaff]="${personList as JSON}"
 														[team]="${availableRoles as JSON}">
                                                 </tds-combobox-group>
 											</td>
@@ -257,7 +257,8 @@
 										</tr>
 
 										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
-									</tbody>
+                                        <g:render template="/angular/common/assetTagsEdit"></g:render>
+                                    </tbody>
 								</table>
 							</div>
 						</td>

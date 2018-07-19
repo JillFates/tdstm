@@ -1,8 +1,9 @@
 package com.tdsops.common.sql
 
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
@@ -270,6 +271,12 @@ class SqlUtil {
 
 		int filterSize = originalFilter.size()
 
+		// Check for many-to-many before attempting one of the standard filterings.
+		if (fieldSearchData.isManyToMany()) {
+			handleManyToMany(fieldSearchData)
+			return
+		}
+
 		/* We're handling 1-char long filters individually because the
 		* switch below has cases where it asks for the second char, which
 		* would break the app. */
@@ -416,7 +423,7 @@ class SqlUtil {
 			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
 
-		fieldSearchData.sqlSearchExpression = fieldSearchData.column + ' ' + inOp + ' (' + values.join(', ') + ')'
+		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
 	}
 
 	/**
@@ -435,7 +442,7 @@ class SqlUtil {
 			String namedParameter = "${fieldSearchData.columnAlias}__" + index
 			// Parse the string parameter considering user wildcards.
 			String parsedParameter = parseStringParameter(value, fieldSearchData.useWildcards)
-			String sqlExpression = getSingleValueExpression(fieldSearchData.column, namedParameter, likeOp )
+			String sqlExpression = getSingleValueExpression(fieldSearchData.whereProperty, namedParameter, likeOp )
 			fieldSearchData.addSqlSearchParameter(namedParameter, parsedParameter)
 			expressions << sqlExpression
 		}
@@ -459,7 +466,7 @@ class SqlUtil {
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
-		String searchColumn = fieldSearchData.column
+		String searchColumn = fieldSearchData.whereProperty
 		Object paramValue
 
 		if (isNumericField(fieldSearchData)) {
@@ -590,6 +597,52 @@ class SqlUtil {
 					COALESCE(${propertyName}lastName,'')
 				)
 				"""
+	}
+
+	/**
+	 * Handle the filtering of many to many relationships.
+	 * @param fieldSearchData
+	 * @return
+	 */
+	private static void handleManyToMany(FieldSearchData fieldSearchData) {
+		List<Long> manyToManyMatches = getManyToManyMatches(fieldSearchData)
+		if (!manyToManyMatches) {
+			manyToManyMatches.add(-1)
+		}
+		List<Long> values = []
+		for (int i = 0; i < manyToManyMatches.size(); i++) {
+			String namedParameter = "${fieldSearchData.columnAlias}__" + i
+			values << ':' + namedParameter
+			fieldSearchData.addSqlSearchParameter(namedParameter, manyToManyMatches[i].toLong())
+		}
+
+		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' IN '  + ' (' + values.join(', ') + ')'
+
+	}
+
+	/**
+	 * Build a list of the ids of the assets that match the given criteria in a many-to-many relationship
+	 * context, such as with tags.
+	 * @param FieldSearchData
+	 * @return
+	 */
+	private static List<Long> getManyToManyMatches(FieldSearchData fieldSearchData) {
+		boolean isAnd = fieldSearchData.filter.contains("&")
+		List<Long> matches = []
+		String key = isAnd ? 'AND' : 'OR'
+		Closure queryBuilder = fieldSearchData.manyToManyQueries[key]
+		Map queryInfo = queryBuilder(fieldSearchData.filter)
+		if (queryInfo) {
+			Class domainClass = fieldSearchData.domain
+			// Check the given Class is an actual domain class.
+			if (GormUtil.isDomainClass(domainClass)) {
+				matches = domainClass.executeQuery(queryInfo.query, queryInfo.params)
+			} else {
+				throw new RuntimeException("Invalid domain class ${domainClass.name}.")
+			}
+		}
+
+		return matches
 	}
 
 }

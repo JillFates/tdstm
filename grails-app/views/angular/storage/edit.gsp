@@ -5,7 +5,7 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div tds-autocenter class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autocenter tds-autofocus class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
                 aria-hidden="true">×</span></button>
@@ -102,9 +102,8 @@
                                             </kendo-dropdownlist>
                                         </td>
                                     </tr>
-                                    %{--<tbody class="customTemplate">--}%
                                     <g:render template="/angular/common/customEdit" model="[assetEntityInstance: filesInstance]"></g:render>
-                                    %{--</tbody>--}%
+                                    <g:render template="/angular/common/assetTagsEdit"></g:render>
                                 </table>
                             </div>
                         </td>

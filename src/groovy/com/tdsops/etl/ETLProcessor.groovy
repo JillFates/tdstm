@@ -201,8 +201,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * <pre>
+	 *  domain Application
+	 * </pre>
 	 * @param domain a domain String value
-	 * @return the current instance of ETLProcessor
+	 * @return the current instance of {@code ETLProcessor} class
 	 */
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
@@ -218,10 +221,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Traps invalid domain command when a String parameter is passed
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * @param element an instance of {@code Element} class
+	 * @return the current instance of {@code ETLProcessor} class
+	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain (String anything) {
-		throw ETLProcessorException.invalidDomainComand()
+	ETLProcessor domain(Element element){
+		return domain(element.value)
+	}
+
+	/**
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * If value is an invalid Domain class name, it throws an Exception.
+	 * @param domainName
+	 * @return the current instance of {@code ETLProcessor} class
+	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
+	 */
+	ETLProcessor domain(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return domain(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
 	/**
@@ -689,9 +712,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	/**
 	 * Create a Find object for a particular Domain instance.
-	 * If the String is an invalid Domain, it throws an Exception.
-	 * @param domain
-	 * @return
+	 * <pre>
+	 *  find Application by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * @param domain an instance of {@code ETLDomain} class
+	 * @return an instance of {@code ETLFindElement} class
 	 */
 	ETLFindElement find (ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
@@ -702,8 +727,54 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Adds another find results in the current find element
-	 * @param domain
+	 * Create a Find object for a particular {@code Element.value}.
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * If value is an invalid Domain class name, it throws an Exception.
+	 * @param element an instance of {@code Element} class
+	 * @return an instance of {@code ETLFindElement} class
+	 */
+	ETLFindElement find(Element element){
+		return find(element.value)
+	}
+
+	/**
+	 * Create a Find object for a particular Domain instance name
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar.value by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * If the String is an invalid Domain, it throws an Exception.
+	 * @param domainName a domain class name
+	 * @return an instance of {@code ETLFindElement}
+	 */
+	ETLFindElement find(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return find(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
+	}
+
+	/**
+	 * Adds another find results in the current find element.
+	 * <pre>
+	 *  find Application by 'Name' with nameVar into 'id'
+	 *  elseFind Application by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * If there is not {@code ETLProceesor.currentFindElement}
+	 * it throws an Exception {@code ETLProcessorException.#notCurrentFindElement}
+	 * @return an instance of {@code ETLFindElement} class
 	 */
 	ETLFindElement elseFind(ETLDomain domain) {
 		validateStack()
@@ -713,6 +784,49 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		pushIntoStack(currentFindElement)
 		return currentFindElement.elseFind(domain)
+	}
+
+	/**
+	 * Adds another find results in the current find element
+	 * for a particular {@code Element.value}
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar by 'Name' with nameVar into 'id'
+	 *  elseFind domainClassVar by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * @param element an instance of {@code Element} class
+	 * @return an instance of {@code ETLProcessor} class
+	 */
+	ETLProcessor elseFind(Element element){
+		return elseFind(element.value)
+	}
+
+	/**
+	 * Adds another find results in the current find element
+	 * for a particular Domain instance name
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar.value by 'Name' with nameVar into 'id'
+	 *  elseFind domainClassVar.value by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * If the String is an invalid Domain, it throws an Exception.
+	 * @param domainName a domain class name
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	ETLProcessor elseFind(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return elseFind(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
 	/**

@@ -10,6 +10,7 @@ import { process, State } from '@progress/kendo-data-query';
 import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {FIELD_COLORS} from '../../model/field-settings.model';
 
 declare var jQuery: any;
 
@@ -38,6 +39,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
+	public colors = FIELD_COLORS;
 	private state: State = {
 		sort: [{
 			dir: 'asc',

@@ -6,6 +6,33 @@ input.searchFilterInput::-ms-clear
   display: none
 
 .field-setting-component
+  .field-importance-table
+    width: 390px
+    background-color: #fff
+    th
+      background: #ddd
+      font-weight: bold
+    th
+      padding: 1px 10px 1px 12px
+    td
+      padding: 1px 10px 1px 13px
+    td, th
+      height: 18px
+  .color-name
+    padding-left: 12px
+    &::first-letter
+      text-decoration: underline
+  .color-required
+    &::after
+      content: "1"
+      font-size: 9px
+      font-weight: bold
+      position: absolute
+      margin-left: 2px
+    padding-right: 10px
+  .required-legend
+    text-align: center
+
   .Y
     background-color: $color-field-yellow !important
     background-image: none !important

@@ -58,11 +58,11 @@ class ControlTagLib {
 			String imp = fieldSpec.imp
 			sb.append(" ${imp}")
 			// Determines if the imp is I)mportant or C)ritical
-			if (imp == "I" || imp == "C") {
+			if (imp == "Y" || imp == "G") {
 				// Checks if the value for the input was given
 				if (attrs.containsKey("value")) {
 					// If the value for the input is empty, the label will be red.
-					if (attrs.value == null | ( (attrs instanceof CharSequence) && StringUtil.isEmpty(attrs.value)) ) {
+					if (attrs.value == null || StringUtil.isBlank(attrs.value.toString())) {
 						sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
 					}
 				}

@@ -20,6 +20,9 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import {TagModel} from '../../../assetTags/model/tag.model';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -90,6 +93,7 @@ export class AssetExplorerViewGridComponent {
 	bulkItems = {};
 	bulkSelectedItems: string[] = [];
 	private columnFiltersOldValues = [];
+	protected tagList: Array<TagModel> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -98,15 +102,14 @@ export class AssetExplorerViewGridComponent {
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
 		private notifier: NotifierService,
-		private dialog: UIDialogService) {
+		private dialog: UIDialogService,
+		private tagService: TagService) {
 
-		this.getPreferences()
-			.subscribe((preferences: any) => {
+		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
-
 		fields.subscribe((result: DomainModel[]) => {
 			this.fields = result.reduce((p, c) => {
 				return p.concat(c.fields);
@@ -117,9 +120,9 @@ export class AssetExplorerViewGridComponent {
 				};
 			});
 		}, (err) => console.log(err));
-
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
+		this.loadTagList();
 	}
 
 	private getPreferences(): Observable<any> {
@@ -307,6 +310,10 @@ export class AssetExplorerViewGridComponent {
 		this.setSelectedItems();
 	}
 
+	clearSelectAll(): void {
+		this.selectAll = false;
+	}
+
 	setSelectedItems(): void {
 		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
@@ -362,7 +369,11 @@ export class AssetExplorerViewGridComponent {
 	 */
 	private getCellClass(column: ViewColumn): string {
 		if (['common_assetName', 'common_id'].indexOf(column.domain + '_' + column.property) !== -1) {
-			return 'asset-detail-link';
+			let classColumn = 'asset-detail-link';
+			if (column.property === 'assetName') {
+				classColumn += ' asset-detail-name-column';
+			}
+			return classColumn;
 		}
 		return '';
 	}
@@ -370,5 +381,28 @@ export class AssetExplorerViewGridComponent {
 	onChangeJustPlanning(isChecked = false): void {
 		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
 			.subscribe(this.onReload.bind(this));
+	}
+
+	/**
+	 * Loads the Available Tags for the current project.
+	 */
+	private loadTagList(): void {
+		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS && result.data) {
+				this.tagList = result.data;
+			}
+		}, error => console.log('error on GET Tag List', error));
+	}
+
+	/**
+	 * On Asset Tag Filter change, run the query.
+	 * @param $event
+	 */
+	protected onTagFilterChange(column: ViewColumn, $event: any): void {
+		column.filter = '';
+		let operator = $event.operator && $event.operator === 'AND' ? '&' : '|';
+		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
+		column.filter = selectedTagsFilter;
+		this.onFilter();
 	}
 }

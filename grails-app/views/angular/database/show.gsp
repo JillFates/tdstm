@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div class="modal-content tds-angular-component-content" tabindex="0">
+<div tds-autofocus class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">Database Detail</h4>
@@ -63,6 +63,7 @@
                                         <td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">${asset.validation}</td>
                                     </tr>
                                     <g:render template="/angular/common/customShow" model="[asset:asset, project:project]"></g:render>
+                                    <g:render template="/angular/common/assetTags"></g:render>
                                 </tbody>
                             </table>
                         </div>
