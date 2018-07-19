@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 /**
  * Represents a batch that is created when a recipe is executed and tasks are generated. This will provide
@@ -9,6 +10,7 @@ import com.tdssrc.grails.TimeUtil
  */
 class TaskBatch {
 	Long   eventId
+	String context
 	String status
 
 	RecipeVersion recipeVersionUsed       // the recipeVersion used to generate the batch of tasks
@@ -59,15 +61,32 @@ class TaskBatch {
 	}
 
 	/**
-	 * Get the name of the object for which the context references
+	 * Gets the event name and or the tags, for the taskBatch, and returns them as a String
+	 *
+	 * @return The name and, or the tag names for the taskBatch
 	 */
 	String eventName() {
-		if(eventId){
-			return MoveEvent.get(eventId)?.name ?: ''
+		List<String> event = []
+		Map context = context()
+
+		if (eventId) {
+			event << MoveEvent.get(eventId)?.name ?: ''
 		}
 
-		//TODO need a better context name to send back
-		return "Tag based events"
+		if(context){
+			event << context.tag.collect{Map tag-> tag.name}.join(',')
+		}
+
+		return event.join(' ')
+	}
+
+	/**
+	 * Gets the context as a map
+	 *
+	 * @return the context json as a map
+	 */
+	Map context() {
+		context ? JsonUtil.convertJsonToMap(context) : [:]
 	}
 
 	/**
