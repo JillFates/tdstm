@@ -7,17 +7,17 @@ import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.SaveViewPage
 import pages.AssetViewManager.ViewPage
-import jodd.util.RandomString
+import utils.CommonActions
 
 
 @Stepwise
-class AssetViewCreationSpec extends GebReportingSpec {
+class ViewManagerCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
 
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "TM8500"
     static viewName=  randStr+" "+baseName
     def filteredName=""
@@ -72,6 +72,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
         given: "I am creating a view"
             createViewModule.displayed
         when: "I select random fields (checkboxes) and filter the selected ones"
+            createViewModule.clickSpecificCheckbox("Name")
             createViewModule.selectRandomCheckboxes()
             createViewModule.filterFields("Selected")
         then: "Only the selected checkboxes are displayed"
@@ -118,7 +119,7 @@ class AssetViewCreationSpec extends GebReportingSpec {
     def "10. Validate created View is listed"() {
         testKey = "TM-8500"
         given: "User saves the created view"
-            waitFor{createViewModule.clickSave()}
+            waitFor{createViewModule.firstSave()}
             at SaveViewPage
             waitFor{enterName(viewName)}
             waitFor{clickSave()}

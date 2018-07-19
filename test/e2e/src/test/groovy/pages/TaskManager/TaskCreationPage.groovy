@@ -1,5 +1,6 @@
 package pages.TaskManager
 import geb.Page
+import modules.CommonsModule
 
 class TaskCreationPage extends Page {
 
@@ -29,5 +30,6 @@ class TaskCreationPage extends Page {
         tcModalSaveBtn                  { tcModalWindow.find("button#saveAndCloseBId")}
         tcModalCancelBtn                { tcModalWindow.find("button",class:"btn btn-default tablesave cancel")}
         tcModalCloseBtn                 { tcModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
+        commonsModule { module CommonsModule }
     }
 }

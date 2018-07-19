@@ -7,6 +7,7 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StopWatch
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -15,6 +16,8 @@ import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserLoginProjectAccess
 import org.apache.commons.lang.math.RandomUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate

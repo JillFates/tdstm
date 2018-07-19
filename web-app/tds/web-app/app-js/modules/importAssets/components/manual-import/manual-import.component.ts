@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ImportAssetsService} from '../../service/import-assets.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
+import {RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -10,7 +10,12 @@ import {
 	DataIngestionService,
 	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
 } from '../../../dataIngestion/service/data-ingestion.service';
-import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
+import {
+	ASSET_IMPORT_FILE_UPLOAD_TYPE,
+	ETL_SCRIPT_FILE_UPLOAD_TYPE,
+	FILE_UPLOAD_TYPE_PARAM,
+	PROGRESSBAR_INTERVAL_TIME
+} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'manual-import',
@@ -256,12 +261,6 @@ export class ManualImportComponent implements OnInit {
 	 * Clears out most of results peformed on the page.
 	 */
 	private onClear(): void {
-		this.fetchResult = null;
-		this.fetchFileContent = null;
-		this.transformResult = null;
-		this.transformFileContent = null;
-		this.viewDataType = null;
-		this.importResult = null;
 		this.removeFileByUID();
 	}
 
@@ -283,10 +282,28 @@ export class ManualImportComponent implements OnInit {
 		if (!this.fetchResult || !this.fetchResult.filename) {
 			return;
 		}
-		e.data = { filename: this.fetchResult.filename };
+		// delete temporary server uploaded file
+		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+
+		// delete temporary transformed file
+		if (this.transformResult) {
+			tempServerFilesToDelete.push(this.transformResult.data.filename)
+		}
+
+		// get the coma separated file names to delete
+		e.data = { filename: tempServerFilesToDelete.join(',') };
+
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.viewDataType = null;
+		this.importResult = null;
 	}
 
-	private onUploadFile(e: any): void {
+	private onUploadFile(e: UploadEvent): void {
+		e.data = {};
+		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
 	}
 

@@ -11,6 +11,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {TaskDetailModel} from '../../../taskManager/components/detail/model/task-detail.model';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: `task-comment`,
@@ -19,8 +20,6 @@ import {TaskDetailModel} from '../../../taskManager/components/detail/model/task
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
-	@Input('pref-value') prefValue ? = false;
-	@Input('view-unpublished-value') viewUnpublishedValue ? = false;
 	@Input('has-publish-permission') hasPublishPermission ? = false;
 	@Input('can-edit-comments') canEdit ? = false;
 	@Input('can-edit-tasks') canEditTasks ? = false;
@@ -30,15 +29,19 @@ export class TaskCommentComponent implements OnInit {
 	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
 	private taskCommentColumnModel = new TaskCommentColumnsModel();
 	private modalType = ModalType;
+	private viewUnpublished = false;
 
-	private showAll: boolean;
+	private showAllTasks: boolean;
+	private showAllComments: boolean;
 	private comments: any[] = [];
 
-	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService) {
+	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
+		this.getPreferences();
 	}
 
 	ngOnInit(): void {
-		this.showAll = this.prefValue;
+		this.showAllTasks = false;
+		this.showAllComments = false;
 		this.getAllComments();
 	}
 
@@ -59,11 +62,16 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		return this.comments
-			.filter(comment => this.viewUnpublishedValue || comment.commentInstance.isPublished)
-			.filter(comment => this.showAll
-				|| (comment.commentInstance.commentType === 'issue' && comment.commentInstance.status !== 'Completed')
-				|| (comment.commentInstance.commentType === 'comment' && !comment.commentInstance.isResolved));
+		const tasks = this.comments
+			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
+			.filter(comment => comment.commentInstance.commentType === 'issue')
+			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
+
+		const comments = this.comments
+			.filter(comment => comment.commentInstance.commentType === 'comment')
+			.filter(comment => this.showAllComments || !comment.commentInstance.isResolved);
+
+		return [...tasks, ...comments];
 	}
 
 	public getAssignedTo(comment): any {
@@ -141,7 +149,7 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			this.getAllComments();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
@@ -164,7 +172,9 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		], true, false).then(result => {
-			// this.getAllComments();
+			if (result && result.commentInstance) {
+				this.openTaskDetail(result, ModalType.VIEW);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -172,6 +182,23 @@ export class TaskCommentComponent implements OnInit {
 
 	public reloadGrid(): void {
 		this.dataGridTaskCommentOnHelper.reloadData(this.getCommentsWithFilter());
+	}
+
+	/**
+	 * Safe the preference as soon a user change the value
+	 */
+	public onViewUnpublishedChange(): void {
+		this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_UNPUBLISHED, this.viewUnpublished.toString()).subscribe();
+	}
+
+	/**
+	 * Get Preference for the View Unpublished
+	 * @returns {Observable<any>}
+	 */
+	private getPreferences(): void {
+		this.preferenceService.getPreferences(PREFERENCES_LIST.VIEW_UNPUBLISHED).subscribe((preferences: any) => {
+			this.viewUnpublished =  preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() ===  'true';
+		});
 	}
 
 	/**
@@ -184,10 +211,14 @@ export class TaskCommentComponent implements OnInit {
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
-					this.taskManagerService.deleteTaskComment(dataItem.commentInstance.id).subscribe((res) => {
+					const commentId = dataItem.commentInstance.id;
+
+					this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
 						// delete the item
 						this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
 						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
+						// update comments collections
+						this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
 					});
 				}
 			})

@@ -1,6 +1,6 @@
 import {Component, HostListener} from '@angular/core';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -10,6 +10,9 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TaskSuccessorPredecessorColumnsModel} from './model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
 import {RowClassArgs} from '@progress/kendo-angular-grid';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: `task-detail`,
@@ -27,10 +30,21 @@ export class TaskDetailComponent extends UIExtraDialog {
 	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public collapsedTaskDetail = false;
+	public hasCookbookPermission = false;
+	public modalOptions: DecoratorOptions;
 
-	constructor(public taskDetailModel: TaskDetailModel, public taskManagerService: TaskService, public promptService: UIPromptService, public userPreferenceService: PreferenceService) {
+	constructor(
+		public taskDetailModel: TaskDetailModel,
+		public taskManagerService: TaskService,
+		private dialogService: UIDialogService,
+		public promptService: UIPromptService,
+		public userPreferenceService: PreferenceService,
+		private permissionService: PermissionService) {
+
 		super('#task-detail-component');
+		this.modalOptions = { isResizable: true, isCentered: true };
 		this.loadTaskDetail();
+		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
 	/**
@@ -53,6 +67,14 @@ export class TaskDetailComponent extends UIExtraDialog {
 			// Get Assigned Team
 			this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
 		});
+	}
+
+	/**
+	 * Open the Task Detail
+	 * @param task
+	 */
+	public openTaskDetail(task: any, modalType: ModalType): void {
+		this.close({commentInstance: {id: task.taskId}});
 	}
 
 	/**
@@ -96,6 +118,10 @@ export class TaskDetailComponent extends UIExtraDialog {
 				}
 			})
 			.catch((error) => console.log(error));
+	}
+
+	protected resizeWindow(resize: any): void {
+		console.log(resize);
 	}
 
 	/**

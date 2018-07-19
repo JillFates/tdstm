@@ -10,7 +10,7 @@ import grails.validation.Validateable
 class CreateCommand {
 
 	String name
-	String description
+	String description = ''
 	Color  color
 
 	static constraints = {

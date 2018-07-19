@@ -1,0 +1,142 @@
+/* Exclusive for Angular*/
+.asset-tag-selector-component
+  .k-widget
+    div.k-multiselect-wrap
+      min-height: 30px
+      kendo-taglist
+        ul
+          width: 90%
+          li.k-button
+            background: unset
+            background-color: unset
+            border: unset
+            padding: 0px
+            margin-right: -8px
+            span
+              div
+                height: 26px
+                padding-left: 10px
+                padding-right: 22px
+                font-size: 13px
+                padding-top: 5px
+                font-weight: 600
+                margin-top: 1px
+                margin-left: 1px
+            span.k-select
+              span.k-i-close
+                margin-left: -26px
+      .k-searchbar
+        .k-input
+          width: 13px
+      span.k-clear-value
+        display: none !important
+  .k-switch.asset-tag
+    position: relative
+    right: 4px
+    top: 28px
+    float: right
+    z-index: 2
+    font-size: 8px
+    background: unset
+    .k-switch-wrapper
+      border-radius: 14px
+      background-color: unset
+      .k-switch-background
+        background: unset
+    .k-switch-container
+      border-radius: 14px
+      .k-switch-handle
+        border-radius: 50%
+        background-color: $color-material--blue1 !important
+        cursor: pointer
+        background-image: unset
+        background-clip: unset
+        .k-switch-label-on,
+        .k-switch-label-off
+          font-size: 11px
+          line-height: 1.7em
+        .k-switch-label-on
+          margin-left: 3px
+        .k-switch-label-off
+          left: 2em
+      .k-switch-handle,
+      .k-switch-off
+        -webkit-box-shadow: 0 0px 0 0px $color-material--blue1, 0 0px 0 0px $color-material--blue1 !important
+        box-shadow: 0 0px 0 0px $color-material--blue1, 0 0px 0 0px $color-material--blue1 !important
+        span
+          color: $color--black
+  .k-switch:focus,
+  .k-switch.k-state-focused
+    box-shadow: unset
+/* Global, but protected by the scope */
+.asset-tag-selector-single-container
+  margin-left: 21px
+  margin-top: -6px
+  width: 100%
+  .asset-tag-selector-single-item
+    height: 30px
+    padding-top: 6px
+    font-size: 14px
+    margin-top: 4px
+    padding-left: 15px
+    i.fa-check
+      display: none
+
+.asset-tag-selector-item-selected
+  background-color: unset !important
+  .asset-tag-selector-single-container
+    .asset-tag-selector-single-item
+      i.fa-check
+        display: inline-block
+        margin-left: -37px
+        margin-right: 16px
+.asset-tag-selector-item-selected.k-state-focused
+  background-color: $color--grey2 !important
+  box-shadow: unset !important
+
+.label.tag
+  width: 60px
+  height: 27px
+  display: block
+  margin: 0 auto 0 auto
+  padding-top: 8px
+  font-size: 11px
+  color: #656565 !important
+.tag-black
+  background-color: black !important
+.tag-grey
+  background-color: #e6e6e6 !important
+.tag-red
+  background-color: #f2d9e1 !important
+.tag-orange
+  background-color: #f2e8d9 !important
+.tag-yellow
+  background-color: #eaf2d9 !important
+.tag-green
+  background-color: #d9f2d9 !important
+.tag-cyan
+  background-color: #d9f2ec !important
+.tag-blue
+  background-color: #d9e8f2 !important
+.tag-purple
+  background-color: #dad9f2 !important
+.tag-pink
+  background-color: #efd9f2 !important
+.tag-white
+  background-color: white !important
+.tag-unselected
+  background-color: unset !important
+
+.tds-angular-component-content, asset-explorer-view-grid
+  .label.tag
+    display: inline-block
+    margin-right: 2px
+    margin-bottom: 2px
+    vertical-align: baseline
+    text-align: center
+    width: inherit
+    height: 28px
+    font-weight: 600
+    padding-left: 10px
+    padding-right: 10px
+    font-size: 13px

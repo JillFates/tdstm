@@ -3,14 +3,15 @@ package specs.AssetViewManager
 import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import spock.lang.Stepwise
+import spock.lang.Ignore
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import pages.AssetViewManager.SaveViewPage
 import jodd.util.RandomString
+import utils.CommonActions
 
 
-@Stepwise
+@Ignore
 class ViewManagerFavoritesSpec extends GebReportingSpec {
 
     def testKey
@@ -18,7 +19,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static numberOfRows
     static favView
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(6)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "TM8503"
     static viewName=  randStr+" "+baseName
     static minimumNumberOfRows =11
@@ -44,10 +45,11 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
                 waitFor { allViewsModule.clickCreateView() }
                 waitFor { createViewModule.selectApplication() }
                 waitFor { createViewModule.clickNext() }
+                createViewModule.clickSpecificCheckbox("Name")
                 createViewModule.selectRandomCheckboxes()
-                waitFor { createViewModule.clickSave() }
+                waitFor { createViewModule.firstSave() }
                 at SaveViewPage
-                waitFor { enterName(RandomString.getInstance().randomAlphaNumeric(10)) }
+                waitFor { enterName(randStr) }
                 waitFor { clickSave() }
                 waitFor { menuModule.goToAssetViewManager() }
                 at AssetViewsPage

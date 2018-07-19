@@ -1,7 +1,6 @@
 package specs.TaskManager
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
 import pages.TaskManager.TaskCreationPage
 import pages.TaskManager.TaskDetailsPage
 import pages.TaskManager.TaskEditionPage
@@ -17,7 +16,7 @@ class TaskEditionSpec extends GebReportingSpec {
     def testKey
     static testCount
     //Define the names of the tasks you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = new CommonActions().getRandomString()
     static baseName = "QAE2E"
     static taskName = baseName +" "+ randStr + " Task For E2E Created"
     static taskNameEdit = baseName +" "+ randStr + " Task For E2E Edited"
@@ -49,6 +48,7 @@ class TaskEditionSpec extends GebReportingSpec {
         tcModalEventSelector = taskEvent
         tcModalStatusSelector = taskOldStatus
         waitFor { tcModalSaveBtn.click() }
+        commonsModule.waitForTaskModal()
         at TaskManagerPage
     }
 

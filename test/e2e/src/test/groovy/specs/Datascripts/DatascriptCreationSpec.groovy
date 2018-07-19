@@ -6,7 +6,7 @@ import pages.Datascripts.DatascriptsPage
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import jodd.util.RandomString
+import utils.CommonActions
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
@@ -15,7 +15,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = new CommonActions().getRandomString() + " "
     static E2E = "E2E DS"
     static datascriptName = randStr + E2E + " Name"
     static datascriptDescription = randStr + E2E + " Description"
@@ -59,7 +59,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
         then: 'The pop up loads with no problem and it is closed again'
             at CreateDatascriptPage
             waitFor{datascriptXIcon.click()}
-
+            commonsModule.waitForDialogModalHidden()
     }
 
     def "3. Create a Datascript"() {
@@ -67,7 +67,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
         given: 'The user is on the Datascripts landing page'
             at DatascriptsPage
         and: 'Opens the Create Datascript pop up'
-            createBtn.click()
+            waitFor{createBtn.click()}
             at CreateDatascriptPage
         when: 'The user fills the necessary data to create a Datascript'
             waitFor{providerDropdown.click()}

@@ -48,7 +48,7 @@ class TagServiceSpec extends Specification {
 
 	void 'Test create'() {
 		when: 'Calling create with a valid name, decription, and color'
-			Tag tag = service.create(project,'tag1', 'description1', Color.Red)
+			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
 
 		then: 'The tag is created and returned.'
 			tag.name == 'tag1'
@@ -60,7 +60,7 @@ class TagServiceSpec extends Specification {
 	void 'Test get'() {
 		when: 'Calling get with an id of a tag'
 			service.create(project, 'tag1', 'description1', Color.Red)
-			Tag tag = service.get(Tag,1, project)
+			Tag tag = service.get(Tag, 1, project)
 
 		then: 'The tag is returned'
 			tag.name == 'tag1'
@@ -79,7 +79,7 @@ class TagServiceSpec extends Specification {
 
 	void 'Test create missing description'() {
 		when: 'Calling create with an invalid description parameter'
-			Tag tag = service.create(project,'tag1', null, Color.Red)
+			Tag tag = service.create(project, 'tag1', null, Color.Red)
 
 		then: 'the tag will be returned with errors.'
 			thrown ValidationException
@@ -96,7 +96,7 @@ class TagServiceSpec extends Specification {
 	void 'Test update name'() {
 		when: 'Calling update with a new name.'
 			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
-			tag = service.update(tag.id, project, 'new name')
+			tag = service.update(tag.id, project, 'new name', null)
 
 		then: 'The updated tag is returned with the new name.'
 			tag.name == 'new name'
@@ -120,22 +120,165 @@ class TagServiceSpec extends Specification {
 	void 'Test update color'() {
 		when: 'Calling update with a new color.'
 			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
-			tag = service.update(tag.id, project, null, null, Color.Blue)
+			tag = service.update(tag.id, project, null, '', Color.Blue)
 
 		then: 'The updated tag is returned with the new color.'
 			tag.name == 'tag1'
-			tag.description == 'description1'
+			tag.description == ''
 			tag.color == Color.Blue
 			tag.project == project
 	}
 
 	void 'Test delete'() {
 		when: 'Calling delete passing a tag'
-			Tag tag = service.create(project,'tag1', 'description1', Color.Red)
+			Tag tag = service.create(project, 'tag1', 'description1', Color.Red)
 			service.delete(tag.id, project)
 			tag = service.get(Tag, 1l, project)
 
 		then: 'The tag is deleted.'
 			thrown EmptyResultException
+	}
+
+	void 'Test handleName'() {
+		when: 'calling handleName with a non null, not empty value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleName('name', whereFilter, params)
+		then: "the where filter is populated, and it's corresponding params"
+			whereFilter == ['t.name like :name']
+			params == [name: '%name%']
+	}
+
+	void 'Test handleName null'() {
+		when: 'calling handleName with a null, or empty value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleName(null, whereFilter, params)
+		then: 'No where filters are added, and no parameters are added.'
+			whereFilter == []
+			params == [:]
+	}
+
+	void 'Test handleDescription'() {
+		when: 'calling handleDescription with a non null, not empty value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleDescription('description', whereFilter, params)
+		then: "the where filter is populated, and it's corresponding params"
+			whereFilter == ['t.description like :description']
+			params == [description: '%description%']
+	}
+
+	void 'Test handleDescription null'() {
+		when: 'calling handleDescription with a null, or empty value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleDescription(null, whereFilter, params)
+		then: 'No where filters are added, and no parameters are added.'
+			whereFilter == []
+			params == [:]
+	}
+
+	void 'Test handleDateCreated'() {
+		when: 'calling handleDateCreated with a non null value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleDateCreated(new Date().parse('d/M/yyyy', '1/1/2018'), whereFilter, params)
+		then: "the where filter is populated, and it's corresponding params"
+			whereFilter == ['(t.dateCreated >= :dateCreatedStart AND t.dateCreated < :dateCreatedEnd)']
+			params == [
+				dateCreatedStart: new Date().parse('d/M/yyyy', '1/1/2018'),
+				dateCreatedEnd  : new Date().parse('d/M/yyyy', '1/1/2018') + 1
+			]
+	}
+
+	void 'Test handleDateCreated null'() {
+		when: 'calling handleDateCreated with a null value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleDateCreated(null, whereFilter, params)
+		then: 'No where filters are added, and no parameters are added.'
+			whereFilter == []
+			params == [:]
+	}
+
+	void 'Test handleLastUpdated'() {
+		when: 'calling handleLastUpdated with a non null value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleLastUpdated(new Date().parse('d/M/yyyy', '1/1/2018'), whereFilter, params)
+		then: "the where filter is populated, and it's corresponding params"
+			whereFilter == ['(t.lastUpdated >= :lastUpdatedStart AND t.lastUpdated < :lastUpdatedEnd)']
+			params == [
+				lastUpdatedStart: new Date().parse('d/M/yyyy', '1/1/2018'),
+				lastUpdatedEnd  : new Date().parse('d/M/yyyy', '1/1/2018') + 1
+			]
+	}
+
+	void 'Test handleLastUpdated null'() {
+		when: 'calling handleLastUpdated with a null value'
+			List whereFilter = []
+			Map params = [:]
+			service.handleLastUpdated(null, whereFilter, params)
+		then: 'No where filters are added, and no parameters are added.'
+			whereFilter == []
+			params == [:]
+	}
+
+	void 'Test handleMoveIds'() {
+		when: 'calling handleMoveIds with a non null values'
+			List whereFilter = []
+			Map params = [:]
+			String joins = service.handleMoveIds(1, 1, whereFilter, params)
+		then: "the where filter is populated, it's corresponding params are populated, and the join query is returned."
+			joins.stripIndent() == """
+				LEFT JOIN tl.asset a
+				LEFT JOIN a.moveBundle mb
+				LEFT OUTER JOIN mb.moveEvent me
+			""".stripIndent()
+			whereFilter == ['mb.id = :moveBundleId', 'me.id = :moveEventId']
+			params == [moveBundleId:1, moveEventId:1]
+	}
+
+	void 'Test handleMoveIds moveEventId null'() {
+		when: 'calling handleMoveIds with, moveEventId null, and moveBundleId non null values'
+			List whereFilter = []
+			Map params = [:]
+			String joins = service.handleMoveIds(1, null, whereFilter, params)
+		then: "the where filter is populated, it's corresponding params are populated, and the join query is returned."
+			joins.stripIndent() == """
+				LEFT JOIN tl.asset a
+				LEFT JOIN a.moveBundle mb
+				LEFT OUTER JOIN mb.moveEvent me
+			""".stripIndent()
+			whereFilter == ['mb.id = :moveBundleId']
+			params == [moveBundleId:1]
+	}
+
+	void 'Test handleMoveIds moveBundleId null'() {
+		when: 'calling handleMoveIds with, moveEventId non null, and moveBundleId null values'
+			List whereFilter = []
+			Map params = [:]
+			String joins = service.handleMoveIds(null, 1, whereFilter, params)
+		then: "the where filter is populated, it's corresponding params are populated, and the join query is returned."
+			joins.stripIndent() == """
+				LEFT JOIN tl.asset a
+				LEFT JOIN a.moveBundle mb
+				LEFT OUTER JOIN mb.moveEvent me
+			""".stripIndent()
+			whereFilter == ['me.id = :moveEventId']
+			params == [moveEventId:1]
+	}
+
+
+	void 'Test handleMoveIds both null'() {
+		when: 'calling handleMoveIds with, both moveEventId and moveBundleId with null values values'
+			List whereFilter = []
+			Map params = [:]
+			String joins = service.handleMoveIds(null, null, whereFilter, params)
+		then: 'No where filters are added, no params added, and an empty string is returned for the join query.'
+			joins == ''
+			whereFilter == []
+			params == [:]
 	}
 }

@@ -1,7 +1,6 @@
 <div class="combo-group">
     <kendo-combobox #innerComboBoxGroup
                         [data]="data"
-                        style="width: 70%"
                         [(ngModel)]="model"
                         [textField]="'text'"
                         [valueField]="'id'"
@@ -26,6 +25,6 @@
             </ng-template>
     </kendo-combobox>
     <div>
-        <label class="fixed"><input type="checkbox" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
+        <label class="fixed"><input type="checkbox" [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
     </div>
 </div>

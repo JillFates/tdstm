@@ -1,4 +1,30 @@
 .task-detail-component
+  .modal-content
+    min-height: 679px
+    min-width: 769px
+    .modal-body
+      height: 86%
+      .task-layout
+        display: flex
+        flex-direction: column
+      .full-height
+        height: 100%
+      .grow-container
+        display: flex
+        flex: 1
+        td
+          flex: 1
+          position: relative
+          .k-grid
+            position: relative
+            min-height: 100%
+      .no-grow-container
+        flex: 0
+        .task-details
+          display: flex
+          flex-direction: column
+        .dates-info-container
+          display: flex
   .successor-predecessor-table
     thead
       th.k-header
@@ -6,10 +32,11 @@
           text-align: left
     td
       padding-top: 8px !important
-      padding-bottom: 8px !important
+      padding-bottom: 4px !important
   .btn-collapsed-fixed-right
-    position: fixed
+    position: absolute
     right: 20px
     button.btn
+      padding: 4px 9px
       i
         padding-right: 0px

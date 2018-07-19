@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -128,5 +129,41 @@ class ProviderService implements ServiceMethods {
         if (provider) {
             provider.delete()
         }
+    }
+
+    /**
+     * Fetch a Provider from database by name
+     * @param providerName - provider name
+     * @param project - project
+     * @param throwException - whether to throw or not an exception if provider is not found
+     * @return a provider instance
+     */
+    Provider getProvider(String name, Project project = null, boolean throwException = false) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
+        // Find a provider with the given name for this project.
+        Provider provider = GormUtil.findInProjectByAlternate(project, Provider, name, throwException)
+
+        return provider
+    }
+
+    /**
+     * Create new provider for api catalog
+     * @param providerName new or existing provider name
+     * @return a provider instance
+     * @throws InvalidParamException
+     */
+    Provider findOrCreateProvider(String providerName, Project project) {
+        if (StringUtil.isBlank(providerName)) {
+            throw new InvalidParamException("Provider name cannot be blank or null.")
+        }
+
+        Provider provider = getProvider(providerName, project, false)
+        if (!provider) {
+            JSONObject jsonObject = new JSONObject([name: providerName, description: '', comment: ''])
+            provider = saveOrUpdateProvider(jsonObject)
+        }
+        return provider
     }
 }

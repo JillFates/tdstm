@@ -8,6 +8,7 @@ import {
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
 import {MAX_DEFAULT, MAX_OPTIONS} from '../model/constants';
+import {DateUtils} from './date.utils';
 
 export class DataGridOperationsHelper {
 
@@ -97,18 +98,13 @@ export class DataGridOperationsHelper {
 		}
 
 		if (column.type === 'date') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'gte',
-					value: column.filter,
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
+			const {init, end} = DateUtils.getInitEndFromDate(column.filter);
+
+			if (filter) {
+				this.state.filter.filters = this.getFiltersExcluding(column.property);
 			}
+			root.filters.push({ field: column.property, operator: 'gte', value: init, });
+			root.filters.push({ field: column.property, operator: 'lte', value: end });
 		}
 
 		if (column.type === 'boolean') {
@@ -131,6 +127,29 @@ export class DataGridOperationsHelper {
 		}
 
 		this.filterChange(root);
+	}
+
+	/**
+	 * Update the filters state structure removing the column filter provided
+	 * @param {any} column: Column to exclude from filters
+	 * @param {any} state: Current filters state
+	 * @returns void
+	 */
+	public clearFilter(column: any): void {
+		column.filter = '';
+		this.state.filter.filters = this.getFiltersExcluding(column.property);
+		this.filterChange(this.state.filter);
+	}
+
+	/**
+	 * Get the filters state structure excluding the column filter name provided
+	 * @param {string} excludeFilterName:  Name of the filter column to exclude
+	 * @param {any} state: Current filters state
+	 * @returns void
+	 */
+	private getFiltersExcluding(excludeFilterName: string): any {
+		const filters = (this.state.filter && this.state.filter.filters) || [];
+		return  filters.filter((r) => r['field'] !== excludeFilterName);
 	}
 
 	/**

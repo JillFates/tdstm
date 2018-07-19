@@ -1218,8 +1218,7 @@ class DataImportService implements ServiceMethods {
 			fieldsToIngnore = []
 		}
 		fieldsToIgnore.addAll(['id'])
-
-		fieldNames =  fieldNames - fieldsToIgnore
+		fieldNames = fieldNames - fieldsToIgnore
 
 		String domainShortName = GormUtil.domainShortName(domain)
 

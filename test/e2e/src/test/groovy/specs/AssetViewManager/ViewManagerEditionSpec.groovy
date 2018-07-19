@@ -7,7 +7,7 @@ import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.SaveViewPage
 import pages.AssetViewManager.ViewPage
-import jodd.util.RandomString
+import utils.CommonActions
 
 
 @Stepwise
@@ -20,7 +20,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
     static expectedColumns =[]
 
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(8)
+    static randStr = new CommonActions().getRandomString()
 
 
     def setupSpec() {
@@ -130,7 +130,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
         at ViewPage
         expectedColumns = createViewModule.getListOfSelectedFields()
         when: "User saves the changes made"
-        waitFor { createViewModule.clickSave() }
+        createViewModule.clickSave()
         waitFor { clickViewManagerBreadCrumb() }
         at AssetViewsPage
         waitFor { allViewsModule.openViewByName(selectedView) }

@@ -4,18 +4,19 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, HostListener, Inject, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import {AssetShowComponent} from '../asset/asset-show.component';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
-import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {AssetCommonEdit} from '../asset/asset-common-edit';
 
 declare var jQuery: any;
 
-export function StorageEditComponent(template: string, editModel: any): any {
+export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
 		selector: 'storage-edit',
 		template: template,
@@ -23,35 +24,18 @@ export function StorageEditComponent(template: string, editModel: any): any {
 			{ provide: 'model', useValue: editModel }
 		]
 	})
-	class StorageShowComponent implements  OnInit {
-		private isDependenciesValidForm = true;
+	class StorageShowComponent extends AssetCommonEdit {
+
 		constructor(
-			@Inject('model') private model: any,
-			private activeDialog: UIActiveDialogService,
-			private preference: PreferenceService,
-			private assetExplorerService: AssetExplorerService,
-			private dialogService: UIDialogService,
-			private notifierService: NotifierService) {
-		}
+			@Inject('model') model: any,
+			activeDialog: UIActiveDialogService,
+			preference: PreferenceService,
+			assetExplorerService: AssetExplorerService,
+			dialogService: UIDialogService,
+			notifierService: NotifierService,
+			tagService: TagService) {
 
-		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-			if (event && event.code === KEYSTROKE.ESCAPE) {
-				this.cancelCloseDialog();
-			}
-		}
-
-		/**
-		 * Initiates The Injected Component
-		 */
-		ngOnInit(): void {
-			jQuery('[data-toggle="popover"]').popover();
-		}
-
-		/***
-		 * Close the Active Dialog
-		 */
-		public cancelCloseDialog(): void {
-			this.activeDialog.close();
+			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata);
 		}
 
 		/**
@@ -72,27 +56,14 @@ export function StorageEditComponent(template: string, editModel: any): any {
 			// Date Formats
 			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
 			// modelRequest.asset.retireDate
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+					this.saveAssetTags();
+				}
 			});
-		}
-
-		private showAssetDetailView(assetClass: string, id: number) {
-			this.dialogService.replace(AssetShowComponent, [
-					{ provide: 'ID', useValue: id },
-					{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
-		}
-
-		/**
-		 * Validate if the current content of the Dependencies is correct
-		 * @param {boolean} invalidForm
-		 */
-		public onDependenciesValidationChange(validForm: boolean): void {
-			this.isDependenciesValidForm = validForm;
 		}
 
 	}

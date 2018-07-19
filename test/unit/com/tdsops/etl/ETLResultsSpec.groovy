@@ -101,7 +101,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
-		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
+		ETLProcessorResult.registerObjectMarshaller()
 	}
 
 	def teardown(){

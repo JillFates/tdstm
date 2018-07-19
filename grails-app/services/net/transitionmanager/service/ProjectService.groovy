@@ -75,6 +75,7 @@ class ProjectService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
 	LicenseAdminService licenseAdminService
+	TagService tagService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -491,7 +492,8 @@ class ProjectService implements ServiceMethods {
 
 
     /**
-	 * Used to determine if a company is associated with a project
+	 * Used to clone the default settings and add them to the project parameter,
+	 * including fieldSpecs and default Tags.
 	 * @param project - the project to update with default settings
 	 */
 	void cloneDefaultSettings(Project project) {
@@ -527,6 +529,9 @@ class ProjectService implements ServiceMethods {
 			}
 			log.debug "Created field spec ${spec.key} for project ${project.id}"
 		}
+		// Clone the Default Project Tags (if it has any) and add them to the new project
+		tagService.cloneProjectTags(defProject, project)
+
 	}
 
 	/**
@@ -1329,31 +1334,26 @@ class ProjectService implements ServiceMethods {
 	private void fillUsersMetrics(metricsByProject, List<Project> projects, sqlSearchDate) {
 
 		def projectDailyMetric
-		def companyIds = [0]
-		Map projectsMapByCompanyId = [:]
-
-		projects.each { p ->
-			companyIds << p.client.id
-			projectsMapByCompanyId[p.client.id] = p
-		}
 
 		String personsCountsQuery = '''
-			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons,
-			       count(u.username) as totalUserLogins, count(u_active.username) as activeUserLogins
-			FROM person p
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
-			LEFT OUTER JOIN party pa on p.person_id=pa.party_id
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id
-			LEFT OUTER JOIN user_login u_active on p.person_id=u_active.person_id AND u_active.last_modified > (? - INTERVAL 1 DAY)
-			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE pg.party_group_id in (''' + companyIds.collect { NumberUtil.toLong(it) }.join(',') + ''')
-			GROUP BY pg.party_group_id
+			SELECT
+			  pr.party_id_from_id projectId,
+			  COUNT(distinct party_id_to_id) as totalPersons,
+			  COUNT(distinct u.username) as totalUserLogins,
+			  COUNT(distinct ulpa.user_login_id, ulpa.date) as activeUserLogins
+			FROM party_relationship pr
+			  LEFT OUTER JOIN user_login u ON pr.party_id_to_id = u.person_id
+			  LEFT OUTER JOIN user_login_project_access ulpa ON pr.party_id_from_id = ulpa.project_id and ulpa.date = ?
+			WHERE
+			  pr.role_type_code_from_id='PROJECT' AND
+			  pr.party_relationship_type_id='PROJ_STAFF' AND
+			  pr.role_type_code_to_id='STAFF'
+			  AND pr.party_id_from_id in (''' + (projects*.id).join(',') + ''')
+			GROUP BY pr.party_id_from_id
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
-			def project = projectsMapByCompanyId[it.companyId]
-			projectDailyMetric = metricsByProject[project.id]
+			projectDailyMetric = metricsByProject[it.projectId]
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins

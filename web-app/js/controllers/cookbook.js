@@ -2750,7 +2750,7 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 	);
 
 	return restCalls;
-}
+};
 
 /********************************************************************************
  * Factory used to edit the recipe, maintain active and WIP version
@@ -2828,6 +2828,7 @@ tds.cookbook.module.config(['$logProvider', function($logProvider) {
 tds.cookbook.module.factory('servicesInterceptor', [tds.core.interceptor.LoggedCheckerInterceptor]);
 
 tds.cookbook.module.factory('cookbookService', ['utils', '$http', '$resource', tds.cookbook.service.CookbookService]);
+
 tds.cookbook.module.factory('recipeManager', ['utils', tds.cookbook.service.RecipeManager]);
 
 tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {

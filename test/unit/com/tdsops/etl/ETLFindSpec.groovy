@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -1241,7 +1242,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					data.size() == 5
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1252,7 +1253,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1263,7 +1264,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[2]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1274,7 +1275,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[3]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1285,7 +1286,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 					with(data[4]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1677,7 +1678,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 					data.size() == 2
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1702,7 +1703,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1783,7 +1784,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1808,7 +1809,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1889,7 +1890,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 
 					with(data[0]) {
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -1914,7 +1915,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == 'I'
+						op == ImportOperationEnum.UNDETERMINED.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2076,7 +2077,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 2
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2105,7 +2106,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 					with(data[1]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2139,7 +2140,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 2
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2168,7 +2169,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 					}
 					with(data[1]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2276,7 +2277,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2400,7 +2401,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2524,7 +2525,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id', 'appVendor', 'appTech'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2652,7 +2653,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2761,7 +2762,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['id'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.UPDATE.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2872,7 +2873,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					fieldNames == ['description'] as Set
 					data.size() == 1
 					with(data[0]){
-						op == 'I'
+						op == ImportOperationEnum.INSERT.toString()
 						warn == false
 						duplicate == false
 						errors == []
@@ -2898,5 +2899,506 @@ class ETLFindSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
-	}}
+	}
+
+	@See('TM-11192')
+	void 'test can register an error if find by id is not using a long value'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+				152255,Mozilla,NGM,ACME Data Center
+				'''.stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
+			}
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				throw new Exception('java.lang.String cannot be cast to java.lang.Long')
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+			read labels
+			domain Application
+			iterate {
+				extract 'application id' load 'id'
+				find Application by 'id' with SOURCE.'vendor name' into 'id'
+			}
+		""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
+					fieldLabelMap == ['id': 'Id']
+					data.size() == 2
+
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						errorCount == 1
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 1
+						with(fields['id'], FieldResult){
+							originalValue == '152254'
+							value == '152254'
+							init == null
+							errors == ['java.lang.String cannot be cast to java.lang.Long']
+							warn == false
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Application.name()
+									kv == [
+										'id': 'Microsoft'
+									]
+								}
+							}
+						}
+					}
+
+					with(data[1], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						errorCount == 1
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 1
+						with(fields['id'], FieldResult){
+							originalValue == '152255'
+							value == '152255'
+							init == null
+							errors == ['java.lang.String cannot be cast to java.lang.Long']
+							warn == false
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Application.name()
+									kv == [
+										'id': 'Mozilla'
+									]
+								}
+							}
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by a String value dynamically in domain command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar.value
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+				}
+
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by an Element value dynamically in domain command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+				}
+
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by a String value dynamically in find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
+			}
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				return []
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar.value
+					find domainClassVar.value by 'Name' with nameVar into 'id'
+					load 'Name' with nameVar
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'xray'
+							value == 'xray'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Application.name()
+									kv == [
+											'assetName': 'xray'
+									]
+								}
+							}
+						}
+					}
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'zulu'
+							value == 'zulu'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Device.name()
+									kv == [
+											'assetName': 'zulu'
+									]
+								}
+							}
+						}
+					}
+				}
+
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11262')
+	void 'test can reference domain names by an Element value dynamically in find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,type
+				xray,App
+				zulu,Srv
+			'''.stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
+			}
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				return []
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+				// Map the type to the domain classes as applicable
+				Map map = [
+					'App': Application,
+					'Srv': Device
+				]
+				
+				read labels
+				iterate {
+					extract 'name' set nameVar
+					extract 'type' transform with substitute(map) set domainClassVar
+					domain domainClassVar
+					find domainClassVar by 'Name' with nameVar into 'id'
+					load 'Name' with nameVar
+				}
+				'''.stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'xray'
+							value == 'xray'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Application.name()
+									kv == [
+											'assetName': 'xray'
+									]
+								}
+							}
+						}
+					}
+				}
+
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+					with(data[0], RowResult){
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields.size() == 2
+						with(fields['assetName'], FieldResult){
+							originalValue == 'zulu'
+							value == 'zulu'
+							init == null
+							create == null
+							update == null
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 0
+							}
+						}
+
+						with(fields['id'], FieldResult){
+							originalValue == null
+							value == null
+							init == null
+							create == null
+							update == null
+
+							with(find, FindResult){
+								results == []
+								matchOn == null
+								query.size() == 1
+								with(query[0], QueryResult){
+									domain == ETLDomain.Device.name()
+									kv == [
+											'assetName': 'zulu'
+									]
+								}
+							}
+						}
+					}
+				}
+
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+}
+
 
