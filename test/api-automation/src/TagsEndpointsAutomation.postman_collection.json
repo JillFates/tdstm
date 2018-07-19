@@ -11,20 +11,26 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "289e044f-4ca6-412d-b329-06e51b4da370",
+						"id": "43bf8cae-a732-4b81-96d3-ad55947ecde4",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
 							"});",
 							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
 							"});",
 							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");",
-							"});"
+							""
 						]
 					}
 				}
@@ -398,7 +404,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c2ad6816-a451-4c7b-b1f9-ba5caa76d985",
+						"id": "61d1fd86-b1a6-490b-9557-f920d8faad91",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -409,8 +415,8 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.include(pm.variables.get(\"updatedTagName\"))",
+							"    var data = jsonData.data;",
+							"    pm.expect(data.name).to.include(pm.variables.get(\"updatedTagName\"));",
 							"    pm.expect(data.description).to.eql('Different Description');",
 							"    pm.expect(data.color).to.eql('Blue');",
 							"    pm.expect(data.css).to.eql('tag-blue');",
@@ -461,7 +467,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"id": "ee8384dd-0d5a-46e6-90a9-928a2a9db140",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -472,7 +478,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
-							"    var data = jsonData.data",
+							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
 							"});"
 						]
@@ -536,28 +542,28 @@
 	],
 	"variable": [
 		{
-			"id": "13f9293e-76e3-4396-9e54-07b60c52f365",
+			"id": "36410f01-56e1-4c78-a457-e2e4f5cc7ac4",
 			"key": "nonExistentTag",
 			"value": "9999999999",
 			"type": "string",
 			"description": ""
 		},
 		{
-			"id": "28e5bee1-9989-47b8-a824-f3a9d0574133",
+			"id": "07380e1b-c71b-4f28-bbc6-3ef8bd3d3d70",
 			"key": "updatedTagName",
 			"value": "updatedTag",
 			"type": "string",
 			"description": ""
 		},
 		{
-			"id": "160072e7-6724-4618-bee3-70f8feb0be68",
+			"id": "08e2a793-263f-4894-999f-3fb93a31754d",
 			"key": "projectId",
 			"value": "2445",
 			"type": "string",
 			"description": ""
 		},
 		{
-			"id": "868af2d7-b1d6-4d38-aec8-42267a7fe928",
+			"id": "b125a2d3-6f01-4d97-9285-df5ccb7cf80c",
 			"key": "tagName",
 			"value": "newTestTag",
 			"type": "string",
