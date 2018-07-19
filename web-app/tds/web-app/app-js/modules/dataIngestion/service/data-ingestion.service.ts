@@ -208,6 +208,7 @@ export class DataIngestionService {
 
 	/**
 	 * Get Sample Data of a File by passing the FileName to the server
+	 * @param {number} id
 	 * @param {string} fileName
 	 * @returns {Observable<SampleDataModel>}
 	 */
