@@ -404,7 +404,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			throw ETLProcessorException.invalidConsoleStatus(reservedWord.name())
 		}
 		debugConsole.status = consoleStatus
-		debugConsole.info "Console status changed: $consoleStatus"
 		this
 	}
 
