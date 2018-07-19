@@ -6,7 +6,7 @@ import grails.validation.Validateable
  * A command object used in creating a Task context.
  */
 @Validateable
-class ContextCommand {
+class TaskGenerationCommand {
 
 	Long recipeId
 	Long eventId
