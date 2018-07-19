@@ -14,13 +14,6 @@ web-app/css/managerStyle.css
 web-app/css/style.css
 web-app/dist/App.js
 web-app/dist/Vendors.js
-web-app/tds/web-app/dist/app.js
-web-app/tds/web-app/dist/app.js.map
-web-app/tds/web-app/dist/vendor.js
-web-app/tds/web-app/dist/vendor.js.map
-web-app/tds/web-app/dist/polyfills.js
-web-app/tds/web-app/dist/polyfills.js.map
-web-app/tds/web-app/dist/vendors-codemirror.js
-web-app/tds/web-app/dist/vendors-codemirror.js.map
+web-app/tds/web-app/dist/**
 web-app/tds/web-app/css/style.css
 test/e2e/build
