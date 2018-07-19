@@ -338,7 +338,6 @@ export class DataIngestionService {
 			name: model.name,
 			description: model.description,
 			provider: { id: model.provider.id },
-			// agentClass: { id: model.agentClass.id },
 			apiCatalog: { id: model.agentClass.id },
 			agentMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,

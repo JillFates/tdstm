@@ -75,7 +75,7 @@ class ApiCatalogServiceIntegrationSpec extends IntegrationSpec {
 			ApiCatalog apiCatalog = apiCatalogService.saveOrUpdate(command)
 
 		when:
-			command = new ApiCatalogCommand(dictionary: DICTIONARY, id: apiCatalog.id, version: 2)
+			command = new ApiCatalogCommand(dictionary: ApiCatalogTestHelper.DICTIONARY, id: apiCatalog.id, version: -1)
 			apiCatalogService.saveOrUpdate(command)
 
 		then:

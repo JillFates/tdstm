@@ -143,14 +143,8 @@ class ProviderService implements ServiceMethods {
             project = securityService.userCurrentProject
         }
         // Find a provider with the given name for this project.
-        Provider provider = Provider.where{
-            name == name
-            project == project
-        }.find()
+        Provider provider = GormUtil.findInProjectByAlternate(project, Provider, name, throwException)
 
-        if (!provider && throwException) {
-            throw new EmptyResultException("No Provider with name ${name} exists for this project.")
-        }
         return provider
     }
 
@@ -158,10 +152,11 @@ class ProviderService implements ServiceMethods {
      * Create new provider for api catalog
      * @param providerName new or existing provider name
      * @return a provider instance
+     * @throws InvalidParamException
      */
     Provider findOrCreateProvider(String providerName, Project project) {
         if (StringUtil.isBlank(providerName)) {
-            throw new EmptyResultException("No Provider name cannot be blank or null.")
+            throw new InvalidParamException("Provider name cannot be blank or null.")
         }
 
         Provider provider = getProvider(providerName, project, false)

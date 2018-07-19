@@ -34,15 +34,4 @@ class GenericHttpAgent extends AbstractAgent {
 		return httpProducerService.executeCall(actionRequest)
 	}
 
-	/**
-	 * Used to fetch/download assets lists from ServiceNow. This method name <code>fetchAssetList</code> is referenced
-	 * by ServiceNow dictionary in the "method" property of every dictionary item.
-	 *
-	 * @param actionRequest - the api action request
-	 * @return an api action response
-	 */
-	ApiActionResponse fetchAssetList(ActionRequest actionRequest) {
-		return httpProducerService.executeCall(actionRequest)
-	}
-
 }

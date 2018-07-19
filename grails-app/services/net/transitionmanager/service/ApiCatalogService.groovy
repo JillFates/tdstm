@@ -28,22 +28,16 @@ class ApiCatalogService implements ServiceMethods {
 	 */
 	boolean validateUnique(String name, Long id, Project project, Provider provider) {
 		// Lookup a api catalog with the given name, project and provider
-		ApiCatalog apiCatalog = ApiCatalog.where {
+		Number matches = ApiCatalog.where {
 			name == name
 			project == project
 			provider == provider
-		}.find()
-
-		boolean unique = true
-		if (apiCatalog) {
-			// If an api catalog was found, check if the IDs match. If not, the name is not unique.
-			if (apiCatalog) {
-				if (apiCatalog.id != id) {
-					unique = false
-				}
+			if (id) {
+				id != id
 			}
-		}
-		return unique
+		}.count()
+
+		return matches == 0
 	}
 
 	/**
@@ -68,9 +62,7 @@ class ApiCatalogService implements ServiceMethods {
 
 		if (command.id) {
 			apiCatalog = ApiCatalog.load(command.id)
-			if (command.version != apiCatalog.version) {
-				throw new DomainUpdateException("The version of the Api Catalog you are trying to update was already updated by another user")
-			}
+			GormUtil.optimisticLockCheck(apiCatalog, command.version, 'Api Catalog')
 		} else {
 			apiCatalog = new ApiCatalog()
 			apiCatalog.project = currentProject
@@ -87,9 +79,8 @@ class ApiCatalogService implements ServiceMethods {
 			throw new DomainUpdateException("Cannot update or create Api Catalog because the name is not unique for this project and provider.")
 		}
 
-		if (!apiCatalog.save()) {
-			throw new DomainUpdateException("Error creating or updating ApiCatalog ${GormUtil.allErrorsString(apiCatalog)}")
-		}
+		// save or update api catalog
+		apiCatalog.save(failOnError: true)
 
 		return apiCatalog
 	}
@@ -159,7 +150,7 @@ class ApiCatalogService implements ServiceMethods {
 	Map getCatalogMethods(Long catalogId) {
 		ApiCatalog apiCatalog = findById(catalogId)
 		if (!apiCatalog) {
-			throw new InvalidParamException("Api Catalog with ID $catalogId, not found")
+			throw new EmptyResultException("Api Catalog with ID $catalogId, not found")
 		}
 
 		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionary)
