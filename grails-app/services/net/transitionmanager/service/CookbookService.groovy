@@ -1403,7 +1403,13 @@ class CookbookService implements ServiceMethods {
 		}
 	}
 
-	void defineRecipeContext(Long recipeId, ContextCommand contextCommand) {
+	/**
+	 * Saves the context to the recipe
+	 *
+	 * @param recipeId the recipe to add context(eventId/tags) to.
+	 * @param contextCommand The command object that holds the recipe context.
+	 */
+	void saveRecipeContext(Long recipeId, ContextCommand contextCommand) {
 		securityService.requirePermission Permission.RecipeEdit
 
 		Project project = securityService.getUserCurrentProjectOrException()

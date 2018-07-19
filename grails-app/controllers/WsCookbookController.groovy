@@ -159,7 +159,7 @@ class WsCookbookController implements ControllerMethods {
 
 	@HasPermission(Permission.RecipeEdit)
 	def defineRecipeContext(Long recipeId, ContextCommand context) {
-		cookbookService.defineRecipeContext(recipeId, context)
+		cookbookService.saveRecipeContext(recipeId, context)
 		renderSuccessJson()
 	}
 
