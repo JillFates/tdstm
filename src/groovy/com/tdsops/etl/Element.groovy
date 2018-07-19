@@ -410,6 +410,46 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Format this element value to the printf-style format strings
+	 * @see https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * In case that the format is not provided we use a default one to each of the following types:
+	 *    Date	                  %1$tY-%1$tm-%1$td
+	 *    Number (Integer, Long)	%,d
+	 *    Float/Decimal	         %,.2f
+	 * <code>
+	 *      load ... transform with format()
+	 * <code>
+	 * @return the element instance that received this command
+	 */
+	Element format(String formatMask) {
+		if( ! formatMask ) {
+			switch ( value.class ) {
+				case Date :
+						formatMask = '%1$tY-%1$tm-%1$td'
+						break
+
+				case [Integer, Long] :
+						formatMask = '%,df'
+						break
+
+				case [Float, Double] :
+						formatMask = '%,.2f'
+						break
+
+				default:
+						formatMask = '%s'
+			}
+		}
+
+		try {
+			value = String.format(formatMask, value)
+		} catch (e) {
+			throw new ETLProcessorException("format function error (${value} : ${value.class}) : ${e.message}")
+		}
+		return this
+	}
+
+	/**
 	 * Converts all of the characters in this element value to lower
 	 * case using the rules of the default locale.
 	 * <code>

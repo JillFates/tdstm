@@ -19,6 +19,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import spock.lang.See
 import spock.lang.Shared
@@ -47,6 +48,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	DataSetFacade applicationDataSet
 	DataSetFacade nonSanitizedDataSet
 	DataSetFacade sixRowsDataSet
+	DataSetFacade mixedTypeDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
 	ETLFieldsValidator validator
@@ -153,6 +155,20 @@ class ETLTransformSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
+		mixedTypeDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "NUMERIC", isNull: false, isKey: true)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'user count', alias: 'USER COUNT', type: "INTEGER", isNull: false)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'expiration date', alias: 'EXPIRATION DATE', type: "DATE", isNull: false)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'issue date', alias: 'ISSUE DATE', type: "DATE", isNull: false)
+
+		new Flow().writeTo(dest: mixedTypeDataSet.getDataSet(), dest_append: true) { updater ->
+			updater(['device id': 152255, 'user count': 12,
+			         'expiration date': DateUtils.parseDate("1974-06-26", 'yyyy-MM-dd'),
+			         'issue date': DateUtils.parseDate("1977-02-18", 'yyyy-MM-dd')
+			])
+		}
+
 		validator = createDomainClassFieldsValidator()
 	}
 
@@ -175,6 +191,29 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(0, 1).value == 'SRW24G1'
 			etlProcessor.getElement(1, 1).value == 'ZPHA MODULE'
 			etlProcessor.getElement(2, 1).value == 'SLIDEAWAY'
+	}
+
+	void 'test can transform a field value with format transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), mixedTypeDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						domain Device
+						read labels
+						iterate {
+							extract 'user count' transform with format('%,d')
+							extract 'expiration date' transform with format('%tD')
+							extract 'issue date' transform with format()
+						}
+					""".stripIndent())
+
+		then: 'Every column for every row is transformed to uppercase'
+			etlProcessor.getElement(0, 1).value == '12'
+			etlProcessor.getElement(0, 2).value == '06/26/74'
+			etlProcessor.getElement(0, 3).value == '1977-02-18'
 	}
 
 	void 'test can check syntax errors at parsing time'() {
