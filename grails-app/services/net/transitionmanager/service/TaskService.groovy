@@ -3518,7 +3518,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskBatch: settings.taskBatch,
 			isPublished: settings.publishTasks,
 			sendNotification: taskSpec.sendNotification ?: false,
-			project: settings?.event?.project ?: settings.project,
+			project: settings.project,
 			moveEvent: settings.event,
 			assetEntity: asset,
 			commentType: AssetCommentType.TASK,
