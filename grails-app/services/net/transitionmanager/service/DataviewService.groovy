@@ -384,7 +384,7 @@ class DataviewService implements ServiceMethods {
         """
 
 		String countHql = """
-            select count(*)
+            select count(DISTINCT AE)
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $conditions
