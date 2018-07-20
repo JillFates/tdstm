@@ -143,10 +143,12 @@ class AllAssetsSpec extends GebReportingSpec {
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user changes the pagination value again'
+            waitFor {view.displayed}
             itemsPerPage.value(25)
 
         then: 'The table loads and the elements are present'
             leftTableElements.displayed
+            waitFor {view.displayed}
 
     }
 
