@@ -59,18 +59,11 @@
                     <textarea id="script" class="form-control" name="script" rows="${lineNumbers}" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
                 </div>
                 <br>
-                <g:if test="${errorCollector}">
+                <g:if test="${error}">
                     <div class="alert alert-danger">
-                        <strong>${errorCollector.getErrorCount()} Errors!</strong>
-                        <g:each in="${errorCollector.errors}" var="error">
-                            <th>${error.cause*.message}</th>
-                        </g:each>
-
-                    </div>
-                </g:if>
-                <g:if test="${missingPropertyError}">
-                    <div class="alert alert-danger">
-                        <strong>Exception!</strong> ${missingPropertyError} Line number: ${lineNumber}
+                        <th>
+                            Line ${error.lineNumber}: <strong>${error.message}</strong>
+                        </th>
                     </div>
                 </g:if>
                 <br>

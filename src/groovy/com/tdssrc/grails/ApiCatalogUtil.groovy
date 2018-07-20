@@ -218,7 +218,12 @@ class ApiCatalogUtil {
 		def paramMatch = paramMatcher[0][1]
 		String[] params = paramMatch.split(',')
 
-		def fnParam = getParam(params[0], jsonDictionary)
+		def fnParamRef = getParam(params[0], jsonDictionary)
+		if (!fnParamRef instanceof Map) {
+			throw new InvalidParamException('fn() param transformation is expecting a Map reference: ' + params[0])
+		}
+
+		def fnParam = fnParamRef.clone()
 		fnParam['fieldName'] = params[1].trim()
 		fnParam['value'] = params[1].trim()
 		fnParam['readonly'] = NumberUtil.toInteger(params[2].trim(), 0)
