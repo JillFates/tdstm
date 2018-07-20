@@ -128,6 +128,7 @@ class AllAssetsSpec extends GebReportingSpec {
             checkJustPlanning()
         and: 'We wait for the table content to be displayed'
             waitFor{leftTableElements.displayed}
+            waitFor {view.displayed}
         and: 'We change the pagination to the value set above'
             itemsPerPage.value(dropdownItems)
 
