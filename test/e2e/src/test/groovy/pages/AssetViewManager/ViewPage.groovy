@@ -111,7 +111,7 @@ class ViewPage extends Page{
             waitFor {view.displayed}
             waitFor{leftTableElements.displayed}
             //We create a list with the elements on the Bundle column every time the table is refreshed
-            def bundleData = $("div" , class:"k-grid-content k-virtual-content").find("table" , class:"k-grid-table" , style:"transform: translateY(0px); width: 1699px;").find("tbody", role:"presentation").find("tr")[4]
+            def bundleData = $("div" , class:"k-grid-content k-virtual-content").find("table" , class:"k-grid-table" , style:"transform: translateY(0px); width: 1699px;").find("tbody", role:"presentation").find("tr").find("aria-colindex":"8")
             for(int i=0; i<bundleData.size();i++){
                 if(bundleData[i].text().equals("TBD")){
                     flag=true
