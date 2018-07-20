@@ -66,18 +66,18 @@ class TaskBatch {
 	 * @return The name and, or the tag names for the taskBatch
 	 */
 	String eventName() {
+		return MoveEvent.get(eventId)?.name ?: ''
+	}
+
+	String tagNames() {
 		List<String> event = []
 		Map context = context()
 
-		if (eventId) {
-			event << MoveEvent.get(eventId)?.name ?: ''
+		if (context.tag) {
+			return context.tag.collect { Map tag -> tag.label }.join(',')
 		}
 
-		if(context){
-			event << context.tag.collect{Map tag-> tag.name}.join(',')
-		}
-
-		return event.join(' ')
+		return ''
 	}
 
 	/**
