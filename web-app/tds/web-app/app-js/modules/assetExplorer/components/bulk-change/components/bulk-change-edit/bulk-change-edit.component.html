@@ -31,6 +31,12 @@
 		.bulk-change-edit-component .className {
 			text-transform: capitalize;
 		}
+		.bulk-change-edit-component .add-button {
+			margin-right: 5px;
+		}
+			.bulk-change-edit-component .add-button span {
+				margin-right: 5px;
+			}
 
 
 </style>
@@ -47,14 +53,11 @@
 			<div class="modal-body">
 				<div class="modal-body-container">
 					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
-
+						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.AFFECTED_ASSETS' | translate:[affectedAssets] }}</label>
 						<kendo-grid
 								*ngIf="gridSettings"
 								[data]="gridSettings.gridData"
-								[pageSize]="gridSettings.state.take"
-								[skip]="gridSettings.state.skip"
-								[pageable]="{pageSizes: gridSettings.defaultPageOptions, info: true}"
-								(pageChange)="gridSettings.pageChange($event)"
+								[pageable]="false"
 								[resizable]="true"
 								(add)="addHandler($event)"
 								(cancel)="cancelHandler($event)"
@@ -64,13 +67,8 @@
 
 							 <!-- Toolbar Template-->
 							<ng-template kendoGridToolbarTemplate [position]="'top'">
-								<button kendoGridAddCommand class="btn btn-default" type="button">
-									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-									{{ 'GLOBAL.CREATE' | translate }} {{'ASSET_TAGS.TAG' | translate}}
-								</button>
-								<label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
-									<span class="glyphicon glyphicon-repeat"></span>
-								</label>
+								<button type="button" class="btn btn-default add-button pull-right" id="btnAddButton">
+									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate}}</button>
 							</ng-template>
 
 							<!-- - Action-->

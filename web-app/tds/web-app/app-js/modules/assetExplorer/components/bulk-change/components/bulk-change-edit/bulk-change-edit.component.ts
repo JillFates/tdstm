@@ -23,9 +23,10 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	ACTION = BulkActions; // Make enum visible to the view
 	gridColumns: BulkChangeEditColumnsModel;
 	gridSettings: DataGridOperationsHelper;
+	affectedAssets: number;
 	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService, private permissionService: PermissionService) {
 		super('#bulk-change-edit-component');
-
+		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 		/*
 		this.selectedItems = this.bulkChangeModel.selectedItems || [];
 		this.selectedAction = this.ACTION.Edit;

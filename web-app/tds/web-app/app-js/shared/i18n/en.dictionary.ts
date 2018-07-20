@@ -74,7 +74,11 @@ export const en_DICTIONARY: Object = {
 		},
 		'SYSTEM_VIEW': 'System View',
 		'BULK_CHANGE' : {
-			'TITLE' : 'Bulk Change'
+			'TITLE' : 'Bulk Change',
+			'EDIT': {
+				'ADD_FIELD': 'Add Field',
+				'AFFECTED_ASSETS': 'This action will affect {param1} Assets'
+			}
 		}
 	},
 	'ASSET_TAGS': {
