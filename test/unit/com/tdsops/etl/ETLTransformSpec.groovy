@@ -163,7 +163,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'issue date', alias: 'ISSUE DATE', type: "DATE", isNull: false)
 
 		new Flow().writeTo(dest: mixedTypeDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': 152255, 'user count': 12,
+			updater(['device id': 152255, 'user count': 12345,
 			         'expiration date': DateUtils.parseDate("1974-06-26", 'yyyy-MM-dd'),
 			         'issue date': DateUtils.parseDate("1977-02-18", 'yyyy-MM-dd')
 			])
@@ -1521,7 +1521,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
-			etlProcessor.getElement(0, 1).value == '12'
+			etlProcessor.getElement(0, 1).value == '12,345'
 			etlProcessor.getElement(0, 2).value == '06/26/74'
 			etlProcessor.getElement(0, 3).value == '1977-02-18'
 	}

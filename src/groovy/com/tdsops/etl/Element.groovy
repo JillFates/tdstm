@@ -444,7 +444,7 @@ class Element implements RangeChecker {
 		try {
 			value = String.format(formatMask, value)
 		} catch (e) {
-			throw new ETLProcessorException("format function error (${value} : ${value.class}) : ${e.message}")
+			addToErrors("format function error (${value} : ${value.class}) : ${e.message}")
 		}
 		return this
 	}
