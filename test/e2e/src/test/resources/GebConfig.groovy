@@ -45,6 +45,8 @@ environments {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
                 //capabilities.setVersion("45.4.0esr")
                 //capabilities.setPlatform(Platform.LINUX)
+                capabilities.setCapability("acceptSslCerts", true)
+                capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
                 new RemoteWebDriver( new URL(browserLocation), capabilities )
 		    }
         }
