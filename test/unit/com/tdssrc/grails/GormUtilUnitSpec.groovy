@@ -7,6 +7,7 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.transform.Memoized
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -16,6 +17,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import spock.lang.See
 import spock.lang.Specification
@@ -315,26 +317,32 @@ class GormUtilUnitSpec extends Specification {
 
 					propertyNames.each {String propertyName ->
 
-						GormUtil.isDomainClassForTesting(clazz, closure)
-						Boolean isDomainProperty = GormUtil.isDomainPropertyForTesting(clazz, propertyName, closure)
+						isDomainClass(clazz, closure)
+						Boolean isDomainProperty = GormUtil.isDomainProperty(clazz, propertyName)
 
 						if(isDomainProperty){
-							GormUtil.isReferencePropertyForTesting(clazz, propertyName, closure)
-							GormUtil.getDomainPropertyTypeForTesting(clazz, propertyName, closure)
-							GormUtil.getDomainClassOfPropertyForTesting(clazz, propertyName, closure)
+							GormUtil.isReferenceProperty(clazz, propertyName)
+							GormUtil.getDomainPropertyType(clazz, propertyName)
+							GormUtil.getDomainClassOfProperty(clazz, propertyName)
 						}
 					}
 				}
 
 				Date stopTime = new Date()
 				TimeDuration timeDuration = TimeCategory.minus( stopTime, startTime )
-				if(timeDuration.toMilliseconds().intdiv(1000) > 0){
+//				if(timeDuration.toMilliseconds().intdiv(1000) > 0){
 					println("Loop ${index}. Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
-				}
+//				}
 			}
 
 		then:
 			12 * closure.call(true)
-			//1 * closure.call('assetName')
+	}
+
+	@Memoized
+	static boolean isDomainClass(Class domainClass, Closure closure) {
+		Boolean isDomainClass = GormUtil.isDomainClass(domainClass)
+		closure(isDomainClass)
+		return isDomainClass
 	}
 }
