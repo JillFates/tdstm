@@ -1591,7 +1591,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
 	Map initiateCreateTasksWithRecipe(TaskGenerationCommand context, Project currentProject) {
-		Long currentProjectId = securityService.userCurrentProjectId
+		Long currentProjectId = NumberUtil.toLong(securityService.userCurrentProjectId)
 		log.debug "initiateCreateTasksWithRecipe() user=$securityService.currentUsername, project.id=$currentProjectId"
 
 		securityService.requirePermission Permission.RecipeGenerateTasks
