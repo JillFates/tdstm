@@ -1414,9 +1414,7 @@ class CookbookService implements ServiceMethods {
 
 		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject(recipe, project)
 
-		checkAccess(project)
 		Map context = [
 			eventId : contextCommand.eventId,
 			tagMatch: contextCommand.tagMatch,
