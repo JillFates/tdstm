@@ -1692,7 +1692,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		context.tag.each { Long tagId ->
 			Tag tag = get(Tag, tagId, project)
 
-			context.tag << [
+			taskBatchContext.tag << [
 				id    : tag.id,
 				label : tag.name,
 				strike: false,
@@ -4588,7 +4588,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					taskBatch: settings.taskBatch,
 					isPublished: settings.publishTasks,
 					sendNotification: taskSpec.sendNotification ?: false,
-					project: project,
+					project: settings.project,
 					moveEvent: moveEvent,
 					commentType: AssetCommentType.TASK,
 					status: ACS.READY,
