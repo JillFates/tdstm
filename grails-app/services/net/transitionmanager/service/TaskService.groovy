@@ -5256,7 +5256,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	def listTaskBatches(Long recipeId, limitDays, Project currentProject) {
 		controllerService.requiredProject
 
-		Recipe recipe = get(Recipe, recipeId, currentProject)
+		Recipe recipe = get(Recipe, recipeId, currentProject, false)
 
 		boolean listAll=(limitDays=='All')
 		if (!listAll && (limitDays == null || !limitDays.isNumber())) {
