@@ -526,12 +526,10 @@ public class GormUtil {
 	}
 
 	/**
-	 * Retrieve a list of domain properties. If a list of property names is given, only
-	 * those properties will be included. If a list of properties to be skipped is provided,
-	 * those properties will be excluded.
-	 * If
-	 * @param domainClass
-	 * @param properties
+	 * Provides a list of domain properties of a domain class
+	 * @param domainClass - the Domain class to interogate
+	 * @param properties - when populated it will only return those properties specified
+	 * @param skipProperties - when populated it will ignore those properties specified
 	 * @return
 	 */
 	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
@@ -568,6 +566,17 @@ public class GormUtil {
 		}
 		return domainProperties
 
+	}
+
+	/**
+	 * Provides a list of the names of domain properties of a domain class
+	 * @param domainClass
+	 * @return names of all properties of a domain
+	 */
+	static List<String> getDomainPropertyNames(Class domainClass) {
+		def dc = getDomainClass(domainClass)
+		List gdcProperties = dc.getPersistantProperties()
+		return gdcProperties.collect { it.getName() }
 	}
 
 	/**

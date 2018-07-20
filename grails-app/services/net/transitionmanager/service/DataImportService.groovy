@@ -723,7 +723,11 @@ class DataImportService implements ServiceMethods {
 			// The ImportBatchRecord currently being processed
 			record: null,
 
-			project: project
+			// The current project
+			project: project,
+
+			// The person whom is associated to this process running
+			whom: securityService.getUserLoginPerson()
 		]
 	}
 
@@ -895,14 +899,19 @@ class DataImportService implements ServiceMethods {
 	private void processBatchRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		switch (batch.domainClassName) {
 			case ETLDomain.Dependency:
-				processDependencyRecord(batch, record, context, recordCount)
+				//processDependencyRecord(batch, record, context, recordCount)
+				//break
+
+			case ETLDomain.Application:
+			case ETLDomain.Asset:
+			case ETLDomain.Database:
+			case ETLDomain.Device:
+			case ETLDomain.Files:
+			case ETLDomain.Storage:
+				processEntityRecord(batch, record, context, recordCount)
 				break
 
 			default:
-			println "******** processBatchRecord()"
-				processEntityRecord(batch, record, context)
-				break
-
 				String domain = batch.domainClassName.name()
 				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
 				throw new InvalidRequestException("Batch process not supported for domain ${domain}")
@@ -916,104 +925,108 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch that the ImportBatchRecord
 	 * @param importBatchRecord - the ImportBatchRecord to be processed
 	 * @param context - the batch processing context that contains objects used throughout the process
-	 * @return a list of errors if any were detected during the process.
+	 * @throws DomainUpdateException when unable to save the record with updates to it
 	 */
-	def processDependencyRecord = { ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount ->
-		Object primary, supporting
-		AssetDependency dependency = null
-		Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
-		Project project = batch.project
-		resetRecordAndFieldsInfoErrors(record, fieldsInfo)
-
+	void processDependencyRecord = { ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount ->
 		try {
-		while (true) {
-			// Try finding the Dependency by it's id if specified in fieldsInfo
-			if (fieldsInfo.containsKey('id')) {
-				def findDomainByIdResult = fetchEntityByFieldMetaData('id', fieldsInfo, context)
-					if ( findDomainByIdResult == -1 ) {
-					// the fields.Info.id.value had a number but the id was not found which is an error
-					log.debug "processDependencyRecord() fetchEntityByFieldMetaData() failed ($findDomainByIdResult)"
+			Object primary, supporting
+			AssetDependency dependency = null
+			Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
+			Project project = batch.project
+			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
+
+			while (true) {
+				// Try finding the Dependency by it's id if specified in fieldsInfo
+				if (fieldsInfo.containsKey('id')) {
+					def findDomainByIdResult = fetchEntityByFieldMetaData('id', fieldsInfo, context)
+						if ( findDomainByIdResult == -1 ) {
+						// the fields.Info.id.value had a number but the id was not found which is an error
+						log.debug "processDependencyRecord() fetchEntityByFieldMetaData() failed ($findDomainByIdResult)"
+						break
+					}
+
+					// May have found the elusive sucker!
+					dependency = findDomainByIdResult
+				}
+
+				// Try looking up both Asset References using the id and/or query elements in fieldsInfo
+				primary = fetchEntityByFieldMetaData('asset', fieldsInfo, context)
+				supporting = fetchEntityByFieldMetaData('dependent', fieldsInfo, context)
+
+				// log.debug 'processDependencyRecord() primary={}', primary
+				// log.debug 'processDependencyRecord() primary errors={}', fieldsInfo['asset'].errors
+				// log.debug 'processDependencyRecord() supporting={}', supporting
+				// log.debug 'processDependencyRecord() supporting errors={}', fieldsInfo['dependent'].errors
+				// if ( primary < 0  || supporting < 0|| fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
+				if ( fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
+					// log.debug 'processDependencyRecord() primary create={}, errors={}', fieldsInfo['asset'].create, fieldsInfo['asset'].errors
+					// log.debug 'processDependencyRecord() supporting create={}, errors={}', fieldsInfo['dependent'].create, fieldsInfo['dependent'].errors
+
+					// If there were multiple assets found then we can't create/update the dependency
+					log.debug "processDependencyRecord() Abandoning the creation/updating of AssetDependency due to errors in the assets"
 					break
 				}
 
-				// May have found the elusive sucker!
-				dependency = findDomainByIdResult
-			}
+				// log.debug "processDependencyRecord() before createReferenceDomain: primary asset: $primary, supporting: $supporting"
 
-			// Try looking up both Asset References using the id and/or query elements in fieldsInfo
-			primary = fetchEntityByFieldMetaData('asset', fieldsInfo, context)
-			supporting = fetchEntityByFieldMetaData('dependent', fieldsInfo, context)
+				// Attempt to create the assets if it don't exist using the create structure generated by the ETL process
+				if (! primary) {
+					primary = createReferenceDomain('asset', fieldsInfo, context)
+					// log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
+				}
+				if (! supporting) {
+					supporting = createReferenceDomain('dependent', fieldsInfo, context)
+					// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
+				}
 
-			// log.debug 'processDependencyRecord() primary={}', primary
-			// log.debug 'processDependencyRecord() primary errors={}', fieldsInfo['asset'].errors
-			// log.debug 'processDependencyRecord() supporting={}', supporting
-			// log.debug 'processDependencyRecord() supporting errors={}', fieldsInfo['dependent'].errors
-			// if ( primary < 0  || supporting < 0|| fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
-			if ( fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
-				// log.debug 'processDependencyRecord() primary create={}, errors={}', fieldsInfo['asset'].create, fieldsInfo['asset'].errors
-				// log.debug 'processDependencyRecord() supporting create={}, errors={}', fieldsInfo['dependent'].create, fieldsInfo['dependent'].errors
-
-				// If there were multiple assets found then we can't create/update the dependency
-				log.debug "processDependencyRecord() Abandoning the creation/updating of AssetDependency due to errors in the assets"
+				if ( primary in AssetEntity && supporting in AssetEntity ) {
+					// Try finding & updating or creating the dependency with primary and supporting assets that were found
+					dependency = findAndUpdateOrCreateDependency(dependency, primary, supporting, fieldsInfo, context)
+				}
 				break
 			}
 
-			// log.debug "processDependencyRecord() before createReferenceDomain: primary asset: $primary, supporting: $supporting"
+			// Tally up all the errors that may have occurred during the process
+			record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
 
-			// Attempt to create the assets if it don't exist using the create structure generated by the ETL process
-			if (! primary) {
-				primary = createReferenceDomain('asset', fieldsInfo, context)
-				// log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
-			}
-			if (! supporting) {
-				supporting = createReferenceDomain('dependent', fieldsInfo, context)
-				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
+			// Now update the Import record
+			if (dependency) {
+				if (record.errorCount) {
+					log.debug "processDependencyRecord() Failing due to errors (${record.errorCount})"
+					// Trash the dependency
+					dependency.discard()
+					dependency = null
+				} else {
+					record.operation = (dependency.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+
+					// log.debug "processDependencyRecord() Saving the Dependency"
+					if (dependency.save(failOnError:false)) {
+						// If we still have a dependency record then the process must have finished
+						// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
+						//    Note that I was running to some strange issues of casting that prevented from doing this originally
+						// record.status = ImportBatchRecordStatusEnum.COMPLETED
+						record.status = ImportBatchStatusEnum.COMPLETED
+					} else {
+						log.warn "processDependencyRecord() failed to create Dependency ${GormUtil.allErrorsString(dependency)}"
+						dependency.discard()
+						dependency = null
+					}
+				}
 			}
 
-			if ( primary in AssetEntity && supporting in AssetEntity ) {
-				// Try finding & updating or creating the dependency with primary and supporting assets that were found
-				dependency = findAndUpdateOrCreateDependency(dependency, primary, supporting, fieldsInfo, context)
-			}
-			break
-		}
+			// Update the fieldsInfo back into the Import Batch Record
+			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+
 		} catch (e) {
 			record.addError(e.getMessage())
 			log.error ExceptionUtil.stackTraceToString("processDependencyRecord() Error while processing record ${recordCount}", e)
 		}
 
-		// Tally up all the errors that may have occurred during the process
-		record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
-
-		// Now update the Import record
-		if (dependency) {
-			if (record.errorCount) {
-				log.debug "processDependencyRecord() Failing due to errors (${record.errorCount})"
-				// Trash the dependency
-				dependency.discard()
-				dependency = null
-			} else {
-				record.operation = (dependency.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
-
-				// log.debug "processDependencyRecord() Saving the Dependency"
-				if (dependency.save(failOnError:false)) {
-					// If we still have a dependency record then the process must have finished
-					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-					//    Note that I was running to some strange issues of casting that prevented from doing this originally
-					// record.status = ImportBatchRecordStatusEnum.COMPLETED
-					record.status = ImportBatchStatusEnum.COMPLETED
-				} else {
-					log.warn "processDependencyRecord() failed to create Dependency ${GormUtil.allErrorsString(dependency)}"
-					dependency.discard()
-					dependency = null
-				}
-			}
-		}
-
-		// Update the fieldsInfo back into the Import Batch Record
-		record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
 		// log.debug "processDependencyRecord() Saving the ImportBatchRecord with status ${record.status}"
 		if (! record.save(failOnError:false) ) {
-			log.warn "processDependencyRecord() Failed saving ImportBatchRecord : ${ GormUtil.allErrorsString(record) }"
+			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
+			log.warn 'processDependencyRecord() Failed saving ImportBatchRecord : {}', domainUpdateErrorMsg
+			throw new DomainUpdateException("Unable to update row $recordCount due to " + domainUpdateErrorMsg)
 		}
 	}
 
@@ -1074,62 +1087,78 @@ class DataImportService implements ServiceMethods {
 		return dependency
 	}
 
-	def processEntityRecord = { ImportBatch batch, ImportBatchRecord record, Map context ->
 
-		Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
+	/**
+	 * Used to process a single Asset ImportBatchRecord
+	 * Note that errors may be recorded a record and/or field level as appropriate.
+	 *
+	 * @param batch - the batch that the ImportBatchRecord
+	 * @param importBatchRecord - the ImportBatchRecord to be processed
+	 * @param context - the batch processing context that contains objects used throughout the process
+	 * @throws DomainUpdateException when unable to save the record with updates to it
+	 */
+	void processEntityRecord = { ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount ->
+		try {
+			Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
 
-		resetRecordAndFieldsInfoErrors(record, fieldsInfo)
+			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
-		Object entity = findOrCreateEntity(fieldsInfo, context)
-
-		if (entity) {
-			log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
-			// Now add/update the remaining properties on the domain entity appropriately
-			Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
-
-			// Deal with binding errors or domain contraint errors
-			if (! bindingOkay || recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
-				if (bindingOkay) {
-					// Must of been a contraints issue then
-					log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
-				} else {
-					log.warn 'processEntityRecord() binding values failed'
-				}
-				// Damn it! Couldn't save this sucker...
-				entity.discard()
-				entity = null
-			}
+			Object entity = findOrCreateEntity(fieldsInfo, context)
 
 			if (entity) {
-				if (record.errorCount) {
-					log.debug 'processEntityRecord() Failing due to {} error(s)', record.errorCount
+				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
+				// Now add/update the remaining properties on the domain entity appropriately
+				Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
+
+				// Deal with binding errors or domain contraint errors
+				if (! bindingOkay || recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
+					if (bindingOkay) {
+						// Must of been a contraints issue then
+						log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
+					} else {
+						log.warn 'processEntityRecord() binding values failed'
+					}
+					// Damn it! Couldn't save this sucker...
 					entity.discard()
 					entity = null
-				} else {
-					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+				}
 
-					// log.debug "processEntityRecord() Saving the Dependency"
-					if (entity.save(failOnError:false)) {
-						// If we still have a dependency record then the process must have finished
-						// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-						//    Note that I was running to some strange issues of casting that prevented from doing this originally
-						// record.status = ImportBatchRecordStatusEnum.COMPLETED
-						record.status = ImportBatchStatusEnum.COMPLETED
-					} else {
-						log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
+				if (entity) {
+					if (record.errorCount) {
+						log.debug 'processEntityRecord() Failing due to {} error(s)', record.errorCount
 						entity.discard()
 						entity = null
+					} else {
+						record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+
+						// log.debug "processEntityRecord() Saving the Entity"
+						if (entity.save(failOnError:false)) {
+							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
+							//    Note that I was running into some strange issues of casting that prevented from doing this originally
+							// record.status = ImportBatchRecordStatusEnum.COMPLETED
+							record.status = ImportBatchStatusEnum.COMPLETED
+						} else {
+							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
+							entity.discard()
+							entity = null
+						}
 					}
 				}
 			}
+
+			// Update the fieldsInfo back into the Import Batch Record
+			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+		} catch (e) {
+			record.addError(e.getMessage())
+			log.error ExceptionUtil.stackTraceToString("processEntityRecord()eError while processing record ${recordCount}", e)
 		}
 
-		// Update the fieldsInfo back into the Import Batch Record
-		record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
 		if (! record.save(failOnError:false) ) {
-			// TODO : JPM 6/2018 : Should we throw an exception here? Seems it.
-			log.error 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', GormUtil.allErrorsString(record)
+			// Catch the error here but need to throw it outside the try/catch so that it gets recorded at the batch level
+			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
+			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg
+			throw new DomainUpdateException("Unable to update row $recordCount due to " + domainUpdateErrorMsg)
 		}
 	}
 
@@ -1173,18 +1202,22 @@ class DataImportService implements ServiceMethods {
 	 * by the data in fieldsInfo.
 	 * @param fieldsInfo
 	 * @param context
-	 * @return the newly minted entity instance
+	 * @return the newly minted domain entity instance
 	 */
 	private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
 		Object entity = domainClass.createInstance()
 
+		// Populate mandatory properties that can be determined at this time
+
+		List propsInDomain = GormUtil.getDomainPropertyNames(domainClass)
+
 		// project
-		if (GormUtil.isDomainProperty(domainClass, 'project')) {
+		if ( 'project' in propsInDomain ) {
 			entity.project = context.project
 		}
 
 		// moveBundle
-		if (GormUtil.isDomainProperty(domainClass, 'moveBundle')) {
+		if ('moveBundle' in propsInDomain) {
 			// Only bother if it isn't specified in the fieldsInfo which will be set later
 			if (! fieldsInfo.containsKey('moveBundle') || ! fieldsInfo['moveBundle'].value ) {
 				entity.moveBundle = context.project.getProjectDefaultBundle()
@@ -1192,8 +1225,15 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// createdBy
-		if (GormUtil.isDomainProperty(domainClass, 'createdBy')) {
-			// TODO : JPM 6/2018 : Set createdBy to check if Person or UserLogin and then
+		if ('createdBy' in propsInDomain) {
+			entity.whom = context.person
+		}
+
+		// owner (i.e. project.client)
+		if ('owner' in propsInDomain
+			&& GormUtil.getDomainPropertyType(domainClass, 'owner') == net.transitionmanager.domain.PartyGroup
+		) {
+			entity.owner = project.client
 		}
 
 		return entity
@@ -1222,6 +1262,11 @@ class DataImportService implements ServiceMethods {
 
 		String domainShortName = GormUtil.domainShortName(domain)
 
+		// Used to add errors and set flag in one line within this function
+		Closure recordErrorHelper = { fieldName, msg ->
+			noErrorsEncountered = false
+			addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, msg)
+		}
 		// Assignment Logic (TBD 6/2018)
 		// 		If no new value and init contains value and entity property has no value
 		// 		Then set the property to the init value
@@ -1231,8 +1276,7 @@ class DataImportService implements ServiceMethods {
 		// fieldNames = ['manufacturer', 'model']
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
-				noErrorsEncountered = false
-				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Modifying the field is not allowed')
+				recordErrorHelper(fieldName,'Modifying the field is not allowed')
 				continue
 			}
 
@@ -1244,8 +1288,7 @@ class DataImportService implements ServiceMethods {
 			}
 
 			if (! GormUtil.isDomainProperty(domain, fieldName)) {
-				noErrorsEncountered = false
-				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Field name is not a property of this domain')
+				recordErrorHelper(fieldName, 'Field name is not a property of this domain')
 				continue
 			}
 
@@ -1272,8 +1315,7 @@ class DataImportService implements ServiceMethods {
 						Boolean nullable = GormUtil.getConstraint(domain, fieldName, 'nullable')
 						log.debug 'bindFieldsInfoValuesToEntity() nullable={}, fieldName={}', nullable, fieldName
 						if ( nullable != true) {
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Unable to resolve reference lookup')
+							recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
 						}
 						break
 
@@ -1312,8 +1354,7 @@ class DataImportService implements ServiceMethods {
 						case Long:
 							Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
 							if (numValueToSet == null) {
-								noErrorsEncountered = false
-								addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value specified must be an numeric value')
+								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
 							} else {
 								// TODO : JPM 6/2018 : Should we consider zero (0) the same as not set - perhaps see if 0 is the default on the domain?
 								if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
@@ -1341,8 +1382,7 @@ class DataImportService implements ServiceMethods {
 								if (! (valueToSet instanceof Date)) {
 
 									String columnType
-									noErrorsEncountered = false
-									addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO8601 format')
+									recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO8601 format')
 								} else {
 									if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
 										domain[fieldName] = valueToSet
@@ -1360,15 +1400,13 @@ class DataImportService implements ServiceMethods {
 									domain[fieldName] = enumValue
 								}
 							} catch (e) {
-								noErrorsEncountered = false
-								addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Unable to validate ENUM value')
+								recordErrorHelper(fieldName, 'Unable to validate ENUM value')
 
 							}
 							break
 
 						default:
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "Import process unable to support setting type ${fieldClassType.getName()}")
+							recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
 					}
 				}
 			}

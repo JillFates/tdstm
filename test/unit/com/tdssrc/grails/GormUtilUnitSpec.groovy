@@ -24,7 +24,7 @@ import spock.lang.Unroll
  */
 class GormUtilUnitSpec extends Specification {
 
-	void '1. Test isDomainProperty'() {
+	void '1 Test isDomainProperty'() {
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:
@@ -40,7 +40,7 @@ class GormUtilUnitSpec extends Specification {
 			thrown RuntimeException
 	}
 
-	void '2. Test getDomainPropertyType'() {
+	void '2 Test getDomainPropertyType'() {
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:
@@ -50,10 +50,12 @@ class GormUtilUnitSpec extends Specification {
 		and:
 			(GormUtil.getDomainPropertyType(asset, 'priority') == java.lang.Integer)
 		and:
+			(GormUtil.getDomainPropertyType(asset, 'owner') == net.transitionmanager.domain.PartyGroup)
+		and:
 			!GormUtil.getDomainPropertyType(asset, 'bogusPropertyName')
 	}
 
-	void '3. Test getDomainPropertyType for a Class.'() {
+	void '3 Test getDomainPropertyType for a Class.'() {
 		expect:
 			GormUtil.getDomainPropertyType(clazz, property) == type
 		where:
@@ -65,7 +67,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '4. test if #clazz is a DomainClass'() {
+	void '4 test if #clazz is a DomainClass'() {
 		expect:
 			GormUtil.isDomainClass(clazz) == isDomainClass
 
@@ -82,7 +84,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '5. test if #instance instance is a DomainClass'() {
+	void '5 test if #instance instance is a DomainClass'() {
 		expect:
 			GormUtil.isDomainClass(instance) == isDomainClass
 
@@ -99,7 +101,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '6. test if #propertyName is a valid property for a DomainClass'() {
+	void '6 test if #propertyName is a valid property for a DomainClass'() {
 		expect:
 			GormUtil.isDomainProperty(instance, propertyName) == isDomainClass
 
@@ -113,7 +115,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '7. test if #propertyName is a valid property for #clazz DomainClass'() {
+	void '7 test if #propertyName is a valid property for #clazz DomainClass'() {
 		expect:
 			GormUtil.isDomainProperty(clazz, propertyName) == isDomainClass
 
@@ -126,7 +128,7 @@ class GormUtilUnitSpec extends Specification {
 			Person      | 'firstName'  || true
 	}
 
-	void '8. test can throw an exception if it ask for a property in a not DomainClass'() {
+	void '8 test can throw an exception if it ask for a property in a not DomainClass'() {
 
 		given:
 			Class clazz = ApiActionResponse.class
@@ -144,7 +146,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '9. test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
+	void '9 test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
 		expect:
 			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
 			grailsDomainClassProperty.name == name
@@ -161,7 +163,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '10. test if #propertyName is a property for an instance of a DomainClass and is an identifier'() {
+	void '10 test if #propertyName is a property for an instance of a DomainClass and is an identifier'() {
 		expect:
 			GormUtil.isDomainIdentifier(instance, propertyName) == isDomainIdentifier
 
@@ -175,7 +177,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '11. test if #propertyName is a property for a DomainClass is an identifier'() {
+	void '11 test if #propertyName is a property for a DomainClass is an identifier'() {
 		expect:
 			GormUtil.isDomainIdentifier(clazz, propertyName) == isDomainIdentifier
 
@@ -189,7 +191,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '12. test if #propertyName is a property for a and instance of a DomainClass is a reference'() {
+	void '12 test if #propertyName is a property for a and instance of a DomainClass is a reference'() {
 		expect:
 			GormUtil.isReferenceProperty(instance, propertyName) == isReferenceProperty
 
@@ -203,7 +205,7 @@ class GormUtilUnitSpec extends Specification {
 	}
 
 	@Unroll
-	void '13. test if #propertyName is a property for a #clazz DomainClass is a reference'() {
+	void '13 test if #propertyName is a property for a #clazz DomainClass is a reference'() {
 		expect:
 			GormUtil.isReferenceProperty(clazz, propertyName) == isReferenceProperty
 
@@ -217,7 +219,7 @@ class GormUtilUnitSpec extends Specification {
 			Person      | 'id'         || false
 	}
 
-	void '14. test the getDomainClass'() {
+	void '14 test the getDomainClass'() {
 		when: 'getDomainClass is called for a domain class'
 			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
 		then: 'a DefaultGrailsDomainClass should be returned'
@@ -240,12 +242,12 @@ class GormUtilUnitSpec extends Specification {
 
 	}
 
-	void '15. Test the domainShortName method'() {
+	void '15 Test the domainShortName method'() {
 		expect: 'shortname of net.transitionmanager.domain.Person should be Person'
 			'Person' == GormUtil.domainShortName(net.transitionmanager.domain.Person)
 	}
 
-	void '16. take getAlternateKeyPropertyName method for a spin'() {
+	void '16 take getAlternateKeyPropertyName method for a spin'() {
 		expect:
 			expectedName == GormUtil.getAlternateKeyPropertyName(clazz)
 		where:
@@ -256,7 +258,7 @@ class GormUtilUnitSpec extends Specification {
 			PartyRelationship	| null
 	}
 
-	void '17. Test getDomainClassOfProperty method'() {
+	void '17 Test getDomainClassOfProperty method'() {
 		expect:
 			expectedClazz == GormUtil.getDomainClassOfProperty(clazz, propertyName)
 		where:
@@ -265,4 +267,16 @@ class GormUtilUnitSpec extends Specification {
 			Application			| 'sme'			| Person
 			Application			| 'url'			| Application
 	}
+
+	void '18 test getDomainPropertyNames'() {
+		when: 'Calling getDomainPropertyNames for Application domain'
+			List props = GormUtil.getDomainPropertyNames(Application)
+		then: 'various properties should be there as expected'
+			'sme' in props
+			'businessUnit' in props
+		and: 'properties from inherited class AssetEntity should be there too'
+			'assetClass' in props
+			'assetName' in props
+	}
+
 }
