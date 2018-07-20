@@ -14,7 +14,7 @@ import geb.error.RequiredPageContentNotPresent
 class ProjectCreationSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"

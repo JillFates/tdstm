@@ -15,7 +15,7 @@ class TaskCreationSpec extends GebReportingSpec {
     def testKey
     static testCount
     //Define the names of the tasks you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static taskName = baseName +" "+ randStr + " Task For E2E Created"
     static taskStatus = "Hold"

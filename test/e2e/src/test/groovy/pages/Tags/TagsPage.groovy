@@ -67,14 +67,12 @@ class TagsPage extends Page{
         firstTagLastModified.text().trim()
     }
 
-    static commonActions = new CommonActions()
-
     def getTagColorHexText(){
         def rgb = firstTagColorSelected.jquery.css("background-color")
         def r = rgb.substring(4, 7).toInteger()
         def g = rgb.substring(9, 12).toInteger()
         def b = rgb.substring(14, 17).toInteger()
-        commonActions.convertRgbToHex r,g,b
+        CommonActions.convertRgbToHex r,g,b
     }
 
     def clickOnCreateTagButton(){

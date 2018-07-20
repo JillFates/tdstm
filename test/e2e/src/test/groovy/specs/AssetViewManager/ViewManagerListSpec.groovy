@@ -16,7 +16,7 @@ class ViewManagerListSpec extends GebReportingSpec {
     static testCount
     static numberOfRows
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "TM8501"
     static viewName=  randStr+" "+baseName
     def filteredName=""

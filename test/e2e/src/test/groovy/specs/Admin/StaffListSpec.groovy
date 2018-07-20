@@ -15,7 +15,7 @@ import spock.lang.Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
 
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"

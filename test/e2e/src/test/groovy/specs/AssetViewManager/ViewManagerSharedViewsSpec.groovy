@@ -18,7 +18,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
     static numberOfRows
     static favView
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
 
     static viewName= "test" +randStr+"TM8504"
     static  initValue=""
