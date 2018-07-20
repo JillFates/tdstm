@@ -245,7 +245,7 @@ class CommentService implements ServiceMethods {
 				assetComment.instructionsLink = params.instructionsLink ?: null
 			}
 			if (assetComment.commentType == 'comment' && params.isResolved?.isNumber()) {
-				if (Integer.parseInt(params.isResolved) == 0) {
+				if (NumberUtil.toInteger(params.isResolved) == 0) {
 					assetComment.setDateResolved(null)
 					assetComment.resolvedBy = null
 				} else {
