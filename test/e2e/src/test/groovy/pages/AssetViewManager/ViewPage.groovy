@@ -107,6 +107,7 @@ class ViewPage extends Page{
         def amountOfIterations = Math.ceil(numberItemsFloat/dropdownItems)
         def flag=false
         for(int j =1 ; j<=amountOfIterations ; j++ ){
+            waitFor {view.displayed}
             waitFor{leftTableElements.displayed}
             //We create a list with the elements on the Bundle column every time the table is refreshed
             def bundleData = $("div" , class:"k-grid-content k-virtual-content").find("table" , class:"k-grid-table" , style:"transform: translateY(0px); width: 1699px;").find("tbody", role:"presentation").find("tr").find("td","aria-colindex":"8")
