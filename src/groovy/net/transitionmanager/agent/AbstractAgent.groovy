@@ -1,16 +1,15 @@
 package net.transitionmanager.agent
 
+import com.tds.asset.AssetComment
+import com.tdssrc.grails.UrlUtil
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
-import com.tds.asset.AssetComment
-import com.tdssrc.grails.UrlUtil
-
-import groovy.util.logging.Slf4j
-import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 
 /**
  * AbstractAgent Class
