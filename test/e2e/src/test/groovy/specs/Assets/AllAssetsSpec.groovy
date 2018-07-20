@@ -99,6 +99,7 @@ class AllAssetsSpec extends GebReportingSpec {
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user sorts the Description and Name Columns'
+            waitFor {view.displayed}
             //We store the original value of the first element for later
             originalFirstElementName=firstElementName.text()
             waitFor{descColumn.click()}
@@ -115,6 +116,7 @@ class AllAssetsSpec extends GebReportingSpec {
             For that reason, the same element that is now displayed should be the same as before(originalFirstElementName)
          */
             waitFor{refreshBtn.click()}
+            waitFor {view.displayed}
             originalFirstElementName==firstElementName.text()
 
     }
