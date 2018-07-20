@@ -1754,7 +1754,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * ProgressService to update the job with the status.
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
 	 */
-	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, Project currentProject) {
+	void generateTasks(TaskBatch taskBatch, Boolean publishTasks) {
 		String progressKey = taskBatchKey(taskBatch.id)
 		Boolean errored = false
 		def detail = ''
@@ -1762,7 +1762,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks) called"
 
 		try {
-			generateTasks(taskBatch, publishTasks, progressKey, currentProject)
+			generateTasks(taskBatch, publishTasks, progressKey)
 		} catch (RuntimeException e) {
 			errored = true
 			detail = e.message
@@ -1778,7 +1778,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * ProgressService to update the job with the status.
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
 	 */
-	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey, Project currentProject) {
+	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey) {
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks, progressKey:$progressKey) called"
 
@@ -1811,7 +1811,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def deferSucc        		// Gets populated with the taskSpec.successor.defer code if defined. It will either be a string if defined or null
 		def gatherPred       		// Gets populated with the taskSpec.predecessor.gather code if defined (it becomes an array) if not null
 		def gatherSucc       		// Gets populated with the taskSpec.successor.gather setting if defined (it becomes an array) if not null
-		def settings = [:]				// This will get populated with the properties from the TaskSpec for each iteration
+		def settings = [project: taskBatch.project] // This will get populated with the properties from the TaskSpec for each iteration
 		// def waitFor = '' 			// When the predecessor.waitFor is defined then wiring predecessors will wait until a subsequent taskspec with a successor.resumeFor attribute of the same value,
 		// def resumeFor = ''			// Used in conjunction with waitFor
 
@@ -1861,7 +1861,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		MoveEvent event = null
 		if(contextObj.eventId) {
-			event = get(MoveEvent, contextObj.eventId, currentProject)
+			event = get(MoveEvent, contextObj.eventId, settings.project)
 			settings.event = event
 		}
 
@@ -2231,7 +2231,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					teamCodes   : teamCodeList,
 					apiAction   : apiAction,
 					event       : event,
-					project     : currentProject
+					project     : taskBatch.project
 				]
 
 				log.debug "##### settings: $settings"
@@ -2386,7 +2386,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Track what tasks were created by the taskSpec
 								taskSpecTasks[taskSpec.id] = []
 
-								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions, project)
+								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions)
 
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
@@ -4458,14 +4458,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions, project) {
+	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions) {
 		def taskList = []
 		String loc 			// used for racks
 		def msg
 
 
 		// Get all the assets
-		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions, project)
+		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions, settings.project)
 
 		// If there were no assets we can bail out of this method
 		if (assetsForAction.size() == 0) {
