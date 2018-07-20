@@ -125,7 +125,7 @@ class TagsPage extends Page{
         firstTagDescInput = dataTagMap.description
         firstTagColorDropdown.click()
         waitFor{firstTagColors[0].displayed}
-        def color = commonActions.getRandomOption firstTagColors
+        def color = CommonActions.getRandomOption firstTagColors
         color.click()
     }
 }
