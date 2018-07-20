@@ -47,24 +47,7 @@ class AllAssetsSpec extends GebReportingSpec {
 
     }
 
-    def "2. The user sets the pagination, clicks the Just Planning checkbox and no TBD bundles are shown "(){
-        given: 'The user is on the All Assets page'
-            at ViewPage
-        when: 'The user clicks the Just Planning checkbox'
-            checkJustPlanning()
-        and: 'We wait for the table content to be displayed'
-            waitFor{leftTableElements.displayed}
-        and: 'We change the pagination to the value set above'
-            itemsPerPage.value(dropdownItems)
-
-        then: 'We verify that no Assets have the TBD bundle'
-            searchTBD(dropdownItems) == false
-        and: 'We uncheck the Just Planning checkbox'
-            waitFor{justPlanningCheck.click()}
-
-    }
-
-    def "3. The user checks and unchecks all the items of the table"(){
+    def "2. The user checks and unchecks all the items of the table"(){
         given: 'The user is on the All Assets page'
             at ViewPage
         and: 'The user checks all the items'
@@ -79,7 +62,7 @@ class AllAssetsSpec extends GebReportingSpec {
 
     }
 
-    def "4. The user filters data on different columns"(){
+    def "3. The user filters data on different columns"(){
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user filters by the name of the first element'
@@ -97,7 +80,7 @@ class AllAssetsSpec extends GebReportingSpec {
 
     }
 
-    def "5. The user clears the filters"(){
+    def "4. The user clears the filters"(){
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user clears the Name filter by clicking its X icon'
@@ -112,7 +95,7 @@ class AllAssetsSpec extends GebReportingSpec {
 
     }
 
-    def "6. The user sorts different columns"(){
+    def "5. The user sorts different columns"(){
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user sorts the Description and Name Columns'
@@ -133,6 +116,23 @@ class AllAssetsSpec extends GebReportingSpec {
          */
             waitFor{refreshBtn.click()}
             originalFirstElementName==firstElementName.text()
+
+    }
+
+    def "6. The user sets the pagination, clicks the Just Planning checkbox and no TBD bundles are shown "(){
+        given: 'The user is on the All Assets page'
+            at ViewPage
+        when: 'The user clicks the Just Planning checkbox'
+            checkJustPlanning()
+        and: 'We wait for the table content to be displayed'
+            waitFor{leftTableElements.displayed}
+        and: 'We change the pagination to the value set above'
+            itemsPerPage.value(dropdownItems)
+
+        then: 'We verify that no Assets have the TBD bundle'
+            searchTBD(dropdownItems) == false
+        and: 'We uncheck the Just Planning checkbox'
+            waitFor{justPlanningCheck.click()}
 
     }
 
