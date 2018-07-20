@@ -5288,21 +5288,24 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
-		queryResults.collect { TaskBatch taskBatch -> [
-			id: taskBatch.id,
-			recipeId : taskBatch.recipe?.id ?: 0,
-			recipeName : taskBatch.recipe?.name ?: '',
-			eventName : taskBatch.eventName(),
-			taskCount: taskBatch.taskCount,
-			exceptionCount: taskBatch.exceptionCount,
-			createdBy: taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
-			dateCreated: TimeUtil.formatDateTime(taskBatch.dateCreated, formatter),
-			status: taskBatch.status,
-			exceptionLog: taskBatch.exceptionLog,
-			infoLog: taskBatch.infoLog,
-			versionNumber : taskBatch.recipe?.releasedVersion?.versionNumber ?: '',
-			isPublished : taskBatch.isPublished
-		]}
+		queryResults.collect { TaskBatch taskBatch ->
+			[
+				id            : taskBatch.id,
+				recipeId      : taskBatch.recipe?.id ?: 0,
+				recipeName    : taskBatch.recipe?.name ?: '',
+				eventName     : taskBatch.eventName(),
+				tagNames      : taskBatch.tagNames(),
+				taskCount     : taskBatch.taskCount,
+				exceptionCount: taskBatch.exceptionCount,
+				createdBy     : taskBatch.createdBy?.firstName + " " + taskBatch.createdBy?.lastName,
+				dateCreated   : TimeUtil.formatDateTime(taskBatch.dateCreated, formatter),
+				status        : taskBatch.status,
+				exceptionLog  : taskBatch.exceptionLog,
+				infoLog       : taskBatch.infoLog,
+				versionNumber : taskBatch.recipe?.releasedVersion?.versionNumber ?: '',
+				isPublished   : taskBatch.isPublished
+			]
+		}
 	}
 
 	/**

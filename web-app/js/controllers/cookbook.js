@@ -1203,6 +1203,7 @@ tds.cookbook.controller.TaskGenerationCompletedController = function(scope, stat
 		scope.tasks.generation.exceptionLog = sce.trustAsHtml(data.data.taskBatch.exceptionLog);
 		scope.tasks.generation.infoLog = sce.trustAsHtml(data.data.taskBatch.infoLog);
 		scope.tasks.generation.eventName = data.data.taskBatch.eventName;
+		scope.tasks.generation.tagNames = data.data.taskBatch.tagNames;
 	}, function(){
 		log.info('Error on getting Task Batch');
 	});
@@ -1417,6 +1418,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 			scope.tasks.colDef = (data.data.list.length > 0) ? [
 				// {field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
 				{field:'eventName', displayName:'Event', enableCellEdit: false, width: '***'},
+				{field:'tagNames', displayName:'Tags', enableCellEdit: false, width: '***'},
 				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center',
 					enableCellEdit: false, width: '**'},
 				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center',
