@@ -34,9 +34,6 @@ class DictionaryItemParameter {
 	// Data type that the parameter should be (TBD) - was the class name
 	String type
 
-	// The context object that the mapping of value or param comes from
-	ContextType context
-
 	// The name of the context field/property name
 	// TODO : JPM 3/2018 : Rename param to fieldName
 	String fieldName
