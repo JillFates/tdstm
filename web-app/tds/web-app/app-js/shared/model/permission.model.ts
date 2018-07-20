@@ -161,6 +161,11 @@ export class Permission {
 	static RoomView = 'RoomView';
 	static SequenceGetNext = 'SequenceGetNext';
 	static ShowListNews = 'ShowListNews';
+	static TagCreate = 'TagCreate';
+	static TagDelete = 'TagDelete';
+	static TagEdit = 'TagEdit';
+	static TagMerge = 'TagMerge';
+	static TagView = 'TagView';
 	static TaskBatchDelete = 'TaskBatchDelete';
 	static TaskBatchRefresh = 'TaskBatchRefresh';
 	static TaskBatchView = 'TaskBatchView';

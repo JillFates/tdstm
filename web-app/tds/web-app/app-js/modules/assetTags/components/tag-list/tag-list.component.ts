@@ -11,6 +11,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tag-list',
@@ -36,7 +37,7 @@ export class TagListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		userPreferenceService: PreferenceService) {
-			userPreferenceService.getUserDatePreferenceAsKendoFormat() .subscribe((dateFormat) => {
+			userPreferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.gridColumns = new TagListColumnsModel(`{0:${dateFormat}}`);
 				this.onLoad();
@@ -253,5 +254,21 @@ export class TagListComponent {
 		if (match) {
 			this.duplicateName = dataItem.id ? dataItem.id !== match.id : true;
 		}
+	}
+
+	protected canCreate(): boolean {
+		return this.permissionService.permissions[Permission.TagCreate] === 1;
+	}
+
+	protected canEdit(): boolean {
+		return this.permissionService.permissions[Permission.TagEdit] === 1;
+	}
+
+	protected canDelete(): boolean {
+		return this.permissionService.permissions[Permission.TagDelete] === 1;
+	}
+
+	protected canMerge(): boolean {
+		return this.permissionService.permissions[Permission.TagMerge] === 1;
 	}
 }

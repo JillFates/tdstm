@@ -25,7 +25,8 @@
 
                     <!-- Toolbar Template -->
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button kendoGridAddCommand class="btn btn-default" type="button">
+                        <button kendoGridAddCommand *ngIf="canCreate()"
+                                class="btn btn-default" type="button">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             {{ 'GLOBAL.CREATE' | translate }} {{'ASSET_TAGS.TAG' | translate}}
                         </button>
@@ -43,13 +44,16 @@
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
                             <div class="text-center">
-                                <button kendoGridEditCommand class="btn btn-action btn-default" title="Edit">
+                                <button kendoGridEditCommand *ngIf="canEdit()"
+                                        class="btn btn-action btn-default" title="Edit">
                                     <span class="glyphicon glyphicon-pencil"></span>
                                 </button>
-                                <button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
+                                <button kendoGridRemoveCommand *ngIf="canDelete()"
+                                        class="btn btn-action btn-default" title="Delete">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <button kendoGridSaveCommand class="btn btn-action btn-default" title="Save"
+                                <button kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
+                                        class="btn btn-action btn-default" title="Save"
                                         [disabled]="myForm.invalid || duplicateName">
                                     <i class="fa fa-save"></i>
                                 </button>
@@ -57,7 +61,8 @@
                                     <i class="glyphicon glyphicon-ban-circle"></i>
                                 </button>
                                 <div class="extra-actions" *ngIf="(!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)">
-                                    <button (click)="onMerge(dataItem)"
+                                    <button *ngIf="canMerge()"
+                                            (click)="onMerge(dataItem)"
                                             class="btn btn-action btn-default" title="Merge">
                                         <i class="fa fa-exchange"></i>
                                     </button>
