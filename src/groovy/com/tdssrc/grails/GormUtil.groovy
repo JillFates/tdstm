@@ -515,6 +515,24 @@ public class GormUtil {
 		return getDomainPropertyType(domainObject.getClass(), propertyName)
 	}
 
+	@Memoized
+	static boolean isDomainPropertyForTesting(Class domainClass, String propertyName, Closure closure) {
+		closure(propertyName)
+		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
+		return grailsDomainClass.hasPersistentProperty(propertyName) ||
+				grailsDomainClass.identifier.name == propertyName
+	}
+
+	@Memoized
+	static Class getDomainClassOfPropertyForTesting(Class domainClass, String propertyName, Closure closure) {
+		closure(propertyName)
+		if (isReferenceProperty(domainClass, propertyName)) {
+			return getDomainPropertyType(domainClass, propertyName)
+		} else {
+			return domainClass
+		}
+	}
+
 	/**
 	 * Used to determine if an object is a Domain class
 	 * @param domainInstance - the object to evaluate to determine if it is a Domain class

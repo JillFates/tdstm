@@ -5,6 +5,8 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -14,9 +16,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
-import org.apache.xpath.operations.Bool
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.exceptions.GrailsDomainException
 import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -273,15 +273,68 @@ class GormUtilUnitSpec extends Specification {
 		given:
 			Closure closure = Mock(Closure)
 
-		when:
-			(0..10).each {
-				GormUtil.getDomainPropertyTypeForTesting(AssetEntity, 'assetName', closure)
+			List<Class<?>> classes = [
+					com.tds.asset.Application,
+					com.tds.asset.AssetEntity,
+					com.tds.asset.Database,
+					com.tds.asset.Files,
+					com.tds.asset.AssetEntity,
+					com.tds.asset.AssetComment,
+					net.transitionmanager.domain.Person,
+					com.tds.asset.AssetComment,
+					com.tds.asset.AssetEntity,
+					net.transitionmanager.domain.Manufacturer,
+					net.transitionmanager.domain.Model,
+					com.tds.asset.AssetDependency,
+					net.transitionmanager.domain.Rack,
+					net.transitionmanager.domain.MoveBundle,
+					net.transitionmanager.domain.Room,
+					com.tds.asset.Files
+			]
 
-				GormUtil.isDomainClassForTesting(AssetEntity, closure)
+			List<String> propertyNames = [
+			        'id',
+					'assetName',
+					'description',
+					'environment',
+					'externalRefId',
+					'id',
+					'lastUpdated',
+					'moveBundle',
+					'priority',
+					'planStatus',
+					'supportType',
+					'validation',
+			]
+
+		when:
+			(1..2000).each { int index ->
+				Date startTime = new Date()
+
+				classes.each { Class clazz ->
+
+					propertyNames.each {String propertyName ->
+
+						GormUtil.isDomainClassForTesting(clazz, closure)
+						Boolean isDomainProperty = GormUtil.isDomainPropertyForTesting(clazz, propertyName, closure)
+
+						if(isDomainProperty){
+							GormUtil.isReferencePropertyForTesting(clazz, propertyName, closure)
+							GormUtil.getDomainPropertyTypeForTesting(clazz, propertyName, closure)
+							GormUtil.getDomainClassOfPropertyForTesting(clazz, propertyName, closure)
+						}
+					}
+				}
+
+				Date stopTime = new Date()
+				TimeDuration timeDuration = TimeCategory.minus( stopTime, startTime )
+				if(timeDuration.toMilliseconds().intdiv(1000) > 0){
+					println("Loop ${index}. Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
+				}
 			}
 
 		then:
-			1 * closure.call(true)
-			1 * closure.call('assetName')
+			12 * closure.call(true)
+			//1 * closure.call('assetName')
 	}
 }
