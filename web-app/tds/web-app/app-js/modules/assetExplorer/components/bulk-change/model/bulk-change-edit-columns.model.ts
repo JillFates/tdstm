@@ -8,7 +8,7 @@ export class BulkChangeEditColumnsModel {
 		this.columns = [
 			{
 				label: 'Class',
-				property: 'name',
+				property: 'className',
 				type: 'text',
 				width: 200,
 				locked: false

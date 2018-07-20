@@ -3,7 +3,8 @@
 	}
 		.bulk-change-edit-component .modal-content {
 			margin: 0 auto;
-			width: 600px;
+			width: 800px;
+			height: 500px;
 		}
 		.bulk-change-edit-component .modal-body {
 			font-size: 13px;
@@ -27,6 +28,11 @@
 		.bulk-change-edit-component .affected-assets-number {
 		}
 
+		.bulk-change-edit-component .className {
+			text-transform: capitalize;
+		}
+
+
 </style>
 
 <div class="bulk-change-edit-component modal fade in" id="bulk-change-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
@@ -42,28 +48,21 @@
 				<div class="modal-body-container">
 					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
 
-						<!--
 						<kendo-grid
 								*ngIf="gridSettings"
 								[data]="gridSettings.gridData"
-								[filter]="gridSettings.state.filter"
-								[filterable]="true"
-								(filterChange)="gridSettings.filterChange($event)"
-								[sort]="gridSettings.state.sort"
-								[sortable]="{mode:'single'}"
 								[pageSize]="gridSettings.state.take"
 								[skip]="gridSettings.state.skip"
 								[pageable]="{pageSizes: gridSettings.defaultPageOptions, info: true}"
 								(pageChange)="gridSettings.pageChange($event)"
 								[resizable]="true"
-								(sortChange)="gridSettings.sortChange($event)"
 								(add)="addHandler($event)"
 								(cancel)="cancelHandler($event)"
 								(edit)="editHandler($event)"
 								(save)="saveHandler($event)"
 								(remove)="removeHandler($event)">
 
-							 - Toolbar Template
+							 <!-- Toolbar Template-->
 							<ng-template kendoGridToolbarTemplate [position]="'top'">
 								<button kendoGridAddCommand class="btn btn-default" type="button">
 									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -74,7 +73,7 @@
 								</label>
 							</ng-template>
 
-							- Action
+							<!-- - Action-->
 							<kendo-grid-command-column [width]="110">
 								<ng-template kendoGridHeaderTemplate>
 									<div class="text-center">
@@ -83,30 +82,14 @@
 								</ng-template>
 								<ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
 									<div class="text-center">
-										<button kendoGridEditCommand class="btn btn-action btn-default" title="Edit">
-											<span class="glyphicon glyphicon-pencil"></span>
-										</button>
 										<button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
 											<i class="fa fa-trash"></i>
 										</button>
-										<button kendoGridSaveCommand class="btn btn-action btn-default" title="Save"
-										        [disabled]="myForm.invalid || duplicateName">
-											<i class="fa fa-save"></i>
-										</button>
-										<button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
-											<i class="glyphicon glyphicon-ban-circle"></i>
-										</button>
-										<div class="extra-actions" *ngIf="(!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)">
-											<button (click)="onMerge(dataItem)"
-											        class="btn btn-action btn-default" title="Merge">
-												<i class="fa fa-exchange"></i>
-											</button>
-										</div>
 									</div>
 								</ng-template>
 							</kendo-grid-command-column>
 
-							- Columns
+							<!-- - Columns-->
 							<kendo-grid-column *ngFor="let column of gridColumns.columns"
 							                   field="{{column.property}}"
 							                   [locked]="column.locked"
@@ -117,22 +100,36 @@
 							                   [style]="column.cellStyle ? column.cellStyle : ''"
 							                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
-								- Header Template
+								<!-- - Header Template-->
 								<ng-template kendoGridHeaderTemplate>
 									<label>{{column.label}}</label>
 								</ng-template>
 
-								- Cell Templates
+
+								<!-- - Cell Templates-->
+								<ng-template kendoGridCellTemplate *ngIf="column.property === 'className'" let-dataItem>
+									<kendo-dropdownlist required name="className" class="form-control className"
+									                    [data]="assetClassList"
+									                    [(ngModel)]="dataItem.className"
+									                    [valueField]="'id'"
+									                    [textField]="'text'">
+									</kendo-dropdownlist>
+								</ng-template>
+
+								<!--
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
 									{{dataItem[column.property]}}
 								</ng-template>
+
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'color'" let-dataItem>
 									<div class="text-center">
 										<span [ngClass]="dataItem.css" class="label tag"></span>
 									</div>
 								</ng-template>
+								-->
 
-								- Edit Templates
+								<!-- - Edit Templates-->
+								<!--
 								<ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'name'">
 									<input [(ngModel)]="dataItem.name" autofocus
 									       [ngClass]="{'ng-invalid': duplicateName}" required
@@ -157,8 +154,10 @@
 										</ng-template>
 									</kendo-dropdownlist>
 								</ng-template>
+								-->
 
-								- Filter Template
+								<!-- - Filter Template-->
+								<!--
 								<ng-template kendoGridFilterCellTemplate let-filter>
 									<div class="has-feedback"
 									     *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'color' )">
@@ -181,10 +180,9 @@
 										</ng-template>
 									</div>
 								</ng-template>
-
+								-->
 							</kendo-grid-column>
 						</kendo-grid>
-						-->
 					</form>
 				</div>
 			</div>

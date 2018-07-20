@@ -12,3 +12,10 @@ export interface BulkOperationResult {
 	success: boolean;
 	message?: string;
 }
+
+export interface BulkEditOperation {
+	className: string;
+	field: string;
+	action: string;
+	value: string;
+}
