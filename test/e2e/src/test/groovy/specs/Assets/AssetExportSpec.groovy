@@ -37,13 +37,13 @@ class AssetExportSpec extends GebReportingSpec {
             at MenuPage
         when: 'The User Clicks in the Assets > Asset Export Menu Option'
             menuModule.goToAssetExport()
-        then: 'Export Accounts page should be displayed'
+        then: 'Export Assets page should be displayed'
             at AssetExportPage
     }
 
-    def "2. The User exports user accounts"() {
+    def "2. The User Exports Assets"() {
         testKey = "TM-8478"
-        given: 'The User is on the Export Accounts Page'
+        given: 'The User is on the Export Assets Page'
             at AssetExportPage
         when: 'The User selects a bundle type'
             randomSelectBundle()

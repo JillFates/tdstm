@@ -1,6 +1,6 @@
 package utils
 
-import jodd.util.RandomString
+import org.apache.commons.lang3.RandomStringUtils
 /*
 * Note: Page including common methods or actions to perform in the system. For example: select options from select.
 * */
@@ -80,6 +80,6 @@ class CommonActions {
     }
 
     def getRandomString(Integer charNumbers = 5){
-        RandomString.getInstance().randomAlphaNumeric(charNumbers)
+        RandomStringUtils.randomAlphanumeric(charNumbers)
     }
 }
