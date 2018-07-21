@@ -11,6 +11,8 @@ import {PermissionService} from '../../../../../../shared/services/permission.se
 import {BulkChangeEditColumnsModel} from '../../model/bulk-change-edit-columns.model';
 import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
 import {BulkEditAction, ListOption} from '../../model/bulk-change.model';
+import {SortUtils} from "../../../../../../shared/utils/sort.utils";
+import {StringUtils} from "../../../../../../shared/utils/string.utils";
 
 @Component({
 	selector: 'tds-bulk-change-edit',
@@ -48,7 +50,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		this.gridSettings.loadPageData();
 	}
 
-
 	ngOnInit() {
 		this.actions = [
 			{ id: 'add', text: 'Add to existing'},
@@ -65,8 +66,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				this.commonFieldSpecs = results;
 			});
 
-		this.assetClassList = ['COMMON', 'APPLICATION', 'DATABASE', 'DEVICE', 'STORAGE']
-			.map((domain): ListOption => ({id: domain, text: `${domain} fields`}));
+		this.assetClassList = ['common', 'application', 'database', 'device', 'storage']
+			.map((domain): ListOption => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
 
 		this.gridColumns = new BulkChangeEditColumnsModel();
 		this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
@@ -115,14 +116,11 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			return fields;
 		}
 
-		const domainFields =  this.commonFieldSpecs.find((field: any) => field.domain === domain.id);
-
+		const domainFields =  this.commonFieldSpecs.find((field: any) => field.domain === domain.id.toUpperCase());
 		if (domainFields && domainFields.fields) {
 			fields = domainFields.fields.map((item: any) => ({id: item.field, text: item.label}));
 		}
-		console.log('FIELDS');
-		console.log(fields);
 
-		return fields;
+		return fields.sort((a, b) => SortUtils.compareByProperty(a, b, 'text'));
 	}
 }
