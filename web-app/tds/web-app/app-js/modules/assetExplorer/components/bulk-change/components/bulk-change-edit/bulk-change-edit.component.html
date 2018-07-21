@@ -1,14 +1,16 @@
 <style>
 	.bulk-change-edit-component {
 	}
+		.bulk-change-edit-component .full-height {
+			height: 100%;
+		}
 		.bulk-change-edit-component .modal-content {
 			margin: 0 auto;
 			width: 800px;
-			height: 500px;
 		}
 		.bulk-change-edit-component .modal-body {
 			font-size: 13px;
-			height: 130px;
+			height: 430px;
 			padding: 5px 30px;
 		}
 		.bulk-change-edit-component .modal-footer {
@@ -38,12 +40,17 @@
 				margin-right: 5px;
 			}
 
+		.bulk-change-edit-component .k-grid {
+			min-height: 95%;
+			max-height: 95%;
+		}
+
 
 </style>
 
 <div class="bulk-change-edit-component modal fade in" id="bulk-change-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content">
+		<div tds-autocenter class="modal-content">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()"  type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
@@ -51,8 +58,8 @@
 				<h4 class="modal-title">Bulk Change > Edit Assets</h4>
 			</div>
 			<div class="modal-body">
-				<div class="modal-body-container">
-					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
+				<div class="modal-body-container full-height">
+					<form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment full-height">
 						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.AFFECTED_ASSETS' | translate:[affectedAssets] }}</label>
 						<kendo-grid
 								*ngIf="gridSettings"
@@ -75,10 +82,10 @@
 							<kendo-grid-command-column [width]="60">
 								<ng-template kendoGridHeaderTemplate>
 									<div class="text-center">
-										<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
+										<label class="action-header"></label>
 									</div>
 								</ng-template>
-								<ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
+								<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
 									<div class="text-center">
 										<button kendoGridRemoveCommand class="btn btn-action btn-default" title="Delete">
 											<i class="fa fa-trash"></i>

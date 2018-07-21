@@ -36,15 +36,16 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		console.log('Selected items');
 	}
 
-	protected addHandler({sender}): void {
+	addHandler({sender}): void {
 		this.editRows.actions.push({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
 		this.editRows.selectedValues.push({domain: null, field: null, action: null});
-
 		this.gridSettings.loadPageData();
+	}
 
-
-		// this.gridSettings.reloadData(this.editRows.actions);
-		// sender.addRow({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
+	removeHandler({dataItem, rowIndex}): void {
+		this.editRows.actions.splice(rowIndex, 1);
+		this.editRows.selectedValues.splice(rowIndex, 1);
+		this.gridSettings.loadPageData();
 	}
 
 
