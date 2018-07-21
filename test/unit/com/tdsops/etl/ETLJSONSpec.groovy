@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import getl.exception.ExceptionGETL
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -16,6 +17,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -241,7 +243,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'Active Applications'"
+			e.message == "Data was not found in JSON at rootNode 'Active Applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -266,7 +268,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'applications'"
+			e.message == "Data was not found in JSON at rootNode 'applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -355,6 +357,52 @@ class ETLJSONSpec extends ETLBaseSpec {
 					value == 'Mozilla'
 				}
 			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11487')
+	void 'test can throw an Exception if rootNode was not defined'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"Applications": [
+						{
+							"application id":152254,
+							"vendor name":"Microsoft",
+							"location":"ACME Data Center"
+						},
+						{
+							"application id":152255,
+							"vendor name": "Mozilla",
+							"Technology":"NGM",
+							"location":"ACME Data Center"
+						}
+					],				
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						//rootNode 'Applications'
+						read labels
+						iterate {
+							domain Application
+							extract 'vendor name' load 'Vendor'
+						}
+						""".stripIndent())
+
+		then: 'It throws an Exception'
+			ExceptionGETL e = thrown ExceptionGETL
+			e.message == "The rootNode must be specified in the ETL Script before loading sample JSON data"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -513,7 +561,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 	}
-
 
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
@@ -736,7 +783,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			],
 			"The Applications": [
 				{
-					"application id":152254,
+					"application id":152254,       
 					"vendor name":"Microsoft",
 					"location":"ACME Data Center"
 				},
