@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
 import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
-import {BulkChangeModel, BulkOperationResult} from '../../model/bulk-change.model';
+import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 
 @Component({
 	selector: 'tds-bulk-change-button',
@@ -11,7 +11,7 @@ import {BulkChangeModel, BulkOperationResult} from '../../model/bulk-change.mode
 })
 export class BulkChangeButtonComponent {
 	@Input() selectedItems: string[];
-	@Output() operationResult = new EventEmitter<BulkOperationResult>();
+	@Output() operationResult = new EventEmitter<BulkActionResult>();
 
 	constructor(private dialogService: UIDialogService) {
 		this.selectedItems = [];

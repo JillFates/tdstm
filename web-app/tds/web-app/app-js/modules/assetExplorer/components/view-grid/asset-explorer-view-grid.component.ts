@@ -20,7 +20,7 @@ import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {BulkOperationResult} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -306,7 +306,7 @@ export class AssetExplorerViewGridComponent {
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 
-	onBulkOperationResult(operationResult: BulkOperationResult): void {
+	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
 			this.bulkSelectedItems = [];
 			this.onReload();

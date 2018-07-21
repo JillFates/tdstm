@@ -7,15 +7,19 @@ export class BulkChangeModel {
 	public selectedItems: string[];
 }
 
-export interface BulkOperationResult {
+export interface BulkActionResult {
 	action: BulkActions;
 	success: boolean;
 	message?: string;
 }
 
-export interface BulkEditOperation {
-	className: string;
-	field: string;
-	action: string;
-	value: string;
+export interface BulkEditAction {
+	domain: string;
+	fields: ListOption[];
+	actions: ListOption[];
+}
+
+export interface ListOption {
+	id: string;
+	text: string;
 }

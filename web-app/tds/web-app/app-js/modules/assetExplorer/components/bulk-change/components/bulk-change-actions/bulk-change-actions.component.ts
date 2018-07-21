@@ -5,7 +5,7 @@ import { TranslatePipe } from '../../../../../../shared/pipes/translate.pipe';
 import {BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
 import {UIDialogService} from '../../../../../../shared/services/ui-dialog.service';
-import {BulkActions, BulkOperationResult} from '../../model/bulk-change.model';
+import {BulkActions, BulkActionResult} from '../../model/bulk-change.model';
 import {AssetExplorerService} from '../../../../service/asset-explorer.service';
 import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
@@ -31,11 +31,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	/**
 	 * Close the Dialog
 	 */
-	cancelCloseDialog(bulkOperationResult: BulkOperationResult): void {
+	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
 		this.dismiss(bulkOperationResult || {action: null, success: false});
 	}
 
-	closeDialog(bulkOperationResult: BulkOperationResult): void {
+	closeDialog(bulkOperationResult: BulkActionResult): void {
 		this.close(bulkOperationResult);
 	}
 
@@ -71,7 +71,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		})
 	}
 
-	private deleteBulk(): Promise<BulkOperationResult> {
+	private deleteBulk(): Promise<BulkActionResult> {
 		// return Promise.resolve({action: BulkActions.Delete, success: true});
 		return new Promise((resolve, reject) =>  {
 			if (this.hasAssetDeletePermission()) {

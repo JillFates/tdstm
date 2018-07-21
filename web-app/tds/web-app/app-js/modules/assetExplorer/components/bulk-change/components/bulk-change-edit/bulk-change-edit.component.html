@@ -28,7 +28,7 @@
 		.bulk-change-edit-component .affected-assets-number {
 		}
 
-		.bulk-change-edit-component .className {
+		.bulk-change-edit-component .domain {
 			text-transform: capitalize;
 		}
 		.bulk-change-edit-component .add-button {
@@ -67,12 +67,12 @@
 
 							 <!-- Toolbar Template-->
 							<ng-template kendoGridToolbarTemplate [position]="'top'">
-								<button type="button" class="btn btn-default add-button pull-right" id="btnAddButton">
+								<button kendoGridAddCommand type="button" class="btn btn-default add-button pull-right" id="btnAddButton">
 									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>  {{'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate}}</button>
 							</ng-template>
 
 							<!-- - Action-->
-							<kendo-grid-command-column [width]="110">
+							<kendo-grid-command-column [width]="60">
 								<ng-template kendoGridHeaderTemplate>
 									<div class="text-center">
 										<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -105,14 +105,54 @@
 
 
 								<!-- - Cell Templates-->
-								<ng-template kendoGridCellTemplate *ngIf="column.property === 'className'" let-dataItem>
-									<kendo-dropdownlist required name="className" class="form-control className"
-									                    [data]="assetClassList"
-									                    [(ngModel)]="dataItem.className"
-									                    [valueField]="'id'"
-									                    [textField]="'text'">
+								<!--(selectionChange)="onDomainChange($event)"-->
+								<ng-template kendoGridCellTemplate *ngIf="column.property === 'domain'" let-dataItem let-rowIndex="rowIndex">
+									<kendo-dropdownlist
+											name="domain" class="form-control domain"
+									        [data]="assetClassList"
+									        [(ngModel)]="editRows.selectedValues[rowIndex].domain"
+											[defaultItem]="editRows.selectedValues[rowIndex].domain"
+											(selectionChange)="onDomainChange($event, rowIndex)"
+									        [valueField]="'id'"
+									        [textField]="'text'">
 									</kendo-dropdownlist>
 								</ng-template>
+
+								<ng-template kendoGridCellTemplate *ngIf="column.property === 'field'" let-dataItem let-rowIndex="rowIndex">
+									<kendo-dropdownlist
+											name="field" class="form-control field"
+									        [data]="editRows.actions[rowIndex].fields"
+											[defaultItem]="editRows.selectedValues[rowIndex].field"
+									        [(ngModel)]="editRows.selectedValues[rowIndex].field"
+									        [valueField]="'id'"
+									        [textField]="'text'">
+									</kendo-dropdownlist>
+								</ng-template>
+
+
+								<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem let-rowIndex="rowIndex">
+									<kendo-dropdownlist
+											name="field" class="form-control action"
+											[data]="editRows.actions[rowIndex].actions"
+											[defaultItem]="editRows.selectedValues[rowIndex].action"
+											[(ngModel)]="editRows.selectedValues[rowIndex].action"
+											[valueField]="'id'"
+											[textField]="'text'">
+									</kendo-dropdownlist>
+								</ng-template>
+
+								<!--
+								<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem let-rowIndex="rowIndex">
+									<kendo-dropdownlist
+											name="action" class="form-control action"
+											[data]="actions"
+											[(ngModel)]="editRows.selectedValues[rowIndex].action"
+											[valueField]="'id'"
+											[textField]="'text'">
+									</kendo-dropdownlist>
+								</ng-template>
+								-->
+
 
 								<!--
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>

@@ -8,23 +8,23 @@ export class BulkChangeEditColumnsModel {
 		this.columns = [
 			{
 				label: 'Class',
-				property: 'className',
+				property: 'domain',
 				type: 'text',
-				width: 200,
+				width: 120,
 				locked: false
 			},
 			{
 				label: 'Field Name',
 				property: 'field',
 				type: 'text',
-				width: 200,
+				width: 120,
 				locked: false
 			},
 			{
 				label: 'Action',
 				property: 'action',
 				type: 'text',
-				width: 80,
+				width: 120,
 				locked: false
 			},
 			{
