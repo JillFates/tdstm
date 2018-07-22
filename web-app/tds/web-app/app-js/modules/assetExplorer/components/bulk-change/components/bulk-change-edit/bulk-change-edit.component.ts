@@ -13,6 +13,7 @@ import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid
 import {BulkEditAction, ListOption} from '../../model/bulk-change.model';
 import {SortUtils} from "../../../../../../shared/utils/sort.utils";
 import {StringUtils} from "../../../../../../shared/utils/string.utils";
+import {BulkChangeService} from "../../../../service/bulk-change.service";
 
 @Component({
 	selector: 'tds-bulk-change-edit',
@@ -32,7 +33,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				private promptService: UIPromptService,
 				private assetExplorerService: AssetExplorerService,
 				private permissionService: PermissionService,
-				private customDomainService: CustomDomainService) {
+				private customDomainService: CustomDomainService,
+				private bulkChangeService: BulkChangeService) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 		console.log('Selected items');
@@ -61,8 +63,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		this.customDomainService.getCommonFieldSpecs()
 			.subscribe((results) => {
-				console.log('The results are');
-				console.log(results);
 				this.commonFieldSpecs = results;
 			});
 
@@ -90,6 +90,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 	onNext() {
 		alert('Editing');
+		console.log(this.editRows);
 	}
 
 	hasAssetDeletePermission(): boolean {
@@ -118,9 +119,13 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		const domainFields =  this.commonFieldSpecs.find((field: any) => field.domain === domain.id.toUpperCase());
 		if (domainFields && domainFields.fields) {
-			fields = domainFields.fields.map((item: any) => ({id: item.field, text: item.label}));
+			fields = domainFields.fields.map((item: any) => ({id: item.field, text: item.label, control: item.control}));
 		}
 
 		return fields.sort((a, b) => SortUtils.compareByProperty(a, b, 'text'));
+	}
+
+	isControl(controlType: string, rowIndex): boolean {
+		return this.editRows.selectedValues[rowIndex] && this.editRows.selectedValues[rowIndex].field && this.editRows.selectedValues[rowIndex].field['control'] ===  controlType;
 	}
 }

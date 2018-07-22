@@ -35,6 +35,7 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
+import { BulkChangeService } from './service/bulk-change.service';
 
 @NgModule({
 	imports: [
@@ -71,7 +72,8 @@ import { TagService } from '../assetTags/service/tag.service';
 		AssetExplorerService,
 		TaskCommentService,
 		DependecyService,
-		TagService
+		TagService,
+		BulkChangeService
 	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [

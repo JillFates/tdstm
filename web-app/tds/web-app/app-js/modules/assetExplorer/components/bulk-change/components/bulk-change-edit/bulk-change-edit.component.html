@@ -139,13 +139,19 @@
 
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem let-rowIndex="rowIndex">
 									<kendo-dropdownlist
-											name="field" class="form-control action"
+											name="action" class="form-control action"
 											[data]="editRows.actions[rowIndex].actions"
 											[defaultItem]="editRows.selectedValues[rowIndex].action"
 											[(ngModel)]="editRows.selectedValues[rowIndex].action"
 											[valueField]="'id'"
 											[textField]="'text'">
 									</kendo-dropdownlist>
+								</ng-template>
+
+								<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex"  *ngIf="column.property === 'value'">
+									<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
+									       type="text" name="actionValue" class="form-control"
+									       *ngIf="isControl('String', rowIndex)"/>
 								</ng-template>
 
 								<!--
