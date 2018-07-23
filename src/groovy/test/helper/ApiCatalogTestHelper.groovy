@@ -147,11 +147,7 @@ class ApiCatalogTestHelper {
           "$paramDef.HOSTNAME_PARAM$"
         ]
       }
-    ],
-    "scriptDef": {},
-    "script": {
-    	"DEFAULT": "// default script"
-    }
+    ]
   }
 }'''
 
