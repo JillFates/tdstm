@@ -4,7 +4,7 @@ import net.transitionmanager.service.DatabaseMigrationService
 
 
 /**
- * Add the AssetClass field to the field settings for every project.
+ * Modify the 'tags' field name to 'tagAssets' the field settings for every project.
  */
 
 databaseChangeLog = {
