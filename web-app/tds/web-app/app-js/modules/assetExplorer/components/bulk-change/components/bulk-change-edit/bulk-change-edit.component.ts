@@ -188,4 +188,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				console.log(error);
 			});
 	}
+
+	isAllInputEntered(): boolean {
+		return this.editRows.selectedValues.every(row => row.domain && row.field && row.action && (row.value || row.action.id === this.CLEAR_ACTION ))
+	}
 }
