@@ -53,8 +53,7 @@ class ApiCatalogService implements ServiceMethods {
 		// obtain a dictionary json object
 		JSONObject jsonDictionary = JsonUtil.parseJson(jsonDictionaryTransformed)
 		// remove unused elements in the transformed dictionary
-		jsonDictionary.dictionary.remove('paramDef')
-		jsonDictionary.dictionary.remove('paramGroup')
+		ApiCatalogUtil.removeUpUnusedDictionaryTransformedEntries(jsonDictionary)
 
 		Project currentProject = securityService.userCurrentProject
 		Provider provider = providerService.findOrCreateProvider(jsonDictionary.dictionary.info.provider, currentProject)
