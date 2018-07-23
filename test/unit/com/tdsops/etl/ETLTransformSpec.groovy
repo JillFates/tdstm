@@ -177,7 +177,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 1).value == 'SLIDEAWAY'
 	}
 
-	void 'test coalesce function'() {
+	void 'test can apply coalesce transformation'() {
 
 		given:
 			def okValue = 'tadah!'
