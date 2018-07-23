@@ -130,6 +130,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'desc', alias: 'DESC', type: "STRING")
 
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
@@ -212,6 +213,38 @@ class ETLTransformSpec extends ETLBaseSpec {
 				}
 			}
 	}
+
+	void 'test defaultValue function'() {
+
+		given:
+			def defaultValue = 'tadah!'
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GroovyMock(Project),
+					  applicationDataSet,
+					  new DebugConsole(buffer: new StringBuffer()),
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						domain Application
+						read labels
+						iterate {
+							extract 'desc' transform with defaultValue('${defaultValue}') load 'description'
+						}
+					""".stripIndent())
+
+		then: 'check that the assigned value is the first not null'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0]) {
+					with(data[0].fields.description) {
+						originalValue == null
+						value == defaultValue
+					}
+				}
+			}
+	}
+
 
 	void 'test can check syntax errors at parsing time'() {
 
