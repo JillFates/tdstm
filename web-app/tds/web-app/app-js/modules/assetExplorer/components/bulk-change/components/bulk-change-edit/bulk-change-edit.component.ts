@@ -93,8 +93,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				this.addRow();
 				this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
 					[], // initial sort config.
-					{ mode: 'single', checkboxOnly: false}, // selectable config.
-					{ useColumn: 'id' }); // checkbox config.
+					{ mode: 'single', checkboxOnly: false},
+					{ useColumn: 'id' });
 			});
 	}
 
@@ -109,6 +109,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	onNext() {
 		this.confirmUpdate()
 			.then(this.update.bind(this))
+			.then(this.closeDialog.bind(this))
 			.catch((err) => console.log(err));
 	}
 
@@ -166,24 +167,27 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		this.editRows.selectedValues[rowIndex].value =  tags.length ? `[${tags.map((tag) => tag.id).toString()}]` : '[]';
 	}
 
-	update() {
-		const edits = this.editRows.selectedValues
-			.map((row) => {
-				const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
+	update(): Promise<BulkActionResult>  {
+		return new Promise((resolve, reject) =>  {
+			const edits = this.editRows.selectedValues
+				.map((row) => {
+					const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
 
-				return {
-					fieldName: row.field.id,
-					action: row.action.id,
-					value: value || '[]'
-				}
-			});
+					return {
+						fieldName: row.field.id,
+						action: row.action.id,
+						value: value || '[]'
+					}
+				});
 
-		this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
-			.subscribe((result) => {
-				console.log(result);
-			}, (error) => {
-				console.log(error);
-			});
+			this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
+				.subscribe((result) => {
+					resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} edited successfully`});
+				}, (err) => {
+					reject({action: BulkActions.Edit, success: false, message: err.message || err})
+				});
+		})
+
 	}
 
 	isAllInputEntered(): boolean {
