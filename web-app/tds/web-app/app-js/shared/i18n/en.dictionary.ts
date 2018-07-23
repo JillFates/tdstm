@@ -78,6 +78,12 @@ export const en_DICTIONARY: Object = {
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
 				'AFFECTED_ASSETS': 'This action will affect {param1} Assets'
+			},
+			'ACTIONS': {
+				'ADD': 'Add to existing',
+				'CLEAR': 'Clear field',
+				'REPLACE': 'Replace with',
+				'REMOVE': 'Remove these'
 			}
 		}
 	},

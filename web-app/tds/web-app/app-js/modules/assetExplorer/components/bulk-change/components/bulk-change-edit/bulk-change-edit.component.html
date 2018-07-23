@@ -139,6 +139,7 @@
 											[data]="editRows.actions[rowIndex].actions"
 											[defaultItem]="editRows.selectedValues[rowIndex].action"
 											[(ngModel)]="editRows.selectedValues[rowIndex].action"
+											(selectionChange)="onActionChange($event, rowIndex)"
 											[valueField]="'id'"
 											[textField]="'text'">
 									</kendo-dropdownlist>
@@ -147,18 +148,18 @@
 								<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex"  *ngIf="column.property === 'value'">
 									<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
 									       type="text" name="actionValue" class="form-control"
-									       *ngIf="isControl('String', rowIndex)"/>
+									       *ngIf="canShowControl('String', rowIndex)"/>
 
 									<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
 									       type="number" name="actionValue" class="form-control"
-									       *ngIf="isControl('Number', rowIndex)"/>
+									       *ngIf="canShowControl('Number', rowIndex)"/>
 
 									<kendo-datepicker [(ngModel)]="editRows.selectedValues[rowIndex].value"
 									                  [ngModelOptions]="{standalone: true}"
-									                  *ngIf="isControl('Date', rowIndex)"></kendo-datepicker>
+									                  *ngIf="canShowControl('Date', rowIndex)"></kendo-datepicker>
 
 									<kendo-dropdownlist
-											*ngIf="isControl('YesNo', rowIndex)"
+											*ngIf="canShowControl('YesNo', rowIndex)"
 											name="yeNoList"
 											[(ngModel)]="editRows.selectedValues[rowIndex].value"
 											[valueField]="'id'"
@@ -166,7 +167,7 @@
 											[data]="yesNoList">
 									</kendo-dropdownlist>
 
-									<tds-asset-tag-selector *ngIf="isControl('asset-tag-selector', rowIndex)"
+									<tds-asset-tag-selector *ngIf="canShowControl('asset-tag-selector', rowIndex)"
 											[tagList]="tagList"
 									        [showSwitch]="false"
 									        (valueChange)="onTagFilterChange(column,rowIndex, $event)">

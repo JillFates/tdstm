@@ -35,14 +35,10 @@ export class BulkChangeService {
 			});
 	}
 
-	getActions(): IdTextItem[] {
-		return [
-			{ id: 'add', text: 'Add to existing'},
-			{ id: 'clear', text: 'Clear field'},
-			{ id: 'replace', text: 'Replace with'},
-			{ id: 'remove', text: 'Remove these'}
-		]
-
+	getActions(): Observable<any[]> {
+		return this.http.get(`${this.bulkChangeUrl}/actions`)
+			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
 	}
 
 }

@@ -17,6 +17,7 @@ import {BulkChangeService} from '../../../../service/bulk-change.service';
 import {TagService} from '../../../../../assetTags/service/tag.service';
 import {TagModel} from '../../../../../assetTags/model/tag.model';
 import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel';
+import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-bulk-change-edit',
@@ -24,6 +25,7 @@ import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel'
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
+	CLEAR_ACTION: string;
 	tagList: TagModel[] = [];
 	yesNoList: IdTextItem[] = [];
 	actions: IdTextItem[] = [];
@@ -36,7 +38,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	editRows: { actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
 
 	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService,
-				private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService, private tagService: TagService) {
+				private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService, private tagService: TagService, private translatePipe: TranslatePipe) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 		console.log('Selected items');
@@ -60,19 +62,31 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
+		this.CLEAR_ACTION = 'clear';
 		this.yesNoList = [
 			{ id: '?', text: '?'},
 			{ id: 'Y', text: 'Yes'},
 			{ id: 'N', text: 'No'}
 		];
 
-		this.actions = this.bulkChangeService.getActions();
+		// this.actions = this.bulkChangeService.getActions();
 		this.editRows = { actions: [], selectedValues: [] };
-		this.addRow();
 
 		this.customDomainService.getCommonFieldSpecs()
 			.subscribe((results) => {
 				this.commonFieldSpecs = results;
+			});
+
+		this.bulkChangeService.getActions()
+			.map((res: any) => Object.keys(res.data.tags))
+			.subscribe((actions: string[]) => {
+				this.actions = actions
+					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
+				this.addRow();
+				this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
+					[], // initial sort config.
+					{ mode: 'single', checkboxOnly: false}, // selectable config.
+					{ useColumn: 'id' }); // checkbox config.
 			});
 
 		this.tagService.getTags()
@@ -86,10 +100,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.map((domain): IdTextItem => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
 
 		this.gridColumns = new BulkChangeEditColumnsModel();
-		this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
-			[], // initial sort config.
-			{ mode: 'single', checkboxOnly: false}, // selectable config.
-			{ useColumn: 'id' }); // checkbox config.
+
 	}
 
 	/**
@@ -118,6 +129,14 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		selectedValues[index].field = null
 	}
 
+	onActionChange(action: IdTextItem, index: number) {
+		/*
+		if (action.id === this.CLEAR_ACTION) {
+			this.editRows.selectedValues[index].value = null;
+		}
+		*/
+	}
+
 	getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
 		let fields: IdTextItem[] = [];
 		if (!domain) {
@@ -132,8 +151,14 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		return fields.sort((a, b) => SortUtils.compareByProperty(a, b, 'text'));
 	}
 
-	isControl(controlType: string, rowIndex): boolean {
-		return this.editRows.selectedValues[rowIndex] && this.editRows.selectedValues[rowIndex].field && this.editRows.selectedValues[rowIndex].field['control'] ===  controlType;
+	// show control if this belongs to class and clear action is not selected
+	canShowControl(controlType: string, rowIndex): boolean {
+		const selectedValue = this.editRows.selectedValues[rowIndex];
+
+		const isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'] ===  controlType)
+		const isClearAction = (selectedValue.action === null  || selectedValue.action.id === this.CLEAR_ACTION);
+
+		return isTypeOfControl && !isClearAction;
 	}
 
 	onTagFilterChange(column, rowIndex, event): void {
@@ -147,10 +172,12 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	update() {
 		const edits = this.editRows.selectedValues
 			.map((row) => {
+				const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
+
 				return {
 					fieldName: row.field.id,
 					action: row.action.id,
-					value: row.value || '[]'
+					value: value || '[]'
 				}
 			});
 
