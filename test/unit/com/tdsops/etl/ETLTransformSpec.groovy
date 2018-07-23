@@ -195,7 +195,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 1).value == 'SLIDEAWAY'
 	}
 
-	void 'test defaultValue function'() {
+	void 'test can apply defaultValue transformation'() {
 
 		given:
 			String defaultStrValue = 'UNDEFINED'
