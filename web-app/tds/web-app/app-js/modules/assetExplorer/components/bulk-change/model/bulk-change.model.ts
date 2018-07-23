@@ -4,7 +4,7 @@ export enum BulkActions {
 }
 
 export class BulkChangeModel {
-	public selectedItems: string[];
+	public selectedItems: number[];
 }
 
 export interface BulkActionResult {

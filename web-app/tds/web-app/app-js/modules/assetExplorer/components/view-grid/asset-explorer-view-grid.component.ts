@@ -88,7 +88,7 @@ export class AssetExplorerViewGridComponent {
 	gridData: GridDataResult;
 	selectAll = false;
 	bulkItems = {};
-	bulkSelectedItems: string[] = [];
+	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 
@@ -302,7 +302,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	setSelectedItems(): void {
-		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+		this.bulkSelectedItems = Object.keys(this.bulkItems)
+			                    .filter(key => this.bulkItems[key])
+								.map(value => parseInt(value, 10));
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 

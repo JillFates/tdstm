@@ -1,11 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
-import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {Permission} from '../../../shared/model/permission.model';
-import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
-import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
@@ -23,4 +19,25 @@ export class BulkChangeService {
 			.catch((error: any) => error.json());
 	}
 
+	update(dataViewId: number, assetIds: any[], edits: any[]): Observable<any> {
+		const defaultParams = { userParams: { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}}, dataViewId: 1, assetIds: [], edits: []};
+		const payload = Object.assign({}, defaultParams, {dataViewId, assetIds, edits});
+
+		let body = JSON.stringify(payload);
+
+
+		return this.http.put(this.bulkChangeUrl, body)
+			.map((res: Response) => {
+				console.log('============');
+				console.log(res);
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => {
+				console.log('============');
+				console.log(error);
+				return error;
+				// error.json();
+			});
+	}
 }

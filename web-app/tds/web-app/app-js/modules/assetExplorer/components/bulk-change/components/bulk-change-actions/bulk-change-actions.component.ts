@@ -17,7 +17,7 @@ import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.comp
 	providers: [TranslatePipe]
 })
 export class BulkChangeActionsComponent extends UIExtraDialog {
-	selectedItems: string[] = [];
+	selectedItems: number[] = [];
 	selectedAction: BulkActions;
 	ACTION = BulkActions; // Make enum visible to the view
 
@@ -72,10 +72,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private deleteBulk(): Promise<BulkActionResult> {
+		const items = this.selectedItems.map((value: number) => value.toString());
 		// return Promise.resolve({action: BulkActions.Delete, success: true});
 		return new Promise((resolve, reject) =>  {
 			if (this.hasAssetDeletePermission()) {
-				this.assetExplorerService.deleteAssets(this.selectedItems)
+				this.assetExplorerService.deleteAssets(items)
 					.subscribe((result) =>  {
 						resolve({action: BulkActions.Delete, success: true, message: result.message});
 					}, err => reject({action: BulkActions.Delete, success: false, message: err.message || err}))

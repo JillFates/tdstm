@@ -10,7 +10,7 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 	providers: [TranslatePipe]
 })
 export class BulkChangeButtonComponent {
-	@Input() selectedItems: string[];
+	@Input() selectedItems: number[];
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 
 	constructor(private dialogService: UIDialogService) {

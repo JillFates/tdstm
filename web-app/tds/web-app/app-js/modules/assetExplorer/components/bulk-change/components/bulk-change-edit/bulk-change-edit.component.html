@@ -6,7 +6,7 @@
 		}
 		.bulk-change-edit-component .modal-content {
 			margin: 0 auto;
-			width: 800px;
+			width: 900px;
 		}
 		.bulk-change-edit-component .modal-body {
 			font-size: 13px;
@@ -79,7 +79,7 @@
 							</ng-template>
 
 							<!-- - Action-->
-							<kendo-grid-command-column [width]="60">
+							<kendo-grid-command-column [width]="50">
 								<ng-template kendoGridHeaderTemplate>
 									<div class="text-center">
 										<label class="action-header"></label>
@@ -99,11 +99,7 @@
 							                   field="{{column.property}}"
 							                   [locked]="column.locked"
 							                   format="{{column.format}}"
-							                   [headerClass]="column.headerClass ? column.headerClass : ''"
-							                   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-							                   [class]="column.cellClass ? column.cellClass : ''"
-							                   [style]="column.cellStyle ? column.cellStyle : ''"
-							                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+							                   width="{{column.width}}">
 
 								<!-- - Header Template-->
 								<ng-template kendoGridHeaderTemplate>
@@ -152,86 +148,30 @@
 									<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
 									       type="text" name="actionValue" class="form-control"
 									       *ngIf="isControl('String', rowIndex)"/>
-								</ng-template>
 
-								<!--
-								<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem let-rowIndex="rowIndex">
+									<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
+									       type="number" name="actionValue" class="form-control"
+									       *ngIf="isControl('Number', rowIndex)"/>
+
+									<kendo-datepicker [(ngModel)]="editRows.selectedValues[rowIndex].value"
+									                  [ngModelOptions]="{standalone: true}"
+									                  *ngIf="isControl('Date', rowIndex)"></kendo-datepicker>
+
 									<kendo-dropdownlist
-											name="action" class="form-control action"
-											[data]="actions"
-											[(ngModel)]="editRows.selectedValues[rowIndex].action"
+											*ngIf="isControl('YesNo', rowIndex)"
+											name="yeNoList"
+											[(ngModel)]="editRows.selectedValues[rowIndex].value"
 											[valueField]="'id'"
-											[textField]="'text'">
+											[textField]="'text'"
+											[data]="yesNoList">
 									</kendo-dropdownlist>
-								</ng-template>
-								-->
 
-
-								<!--
-								<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
-									{{dataItem[column.property]}}
+									<tds-asset-tag-selector *ngIf="isControl('asset-tag-selector', rowIndex)"
+											[tagList]="tagList"
+									        [showSwitch]="false"
+									        (valueChange)="onTagFilterChange(column,rowIndex, $event)">
+									</tds-asset-tag-selector>
 								</ng-template>
-
-								<ng-template kendoGridCellTemplate *ngIf="column.property === 'color'" let-dataItem>
-									<div class="text-center">
-										<span [ngClass]="dataItem.css" class="label tag"></span>
-									</div>
-								</ng-template>
-								-->
-
-								<!-- - Edit Templates-->
-								<!--
-								<ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'name'">
-									<input [(ngModel)]="dataItem.name" autofocus
-									       [ngClass]="{'ng-invalid': duplicateName}" required
-									       #input (input)="validateUniqueName(dataItem); input.value=$event.target.value"
-									       type="text" name="name" class="form-control"/>
-								</ng-template>
-								<ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'description'">
-									<input [(ngModel)]="dataItem.description"
-									       type="text" name="description" class="form-control"/>
-								</ng-template>
-								<ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'color'">
-									<kendo-dropdownlist required name="color" class="form-control"
-									                    [data]="colorList"
-									                    [(ngModel)]="dataItem.color"
-									                    [valueField]="'id'"
-									                    [valuePrimitive]="true">
-										<ng-template kendoDropDownListValueTemplate let-dataItem>
-											<span *ngIf="dataItem" [ngClass]="dataItem.css" class="label tag" style="margin: auto; margin-left: 10px;"></span>
-										</ng-template>
-										<ng-template kendoDropDownListItemTemplate let-dataItem>
-											<span [ngClass]="dataItem.css" class="label tag"></span>
-										</ng-template>
-									</kendo-dropdownlist>
-								</ng-template>
-								-->
-
-								<!-- - Filter Template-->
-								<!--
-								<ng-template kendoGridFilterCellTemplate let-filter>
-									<div class="has-feedback"
-									     *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'color' )">
-										<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
-										<ng-template #dateFilter>
-											<kendo-datepicker [format]="dateFormat"
-											                  [(ngModel)]="column.filter"
-											                  [ngModelOptions]="{standalone: true}"
-											                  (valueChange)="gridSettings.onFilter(column)"
-											                  style="width: 100%;"></kendo-datepicker>
-											<span *ngIf="column.filter" (click)="gridSettings.clearFilter(column)"
-											      style="margin-right: 25px" class="fa fa-times form-control-feedback"></span>
-										</ng-template>
-										<ng-template #stringFilter>
-											<input [(ngModel)]="column.filter" (keyup)="gridSettings.onFilter(column)"
-											       [ngModelOptions]="{standalone: true}"
-											       type="text" class="form-control" name="{{column.property}}" placeholder="Filter">
-											<span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
-											      class="fa fa-times form-control-feedback"></span>
-										</ng-template>
-									</div>
-								</ng-template>
-								-->
 							</kendo-grid-column>
 						</kendo-grid>
 					</form>

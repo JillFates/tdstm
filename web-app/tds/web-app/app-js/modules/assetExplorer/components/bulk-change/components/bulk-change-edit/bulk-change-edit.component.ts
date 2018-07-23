@@ -11,38 +11,50 @@ import {PermissionService} from '../../../../../../shared/services/permission.se
 import {BulkChangeEditColumnsModel} from '../../model/bulk-change-edit-columns.model';
 import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
 import {BulkEditAction, ListOption} from '../../model/bulk-change.model';
-import {SortUtils} from "../../../../../../shared/utils/sort.utils";
-import {StringUtils} from "../../../../../../shared/utils/string.utils";
-import {BulkChangeService} from "../../../../service/bulk-change.service";
+import {SortUtils} from '../../../../../../shared/utils/sort.utils';
+import {StringUtils} from '../../../../../../shared/utils/string.utils';
+import {BulkChangeService} from '../../../../service/bulk-change.service';
+import {TagService} from '../../../../../assetTags/service/tag.service';
+import {TagModel} from '../../../../../assetTags/model/tag.model';
+import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel';
 
 @Component({
 	selector: 'tds-bulk-change-edit',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/bulk-change/components/bulk-change-edit/bulk-change-edit.component.html'
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
-	actions: ListOption[];
-	assetClassList: ListOption[];
+	COLUMN_MIN_WIDTH = 120;
+	tagList: TagModel[] = [];
+	yesNoList: ListOption[] = [];
+	actions: ListOption[] = [];
+	assetClassList: ListOption[] = [];
 	selectedItems: string[] = [];
+	commonFieldSpecs: any[] = [];
 	gridColumns: BulkChangeEditColumnsModel;
 	gridSettings: DataGridOperationsHelper;
 	affectedAssets: number;
-	commonFieldSpecs: any[] = [];
-	editRows: { actions: BulkEditAction[], selectedValues: {domain: ListOption, field: ListOption, action: ListOption}[]};
+	editRows: { actions: BulkEditAction[], selectedValues: {domain: ListOption, field: ListOption, action: ListOption, value: any}[] };
 
 	constructor(private bulkChangeModel: BulkChangeModel,
 				private promptService: UIPromptService,
 				private assetExplorerService: AssetExplorerService,
 				private permissionService: PermissionService,
 				private customDomainService: CustomDomainService,
-				private bulkChangeService: BulkChangeService) {
+				private bulkChangeService: BulkChangeService,
+				private tagService: TagService) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 		console.log('Selected items');
 	}
 
-	addHandler({sender}): void {
+	addRow(): any {
 		this.editRows.actions.push({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
-		this.editRows.selectedValues.push({domain: null, field: null, action: null});
+		this.editRows.selectedValues.push({domain: null, field: null, action: null, value: null});
+	}
+
+	addHandler({sender}): void {
+		this.addRow();
+
 		this.gridSettings.loadPageData();
 	}
 
@@ -53,6 +65,12 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
+		this.yesNoList = [
+			{ id: '?', text: '?'},
+			{ id: 'Y', text: 'Yes'},
+			{ id: 'N', text: 'No'}
+		];
+
 		this.actions = [
 			{ id: 'add', text: 'Add to existing'},
 			{ id: 'clear', text: 'Clear field'},
@@ -60,11 +78,19 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			{ id: 'remove', text: 'Remove these'}
 		];
 		this.editRows = { actions: [], selectedValues: [] };
+		this.addRow();
 
 		this.customDomainService.getCommonFieldSpecs()
 			.subscribe((results) => {
 				this.commonFieldSpecs = results;
 			});
+
+		this.tagService.getTags()
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS && result.data) {
+					this.tagList = result.data;
+				}
+			}, error => console.log('error on GET Tag List', error));
 
 		this.assetClassList = ['common', 'application', 'database', 'device', 'storage']
 			.map((domain): ListOption => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
@@ -74,7 +100,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			[], // initial sort config.
 			{ mode: 'single', checkboxOnly: false}, // selectable config.
 			{ useColumn: 'id' }); // checkbox config.
-		// this.addEditAction();
 	}
 
 	/**
@@ -89,8 +114,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	onNext() {
-		alert('Editing');
-		console.log(this.editRows);
+		this.update();
 	}
 
 	hasAssetDeletePermission(): boolean {
@@ -103,13 +127,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		actions[index].fields =  this.getFieldsByDomain(domain);
 		selectedValues[index].field = null
 	}
-
-	/*
-	onFieldChange(field: ListOption) {
-		console.log('changing field');
-		console.log(field);
-	}
-	*/
 
 	getFieldsByDomain(domain: ListOption): ListOption[] {
 		let fields: ListOption[] = [];
@@ -128,4 +145,37 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	isControl(controlType: string, rowIndex): boolean {
 		return this.editRows.selectedValues[rowIndex] && this.editRows.selectedValues[rowIndex].field && this.editRows.selectedValues[rowIndex].field['control'] ===  controlType;
 	}
+
+	onTagFilterChange(column, rowIndex, event): void {
+		const tags = event.tags || [];
+
+		this.editRows.selectedValues[rowIndex].value =  tags.length ? `[${tags.map((tag) => tag.id).toString()}]` : '[]';
+		console.log(column);
+		console.log(event);
+	}
+
+	update() {
+		const edits = this.editRows.selectedValues
+			.map((row) => {
+				return {
+					fieldName: row.field.id,
+					action: row.action.id,
+					value: row.value || '[]'
+				}
+			});
+
+		this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
+			.subscribe((result) => {
+				console.log('Getting the results');
+				console.log(result);
+			}, (error) => {
+				console.log('here we have an error');
+				console.log(error);
+			});
+
+		console.log('EDITS ARE');
+		console.log(edits);
+		console.log('--------------');
+	}
+
 }
