@@ -6,7 +6,6 @@ import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 import org.quartz.TriggerKey
 import org.quartz.spi.MutableTrigger
-
 /**
  * Generates tasks for a given task Batch.
  */
