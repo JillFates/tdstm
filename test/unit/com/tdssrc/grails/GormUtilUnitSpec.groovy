@@ -310,7 +310,7 @@ class GormUtilUnitSpec extends Specification {
 			]
 
 		when:
-			(1..2000).each { int index ->
+			(1..400).each { int index ->
 				Date startTime = new Date()
 
 				classes.each { Class clazz ->
@@ -330,9 +330,7 @@ class GormUtilUnitSpec extends Specification {
 
 				Date stopTime = new Date()
 				TimeDuration timeDuration = TimeCategory.minus( stopTime, startTime )
-//				if(timeDuration.toMilliseconds().intdiv(1000) > 0){
-					println("Loop ${index}. Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
-//				}
+				println("Loop ${index}. Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
 			}
 
 		then:
