@@ -50,14 +50,10 @@ grails.project.dependency.resolution = {
 		 * NOTE: we are using latest from the 1.2.x series since the latest library breaks our implementation
 		 * TODO: If we are going to use the latest GETL version we need to fix our implementation (or the authors)
 		 */
-		runtime 'net.sourceforge.getl:getl:1.2.11'
-		// runtime ('net.sourceforge.getl:getl:1.2.11') {
-			/*
-			 * removing the library that can cause a loop in the Log4J configuration
-			 * @see  http://www.slf4j.org/legacy.html#log4j-over-slf4j
-			 */
-		//	excludes 'org.slf4j:slf4j-log4j12'
-		// }
+		runtime ('net.sourceforge.getl:getl:1.2.11') {
+			excludes 'org.apache.hadoop:hadoop-hdfs'
+			excludes 'org.apache.hadoop:hadoop-common'
+		}
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
