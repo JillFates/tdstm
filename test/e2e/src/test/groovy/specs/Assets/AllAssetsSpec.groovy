@@ -51,6 +51,7 @@ class AllAssetsSpec extends GebReportingSpec {
         given: 'The user is on the All Assets page'
             at ViewPage
         and: 'The user checks all the items'
+            waitFor {view.displayed}
             checkAllItems()
         and: 'We verify all the items are checked'
             checkedItems()== true

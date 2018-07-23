@@ -29,7 +29,7 @@ class ViewPage extends Page{
         itemNumberDesc(required:false) {$("kendo-pager-info" , class:"k-pager-info k-label")}
         nextPageButton(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-next-buttons").find("a", class:"k-link k-pager-nav" , title:"Go to the next page").find("span", class:"k-icon k-i-arrow-e")}
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
-        allItemsCheckbox(required:false) {$("div", class:"checkbox checkbox-grid").find("input",name:"selectAll",type:"checkbox")}
+        allItemsCheckbox(required:false) {$("label",class:"selectall-checkbox-column text-center").find("input",type:"checkbox", class:"ng-untouched ng-pristine ng-valid")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
         nameFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("input",type:"text")}
