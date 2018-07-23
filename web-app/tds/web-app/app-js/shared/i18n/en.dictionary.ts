@@ -77,10 +77,11 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'AFFECTED_ASSETS': 'This action will affect {param1} Assets'
+				'AFFECTED_ASSETS': 'This action will affect {param1} Assets',
+				'CONFIRM_UPDATE': 'Your about to update {param1} assets. There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
 			},
 			'DELETE': {
-				'AFFECTED_ASSETS': 'Your about to delete {param1} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
+				'CONFIRM_DELETE': 'Your about to delete {param1} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
 			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',

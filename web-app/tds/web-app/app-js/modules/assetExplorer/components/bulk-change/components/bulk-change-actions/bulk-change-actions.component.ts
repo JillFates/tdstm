@@ -64,7 +64,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private confirmDelete(): Promise<boolean> {
-		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.AFFECTED_ASSETS', [this.selectedItems.length]);
+		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE', [this.selectedItems.length]);
 		return new Promise((resolve, reject) =>  {
 			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				message,

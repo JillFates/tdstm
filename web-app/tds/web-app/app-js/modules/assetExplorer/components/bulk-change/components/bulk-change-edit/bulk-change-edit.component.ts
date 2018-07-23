@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
 
-import {BulkChangeModel} from '../../model/bulk-change.model';
+import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
 import {BulkActionResult} from '../../model/bulk-change.model';
 import {AssetExplorerService} from '../../../../service/asset-explorer.service';
@@ -25,7 +25,8 @@ import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
-	CLEAR_ACTION: string;
+	CLEAR_ACTION = 'clear';
+	defaultAssetClass: IdTextItem;
 	tagList: TagModel[] = [];
 	yesNoList: IdTextItem[] = [];
 	actions: IdTextItem[] = [];
@@ -41,12 +42,13 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService, private tagService: TagService, private translatePipe: TranslatePipe) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
-		console.log('Selected items');
 	}
 
 	addRow(): any {
 		this.editRows.actions.push({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
-		this.editRows.selectedValues.push({domain: null, field: null, action: null, value: null});
+		this.editRows.selectedValues.push({domain: this.defaultAssetClass, field: null, action: null, value: null});
+		//  get the fields for the default domain
+		this.editRows.actions[this.editRows.actions.length - 1].fields =  this.getFieldsByDomain(this.defaultAssetClass);
 	}
 
 	addHandler({sender}): void {
@@ -62,24 +64,27 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
-		this.CLEAR_ACTION = 'clear';
+		this.defaultAssetClass = { id: 'common', text: 'Common Fields'};
 		this.yesNoList = [ { id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
 		this.editRows = { actions: [], selectedValues: [] };
-		this.customDomainService.getCommonFieldSpecs()
-			.subscribe((results) => {
-				this.commonFieldSpecs = results;
-			});
+
+
 
 		this.bulkChangeService.getActions()
 			.map((res: any) => Object.keys(res.data.tags))
 			.subscribe((actions: string[]) => {
-				this.actions = actions
-					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
-				this.addRow();
-				this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
-					[], // initial sort config.
-					{ mode: 'single', checkboxOnly: false}, // selectable config.
-					{ useColumn: 'id' }); // checkbox config.
+				this.customDomainService.getCommonFieldSpecs()
+					.subscribe((results) => {
+						this.commonFieldSpecs = results;
+
+						this.actions = actions
+							.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
+						this.addRow();
+						this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
+							[], // initial sort config.
+							{ mode: 'single', checkboxOnly: false}, // selectable config.
+							{ useColumn: 'id' }); // checkbox config.
+					});
 			});
 
 		this.tagService.getTags()
@@ -105,7 +110,21 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	onNext() {
-		this.update();
+		this.confirmUpdate()
+			.then(this.update.bind(this))
+			.catch((err) => console.log(err));
+	}
+
+	confirmUpdate(): Promise<boolean> {
+		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.EDIT.CONFIRM_UPDATE', [this.affectedAssets]);
+
+		return new Promise((resolve, reject) =>  {
+			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				message,
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'))
+				.then((result) => result ? resolve() : reject({action: BulkActions.Edit, success: false, message: 'canceled'}))
+		})
 	}
 
 	hasAssetDeletePermission(): boolean {
@@ -118,6 +137,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		actions[index].fields =  this.getFieldsByDomain(domain);
 		selectedValues[index].field = null
 	}
+
 
 	getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
 		let fields: IdTextItem[] = [];
@@ -147,8 +167,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		const tags = event.tags || [];
 
 		this.editRows.selectedValues[rowIndex].value =  tags.length ? `[${tags.map((tag) => tag.id).toString()}]` : '[]';
-		console.log(column);
-		console.log(event);
 	}
 
 	update() {
