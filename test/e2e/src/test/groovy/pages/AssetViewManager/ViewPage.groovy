@@ -24,7 +24,7 @@ class ViewPage extends Page{
         starOff {$(".fa.text-yellow.fa-star-o")}
         gearBtn {$(".fa-cog")}
         justPlanningCheck(required:false)  { $("input", type: "checkbox" , name: "justPlanning") }
-        itemsPerPage(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-page-sizes", class:"k-pager-sizes k-label").find("select")}
+        itemsPerPage(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-page-sizes", class:"k-pager-info k-label")}
         selectAllChecks(required:false) {$("input" , type:"checkbox" , name:"selectAll")}
         itemNumberDesc(required:false) {$("kendo-pager-info" , class:"k-pager-info k-label")}
         nextPageButton(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-next-buttons").find("a", class:"k-link k-pager-nav" , title:"Go to the next page").find("span", class:"k-icon k-i-arrow-e")}
