@@ -205,9 +205,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
-					domain == ETLDomain.Application.name()
 					with(data[0].fields.appVendor) {
-						originalValue.contains(okValue)
+						originalValue == okValue
 						value == okValue
 					}
 				}
