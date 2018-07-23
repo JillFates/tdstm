@@ -12,16 +12,26 @@ export class BulkChangeService {
 
 	constructor(private http: HttpInterceptor) {}
 
+	/**
+	 * GET - List of fields
+	 * @returns {Observable<any>}
+	 */
 	getFields(): Observable<any[]> {
 		return this.http.get(`${this.bulkChangeUrl}/fields`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
 
-	update(dataViewId: number, assetIds: any[], edits: any[]): Observable<any> {
-		const defaultUserParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
-		const defaultParams = { userParams: defaultUserParams, dataViewId: 1, assetIds: [], edits: []};
-		const payload = Object.assign({}, defaultParams, {dataViewId, assetIds, edits});
+	/**
+	 * PUT - Save/Update  a bulk of asset changes.
+	 * @param {any[]} assetIds
+	 * @param {edits[]} edits
+	 * @returns {Observable<any>}
+	 */
+	bulkUpdate(assetIds: any[], edits: any[]): Observable<any> {
+		const defaultUserParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: []}};
+		const defaultParams = { userParams: defaultUserParams, dataViewId: null, assetIds: [], edits: []};
+		const payload = Object.assign({}, defaultParams, {assetIds, edits});
 
 		return this.http.put(this.bulkChangeUrl, JSON.stringify(payload))
 			.map((res: Response) => {
@@ -33,6 +43,10 @@ export class BulkChangeService {
 			});
 	}
 
+	/**
+	 * GET - List of edit actions
+	 * @returns {Observable<any>}
+	 */
 	getActions(): Observable<any[]> {
 		return this.http.get(`${this.bulkChangeUrl}/actions`)
 			.map((res: Response) => res.json())

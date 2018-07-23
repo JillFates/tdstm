@@ -27,6 +27,7 @@ import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
 	CLEAR_ACTION = 'clear';
+	isLoaded: boolean;
 	defaultAssetClass: IdTextItem = {id: 'common', text: 'Common Fields'};
 	tagList: TagModel[] = [];
 	yesNoList: IdTextItem[] = [{ id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
@@ -65,6 +66,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
+		this.isLoaded = false;
 		this.editRows = { actions: [], selectedValues: [] };
 		this.gridColumns = new BulkChangeEditColumnsModel();
 
@@ -87,6 +89,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 					[], // initial sort config.
 					{ mode: 'single', checkboxOnly: false},
 					{ useColumn: 'id' });
+				this.isLoaded = true;
 			});
 	}
 
@@ -189,7 +192,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				});
 
 			if (this.hasAssetEditPermission()) {
-				this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
+				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits)
 					.subscribe((result) => {
 						resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
 					}, (err) => {
