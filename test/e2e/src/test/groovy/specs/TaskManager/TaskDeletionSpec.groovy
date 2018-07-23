@@ -1,7 +1,7 @@
 package specs.TaskManager
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.TaskManager.TaskCreationPage
 import pages.TaskManager.TaskDetailsPage
 import pages.TaskManager.TaskEditionPage
@@ -16,7 +16,7 @@ class TaskDeletionSpec extends GebReportingSpec {
     def testKey
     static testCount
     //Define the names of the tasks you will Create and Delete
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static taskName = baseName +" "+ randStr + " Task For E2E Automation for Delete"
     static taskEvent = "Buildout"

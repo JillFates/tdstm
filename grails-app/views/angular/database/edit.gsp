@@ -129,6 +129,7 @@
 											</td>
 										</tr>
 										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
+                                        <g:render template="/angular/common/assetTagsEdit"></g:render>
 									</tbody>
 								</table>
 							</div>

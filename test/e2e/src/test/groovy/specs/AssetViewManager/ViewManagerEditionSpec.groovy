@@ -7,7 +7,7 @@ import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.SaveViewPage
 import pages.AssetViewManager.ViewPage
-import jodd.util.RandomString
+import utils.CommonActions
 
 
 @Stepwise
@@ -20,7 +20,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
     static expectedColumns =[]
 
     //Define the names of the Application you will Create and Edit
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(8)
+    static randStr = CommonActions.getRandomString()
 
 
     def setupSpec() {

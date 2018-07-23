@@ -1144,6 +1144,48 @@ public class GormUtil {
 	}
 
 	/**
+	 * Find an instance of the given type using the alternate key provided within the
+	 * project specified.
+	 *
+	 * @param project - the project the domain should belong to
+	 * @param type - the domain class type
+	 * @param searchValue - the search value to match against the alternate key
+	 * @param throwException - whether the method should throw an exeption upon errors
+	 * @return if found it returns the domain instance of the type
+	 * @throws EmptyResultException
+	 */
+	static <T> T findInProjectByAlternate(Project project, Class<T> type, searchValue, boolean throwException = false) {
+		T instance = null
+		String errorMsg
+		// Project, type and id are mandatory
+		if (type && searchValue && project) {
+			// Check if the class is a domain class.
+			if (isDomainClass(type)) {
+				List<T> domainInstancesFound = findDomainByAlternateKey(type, searchValue, project)
+				if (domainInstancesFound && domainInstancesFound.size() > 0) {
+					instance = domainInstancesFound.pop()
+				} else {
+					errorMsg = "The record $type not found using alternate key $searchValue"
+				}
+			} else {
+				errorMsg = "$type is not a domain class"
+			}
+		} else {
+			errorMsg = "findInProjectByAlternate() requires a project, a domain class and a searchValue"
+		}
+
+		if (errorMsg) {
+			logger.info(errorMsg)
+			if (throwException) {
+				throw new EmptyResultException(errorMsg)
+			} else {
+				instance = null
+			}
+		}
+		return instance
+	}
+
+	/**
 	 * Determine if a domain property represents a referenced class type or if the property is an association
 	 * @param domainObject
 	 * @param propertyName

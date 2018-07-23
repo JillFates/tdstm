@@ -5,17 +5,24 @@ import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.c
 import { DependecyService } from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetEditComponent} from '../asset/asset-edit.component';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function DeviceShowComponent(template, modelId: number) {
+export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
 		selector: `device-show`,
 		template: template
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
+		protected assetTags: Array<TagModel> = metadata.assetTags;
 
-		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		constructor(
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetService: DependecyService) {
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

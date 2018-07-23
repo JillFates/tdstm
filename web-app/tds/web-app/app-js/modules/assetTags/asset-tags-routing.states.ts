@@ -1,6 +1,7 @@
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 import {Ng2StateDeclaration} from '@uirouter/angular';
 import {TagListComponent} from './components/tag-list/tag-list.component';
+import {Permission} from '../../shared/model/permission.model';
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 
@@ -21,7 +22,8 @@ export const TagList: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			menu: ['GLOBAL.PROJECTS', 'ASSET_TAGS.MANAGE_TAGS'],
 			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
 		},
-		requiresAuth: true
+		requiresAuth: true,
+		requiresPermission: Permission.TagView,
 	},
 	views: {
 		'headerView@tds': {component: HeaderComponent},

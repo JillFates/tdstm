@@ -1,7 +1,7 @@
 package specs.Assets
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Assets.AssetClonePage
 import pages.Assets.ApplicationCreationPage
 import pages.Assets.ApplicationDetailsPage
@@ -15,7 +15,7 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static appName = baseName + " " + randStr + " App For E2E Created"
     static appDesc = baseName + " " + randStr + " App Description Created"

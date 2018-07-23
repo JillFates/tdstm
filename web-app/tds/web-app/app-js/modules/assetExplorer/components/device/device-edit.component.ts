@@ -6,7 +6,7 @@
  */
 
 import * as R from 'ramda';
-import {Component, HostListener, Inject, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -15,12 +15,13 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {Observable} from 'rxjs/Observable';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AssetShowComponent} from '../asset/asset-show.component';
-import {KEYSTROKE} from '../../../../shared/model/constants';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {AssetCommonEdit} from '../asset/asset-common-edit';
 
 declare var jQuery: any;
 
-export function DeviceEditComponent(template, editModel) {
+export function DeviceEditComponent(template, editModel, metadata: any) {
 
 	@Component({
 		selector: `device-edit`,
@@ -28,15 +29,13 @@ export function DeviceEditComponent(template, editModel) {
 		providers: [
 			{ provide: 'model', useValue: editModel }
 		]
-	}) class DeviceEditComponent implements OnInit {
+	}) class DeviceEditComponent extends AssetCommonEdit {
 
-		private isDependenciesValidForm = true;
-		private dateFormat: string;
 		private showRackFields = true;
 		private showRackSourceInput: 'none'|'new'|'select' = 'none';
 		private showRackTargetInput: 'none'|'new'|'select' = 'none';
 		private rackSourceOptions: Array<any> = [];
-		private rackTargetOptions: Array<any> = [];
+		private rackTargetOptions: Array<any> =   [];
 		private showBladeFields = true;
 		private showBladeSourceInput: 'none'|'new'|'select' = 'none';
 		private showBladeTargetInput: 'none'|'new'|'select' = 'none';
@@ -44,30 +43,18 @@ export function DeviceEditComponent(template, editModel) {
 		private bladeTargetOptions: Array<any> = [];
 
 		constructor(
-					@Inject('model') private model: any,
-					private activeDialog: UIActiveDialogService,
-					private preference: PreferenceService,
-					private assetExplorerService: AssetExplorerService,
-					private dialogService: UIDialogService,
-					private notifierService: NotifierService) {
+			@Inject('model') model: any,
+			activeDialog: UIActiveDialogService,
+			preference: PreferenceService,
+			assetExplorerService: AssetExplorerService,
+			dialogService: UIDialogService,
+			notifierService: NotifierService,
+			tagService: TagService) {
 
-			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata);
+
 			this.initModel();
 			this.toggleAssetTypeFields();
-		}
-
-		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-			if (event && event.code === KEYSTROKE.ESCAPE) {
-				this.cancelCloseDialog();
-			}
-		}
-
-		/**
-		 * Initiates The Injected Component
-		 */
-		ngOnInit(): void {
-			jQuery('[data-toggle="popover"]').popover();
 		}
 
 		/**
@@ -194,11 +181,13 @@ export function DeviceEditComponent(template, editModel) {
 				}
 			});
 
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+					this.saveAssetTags();
+				}
 			});
 		}
 
@@ -391,28 +380,6 @@ export function DeviceEditComponent(template, editModel) {
 		 */
 		protected onRoomTargetValueChange(event: any): void {
 			this.toggleAssetTypeFields();
-		}
-
-		private showAssetDetailView(assetClass: string, id: number) {
-			this.dialogService.replace(AssetShowComponent, [
-					{ provide: 'ID', useValue: id },
-					{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
-		}
-
-		/***
-		 * Close the Active Dialog
-		 */
-		private cancelCloseDialog(): void {
-			this.activeDialog.close();
-		}
-
-		/**
-		 * Validate if the current content of the Dependencies is correct
-		 * @param {boolean} invalidForm
-		 */
-		public onDependenciesValidationChange(validForm: boolean): void {
-			this.isDependenciesValidForm = validForm;
 		}
 
 	}

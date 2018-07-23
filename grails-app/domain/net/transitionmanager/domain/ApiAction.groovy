@@ -1,11 +1,9 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
-import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
 import net.transitionmanager.i18n.Message
@@ -22,16 +20,16 @@ import java.util.regex.Matcher
  * invoked by the TransitionManager application in Tasks and other places.
  */
 @Slf4j
-@ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
+@ToString(includes='name, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
 	String name
 	String description
 
-	// Indicates the class to use when invoking the action
-	AgentClass agentClass
+	// Indicates the catalog to use when invoking the action
+	ApiCatalog apiCatalog
 
-	// The method on the agentClass to invoke
+	// The method on the agent to invoke
 	String agentMethod
 
 	Provider provider
@@ -116,7 +114,8 @@ class ApiAction {
 
 	static belongsTo = [
 		project: Project,
-		provider: Provider
+		provider: Provider,
+		apiCatalog: ApiCatalog
 	]
 
 	static constraints = {
@@ -146,7 +145,6 @@ class ApiAction {
 
 	static mapping = {
 		columns {
-			agentClass 		sqlType: 'varchar(64)'
 			agentMethod 	sqlType: 'varchar(64)'
 			callbackMode 	sqlType: 'varchar(64)'
 			callbackMethod	sqlType: 'varchar(64)'

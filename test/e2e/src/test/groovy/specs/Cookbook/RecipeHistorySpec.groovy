@@ -15,16 +15,17 @@ import pages.Cookbook.TaskDetailsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
-import jodd.util.RandomString
+import utils.CommonActions
+
 
 @Stepwise
 class RecipeHistorySpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
-    static recipeName = baseName + " " + randStr + " Geb Recipe Test"
-    static recipeWithTasksName = baseName + " " + randStr + " Geb Recipe with Tasks Test"
+    static recipeName = baseName + " " + randStr + " Recipe"
+    static recipeWithTasksName = baseName + " " + randStr + " Recipe with Tasks"
     static recipeDataMap = [
             name: recipeName,
             context: "Event",

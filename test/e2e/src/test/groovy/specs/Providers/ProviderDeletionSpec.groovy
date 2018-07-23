@@ -1,7 +1,7 @@
 package specs.Providers
 
 import geb.spock.GebReportingSpec
-import jodd.util.RandomString
+import utils.CommonActions
 import pages.Providers.CreateProviderPage
 import pages.Providers.ProvidersPage
 import pages.Providers.ProvidersDetailPage
@@ -14,8 +14,8 @@ class ProviderDeletionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
-    static randStr2 =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = CommonActions.getRandomString() + " "
+    static randStr2 = CommonActions.getRandomString() + " "
     static E2E = "E2E Provider to be deleted"
     static provName = randStr + E2E
     static provName2 = randStr2 + E2E

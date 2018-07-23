@@ -5,16 +5,17 @@ import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.c
 import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import {DOMAIN, DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 
-export function StorageShowComponent(template, modelId: number) {
+export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({
 		selector: `storage-show`,
 		template: template
 	}) class StorageShowComponent implements OnInit {
-
 		mainAsset = modelId;
+		protected assetTags: Array<TagModel> = metadata.assetTags;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 		}

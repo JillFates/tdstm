@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 
 /**
  * Test about ETLProcessor commands:
@@ -557,4 +558,48 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
+    @See('TM-11182')
+    void 'test can create throw an Exception when script tries to use a non existing variable'() {
+
+	    given:
+		    def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+	    and:
+		    GroovySpy(AssetEntity, global: true)
+		    AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			    []
+		    }
+
+	    and:
+		    ETLProcessor etlProcessor = new ETLProcessor(
+				    GMDEMO,
+				    dataSet,
+				    debugConsole,
+				    validator)
+
+	    when: 'The ETL script is evaluated'
+		    etlProcessor.evaluate("""
+            console on
+            read labels
+            domain Dependency
+            iterate {
+                extract 'AssetId' load 'asset'
+                find Device by 'id' with DOMAIN.asset into 'asset' 
+                whenNotFound 'asset' create {
+                    description unknownVar
+                }
+            }
+        """.stripIndent())
+
+	    then: 'It throws an Exception because variable in not defined'
+		    ETLProcessorException e = thrown ETLProcessorException
+		    e.message == 'No such property: unknownVar'
+
+	    cleanup:
+		    if (fileName) {
+			    service.deleteTemporaryFile(fileName)
+		    }
+    }
+
 }

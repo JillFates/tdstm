@@ -136,6 +136,7 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
+        <g:render template="/angular/common/assetTags"></g:render>
 	</tbody>
 </table>
 

@@ -13,6 +13,7 @@
     <div class="modal-body">
         <div>
             <table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
+
                 <tr>
                     <td colspan="2" class="dialog-container">
                         <div class="dialog">
@@ -132,6 +133,7 @@
                                     <td>&nbsp;</td>
                                 </tr>
                                 <g:render template="/angular/common/customShow"></g:render>
+                                <g:render template="/angular/common/assetTags"></g:render>
                                 </tbody>
                             </table>
                         </div>
@@ -148,7 +150,6 @@
                         </table>
                     </td>
                 </tr>
-
 
                 <tr id="deps">
                     <g:render template="/angular/common/dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>

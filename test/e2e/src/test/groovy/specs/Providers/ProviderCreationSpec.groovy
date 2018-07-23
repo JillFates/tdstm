@@ -5,7 +5,7 @@ import pages.Providers.ProvidersDetailPage
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import jodd.util.RandomString
+import utils.CommonActions
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import pages.Providers.ProvidersPage
@@ -16,7 +16,7 @@ class ProviderCreationSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(4) + " "
+    static randStr = CommonActions.getRandomString() + " "
     static E2E = "E2E Provider"
     static provName = randStr + E2E + " Name"
     static provDescription = randStr + E2E + " Description"

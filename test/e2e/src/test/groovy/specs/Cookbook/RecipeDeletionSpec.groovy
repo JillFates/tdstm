@@ -6,13 +6,13 @@ import pages.Cookbook.CreateRecipePage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
-import jodd.util.RandomString
+import utils.CommonActions
 
 @Stepwise
 class RecipeDeletionSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static recipeName = baseName + " " + randStr + " Geb Recipe Test"
     static recipeDataMap = [

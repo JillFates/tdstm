@@ -75,6 +75,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
+	 * Static variable name definition for script name
+	 */
+	static final String ETLScriptName = 'TDSETLScript'
+
+
+	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -208,8 +214,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * <pre>
+	 *  domain Application
+	 * </pre>
 	 * @param domain a domain String value
-	 * @return the current instance of ETLProcessor
+	 * @return the current instance of {@code ETLProcessor} class
 	 */
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
@@ -225,10 +234,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Traps invalid domain command when a String parameter is passed
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * @param element an instance of {@code Element} class
+	 * @return the current instance of {@code ETLProcessor} class
+	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain (String anything) {
-		throw ETLProcessorException.invalidDomainComand()
+	ETLProcessor domain(Element element){
+		return domain(element.value)
+	}
+
+	/**
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
+	 * If value is an invalid Domain class name, it throws an Exception.
+	 * @param domainName
+	 * @return the current instance of {@code ETLProcessor} class
+	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
+	 */
+	ETLProcessor domain(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return domain(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
 	/**
@@ -695,9 +724,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	/**
 	 * Create a Find object for a particular Domain instance.
-	 * If the String is an invalid Domain, it throws an Exception.
-	 * @param domain
-	 * @return
+	 * <pre>
+	 *  find Application by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * @param domain an instance of {@code ETLDomain} class
+	 * @return an instance of {@code ETLFindElement} class
 	 */
 	ETLFindElement find (ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
@@ -708,8 +739,54 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Adds another find results in the current find element
-	 * @param domain
+	 * Create a Find object for a particular {@code Element.value}.
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * If value is an invalid Domain class name, it throws an Exception.
+	 * @param element an instance of {@code Element} class
+	 * @return an instance of {@code ETLFindElement} class
+	 */
+	ETLFindElement find(Element element){
+		return find(element.value)
+	}
+
+	/**
+	 * Create a Find object for a particular Domain instance name
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar.value by 'Name' with nameVar into 'id'
+	 * </pre>
+	 * If the String is an invalid Domain, it throws an Exception.
+	 * @param domainName a domain class name
+	 * @return an instance of {@code ETLFindElement}
+	 */
+	ETLFindElement find(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return find(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
+	}
+
+	/**
+	 * Adds another find results in the current find element.
+	 * <pre>
+	 *  find Application by 'Name' with nameVar into 'id'
+	 *  elseFind Application by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * If there is not {@code ETLProceesor.currentFindElement}
+	 * it throws an Exception {@code ETLProcessorException.#notCurrentFindElement}
+	 * @return an instance of {@code ETLFindElement} class
 	 */
 	ETLFindElement elseFind(ETLDomain domain) {
 		validateStack()
@@ -719,6 +796,49 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		pushIntoStack(currentFindElement)
 		return currentFindElement.elseFind(domain)
+	}
+
+	/**
+	 * Adds another find results in the current find element
+	 * for a particular {@code Element.value}
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar by 'Name' with nameVar into 'id'
+	 *  elseFind domainClassVar by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * @param element an instance of {@code Element} class
+	 * @return an instance of {@code ETLProcessor} class
+	 */
+	ETLProcessor elseFind(Element element){
+		return elseFind(element.value)
+	}
+
+	/**
+	 * Adds another find results in the current find element
+	 * for a particular Domain instance name
+	 * <pre>
+	 *  Map map = [
+	 * 	    'App': Application,
+	 * 		'Srv': Device
+	 * 	]
+	 *  extract 'type' transform with substitute(map) set domainClassVar
+	 *  find domainClassVar.value by 'Name' with nameVar into 'id'
+	 *  elseFind domainClassVar.value by 'appVersion' with appVersionVar into 'id'
+	 * </pre>
+	 * If the String is an invalid Domain, it throws an Exception.
+	 * @param domainName a domain class name
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	ETLProcessor elseFind(String domainName){
+		ETLDomain domain = ETLDomain.lookup(domainName)
+		if(domain){
+			return elseFind(domain)
+		}
+		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
 	/**
@@ -1271,6 +1391,62 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
+	@TimedInterrupt(600l)
+	Object execute(String script){
+		Object result = new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				defaultCompilerConfiguration())
+				.evaluate(script, ETLScriptName)
+
+		return result
+	}
+
+	/**
+	 * Calculates an return error message and line number where the ocurred.<br>
+	 * If exception paramter is an instance of {@code MultipleCompilationErrorsException}
+	 * line number is calculated by {@code MultipleCompilationErrorsException#errorCollector}
+	 * and {@code SyntaxErrorMessage#cause#startLine}<br>
+	 * Otherwise, line number is calculated by {@code StackTraceElement#fileName} equals to
+	 * {@code ETLProcessor#ETLScriptName} <br>
+	 * Result map is returned as follow:
+	 * <pre>
+	 * return [
+	 *  startLine: 4,
+	 *  endLine: 4,
+	 *  startColumn: 12,
+	 *  endColumn: 24,
+	 *  fatal: true,
+	 *  message: '...',
+	 *
+	 * ]
+	 * </pre>
+	 * @param exception an instance of {@code Throwable}
+	 * @return a Map with 2 fields: message and lineNumber
+	 */
+	static Map<String, ?> getErrorMessage(Throwable exception){
+
+		Map<String, ?> error = [:]
+		if(exception instanceof MultipleCompilationErrorsException){
+			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}
+			error.message    = syntaxErrorMessage.cause?.message
+			error.startLine  = syntaxErrorMessage.cause?.startLine
+			error.endLine    = syntaxErrorMessage.cause?.endLine
+			error.startColumn= syntaxErrorMessage.cause?.startColumn
+			error.endColumn  = syntaxErrorMessage.cause?.endColumn
+			error.fatal      = syntaxErrorMessage.cause?.fatal
+		}  else{
+			error.message = exception.getMessage()
+			error.startLine  = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+			error.endLine    = error.startLine
+			error.startColumn= null
+			error.endColumn  = null
+			error.fatal      = true
+		}
+		return error
+
+	}
+
 	/**
 	 * Using an instance of GroovyShell, it evaluates an ETL script content
 	 * using this instance of the ETLProcessor.
@@ -1286,7 +1462,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		setUpProgressIndicator(script, progressCallback)
 		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ETLProcessor.class.name)
+			.evaluate(script, ETLScriptName)
 		return result
 	}
 
@@ -1307,7 +1483,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 				this.class.classLoader,
 				this.binding,
 				configuration
-			).parse(script?.trim(), ETLProcessor.class.name)
+			).parse(script?.trim(), ETLScriptName)
 
 		} catch (MultipleCompilationErrorsException cfe) {
 			ErrorCollector errorCollector = cfe.getErrorCollector()
