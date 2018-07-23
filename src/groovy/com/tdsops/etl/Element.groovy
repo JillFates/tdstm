@@ -532,6 +532,23 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Set a default value when extracting and loading values
+	 * So that I can reduce the amount of code to write and simplify the scripts
+	 * <code>
+	 *     extract 'desc' transform with defaultValue('Something') load 'Description'
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	def defaultValue(Object value){
+		if( this.value == null ) {
+			this.value = value
+		}
+
+		return this
+	}
+
+	/**
 	 * Perform the append process over all values separated by <code>separator</code> provided
 	 * @param separator - value separator
 	 * @param values - list of values to concatenate
