@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
+import {Observable} from 'rxjs/Observable';
 
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
@@ -26,9 +27,9 @@ import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
 	CLEAR_ACTION = 'clear';
-	defaultAssetClass: IdTextItem;
+	defaultAssetClass: IdTextItem = {id: 'common', text: 'Common Fields'};
 	tagList: TagModel[] = [];
-	yesNoList: IdTextItem[] = [];
+	yesNoList: IdTextItem[] = [{ id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
 	actions: IdTextItem[] = [];
 	assetClassList: IdTextItem[] = [];
 	selectedItems: string[] = [];
@@ -63,42 +64,38 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		this.gridSettings.loadPageData();
 	}
 
-	ngOnInit() {
-		this.defaultAssetClass = { id: 'common', text: 'Common Fields'};
-		this.yesNoList = [ { id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
-		this.editRows = { actions: [], selectedValues: [] };
-
-
-
-		this.bulkChangeService.getActions()
-			.map((res: any) => Object.keys(res.data.tags))
-			.subscribe((actions: string[]) => {
-				this.customDomainService.getCommonFieldSpecs()
-					.subscribe((results) => {
-						this.commonFieldSpecs = results;
-
-						this.actions = actions
-							.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
-						this.addRow();
-						this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
-							[], // initial sort config.
-							{ mode: 'single', checkboxOnly: false}, // selectable config.
-							{ useColumn: 'id' }); // checkbox config.
-					});
-			});
-
-		this.tagService.getTags()
-			.subscribe((result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS && result.data) {
-					this.tagList = result.data;
-				}
-			}, error => console.log('error on GET Tag List', error));
-
-		this.assetClassList = ['common', 'application', 'database', 'device', 'storage']
+	getAssetClassList(fields: any[]): IdTextItem[] {
+		const assetClassList = fields
+			.map((field) => field.domain.toLowerCase())
 			.map((domain): IdTextItem => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
 
+		return assetClassList;
+	}
+
+	ngOnInit() {
+		this.editRows = { actions: [], selectedValues: [] };
 		this.gridColumns = new BulkChangeEditColumnsModel();
 
+		Observable.forkJoin(this.bulkChangeService.getActions(), this.customDomainService.getCommonFieldSpecs(), this.tagService.getTags())
+			.subscribe((result: any[]) => {
+				const [actions, fields, tags] = result;
+
+				this.actions = Object.keys(actions.data.tags)
+					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
+
+				this.commonFieldSpecs = fields;
+				this.assetClassList = this.getAssetClassList(this.commonFieldSpecs);
+
+				if (tags.status === ApiResponseModel.API_SUCCESS && tags.data) {
+					this.tagList = tags.data;
+				}
+
+				this.addRow();
+				this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
+					[], // initial sort config.
+					{ mode: 'single', checkboxOnly: false}, // selectable config.
+					{ useColumn: 'id' }); // checkbox config.
+			});
 	}
 
 	cancelCloseDialog(bulkActionResult: BulkActionResult): void {

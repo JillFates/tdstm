@@ -126,6 +126,7 @@
 											name="field" class="form-control field"
 									        [data]="editRows.actions[rowIndex].fields"
 									        [(ngModel)]="editRows.selectedValues[rowIndex].field"
+											[defaultItem]="editRows.selectedValues[rowIndex].field"
 									        [valueField]="'id'"
 									        [textField]="'text'">
 									</kendo-dropdownlist>
@@ -136,6 +137,7 @@
 									<kendo-dropdownlist
 											name="action" class="form-control action"
 											[data]="editRows.actions[rowIndex].actions"
+											[defaultItem]="editRows.selectedValues[rowIndex].action"
 											[(ngModel)]="editRows.selectedValues[rowIndex].action"
 											[valueField]="'id'"
 											[textField]="'text'">
