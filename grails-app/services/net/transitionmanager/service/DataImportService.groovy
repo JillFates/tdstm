@@ -21,10 +21,8 @@ import com.tdssrc.grails.TimeUtil
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
 import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.DataTransferSet
-import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
@@ -77,14 +75,6 @@ class DataImportService implements ServiceMethods {
 	static final Integer NOT_FOUND_BY_ID = -1
 	static final Integer FOUND_MULTIPLE = -2
 
-	// List of the domains that are supported by the Legacy Batch import
-	static final Map LEGACY_DOMAIN_CLASSES = [
-			( ETLDomain.Application.name() ) : ETLDomain.Application,
-			( ETLDomain.Database.name() ) : ETLDomain.Database,
-			( ETLDomain.Device.name() ) : ETLDomain.Device,
-			( ETLDomain.Storage.name() ) : ETLDomain.Storage
-		]
-
 	static final List<String> PROPERTIES_THAT_CANNOT_BE_MODIFIED = [
 		'version', 'assetClass', 'createdBy', 'updatedBy', 'project', 'dateCreated', 'lastUpdated'
 	]
@@ -101,8 +91,8 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
 	 *
-	 * This method will create a DataTransferBatch for each domain present in the importJsonData and then
-	 * create DataTransferValues for each field the rows specified in the meta-data.
+	 * This method will create a ImportBatch for each domain present in the importJsonData and then
+	 * create ImportBatchRecords for each row of the import JSON meta-data.
 	 *
 	 * The method is marked NonTransactional so that each the domains in the importJsonData can be handled
 	 * as independent transactions.
@@ -119,14 +109,14 @@ class DataImportService implements ServiceMethods {
 	 */
 	@NotTransactional()
 	Map loadETLJsonIntoImportBatch(Project project, UserLogin userLogin, JSONObject importJsonData) {
-		return localFunction(project, userLogin, importJsonData)
-	}
+		// 	return localFunction(project, userLogin, importJsonData)
+		// }
 
-	// TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
-	// This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
-	// that the @NotTransactional annotation causes issues. This was a neat trick to get around that since the loadETLJsonIntoImportBatch
-	// method wasn't being changed. Groovy is more forgiving with Closures...
-	def localFunction = { Project project, UserLogin userLogin, JSONObject importJsonData ->
+		// // TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
+		// // This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
+		// // that the @NotTransactional annotation causes issues. This was a neat trick to get around that since the loadETLJsonIntoImportBatch
+		// // method wasn't being changed. Groovy is more forgiving with Closures...
+		// def localFunction = { Project project, UserLogin userLogin, JSONObject importJsonData ->
 
 		// Map which summarizes the results from the import process.
 		Map importResults = [ batchesCreated: 0, domains:[], errors: [] ]
@@ -148,14 +138,12 @@ class DataImportService implements ServiceMethods {
 			rowsCreated: 0,
 			rowsSkipped: 0,
 			rowNumber: 0,
-			errors:[],
-			isLegacy:false
+			errors:[]
 		]
 
 		// Iterate over the domains and create batches for each
 		for (domainJson in importJsonData.domains) {
 			importContext.domainClass = domainJson.domain
-			importContext.isLegacy = isLegacy( importContext.domainClass )
 
 			log.debug "localFunction() in for loop: importContext=$importContext"
 
@@ -165,10 +153,8 @@ class DataImportService implements ServiceMethods {
 				importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0 ]
 			} else {
 
-				Class batchClass = (importContext.isLegacy ? DataTransferBatch : ImportBatch)
-
 				// Process each batch in a separate transaction to help with performance and memory
-				batchClass.withNewTransaction { session ->
+				ImportBatch.withNewTransaction { session ->
 					// Attach the project to the current transaction
 					// project.attach()
 
@@ -183,7 +169,7 @@ class DataImportService implements ServiceMethods {
 					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
-					def batch = createBatch(importContext)
+					def batch = createImportBatch(importContext)
 
 					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
 					if (batch == null) {
@@ -214,81 +200,13 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to determine if the importContext at the moment is for the Legacy DataImportBatch or the
-	 * new ImportBatch system.
-	 * @param domainName - the name of the domain used by the Import process
-	 * @return true if Legacy otherwise false
-	 */
-	private Boolean isLegacy( String domainName ) {
-		return false
-		// return LEGACY_DOMAIN_CLASSES.containsKey( domainName )
-	}
-
-	/**
-	 * This is used to create either an ImportBatch or legacy DataTransferBatch object
-	 * @param importContext - the map with all the juicy information used by the Import process
-	 * @return either an ImportBatch or DataTransferBatch Domain instance or null if failed to be created
-	 */
-	private Object createBatch(Map importContext) {
-		if ( importContext.isLegacy ) {
-			return createDataTransferBatch(importContext)
-		} else {
-			return createImportBatch(importContext)
-		}
-	}
-
-	/**
-	 * LEGACY - Create a Transfer Batch for the given Asset Class.
-	 * @param domainClass
-	 * @param currentUser
-	 * @param project
-	 * @return
-	 */
-	private DataTransferBatch createDataTransferBatch(Map importContext) {
-		DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
-		if (!dts) {
-			dts = DataTransferSet.get(1)
-		}
-
-		Class<?> clazz = LEGACY_DOMAIN_CLASSES[importContext.domainClass].getClazz()
-		AssetClass assetClass = AssetClass.lookup(clazz)
-
-		// If the asset class is invalid, return null
-		if (! assetClass) {
-			importContext.errors << "Import does not support domain type ${transDomainName}"
-			return null
-		}
-
-		DataTransferBatch batch = new DataTransferBatch(
-				project: importContext.project,
-				userLogin: importContext.userLogin,
-				statusCode: DataTransferBatch.PENDING,
-				transferMode: "I",
-				assetClass: assetClass,
-				dataTransferSet: dts,
-				// Make an assumption that the export time was now...
-				exportDatetime: new Date()
-			)
-
-		// Check if the transfer batch is valid, report the error if not.
-		if (! batch.save(failOnError:false)) {
-			importContext.errors << "There was an error when creating the import batch for ${domainClass}"
-			log.error 'DataImportService.createDataTransferBatch() failed save: {}', GormUtil.allErrorsString(batch)
-			batch.discard()
-
-			return null
-		}
-
-		return batch
-	}
-
-	/**
 	 * NEW ETL - Create a ImportBatch record for a given Domain Class
 	 * @param domainClass
 	 * @param currentUser
 	 * @param project
 	 * @return a newly created ImportBatch object
 	 */
+	//@CompileStatic
 	private ImportBatch createImportBatch( Map importContext ) {
 
 		Date warnOnChangesAfter
@@ -301,23 +219,22 @@ class DataImportService implements ServiceMethods {
 		DataScript dataScript = GormUtil.findInProject(importContext.project, DataScript, importContext.etlInfo.dataScriptId)
 
 		ImportBatch batch = new ImportBatch(
-				project: importContext.project,
-				status: ImportBatchStatusEnum.PENDING,
-				dataScript: dataScript,
-				provider: dataScript?.provider,
-				domainClassName: importContext.domainClass,
-				createdBy: importContext.userLogin.person,
-				// createdBy: importContext.etlInfo.createdBy,
-				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
-				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
-				fieldNameList: JsonUtil.toJson(importContext.fieldNames),
-				fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
-				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
-				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
-				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
-				timezone: ( importContext.etlInfo.timezone ?: 'GMT' ),
-				warnOnChangesAfter: warnOnChangesAfter
-			)
+			project: importContext.project,
+			status: ImportBatchStatusEnum.PENDING,
+			dataScript: dataScript,
+			provider: dataScript?.provider,
+			domainClassName: importContext.domainClass,
+			createdBy: importContext.userLogin.person,
+			autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
+			dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
+			fieldNameList: JsonUtil.toJson(importContext.fieldNames),
+			fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
+			nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
+			originalFilename: (importContext.etlInfo.originalFilename ?: ''),
+			overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
+			timezone: ( importContext.etlInfo.timezone ?: 'GMT' ),
+			warnOnChangesAfter: warnOnChangesAfter
+		)
 
 		// Check if the transfer batch is valid, report the error if not.
 		if (!batch.save(failOnError:false)) {
@@ -334,11 +251,12 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * Import all the assets for the given batch.
 	 *
-	 * @param dataTransferBatch - current batch
+	 * @param batch - current batch
 	 * @param assets - list of assets
 	 * @param importContext - additional parameters required for logging
 	 */
-	private void importRowsIntoBatch(session, Object batch, List<JSONObject> importRows, Map importContext) {
+	//@CompileStatic
+	private void importRowsIntoBatch(session, ImportBatch batch, List<JSONObject> importRows, Map importContext) {
 		for (rowData in importRows) {
 			// Keep track of the row number for reporting
 			importContext.rowNumber++
@@ -356,21 +274,17 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * Import an individual row of data
 	 *
-	 * @param dataTransferBatch
+	 * @param batch
 	 * @param asset - LazyMap with all the field information
 	 * @param importContext - additional parameters required for logging
 	 */
-	private void importRow(session, Object batch, JSONObject rowData, Map importContext ) {
+	// @CompileStatic
+	private void importRow(session, ImportBatch batch, JSONObject rowData, Map importContext ) {
 		boolean importOfRowOkay = false
 		Long domainId = getAndValidateDomainId(rowData, importContext)
 		log.debug "importRow() id={}", domainId
-		if (importContext.isLegacy) {
-			if (domainId == null || domainId > 0) {
-				importOfRowOkay = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext)
-			}
-		} else {
-			importOfRowOkay = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
-		}
+
+		importOfRowOkay = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext)
 
 		if (importOfRowOkay) {
 			importContext.rowsCreated++
@@ -380,99 +294,14 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * LEGACY -- Create a new DataTransferValue for each field in the rowData. Any errors will be added to the importContext.errors list and
-	 * the entire row will be skipped. This method is implemented with a NESTED transaction so that it will rollback all of the fields
-	 * that were added prior to the error.
-	 *
-	 * @param dataTransferBatch - current batch
-	 * @param rowData - the meta-data for the current field to be inserted
-	 * @param domainId - the id for the domain object if known
-	 * @param importContext - Map of the import context objects
-	 * @return true if all of the fields were successfully added to the DataTransferValue table or false if there was an error
-	 */
-	private boolean insertRowDataIntoDataTransferValues(session, DataTransferBatch batch, JSONObject rowData, Long domainId, Map importContext ) {
-
-		int rowNum = importContext.rowNumber - 1
-		// Tried using sessionFactory.currentSession but that session object did not have the createSavepoint() method
-		def savePoint = session.createSavepoint()
-
-		Boolean hadError = false
-
-		// If the domain id is null or negative, default it to zero.
-		if (!domainId || domainId < 0) {
-			domainId = 0
-		}
-		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
-		for (fieldName in importContext.fieldNames) {
-
-			// If the current field is the id, skip it (avoid inserting it into the database).
-			if (fieldName != 'id') {
-
-				JSONObject field = rowData.fields[fieldName]
-
-				// TODO : JPM 2/2018 : MINOR - Revisit this later - this implementation is iffy - will be important for Dependency implementation
-				// def fieldValue = DataImportHelper.resolveFieldValue(fieldName, field)
-
-				def fieldValue = field?.value
-
-				// Don't bother with String values that are empty or any types that are null
-				if ( fieldValue == null || ( (fieldValue instanceof CharSequence) && StringUtil.isBlank(fieldValue) ) ) {
-					continue
-				}
-
-				// Truncate the original value if necessary
-				def origValue = field.originalValue
-				if ( (origValue instanceof CharSequence) && origValue != null && origValue.size() > 255 ) {
-					origValue = StringUtil.ellipsis(origValue, 255)
-				}
-
-				DataTransferValue batchRecord = new DataTransferValue(
-					dataTransferBatch: batch,
-					fieldName: fieldName,
-					assetEntityId: domainId,
-					importValue: origValue,
-					correctedValue: fieldValue,
-					rowId: rowNum
-				)
-
-				// Boolean triggerFailureTest = (fieldValue == 'oradbsrv02')
-				Boolean triggerFailureTest = false
-
-				// This should NOT throw an exception because we're dealing errors in a savepoint rollback
-				if (! batchRecord.save(failOnError:false) || triggerFailureTest ) {
-
-					// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
-					importContext.errors << "Unable to save field $fieldName on row ${rowNum}: ${GormUtil.allErrorsString(batchRecord)}"
-
-					// Get rid of the GORM object that can't be saved so the main transaction can
-					// still be committed.
-					batchRecord.discard()
-
-					// Roll back so none of the fields for this one row will be saved
-					session.rollbackToSavepoint(savePoint)
-
-					hadError = true
-					break
-				}
-			}
-		}
-
-		// TODO : JPM 2/2018 : Determine if the releaseSavepoint should be called after the rollbackToSavepoint
-		// It seems to work okay but would like confirmation.
-		session.releaseSavepoint(savePoint)
-
-		return true
-	}
-
-	/**
 	 * Create a new ImportBatchRecord for the given row. Any errors will be added to the importContext.errors list and
 	 * the entire row will be skipped.
 	 *
-	 * @param dataTransferBatch - current batch
+	 * @param batch - current batch
 	 * @param rowData - the meta-data for the current field to be inserted
 	 * @param domainId - the id for the domain object if known
 	 * @param importContext - Map of the import context objects
-	 * @return true if all of the fields were successfully added to the DataTransferValue table or false if there was an error
+	 * @return true if all of the fields were successfully added to the ImportBatchRecord table or false if there was an error
 	 */
 	private boolean insertRowDataIntoImportBatchRecord(session, ImportBatch batch, JSONObject rowData, Long domainId, Map importContext ) {
 
@@ -1121,20 +950,23 @@ class DataImportService implements ServiceMethods {
 					// Damn it! Couldn't save this sucker...
 					entity.discard()
 					entity = null
-				}
 
-				if (entity) {
-					if (record.errorCount) {
-						log.debug 'processEntityRecord() Failing due to {} error(s)', record.errorCount
-						entity.discard()
-						entity = null
-					} else {
-						record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+				} else {
 
-						// log.debug "processEntityRecord() Saving the Entity"
+					// Determine the correct Operation that was performed and if the record should be saved
+					Boolean shouldBeSaved = true
+					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
+					if ( record.operation == ImportOperationEnum.UPDATE && ! GormUtil.hasUnsavedChanges(entity) ) {
+						record.operation = ImportOperationEnum.UNCHANGED
+						shouldBeSaved = false
+					}
+
+					// log.debug "processEntityRecord() Saving the Dependency"
+					if (shouldBeSaved) {
 						if (entity.save(failOnError:false)) {
+							// If we still have a dependency record then the process must have finished
 							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-							//    Note that I was running into some strange issues of casting that prevented from doing this originally
+							//    Note that I was running to some strange issues of casting that prevented from doing this originally
 							// record.status = ImportBatchRecordStatusEnum.COMPLETED
 							record.status = ImportBatchStatusEnum.COMPLETED
 						} else {
@@ -1142,6 +974,10 @@ class DataImportService implements ServiceMethods {
 							entity.discard()
 							entity = null
 						}
+					} else {
+						// Discard the entity just incase something unexpected
+						entity.discard()
+						record.status = ImportBatchStatusEnum.COMPLETED
 					}
 				}
 			}
@@ -1177,6 +1013,8 @@ class DataImportService implements ServiceMethods {
 	private Object findOrCreateEntity(Map fieldsInfo, Map context ) {
 		Object entity
 
+		log.debug 'findOrCreateEntity() called'
+
 		entity = fetchEntityByFieldMetaData('id', fieldsInfo, context)
 
 		if (entity == -1) {
@@ -1205,7 +1043,11 @@ class DataImportService implements ServiceMethods {
 	 * @return the newly minted domain entity instance
 	 */
 	private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
-		Object entity = domainClass.createInstance()
+		if (! GormUtil.isDomainClass(domainClass)) {
+			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
+		}
+
+		Object entity = domainClass.newInstance()
 
 		// Populate mandatory properties that can be determined at this time
 
@@ -1254,11 +1096,14 @@ class DataImportService implements ServiceMethods {
 
 		// Take the complete list of field names in fieldsInfo and remove 'id' plus any passed to the method
 		Set<String> fieldNames = fieldsInfo.keySet()
+		log.debug 'bindFieldsInfoValuesToEntity() starting with fields to update of: {}', fieldNames.join(', ')
 		if (fieldsToIgnore == null) {
 			fieldsToIngnore = []
 		}
 		fieldsToIgnore.addAll(['id'])
 		fieldNames = fieldNames - fieldsToIgnore
+
+		Boolean isNewEntity = (Boolean)(domain.id == null)
 
 		String domainShortName = GormUtil.domainShortName(domain)
 
@@ -1267,20 +1112,20 @@ class DataImportService implements ServiceMethods {
 			noErrorsEncountered = false
 			addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, msg)
 		}
+
 		// Assignment Logic (TBD 6/2018)
 		// 		If no new value and init contains value and entity property has no value
 		// 		Then set the property to the init value
 		// 		Else if new value and current value not equal new value
 		// 		Then set new value
 
-		// fieldNames = ['manufacturer', 'model']
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
 				recordErrorHelper(fieldName,'Modifying the field is not allowed')
 				continue
 			}
 
-			log.debug 'bindFieldsInfoValuesToEntity() Checking ignore for {}.{}', domainShortName, fieldName
+			log.debug 'bindFieldsInfoValuesToEntity() Processing {}.{}', domainShortName, fieldName
 
 			// Check for exception fields that should be ignored
 			if (DOMAIN_FIELD_EXCEPTIONS."$domainShortName"?."$fieldName"?.'ignore') {
@@ -1298,30 +1143,37 @@ class DataImportService implements ServiceMethods {
 			def (value, initValue) = getValueAndInitialize(fieldName, fieldsInfo)
 			boolean isInitValue = (initValue != null)
 
+			// This will get populated with the domain's existing value for fields to be recorded when different
+			Object existingValue = null
+
 			if (isReference) {
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 
 				Object refObject = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context)
-
+				existingValue = domain[fieldName] ? domain[fieldName].toString() : null
 				switch (refObject) {
 					case -1:
 						noErrorsEncountered = false
 						break
 
 					case null:
-						// TODO : JPM 6/2018 : Make the lookup of the constraint cachable with java.util.concurrent.ConcurrentHashMap
-						// This operation repeated tens of thousands of times is going to be very expensive otherwise
 						Boolean nullable = GormUtil.getConstraint(domain, fieldName, 'nullable')
-						log.debug 'bindFieldsInfoValuesToEntity() nullable={}, fieldName={}', nullable, fieldName
+						log.debug 'bindFieldsInfoValuesToEntity() Set reference to null > isNullable={}', nullable, fieldName
 						if ( nullable != true) {
 							recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
+						} else {
+							if (existingValue != refObject) {
+								// TODO : JPM 7/2018 : need to deal with init or explicit setting
+								_recordChangeOnField(domain, fieldName, existingValue, refObject, isNewEntity, fieldsInfo)
+							}
+							domain[fieldName] = null
 						}
 						break
 
 					default:
 						if ( (isInitValue && domainValue == null) || (!isInitValue && domainValue != refObject) ) {
-							domain[fieldName] = refObject
+							_recordChangeOnField(domain, fieldName, existingValue, refObject, isNewEntity, fieldsInfo)
 						}
 				}
 				continue
@@ -1334,106 +1186,112 @@ class DataImportService implements ServiceMethods {
 				// The field must have a value to set otherwise the logic will skip over it. As such this logic
 				// will determine if the value or init properties have a real value and set a few boolean flags.
 				def valueToSet = isInitValue ? initValue : value
-				boolean valueIsSet = true
-				if (valueToSet instanceof CharSequence) {
-					valueIsSet = ! StringUtil.isBlank(valueToSet)
-				} else {
-					valueIsSet = (valueToSet != null)
-				}
+				existingValue = domain[fieldName]
 
-				if (valueIsSet) {
-					Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
-					switch (fieldClassType) {
-						case String:
-							if ( (isInitValue && StringUtil.isBlank(domainValue)) ||  ( !isInitValue && valueToSet != domainValue) ) {
-								domain[fieldName] = valueToSet
+				Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
+				log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+				switch (fieldClassType) {
+					case String:
+						if ( (isInitValue && StringUtil.isBlank(domainValue)) ||  ( !isInitValue && valueToSet != domainValue) ) {
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
+						}
+						break
+
+					case Integer:
+						Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
+						if (numValueToSet == null) {
+							noErrorsEncountered = false
+							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value specified must be an numeric value')
+						} else {
+							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
+								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
 							}
-							break
+						}
+						break
 
-						case Integer:
-						case Long:
-							Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
-							if (numValueToSet == null) {
-								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
-							} else {
-								// TODO : JPM 6/2018 : Should we consider zero (0) the same as not set - perhaps see if 0 is the default on the domain?
-								if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
-									domain[fieldName] = numValueToSet
-								}
+					case Long:
+						Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
+						if (numValueToSet == null) {
+							noErrorsEncountered = false
+							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value specified must be an numeric value')
+						} else {
+							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
+								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
 							}
-							break
+						}
+						break
 
-						case Date:
-							if (valueToSet != '') {
-
-								if (valueToSet instanceof CharSequence) {
-									// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
-									if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-										valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-									} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
-										valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-									}
-									// Attempt to parse a Date / Date Time based on the underlying database table column type
-									def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-									def propConfig = mapping.getPropertyConfig(fieldName)
-									// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
-								}
-
-								if (! (valueToSet instanceof Date)) {
-
-									String columnType
-									recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO8601 format')
-								} else {
-									if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
-										domain[fieldName] = valueToSet
-									}
-								}
+					case Date:
+						if (valueToSet instanceof CharSequence) {
+							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
+							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 							}
-							break
+							// Attempt to parse a Date / Date Time based on the underlying database table column type
+							def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+							def propConfig = mapping.getPropertyConfig(fieldName)
+							// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
+						}
 
-
-						case Enum:
-							try {
-								// def valueToSet = valueToSet as "${fieldClassType.getName()}"
-								def enumValue = fieldClassType.valueOf(valueToSet)
-								if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != enumValue) ) {
-									domain[fieldName] = enumValue
-								}
-							} catch (e) {
-								recordErrorHelper(fieldName, 'Unable to validate ENUM value')
-
+						if (! (valueToSet instanceof Date)) {
+							String columnType
+							noErrorsEncountered = false
+							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO8601 format')
+						} else {
+							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
+								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
 							}
-							break
+						}
+						break
 
-						default:
-							recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
-					}
+					case Enum:
+						try {
+							// def valueToSet = valueToSet as "${fieldClassType.getName()}"
+							def enumValue = fieldClassType.valueOf(valueToSet)
+							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != enumValue) ) {
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
+							}
+						} catch (e) {
+							noErrorsEncountered = false
+							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Unable to validate ENUM value')
+						}
+						break
+
+					default:
+						noErrorsEncountered = false
+						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "Import process unable to support setting type ${fieldClassType.getName()}")
 				}
 			}
-
-			//boolean hasInitializeValue = (initValue != null)
-			//boolean newValueIsSet = (newValue != null)
-
-			// log.debug 'bindFieldsInfoValuesToEntity() fieldName {} isReference {}, newValue {}, domainValue {}, initValue {}, hasInitializeValue {}',
-			// 	fieldName, isReference, newValue, domainValue, initValue, hasInitializeValue
-			// log.debug 'bindFieldsInfoValuesToEntity() initValue isa {} and value of {}', initValue.getClass().getName(), initValue
-
-			// if (hasInitializeValue) {
-			// 	if (isReference) {
-			// 		noErrorsEncountered = false
-			// 		addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "The 'initialize' command is not supported for id or reference fields")
-			// 		continue
-			// 	}
-			// 	if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
-			// 		domain[fieldName] = initValue
-			// 	}
-			// } else {
-			//}
 		}
 
 		log.debug 'bindFieldsInfoValuesToEntity() dirty fields {}', domain.dirtyPropertyNames
 
 		return noErrorsEncountered
+	}
+
+	/**
+	 * Used to actually assign values to the domain being created or updated. Additionally it will record the original value when
+	 * the record pre-existed back into the fieldsInfo to allow for showing what fields actually changed.
+	 *
+	 * The original value will be saved to the 'previousValue' property only if the record is pre-existing.
+	 *
+	 * @param domainInstance - the domain entity to save values to
+	 * @param fieldName - the field to update
+	 * @param oldValue - the original value
+	 * @param newValue - the value to save
+	 * @param isNewEntity - flag if the record is new or existing
+	 * @param fieldsInfo - the JSON data from the import batch record
+	 */
+	void _recordChangeOnField(Object domainInstance, String fieldName, Object existingValue, Object newValue, Boolean isNewEntity, JSONObject fieldsInfo) {
+		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
+			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
+
+		domainInstance[fieldName] = newValue
+		if (! isNewEntity) {
+			fieldsInfo[fieldName].previousValue = existingValue
+		}
 	}
 
 	/**
@@ -1572,7 +1430,8 @@ class DataImportService implements ServiceMethods {
 	 * 				"value": "xraysrv01",
 	 *				// Search by primary ID Example
 	 * 				"value": 114052,
-	 * 				"originalValue": "114052",
+	 * 				"originalValue": "114052",   // THIS MAY BE GOING AWAY JPM 7/2018
+	 *              "previousValue": "23432" // This is set during the POSTING process for existing records being updated
 	 * 				"error": false,
 	 *				"errors": [ "Lookup by ID was not found"],
 	 * 				"warn": false,
@@ -1599,108 +1458,130 @@ class DataImportService implements ServiceMethods {
 
 		boolean foundInCache=false
 		boolean errorPreviouslyRecorded = false
+		boolean fieldIsId = fieldName == 'id'
+		boolean fieldIsInFieldsInfo = fieldsInfo.containsKey(fieldName)
 
 		// Flags that a search by ID failed which will result in an error so that duplicates are not created
 		boolean searchedById = false
 
 		Class domainClass = classOfDomainProperty(fieldName, fieldsInfo, context)
 		String domainShortName = GormUtil.domainShortName(domainClass)
+		int xyz = 0
+		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+		while (true) {
+		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
-		boolean working = true
-		while (working) {
-			if ( ! fieldsInfo[fieldName] ) {
+			if ( ! fieldIsInFieldsInfo && ! fieldIsId) {
 				// Shouldn't happen but just in case...
 				entity = "Reference property $fieldName is missing from ETL output"
 				break
 			}
-
+			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 			//
-			// Going to try up to 5 different ways to find the domain entity
+			// Now going to try up to 5+ different ways to find the domain entity
 			//
 
-			// 1. See if this property based on ID is in the cache already
-			md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
-			// log.debug 'fetchEntityByFieldMetaData() has cache key {}', md5
-			entity = context.cache.get(md5)
-			if (entity) {
-				log.debug 'fetchEntityByFieldMetaData() found cache ID {}, {}', md5, entity
-				foundInCache=true
-				break
-			}
-
-			// 2. Attempt to find the domain by the ID in the property field.value (Number or String)
-			entity = _fetchEntityById(domainClass, fieldName, fieldsInfo, context)
-			if (entity) {
-				if (entity == NOT_FOUND_BY_ID) {
-					// Didn't find but we did have an ID
-					searchedById = true
-				} else {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 1 (ID)'
-					break
-				}
-			}
-
-			// 3. Attempt to find domain with the single result (find.results[0])
-			if ( _hasSingleFindResult(fieldName, fieldsInfo) ) {
-				searchedById = true
-				entity = _fetchEntityByFindResults(fieldName, fieldsInfo, context)
+			if (fieldIsInFieldsInfo) {
+				// 1. See if this property based on ID is in the cache already
+				md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
+				// log.debug 'fetchEntityByFieldMetaData() has cache key {}', md5
+				entity = context.cache.get(md5)
 				if (entity) {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 3 (find results)'
+					log.debug 'fetchEntityByFieldMetaData() resolved by method 1 (cache ID {}, {})', md5, entity
+					foundInCache=true
 					break
 				}
-			}
+				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
-			// Fail out if the field had a previously set/resolved ID
-			if (searchedById) {
-				// This is when we give up because there were attempts by previously specified or resolved ID but
-				// now attempting to retrieve has failed indicating that the entity was deleted. As such we do NOT
-				// what a create a new record.
-				log.info 'fetchEntityByFieldMetaData() failed to resolve by ELT ID reference - domain {}, field {}',
-					domainClass.getName(), fieldName
-				entity = SEARCH_BY_ID_NOT_FOUND_MSG
-				break
-			}
+				// 2. Attempt to find the domain by the ID in the property field.value (Number or String)
+				entity = _fetchEntityById(domainClass, fieldName, fieldsInfo, context)
+				if (entity) {
+					if (entity == NOT_FOUND_BY_ID) {
+						// Didn't find but we did have an ID
+						searchedById = true
+					} else {
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 2 (ID)'
+						break
+					}
+				}
+				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
-			// 4. Attept to find domain by re-applying the find/elseFind queries
-			if ( _hasFindQuery(fieldName, fieldsInfo)) {
-				List entities = _performQueryAndUpdateFindElement(fieldName, fieldsInfo, context)
-				int qtyFound = entities?.size() ?: 0
-				if (qtyFound == 1) {
-					entity = entities[0]
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found 1 '
-					break
-				} else if (qtyFound > 1 ) {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found {}', qtyFound
-					entity = FIND_FOUND_MULTIPLE_REFERENCES_MSG
-					errorPreviouslyRecorded = true
+				// 3. Attempt to find domain with the single result (find.results[0])
+				if ( _hasSingleFindResult(fieldName, fieldsInfo) ) {
+					searchedById = true
+					entity = _fetchEntityByFindResults(fieldName, fieldsInfo, context)
+					if (entity) {
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 3 (find results)'
+						break
+					}
+				}
+				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+
+				// Fail out if the field had a previously set/resolved ID
+				if (searchedById) {
+					// This is when we give up because there were attempts by previously specified or resolved ID but
+					// now attempting to retrieve has failed indicating that the entity was deleted. As such we do NOT
+					// what a create a new record.
+					log.info 'fetchEntityByFieldMetaData() failed to resolve by ELT ID reference - domain {}, field {}',
+						domainClass.getName(), fieldName
+					entity = SEARCH_BY_ID_NOT_FOUND_MSG
 					break
 				}
-			}
+				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
-			// 5. Attempt to find domain by alternate key (which is the least precise)
-			// If the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name)
-			def searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-			Map findResult = _fetchEntityByAlternateKey(domainClass, searchValue, fieldName, fieldsInfo, context)
-			// entities = findDomainByAlternateProperty(fieldName, fieldsInfo, context)
-			if (findResult.error) {
-				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, findResult.error)
-				entity = findResult.error
-			} else {
-				int qtyFound = findResult.entities?.size() ?: 0
-				if (qtyFound == 1) {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found 1 by {}', fieldsInfo[fieldName].value
-					entity = findResult.entities[0]
-				} else if (qtyFound > 1 ) {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found {} by []', qtyFound, fieldsInfo[fieldName].value
-					entity = ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
+				// 4. Attept to find domain by re-applying the find/elseFind queries
+				if ( _hasFindQuery(fieldName, fieldsInfo)) {
+					List entities = _performQueryAndUpdateFindElement(fieldName, fieldsInfo, context)
+					int qtyFound = entities?.size() ?: 0
+					if (qtyFound == 1) {
+						entity = entities[0]
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found 1 '
+						break
+					} else if (qtyFound > 1 ) {
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found {}', qtyFound
+						entity = FIND_FOUND_MULTIPLE_REFERENCES_MSG
+						errorPreviouslyRecorded = true
+						break
+					}
 				}
+				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+
+				// 5. Attempt to find domain by alternate key (which is the least precise)
+				// If the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name)
+				def searchValue = getValueOrInitialize(fieldName, fieldsInfo)
+				Map findResult = _fetchEntityByAlternateKey(domainClass, searchValue, fieldName, fieldsInfo, context)
+				// entities = findDomainByAlternateProperty(fieldName, fieldsInfo, context)
+				if (findResult.error) {
+					addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, findResult.error)
+					entity = findResult.error
+					break
+				} else {
+					int qtyFound = findResult.entities?.size() ?: 0
+					if (qtyFound == 1) {
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found 1 by {}', fieldsInfo[fieldName].value
+						entity = findResult.entities[0]
+						break
+					} else if (qtyFound > 1 ) {
+						log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found {} by []', qtyFound, fieldsInfo[fieldName].value
+						entity = ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
+						break
+					}
+				}
+			} // if (fieldIsInFieldsInfo) {
+
+			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+			// 6. Attempt for certain domain classes (e.g. AssetDependency) that weren't found
+			if (context.domainShortName == 'AssetDependency') {
+				entity = _fetchAssetDependencyByAssets(fieldsInfo, context)
 			}
+			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+
 			break
 		}
 
 		// Cache the entity or error message for the lookup (unless it was found in cache above)
-		if (! foundInCache) {
+		if (! foundInCache && md5) {
 			log.debug ('fetchEntityByFieldMetaData() added to cache: key {}, class {}, fieldName {}, entity {}', md5, domainShortName, fieldName, entity)
 			context.cache.put(md5, entity)
 		}
@@ -1714,6 +1595,38 @@ class DataImportService implements ServiceMethods {
 		}
 
 		return entity
+	}
+
+	/**
+	 * Used by the fetchEntityByFieldMetaData method to find an AssetDependency by the asset and dependent assets specified
+	 * in the fieldsInfo appropriately. If either assets can not be located then a null is returned.
+	 *
+	 * @return the Dependency if found
+	 */
+	private AssetDependency _fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
+		AssetEntity primary
+		AssetEntity supporting
+		AssetDependency dependency
+
+		log.debug '_fetchAssetDependencyByAssets() was called'
+
+		primary = fetchEntityByFieldMetaData('asset', fieldsInfo, context)
+		if (primary in AssetEntity) {
+			log.debug '_fetchAssetDependencyByAssets() primary asset was found'
+			supporting = fetchEntityByFieldMetaData('dependent', fieldsInfo, context)
+			if (supporting in AssetEntity) {
+				log.debug '_fetchAssetDependencyByAssets() supporting asset was found'
+				dependency = AssetDependency.where {
+					asset.id == primary.id
+					dependent.id == supporting.id
+				}.find()
+				if (dependency) {
+					log.debug '_fetchAssetDependencyByAssets() asset dependency was found'
+				}
+			}
+		}
+
+		return dependency
 	}
 
 	/**
@@ -1753,7 +1666,9 @@ class DataImportService implements ServiceMethods {
 	 * @return true if there is a single result otherwise false
 	 */
 	private Boolean _hasSingleFindResult(String propertyName, Map fieldsInfo) {
-		return fieldsInfo[propertyName].find?.results?.size() == 1
+		Boolean hasSingleResult = fieldsInfo[propertyName].find?.results?.size() == 1
+		log.debug '_hasSingleFindResult() for field {} has single result? {}', propertyName, hasSingleResult
+		return hasSingleResult
 	}
 
 	/**
@@ -1763,7 +1678,9 @@ class DataImportService implements ServiceMethods {
 	 * @return true if there is one or more queries defined
 	 */
 	private Boolean _hasFindQuery(String propertyName, Map fieldsInfo) {
-		return fieldsInfo[propertyName].find?.query?.size() > 0
+		Boolean hasFindQuery = fieldsInfo[propertyName].find?.query?.size() > 0
+		log.debug '_hasFindQuery() for field {} has find query? {}', propertyName, hasFindQuery
+		return hasFindQuery
 	}
 
 	/**
@@ -2064,64 +1981,81 @@ class DataImportService implements ServiceMethods {
 		Class domainClassToCreate
 		ETLDomain ed
 		String errorMsg
-		log.debug 'classOfDomainProperty() for property {}', propertyName
 
 		if (! GormUtil.isDomainProperty(context.domainClass, propertyName)) {
 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-		}
-		while ( ! errorMsg ) {
-			Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(context.domainClass, propertyName)
-			Boolean isReferenceProperty = GormUtil.isReferenceProperty(context.domainClass, propertyName)
-			log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
+			log.debug 'classOfDomainProperty() {}', errorMsg
+		} else {
+			while ( true ) {
+				if (propertyName == 'id') {
+					domainClassToCreate = context.domainClass
+					break
+				}
 
-			if (! fieldsInfo.containsKey(propertyName)) {
-				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
-				break
-			}
-			// propertyName MUST be a reference or identifier for this function otherwise record an error
-			if (! ( isIdentifierProperty || isReferenceProperty ) ) {
-				errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG
-				break
-			}
+				if (! fieldsInfo.containsKey(propertyName)) {
+					errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
+					log.debug 'classOfDomainProperty() {}', errorMsg
+					break
+				}
 
-			if (isIdentifierProperty) {
-				domainClassToCreate = context.domainClass
-				break
-			}
+				Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(context.domainClass, propertyName)
+				Boolean isReferenceProperty = GormUtil.isReferenceProperty(context.domainClass, propertyName)
+				log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
 
-			// Get the type for the property of domain class being processed by the batch
-			domainClassToCreate = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
+				// propertyName MUST be a reference or identifier for this function otherwise record an error
+				if (! ( isIdentifierProperty || isReferenceProperty ) ) {
+					errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG
+					log.debug 'classOfDomainProperty() {}', errorMsg
+					break
+				}
 
-			if (isReferenceProperty) {
-				// We need to try and resolve what class to create. Most times it is just the class type of the property in the
-				// parent domain. In the case of AssetEntity however the class could be AssetEntity, Application, Database, etc.
-				// In order to know which the assumption is that there will be a find.query and that the first search is going to
-				//be precisely what that DataScript developer intended to be created.
+				if (isIdentifierProperty) {
+					log.debug 'classOfDomainProperty() is the identifier'
+					domainClassToCreate = context.domainClass
+					break
+				}
 
-				String classShortName = GormUtil.domainShortName(domainClassToCreate)
-				if (classShortName in ['AssetEntity']) {
-					// Try looking for the exact class type in the find.query
-					List query = fieldsInfo[propertyName].find?.query
-					if (query?.size() > 0) {
-						ed = ETLDomain.lookup(query[0].domain)
-						domainClassToCreate = ed.getClazz()
-					} else {
-						// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
-						Map createInfo = fieldsInfo[propertyName].create ?: [:]
-						if (createInfo.containsKey('assetClass')) {
-							ed = ETLDomain.lookup(createInfo['assetClass'])
+				// Get the type for the property of domain class being processed by the batch
+				domainClassToCreate = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
+
+				if (isReferenceProperty) {
+					// We need to try and resolve what class to create. Most times it is just the class type of the property in the
+					// parent domain. In the case of AssetEntity however the class could be AssetEntity, Application, Database, etc.
+					// In order to know which the assumption is that there will be a find.query and that the first search is going to
+					//be precisely what that DataScript developer intended to be created.
+
+					String classShortName = GormUtil.domainShortName(domainClassToCreate)
+					if (classShortName in ['AssetEntity']) {
+						// Try looking for the exact class type in the find.query
+						List query = fieldsInfo[propertyName].find?.query
+						if (query?.size() > 0) {
+							ed = ETLDomain.lookup(query[0].domain)
 							domainClassToCreate = ed.getClazz()
+						} else {
+							// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
+							Map createInfo = fieldsInfo[propertyName].create ?: [:]
+							if (createInfo.containsKey('assetClass')) {
+								ed = ETLDomain.lookup(createInfo['assetClass'])
+								domainClassToCreate = ed.getClazz()
+							}
 						}
 					}
+					break
 				}
+
 				break
 			}
-
-			break
 		}
+
 		if (errorMsg) {
 			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
 		}
+
+		log.debug 'classOfDomainProperty() for property {} for class {} type is {}',
+			propertyName,
+			context.domainClass.getName(),
+			( domainClassToCreate ? domainClassToCreate.getName() : 'Not a Reference' )
+
 		return domainClassToCreate
 	}
 
@@ -2578,62 +2512,3 @@ class DataImportEntityCache {
 		return cache.size()
 	}
 }
-
-
-/**
-	*
-	 * Used to retrieve a domain entity by the id reference if it is specified in the fieldsInfo map that
-	 * was generated by the ETL process. This is meant to be called by fetchEntityByFieldMetaData().
-	 *
-	 * The logic will attempt two ways to determine the ID:
-	 *    1) If the 'find.result' element has been populated and there was a single ID. Note that if there were multiple
-	 *		 IDs in the results, that may have changed since the ETL process ran so fetchEntityByFieldMetaData may
-	 * 		 retry the queries if this fails to find something.
-	 *	  2) If 'id' field is a numeric object (Integer or Long)
-	 *
-	 * If either scenario resulted in an ID and the entity can not be found then NOT_FOUND_BY_ID(-1) will be returned
-	 *
-	 * Note: If the domain contains the project field then it will be used in the query criteria.
-	 *
-	 * @param domainClass - the class to attempt to find by id
-	 * @param refPropertyName - the property name that the id value will be used and will be populated with error if not found
-	 * @param isReference - flag that indicates that the property is a reference otherwise can assume it is the identifier field
-	 * @param fieldsInfo - the fields map that came from the ETL process
-	 * @return the domain object if found; -1 of id is number and not found; otherwise null
-	 *
-	// private Object searchForDomainById(String propertyName, JSONObject fieldsInfo, Map context) {
-	private Object _fetchEntityByFindResults(Class domainClass, String propertyName, JSONObject fieldsInfo, Map context) {
-
-		String notFoundByID = 'Entity was not found by ID'
-		Object domain=null
-		Long id
-		Map info = fieldsInfo[propertyName]
-
-		// Try to get the ID number from the find results or from the field if it was populated with an ID directly
-		if (info.find?.results?.size() == 1) {
-			// Ignore if the find.query found more than 1
-			id = info.find.results[0]
-		} else if (NumberUtil.isaNumber(info.value)) {
-			id = info.value
-		}
-		log.debug 'searchForDomainById() resolved id to {}', id
-
-		if (id) {
-			// Attempt to access the entity by the ID for the appropriate domain class
-			// If Identifier then the domainClass otherwise the domain class of the property
-			Boolean isReference = GormUtil.isReferenceProperty(domainClass, propertyName)
-			Class domainClassToQuery = GormUtil.getDomainClassOfProperty(domainClass, propertyName)
-			log.debug 'searchForDomainById() going to search class {}', domainClassToQuery.getName()
-			def entity = GormUtil.findInProject(context.project, domainClassToQuery, id)
-			if (entity) {
-				log.debug 'searchForDomainById() found entity {}', entity.id
-				return entity
-			} else {
-				log.debug 'searchForDomainById() did not find entity'
-				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, SEARCH_BY_ID_NOT_FOUND_MSG)
-				return NOT_FOUND_BY_ID
-			}
-		}
-		return null
-	}
-**/

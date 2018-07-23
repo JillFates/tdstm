@@ -1340,4 +1340,13 @@ public class GormUtil {
 		}
 		return entities
 	}
+
+	/**
+	 * Used to determine if a domain instance has any unsaved changes
+	 * @param domainInstance - the instance being examined
+	 * @return true if the instance has any dirty fields
+	 */
+	static boolean hasUnsavedChanges(Object domainInstance) {
+		return domainInstance.dirtyPropertyNames.size() > 0
+	}
 }

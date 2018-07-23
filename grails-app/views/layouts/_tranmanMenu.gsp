@@ -273,19 +273,19 @@
                             </li>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
-                                    <g:link controller="assetEntity" action="assetImport">Import Assets (TM XLS)</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetImport}">
-                                <li class="menu-child-item menu-parent-assets-manage-batches">
-                                    <g:link controller="dataTransferBatch" action="list">Manage Asset Batches</g:link>
+                                    <g:link controller="assetEntity" action="assetImport">Import Assets (TM Excel)</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                 <li class="menu-child-item menu-parent-assets-manage-dep-batches">
                                     <g:link class="mmlink" controller="module" action="dependencybatch" id="list">
-                                        Manage Dep. Batches
+                                        Manage Import Batches (ETL)
                                     </g:link>
+                                </li>
+                            </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.AssetImport}">
+                                <li class="menu-child-item menu-parent-assets-manage-batches">
+                                    <g:link controller="dataTransferBatch" action="list">Manage Import Batches (Excel)</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.HelpMenuView}">
