@@ -21,7 +21,14 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	selectedAction: BulkActions;
 	ACTION = BulkActions; // Make enum visible to the view
 
-	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService, private permissionService: PermissionService, private dialogService: UIDialogService, private translatePipe: TranslatePipe) {
+	constructor(
+		private bulkChangeModel: BulkChangeModel,
+		private promptService: UIPromptService,
+		private assetExplorerService: AssetExplorerService,
+		private permissionService: PermissionService,
+		private dialogService: UIDialogService,
+		private translatePipe: TranslatePipe
+	) {
 		super('#bulk-change-action-component');
 		this.selectedItems = this.bulkChangeModel.selectedItems || [];
 		this.selectedAction = this.ACTION.Edit;

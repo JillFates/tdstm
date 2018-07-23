@@ -39,8 +39,11 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	affectedAssets: number;
 	editRows: { actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
 
-	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService,
-				private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService, private tagService: TagService, private translatePipe: TranslatePipe) {
+	constructor(
+		private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService,
+		private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService,
+		private tagService: TagService, private translatePipe: TranslatePipe
+	) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 	}
