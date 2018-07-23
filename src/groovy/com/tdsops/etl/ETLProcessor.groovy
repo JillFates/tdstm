@@ -1534,6 +1534,23 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return checkSyntax(script, defaultCompilerConfiguration())
 	}
 
+	/**
+	 * Coalesce function that is akin to that in MySQL however it would skip over a list of values
+	 * that are empty (null or blank) until a value encountered
+	 * <code>
+	 *     load 'OS' with coalesce(sshOsVar, vmOsVar, snmpOsVar, 'Unknown')
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	def coalesce(Object... values){
+		def retVal = null
+		if( values ) {
+			retVal = values.findResult { it }
+		}
+
+		return retVal
+	}
 }
 
 class IterateIndex {
