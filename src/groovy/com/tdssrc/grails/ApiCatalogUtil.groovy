@@ -1,7 +1,9 @@
 package com.tdssrc.grails
 
+import grails.converters.JSON
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
+import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -79,7 +81,8 @@ import java.util.regex.Pattern
 class ApiCatalogUtil {
 
 	private static final String DICTIONARY_ROOT_ELEMENT = 'dictionary'
-	private static final String[] DICTIONARY_PRIMARY_KEYS = ['info', 'variable', 'credential', 'paramDef', 'paramGroup', 'method']
+	private static final String[] DICTIONARY_PRIMARY_KEYS = ['info', 'variable', 'credential', 'paramDef', 'paramGroup', 'scriptDef', 'script', 'method']
+	private static final String[] TRANSFORMED_DICTIONARY_UNUSED_KEYS = ['paramDef', 'paramGroup', 'scriptDef', 'script']
 	private static final String DOT = '.'
 	private static final Pattern BETWEEN_PARENTHESIS = ~/\((.*?)\)/
 
@@ -109,6 +112,9 @@ class ApiCatalogUtil {
 			}
 			jsonDictionary.dictionary.put(key, element)
 		}
+
+		// merge params scripts maps
+		mergeParamsScripts(jsonDictionary)
 
 		return jsonDictionary
 	}
@@ -243,6 +249,46 @@ class ApiCatalogUtil {
 	}
 
 	/**
+	 * Validate script keys are valid and belong to the ReactionScriptCode enum
+	 * @param script - script map which key is a ReactionScriptCode like SUCCESS...
+	 * @throws InvalidParamException
+	 */
+	private static void scriptKeyValidator(Map script) {
+		script.keySet().each { String key ->
+			if (ReactionScriptCode.lookup(key) == null) {
+				throw new InvalidParamException("Invalid reaction script code entry: ${key}")
+			}
+		}
+	}
+
+	/**
+	 * Merges top level scripts map into method scripts map. Method script map has precedence so an existing
+	 * method script entry won't be overriden by top level script entry.
+	 * @param jsonDictionary - a transformed api catalog dictionary
+	 */
+	private static void mergeParamsScripts(JSONObject jsonDictionary) {
+		if (!jsonDictionary.dictionary.containsKey('scriptDef') || !jsonDictionary.dictionary.containsKey('script')) {
+			// no scriptDef or script was defined
+			return
+		}
+
+		// validate top level script keys
+		scriptKeyValidator(jsonDictionary.dictionary.script)
+
+		// iterate method script map and union upper level script with missing entries
+		jsonDictionary.dictionary.method.each { Map method ->
+			if (!method.script) {
+				// add script entry to the method when it does not have one for further usage
+				method.script = [:]
+			}
+			method.script = jsonDictionary.dictionary.script + method.script
+
+			// validate method level script keys
+			scriptKeyValidator(method.script)
+		}
+	}
+
+	/**
 	 * Transform a api catalog dictionary placeholders to the corresponding values as params definition indicates.
 	 *
 	 * @param dictionary - a json string containing the dictionary definition
@@ -319,6 +365,17 @@ class ApiCatalogUtil {
 			String error = String.format('Error transforming ApiCatalog dictionary. %s', e.message)
 			log.info(error)
 			throw new InvalidParamException(error)
+		}
+	}
+
+	/**
+	 * Removes unused transformed dictionary entries after dictionary has been transformed.
+	 * These entries are not going to be required at all within api actions for further system action.
+	 * @param jsonDictionary - a transform api catalog dictionary
+	 */
+	static void removeUpUnusedDictionaryTransformedEntries(JSONObject jsonDictionary) {
+		TRANSFORMED_DICTIONARY_UNUSED_KEYS.each { String key ->
+			jsonDictionary.dictionary.remove(key)
 		}
 	}
 }
