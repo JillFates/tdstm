@@ -541,7 +541,7 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	def defaultValue(Object value){
-		if( this.value == null ) {
+		if( this.value == null || value == '') {
 			this.value = value
 		}
 
