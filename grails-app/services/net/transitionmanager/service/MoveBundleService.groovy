@@ -1,6 +1,10 @@
 package net.transitionmanager.service
 
-import com.tds.asset.*
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetDependencyBundle
+import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
+import com.tds.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
@@ -16,12 +20,20 @@ import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveBundleStep
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventSnapshot
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.StepSnapshot
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Slf4j(value='logger')
 @Transactional
@@ -251,9 +263,10 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
-	def dependencyConsoleMap(Project project, moveBundleId, String isAssigned, dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
+	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned, dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
 		Date startAll = new Date()
 		def dependencyConsoleList = []
+		Map queryParams = [:]
 
 		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
 		def stats = [
@@ -268,6 +281,7 @@ class MoveBundleService implements ServiceMethods {
 		String virtualTypes = AssetType.virtualServerTypesAsString
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
+		String tagQuery = getTagsQuery(tagIds, tagMatch, queryParams)
 
 		def depSql = new StringBuffer("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
@@ -289,13 +303,15 @@ class MoveBundleService implements ServiceMethods {
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			LEFT OUTER JOIN model m ON a.model_id=m.model_id
+			LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
+			LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
 				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
 				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id
 				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
 				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
 			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
-			WHERE adb.project_id=${project.id}""")
+			WHERE adb.project_id=${project.id} $tagQuery""")
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
@@ -317,7 +333,14 @@ class MoveBundleService implements ServiceMethods {
 
 		depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
 
-		def dependList = jdbcTemplate.queryForList(depSql.toString())
+		def dependList = []
+
+		if(queryParams){
+			NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getJdbcTemplate().getDataSource())
+			dependList = template.queryForList(depSql.toString(), queryParams)
+		} else{
+			dependList = jdbcTemplate.queryForList(depSql.toString())
+		}
 
 		if (moveBundleId) {
 		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId as String)){ it } }
@@ -450,6 +473,31 @@ class MoveBundleService implements ServiceMethods {
 		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
 		return map
+	}
+
+	/**
+	 * Generates up the query for filtering by tags, if there are any.
+	 *
+	 * @param tagIds The tag ids to filter by.
+	 * @param andOp To filter multiple tag ids using AND, if true, or use OR if false.
+	 *
+	 * @return the query for filtering by tags, using AND/OR, or and empty string, if there are no tags to filter by.
+	 */
+	String getTagsQuery(List<Long> tagIds, String tagMatch, Map queryParams){
+
+		if(!tagIds){
+			return ''
+		}
+
+		if(tagMatch == 'ANY'){
+			queryParams.tagIds = tagIds
+			return "AND t.tag_id in (:tagIds)"
+
+		} else {
+			queryParams.tagIds = tagIds
+			queryParams.tagIdsSize = tagIds.size()
+			return "AND a.asset_entity_id in(SELECT ta2.asset_id FROM tag_asset ta2 WHERE ta2.tag_id in (:tagIds) GROUP BY ta2.asset_id HAVING count(*) = :tagIdsSize)"
+		}
 	}
 
 	/**

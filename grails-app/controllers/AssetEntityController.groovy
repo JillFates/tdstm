@@ -17,7 +17,6 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
@@ -35,7 +34,6 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.Manufacturer
@@ -50,44 +48,18 @@ import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.CommentService
-import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.ImportService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.LicenseAdminService
-import net.transitionmanager.service.MoveBundleService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProgressService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.StateEngineService
-import net.transitionmanager.service.TaskImportExportService
-import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UnauthorizedException
-import net.transitionmanager.service.UserPreferenceService
-import net.transitionmanager.service.UserService
+import net.transitionmanager.service.*
 import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.util.StreamUtils
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -1798,12 +1770,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def asset
 
 		if (params.entity != 'graph') {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null,
+			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
 				params.dependencyBundle != "null" ? params.dependencyBundle : "all")
 			depMap = depMap.gridStats
 		}
 		else {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null,
+			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
 				params.dependencyBundle != "null" ? params.dependencyBundle : "all", true)
 		}
 		def model = [entity: params.entity ?: 'apps', stats: depMap]
