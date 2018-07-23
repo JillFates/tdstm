@@ -10,28 +10,28 @@ export class BulkChangeEditColumnsModel {
 				label: 'Class',
 				property: 'domain',
 				type: 'text',
-				width: 110,
+				width: 100,
 				locked: false
 			},
 			{
 				label: 'Field Name',
 				property: 'field',
 				type: 'text',
-				width: 110,
+				width: 100,
 				locked: false
 			},
 			{
 				label: 'Action',
 				property: 'action',
 				type: 'text',
-				width: 110,
+				width: 100,
 				locked: false
 			},
 			{
 				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 180,
+				width: 190,
 				locked: false
 			}
 		]

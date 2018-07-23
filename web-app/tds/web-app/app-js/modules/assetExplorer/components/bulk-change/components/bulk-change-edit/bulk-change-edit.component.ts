@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
 import {Observable} from 'rxjs/Observable';
 
@@ -125,8 +125,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		})
 	}
 
-	hasAssetDeletePermission(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetDelete);
+	hasAssetEditPermission(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetEdit);
 	}
 
 	onDomainChange(domain: IdTextItem, index: number) {
@@ -181,14 +181,17 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 					}
 				});
 
-			this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
-				.subscribe((result) => {
-					resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
-				}, (err) => {
-					reject({action: BulkActions.Edit, success: false, message: err.message || err})
-				});
+			if (this.hasAssetEditPermission()) {
+				this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
+					.subscribe((result) => {
+						resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
+					}, (err) => {
+						reject({action: BulkActions.Edit, success: false, message: err.message || err})
+					});
+			} else {
+				reject({action: BulkActions.Edit, success: false, message: 'Forbidden operation' });
+			}
 		})
-
 	}
 
 	isAllInputEntered(): boolean {
