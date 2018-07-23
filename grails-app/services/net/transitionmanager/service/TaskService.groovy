@@ -53,6 +53,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -147,7 +148,7 @@ class TaskService implements ServiceMethods {
 		//log.error "person:personId"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
 
-		StringBuffer sql = new StringBuffer("""
+		StringBuilder sql = new StringBuilder("""
 			SELECT t.asset_comment_id AS id,
 			t.task_number AS taskNumber,
 			t.role,
@@ -341,7 +342,7 @@ class TaskService implements ServiceMethods {
 
 		search = StringUtils.trimToNull(search)
 
-		StringBuffer hql = new StringBuffer('FROM AssetComment AS c')
+		StringBuilder hql = new StringBuilder('FROM AssetComment AS c')
 		if (search) {
 			// Join on the AssetEntity and embed the search criteria
 			hql.append(', AssetEntity AS a WHERE c.assetEntity.id=a.id AND a.assetTag=:search AND ')
@@ -837,7 +838,7 @@ class TaskService implements ServiceMethods {
 		}
 		def taskIndex = 0
 
-		StringBuffer query = new StringBuffer("""
+		StringBuilder query = new StringBuilder("""
 			SELECT rownum FROM (
 				SELECT asset_comment_id, task_number,@rownum:=@rownum+1 as rownum
 				FROM asset_comment ac, (SELECT @rownum:=0) r
@@ -1724,29 +1725,37 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Used to find assets associated with a given context object
+	 * Used to find assets associated with a given context object. When the context contains one or more tags
+	 * then the query will be based solely on Tags and it will find assets associated with ANY of the tags. The event will
+	 * not affect the query with Tags. If only an event is specified then the search will be for any asset associated to planning
+	 * bundles assigned to the event.
 	 * @param context - the context object to find associated assets for
 	 * @return list of assets
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
-		if (contextObj.tag) {
-			List<Long>tagIds = contextObj.tag.collect{tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
+		List<AssetEntity> assets = []
 
-			return TagAsset.where {
-				tag.id in tagIds
-				asset.moveBundle.useForPlanning == true }.projections {
-			}.projections {
-			   property 'asset'
-			}.list()
+		if (contextObj.tag) {
+			// Get list of tags from the generation context
+			List<Long>tagIds = contextObj.tag.collect{ tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
+
+			// Query the TagAsset to get list of Assets with ANY of the tags
+			assets = TagAsset.where {
+					tag.id in tagIds
+					asset.moveBundle.useForPlanning == true }.projections {
+				}.projections {
+					property 'asset'
+				}.list()
 		} else {
-			List bundleIds = getBundleIds(contextObj)
+			// Legacy get assets by event
+			List<Long> bundleIds = getBundleIds(contextObj)
 
 			if (bundleIds) {
-				AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
-			} else {
-				[]
+				assets = AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
 			}
 		}
+
+		return assets
 	}
 
 	/**
@@ -1824,8 +1833,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		boolean isDebugEnabled = log.debugEnabled
 
 		// These buffers are used to capture status output for short-term
-		StringBuffer out = new StringBuffer()
-		StringBuffer exceptions = new StringBuffer()
+		StringBuilder out = new StringBuilder()
+		StringBuilder exceptions = new StringBuilder()
 		Integer exceptCnt = 0
 
 		Date startedAt = new Date()
@@ -3844,7 +3853,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param The taskSpec property settings
 	 * @param The string buffer used for logging to the user
 	 */
-	private int gatherDeferment(Map taskList, Map assetsLatestTask, AssetComment task, String predSucc, List keys, Map settings, StringBuffer out) {
+	private int gatherDeferment(Map taskList, Map assetsLatestTask, AssetComment task, String predSucc, List keys, Map settings, StringBuilder out) {
 		boolean isPred = predSucc == 'p'
 
 
@@ -4237,13 +4246,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						// Add any devices specific attribute filters
-						addWhereConditions(['supportType', 'environment', 'department', 'description', 'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
-							'truck', 'cart', 'shelf',
-							'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress'])
+						addWhereConditions( [
+								'supportType', 'environment', 'department',
+								'description', 'costCenter',
+								'maintContract', 'maintExpDate', 'retireDate',
+								'truck', 'cart', 'shelf', 'os', 'serialNumber',
+								'assetTag', 'usize', 'ipAddress'
+							])
 
 						// Deal with 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom', since these are joins
 
-						def sb = new StringBuffer('')
+						def sb = new StringBuilder('')
 
 						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
 						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)}) {
@@ -4296,9 +4309,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				assets = AssetEntity.executeQuery(sql, map)
 			} catch (e) {
-				msg = "An unexpected error occurred while trying to locate assets for filter $filter: $e"
-				log.error "$msg\nSQL: $sql\nPARAMS: $map\n${ExceptionUtil.stackTraceToString(e)}"
-				throw new RuntimeException("$msg<br>$e.message")
+				msg = "An unexpected error occurred while trying to locate assets for filter $filter:"
+				log.error "{}\nSQL: {}\nPARAMS: {}\n{}", msg, sql, map, ExceptionUtil.stackTraceToString(e)
+				throw new RuntimeException(msg)
 			}
 
 			//
@@ -4408,27 +4421,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return assets
 	}
 
-	List getBundleIds(contextObject, project = null, filter = null) {
+	/**
+	 * Used to retrieve a list of Bundle IDs that are associated with the Recipe Event/Tag context
+	 * @param contextObject - the Context JSON parsed
+	 * @param project - the current project
+	 * @param filter
+	 * @return a list of MoveBundle IDs
+	 */
+	List getBundleIds(JSONObject contextObject, Project project = null, Map filter = null) {
+		List bundleIds = []
 		// Now find the bundles if the contextObject had an event id, but not bundle ids
 		if (contextObject.eventId) {
-			List bundleIds = MoveBundle.where { moveEvent.id == contextObject.eventId }.projections {
+			bundleIds = MoveBundle.where {
+				moveEvent.id == contextObject.eventId
+			}.projections {
 				property 'id'
 			}.list()
 
 			// See if they are trying to filter on the Bundle Name
+			// TODO : JPM 7/2018 : I don't believe that this holds true any longer unless this is used in the recipes themselves
 			if (project && filter?.asset?.containsKey('bundle')) {
-				def moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
+				MoveBundle moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
 				if (moveBundle) {
 					bundleIds = [moveBundle.id]
 				} else {
 					throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
 				}
 			}
-
-			return bundleIds
-		} else {
-			return []
 		}
+		return bundleIds
 	}
 
 	/**
@@ -4443,7 +4464,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param Integer recipeId
 	 * @param Map taskSpec
 	 * @param List? groups
-	 * @param StringBuffer exceptions
+	 * @param StringBuilder exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
 	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions) {
@@ -4983,7 +5004,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Helper method to set any scheduling constraints on a task
 	 */
-	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuffer exceptions) {
+	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuilder exceptions) {
 		def ctype
 		def cdt
 		def dateTime
@@ -5198,8 +5219,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
 
 		try {
-			def taskBatchs = namedParameterJdbcTemplate.queryForList("""select * 
-				from task_batch 
+			def taskBatchs = namedParameterJdbcTemplate.queryForList("""select *
+				from task_batch
 				inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id
 				inner join person on task_batch.created_by_id = person.person_id
 				where recipe_version.recipe_id = :recipeId AND task_batch.event_id = :eventId
