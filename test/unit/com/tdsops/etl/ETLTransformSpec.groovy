@@ -231,7 +231,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test defaultValue function'() {
+	void 'test can apply defaultValue transformation'() {
 
 		given:
 			String defaultStrValue = 'UNDEFINED'
@@ -268,7 +268,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 2).value == 0
 			etlProcessor.getElement(2, 3).value == defaultDateValue
 	}
-
 
 	void 'test can check syntax errors at parsing time'() {
 
