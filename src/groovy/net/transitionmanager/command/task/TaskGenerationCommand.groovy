@@ -11,12 +11,13 @@ class TaskGenerationCommand {
 	Long recipeId
 	Long eventId
 	List <Long> tag = []
-	String tagMatch = "ANY"
+	String tagMatch = 'ANY'
 	Boolean deletePrevious
 	Boolean useWIP
 	Boolean autoPublish
 
 	static constraints = {
 		eventId nullable: true
+		tagMatch inList: ['ANY', 'ALL']
 	}
 }

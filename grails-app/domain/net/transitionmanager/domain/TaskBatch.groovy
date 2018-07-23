@@ -74,7 +74,7 @@ class TaskBatch {
 		Map context = context()
 
 		if (context.tag) {
-			return context.tag.collect { Map tag -> tag.label }.join(',')
+			return context.tag.collect { Map tag -> tag.label }.join(', ')
 		}
 
 		return ''

@@ -16,7 +16,7 @@ class ProviderCreationSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString() + " "
+    static randStr = CommonActions.getRandomString() + " "
     static E2E = "E2E Provider"
     static provName = randStr + E2E + " Name"
     static provDescription = randStr + E2E + " Description"
