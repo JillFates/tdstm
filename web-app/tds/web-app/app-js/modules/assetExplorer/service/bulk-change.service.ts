@@ -2,8 +2,6 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PermissionService} from '../../../shared/services/permission.service';
-import {IdTextItem} from '../components/bulk-change/model/bulk-change.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -12,7 +10,7 @@ import 'rxjs/add/operator/catch';
 export class BulkChangeService {
 	private bulkChangeUrl = '../ws/bulkChange';
 
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
+	constructor(private http: HttpInterceptor) {}
 
 	getFields(): Observable<any[]> {
 		return this.http.get(`${this.bulkChangeUrl}/fields`)

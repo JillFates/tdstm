@@ -30,7 +30,6 @@ export class BulkChangeButtonComponent {
 			this.operationResult.emit(bulkOperationResult);
 		}).catch(err => {
 			console.log(err);
-			console.log('Dismissed Dialog');
 			this.operationResult.emit(err);
 		});
 	}

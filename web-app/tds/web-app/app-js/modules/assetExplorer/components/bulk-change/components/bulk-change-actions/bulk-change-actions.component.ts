@@ -21,7 +21,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	selectedAction: BulkActions;
 	ACTION = BulkActions; // Make enum visible to the view
 
-	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService, private permissionService: PermissionService, private dialogService: UIDialogService) {
+	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService, private permissionService: PermissionService, private dialogService: UIDialogService, private translatePipe: TranslatePipe) {
 		super('#bulk-change-action-component');
 		this.selectedItems = this.bulkChangeModel.selectedItems || [];
 		this.selectedAction = this.ACTION.Edit;
@@ -64,9 +64,12 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private confirmDelete(): Promise<boolean> {
-		const message = ` Your about to delete ${this.selectedItems.length} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel `;
+		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.AFFECTED_ASSETS', [this.selectedItems.length]);
 		return new Promise((resolve, reject) =>  {
-			this.promptService.open('Confirmation Required',  message, 'Confirm', 'Cancel')
+			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				message,
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'))
 				.then((result) => result ? resolve() : reject({action: BulkActions.Delete, success: false, message: 'canceled'}))
 		})
 	}

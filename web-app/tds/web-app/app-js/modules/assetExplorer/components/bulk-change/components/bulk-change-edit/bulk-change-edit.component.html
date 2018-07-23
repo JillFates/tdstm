@@ -139,7 +139,6 @@
 											[data]="editRows.actions[rowIndex].actions"
 											[defaultItem]="editRows.selectedValues[rowIndex].action"
 											[(ngModel)]="editRows.selectedValues[rowIndex].action"
-											(selectionChange)="onActionChange($event, rowIndex)"
 											[valueField]="'id'"
 											[textField]="'text'">
 									</kendo-dropdownlist>

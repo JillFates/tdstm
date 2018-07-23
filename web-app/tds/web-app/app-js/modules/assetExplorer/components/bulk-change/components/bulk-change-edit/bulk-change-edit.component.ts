@@ -63,15 +63,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 	ngOnInit() {
 		this.CLEAR_ACTION = 'clear';
-		this.yesNoList = [
-			{ id: '?', text: '?'},
-			{ id: 'Y', text: 'Yes'},
-			{ id: 'N', text: 'No'}
-		];
-
-		// this.actions = this.bulkChangeService.getActions();
+		this.yesNoList = [ { id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
 		this.editRows = { actions: [], selectedValues: [] };
-
 		this.customDomainService.getCommonFieldSpecs()
 			.subscribe((results) => {
 				this.commonFieldSpecs = results;
@@ -103,9 +96,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 	}
 
-	/**
-	 * Close the Dialog
-	 */
 	cancelCloseDialog(bulkActionResult: BulkActionResult): void {
 		this.dismiss(bulkActionResult || {action: null, success: false});
 	}
@@ -127,14 +117,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		actions[index].fields =  this.getFieldsByDomain(domain);
 		selectedValues[index].field = null
-	}
-
-	onActionChange(action: IdTextItem, index: number) {
-		/*
-		if (action.id === this.CLEAR_ACTION) {
-			this.editRows.selectedValues[index].value = null;
-		}
-		*/
 	}
 
 	getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
