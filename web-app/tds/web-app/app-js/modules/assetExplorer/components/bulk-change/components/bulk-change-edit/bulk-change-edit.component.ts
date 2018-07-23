@@ -136,7 +136,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		selectedValues[index].field = null
 	}
 
-
 	getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
 		let fields: IdTextItem[] = [];
 		if (!domain) {
@@ -145,7 +144,9 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		const domainFields =  this.commonFieldSpecs.find((field: any) => field.domain === domain.id.toUpperCase());
 		if (domainFields && domainFields.fields) {
-			fields = domainFields.fields.map((item: any) => ({id: item.field, text: item.label, control: item.control}));
+			fields = domainFields.fields
+				.filter((item) => item.control === 'asset-tag-selector') // REMOVE THIS LiNE WHEN EDITION SERVICES ARE IMPLEMENTED FOR ALL FIELDS
+				.map((item: any) => ({id: item.field, text: item.label, control: item.control}))
 		}
 
 		return fields.sort((a, b) => SortUtils.compareByProperty(a, b, 'text'));
@@ -182,7 +183,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 			this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
 				.subscribe((result) => {
-					resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} edited successfully`});
+					resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
 				}, (err) => {
 					reject({action: BulkActions.Edit, success: false, message: err.message || err})
 				});
