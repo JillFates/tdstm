@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -119,8 +120,11 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -242,8 +246,11 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -322,8 +329,11 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -401,8 +411,11 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -520,8 +533,11 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -567,6 +583,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 	    and:
 		    GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz in [AssetEntity, Application, Database, Files]
+			}
 		    AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 			    []
 		    }

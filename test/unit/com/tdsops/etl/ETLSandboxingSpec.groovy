@@ -369,10 +369,8 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				domain Device
 			""".stripIndent())
 
-		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			etlProcessor.debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-				.append(System.lineSeparator())
-				.append("INFO - Selected Domain: Device")
+		then: 'A console content could be recovered after processing an ETL Script'
+			etlProcessor.debugConsole.buffer.toString() == new StringBuilder("INFO - Selected Domain: Device")
 				.append(System.lineSeparator())
 				.toString()
 	}
@@ -420,7 +418,6 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			console.buffer.toString().contains('INFO - Console status changed: on')
 			console.buffer.toString().contains('INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name, 3:location]')
 			console.buffer.toString().contains('INFO - Selected Domain: Device')
 			console.buffer.toString().contains('DEBUG - [position:[0, 1], value:152254]')

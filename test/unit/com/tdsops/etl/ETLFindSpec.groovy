@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.NumberUtil
@@ -125,7 +126,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
@@ -232,7 +233,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				assetEntities.findAll { it.id == namedParams.id }*.getId()
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 
 		and:
@@ -353,7 +354,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				assetEntities.findAll { it.id == args.id }
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 
 		and:
@@ -449,7 +450,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				assetEntities.findAll { it.id == args.id }
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 
 		and:
@@ -764,7 +765,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
@@ -893,7 +894,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if (namedParams.containsKey('id')) {
@@ -1010,7 +1011,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				throw new RuntimeException('Invalid query for this Spec')
@@ -1159,7 +1160,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 
 		and:
@@ -1233,7 +1234,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(Room, global: true)
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id }
@@ -1378,7 +1379,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(Room, global: true)
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id }
@@ -1446,7 +1447,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(Room, global: true)
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id }
@@ -1512,7 +1513,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assert NumberUtil.isaNumber(args.id)
@@ -1604,7 +1605,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assert NumberUtil.isLong(args.id)
@@ -1682,7 +1683,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				[]
@@ -1788,7 +1789,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
@@ -1894,7 +1895,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
@@ -2003,7 +2004,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
@@ -2271,7 +2272,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2397,7 +2398,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2521,7 +2522,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2645,7 +2646,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2754,7 +2755,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2863,7 +2864,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.appVendor == namedParams.appVendor && it.project.id == namedParams.project.id }*.getId()
@@ -2947,7 +2948,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				throw new Exception('java.lang.String cannot be cast to java.lang.Long')
@@ -3159,7 +3160,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
@@ -3303,7 +3304,7 @@ class ETLFindSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
+				return clazz in [AssetEntity, Application, Database, Files]
 			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
