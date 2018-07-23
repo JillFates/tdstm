@@ -81,11 +81,13 @@ class StaffListCleanUpSpec extends GebReportingSpec {
                 at StaffListPage
                 filterByLastname baseName
                 getGridRowsSize() >= maxNumberOfUsers
+                println "$count user/staff were deleted."
             } else {
                 at MenuPage
                 adminModule.goToAdminListStaff()
                 filterByLastname baseName
                 getGridRowsSize() >= maxNumberOfUsers
+                println "We are still good, no staff needs to be deleted."
             }
     }
 }
