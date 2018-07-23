@@ -28,9 +28,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		console.log('Selected items');
 	}
 
-	/**
-	 * Close the Dialog
-	 */
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
 		this.dismiss(bulkOperationResult || {action: null, success: false});
 	}
