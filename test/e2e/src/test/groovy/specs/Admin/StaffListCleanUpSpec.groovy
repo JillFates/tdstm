@@ -51,7 +51,7 @@ class StaffListCleanUpSpec extends GebReportingSpec {
             clickOnDeleteAssociatedAppOwnerOrSMEsInput()
             clickOnDeleteConfirmationModalButton()
             clickOnCloseConfirmationModalButton()
-            at StaffListPage // need to wait because page is refreshed after delete staff
+            at StaffListPage // need to wait because page is refreshed after deleting a staff member
         }
     }
 
