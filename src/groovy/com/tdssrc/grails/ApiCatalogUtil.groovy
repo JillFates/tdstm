@@ -80,7 +80,6 @@ import java.util.regex.Pattern
 @Slf4j
 class ApiCatalogUtil {
 
-
 	private static final String DOT = '.'
 	private static final Pattern BETWEEN_PARENTHESIS = ~/\((.*?)\)/
 
