@@ -112,6 +112,34 @@ class ApiCatalogUtilSpec extends Specification {
 	}
 
 	@See('TM-11427')
+	def 'test method without reaction script entry gets added common reaction script'() {
+		when: 'try to transform a dictionary with wrong reaction script code key'
+			def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"scriptDef": {}, ' +
+					'"script": {"DEFAULT": "// default common reaction script"},' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod"' +
+					'	}' +
+					']}}'
+			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
+			Map methods = ApiCatalogUtil.getCatalogMethods(jsonDictionaryTransformed)
+		then:
+			methods
+			methods.size() == 1
+			methods.containsKey('testMethod')
+			with(methods['testMethod']) {
+				apiMethod == 'testMethod'
+				script.size() == 1
+				with(script) {
+					DEFAULT == "// default common reaction script"
+				}
+			}
+	}
+
+	@See('TM-11427')
 	def 'test transform dictionary with reaction scripts and methods will contain expected reactions scripts transformed and merged'() {
 		when:
 			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(ApiCatalogTestHelper.DICTIONARY_WITH_SCRIPTS)
