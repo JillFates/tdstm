@@ -10,9 +10,10 @@ class ContextCommand {
 
 	Long eventId
 	List <Long> tag = []
-	String tagMatch = "ANY"
+	String tagMatch = 'ANY'
 
 	static constraints = {
 		eventId nullable: true
+		tagMatch inList: ['ANY', 'ALL']
 	}
 }
