@@ -1995,7 +1995,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		if (isDebugEnabled) {
 			log.debug '*************************************************************************************'
-			log.debug '**************** generateRunbook() by {} for MoveEvent {} ****************', whom, moveEvent
+			log.debug '**************** generateRunbook() by {} for MoveEvent {} ****************', whom, event
 			log.debug '*************************************************************************************'
 			// log.debug "projectStaff is $projectStaff"
 		}
@@ -5210,8 +5210,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
 
 		try {
-			def taskBatchs = namedParameterJdbcTemplate.queryForList("""select * 
-				from task_batch 
+			def taskBatchs = namedParameterJdbcTemplate.queryForList("""select *
+				from task_batch
 				inner join recipe_version on task_batch.recipe_version_used_id = recipe_version.recipe_version_id
 				inner join person on task_batch.created_by_id = person.person_id
 				where recipe_version.recipe_id = :recipeId AND task_batch.event_id = :eventId
