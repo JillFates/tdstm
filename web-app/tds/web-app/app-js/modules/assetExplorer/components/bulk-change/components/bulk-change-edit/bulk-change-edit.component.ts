@@ -10,7 +10,7 @@ import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
 import {BulkChangeEditColumnsModel} from '../../model/bulk-change-edit-columns.model';
 import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
-import {BulkEditAction, ListOption} from '../../model/bulk-change.model';
+import {BulkEditAction, IdTextItem} from '../../model/bulk-change.model';
 import {SortUtils} from '../../../../../../shared/utils/sort.utils';
 import {StringUtils} from '../../../../../../shared/utils/string.utils';
 import {BulkChangeService} from '../../../../service/bulk-change.service';
@@ -25,23 +25,18 @@ import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel'
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
 	tagList: TagModel[] = [];
-	yesNoList: ListOption[] = [];
-	actions: ListOption[] = [];
-	assetClassList: ListOption[] = [];
+	yesNoList: IdTextItem[] = [];
+	actions: IdTextItem[] = [];
+	assetClassList: IdTextItem[] = [];
 	selectedItems: string[] = [];
 	commonFieldSpecs: any[] = [];
 	gridColumns: BulkChangeEditColumnsModel;
 	gridSettings: DataGridOperationsHelper;
 	affectedAssets: number;
-	editRows: { actions: BulkEditAction[], selectedValues: {domain: ListOption, field: ListOption, action: ListOption, value: any}[] };
+	editRows: { actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
 
-	constructor(private bulkChangeModel: BulkChangeModel,
-				private promptService: UIPromptService,
-				private assetExplorerService: AssetExplorerService,
-				private permissionService: PermissionService,
-				private customDomainService: CustomDomainService,
-				private bulkChangeService: BulkChangeService,
-				private tagService: TagService) {
+	constructor(private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService,
+				private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService, private tagService: TagService) {
 		super('#bulk-change-edit-component');
 		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
 		console.log('Selected items');
@@ -71,12 +66,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			{ id: 'N', text: 'No'}
 		];
 
-		this.actions = [
-			{ id: 'add', text: 'Add to existing'},
-			{ id: 'clear', text: 'Clear field'},
-			{ id: 'replace', text: 'Replace with'},
-			{ id: 'remove', text: 'Remove these'}
-		];
+		this.actions = this.bulkChangeService.getActions();
 		this.editRows = { actions: [], selectedValues: [] };
 		this.addRow();
 
@@ -93,7 +83,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			}, error => console.log('error on GET Tag List', error));
 
 		this.assetClassList = ['common', 'application', 'database', 'device', 'storage']
-			.map((domain): ListOption => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
+			.map((domain): IdTextItem => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
 
 		this.gridColumns = new BulkChangeEditColumnsModel();
 		this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
@@ -121,15 +111,15 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		return this.permissionService.hasPermission(Permission.AssetDelete);
 	}
 
-	onDomainChange(domain: ListOption, index: number) {
+	onDomainChange(domain: IdTextItem, index: number) {
 		const {actions, selectedValues} = this.editRows;
 
 		actions[index].fields =  this.getFieldsByDomain(domain);
 		selectedValues[index].field = null
 	}
 
-	getFieldsByDomain(domain: ListOption): ListOption[] {
-		let fields: ListOption[] = [];
+	getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
+		let fields: IdTextItem[] = [];
 		if (!domain) {
 			return fields;
 		}
@@ -166,16 +156,9 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		this.bulkChangeService.update(1, this.bulkChangeModel.selectedItems , edits)
 			.subscribe((result) => {
-				console.log('Getting the results');
 				console.log(result);
 			}, (error) => {
-				console.log('here we have an error');
 				console.log(error);
 			});
-
-		console.log('EDITS ARE');
-		console.log(edits);
-		console.log('--------------');
 	}
-
 }

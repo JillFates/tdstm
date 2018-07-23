@@ -3,6 +3,11 @@ export enum BulkActions {
 	Delete
 }
 
+export interface IdTextItem {
+	id: string;
+	text: string;
+}
+
 export class BulkChangeModel {
 	public selectedItems: number[];
 }
@@ -15,11 +20,6 @@ export interface BulkActionResult {
 
 export interface BulkEditAction {
 	domain: string;
-	fields: ListOption[];
-	actions: ListOption[];
-}
-
-export interface ListOption {
-	id: string;
-	text: string;
+	fields: IdTextItem[];
+	actions: IdTextItem[];
 }

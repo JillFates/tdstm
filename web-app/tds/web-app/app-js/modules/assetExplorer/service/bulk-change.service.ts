@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Observable';
 import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PermissionService} from '../../../shared/services/permission.service';
+import {IdTextItem} from '../components/bulk-change/model/bulk-change.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -20,24 +21,28 @@ export class BulkChangeService {
 	}
 
 	update(dataViewId: number, assetIds: any[], edits: any[]): Observable<any> {
-		const defaultParams = { userParams: { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}}, dataViewId: 1, assetIds: [], edits: []};
+		const defaultUserParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
+		const defaultParams = { userParams: defaultUserParams, dataViewId: 1, assetIds: [], edits: []};
 		const payload = Object.assign({}, defaultParams, {dataViewId, assetIds, edits});
 
-		let body = JSON.stringify(payload);
-
-
-		return this.http.put(this.bulkChangeUrl, body)
+		return this.http.put(this.bulkChangeUrl, JSON.stringify(payload))
 			.map((res: Response) => {
-				console.log('============');
-				console.log(res);
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => {
-				console.log('============');
-				console.log(error);
 				return error;
-				// error.json();
 			});
 	}
+
+	getActions(): IdTextItem[] {
+		return [
+			{ id: 'add', text: 'Add to existing'},
+			{ id: 'clear', text: 'Clear field'},
+			{ id: 'replace', text: 'Replace with'},
+			{ id: 'remove', text: 'Remove these'}
+		]
+
+	}
+
 }
