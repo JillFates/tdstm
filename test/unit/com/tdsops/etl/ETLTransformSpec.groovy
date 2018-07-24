@@ -197,20 +197,17 @@ class ETLTransformSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							extract 'vendor name' transform with lowercase() set myLocalVar
+							load 'description' with coalesce(var1, var2, myLocalVar, var3, var4)
 							load 'appVendor' with coalesce(var1, var2, var3, var4) 
 						}
 					""".stripIndent())
 
 		then: 'check that the assigned value is the first not null'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					with(data[0].fields.appVendor) {
-						originalValue == okValue
-						value == okValue
-					}
-				}
-			}
+			etlProcessor.getElement(0, 1).value == etlProcessor.getElement(0, 5).value
+			etlProcessor.getElement(0, 6).value == okValue
+
+			etlProcessor.getElement(1, 1).value == etlProcessor.getElement(1, 5).value
+			etlProcessor.getElement(1, 6).value == okValue
 	}
 
 	void 'test can check syntax errors at parsing time'() {

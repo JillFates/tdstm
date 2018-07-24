@@ -1544,9 +1544,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return
 	 */
 	Object coalesce(Object... values){
-		def retVal = null
+		Object retVal = null
 		if( values ) {
-			retVal = values.findResult { it }
+			retVal = values.findResult {
+				if ( it && it instanceof Element ) {
+					it = it.value
+				}
+
+				return it
+			}
 		}
 
 		return retVal
