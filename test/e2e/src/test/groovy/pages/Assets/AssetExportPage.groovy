@@ -22,14 +22,10 @@ class AssetExportPage extends Page{
         assetCheckedOptions {$('li.list-group-item input[checked*=checked]')}
     }
 
-    static initializeCommonActions(){
-        new CommonActions()
-    }
-
     def randomSelectBundle(){
         // Planning bundle default selected, clean selection to random select
         browser.driver.executeScript('$("[value=useForPlanning]").removeAttr("selected")')
-        def randomOption = initializeCommonActions().getRandomOption bundleOptions
+        def randomOption = CommonActions.getRandomOption bundleOptions
         randomOption.click()
     }
 
@@ -37,7 +33,7 @@ class AssetExportPage extends Page{
         try {
             // because remembers previous selection, cleans if needed.
             if (assetCheckedOptions.size() > 0) {
-                initializeCommonActions().uncheckCheckboxes assetCheckedOptions
+                CommonActions.uncheckCheckboxes assetCheckedOptions
             }
             randomCheckOptions()
         } catch (RequiredPageContentNotPresent e) {
@@ -48,7 +44,7 @@ class AssetExportPage extends Page{
 
     def randomCheckOptions(){
         // getting 3 random checkboxes to click because export process succeeds default timeout
-        def randomElements = initializeCommonActions().getRandomOptions assetOptions, 3
+        def randomElements = CommonActions.getRandomOptions assetOptions, 3
         randomElements.each { element ->
             element.click()
         }

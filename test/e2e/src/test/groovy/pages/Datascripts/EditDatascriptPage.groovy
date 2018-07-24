@@ -30,8 +30,6 @@ class EditDatascriptPage extends Page{
         commonsModule { module CommonsModule }
     }
 
-    static commonActions = new CommonActions()
-
     def setDsName(name){
         datascriptNameField = name
     }
@@ -44,7 +42,7 @@ class EditDatascriptPage extends Page{
         waitFor{providerDropdown.click()}
         def provider
         if (providers.size() > 1){
-            provider = commonActions.getRandomOption providers
+            provider = CommonActions.getRandomOption providers
         } else {
             // only one provider so selecting that
             provider = providers

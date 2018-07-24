@@ -12,31 +12,11 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-sm-8 col-md-8 col-lg-8" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
-				<div class="form-group">
-					<label class="col-title" for="bundleSelect">Bundle:</label>
-					<select class="form-control" name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
-						<option value="">Please select</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-8 col-md-8 col-lg-8 application-container" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
-				<div class="form-group">
-					<label class="col-title" for="bundleSelect">Application:</label>
-					<select class="form-control" name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
-						<option value="">Please select</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<!-- <div class="row">
 			<div class="col-sm-8 col-md-8 col-lg-8 tm-asset-tag-selector-container recipe-editor">
 				<label class="col-title">Tag:</label>
-				<tm-asset-tag-selector selected-tags="contexts.selectedTags" selected-event="contexts.selectedEvent" selected-bundle="contexts.selectedBundle"></tm-asset-tag-selector>
+				<tm-asset-tag-selector asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context"on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
 			</div>
-		</div> -->
+		</div>
 		<div class="row">
 			<div class="col-sm-8 col-md-8 col-lg-8 settings-container recipe-editor">
 				<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
@@ -52,7 +32,7 @@
 	<div class="selectors in">
 		<div class="refreshWrapper">
 			<label for="refreshGroups">
-				<a class="btn btn-default" ng-disabled="(contexts.contextId == 0)" id="refreshGroups" ng-click="groups.fetchGroups()">
+				<a class="btn btn-default" id="refreshGroups" ng-click="groups.fetchGroups()">
 					Fetch
 				</a>
 			</label>

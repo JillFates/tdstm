@@ -17,7 +17,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
     def testKey
     static testCount
     //Define the names of the app you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
     static appNameOld = baseName +" "+ randStr + " App For E2E Created"
     static appName = baseName +" "+ randStr + " App For E2E Edited"
@@ -243,7 +243,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             aeModalIsDepTypeSelector.click()
             waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
             aeModalIsDepStatusSelector.click()
-            isDepStatus = new CommonActions().getRandomOption(aeModalIsDepStatusSelector.find("option")).text()
+            isDepStatus = CommonActions.getRandomOption(aeModalIsDepStatusSelector.find("option")).text()
             waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).click() }
 
         then: 'Every value should be accordingly added'

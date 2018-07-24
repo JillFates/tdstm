@@ -17,7 +17,7 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString() + " "
+    static randStr = CommonActions.getRandomString() + " "
     static E2E = "E2E DS"
     static datascriptName = randStr + E2E + " Name"
     static datascriptDescription = randStr + E2E + " Description"

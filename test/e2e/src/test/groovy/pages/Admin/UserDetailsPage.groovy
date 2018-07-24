@@ -20,4 +20,8 @@ class UserDetailsPage extends Page {
         udDeleteBtn             { udButtonsForm.find("input", class:"delete")}
         udPassResetBtn          { udButtonsForm.find("input#resetPassword")}
     }
+
+    def clickOnDeleteButtonAndConfirm(){
+        withConfirm(true){waitFor{udDeleteBtn.click()}}
+    }
 }

@@ -1,11 +1,11 @@
 tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" />
+						<!--<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" /> -->
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
-							<div class="asset-tag-selector-single-item">
+							<div class="asset-tag-selector-single-item #:(data.strike !== undefined)? 'hidden-tag-item': ''#">
 								<div class="asset-tag-selector-single-item  #:data.css#">
 									<i class="fa fa-fw fa-check"></i> #:data.name#
 								</div>
@@ -13,19 +13,22 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						</script>
 						
 						<script id="asset-tag-selector-tag" type="text/x-kendo-template">
-							<div class="#:data.css#">#:data.name#</div>
+							<div class="#:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
 						</script>
 					</div>`,
 		restrict: 'E',
 		scope: {
-			selectedTags: '=',
-			selectedEvent: '=',
-			selectedBundle: '=',
+			assetSelector: '=',
+			preAssetSelector: '=',
+			onChange: '&'
 		},
 		controller: function ($scope) {
 
-			$scope.selectedTags = {
-				tags: [],
+			// Init the Load
+			getAssetTags();
+
+			$scope.assetSelector = {
+				tag: [],
 				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
 			};
 
@@ -33,19 +36,10 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				onLabel: "AND",
 				offLabel: "OR",
 				change: function (e) {
-					$scope.selectedTags.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'OR' : 'AND'
+					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR';
+					$scope.onChange();
 				}
 			});
-
-			$scope.$watch('selectedEvent', function (nVal, oVal) {
-				setNewDataSource([]);
-				getAssetTags();
-			}, true);
-
-			$scope.$watch('selectedBundle', function (nVal, oVal) {
-				setNewDataSource([]);
-				getAssetTags();
-			}, true);
 
 			$(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
@@ -68,38 +62,66 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				}));
 				widget.dataSource.sync();
 				widget.refresh();
+				setTimeout(preSelectTags, 600);
 			}
 
-			function getAssetTags() {
-				if (($scope.selectedEvent && $scope.selectedEvent.id) || ($scope.selectedBundle && $scope.selectedBundle.id)) {
-					if ($scope.selectedBundle && $scope.selectedBundle.id !== '') {
-						$http.get(utils.url.applyRootPath('/ws/tag?moveBundleId=' + $scope.selectedBundle.id)).success(function (data, status, headers, config) {
-							if (data && data.status === 'success') {
-								setNewDataSource(data.data);
-							}
-						}).error(function (data, status, headers, config) {});
-					} else {
-						$http.get(utils.url.applyRootPath('/ws/tag?moveEventId=' + $scope.selectedEvent.id)).success(function (data, status, headers, config) {
-							if (data && data.status === 'success') {
-								setNewDataSource(data.data);
-							}
-						}).error(function (data, status, headers, config) {});
-					}
-				} else if(($scope.selectedEvent === null || $scope.selectedEvent === "") && ($scope.selectedBundle === null || $scope.selectedBundle === "")) {
-					$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
-						if (data && data.status === 'success') {
-							setNewDataSource(data.data);
+			/**
+			 * Pre Select Assets
+			 */
+			function preSelectTags() {
+				if($scope.preAssetSelector && $scope.preAssetSelector.tag) {
+					var selectedTags = [];
+					var widget = $("#asset-tag-selector").getKendoMultiSelect();
+					var dataSource = widget.dataSource;
+
+					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
+
+						var elementExist = dataSource.data().filter((e) => {
+							return e.id === $scope.preAssetSelector.tag[i].id
+						});
+						if (elementExist.length === 0) {
+							dataSource.add({
+								name: $scope.preAssetSelector.tag[i].label,
+								css: $scope.preAssetSelector.tag[i].css,
+								id: $scope.preAssetSelector.tag[i].id,
+								strike: true
+							});
 						}
-					}).error(function (data, status, headers, config) {});
+
+						selectedTags.push($scope.preAssetSelector.tag[i].id);
+
+					}
+					dataSource.sync();
+
+					// Always false on Cookbook context
+					$scope.assetSelector.operator = false;
+
+					if(selectedTags !== '') {
+						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
+						selectTags();
+					}
 				}
 			}
 
+			function getAssetTags() {
+				// At least for Cookbook it will alw
+				$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
+					if (data && data.status === 'success') {
+						setNewDataSource(data.data);
+					}
+				}).error(function (data, status, headers, config) {});
+			}
+
 			function selectTags(e) {
+				//
+				$("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
 				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
 				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
-				$scope.selectedTags.tags = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+
+				$scope.onChange();
 			}
 		}
 	};

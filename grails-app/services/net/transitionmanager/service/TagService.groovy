@@ -40,7 +40,7 @@ class TagService implements ServiceMethods {
 		String description = null,
 		Date dateCreated = null,
 		Date lastUpdated = null,
-		Long moveBundleId = null,
+		List<Long> moveBundleIds = null,
 		Long moveEventId = null) {
 
 		List whereFilters = ['t.project = :project']
@@ -52,7 +52,7 @@ class TagService implements ServiceMethods {
 		handleDescription(description, whereFilters, params)
 		handleDateCreated(dateCreated, whereFilters, params)
 		handleLastUpdated(lastUpdated, whereFilters, params)
-		String eventBundleJoins = handleMoveIds(moveBundleId, moveEventId, whereFilters, params)
+		String eventBundleJoins = handleMoveIds(moveBundleIds, moveEventId, whereFilters, params)
 
 		String where = ''
 		if (whereFilters) {
@@ -153,7 +153,7 @@ class TagService implements ServiceMethods {
 	 * @return If wither the moveBundleId, or the moveEventId are not null, a join string for the assets, to the moveBundle and moveEvent
 	 * is returned, otherwise and empty string in returned.
 	 */
-	String handleMoveIds(Long moveBundleId, Long moveEventId, List whereFilters, Map params) {
+	String handleMoveIds(List<Long> moveBundleIds, Long moveEventId, List whereFilters, Map params) {
 		boolean returnJoins = false
 		String eventBundleJoins = """
 			LEFT JOIN tl.asset a
@@ -161,9 +161,9 @@ class TagService implements ServiceMethods {
 			LEFT OUTER JOIN mb.moveEvent me
 		"""
 
-		if (moveBundleId) {
-			whereFilters << 'mb.id = :moveBundleId'
-			params.moveBundleId = moveBundleId
+		if (moveBundleIds) {
+			whereFilters << 'mb.id in (:moveBundleIds)'
+			params.moveBundleIds = moveBundleIds
 			returnJoins = true
 		}
 
