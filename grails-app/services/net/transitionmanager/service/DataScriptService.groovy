@@ -1,10 +1,13 @@
 package net.transitionmanager.service
 
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
+import getl.json.JSONConnection
+import getl.json.JSONDataset
 import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
@@ -19,6 +22,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
@@ -282,13 +286,13 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (String fileName, Long maxRows) throws EmptyResultException{
+	Object parseDataFromFile (String fileName, Long maxRows, GrailsParameterMap params) throws EmptyResultException{
 		try{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
         switch (extension) {
             case 'JSON':
-                return parseDataFromJSON(fileName)
+                return parseDataFromJSON(fileName, maxRows, params['rootNode'])
 
             case 'CSV':
                 return parseDataFromCSV(fileName, 0, maxRows)
@@ -338,14 +342,37 @@ class DataScriptService implements ServiceMethods{
 	 * @return Map with the description of JSON data in the File
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromJSON (String jsonFile, String rootNode = '.') throws RuntimeException {
-		File inputFile = tempFile(jsonFile)
-		String text = inputFile?.text?.trim()
-		if(! text ) {
-			return EMPTY_SAMPLE_DATA_TABLE
+	Map parseDataFromJSON (String jsonFile, Long maxRows, String rootNode) throws RuntimeException {
+
+		Map results
+		try {
+
+			JSONConnection jsonCon = new JSONConnection(config: "json", path: FileSystemService.temporaryDirectory, driver:TDSJSONDriver)
+			JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: rootNode?:'.', fileName: jsonFile)
+			DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
+
+			results = [
+					config: dataSetFacade.fields().collect {
+						def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+						[
+								property : it.name,
+								type     : type
+						]
+					},
+					rows: dataSetFacade.rows().take(maxRows.intValue())
+			]
+
+		} catch (Throwable t) {
+			log.error("Could not parse ${jsonFile}. cause: ${t.message}", t)
+			results = [
+					error: [
+					        message: 'The rootNode must be specified in the ETL Script before loading sample JSON data',
+							details: t.message
+					]
+			]
 		}
 
-		return JsonUtil.parseJson(text)
+		return results
 	}
 
 	/**

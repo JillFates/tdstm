@@ -28,32 +28,20 @@ class DataScriptServiceSpec extends Specification {
 		assert fileSystemService != null
 	}
 
-	def 'test can parse a JSON data using default rootNode'(){
+	def 'test can parse a JSON data using custom rootNode and json object'() {
 
 		given:
 			String fileContent = '''
 				{
-				  "assets": [
-					{
+				  "assets": {
 					  "data": [
 						{
 						  "collection_type": "SNMP",
 						  "cpu_architecture": "Not Collected",
 						  "cpu_count": "2",
-						  "cpu_frequency": "2100000000",
-						  "cpu_model": "GenuineIntel: Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz",
-						  "deviceid": 3232238251,
-						  "devicetype": "Virtual-Generic Server",
-						  "dist_full": "Not Collected",
-						  "hardware_model": "Not Collected",
-						  "hardware_serial": "Not Collected",
-						  "hardware_vendor": "Not Collected",
-						  "hostname": "lab-opensuse",
-						  "identifying_mac": "00:50:56:a8:f6:0d"
 						}
 					  ]
 					}
-				  ]
 				}'''.stripIndent()
 
 		and:
@@ -62,14 +50,103 @@ class DataScriptServiceSpec extends Specification {
 			fileOutputStream.close()
 
 		when:
-			Map json = service.parseDataFromJSON(fileName)
+			Map json = service.parseDataFromJSON(fileName, 1, 'assets.data')
 
 		then:
-			json
+			json.config == [
+					[property: 'collection_type', type: 'text'],
+					[property: 'cpu_architecture', type: 'text'],
+					[property: 'cpu_count', type: 'text']
+			]
+
+			json.rows == [
+					[collection_type: 'SNMP', cpu_architecture: 'Not Collected', cpu_count: '2']
+			]
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
+
+	def 'test can parse a JSON data using default rootNode and an incorrect json object'() {
+
+		given:
+			String fileContent = '''
+			{
+				"assets": [
+					{
+					  	"collection_type": "SNMP",
+					  	"cpu_architecture": "Not Collected",
+					  	"cpu_count": "2",
+					},
+					{
+						"collection_type": "SNMP 1",
+						"cpu_architecture": "Collected",
+						"cpu_count": "8",
+					}
+				]
+			}'''.stripIndent()
+
+		and:
+			def (String fileName, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile('unit-test-', 'json')
+			fileOutputStream << fileContent
+			fileOutputStream.close()
+
+		when:
+			Map json = service.parseDataFromJSON(fileName, 1, '.')
+
+		then:
+			json.config == [
+					[property: 'assets', type: 'text']
+			]
+
+			json.rows == [
+					[
+							assets: [
+									[collection_type: 'SNMP', cpu_architecture: 'Not Collected', cpu_count: '2'],
+									[collection_type: 'SNMP 1', cpu_architecture: 'Collected', cpu_count: '8']
+							]
+					]
+			]
+
+		cleanup:
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+
+	}
+
+
+	def 'test can parse a JSON data using default rootNode as a json array returning an error'() {
+
+		given:
+			String fileContent = '''
+				[
+					{
+					  	"collection_type": "SNMP",
+					  	"cpu_architecture": "Not Collected",
+					  	"cpu_count": "2",
+					},
+					{
+						"collection_type": "SNMP 1",
+						"cpu_architecture": "Collected",
+						"cpu_count": "8",
+					}
+				]'''.stripIndent()
+
+		and:
+			def (String fileName, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile('unit-test-', 'json')
+			fileOutputStream << fileContent
+			fileOutputStream.close()
+
+		when:
+			Map json = service.parseDataFromJSON(fileName, 1, 'assets.data')
+
+		then:
+			json.error.message == 'The rootNode must be specified in the ETL Script before loading sample JSON data'
+
+		cleanup:
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+
+	}
+
 
 }

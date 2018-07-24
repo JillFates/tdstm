@@ -47,11 +47,11 @@ class TDSJSONDriver extends JSONDriver {
 			Object json = getRootNode(dataset, dataset.rootNode)
 			List nodeList
 
-			if (!(json instanceof List)) {
-				throw new ExceptionGETL("The rootNode must be specified in the ETL Script before loading sample JSON data")
+			if (json instanceof List) {
+				nodeList = json as List
+			} else {
+				nodeList = [json]
 			}
-
-			nodeList = json as List
 
 			// Sorted Map when creating from the nodes
 			TreeMap<String, Field> fields = [:]
