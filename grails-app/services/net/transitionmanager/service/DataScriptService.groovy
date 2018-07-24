@@ -338,7 +338,7 @@ class DataScriptService implements ServiceMethods{
 	 * @return Map with the description of JSON data in the File
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
+	Map parseDataFromJSON (String jsonFile, String rootNode = '.') throws RuntimeException {
 		File inputFile = tempFile(jsonFile)
 		String text = inputFile?.text?.trim()
 		if(! text ) {
