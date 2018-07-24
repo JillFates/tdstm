@@ -179,35 +179,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	void 'test can apply coalesce transformation'() {
 
-		given:
-			def okValue = 'tadah!'
-			ETLProcessor etlProcessor = new ETLProcessor(
-					  GroovyMock(Project),
-					  applicationDataSet,
-					  new DebugConsole(buffer: new StringBuffer()),
-					  validator)
+		expect:
+			result == ETLProcessor.coalesce(value1, value2, value3)
 
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-						def var1
-						def var2
-						def var3 = '${okValue}'
-						def var4 = 'never get this'
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with lowercase() set myLocalVar
-							load 'description' with coalesce(var1, var2, myLocalVar, var3, var4)
-							load 'appVendor' with coalesce(var1, var2, var3, var4) 
-						}
-					""".stripIndent())
-
-		then: 'check that the assigned value is the first not null'
-			etlProcessor.getElement(0, 1).value == etlProcessor.getElement(0, 5).value
-			etlProcessor.getElement(0, 6).value == okValue
-
-			etlProcessor.getElement(1, 1).value == etlProcessor.getElement(1, 5).value
-			etlProcessor.getElement(1, 6).value == okValue
+		where:
+			result | value1 | value2 | value3
+			null   | null   | null   | null
+			''     | ''     | null   | 5
+			new Element(value: 5) | null | null | new Element(value: 5)
+			''     | null | '' | 'tadah'
+			false  | null  | null | false
 	}
 
 	void 'test can check syntax errors at parsing time'() {
