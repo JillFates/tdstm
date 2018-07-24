@@ -36,6 +36,7 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.domain.ApiAction
@@ -53,6 +54,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
+// import org.codehaus.groovy.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -98,10 +100,37 @@ class TaskService implements ServiceMethods {
 	// The RoleTypes for Staff (populated in init())
 	private static List staffingRoles
 
+	private static final List<String> deviceFilterProperties = [
+		'cart',
+		'costCenter',
+		'ipAddress',
+		'maintContract',
+		'maintExpDate',
+		'os',
+		'retireDate',
+		'shelf',
+		'serialNumber',
+		'truck',
+		'usize'
+	].asImmutable()
+	// Note that devide fields: sourceLocation, sourceRoom, sourceRack, targetLocation, targetRoom and targetRack
+	// are handled separately in the code that references deviceFilterProperties so are not in the list.
+
 	private static final List<String> coreFilterProperties = [
-		'assetName', 'assetTag', 'assetType', 'costCenter', 'department',
-	    'description', 'environment', 'externalRefId', 'planStatus',
-	    'priority', 'supportType', 'validation'].asImmutable()
+		'assetClass',
+		'assetName',
+		'assetTag',
+		'costCenter',
+		'department',
+	    'description',
+		'environment',
+		'externalRefId',
+		'id',
+		'planStatus',
+	    'priority',
+		'supportType',
+		'validation'
+	].asImmutable()
 
 	// The common asset properties that filtering can be applied to (populated in init())
 	private static List<String> commonFilterProperties
@@ -147,7 +176,7 @@ class TaskService implements ServiceMethods {
 		//log.error "person:personId"
 		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
 
-		StringBuffer sql = new StringBuffer("""
+		StringBuilder sql = new StringBuilder("""
 			SELECT t.asset_comment_id AS id,
 			t.task_number AS taskNumber,
 			t.role,
@@ -341,7 +370,7 @@ class TaskService implements ServiceMethods {
 
 		search = StringUtils.trimToNull(search)
 
-		StringBuffer hql = new StringBuffer('FROM AssetComment AS c')
+		StringBuilder hql = new StringBuilder('FROM AssetComment AS c')
 		if (search) {
 			// Join on the AssetEntity and embed the search criteria
 			hql.append(', AssetEntity AS a WHERE c.assetEntity.id=a.id AND a.assetTag=:search AND ')
@@ -837,7 +866,7 @@ class TaskService implements ServiceMethods {
 		}
 		def taskIndex = 0
 
-		StringBuffer query = new StringBuffer("""
+		StringBuilder query = new StringBuilder("""
 			SELECT rownum FROM (
 				SELECT asset_comment_id, task_number,@rownum:=@rownum+1 as rownum
 				FROM asset_comment ac, (SELECT @rownum:=0) r
@@ -1499,8 +1528,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						def ids = td[nextProp]*.id
 						// isPred = nextProp == 'predecessor'
 
-//						def sql = "SELECT $nextProp as id, count(*) as cnt FROM task_dependency WHERE $nextProp in (" .
-//							GormUtil.asCommaDelimitedString(ids) . ') group by id'
 						def sql = "SELECT $findCol as id, count(*) as cnt FROM task_dependency WHERE $findCol in (" +
 							GormUtil.asCommaDelimitedString(ids) + ") group by id"
 						log.debug "getNeighborhood: SQL = $sql, ids=$ids"
@@ -1724,29 +1751,37 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
-	 * Used to find assets associated with a given context object
+	 * Used to find assets associated with a given context object. When the context contains one or more tags
+	 * then the query will be based solely on Tags and it will find assets associated with ANY of the tags. The event will
+	 * not affect the query with Tags. If only an event is specified then the search will be for any asset associated to planning
+	 * bundles assigned to the event.
 	 * @param context - the context object to find associated assets for
 	 * @return list of assets
 	 */
 	List<AssetEntity> getAssocAssets(Object contextObj) {
-		if (contextObj.tag) {
-			List<Long>tagIds = contextObj.tag.collect{tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
+		List<AssetEntity> assets = []
 
-			return TagAsset.where {
-				tag.id in tagIds
-				asset.moveBundle.useForPlanning == true }.projections {
-			}.projections {
-			   property 'asset'
-			}.list()
+		if (contextObj.tag) {
+			// Get list of tags from the generation context
+			List<Long>tagIds = contextObj.tag.collect{ tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
+
+			// Query the TagAsset to get list of Assets with ANY of the tags
+			assets = TagAsset.where {
+					tag.id in tagIds
+					asset.moveBundle.useForPlanning == true }.projections {
+				}.projections {
+					property 'asset'
+				}.list()
 		} else {
-			List bundleIds = getBundleIds(contextObj)
+			// Legacy get assets by event
+			List<Long> bundleIds = getBundleIds(contextObj)
 
 			if (bundleIds) {
-				AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
-			} else {
-				[]
+				assets = AssetEntity.executeQuery('from AssetEntity WHERE moveBundle.id IN (:bundleIds) AND moveBundle.useForPlanning = true', [bundleIds: bundleIds])
 			}
 		}
+
+		return assets
 	}
 
 	/**
@@ -1824,8 +1859,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		boolean isDebugEnabled = log.debugEnabled
 
 		// These buffers are used to capture status output for short-term
-		StringBuffer out = new StringBuffer()
-		StringBuffer exceptions = new StringBuffer()
+		StringBuilder out = new StringBuilder()
+		StringBuilder exceptions = new StringBuilder()
 		Integer exceptCnt = 0
 
 		Date startedAt = new Date()
@@ -1836,14 +1871,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		 */
 		def bailOnTheGeneration = { cause ->
 			failure = cause
-/*
+			/*
 			// Update the taskBatch
 			taskBatch.exceptionLog = exceptions.toString()
 			taskBatch.infoLog = out.toString()
 			taskBatch.taskCount = taskList.size()
 			taskBatch.exceptionCount = ++exceptCnt
 			taskBatch.save(flush:true, failOnError:true)
-*/
+			*/
+
 			log.info(msg)
 			throw new RuntimeException(cause)
 		}
@@ -1862,10 +1898,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		MoveEvent event = null
 		if(contextObj.eventId) {
 			event = get(MoveEvent, contextObj.eventId, settings.project)
-			settings.event = event
 		}
-
-
+		settings.event = event
 
 		// Determine the start/completion times for the event
 		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
@@ -1898,7 +1932,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.debug "linkTaskToMilestone - $taskToLink"
 			if (latestMilestone) {
 				log.debug "Calling createTaskDependency from linkTaskToMile"
-				depCount += createTaskDependency(latestMilestone, taskToLink, taskList, assetsLatestTask, settings, out)
+				depCount += createTaskDependency(latestMilestone, taskToLink, assetsLatestTask, settings, out)
 			} else {
 				exceptions.append("Task($taskToLink) has no predecessor tasks<br>")
 				exceptCnt++
@@ -1916,7 +1950,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (assetsLatestTask.containsKey(taskToLink.assetEntity.id)) {
 					if (assetsLatestTask[taskToLink.assetEntity.id].taskNumber != taskToLink.taskNumber) {
 						log.info "linkTaskToLastAssetOrMilestone: creating dependency for task $taskToLink"
-						depCount += createTaskDependency(assetsLatestTask[taskToLink.assetEntity.id], taskToLink, taskList, assetsLatestTask, settings, out)
+						depCount += createTaskDependency(assetsLatestTask[taskToLink.assetEntity.id], taskToLink, assetsLatestTask, settings, out)
 						out.append("Created dependency between ${assetsLatestTask[taskToLink.assetEntity.id]} and $taskToLink<br>")
 					} else {
 						exceptions.append("Unexpected binding of task dependencies where a task references itself, task($taskToLink), TaskSpec ($taskToLink.taskSpec) <br>")
@@ -2290,7 +2324,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						if (tasksNoSuccessors.size()==0 && taskList.size() > 1) {
 							if (prevMilestone) {
 								log.debug "Calling createTaskDependency from milestone 1"
-								depCount += createTaskDependency(prevMilestone, newTask, taskList, assetsLatestTask, settings, out)
+								depCount += createTaskDependency(prevMilestone, newTask, assetsLatestTask, settings, out)
 							} else {
 								out.append("Found no successors for a milestone, which is unexpected but not necessarily wrong - Task $newTask<br>")
 							}
@@ -2301,7 +2335,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							// def predecessorTask = AssetComment.read(p.id)
 							def predecessorTask = taskList[p.id]
 							log.debug "Calling createTaskDependency from milestone 2"
-							depCount += createTaskDependency(predecessorTask, newTask, taskList, assetsLatestTask, settings, out)
+							depCount += createTaskDependency(predecessorTask, newTask, assetsLatestTask, settings, out)
 
 							// Bump along any predecessor assets to this task if the predecessor was a collection taskSpec
 							// TODO - I don't think that this is necessary
@@ -2466,9 +2500,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						def genTitles = CU.asList(taskSpec.title)
 						def genLastTask
 
-						genTitles.each { gt ->
+						genTitles.each { generalTaskTitle ->
 							// Replace the potential title:[array] with just the current title
-							taskSpec.title = gt
+							taskSpec.title = generalTaskTitle
 							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null, null)
 
 							taskSpecTasks[taskSpec.id] << newTask
@@ -2489,7 +2523,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 									tasksNeedingPredecessors << newTask
 								} else {
 									log.debug "Calling createTaskDependency from general"
-									depCount += createTaskDependency(genLastTask, newTask, taskList, assetsLatestTask, settings, out)
+									depCount += createTaskDependency(genLastTask, newTask, assetsLatestTask, settings, out)
 								}
 								genLastTask = newTask
 
@@ -2672,10 +2706,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 										// that the tasks are to be completed.
 										log.debug "Calling createTaskDependency from tasksNeedingPredecessors.each inverse=$settings.isInversed"
 										if (settings.isInversed) {
-											depCount += createTaskDependency(prevTask, tnp, taskList, assetsLatestTask, settings, out)
+											depCount += createTaskDependency(prevTask, tnp, assetsLatestTask, settings, out)
 											log.debug "Inversed task predecessor due to inverse flag"
 										} else {
-											depCount += createTaskDependency(tnp, prevTask, taskList, assetsLatestTask, settings, out)
+											depCount += createTaskDependency(tnp, prevTask, assetsLatestTask, settings, out)
 										}
 										missedDepToRemove << prevTask
 									} else {
@@ -2742,7 +2776,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							if (tnp.assetEntity && predTasksByAssetId.containsKey(tnp.assetEntity.id)) {
 								predTasksByAssetId[tnp.assetEntity.id].each { pt ->
 									log.debug "Calling createTaskDependency from TASKSPEC 1"
-									depCount += createTaskDependency(pt, tnp, taskList, assetsLatestTask, settings, out)
+									depCount += createTaskDependency(pt, tnp, assetsLatestTask, settings, out)
 									wasWired = true
 									if (isRequired) {
 										// Update the Asset's last task based on if the previous task is for an asset or the current one is for an asset
@@ -2756,7 +2790,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							// Now try and find all non-asset predecessor tasks and wire to them
 							predTasksWithNoAssets.each { pt ->
 								log.debug "Calling createTaskDependency from TASKSPEC 2"
-								depCount += createTaskDependency(pt, tnp, taskList, assetsLatestTask, settings, out)
+								depCount += createTaskDependency(pt, tnp, assetsLatestTask, settings, out)
 								wasWired = true
 							}
 
@@ -2783,7 +2817,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 										def parentDep = TaskDependency.findByAssetComment(assetsLatestTask[tnp.assetEntity.id])
 										if (parentDep) {
 											log.debug "Calling createTaskDependency from DIRECT_MODE"
-											depCount += createTaskDependency(parentDep.predecessor, tnp, taskList, assetsLatestTask, settings, out)
+											depCount += createTaskDependency(parentDep.predecessor, tnp, assetsLatestTask, settings, out)
 
 											wasWired = true
 
@@ -2813,7 +2847,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 											// Find the latest asset for the task.assetEntity
 											if (assetsLatestTask.containsKey(tnp.assetEntity.id)) {
 												log.debug "Calling createTaskDependency from GROUPS - asset $tnp.id $tnp.assetName"
-												depCount += createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp, taskList, assetsLatestTask, settings, out)
+												depCount += createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp, assetsLatestTask, settings, out)
 												wasWired = true
 											} else {
 												// Wire to last milestone
@@ -2840,7 +2874,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 											if (assetsLatestTask.containsKey(predAsset.id)) {
 												def predAssetTask = assetsLatestTask[predAsset.id]
 												log.debug "Calling createTaskDependency from GROUPS 2 - asset $predAsset.id $predAsset.assetName"
-												depCount += createTaskDependency(predAssetTask, tnp, taskList, assetsLatestTask, settings, out)
+												depCount += createTaskDependency(predAssetTask, tnp, assetsLatestTask, settings, out)
 
 												// Check to see if the predecessor and the successor are funnels and if so, then move the asset forward to the new successor
 												if (predAssetTask.getTmpIsFunnellingTask() != null && tnp.getTmpIsFunnellingTask() != null) {
@@ -2935,7 +2969,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								if (assetsLatestTask.containsKey(tnp.assetEntity.id) &&
 									  assetsLatestTask[tnp.assetEntity.id].getTmpIsFunnellingTask() != null) {
 									log.debug "Calling createTaskDependency from ASSET_DEP_MODE"
-									depCount += createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp, taskList, assetsLatestTask, settings, out)
+									depCount += createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp, assetsLatestTask, settings, out)
 									wasWired=true
 								}
 
@@ -2996,7 +3030,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 											}
 											if (previousTask) {
 												log.debug "Calling createTaskDependency from ASSET_DEP_MODE"
-												depCount += createTaskDependency(previousTask, tnp, taskList, assetsLatestTask, settings, out)
+												depCount += createTaskDependency(previousTask, tnp, assetsLatestTask, settings, out)
 												wasWired=true
 											} else {
 												log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp) ASSET_DEP_MODE"
@@ -3127,7 +3161,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// If the failed variable is empty then we have an unexpected error so dump the stack for debugging purposes
 				failure = e.message
 				exceptions.append(failure)
-				log.error "$failure\n${ExceptionUtil.stackTraceToString(e)}"
+				log.error "$failure\n${ExceptionUtil.stackTraceToString(e,80)}"
 			}
 		}
 
@@ -3154,10 +3188,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// TM-2843 - Fix issue with memory leak due to the usage of metaClass.addProperty
 		// TODO : JPM 5/2016 : generateTasks() review if the 'taskToWipe.metaClass = null' is still necessary for the memory leak
-		taskList.each { id, taskToWipe -> taskToWipe.metaClass = null }
+		// taskList.each { id, taskToWipe -> taskToWipe.metaClass = null }
 
-		if (failure)
+		if (failure) {
 			throw new RuntimeException(failure)
+		}
 	}
 
 	/**
@@ -3195,15 +3230,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			assocAssetPropName = 'asset'
 		}
 
-
 		if (depMode == 'b') {
-//			baseHql = '''
-//			from AssetDependency ad
-//			where (ad.dependent.id=:assetId or ad.asset.id=:assetId)
-//			  and ad.dependent.moveBundle.id IN (:moveBundleIds)
-//			  and ad.asset.moveBundle.id IN (:moveBundleIds)
-//			  and ad.status not in ('$AssetDependencyStatus.NA', '$AssetDependencyStatus.ARCHIVED') \
-//				and ad.type <> '$AssetDependencyType.BATCH'"
 			baseHql = '''
 				from AssetDependency ad
 				where (dependent.id=:assetId or asset.id=:assetId)
@@ -3537,7 +3564,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Handle setting the task duration which can have an indirect reference to another property as well as a default value
 		// or a numeric value
-		task.priority = taskSpec.containsKey('priority') ? taskSpec.priority : 3
+		if (taskSpec.containsKey('priority')) {
+			task.priority = taskSpec.priority
+		}
 
 		if (taskSpec.containsKey("docLink")) {
 			try {
@@ -3552,13 +3581,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Set the duration appropriately
 		if (taskSpec.containsKey('duration')) {
 			errMsg = setTaskDuration(task, taskSpec.duration)
-			if (errMsg)
+			if (errMsg) {
 				exceptions.append("$errMsg for taskSpec $id<br>")
-		} else {
-			task.duration=0
+			}
 		}
 
-		task.durationLocked = taskSpec.containsKey('durationLocked') ? taskSpec.durationLocked.toBoolean() : false
+		if (taskSpec.containsKey('durationLocked')) {
+			task.durationLocked = taskSpec.durationLocked.toBoolean()
+		}
 
 		if (taskSpec.containsKey('category') && taskSpec.category) {
 			task.category = taskSpec.category
@@ -3571,48 +3601,67 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (asset) {
 				task.comment = new GStringEval().toString(taskSpec.title, asset)
 			} else {
-				task.comment = new GStringEval().toString(taskSpec.title, moveEvent)
+				task.comment = new GStringEval().toString(taskSpec.title, settings.event)
 			}
-		} catch (Exception ex) {
+		} catch (Exception e) {
+			log.debug ExceptionUtil.stackTraceToString(e)
 			exceptions.append("Unable to parse title ($taskSpec.title) for taskSpec $taskSpec.id<br>")
 			task.comment = "** Error computing title **"
 		}
 
 		// Set various values if there is a workflow associated to this taskSpec and Asset
-		if (workflow) {
-			// log.info "Applying workflow values to task $taskNumber - values=$workflow"
-			if (workflow.workflow_transition_id) { task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id) }
-			// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
-			if (! task.category && workflow.category) { task.category = workflow.category }
-			if (! task.estStart && workflow.plan_start_time) { task.estStart = workflow.plan_start_time }
-			if (! task.estFinish && workflow.plan_completion_time) { task.estFinish = workflow.plan_completion_time }
-			if (! task.duration && workflow.duration != null) {
-				task.duration = workflow.duration
-				task.durationScale = workflow.duration_scale ?: 'm'
-			}
+		// if (workflow) {
+		// 	// log.info "Applying workflow values to task $taskNumber - values=$workflow"
+		// 	if (workflow.workflow_transition_id) { task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id) }
+		// 	// if (! task.role && workflow.role_id) { task.role = workflow.role_id }
+		// 	if (! task.category && workflow.category) { task.category = workflow.category }
+		// 	if (! task.estStart && workflow.plan_start_time) { task.estStart = workflow.plan_start_time }
+		// 	if (! task.estFinish && workflow.plan_completion_time) { task.estFinish = workflow.plan_completion_time }
+		// 	if (! task.duration && workflow.duration != null) {
+		// 		task.duration = workflow.duration
+		// 		task.durationScale = workflow.duration_scale ?: 'm'
+		// 	}
+		// }
+
+		if (task.category == null) {
+			task.category = defCat
 		}
 
-		if (task.category == null) task.category = defCat
-
 		// log.info "About to save task: $task.category"
-		if (! (task.validate() && task.save(flush:true))) {
+		if (! task.save(flush:true, failOnError:false)) {
 			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
 		// Perform the assignment logic
 		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
-		if (errMsg)
+		if (errMsg) {
 			exceptions.append("$errMsg<br>")
-
+		}
 		taskList[task.id] = task
 
-		log.info "Saved task $task.id - $task"
+		log.info 'Saved task {} - {}', task.id, task.toString()
 
 		// Set any scheduling constraints on the task
 		setTaskConstraints(task, taskSpec, workflow, projectStaff, exceptions)
 
 		return task
+	}
+
+	/**
+	 * Used to fetch a Task Dependency by finding the predecessor / successor tasks
+	 * @param predecessor - the predecessor task
+	 * @param successor - the successor task
+	 * @return the TaskDependency if found otherwise null
+	 */
+	private TaskDependency fetchTaskDependencyByTasks(AssetComment predecessor, AssetComment successor) {
+
+		return TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor)
+		// The following was complaining for some reason
+		// dependency = TaskDependency.where {
+		// 	assetComment.id == successor.id
+		// 	predecessor.id == predecessor.id
+		// }.find()
 	}
 
 	/**
@@ -3627,7 +3676,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return TaskDependency
 	 * @throws RuntimeException if unable to save the dependency
 	 */
-	def createTaskDependency(predecessor, successor, taskList, assetsLatestTask, settings, out, count=0) {
+	@CompileStatic
+	Integer createTaskDependency(AssetComment predecessor, AssetComment successor, Map assetsLatestTask, Map settings, StringBuilder out, Integer count=0) {
 
 		log.info "createTaskDependency: ** START - Creating dependency count=$count predecessor=$predecessor, successor=$successor"
 
@@ -3635,7 +3685,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Attempted to create dependency where predecessor and successor are the same task ($predecessor)")
 		}
 
-		def dependency
+		TaskDependency dependency
 
 		// Need to see if the dependency was previously created. In addition, in the case of a missed dependency where there is a reversed
 		// taskSpec dependency (e.g. Auto App Shutdowns) we can get into the situation where a dependency is improperly created so we'll
@@ -3645,17 +3695,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// then need to bump the latest task for each of the assets appropriately. Keep in mind that the calling logic stuffs each of the assets into the task before
 		// calling this method. It's a bit convoluted...
 
-		// TODO : change to use local memory list
-		dependency = TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor)
+		dependency = fetchTaskDependencyByTasks(successor, predecessor)
 		if (!dependency) {
-			dependency = TaskDependency.findByAssetCommentAndPredecessor(predecessor, successor)
+			dependency = fetchTaskDependencyByTasks(predecessor, successor)
 		}
 
 		if (dependency) {
 			log.info "createTaskDependency: dependency already exists"
 		} else {
 			dependency = new TaskDependency(predecessor:predecessor, assetComment:successor)
-			if (! (dependency.validate() && dependency.save(flush:true))) {
+			if (! (dependency.save(flush:true))) {
 				throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error:${GormUtil.errorsAsUL(dependency)}, ")
 			}
 			out.append("Created dependency ($dependency.id) between $predecessor and $successor<br/>")
@@ -3673,17 +3722,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		*/
 
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
-		if (! predecessor.getTmpHasSuccessorTaskFlag())
+		if (! predecessor.getTmpHasSuccessorTaskFlag()) {
 			predecessor.setTmpHasSuccessorTaskFlag(true)
+		}
 
 		// Mark the Successor task to the PENDING status since it has to wait for the predecessor task to complete before it can begin
 		successor.status = ACS.PENDING
-		if (! (successor.validate() && successor.save(flush:true))) {
+		if (! successor.save(flush:true)) {
 			throw new RuntimeException("Failed to update successor ($successor) status to PENDING<br>Errors:${GormUtil.errorsAsUL(dependency)}")
 		}
 
-		if (predecessor.assetEntity)
+		if (predecessor.assetEntity) {
 			log.info "createTaskDependency: pred asset latest task? ${assetsLatestTask.containsKey(predecessor.assetEntity.id)} - ${assetsLatestTask[predecessor.assetEntity.id] ?: ''}"
+		}
 
 		// Handle updating predecessor tasks' asset with successor task if it is a funnel type (e.g. gateway, milestone, set, truck, cart, etc)
 		if (predecessor.assetEntity && successor.getTmpIsFunnellingTask() != null) {
@@ -3701,13 +3752,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Handling deferring dependency relationships when taskSpec indicates to successor.defer:'key'
 		if (settings.deferSucc) {
-			setDeferment(successor, successor.assetEntity, 's', settings.deferSucc, settings)
+			setDeferment(successor, successor.assetEntity, 's', (String)settings.deferSucc, settings)
 		}
 
 		// Here is the recursive loop if the predecessor has a peer
-		if (predecessor.getTmpChainPeerTask()) {
-			log.info "createTaskDependency: Invoking recursively due to predecessor having chainPeerTask ($predecessor.chainPeerTask)"
-			count += createTaskDependency(predecessor.chainPeerTask, successor, taskList, assetsLatestTask, settings, out, count)
+		AssetComment peerTask
+		if (peerTask) {
+			log.info "createTaskDependency: Invoking recursively due to predecessor having chainPeerTask ($peerTask)"
+			count += createTaskDependency(peerTask, successor, assetsLatestTask, settings, out, count)
 		}
 
 		log.debug "createTaskDependency: ** FINISHED - count=$count"
@@ -3760,7 +3812,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param settings - the hash map containing a bunch of settings used for the task spec, etc
 	 * @throws RuntimeException when used in appropriately
 	 */
-	private void setDeferment(AssetComment task, Object asset, String predSucc, String key, Map settings) {
+	private void setDeferment(AssetComment task, AssetEntity asset, String predSucc, String key, Map settings) {
 
 		boolean isPredSucc = predSucc == 'p'
 
@@ -3844,7 +3896,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param The taskSpec property settings
 	 * @param The string buffer used for logging to the user
 	 */
-	private int gatherDeferment(Map taskList, Map assetsLatestTask, AssetComment task, String predSucc, List keys, Map settings, StringBuffer out) {
+	private int gatherDeferment(Map taskList, Map assetsLatestTask, AssetComment task, String predSucc, List keys, Map settings, StringBuilder out) {
 		boolean isPred = predSucc == 'p'
 
 
@@ -3870,10 +3922,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Setup the proper dependencies as necessary
 						if (predSucc == 'p') {
 							log.debug "gatherDeferment: Gathered Predecessor - pred($t), succ($task)"
-							depCount += createTaskDependency(task, t, taskList, assetsLatestTask, settings, out)
+							depCount += createTaskDependency(task, t, assetsLatestTask, settings, out)
 						} else {
 							log.debug "gatherDeferment: Gathered Successors - pred($t), succ($task)"
-							depCount += createTaskDependency(t, task, taskList, assetsLatestTask, settings, out)
+							depCount += createTaskDependency(t, task, assetsLatestTask, settings, out)
 						}
 
 						// Now remove the asset deferral from the task and if the key is empty, then remove that too
@@ -4224,7 +4276,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				switch(queryOn) {
 
 					case 'device':
-						where = SqlUtil.appendToWhere(where, "a.assetClass=:assetClass")
+						where = SqlUtil.appendToWhere(where, 'a.assetClass=:assetClass')
 						map.assetClass = AssetClass.DEVICE
 						if (filter?.asset?.containsKey('virtual')) {
 							// Just Virtual devices
@@ -4237,13 +4289,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						// Add any devices specific attribute filters
-						addWhereConditions(['supportType', 'environment', 'department', 'description', 'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
-							'truck', 'cart', 'shelf',
-							'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress'])
-
+						addWhereConditions( deviceFilterProperties )
 						// Deal with 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom', since these are joins
 
-						def sb = new StringBuffer('select a FROM AssetEntity a ')
+						def sb = new StringBuilder('')
 
 						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
 						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)}) {
@@ -4266,40 +4315,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
 						}
 
-						if(contextObject.tag){
-							sb.append('left outer join a.tagAssets ta left outer join ta.tag t')
-						}
-
-						sb.append("${where ? ' where ' + where : ''}")
-						sql = sb.toString()
-
-						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
-						assets = AssetEntity.executeQuery(sql, map)
+						sb.append("${where ?  where : ''}")
+						where = sb.toString()
 						break
 
 					case 'application':
+						where = SqlUtil.appendToWhere(where, 'a.assetClass=:assetClass')
+						map.assetClass = AssetClass.APPLICATION
 						// Add additional WHERE clauses based on the following properties being present in the filter (Application domain specific)
 						addWhereConditions(['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'])
-
-						sql = "select a from Application a $join where $where"
-						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
-						assets = Application.executeQuery(sql, map)
 						break
 
 					case 'database':
+						where = SqlUtil.appendToWhere(where, 'a.assetClass=:assetClass')
+						map.assetClass = AssetClass.DATABASE
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['dbFormat','size'])
-						sql = "select a from Database a $join where $where"
-						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
-						assets = Database.executeQuery(sql, map)
 						break
 
 					case ~/files|file|storage/:
+						where = SqlUtil.appendToWhere(where, 'a.assetClass=:assetClass')
+						map.assetClass = AssetClass.STORAGE
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions(['fileFormat','size', 'scale', 'LUN'])
-						sql = "select a from Files a $join where $where"
-						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
-						assets = Files.executeQuery(sql, map)
 						break
 
 					default:
@@ -4307,10 +4345,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						throw new RuntimeException("Invalid class '$queryOn' specified in filter ($filter)")
 						break
 				}
+
+				sql = "select a FROM AssetEntity a $join where $where"
+				log.debug "findAllAssetsWithFilter: sql=$sql, map=$map"
+
+				assets = AssetEntity.executeQuery(sql, map)
 			} catch (e) {
-				msg = "An unexpected error occurred while trying to locate assets for filter $filter: $e"
-				log.error "$msg\nSQL: $sql\nPARAMS: $map\n${ExceptionUtil.stackTraceToString(e)}"
-				throw new RuntimeException("$msg<br>$e.message")
+				msg = "An unexpected error occurred while trying to locate assets for filter $filter:"
+				log.error "{}\nSQL: {}\nPARAMS: {}\n{}", msg, sql, map, ExceptionUtil.stackTraceToString(e)
+				throw new RuntimeException(msg)
 			}
 
 			//
@@ -4420,27 +4463,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return assets
 	}
 
-	List getBundleIds(contextObject, project = null, filter = null) {
+	/**
+	 * Used to retrieve a list of Bundle IDs that are associated with the Recipe Event/Tag context
+	 * @param contextObject - the Context JSON parsed
+	 * @param project - the current project
+	 * @param filter
+	 * @return a list of MoveBundle IDs
+	 */
+	List getBundleIds(contextObject, Project project = null, Map filter = null) {
+		List bundleIds = []
 		// Now find the bundles if the contextObject had an event id, but not bundle ids
 		if (contextObject.eventId) {
-			List bundleIds = MoveBundle.where { moveEvent.id == contextObject.eventId }.projections {
+			bundleIds = MoveBundle.where {
+				moveEvent.id == contextObject.eventId
+			}.projections {
 				property 'id'
 			}.list()
 
 			// See if they are trying to filter on the Bundle Name
+			// TODO : JPM 7/2018 : I don't believe that this holds true any longer unless this is used in the recipes themselves
 			if (project && filter?.asset?.containsKey('bundle')) {
-				def moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
+				MoveBundle moveBundle = MoveBundle.findByProjectAndName(project, filter.asset.bundle)
 				if (moveBundle) {
 					bundleIds = [moveBundle.id]
 				} else {
 					throw new RuntimeException("Bundle name ($filter.moveBundle) was not found for filter: $filter")
 				}
 			}
-
-			return bundleIds
-		} else {
-			return []
 		}
+		return bundleIds
 	}
 
 	/**
@@ -4455,7 +4506,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param Integer recipeId
 	 * @param Map taskSpec
 	 * @param List? groups
-	 * @param StringBuffer exceptions
+	 * @param StringBuilder exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
 	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions) {
@@ -4724,7 +4775,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Handle the various settings from the taskSpec
 			if (taskSpec.containsKey('category')) task.category = taskSpec.category
 
-			if (! (task.validate() && task.save(flush:true))) {
+			if (! (task.save(flush:true))) {
 				log.error "createRollcallTasks: failed to create task for $lastPerson on moveEvent $settings.moveEvent"
 				throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}")
 			}
@@ -4995,7 +5046,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Helper method to set any scheduling constraints on a task
 	 */
-	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuffer exceptions) {
+	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuilder exceptions) {
 		def ctype
 		def cdt
 		def dateTime
