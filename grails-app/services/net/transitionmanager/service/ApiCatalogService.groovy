@@ -148,4 +148,25 @@ class ApiCatalogService implements ServiceMethods {
 		ApiCatalog apiCatalog = GormUtil.findInProject(securityService.userCurrentProject, ApiCatalog, catalogId, true)
 		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionaryTransformed)
 	}
+
+	void cloneProjectApiCatalogs(Project sourceProject, Project targetProject) {
+		List<ApiCatalog> apiCatalogs = ApiCatalog.where {
+			project == sourceProject
+		}.list()
+
+		if (!apiCatalogs.isEmpty()) {
+			apiCatalogs.each { ApiCatalog sourceApiCatalog ->
+				Provider targetProvider = providerService.cloneProvider(sourceApiCatalog.provider, targetProject)
+				ApiCatalog newApiCatalog = new ApiCatalog(
+						project: targetProject,
+						provider: targetProvider,
+						name: sourceApiCatalog.name,
+						dictionary: sourceApiCatalog.dictionary,
+						dictionaryTransformed: sourceApiCatalog.dictionaryTransformed
+				)
+				newApiCatalog.save()
+				log.debug "Cloned api catalog ${newApiCatalog.name} for project ${targetProject.toString()}"
+			}
+		}
+	}
 }
