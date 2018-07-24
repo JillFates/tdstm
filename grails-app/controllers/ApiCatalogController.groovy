@@ -1,9 +1,11 @@
+import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApiCatalogCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiCatalog
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiCatalogService
 
 @Secured('isAuthenticated()')
@@ -13,6 +15,7 @@ class ApiCatalogController implements ControllerMethods {
 	/**
 	 * Api Catalog manager landing page
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def manager() {
 	}
 
@@ -20,6 +23,7 @@ class ApiCatalogController implements ControllerMethods {
 	 * It accepts an unsaved Api Catalog for transformation and pretty viewing without saving.
 	 * @return
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def viewMerged() {
 		ApiCatalogCommand command = populateCommandObject(ApiCatalogCommand.class)
 		validateCommandObject(command)
@@ -33,6 +37,7 @@ class ApiCatalogController implements ControllerMethods {
 	 * Save or update an Api Catalog
 	 * @return
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def save() {
 		ApiCatalogCommand command = populateCommandObject(ApiCatalogCommand.class)
 		validateCommandObject(command)
@@ -47,6 +52,7 @@ class ApiCatalogController implements ControllerMethods {
 	 * @param id
 	 * @return
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def viewPretty(Long id) {
 		ApiCatalog apiCatalog = apiCatalogService.findById(id)
 
@@ -67,6 +73,7 @@ class ApiCatalogController implements ControllerMethods {
 	 * @param id
 	 * @return
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def delete(Long id) {
 		apiCatalogService.deleteById(id)
 		renderSuccessJson()
@@ -77,6 +84,7 @@ class ApiCatalogController implements ControllerMethods {
 	 *
 	 * @return a collection of api catalogs
 	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
 	def list() {
 		renderAsJson([model: apiCatalogService.list()*.toMap()])
 	}
