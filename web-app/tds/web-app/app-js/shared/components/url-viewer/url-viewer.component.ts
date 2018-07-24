@@ -3,6 +3,7 @@
  */
 
 import {Component, OnInit, Input} from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
 	selector: 'tds-url-viewer',
@@ -13,9 +14,11 @@ export class URLViewerComponent implements OnInit {
 	@Input('model') model: string;
 	// _blank|_self|_parent|_top|framename
 	@Input('target') target: string;
+	public label: string ;
+	public trustedUrl: SafeUrl;
 
-	public urlLabel = '';
-	public urlReference = '';
+	constructor(private sanitizer: DomSanitizer) {
+	}
 
 	public ngOnInit() {
 		// Open a new Page by Default
@@ -32,13 +35,13 @@ export class URLViewerComponent implements OnInit {
 	 */
 	protected getURLContext(): void {
 		if (this.model && this.model.indexOf('|') !== -1) {
-			let modelContent = this.model.split('|');
-			// if there is no label fall back to url
-			this.urlLabel = modelContent[0] || modelContent[1];
-			this.urlReference = modelContent[1];
+			const [label, url] = this.model.split('|');
+
+			this.label = label || url; // if there is no label fall back to url, (for label in the template is shown interpolated, we don't need sanitize)
+			this.trustedUrl = this.sanitizer.bypassSecurityTrustUrl(url);
 		} else {
-			this.urlReference = this.model;
-			this.urlLabel = 'Click to View';
+			this.trustedUrl = this.sanitizer.bypassSecurityTrustUrl(this.model);
+			this.label = 'Click to View';
 		}
 	}
 }
