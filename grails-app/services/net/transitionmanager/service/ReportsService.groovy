@@ -434,10 +434,10 @@ class ReportsService implements ServiceMethods {
 			from AssetComment
 			where moveEvent = :event
 			  and category in(:categories)
-			  and dateResolved=:dateResolved
+			  and dateResolved = null
 			  and isPublished IN (:publishedValues)
 		''', [event: moveEvent, categories: ['general', 'discovery', 'planning', 'walkthru'],
-		      dateResolved: null, publishedValues: publishedValues])
+		      publishedValues: publishedValues])
 
 		String eventIssues
 		if (nonAssetIssue) {
