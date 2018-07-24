@@ -1547,8 +1547,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		Object retVal = null
 		if( values ) {
 			retVal = values.findResult {
-				if ( it && it instanceof Element ) {
-					it = it.value
+				if ( it instanceof Element && !(it?.value) ) {
+					it = null
 				}
 
 				return it
