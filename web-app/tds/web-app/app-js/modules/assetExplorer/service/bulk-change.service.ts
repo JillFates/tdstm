@@ -8,16 +8,25 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class BulkChangeService {
-	private bulkChangeUrl = '../ws/bulkChange';
+	// todo make URL work with a FQPN
+	private readonly BASE_URL = '../ws/bulkChange';
 
 	constructor(private http: HttpInterceptor) {}
+
+	/**
+	 * GET - Build the url passing arg variable segments
+	 * @returns {Observable<any>}
+	 */
+	private getURL(...segments: string[]): string {
+		return `${this.BASE_URL}/${segments.join('/')}`;
+	}
 
 	/**
 	 * GET - List of fields
 	 * @returns {Observable<any>}
 	 */
 	getFields(): Observable<any[]> {
-		return this.http.get(`${this.bulkChangeUrl}/fields`)
+		return this.http.get(this.getURL('fields'))
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
@@ -33,7 +42,7 @@ export class BulkChangeService {
 		const defaultParams = { userParams: defaultUserParams, dataViewId: null, assetIds: [], edits: []};
 		const payload = Object.assign({}, defaultParams, {assetIds, edits});
 
-		return this.http.put(this.bulkChangeUrl, JSON.stringify(payload))
+		return this.http.put(this.getURL(), JSON.stringify(payload))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -48,9 +57,8 @@ export class BulkChangeService {
 	 * @returns {Observable<any>}
 	 */
 	getActions(): Observable<any[]> {
-		return this.http.get(`${this.bulkChangeUrl}/actions`)
+		return this.http.get(this.getURL('actions'))
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
-
 }
