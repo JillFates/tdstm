@@ -214,6 +214,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						iterate {
 							extract 'vendor name' transform with lowercase() set myLocalVar
 							load 'appVendor' with coalesce(var1, var2, var3, var4) 
+							extract 'issue date' transform with format()
 						}
 					""".stripIndent())
 
