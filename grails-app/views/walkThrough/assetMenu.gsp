@@ -323,7 +323,7 @@ function checkComments(type) {
 			</tbody>
 		</table>
 		<div style="MARGIN-TOP: 15px" align=center>
-			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and dateResolved = ? and commentCode = ?' ,['issue',null,'ASSET_MISSING'])}">
+			<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id +' and commentType = ? and dateResolved = null and commentCode = ?' ,['issue','ASSET_MISSING'])}">
 				<input name="type" value="resolve" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('resolve', '${assetEntity?.id}','Resolve missing asset issue. Are you sure?')">Missing Asset Found</a>
 			</g:if>
