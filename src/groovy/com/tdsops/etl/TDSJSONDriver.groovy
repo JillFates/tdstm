@@ -59,6 +59,7 @@ class TDSJSONDriver extends JSONDriver {
 			nodeList.each { node ->
 				node.each { k, v ->
 					if(! fields.containsKey(k) ) {
+						//TODO: Set Field Type properly based v class type
 						fields[k] = new Field(name: k, type: Field.Type.STRING)
 					}
 				}

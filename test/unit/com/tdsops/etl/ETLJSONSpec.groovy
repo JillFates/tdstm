@@ -362,52 +362,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	@See('TM-11487')
-	void 'test can throw an Exception if rootNode was not defined'(){
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
-				{
-					"Applications": [
-						{
-							"application id":152254,
-							"vendor name":"Microsoft",
-							"location":"ACME Data Center"
-						},
-						{
-							"application id":152255,
-							"vendor name": "Mozilla",
-							"Technology":"NGM",
-							"location":"ACME Data Center"
-						}
-					],				
-				}'''.stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-						//rootNode 'Applications'
-						read labels
-						iterate {
-							domain Application
-							extract 'vendor name' load 'Vendor'
-						}
-						""".stripIndent())
-
-		then: 'It throws an Exception'
-			ExceptionGETL e = thrown ExceptionGETL
-			e.message == "The rootNode must be specified in the ETL Script before loading sample JSON data"
-
-		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
-	}
-
 	void 'test can read JSONObject fields iterating rows for a JSON DataSet'(){
 
 		given:

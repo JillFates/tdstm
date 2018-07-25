@@ -133,20 +133,64 @@ class DataScriptServiceSpec extends Specification {
 				]'''.stripIndent()
 
 		and:
-			def (String fileName, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile('unit-test-', 'json')
+			def (String fileName, OutputStream fileOutputStream) = fileSystemService
+					.createTemporaryFile('unit-test-', 'json')
+
 			fileOutputStream << fileContent
 			fileOutputStream.close()
 
 		when:
-			Map json = service.parseDataFromJSON(fileName, 1, 'assets.data')
+			Map json = service.parseDataFromJSON(fileName, 1, '.')
 
 		then:
-			json.error.message == 'The rootNode must be specified in the ETL Script before loading sample JSON data'
+			json.config == [
+				[property: 'collection_type', type: 'text'],
+				[property: 'cpu_architecture', type: 'text'],
+				[property: 'cpu_count', type: 'text']
+			]
+
+			json.rows == [
+				[collection_type: 'SNMP', cpu_architecture: 'Not Collected', cpu_count: '2'],
+			]
 
 		cleanup:
 			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 
 	}
 
+	def 'test can parse a JSON data using default rootNo de as a json returning an error'() {
+
+		given:
+			String fileContent = '''
+				{
+					"collection_type": "SNMP",
+					"cpu_architecture": "Not Collected",
+					"cpu_count": "2",
+			'''.stripIndent()
+
+		and:
+			def (String fileName, OutputStream fileOutputStream) = fileSystemService.
+					createTemporaryFile('unit-test-', 'json')
+			fileOutputStream << fileContent
+			fileOutputStream.close()
+
+		when:
+			service.parseDataFromJSON(fileName, 1, '.')
+
+		then: 'It throws an Exception with incorrect format message'
+			Exception e = thrown Exception
+			e.message == '''Invalid JSON : expecting '}' or ',' but got current char [NEWLINE] with an int value of 10
+
+The current character read is [NEWLINE] with an int value of 10
+expecting '}' or ',' but got current char [NEWLINE] with an int value of 10
+line number 5
+index number 87
+	"cpu_count": "2",
+..................^'''
+
+		cleanup:
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+
+	}
 
 }

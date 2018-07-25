@@ -287,7 +287,10 @@ class DataScriptService implements ServiceMethods{
 	* @return
 	*/
 	Object parseDataFromFile (String fileName, Long maxRows, GrailsParameterMap params) throws EmptyResultException{
+
+		String message
 		try{
+
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
         switch (extension) {
@@ -301,13 +304,13 @@ class DataScriptService implements ServiceMethods{
                 return parseDataFromXLS(fileName, 0, 0, maxRows)
 
 			default :
-				throw new InvalidParamException("File format ($extension) is not supported")
+				message = "File format ($extension) is not supported"
 			}
 
 		} catch (ex) {
-			log.error(ex.message, ex)
+			log.info(ex.message)
 
-			String message
+
 			switch(ex) {
 				case FileNotFoundException :
 					message = "The source data was not found"
@@ -318,11 +321,12 @@ class DataScriptService implements ServiceMethods{
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
-
 				default :
 					message = ex.message
 			}
+		}
 
+		if(message) {
 			throw new InvalidParamException(message)
 		}
 	}
@@ -338,41 +342,33 @@ class DataScriptService implements ServiceMethods{
 
 	/**
 	 * Check that the File with the JSON data is ok and return the map
-	 * @param jsonFile
+	 * @param jsonFile json file name
+	 * @param maxRows max number of results requested
+	 * @param rootNode json root node used to build map fields
 	 * @return Map with the description of JSON data in the File
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromJSON (String jsonFile, Long maxRows, String rootNode) throws RuntimeException {
+	Map parseDataFromJSON(String jsonFile, Long maxRows, String rootNode) throws RuntimeException {
 
-		Map results
-		try {
+		JSONConnection jsonCon = new JSONConnection(
+			config: "json",
+			path: FileSystemService.temporaryDirectory, driver: TDSJSONDriver)
 
-			JSONConnection jsonCon = new JSONConnection(config: "json", path: FileSystemService.temporaryDirectory, driver:TDSJSONDriver)
-			JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: rootNode?:'.', fileName: jsonFile)
-			DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
+		JSONDataset dataSet = new JSONDataset(
+			connection: jsonCon,
+			rootNode: rootNode ?: '.',
+			fileName: jsonFile)
+		DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
 
-			results = [
-					config: dataSetFacade.fields().collect {
-						def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
-						[
-								property : it.name,
-								type     : type
-						]
-					},
-					rows: dataSetFacade.rows().take(maxRows.intValue())
-			]
-
-		} catch (Throwable t) {
-			log.error("Could not parse ${jsonFile}. cause: ${t.message}", t)
-			results = [
-					error: [
-					        message: 'The rootNode must be specified in the ETL Script before loading sample JSON data',
-							details: t.message
-					]
-			]
-		}
-
-		return results
+		return [
+			config: dataSetFacade.fields().collect {
+				[
+					property: it.name,
+					type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+				]
+			},
+			rows  : dataSetFacade.rows().take(maxRows.intValue())
+		]
 	}
 
 	/**
