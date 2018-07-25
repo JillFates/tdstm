@@ -169,6 +169,13 @@ class ProviderService implements ServiceMethods {
         return provider
     }
 
+    /**
+     * Clone any existing providers associated to sourceProject (if any),
+     * then associate those newly created tags to targetProject.
+     *
+     * @param sourceProject  The project from which the existing tags will be cloned.
+     * @param targetProject  The project to which the new tags will be associated.
+     */
     Provider cloneProvider(Provider sourceProvider, Project targetProject) {
         Provider newProvider = new Provider(
                 project: targetProject,

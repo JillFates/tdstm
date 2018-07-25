@@ -149,6 +149,13 @@ class ApiCatalogService implements ServiceMethods {
 		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionaryTransformed)
 	}
 
+	/**
+	 * Clone any existing api catalogs and providers associated to sourceProject (if any),
+	 * then associate those newly created tags to targetProject.
+	 *
+	 * @param sourceProject  The project from which the existing tags will be cloned.
+	 * @param targetProject  The project to which the new tags will be associated.
+	 */
 	void cloneProjectApiCatalogs(Project sourceProject, Project targetProject) {
 		List<ApiCatalog> apiCatalogs = ApiCatalog.where {
 			project == sourceProject
