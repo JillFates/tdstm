@@ -46,7 +46,12 @@
         <div>
             <!-- /.box-header -->
             <div class="box-body">
-                <asset-explorer-view-grid #grid="assetExplorerViewGrid" (modelChange)="onQuery()" [edit]="false" [model]="model.schema"></asset-explorer-view-grid>
+                <asset-explorer-view-grid #grid="assetExplorerViewGrid"
+                                          (modelChange)="onQuery()"
+                                          [edit]="false"
+                                          [model]="model.schema"
+                                          [metadata]="metadata">
+                </asset-explorer-view-grid>
             </div>
             <!-- /.box-body -->
         </div>

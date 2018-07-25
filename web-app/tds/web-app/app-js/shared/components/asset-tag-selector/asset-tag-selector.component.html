@@ -4,8 +4,8 @@
             [(ngModel)]="assetSelectorModel.switch"
             [onLabel]="'AND'"
             [offLabel]="'OR'"
-            (valueChange)="onSwitchValueChange($event)"
-    ></kendo-switch>
+            (valueChange)="onSwitchValueChange($event)">
+    </kendo-switch>
     <kendo-multiselect
             id="asset-tag-selector-component"
             [data]="tagList"
