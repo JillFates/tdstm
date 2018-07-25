@@ -19,6 +19,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
 import spock.lang.See
@@ -42,12 +43,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 	@Shared
 	JSONConnection jsonConnection
 
+	@Shared
 	Date          now
+	@Shared
+	Date          otherD
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
 	DataSetFacade applicationDataSet
-	DataSetFacade appDSMixedTypes
 	DataSetFacade nonSanitizedDataSet
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
@@ -77,6 +80,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	def setup() {
 		now = new DateMidnight(1974,06,26).toDate()
+		otherD = new DateMidnight(2018, 7,4).toDate()
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -139,19 +143,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
-		}
-
-
-		appDSMixedTypes = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		appDSMixedTypes.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "NUMERIC", isKey: true)
-		appDSMixedTypes.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		appDSMixedTypes.getDataSet().field << new getl.data.Field(name: 'user count', alias: 'USER COUNT', type: "NUMERIC")
-		appDSMixedTypes.getDataSet().field << new getl.data.Field(name: 'date updated', alias: 'DATE UPDATED', type: "DATE")
-
-		new Flow().writeTo(dest: appDSMixedTypes.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': 152254, 'vendor name': 'Microsoft', 'user count': 5, 'date updated': now])
-			updater(['application id': 152255])
-			updater(['application id': 152254, 'vendor name': '', 'user count': 0, 'date updated': null])
 		}
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
@@ -233,40 +224,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	void 'test can apply defaultValue transformation'() {
 
-		given:
-			String defaultStrValue = 'UNDEFINED'
-			Number defaultNumValue = 1
-			Date   defaultDateValue = new DateMidnight().toDate()
+		expect:
+			result == new Element(value:value).defaultValue(dafaultVal).value
 
-			ETLProcessor etlProcessor = new ETLProcessor(
-					  GroovyMock(Project),
-					  appDSMixedTypes,
-					  new DebugConsole(buffer: new StringBuffer()),
-					  validator)
+		where:
 
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with defaultValue('${defaultStrValue}')
-							extract 'user count' transform with defaultValue(${defaultNumValue})
-							extract 'date updated' transform with defaultValue(new Date(${defaultDateValue.time}l))
-						}
-					""".stripIndent())
 
-		then: 'check that the assigned value is the first not null'
-			etlProcessor.getElement(0, 1).value == 'Microsoft'
-			etlProcessor.getElement(0, 2).value == 5
-			etlProcessor.getElement(0, 3).value == now
+			result  || value     | dafaultVal
+			'abc'   || null      | 'abc'
+			'abc'   || ''        | 'abc'
+			'xyz'   || 'xyz'     | 'abc'
+			now     || null      | now
+			otherD  || otherD    | now
+			5       || null      | 5
+			42      || 42        | 5
 
-			etlProcessor.getElement(1, 1).value == defaultStrValue
-			etlProcessor.getElement(1, 2).value == defaultNumValue
-			etlProcessor.getElement(1, 3).value == defaultDateValue
-
-			etlProcessor.getElement(2, 1).value == defaultStrValue
-			etlProcessor.getElement(2, 2).value == 0
-			etlProcessor.getElement(2, 3).value == defaultDateValue
 	}
 
 	void 'test can check syntax errors at parsing time'() {
