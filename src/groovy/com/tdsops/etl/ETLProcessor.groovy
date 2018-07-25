@@ -11,6 +11,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.runtime.StackTraceUtils
 
 import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
@@ -1362,13 +1363,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map,
-				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 			    Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List
 			].asImmutable()
 		}
 
@@ -1429,13 +1430,28 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		Map<String, ?> error = [:]
 		if(exception instanceof MultipleCompilationErrorsException){
-			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}
-			error.message    = syntaxErrorMessage.cause?.message
-			error.startLine  = syntaxErrorMessage.cause?.startLine
-			error.endLine    = syntaxErrorMessage.cause?.endLine
-			error.startColumn= syntaxErrorMessage.cause?.startColumn
-			error.endColumn  = syntaxErrorMessage.cause?.endColumn
-			error.fatal      = syntaxErrorMessage.cause?.fatal
+
+			List errors = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.toList()
+
+			SyntaxErrorMessage syntaxErrorMessage = errors.find {it?.source?.name == ETLProcessor.ETLScriptName}
+			if(syntaxErrorMessage){
+				error.message    = syntaxErrorMessage.cause?.message
+				error.startLine  = syntaxErrorMessage.cause?.startLine
+				error.endLine    = syntaxErrorMessage.cause?.endLine
+				error.startColumn= syntaxErrorMessage.cause?.startColumn
+				error.endColumn  = syntaxErrorMessage.cause?.endColumn
+				error.fatal      = syntaxErrorMessage.cause?.fatal
+
+			} else {
+				Throwable throwable = StackTraceUtils.extractRootCause(errors.first().cause )?.message
+				error.message    = throwable?.message
+				error.startLine  = -1
+				error.endLine    = -1
+				error.startColumn= -1
+				error.endColumn  = -1
+				error.fatal      = -1
+			}
+
 		}  else{
 			error.message = exception.getMessage()
 			error.startLine  = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber

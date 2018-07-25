@@ -19,6 +19,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
+import spock.lang.See
 
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
@@ -53,12 +54,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new ETLFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
@@ -425,6 +421,95 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			console.buffer.toString().contains('INFO - Selected Domain: Device')
 			console.buffer.toString().contains('DEBUG - [position:[0, 1], value:152254]')
 			console.buffer.toString().contains('DEBUG - [position:[0, 2], value:152255]')
+	}
+
+	@See('TM-11563')
+	void 'test can use type boolean expressions'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					x
+					y
+					z
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					def isNew = true
+					read labels
+					domain Device
+					iterate {
+						extract 1 load 'Name'
+					}
+			'''.stripIndent())
+
+		then: 'It throws an Exception because find command is incorrect'
+			Exception e = thrown Exception
+			e.message == 'Constant expression type [boolean] is not allowed'
+			ETLProcessor.getErrorMessage(e) == [
+					message: 'find/elseFind statement is missing required [into] keyword',
+					startLine:6,
+					endLine:6,
+					startColumn:null,
+					endColumn:null,
+					fatal:true
+			]
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+
+	}
+
+	@See('TM-11563')
+	void 'test can disable type boolean expressions'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					x
+					y
+					z
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					def isNew = true
+					read labels
+					domain Device
+					iterate {
+						extract 1 load "assetName"
+					}
+			'''.stripIndent())
+
+		then: 'It throws an Exception because find command is incorrect'
+			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
+			e.message.contains('Constant expression type [boolean] is not allowed')
+			ETLProcessor.getErrorMessage(e) == [
+					message: 'Constant expression type [boolean] is not allowed',
+					startLine:6,
+					endLine:6,
+					startColumn:null,
+					endColumn:null,
+					fatal:true
+			]
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+
 	}
 
 	final static String deviceDataSetContent = """
