@@ -21,6 +21,7 @@ export class TagService {
 			.map((res: Response) => {
 				let jsonResult = res.json();
 				let models: Array<TagModel> = jsonResult && jsonResult.status === ApiResponseModel.API_SUCCESS && jsonResult.data;
+				models = models.sort( (item1, item2) => this.sortTagsByColorThenByName(item1, item2));
 				models.forEach((model: TagModel) => {
 					model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : null);
 					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
@@ -153,11 +154,23 @@ export class TagService {
 						tagModel.assetTagId = item.id;
 						return tagModel;
 					});
-					result.data = data;
+					// sort tags by color then by name.
+					result.data = data.sort((item1, item2) => this.sortTagsByColorThenByName(item1, item2));
 				}
 				return result;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Sort function to sort an array of tags by "css-color" then by "Name"
+	 * @returns {number}
+	 */
+	private sortTagsByColorThenByName(item1: TagModel, item2: TagModel): number {
+		if (item1.css < item2.css) { return -1 };
+		if (item1.css > item2.css) { return 1 };
+		if (item1.name.toUpperCase() < item2.name.toUpperCase()) { return -1 };
+		if (item1.name.toUpperCase() > item2.name.toUpperCase()) { return 1 };
 	}
 
 	/**
