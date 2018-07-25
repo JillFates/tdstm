@@ -1430,28 +1430,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		Map<String, ?> error = [:]
 		if(exception instanceof MultipleCompilationErrorsException){
-
-			List errors = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.toList()
-
-			SyntaxErrorMessage syntaxErrorMessage = errors.find {it?.source?.name == ETLProcessor.ETLScriptName}
-			if(syntaxErrorMessage){
-				error.message    = syntaxErrorMessage.cause?.message
-				error.startLine  = syntaxErrorMessage.cause?.startLine
-				error.endLine    = syntaxErrorMessage.cause?.endLine
-				error.startColumn= syntaxErrorMessage.cause?.startColumn
-				error.endColumn  = syntaxErrorMessage.cause?.endColumn
-				error.fatal      = syntaxErrorMessage.cause?.fatal
-
-			} else {
-				Throwable throwable = StackTraceUtils.extractRootCause(errors.first().cause )?.message
-				error.message    = throwable?.message
-				error.startLine  = -1
-				error.endLine    = -1
-				error.startColumn= -1
-				error.endColumn  = -1
-				error.fatal      = -1
-			}
-
+			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}
+			error.message    = syntaxErrorMessage.cause?.message
+			error.startLine  = syntaxErrorMessage.cause?.startLine
+			error.endLine    = syntaxErrorMessage.cause?.endLine
+			error.startColumn= syntaxErrorMessage.cause?.startColumn
+			error.endColumn  = syntaxErrorMessage.cause?.endColumn
+			error.fatal      = syntaxErrorMessage.cause?.fatal
 		}  else{
 			error.message = exception.getMessage()
 			error.startLine  = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
@@ -1461,7 +1446,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			error.fatal      = true
 		}
 		return error
-
 	}
 
 	/**
