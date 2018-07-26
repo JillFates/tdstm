@@ -473,11 +473,11 @@ class MoveEventController implements ControllerMethods {
 			unresolvedIssues = AssetComment.executeQuery('''
 				from AssetComment
 				where assetEntity.id in (:assetIds)
-				  and isResolved=:isResolved
+				  and dateResolved=:dateResolved
 				  and commentType=:commentType
 				  and category in ('general', 'discovery', 'planning', 'walkthru')
 				  AND isPublished IN (:publishedValues)
-			''', [assetIds: allAssetIds, isResolved: 0, commentType: AssetCommentType.ISSUE,
+			''', [assetIds: allAssetIds, dateResolved: null, commentType: AssetCommentType.ISSUE,
 			      publishedValues: publishedValues])
 		}
 

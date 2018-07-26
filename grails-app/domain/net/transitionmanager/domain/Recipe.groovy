@@ -1,8 +1,7 @@
 package net.transitionmanager.domain
 
-import com.tdsops.tm.enums.domain.ContextType
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
-
 /**
  * Recipe Domain Object
  *
@@ -24,13 +23,10 @@ class Recipe {
 
 	Boolean archived = false
 
-	Integer defaultAssetId
 
 	static constraints = {
-		// TODO : Switch the context property to ENUM RecipeContext
-		context blank: false, inList: ['Event', 'Bundle', 'Application'], size: 1..45
+		context nullable: true
 		dateCreated nullable: true
-		defaultAssetId nullable: true
 		description nullable: true
 		lastUpdated nullable: true
 		name blank: false, size: 1..40
@@ -59,12 +55,12 @@ class Recipe {
 
 	String toString() { name }
 
-	ContextType asContextType() {
-		switch (context) {
-			case 'Application': return ContextType.A
-			case 'Bundle':      return ContextType.B
-			case 'Event':       return ContextType.E
-			default: throw new IllegalArgumentException('Invalid context')
-		}
+	/**
+	 * Gets the context as a map.
+	 *
+	 * @return the context including event id and tags as a map.
+	 */
+	Map context(){
+		context ? JsonUtil.convertJsonToMap(context) : [:]
 	}
 }

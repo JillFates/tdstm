@@ -134,8 +134,8 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			Map<String, ?> result = etlProcessor.checkSyntax("""
 					domain Device
 					read labels
-					iterate 
-						extract 'MODEL NAME' 
+					iterate
+						extract 'MODEL NAME'
 					}
 				""".stripIndent())
 
@@ -168,8 +168,8 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				.evaluate("""
 					domain Device
 					read labels
-					iterate 
-						extract 'MODEL NAME' 
+					iterate
+						extract 'MODEL NAME'
 					}
 				""".stripIndent())
 
@@ -268,8 +268,8 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				domain Device
 				read labels
-				def greeting(String name){ 
-					"Hello, \$name!" 
+				def greeting(String name){
+					"Hello, \$name!"
 				}
 				assert greeting('Diego') == 'Hello, Diego!'
 			""".stripIndent())
@@ -291,7 +291,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				import java.lang.Math
-				
+
 				domain Device
 				read labels
 				Math.max 10, 100
@@ -312,7 +312,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			etlProcessor.
 				evaluate("""
 					import java.lang.Math.*
-					
+
 					domain Device
 					read labels
 					max 10, 100
@@ -370,32 +370,11 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'A console content could be recovered after processing an ETL Script'
-			etlProcessor.debugConsole.buffer.toString() == new StringBuilder("INFO - Selected Domain: Device")
+			etlProcessor.debugConsole.buffer.toString().startsWith(
+				new StringBuilder("INFO - Selected Domain: Device")
 				.append(System.lineSeparator())
 				.toString()
-	}
-
-	@Ignore
-	void 'test can enable console without defining on parameter'() {
-
-		given:
-			DebugConsole debugConsole = new DebugConsole(buffer: new StringBuffer())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, debugConsole)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-							domain Device
-				console
-					""".stripIndent())
-
-		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-				.append(System.lineSeparator())
-				.append("INFO - Selected Domain: Device")
-				.append(System.lineSeparator())
-				.toString()
+			)
 	}
 
 	void 'test can debug a selected value for a column name'() {

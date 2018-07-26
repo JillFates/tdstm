@@ -10,6 +10,8 @@ import { HeaderComponent } from '../../shared/modules/header/header.component';
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 import { PreferenceService } from '../../shared/services/preference.service';
+import {TagService} from '../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
 
 /**
  * Top menu parent section class for all Assets Explorer module.
@@ -39,6 +41,15 @@ const fieldsResolve = {
 			d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
 		});
 		return domains;
+	})
+};
+
+const resolveTagList = {
+	token: 'tagList',
+	policy: { async: 'RXWAIT' },
+	deps: [TagService],
+	resolveFn: (tagService: TagService) => tagService.getTags().map( (result: ApiResponseModel) => {
+		return result.status === ApiResponseModel.API_SUCCESS && result.data ? result.data : [];
 	})
 };
 
@@ -157,7 +168,8 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService],
 			resolveFn: (service: AssetExplorerService) => service.getReports()
-		}
+		},
+		resolveTagList
 	]
 };
 
@@ -190,7 +202,8 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService],
 			resolveFn: (service: AssetExplorerService) => service.getReports()
-		}
+		},
+		resolveTagList
 	]
 };
 

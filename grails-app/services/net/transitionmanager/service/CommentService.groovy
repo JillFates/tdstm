@@ -245,7 +245,7 @@ class CommentService implements ServiceMethods {
 				assetComment.instructionsLink = params.instructionsLink ?: null
 			}
 			if (assetComment.commentType == 'comment' && params.isResolved?.isNumber()) {
-				if (Integer.parseInt(params.isResolved) == 0) {
+				if (NumberUtil.toInteger(params.isResolved) == 0) {
 					assetComment.setDateResolved(null)
 					assetComment.resolvedBy = null
 				} else {
@@ -254,6 +254,7 @@ class CommentService implements ServiceMethods {
 				}
 			}
 			// TM-10112 - Make sure isResolved == 0 (setDateResolved() sets isResolved to 0 internally)
+			// TM-11379 - (updated) isResolved property doesn't exist anymore, code is still ok
 			if (isNew && assetComment.commentType == 'comment') {
 				assetComment.setDateResolved(null)
 			}
@@ -422,7 +423,7 @@ class CommentService implements ServiceMethods {
 
 				// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 				def css = (assetComment.dueDate < date ? 'Lightpink' : 'White')
-				boolean status = assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0
+				boolean status = assetComment.commentType == AssetCommentType.TASK && !assetComment.isResolved()
 
 				map = [
 					assetComment: assetComment,
@@ -796,7 +797,7 @@ class CommentService implements ServiceMethods {
 		}
 		assetComment.with {
 			assetEntity = asset
-			if(command.isResolved) {
+			if(!isResolved() && command.isResolved) {
 				dateResolved = TimeUtil.nowGMT()
 			}
 			commentType = AssetCommentType.COMMENT

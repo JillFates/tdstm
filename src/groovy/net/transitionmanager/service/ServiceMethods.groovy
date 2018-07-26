@@ -36,8 +36,11 @@ trait ServiceMethods {
 	@CompileStatic
 	<T> T get(Class<T> type, Object id, Project currentProject, boolean throwException = true) {
 		T t
-		if (id == null){
+
+		if (id == null && throwException){
 			throw new InvalidParamException('Unable to retrieve ' + type.simpleName + ' with invalid id: ' + id)
+		} else if(id == null && !throwException){
+			return null
 		}
 
 		if (id in type) {

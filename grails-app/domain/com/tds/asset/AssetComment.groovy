@@ -35,7 +35,6 @@ class AssetComment {
 	Date lastUpdated
 	Date statusUpdated              // Updated when the status changes so we can compute the elapsed time that a task is in a status
 
-	Integer isResolved = 0
 	Date dateResolved
 	String resolution
 	Person resolvedBy
@@ -140,7 +139,6 @@ class AssetComment {
 		estStart nullable: true
 		hardAssigned nullable: true
 		instructionsLink nullable: true
-		isResolved nullable: true
 		lastUpdated nullable: true
 		moveEvent nullable: true
 		mustVerify nullable: true
@@ -175,7 +173,6 @@ class AssetComment {
 			displayOption sqltype: 'char', length: 1
 			duration sqltype: 'mediumint'
 			durationScale sqltype: 'char', length: 1
-			isResolved sqltype: 'tinyint'
 			mustVerify sqltype: 'tinyint'
 			priority sqltype: 'tinyint'
 			resolution sqltype: 'text'
@@ -266,7 +263,15 @@ class AssetComment {
 
 	void setDateResolved(Date date) {
 		dateResolved = date
-		isResolved = date ? 1 : 0
+	}
+
+	/**
+	 * Returns true is the task/comment is resolved, that is to say,
+	 * if the dateResolved is not null.
+	 * @return  true if the task/comment is resolved, false otherwise.
+	 */
+	boolean isResolved() {
+		dateResolved != null
 	}
 
 	/**
@@ -347,7 +352,7 @@ class AssetComment {
 		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
 		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',
 		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', lastUpdated: 'Last Updated', sendNotification: 'Send Notification',
-		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
+		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
 		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
 	].asImmutable()

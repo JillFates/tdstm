@@ -3,6 +3,7 @@ import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.tag.CreateCommand
 import net.transitionmanager.command.tag.ListCommand
+import net.transitionmanager.command.tag.SearchCommand
 import net.transitionmanager.command.tag.UpdateCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Tag
@@ -28,8 +29,30 @@ class WsTagController implements ControllerMethods {
 			filter.description,
 			filter.dateCreated,
 			filter.lastUpdated,
-			filter.moveBundleId,
-			filter.moveEventId
+			filter.bundleId ?[filter.bundleId] : [],
+			filter.eventId
+		)
+
+		renderSuccessJson(tags)
+	}
+
+	@HasPermission(Permission.TagView)
+	def search() {
+		SearchCommand filter = populateCommandObject(SearchCommand)
+
+		if (filter.hasErrors()) {
+			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
+			return
+		}
+
+		List<Map> tags = tagService.list(
+			projectForWs,
+			filter.name,
+			filter.description,
+			filter.dateCreated,
+			filter.lastUpdated,
+			filter.bundleIds,
+			filter.eventId
 		)
 
 		renderSuccessJson(tags)
