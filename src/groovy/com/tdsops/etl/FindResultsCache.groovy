@@ -26,9 +26,40 @@ class FindResultsCache {
 	 */
 	private long hitCount = 0
 
+	/**
+	 * The size of the actual size of the cache that can be overriden in constructor
+	 */
+	private long cacheMaxSize = MAX_ENTRIES
+
+	/**
+	 * Extending the LinkedHashMap is necessary to allow setting the MAX ENTRIES
+	 * TODO : JPM 7/2018 : split out and have constructor that accepts max and initial size
+	*/
+	public class CachingLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
+
+		private int maxCacheEntries = 0
+
+		public CachingLinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder) {
+			super(initialCapacity, loadFactor, accessOrder);
+			maxCacheEntries = initialCapacity
+		}
+
+		@Override
+		protected boolean removeEldestEntry(Map.Entry eldest) {
+			// return size() > MAX_ENTRIES;
+			return size() > maxCacheEntries;
+		}
+	}
+
+	/**
+	 * Constructor
+	 */
 	FindResultsCache(Integer initialSize = MAX_ENTRIES) {
 
-		cache = new LinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true) {
+		// Retain the cache max size
+		cacheMaxSize = initialSize
+
+		cache = new CachingLinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true) {
 			/**
 			 * Overrides a default implementation in LinkedHashMap and is where
 			 * we determine the policy for removing the oldest entry.
@@ -88,8 +119,19 @@ class FindResultsCache {
 		accessCount++
 		String key = generateMd5Key(domainClassName, fieldsInfo)
 		List<?> value = cache.get(key)
-		hitCount = (value == null) ? hitCount : hitCount + 1
+
+		updateHitCount(value != null)
+
 		return value
+	}
+
+	/**
+	 * Updates the hit count for reporting the hit ratio
+	 */
+	private void updateHitCount(boolean found) {
+		if (found) {
+			hitCount++
+		}
 	}
 
 	/**
@@ -113,7 +155,7 @@ class FindResultsCache {
 	 * Return the # of objects contained in the findCache
 	 */
 	Long size() {
-		return cache.size()
+		return cache ? cache.size() : 0
 	}
 
 	Long getAccessCount() {
@@ -122,6 +164,13 @@ class FindResultsCache {
 
 	Long getHitCount() {
 		return hitCount
+	}
+
+	/**
+	 * Used to access the max size of the cache
+	 */
+	Long cacheMaxSize() {
+		return cacheMaxSize
 	}
 
 	/**

@@ -12,7 +12,7 @@ package com.tdsops.etl
  * @param values
  * @return
  */
-class ETLFindElement implements ETLStackableCommand{
+class ETLFindElement implements ETLStackableCommand {
 
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
@@ -205,7 +205,9 @@ class ETLFindElement implements ETLStackableCommand{
 					processor.project,
 					currentFind.kv)
 
-			processor.findCache?.put(currentFind.domain, currentFind.kv, cacheResults)
+			if (processor.findCache) {
+				processor.findCache.put(currentFind.domain, currentFind.kv, cacheResults)
+			}
 		}
 
 		return cacheResults

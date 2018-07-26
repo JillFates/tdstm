@@ -165,6 +165,7 @@ public class GormUtil {
 	 * @param property - the name of the property to be accessed
 	 * @return the map of constraints
 	 */
+	@Memoized
 	public static Map getConstrainedProperties(Class domainClass) {
 		if (! isDomainClass(domainClass)) {
 			throw new RuntimeException("A non-domain class parameter was provided")
@@ -185,6 +186,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property to be accessed
 	 * @return the map of constraints
 	 */
+	@Memoized
 	public static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
 		Map props = getConstrainedProperties(domainClass)
 
@@ -202,6 +204,7 @@ public class GormUtil {
 	 * @param constraintName - the individual constraint to access
 	 * @return the constraint value
 	 */
+	@Memoized
 	public static getConstraint(Class domainClass, String property, String constraintName) {
 		ConstrainedProperty constraint =  getConstrainedProperty(domainClass, property)
 		return constraint.getAppliedConstraint(constraintName)
@@ -332,6 +335,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property to get the maxSize constraint of
 	 * @return The value set in the maxSize constraint or null of the property does not have the constraint
 	 */
+	@Memoized
 	static Long getConstraintMaxSize(Class domainClass, String propertyName) {
 		Constraint constraint = GormUtil.getConstraint(domainClass, propertyName, 'maxSize')
 		return constraint?.getMaxSize()
@@ -344,6 +348,7 @@ public class GormUtil {
 	 * @param propertyName - the name of the property to get the maxSize constraint of
 	 * @return a list of the property names
 	 */
+	@Memoized
 	static List getConstraintUniqueProperties(Class domainClass, String propertyName) {
 		Constraint cp = GormUtil.getConstraint(domainClass, propertyName, 'unique')
 		return cp.getUniquenessGroup()
@@ -356,6 +361,7 @@ public class GormUtil {
 	 * @param constraintName - the name of the constraint being inspected
 	 * @return the value be it an Integer, Closure, Range, etc base on the constraint type
 	 */
+	@Memoized
 	static Object getConstraintValue(Class clazz, String propertyName, String constraintName) {
 		Map<String, ConstrainedProperty> constraints = getDomainClass(clazz).constrainedProperties
 		Constraint constraint = constraints[propertyName].getAppliedConstraint(constraintName)
@@ -377,6 +383,7 @@ public class GormUtil {
 	 * @param propertyName - the property name to inspect
 	 * @return true if the property is a String otherwise false
 	 */
+	@Memoized
 	static boolean isStringType(Class clazz, String propertyName) {
 		String == GrailsClassUtils.getPropertyType(clazz, propertyName)
 	}
@@ -388,6 +395,7 @@ public class GormUtil {
 	 * @param notToUpdateNames - a list of property names that should be excluded from the result
 	 * @return a list of GrailsDomainClassProperty that are updatable
 	 */
+	@Memoized
 	static Collection<GrailsDomainClassProperty> updatablePersistentProperties(Class clazz, Collection<String> notToUpdateNames) {
 		getDomainClass(clazz).persistentProperties.findAll { it.isPersistent() && !notToUpdateNames.contains(it.name) }
 	}
@@ -418,6 +426,7 @@ public class GormUtil {
 	 * @param propertyName a String with the property name to be used in the validation
 	 * @return tru if property is an identifier for clazz parameter
 	 */
+	@Memoized
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
 		getDomainClass(clazz)?.identifier.name == propertyName
 	}
@@ -432,6 +441,7 @@ public class GormUtil {
 		isDomainIdentifier(domainInstance.getClass(), propertyName)
 	}
 
+	@Memoized
 	static boolean hasStringId(Class clazz) {
 		getDomainClass(clazz).identifier.type == String
 	}
@@ -456,6 +466,7 @@ public class GormUtil {
 		return new DefaultGrailsDomainClass(domainClass)
 	}
 
+	@Memoized
 	private static GrailsApplication getGrailsApplication() {
 		ApplicationContextHolder.grailsApplication
 	}
@@ -526,6 +537,7 @@ public class GormUtil {
 	 * @param properties
 	 * @return
 	 */
+	@Memoized
 	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
 		List<GrailsDomainClassProperty> domainProperties = []
 		boolean allProperties = false
@@ -635,6 +647,7 @@ public class GormUtil {
 	 * @param domainClass - the domain to integrate
 	 * @return true if it has a composite primary key
 	 */
+	@Memoized
 	static boolean hasCompositeKey(Class domainClass) {
 		Mapping mapping = getDomainBinderMapping(domainClass)
 		boolean hasCK = (mapping && (mapping.identity instanceof CompositeIdentity))
@@ -646,6 +659,7 @@ public class GormUtil {
 	 * @param domainClass - the domain to integrate
 	 * @return a list of the property names
 	 */
+	@Memoized
 	static List<String> getCompositeKeyProperties(Class domainClass) {
 		List props = []
 		if (hasCompositeKey(domainClass)) {
@@ -661,6 +675,7 @@ public class GormUtil {
 	 * @param propertyName - the name of a property to check as being a composite key element
 	 * @return true if property is part of a composite key otherwise false
 	 */
+	@Memoized
 	static boolean isCompositeProperty(Class domainClass, String propertyName) {
 		GrailsDomainClassProperty property = getDomainProperty(domainClass, propertyName)
 		return isCompositeProperty(domainClass, property)
@@ -900,6 +915,7 @@ public class GormUtil {
 	 * @param domainClass - the class of the domain interested in
 	 * @return a String representing the name of the Domain
 	 */
+	@Memoized
 	static String getDomainNameForClass(Class domain) {
 		String name = domain.getName()
 		name = name.tokenize('.').last()
@@ -1058,7 +1074,6 @@ public class GormUtil {
 	 * @param propertyName - the name of the property
 	 * @return the class name of the property as a string
 	 */
-	@Memoized
 	static Class getDomainPropertyType(Object domainObject, String propertyName) {
 		return getDomainPropertyType(domainObject.getClass(), propertyName)
 	}

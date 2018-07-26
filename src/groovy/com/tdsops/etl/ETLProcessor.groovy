@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
+import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
@@ -905,9 +906,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param size initial size of findCache
 	 * @return current instance of ETLProcessor
 	 */
-	ETLProcessor cache(Integer size){
+	ETLProcessor findCache(Integer size) {
 
-		if(size > 0){
+		debugConsole.info("Changed findCache size from ${findCache ? findCache.cacheMaxSize():0} to ${size}")
+		if (size > 0) {
 			this.findCache = new FindResultsCache(size)
 		} else {
 			this.findCache = null
@@ -921,7 +923,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor debug(Integer index) {
-
 		if (index in (0..currentRow.size())){
 			currentColumnIndex = index
 			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
@@ -1515,9 +1516,27 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *
 	 * @param timeDuration
 	 */
-	private void logMeasurements(TimeDuration timeDuration){
-		debugConsole.info("Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
-		debugConsole.info("Cache hit count rate ${findCache?findCache.hitCountRate():0}%")
+	private void logMeasurements(TimeDuration timeDuration) {
+		String ago = TimeUtil.ago(timeDuration)
+		long size = findCache ? findCache.cacheMaxSize() : 0
+		long used = findCache ? findCache.size() : 0
+		String ratio = String.format('%.1f', (findCache ? findCache.hitCountRate() : 0.0))
+
+		log.info "ETL Transformation Process took ${ago}"
+		log.info "ETL find cache - size ${size}, used ${used}, hit count ratio ${ratio}%"
+
+		debugConsole.info("Exection time: ${ago}")
+		debugConsole.info("Cache size ${size}, used ${used}, hit ratio ${ratio}%")
+
+		long totalRecords = 0
+		// Dump out the results
+		for (domain in result.domains) {
+			totalRecords += domain.data.size()
+			debugConsole.info("Domain ${domain.domain} ${domain.data.size()} records, fields: ${domain.fieldNames}")
+		}
+		String avgPerRec = String.format('%.4f', timeDuration.toMilliseconds() / (totalRecords > 0 ? totalRecords : 1))
+		debugConsole.info("Process time/record ${avgPerRec} msec")
+
 	}
 	/**
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
