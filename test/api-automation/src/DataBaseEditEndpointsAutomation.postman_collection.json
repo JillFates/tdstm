@@ -237,14 +237,7 @@
 	],
 	"variable": [
 		{
-			"id": "8b72c1cf-a138-4506-95ef-1571e0e63efe",
-			"key": "assetID_01",
-			"value": "123563",
-			"type": "string",
-			"description": ""
-		},
-		{
-			"id": "2a5011e7-f9b3-4cc9-bbe5-dd03fe65f364",
+			"id": "803653fd-8f50-4257-9da1-111797160a9b",
 			"key": "assetID_02",
 			"value": "999999999999999",
 			"type": "string",
