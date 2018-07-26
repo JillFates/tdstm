@@ -907,7 +907,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor findCache(Integer size) {
-
 		debugConsole.info("Changed findCache size from ${findCache ? findCache.cacheMaxSize():0} to ${size}")
 		if (size > 0) {
 			this.findCache = new FindResultsCache(size)
@@ -1008,10 +1007,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		ETLFieldDefinition fieldSpec
 
 		if (ETLDomain.External != domain) {
-
-			if (!fieldsValidator.hasSpecs(domain, field)) {
-				throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
-			}
+println "looking up ${domain.name()}.${field}"
+			// if (!fieldsValidator.hasSpecs(domain, field)) {
+			// 	throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
+			// }
 
 			fieldSpec = fieldsValidator.lookup(domain, field)
 			if (!fieldSpec) {
@@ -1044,7 +1043,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.domain.clazz
-
+println "looking up ${clazz.getName()}.${property}"
 		if(!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain.domain, property)
 		}

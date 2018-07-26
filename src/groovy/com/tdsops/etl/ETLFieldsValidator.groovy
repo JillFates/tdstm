@@ -24,18 +24,24 @@ class ETLFieldsValidator {
 	 * @return true if there is field spec for that field and domain
 	 */
 	//TODO: rename validate fieldName exists
-	Boolean hasSpecs(ETLDomain domain, String field) {
+// 	Boolean hasSpecs(ETLDomain domain, String field) {
+// println "hasSpecs() called for ${domain?.name()}.$field"
+// 		if (domain)	{
+// 			// if (cacheContains(domain, field)) {
+// 			// 	return true
+// 			// }
 
-		if (cacheContains(domain, field)) {
-			return true
-		}
-
-		if (domain.isAsset()) {
-			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
-		} else {
-			return GormUtil.isDomainProperty(domain.clazz, field)
-		}
-	}
+// 			if (domain.isAsset()) {
+// 	println "hasSpecs() return from isAsset()"
+// 				return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
+// 	// 		} else {
+// 	// println "hasSpecs() return from GormUtil ${GormUtil.isDomainProperty(domain.clazz, field)}"
+// 	// 			return GormUtil.isDomainProperty(domain.clazz, field)
+// 	// 		}
+// 		} else {
+// 			return false
+// 		}
+// 	}
 
 	/**
 	 * It looks a field specification up based on a ETLDomain
@@ -45,22 +51,31 @@ class ETLFieldsValidator {
 	 */
 	ETLFieldDefinition lookup(ETLDomain domain, String field) {
 
-		if(cacheContains(domain, field)){
+		if (cacheContains(domain, field)) {
 			return getFromCache(domain, field)
 		}
 
 		ETLFieldDefinition fieldDefinition
-		if(domain.isAsset()){
-			if(hasSpecs(domain, field)){
-				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
-					it.field == field || it.label == field
-				}
-				fieldDefinition = new ETLFieldDefinition(fieldSpec)
+
+		Map<String, ?> fieldSpec
+
+		// Try finding the fieldspec for asset classes
+		if (assetClassFieldsSpecMap.containsKey(domain)) {
+			fieldSpec = assetClassFieldsSpecMap[domain].find {
+				it.field == field || it.label == field
 			}
+		}
+
+		if (fieldSpec) {
+			fieldDefinition = new ETLFieldDefinition(fieldSpec)
 		} else {
-			Class<?> domainClass = domain.clazz
-			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
-			fieldDefinition = new ETLFieldDefinition(domainProperty)
+			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, field)
+			if (domainProperty) {
+				//println "lookup() class ${domainClass.getName()} call to GormUtil.getDomainProperty returned ${domainProperty ? 'OBJECT' : 'NULL'}"
+				fieldDefinition = new ETLFieldDefinition(domainProperty)
+			} else {
+				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
+			}
 		}
 
 		saveInCache(domain, field, fieldDefinition)
@@ -88,7 +103,11 @@ class ETLFieldsValidator {
 		if(!fieldsDefinitionCache.containsKey(domain)){
 			fieldsDefinitionCache.put(domain, [:])
 		}
-		fieldsDefinitionCache[domain].put(field, fieldDefinition)
+
+		if (! fieldsDefinitionCache[domain].containsKey(field)) {
+			fieldsDefinitionCache[domain].put(field, fieldDefinition)
+		}
+		println "saveInCache( ${domain.name()}, $field ) called"
 	}
 
 	/**

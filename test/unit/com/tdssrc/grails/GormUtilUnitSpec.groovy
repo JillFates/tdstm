@@ -37,6 +37,8 @@ class GormUtilUnitSpec extends Specification {
 			!GormUtil.isDomainProperty(asset, 'bogusPropertyName')
 			GormUtil.isDomainProperty(AssetEntity, 'assetName')
 			!GormUtil.isDomainProperty(AssetEntity, 'bogusPropertyName')
+			GormUtil.isDomainProperty(AssetDependency, 'id')
+			GormUtil.isDomainProperty(AssetDependency, 'asset')
 
 		when: 'called with a non-domain class'
 			GormUtil.isDomainProperty(Specification, 'NotADomainClass')
