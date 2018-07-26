@@ -1,17 +1,18 @@
-package pages.Admin.LandingItems
+package pages.Admin
 
 import geb.Page
 import modules.AdminModule
 
-class AssetOptionsLandingPage extends Page {
+class ListManufacturersPage extends Page{
 
     static at = {
-        title == "Asset Options"
-        pageHeaderName.text() == "Administrative Setting"
+        title == "Manufacturer List"
+        pageHeaderName.text() == "Manufacturer List"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
+
 }
