@@ -34,21 +34,24 @@ class ETLFieldsValidator {
 		Map<String, ?> fieldSpec
 
 		// Try finding the fieldspec for asset classes
-		if (assetClassFieldsSpecMap.containsKey(domain)) {
+		if (domain.isAsset()) {
 			fieldSpec = assetClassFieldsSpecMap[domain].find {
 				it.field == field || it.label == field
 			}
-		}
 
-		if (fieldSpec) {
-			fieldDefinition = new ETLFieldDefinition(fieldSpec)
+			if (fieldSpec) {
+				fieldDefinition = new ETLFieldDefinition(fieldSpec){}
+			}
 		} else {
 			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, field)
 			if (domainProperty) {
 				fieldDefinition = new ETLFieldDefinition(domainProperty)
-			} else {
-				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
+
+		}
+
+		if (! fieldDefinition) {
+			throw ETLProcessorException.unknownDomainFieldName(domain, field)
 		}
 
 		saveInCache(domain, field, fieldDefinition)

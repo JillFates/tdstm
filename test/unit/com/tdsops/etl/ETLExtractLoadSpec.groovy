@@ -901,7 +901,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'appVendor'])
+			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Application, 'appVendor').message
 
 	}
 
@@ -930,7 +930,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'vendedor'])
+			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Application, 'vendedor').message
 	}
 
 	void 'test can extract a field value and load into a domain object property name'() {

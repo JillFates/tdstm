@@ -1007,15 +1007,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		ETLFieldDefinition fieldSpec
 
 		if (ETLDomain.External != domain) {
-println "looking up ${domain.name()}.${field}"
-			// if (!fieldsValidator.hasSpecs(domain, field)) {
-			// 	throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
-			// }
-
 			fieldSpec = fieldsValidator.lookup(domain, field)
-			if (!fieldSpec) {
-				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
-			}
 		}
 		return fieldSpec
 	}
@@ -1043,7 +1035,6 @@ println "looking up ${domain.name()}.${field}"
 
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.domain.clazz
-println "looking up ${clazz.getName()}.${property}"
 		if(!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain.domain, property)
 		}

@@ -42,10 +42,8 @@ enum ETLDomain {
 		if (clazz) {
 			String name = clazz.getName()
 			isaAsset = name in ASSET_CLASSNAMES
-			println "isAsset() for ${clazz.getName()} / $name isa AssetEntity? ${isaAsset}"
-		} else {
-			println "isAsset() NULL"
 		}
+
 		return isaAsset
 	}
 
