@@ -229,7 +229,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		where:
 
-
 			result  || value     | dafaultVal
 			'abc'   || null      | 'abc'
 			'abc'   || ''        | 'abc'
@@ -238,6 +237,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			otherD  || otherD    | now
 			5       || null      | 5
 			42      || 42        | 5
+			5       || ''        | new Element(value:5)
 
 	}
 

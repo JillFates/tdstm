@@ -551,7 +551,7 @@ class Element implements RangeChecker {
 	 */
 	def defaultValue(Object value) {
 		if( ! isValueSet() ) {
-			this.value = value
+			this.setValue(value)
 		}
 
 		return this
