@@ -2,7 +2,9 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StopWatch
 import getl.data.Field
+import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -78,8 +80,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Static variable name definition for script name
 	 */
 	static final String ETLScriptName = 'TDSETLScript'
-
-
 	/**
 	 * Project used in some commands.
 	 */
@@ -131,6 +131,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 	SelectedDomain selectedDomain
 	ETLFindElement currentFindElement
+
+	/**
+	 * Last Recently used findCache
+	 */
+	FindResultsCache findCache
+	/**
+	 * {@code StopWatch} used for measurement.
+	 */
+	StopWatch stopWatch
 
 	/**
 	 * List of command that needs to be completed.
@@ -205,6 +214,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
+		this.findCache = new FindResultsCache()
+		this.stopWatch = new StopWatch()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -882,6 +893,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * <b>Cache ETL command.</b><br>
+	 * ETL Script evaluation is using internally a findCache of find command results.
+	 * This commands enables user to define the initial size of that findCache.
+	 * <br>
+	 * If size is greater than zero it creates an instance of {@code FindResultsCache}
+	 * otherwise findCache is set as a null
+	 * <pre>
+	 *  findCache 0 // It disables findCache in find results
+	 *  findCache 100
+	 * </pre>
+	 * @param size initial size of findCache
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor cache(Integer size){
+
+		if(size > 0){
+			this.findCache = new FindResultsCache(size)
+		} else {
+			this.findCache = null
+		}
+		return this
+	}
+
+	/**
 	 * Add a message in console for an element from dataSource by its index in the row
 	 * @param index
 	 * @return current instance of ETLProcessor
@@ -1462,11 +1497,29 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
 		setUpProgressIndicator(script, progressCallback)
-		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ETLScriptName)
+
+		String tag = this.dataSetFacade.fileName()
+		this.stopWatch.begin(tag)
+
+		Object result = new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				configuration
+		).evaluate(script, ETLScriptName)
+
+		logMeasurements(this.stopWatch.lap(tag))
 		return result
 	}
 
+	/**
+	 * Logs metrics related with evaluation time and findCache hit ratio
+	 *
+	 * @param timeDuration
+	 */
+	private void logMeasurements(TimeDuration timeDuration){
+		debugConsole.info("Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
+		debugConsole.info("Cache hit count rate ${findCache?findCache.hitCountRate():0}%")
+	}
 	/**
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
 	 * using this instance of the ETLProcessor.
