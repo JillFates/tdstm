@@ -107,6 +107,7 @@ class ApiCatalogTestHelper {
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
         "method": "fetchAssetList",
+        "httpMethod": "GET",
         "producesData": 1,
         "params": [
           "$paramGroup.FOO_GRP$",
@@ -129,6 +130,7 @@ class ApiCatalogTestHelper {
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
         "method": "fetchAssetList",
+        "httpMethod": "GET",
         "producesData": 1,
         "params": [
           "$paramGroup.FOO_GRP$",
@@ -142,6 +144,7 @@ class ApiCatalogTestHelper {
         "endpointUrl": "https://{HOSTNAME}.about.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
         "method": "fetchAssetList",
+        "httpMethod": "GET",
         "producesData": 1,
         "params": [
           "$paramDef.HOSTNAME_PARAM$"
@@ -199,6 +202,7 @@ class ApiCatalogTestHelper {
                 "endpointUrl": "https://SOME-DOMAIN/SOME/PATH",
                 "docUrl": "http://about.com/docs#appList",
                 "method": "invokeHttpRequest",
+                "httpMethod": "GET",
                 "producesData": 0,
                 "params": [
                 	"$paramDef.HOSTNAME_PARAM$"
