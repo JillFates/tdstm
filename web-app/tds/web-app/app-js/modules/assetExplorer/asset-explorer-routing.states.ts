@@ -134,7 +134,8 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService],
 			resolveFn: (service: AssetExplorerService) => service.getReports()
-		}
+		},
+		resolveTagList
 	]
 };
 
