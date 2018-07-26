@@ -361,10 +361,6 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-
 			AssetEntity.executeQuery(_, _, _) >> { query, namedParams, metaParams ->
 				return []
 			}
@@ -526,7 +522,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					extract 'name' load 'Name'
 					assert CE.value == 'xraysrv01'
 					assert CE.originalValue == 'xraysrv01'
-					
+
 					initialize 'Name' with 'Unknown'
 					assert CE.value == 'xraysrv01'
 					assert CE.originalValue == 'xraysrv01'
@@ -660,10 +656,6 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-
 			AssetEntity.executeQuery(_, _, _) >> { query, namedParams, metaParams ->
 				return []
 			}

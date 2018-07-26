@@ -1279,9 +1279,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(Room, global: true)
-			Room.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -2633,7 +2630,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							domain Device
 							extract 'ip' transform with lowercase() set ipVar
 							extract 'srv' set srvVar
-	
+
 							lookup 'assetName' with srvVar
 							if ( LOOKUP.notFound() ) {
 								// Set the server name first time seen
@@ -2707,8 +2704,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						iterate {
 							domain Application
 							set envVar with 'Prod'
-							
-							load 'Name' with append('-', envVar) 
+
+							load 'Name' with append('-', envVar)
 						}
 					""".stripIndent())
 
