@@ -121,7 +121,8 @@ class ApiCatalogUtilSpec extends Specification {
 					'"method": [' +
 					'	{' +
 					'		"name": "Test Method",' +
-					'		"apiMethod": "testMethod"' +
+					'		"apiMethod": "testMethod",' +
+					'       "httpMethod": "OPTIONS"' +
 					'	}' +
 					']}}'
 			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
@@ -132,6 +133,7 @@ class ApiCatalogUtilSpec extends Specification {
 			methods.containsKey('testMethod')
 			with(methods['testMethod']) {
 				apiMethod == 'testMethod'
+				httpMethod == 'OPTIONS'
 				script.size() == 1
 				with(script) {
 					DEFAULT == "// default common reaction script"
@@ -159,6 +161,25 @@ class ApiCatalogUtilSpec extends Specification {
 					ERROR == "// Put the task on hold and add a comment with the cause of the error\n          task.error( response.error )"
 				}
 			}
+
+	}
+
+	@See('TM-11589')
+	def 'test invalid httpMethod entry'() {
+		when: 'try to transform a dictionary with wrong httpMethod key'
+		def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+				'"credential": {}, "paramGroup": {}, ' +
+				'"method": [' +
+				'	{' +
+				'		"name": "Test Method",' +
+				'		"apiMethod": "testMethod",' +
+				'       "httpMethod": "HTTP"' +
+				'	}' +
+				']}}'
+			ApiCatalogUtil.transformDictionary(dictionary)
+		then:
+			def e = thrown InvalidParamException
+			e.message == "Error transforming ApiCatalog dictionary. Api method testMethod has an invalid httpMethod value: HTTP"
 
 	}
 }
