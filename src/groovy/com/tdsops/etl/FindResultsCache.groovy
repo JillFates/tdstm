@@ -12,7 +12,7 @@ import com.tdssrc.grails.StringUtil
  */
 class FindResultsCache {
 
-	Map<String, List<?>> cache
+	CachingLinkedHashMap<String, List<?>> cache
 	/**
 	 * Initial size of LRU findCache
 	 */
@@ -25,11 +25,6 @@ class FindResultsCache {
 	 * Counter for the number of hits
 	 */
 	private long hitCount = 0
-
-	/**
-	 * The size of the actual size of the cache that can be overriden in constructor
-	 */
-	private long cacheMaxSize = MAX_ENTRIES
 
 	/**
 	 * Extending the LinkedHashMap is necessary to allow setting the MAX ENTRIES
@@ -46,8 +41,11 @@ class FindResultsCache {
 
 		@Override
 		protected boolean removeEldestEntry(Map.Entry eldest) {
-			// return size() > MAX_ENTRIES;
-			return size() > maxCacheEntries;
+			return size() > maxCacheEntries
+		}
+
+		int getMaxCacheEntries() {
+			return maxCacheEntries
 		}
 	}
 
@@ -55,33 +53,8 @@ class FindResultsCache {
 	 * Constructor
 	 */
 	FindResultsCache(Integer initialSize = MAX_ENTRIES) {
-
 		// Retain the cache max size
-		cacheMaxSize = initialSize
-
-		cache = new CachingLinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true) {
-			/**
-			 * Overrides a default implementation in LinkedHashMap and is where
-			 * we determine the policy for removing the oldest entry.
-			 * In this case, we return true when the findCache has
-			 * more entries than our defined capacity.
-			 * @param eldest The least recently inserted entry in the map, or if
-			 *           this is an access-ordered map, the least recently accessed
-			 *           entry.  This is the entry that will be removed it this
-			 *           method returns <tt>true</tt>.  If the map was empty prior
-			 *           to the <tt>put</tt> or <tt>putAll</tt> invocation resulting
-			 *           in this invocation, this will be the entry that was just
-			 *           inserted; in other words, if the map contains a single
-			 *           entry, the eldest entry is also the newest.
-			 *
-			 * @return <tt>true</tt> if the eldest entry should be removed
-			 *          from the map; <tt>false</tt> if it should be retained.
-			 */
-			@Override
-			protected boolean removeEldestEntry(Map.Entry eldest) {
-				return size() > MAX_ENTRIES
-			}
-		}
+		cache = new CachingLinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true)
 	}
 
 	/**
@@ -170,7 +143,7 @@ class FindResultsCache {
 	 * Used to access the max size of the cache
 	 */
 	Long cacheMaxSize() {
-		return cacheMaxSize
+		return cache.getMaxCacheEntries()
 	}
 
 	/**
