@@ -18,32 +18,6 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * Checks if there is a Field spec for a domain and field name
-	 * @param domain : a ETL Domain used for looking a field spec up
-	 * @param field : field name use to lookup
-	 * @return true if there is field spec for that field and domain
-	 */
-	//TODO: rename validate fieldName exists
-// 	Boolean hasSpecs(ETLDomain domain, String field) {
-// println "hasSpecs() called for ${domain?.name()}.$field"
-// 		if (domain)	{
-// 			// if (cacheContains(domain, field)) {
-// 			// 	return true
-// 			// }
-
-// 			if (domain.isAsset()) {
-// 	println "hasSpecs() return from isAsset()"
-// 				return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
-// 	// 		} else {
-// 	// println "hasSpecs() return from GormUtil ${GormUtil.isDomainProperty(domain.clazz, field)}"
-// 	// 			return GormUtil.isDomainProperty(domain.clazz, field)
-// 	// 		}
-// 		} else {
-// 			return false
-// 		}
-// 	}
-
-	/**
 	 * It looks a field specification up based on a ETLDomain
 	 * @param domain : a ETL Domain used for looking a field spec up
 	 * @param field : field name use to lookup
@@ -71,7 +45,6 @@ class ETLFieldsValidator {
 		} else {
 			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, field)
 			if (domainProperty) {
-				//println "lookup() class ${domainClass.getName()} call to GormUtil.getDomainProperty returned ${domainProperty ? 'OBJECT' : 'NULL'}"
 				fieldDefinition = new ETLFieldDefinition(domainProperty)
 			} else {
 				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
