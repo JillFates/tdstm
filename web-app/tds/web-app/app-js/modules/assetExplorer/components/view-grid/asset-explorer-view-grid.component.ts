@@ -7,7 +7,6 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { Observable } from 'rxjs/Observable';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE,
@@ -15,13 +14,13 @@ import {
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -36,9 +35,6 @@ declare var jQuery: any;
 	styles: [`
 	.btnClear {
 		margin-right: 20px !important;
-	}
-	.btnDelete{
-		margin: 5px 0px 0px 15px;
 	}
 	.btnReload{
 		padding-top:7px;
@@ -92,16 +88,13 @@ export class AssetExplorerViewGridComponent {
 	gridData: GridDataResult;
 	selectAll = false;
 	bulkItems = {};
-	bulkSelectedItems: string[] = [];
+	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
-		private prompt: UIPromptService,
-		private permissionService: PermissionService,
-		private assetService: AssetExplorerService,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
@@ -169,14 +162,6 @@ export class AssetExplorerViewGridComponent {
 
 	hasFilterApplied(): boolean {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
-	}
-
-	hasItensSelected(): boolean {
-		return this.bulkSelectedItems.length > 0;
-	}
-
-	hasAssetDeletePermission(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetDelete);
 	}
 
 	clearText(column: ViewColumn): void {
@@ -317,27 +302,23 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	setSelectedItems(): void {
-		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+		this.bulkSelectedItems = Object.keys(this.bulkItems)
+			.filter(key => this.bulkItems[key])
+			.map(value => parseInt(value, 10));
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 
-	onBulkDelete(): void {
-		if (this.hasAssetDeletePermission()) {
-			const message = this.bulkSelectedItems.length === 1 ? 'asset' : 'assets';
-			this.prompt.open('Confirmation Required', `You are about to delete ${this.bulkSelectedItems.length} ${message}. Click Confirm to delete the ${message} otherwise click Cancel`, 'Confirm', 'Cancel')
-				.then((res) => {
-					if (res) {
-						this.assetService.deleteAssets(this.bulkSelectedItems)
-							.subscribe(result => {
-								this.notifier.broadcast({
-									name: AlertType.SUCCESS,
-									message: result.message
-								});
-								this.bulkSelectedItems = [];
-								this.onReload();
-							}, err => console.log(err));
-					}
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		if (operationResult.success) {
+			this.bulkSelectedItems = [];
+			this.onReload();
+
+			if (operationResult.message) {
+				this.notifier.broadcast({
+					name: AlertType.SUCCESS,
+					message: operationResult.message
 				});
+			}
 		}
 	}
 

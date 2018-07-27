@@ -274,7 +274,7 @@ export class DataIngestionService {
 								}
 							},
 							methodParams: result[property].params
-						});
+});
 					}
 				}
 				result = agentMethodModel;
