@@ -83,7 +83,6 @@ class ETLFieldsValidator {
 		if (! fieldsDefinitionCache[domain].containsKey(field)) {
 			fieldsDefinitionCache[domain].put(field, fieldDefinition)
 		}
-		println "saveInCache( ${domain.name()}, $field ) called"
 	}
 
 	/**
