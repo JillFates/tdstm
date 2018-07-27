@@ -3231,8 +3231,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					extract 'name' set nameVar
 					extract 'type' transform with substitute(map) set domainClassVar
 					domain domainClassVar.value
-					find domainClassVar.value by 'Name' with nameVar into 'id'
-					load 'Name' with nameVar
+					find domainClassVar.value by 'assetName' with nameVar into 'id'
+					load 'assetName' with nameVar
 				}
 				'''.stripIndent())
 
