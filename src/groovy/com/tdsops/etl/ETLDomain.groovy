@@ -39,7 +39,7 @@ enum ETLDomain {
 	 */
 	boolean isAsset() {
 		boolean isaAsset = false
-		if (clazz) {
+		if (clazz != null) {
 			String name = clazz.getName()
 			isaAsset = name in ASSET_CLASSNAMES
 		}
