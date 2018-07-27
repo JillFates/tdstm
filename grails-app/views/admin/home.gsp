@@ -153,7 +153,16 @@ a:hover {
 								</tds:hasPermission>
 							</td>
 						</tr>
-
+						<tr class="odd">
+							<td>
+								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess}">
+									<g:link controller="apiCatalog" action="manager" style="color:black">API Dictionary Catalog</g:link>
+								</tds:hasPermission>
+							</td>
+							<td>
+								&nbsp;
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>

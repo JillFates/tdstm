@@ -1,6 +1,8 @@
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.cookbook.ContextCommand
+import net.transitionmanager.command.cookbook.GroupCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
@@ -19,8 +21,8 @@ class WsCookbookController implements ControllerMethods {
 	CookbookService cookbookService
 
 	@HasPermission(Permission.RecipeCreate)
-	def createRecipe(String name, String description, String context, Long clonedFrom) {
-		def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
+	def createRecipe(String name, String description, Long clonedFrom) {
+		def recipeVersion = cookbookService.createRecipe(name, description, clonedFrom)
 		renderSuccessJson(recipeId: recipeVersion.recipe.id)
 	}
 
@@ -94,10 +96,11 @@ class WsCookbookController implements ControllerMethods {
 		Map result = cookbookService.getRecipe(id, version)
 		Recipe recipe = result.recipe
 		RecipeVersion rv = result.recipeVersion
+
 		renderSuccessJson(recipeId: recipe.id,
 			name: recipe.name,
 			description: recipe.description,
-			context: recipe.context,
+			context: result.context,
 			createdBy: result.person.firstName + ' ' + result.person.lastName,
 			lastUpdated: rv.lastUpdated,
 			versionNumber: rv.versionNumber,
@@ -106,10 +109,7 @@ class WsCookbookController implements ControllerMethods {
 			hasWIP: result.wip != null,
 			sourceCode: rv.sourceCode,
 			changelog: rv.changelog,
-			clonedFrom: (rv.clonedFrom ?: '').toString(),
-			eventId: result.eventId,
-			bundleId: result.bundleId,
-			applicationId: result.applicationId)
+			clonedFrom: (rv.clonedFrom ?: '').toString())
 	}
 
 	@HasPermission(Permission.RecipeView)
@@ -151,19 +151,21 @@ class WsCookbookController implements ControllerMethods {
 
 	@HasPermission(Permission.RecipeView)
 	def groups() {
-		def groups = cookbookService.getGroups(params.recipeVersionId, params.contextId, params.contextType, params.sourceCode)
+		GroupCommand group = populateCommandObject(GroupCommand)
+		validateCommandObject(group)
+		def groups = cookbookService.getGroups(group.recipeVersionId, group.context, group.sourceCode)
 		renderSuccessJson(groups: groups)
 	}
 
 	@HasPermission(Permission.RecipeEdit)
-	def defineRecipeContext() {
-		cookbookService.defineRecipeContext(params.recipeId, params.contextId)
+	def defineRecipeContext(Long recipeId, ContextCommand context) {
+		cookbookService.saveRecipeContext(recipeId, context)
 		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
-	def deleteRecipeContext() {
-		cookbookService.deleteRecipeContext(params.recipeId)
+	def deleteRecipeContext(Long recipeId) {
+		cookbookService.deleteRecipeContext(recipeId)
 		renderSuccessJson()
 	}
 }

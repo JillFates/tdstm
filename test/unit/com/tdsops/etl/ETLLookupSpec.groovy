@@ -94,7 +94,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Device', FIELD:'unknown'])
+			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'unknown').message
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)

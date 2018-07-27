@@ -25,6 +25,15 @@ class Element implements RangeChecker {
 	 * Value with transformations applied
 	 */
 	Object value
+
+	/**
+	 * Overrides default assignation to value in case that we are assigning another Element Object
+	 * @param obj
+	 */
+	void setValue ( Object obj ) {
+		this.value = ( obj instanceof Element ) ? obj.value : obj
+	}
+
 	/**
 	 * Default o initialize value
 	 */
@@ -410,6 +419,46 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Format this element value to the printf-style format strings
+	 * @see https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * In case that the format is not provided we use a default one to each of the following types:
+	 *    Date	                  %1$tY-%1$tm-%1$td
+	 *    Number (Integer, Long)	%,d
+	 *    Float/Decimal	         %,.2f
+	 * <code>
+	 *      load ... transform with format()
+	 * <code>
+	 * @return the element instance that received this command
+	 */
+	Element format(String formatMask) {
+		if( ! formatMask ) {
+			switch ( value.class ) {
+				case Date :
+						formatMask = '%1$tY-%1$tm-%1$td'
+						break
+
+				case [Integer, Long] :
+						formatMask = '%,df'
+						break
+
+				case [Float, Double] :
+						formatMask = '%,.2f'
+						break
+
+				default:
+						formatMask = '%s'
+			}
+		}
+
+		try {
+			value = String.format(formatMask, value)
+		} catch (e) {
+			addToErrors("format function error (${value} : ${value.class}) : ${e.message}")
+		}
+		return this
+	}
+
+	/**
 	 * Converts all of the characters in this element value to lower
 	 * case using the rules of the default locale.
 	 * <code>
@@ -529,6 +578,34 @@ class Element implements RangeChecker {
 	Element plus(String value) {
 		this.value += value
 		return this
+	}
+
+	/**
+	 * Set a default value when extracting and loading values
+	 * So that I can reduce the amount of code to write and simplify the scripts
+	 * <code>
+	 *     extract 'desc' transform with defaultValue('Something') load 'Description'
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	def defaultValue(Object value) {
+		if( ! isValueSet() ) {
+			this.setValue(value)
+		}
+
+		return this
+	}
+
+	/**
+	 * checks that the wrapped value is not Null nor Blank
+	 * @return
+	 */
+	private boolean isValueSet() {
+		return ! (
+				  value == null ||
+				  (value instanceof CharSequence) && value.trim().size() == 0
+		)
 	}
 
 	/**

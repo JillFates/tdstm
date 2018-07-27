@@ -45,6 +45,7 @@ class ETLBinding extends Binding {
 		        throw ETLProcessorException.missingPropertyException(name)
 	        }
         }
+        // TODO : JPM 7/2018 : Check to see if this is a Var variable and if so then return the myVar.value instead
 
         return result
     }

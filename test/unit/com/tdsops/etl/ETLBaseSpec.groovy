@@ -185,7 +185,6 @@ abstract class ETLBaseSpec extends Specification {
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE) + commonFieldsSpec)
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE) + commonFieldsSpec)
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE) + commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency) + commonFieldsSpec)
 
 		return validator
 	}
@@ -360,6 +359,7 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('assetName', 'AssetName'),
 					buildFieldSpec('assetType', 'AssetType'),
 					buildFieldSpec('asset', 'Asset'),
+					buildFieldSpec('dependent', 'Dependent'),
 					buildFieldSpec('comment', 'Comment'),
 					buildFieldSpec('status', 'Status'),
 					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),

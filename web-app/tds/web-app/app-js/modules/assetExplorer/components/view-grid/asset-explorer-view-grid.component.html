@@ -82,7 +82,9 @@
         </ng-template>
         <!-- Asset Tags Filter Template -->
         <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tags'">
-            <tds-asset-tag-selector [tagList]="tagList"
+            <tds-asset-tag-selector #tagSelector
+                                    [tagList]="metadata.tagList"
+                                    [viewFilterModel]="column.filter"
                                     (valueChange)="onTagFilterChange(column, $event)">
             </tds-asset-tag-selector>
         </ng-template>

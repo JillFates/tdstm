@@ -1687,7 +1687,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
 		temp.sendNotification = ac.sendNotification;
 		temp.instructionsLink = ac.instructionsLink ? ac.instructionsLink.toString() : '';
-		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
+		temp.isResolved = ac.dateResolved != null ? '1' : '0';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
 		temp.mustVerify = ac.mustVerify;
 		temp.override = ac.workflowOverride ? ac.workflowOverride.toString() : '0';
@@ -2613,7 +2613,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 				} else {
 					return (
 						((comment.commentInstance.commentType == 'issue') && (comment.commentInstance.status != 'Completed'))
-						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.isResolved))
+						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.dateResolved))
 					) && (scope.viewUnpublishedValue == 'true' || comment.commentInstance.isPublished);
 				}
 			}

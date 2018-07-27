@@ -122,7 +122,9 @@ var Person = function () {
 					$(".mobmenu").removeClass("mobselect")
 					$("#"+currentHeaderShow).addClass("mobselect")
 					
-					personDiv.dialog('open')
+					personDiv.dialog('open');
+					$('.ui-widget-overlay').addClass('old-legacy-content');
+					$('.ui-dialog').addClass('old-legacy-content');
 				},
 				error : function (response) {
 					tdsCommon.displayWsError(response, "Error retrieving person information.", false)

@@ -4,6 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -120,7 +121,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -136,17 +137,17 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							
+
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
-    
-							find Device by 'id' with DOMAIN.asset into 'asset' 
+
+							find Device by 'id' with DOMAIN.asset into 'asset'
    							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
-    						
+
     						whenNotFound 'asset' create {
     							assetName primaryNameVar
     							assetType primaryTypeVar
@@ -243,7 +244,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -259,16 +260,16 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							
+
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
-    
-							find Application by 'id' with DOMAIN.asset into 'asset' 
+
+							find Application by 'id' with DOMAIN.asset into 'asset'
    							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-    						
+
     						whenNotFound 'asset' update {
     							assetName primaryNameVar
     							assetType primaryTypeVar
@@ -323,7 +324,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -339,17 +340,17 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							
+
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
-    
-							find Application by 'id' with DOMAIN.asset into 'asset' 
+
+							find Application by 'id' with DOMAIN.asset into 'asset'
    							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, 'primaryType' into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
-    						
+
     						whenFound 'asset' create {
     							"TN Last Seen" NOW
     						}
@@ -402,7 +403,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -418,17 +419,17 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							
+
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
-    
-							find Device by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+
+							find Device by 'id' with DOMAIN.asset into 'asset'
+   							elseFind Device by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Device by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
-    						
+
     						whenFound 'asset' update {
     							"Modified Date" NOW
     						}
@@ -521,7 +522,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		and:
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
 
 		and:
@@ -537,12 +538,12 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						read labels
 						domain Dependency
 						iterate {
-							
+
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
 							extract 'AssetType' set primaryTypeVar
-    
+
     						whenFound 'asset' create {
     							"Modified Date" NOW
     						}
@@ -585,7 +586,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
             domain Dependency
             iterate {
                 extract 'AssetId' load 'asset'
-                find Device by 'id' with DOMAIN.asset into 'asset' 
+                find Device by 'id' with DOMAIN.asset into 'asset'
                 whenNotFound 'asset' create {
                     description unknownVar
                 }

@@ -130,9 +130,6 @@ class ETLResultsSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -152,7 +149,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 							domain Application
 							load 'environment' with 'Production'
 							extract 'application id' load 'id'
-							
+
 							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
 						""".stripIndent())

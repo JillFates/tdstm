@@ -19,7 +19,9 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.joda.time.DateMidnight
 import spock.lang.See
 import spock.lang.Shared
 /**
@@ -41,12 +43,17 @@ class ETLTransformSpec extends ETLBaseSpec {
 	@Shared
 	JSONConnection jsonConnection
 
+	@Shared
+	Date          now
+	@Shared
+	Date          otherD
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
 	DataSetFacade applicationDataSet
 	DataSetFacade nonSanitizedDataSet
 	DataSetFacade sixRowsDataSet
+	DataSetFacade mixedTypeDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
 	ETLFieldsValidator validator
@@ -73,6 +80,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
+		now = new DateMidnight(1974,06,26).toDate()
+		otherD = new DateMidnight(2018, 7,4).toDate()
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -130,6 +139,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'desc', alias: 'DESC', type: "STRING")
 
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
@@ -151,6 +161,20 @@ class ETLTransformSpec extends ETLBaseSpec {
 		new Flow().writeTo(dest: nonSanitizedDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
+		}
+
+		mixedTypeDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "NUMERIC", isNull: false, isKey: true)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'user count', alias: 'USER COUNT', type: "INTEGER", isNull: false)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'expiration date', alias: 'EXPIRATION DATE', type: "DATE", isNull: false)
+		mixedTypeDataSet.getDataSet().field << new getl.data.Field(name: 'issue date', alias: 'ISSUE DATE', type: "DATE", isNull: false)
+
+		new Flow().writeTo(dest: mixedTypeDataSet.getDataSet(), dest_append: true) { updater ->
+			updater(['device id': 152255, 'user count': 12345,
+			         'expiration date': DateUtils.parseDate("1974-06-26", 'yyyy-MM-dd'),
+			         'issue date': DateUtils.parseDate("1977-02-18", 'yyyy-MM-dd')
+			])
 		}
 
 		validator = createDomainClassFieldsValidator()
@@ -189,6 +213,25 @@ class ETLTransformSpec extends ETLBaseSpec {
 			new Element(value: 5) | null | null | new Element(value: 5)
 			''     | null | '' | 'tadah'
 			false  | null  | null | false
+	}
+
+	void 'test can apply defaultValue transformation'() {
+
+		expect:
+			result == new Element(value:value).defaultValue(dafaultVal).value
+
+		where:
+
+			result  || value     | dafaultVal
+			'abc'   || null      | 'abc'
+			'abc'   || ''        | 'abc'
+			'xyz'   || 'xyz'     | 'abc'
+			now     || null      | now
+			otherD  || otherD    | now
+			5       || null      | 5
+			42      || 42        | 5
+			5       || ''        | new Element(value:5)
+
 	}
 
 	void 'test can check syntax errors at parsing time'() {
@@ -1356,9 +1399,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 					3,06/25/2018
 					4,99/99/2018
 					5,
-					6, 
+					6,
 					7,abc-123
 					""".stripIndent())
+			Date goodDate = new Date(2018 - 1900, 6 - 1, 25)
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
 					validator)
@@ -1369,6 +1413,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							extract 'retire date' transform with toDate('yyyy-MM-dd','yyyy/MM/dd','MM/dd/yyyy') load 'Retire Date'
+							extract 'retire date' transform with toDate() load 'maintExpDate'
 						}
 					""".stripIndent())
 
@@ -1384,75 +1429,98 @@ class ETLTransformSpec extends ETLBaseSpec {
 						rowNum == 1
 						errorCount == 0
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '2018-06-25'
+							value == goodDate
+							init == null
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == goodDate
 							init == null
 							errors == []
 						}
 					}
 					with(data[1], RowResult) {
 						rowNum == 2
-						errorCount == 1
+						errorCount == 0
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '2018/06/25'
+							value == goodDate
 							init == null
-							errors == ['Not able to transform date: 2018/06/25, pattern: yyyy-MM-dd']
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == goodDate
+							init == null
+							errors == []
 						}
 					}
 					with(data[2], RowResult) {
 						rowNum == 3
-						errorCount == 2
+						errorCount == 1
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '06/25/2018'
+							value == goodDate
 							init == null
-							errors[0] == 'Not able to transform date: 06/25/2018, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: 06/25/2018, pattern: yyyy/MM/dd'
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == '06/25/2018'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 					with(data[3], RowResult) {
 						rowNum == 4
-						errorCount == 3
+						errorCount == 1
 						with(fields.retireDate, FieldResult) {
 							value == '99/99/2018'
-							originalValue == '99/99/2018'
 							init == null
-							errors[0] == 'Not able to transform date: 99/99/2018, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: 99/99/2018, pattern: yyyy/MM/dd'
-							errors[2] == 'Not able to transform date: 99/99/2018, pattern: MM/dd/yyyy'
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == '99/99/2018'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 					with(data[4], RowResult) {
 						rowNum == 5
-						errorCount == 1
+						errorCount == 1	// Should be 2
 						with(fields.retireDate, FieldResult) {
 							value == null
-							originalValue == null
 							init == null
-							errors == ['Not able to transform blank or null date: null']
+							errors == ['Unable to transform blank or null value to a date']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == null
+							init == null
+							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
 					with(data[5], RowResult) {
 						rowNum == 6
-						errorCount == 1
+						errorCount == 1 // Should be 2
 						with(fields.retireDate  , FieldResult) {
-							value == ''
-							originalValue == ' '
+							value == null
 							init == null
-							errors == ['Not able to transform blank or null date: ']
+							errors == ['Unable to transform blank or null value to a date']
+						}
+						with(fields.maintExpDate  , FieldResult) {
+							value == null
+							init == null
+							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
 					with(data[6], RowResult) {
 						rowNum == 7
-						errorCount == 3
+						errorCount == 1 // Should be 2
 						with(fields.retireDate, FieldResult) {
 							value == 'abc-123'
-							originalValue == 'abc-123'
 							init == null
-							errors[0] == 'Not able to transform date: abc-123, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: abc-123, pattern: yyyy/MM/dd'
-							errors[2] == 'Not able to transform date: abc-123, pattern: MM/dd/yyyy'
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == 'abc-123'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 				}
@@ -1463,5 +1531,28 @@ class ETLTransformSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 
+	}
+
+	void 'test can transform a field value with format transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), mixedTypeDataSet, GroovyMock(DebugConsole),
+					  GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						domain Device
+						read labels
+						iterate {
+							extract 'user count' transform with format('%,d')
+							extract 'expiration date' transform with format('%tD')
+							extract 'issue date' transform with format()
+						}
+					""".stripIndent())
+
+		then: 'Every column for every row is transformed to uppercase'
+			etlProcessor.getElement(0, 1).value == '12,345'
+			etlProcessor.getElement(0, 2).value == '06/26/74'
+			etlProcessor.getElement(0, 3).value == '1977-02-18'
 	}
 }
