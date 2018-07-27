@@ -3204,6 +3204,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
 			}
@@ -3345,6 +3346,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				return []
 			}

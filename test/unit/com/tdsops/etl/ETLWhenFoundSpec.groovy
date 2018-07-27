@@ -455,22 +455,26 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 						find.query.size() == 4
 						with(find.query[0]) {
+							errors == []
 							domain == ETLDomain.Device.name()
 							kv.id == '151954'
 						}
 
 						with(find.query[1]) {
+							errors == []
 							domain == ETLDomain.Device.name()
 							kv.assetName == 'ACMEVMPROD01'
 							kv.assetClass == 'VM'
 						}
 
 						with(find.query[2]) {
+							errors == []
 							domain == ETLDomain.Device.name()
 							kv.assetName == 'VMWare Vcenter'
 						}
 
 						with(find.query[3]) {
+							errors == []
 							domain == ETLDomain.Asset.name()
 							kv.assetName == 'VMWare Vcenter'
 						}
