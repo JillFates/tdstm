@@ -33,7 +33,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		sample: false,
 		transform: false,
 	};
-	private script: string = '';
+	private script: string;
 	private filename: string;
 	private isWindowMaximized = false;
 	private initialWindowStyle = null;
@@ -71,13 +71,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
-		super('#etlBuilder');
-		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
-		this.loadETLScript();
+			super('#etlBuilder');
+			this.script = '';
+			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+			this.loadETLScript();
 	}
 
 	/**
-	 * Load the Script from the ETL API
+	 * Loads the Script from API call, If a previous sampleFilename exists or has been uploaded before then it loads the
+	 * content calling the #extractSampleDataFromFile method.
      */
 	private loadETLScript(): void {
 		this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
@@ -221,7 +223,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			});
 	}
 
-	private isScriptDirty(): boolean {
+	protected isScriptDirty(): boolean {
 		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
 	}
 
@@ -252,7 +254,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Call API and get the Sample Data based on the FileName already Uploaded
+	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
 	private extractSampleDataFromFile() {
 		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename).subscribe((result) => {
