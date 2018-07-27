@@ -402,6 +402,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() >> 'com.tds.asset.AssetEntity'
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }*.getId()
 			}
