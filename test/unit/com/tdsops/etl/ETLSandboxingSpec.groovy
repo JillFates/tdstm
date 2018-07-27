@@ -4,7 +4,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -12,17 +12,17 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
+import spock.lang.See
 
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
-class ETLSandboxingSpec  extends ETLBaseSpec {
+class ETLSandboxingSpec extends ETLBaseSpec {
 
 	Project GMDEMO
 	Project TMDEMO
@@ -53,12 +53,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new ETLFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
@@ -66,17 +61,17 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 	}
 
 	def cleanup() {
-		if(simpleDataSetFileName) service.deleteTemporaryFile(simpleDataSetFileName)
+		if (simpleDataSetFileName) service.deleteTemporaryFile(simpleDataSetFileName)
 	}
 
 	void 'test can check syntax in an ETL script with groovy comments'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				GroovyMock(DataSetFacade),
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor.checkSyntax("""
@@ -97,10 +92,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				GroovyMock(DataSetFacade),
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -115,7 +110,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.finalResult()){
+			with(etlProcessor.finalResult()) {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
@@ -128,7 +123,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor.checkSyntax("""
@@ -158,14 +153,14 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-				.evaluate("""
+					.evaluate("""
 					domain Device
 					read labels
 					iterate
@@ -181,10 +176,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -200,13 +195,13 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor
-				.checkSyntax("""
+					.checkSyntax("""
 					domain Device
 					read labels
 					def greeting = { String name -> "Hello, \$name!" }
 					assert greeting('Diego') == 'Hello, Diego!'
 				""".stripIndent(),
-				configuration)
+					configuration)
 
 		then: 'Result has validSyntax equals false and a list of errors'
 			with(result) {
@@ -226,10 +221,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 	void 'test can evaluate an ETL script disallowing closure creation and using a custom compiler configuration'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -245,13 +240,13 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor
-				.evaluate("""
+					.evaluate("""
 					domain Device
 					read labels
 					def greeting = { String name -> "Hello, \$name!" }
 					assert greeting('Diego') == 'Hello, Diego!'
 				""".stripIndent(),
-				configuration)
+					configuration)
 
 		then: 'An MissingMethodException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -262,7 +257,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -283,10 +278,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -306,11 +301,11 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.
-				evaluate("""
+					evaluate("""
 					import java.lang.Math.*
 
 					domain Device
@@ -327,10 +322,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		and:
 			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -348,7 +343,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				read labels
 				max 10, 100
 			""".stripIndent(),
-				configuration)
+					configuration)
 
 		then: 'An MultipleCompilationErrorsException exception is not thrown'
 			notThrown MultipleCompilationErrorsException
@@ -358,10 +353,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				GroovyMock(ETLFieldsValidator))
+					GroovyMock(Project),
+					simpleDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -401,6 +396,73 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			console.buffer.toString().contains('INFO - Selected Domain: Device')
 			console.buffer.toString().contains('DEBUG - [position:[0, 1], value:152254]')
 			console.buffer.toString().contains('DEBUG - [position:[0, 2], value:152255]')
+	}
+
+	@See('TM-11563')
+	void 'test can use type boolean expressions'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					x
+					y
+					z
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					def isNew = true
+					read labels
+					domain Device
+					iterate {
+						extract 1 load 'assetName'
+					}
+			'''.stripIndent())
+
+		then: 'Results should contain Device Name assigment'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 3
+
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'x'
+							value == 'x'
+						}
+					}
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						with(fields.assetName) {
+							originalValue == 'y'
+							value == 'y'
+						}
+					}
+					with(data[2], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 3
+						with(fields.assetName) {
+							originalValue == 'z'
+							value == 'z'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 
 	final static String deviceDataSetContent = """
