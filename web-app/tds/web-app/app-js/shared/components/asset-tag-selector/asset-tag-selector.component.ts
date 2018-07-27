@@ -5,6 +5,7 @@
  */
 
 import {Component, EventEmitter, Input, Output, SimpleChanges, OnChanges, OnInit} from '@angular/core';
+import {TagModel} from '../../../modules/assetTags/model/tag.model';
 
 declare var jQuery: any;
 
@@ -15,12 +16,14 @@ declare var jQuery: any;
 })
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
-	@Input('tagList') tagList: any;
+	@Input('tagList') tagList: Array<TagModel>;
 	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	// Model
 	@Input('model') model: any;
+	// Model coming from the views filters.
+	@Input('viewFilterModel') viewFilterModel: string;
 
 	private assetSelectorModel = {
 		switch: false,
@@ -31,6 +34,13 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'AND' ? true : false;
+		} else if (this.viewFilterModel && this.viewFilterModel.length > 0) {
+			let ids = this.viewFilterModel.split('|');
+			ids.forEach( item => {
+				let tag: TagModel = new TagModel();
+				tag.id = parseInt(item, 0);
+				this.assetSelectorModel.tags.push(tag);
+			});
 		}
 	}
 
@@ -55,9 +65,11 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 * @param {SimpleChanges} changes
 	 */
 	ngOnChanges(changes: SimpleChanges) {
-		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
+		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue && !changes['model'].isFirstChange()) {
 			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
-			//
+		}
+		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue && !changes['viewFilterModel'].isFirstChange()) {
+			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
 		}
 		if (changes['tagList'] && changes['tagList'].currentValue !== changes['tagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
@@ -78,6 +90,14 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 */
 	public onSwitchValueChange(value: any): void {
 		this.onValueChange();
+	}
+
+	/**
+	 * Resets the component to be empty.
+	 */
+	public reset(): void {
+		this.assetSelectorModel.tags = [];
+		this.assetSelectorModel.switch = false;
 	}
 
 	/**

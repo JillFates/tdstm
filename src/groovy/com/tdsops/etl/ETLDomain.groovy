@@ -31,12 +31,20 @@ enum ETLDomain {
 		return clazz
 	}
 
+	static final ASSET_CLASSNAMES = [ 'com.tds.asset.Application', 'com.tds.asset.AssetEntity', 'com.tds.asset.Database', 'com.tds.asset.Files']
+
 	/**
 	 * Check if a domain instance has a Class in the AssetEntity hierarchy
 	 * @return true if clazz is assignable from AssetEntity class.
 	 */
-	boolean isAsset(){
-		return com.tds.asset.AssetEntity.isAssignableFrom(clazz)
+	boolean isAsset() {
+		boolean isaAsset = false
+		if (clazz) {
+			String name = clazz.getName()
+			isaAsset = name in ASSET_CLASSNAMES
+		}
+
+		return isaAsset
 	}
 
 	/**

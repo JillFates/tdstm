@@ -23,6 +23,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 @Component({
@@ -61,6 +62,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	position: any[] = [];
 	currentTab = 0;
 	previewButtonClicked = false;
+	protected metadata: any = {};
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -71,19 +73,21 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
-		private dictionary: DictionaryService) {
-		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-			this.domains = result[0];
-			this.model = { ...result[1] };
-			this.dataSignature = JSON.stringify(this.model);
-			if (this.model.id) {
-				this.updateFilterbyModel();
-				this.currentTab = 1;
-				this.state.$current.data.page.title = this.model.name;
-				document.title = this.model.name;
-				this.draggableColumns = this.model.schema.columns.slice();
-			}
-		}, (err) => console.log(err));
+		private dictionary: DictionaryService,
+		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
+			tagList.subscribe( result => this.metadata.tagList = result);
+			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
+				this.domains = result[0];
+				this.model = { ...result[1] };
+				this.dataSignature = JSON.stringify(this.model);
+				if (this.model.id) {
+					this.updateFilterbyModel();
+					this.currentTab = 1;
+					this.state.$current.data.page.title = this.model.name;
+					document.title = this.model.name;
+					this.draggableColumns = this.model.schema.columns.slice();
+				}
+			}, (err) => console.log(err));
 	}
 
 	ngOnInit(): void {

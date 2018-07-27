@@ -69,7 +69,7 @@ export class TaskCommentComponent implements OnInit {
 
 		const comments = this.comments
 			.filter(comment => comment.commentInstance.commentType === 'comment')
-			.filter(comment => this.showAllComments || !comment.commentInstance.isResolved);
+			.filter(comment => this.showAllComments || !comment.commentInstance.dateResolved);
 
 		return [...tasks, ...comments];
 	}
@@ -133,7 +133,7 @@ export class TaskCommentComponent implements OnInit {
 				title: 'Comment Detail',
 				type: modalType
 			},
-			archive: comment.commentInstance.isResolved !== 0,
+			archive: comment.commentInstance.dateResolved !== null,
 			comment: comment.commentInstance.comment,
 			category: comment.commentInstance.category,
 			assetClass: {

@@ -163,7 +163,12 @@
 				</div>
 			</div>
 		</div>
-		<asset-explorer-view-grid #grid="assetExplorerViewGrid" (modelChange)="onPreview()" [edit]="true" [model]="model.schema"></asset-explorer-view-grid>
+		<asset-explorer-view-grid #grid="assetExplorerViewGrid"
+                                  (modelChange)="onPreview()"
+                                  [edit]="true"
+                                  [model]="model.schema"
+                                  [metadata]="metadata">
+        </asset-explorer-view-grid>
 		<!-- /.box-body -->
 		<!-- /.box -->
 		<!-- <a href="javascript:void(0) " (click)="onBackToStart() "><i class="fa fa-chevron-left "></i> Back to View List</a> -->

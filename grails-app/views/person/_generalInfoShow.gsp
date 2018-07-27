@@ -3,14 +3,14 @@
 <div class="menu4">
 	<ul>
 		<li>
-			<a href="#" id="generalShowHeadId" class="mobmenu mobselect" onclick="Person.switchTab('generalInfoShowId','generalShowHeadId')">Person/Contact</a>
+			<a href="javascript:void(0)" id="generalShowHeadId" class="mobmenu mobselect" onclick="Person.switchTab('generalInfoShowId','generalShowHeadId')">Person/Contact</a>
 		</li>
 		<li>
-			<a href="#" id="availShowHeadId" class="mobmenu" onclick="Person.switchTab('availabilityShowId','availShowHeadId')">Availability</a>
+			<a href="javascript:void(0)" id="availShowHeadId" class="mobmenu" onclick="Person.switchTab('availabilityShowId','availShowHeadId')">Availability</a>
 		</li>
 		<tds:hasPermission permission="${Permission.PersonEditTDS}">
 			<li>
-				<a href="#" id="tdsShowHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityShowId','tdsShowHeadId')">Misc</a>
+				<a href="javascript:void(0)" id="tdsShowHeadId" class="mobmenu" onclick="Person.switchTab('tdsUtilityShowId','tdsShowHeadId')">Misc</a>
 			</li>
 		</tds:hasPermission>
 	</ul>

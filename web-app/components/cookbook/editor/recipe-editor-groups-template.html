@@ -32,7 +32,7 @@
 	<div class="selectors in">
 		<div class="refreshWrapper">
 			<label for="refreshGroups">
-				<a class="btn btn-default" id="refreshGroups" ng-click="groups.fetchGroups()">
+				<a class="btn btn-default" ng-disabled="!contexts.validCurrentSelection" id="refreshGroups" ng-click="groups.fetchGroups()">
 					Fetch
 				</a>
 			</label>

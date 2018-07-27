@@ -18,26 +18,6 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * Checks if there is a Field spec for a domain and field name
-	 * @param domain : a ETL Domain used for looking a field spec up
-	 * @param field : field name use to lookup
-	 * @return true if there is field spec for that field and domain
-	 */
-	//TODO: rename validate fieldName exists
-	Boolean hasSpecs(ETLDomain domain, String field) {
-
-		if (cacheContains(domain, field)) {
-			return true
-		}
-
-		if (domain.isAsset()) {
-			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
-		} else {
-			return GormUtil.isDomainProperty(domain.clazz, field)
-		}
-	}
-
-	/**
 	 * It looks a field specification up based on a ETLDomain
 	 * @param domain : a ETL Domain used for looking a field spec up
 	 * @param field : field name use to lookup
@@ -45,22 +25,33 @@ class ETLFieldsValidator {
 	 */
 	ETLFieldDefinition lookup(ETLDomain domain, String field) {
 
-		if(cacheContains(domain, field)){
+		if (cacheContains(domain, field)) {
 			return getFromCache(domain, field)
 		}
 
 		ETLFieldDefinition fieldDefinition
-		if(domain.isAsset()){
-			if(hasSpecs(domain, field)){
-				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
-					it.field == field || it.label == field
-				}
-				fieldDefinition = new ETLFieldDefinition(fieldSpec)
+
+		Map<String, ?> fieldSpec
+
+		// Try finding the fieldspec for asset classes
+		if (domain.isAsset()) {
+			fieldSpec = assetClassFieldsSpecMap[domain].find {
+				it.field == field || it.label == field
+			}
+
+			if (fieldSpec) {
+				fieldDefinition = new ETLFieldDefinition(fieldSpec){}
 			}
 		} else {
-			Class<?> domainClass = domain.clazz
-			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
-			fieldDefinition = new ETLFieldDefinition(domainProperty)
+			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, field)
+			if (domainProperty) {
+				fieldDefinition = new ETLFieldDefinition(domainProperty)
+			}
+
+		}
+
+		if (! fieldDefinition) {
+			throw ETLProcessorException.unknownDomainFieldName(domain, field)
 		}
 
 		saveInCache(domain, field, fieldDefinition)
@@ -88,7 +79,11 @@ class ETLFieldsValidator {
 		if(!fieldsDefinitionCache.containsKey(domain)){
 			fieldsDefinitionCache.put(domain, [:])
 		}
-		fieldsDefinitionCache[domain].put(field, fieldDefinition)
+
+		if (! fieldsDefinitionCache[domain].containsKey(field)) {
+			fieldsDefinitionCache[domain].put(field, fieldDefinition)
+		}
+		println "saveInCache( ${domain.name()}, $field ) called"
 	}
 
 	/**

@@ -21,8 +21,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
-import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -70,6 +69,8 @@ export class AssetExplorerViewGridComponent {
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
+	@Input() metadata: any;
+	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 
 	fields = [];
 	justPlanning = false;
@@ -102,8 +103,7 @@ export class AssetExplorerViewGridComponent {
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
 		private notifier: NotifierService,
-		private dialog: UIDialogService,
-		private tagService: TagService) {
+		private dialog: UIDialogService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
@@ -122,7 +122,6 @@ export class AssetExplorerViewGridComponent {
 		}, (err) => console.log(err));
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
-		this.loadTagList();
 	}
 
 	private getPreferences(): Observable<any> {
@@ -163,6 +162,9 @@ export class AssetExplorerViewGridComponent {
 			c.filter = '';
 		});
 		this.onFilter();
+		if (this.tagSelector) {
+			this.tagSelector.reset();
+		}
 	}
 
 	hasFilterApplied(): boolean {
@@ -381,17 +383,6 @@ export class AssetExplorerViewGridComponent {
 	onChangeJustPlanning(isChecked = false): void {
 		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
 			.subscribe(this.onReload.bind(this));
-	}
-
-	/**
-	 * Loads the Available Tags for the current project.
-	 */
-	private loadTagList(): void {
-		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
-			if (result.status === ApiResponseModel.API_SUCCESS && result.data) {
-				this.tagList = result.data;
-			}
-		}, error => console.log('error on GET Tag List', error));
 	}
 
 	/**
