@@ -47,13 +47,14 @@ class ScriptProcessorService {
      * @param filename
      * @return and instance of ETLProcessor used to execute the scriptContent
      */
-    ETLProcessor execute (Project project, String scriptContent, String filename, ProgressCallback progressCallback = null) {
+    ETLProcessor execute (Project project, String scriptContent, String filename) {
 
         Dataset dataset = FileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
-	    etlProcessor.evaluate(scriptContent?.trim(), progressCallback)
+	    etlProcessor.execute(scriptContent?.trim())
+
         return etlProcessor
     }
 

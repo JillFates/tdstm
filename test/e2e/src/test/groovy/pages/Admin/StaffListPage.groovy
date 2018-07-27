@@ -2,10 +2,12 @@ package pages.Admin
 
 import geb.Page
 import modules.AdminModule
+import modules.CommonsModule
 
 class   StaffListPage extends Page {
 
     static at = {
+        title == "Staff List"
         staffPageTitle.text().trim() == "Staff List"
         pageBreadcrumbs[0].text() == "Admin"
         pageBreadcrumbs[1].text() == "Client"
@@ -36,7 +38,7 @@ class   StaffListPage extends Page {
         columnsHeader               { staffGridHeader.find("tr", class: "ui-jqgrid-labels ui-sortable")}
         searchToolbar               { staffGridHeader.find("tr", class: "ui-search-toolbar")}
         staffGridHeaderCols         { columnsHeader.find("div", class:"ui-jqgrid-sortable")}
-        staffGridRows               { staffView.find("table#personIdGrid").find("tr","role":"row")}
+        staffGridRows               { staffView.find("table#personIdGrid").find("tr.ui-widget-content","role":"row")}
         gridSize                    { staffGridRows.size()}
         rowSize                     { staffGridHeaderCols.size()}
 
@@ -50,5 +52,43 @@ class   StaffListPage extends Page {
         manageStaffModal(required: false, wait:true) { $("div", "window-class":"modal-task")}
 
         adminModule { module AdminModule}
+        bulkDeleteConfirmationModal { $('div#bulkDeleteModal')}
+        deleteAssociatedAppOwnerOrSMEsInput { $('input#deleteIfAssocWithAssets')}
+        deleteConfirmationModalButton { $('button#bulkModalDeleteBtn')}
+        closeConfirmationModalButton { $('button#bulkModalCloseBtn')}
+        lastNameFilter { $("input#gs_lastname")}
+        rowInputsCheckbox {staffGridRows.find("td input")}
+        commonsModule { module CommonsModule }
+    }
+
+    def filterByLastname(name){
+        waitFor{lastNameFilter.displayed}
+        lastNameFilter = name
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def getGridRowsSize(){
+        gridSize
+    }
+
+    def selectRow(){
+        rowInputsCheckbox.click()
+    }
+
+    def clickOnBulkDeleteButton(){
+        waitFor{bulkDeleteBtn.click()}
+        waitFor{bulkDeleteConfirmationModal.jquery.attr("class").contains("in")}
+    }
+
+    def clickOnDeleteAssociatedAppOwnerOrSMEsInput(){
+        waitFor{deleteAssociatedAppOwnerOrSMEsInput.click()}
+    }
+
+    def clickOnDeleteConfirmationModalButton(){
+        waitFor{deleteConfirmationModalButton.click()}
+    }
+
+    def clickOnCloseConfirmationModalButton(){
+        waitFor{closeConfirmationModalButton.click()}
     }
 }

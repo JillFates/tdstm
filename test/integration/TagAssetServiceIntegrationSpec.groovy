@@ -103,7 +103,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
 
@@ -268,7 +268,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			List<TagAsset> tagAssets2 = tagAssetService.list(project, device2.id)
 		then: 'the assets are associated with the new tags.'
 			tagAssets.size() == 3
-			tagAssets[0].tag.color == Color.Black
+			tagAssets[0].tag.color == Color.Green
 			tagAssets[0].asset.id == device.id
 			tagAssets[1].tag.color == Color.Cyan
 			tagAssets[1].asset.id == device.id
@@ -276,7 +276,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			tagAssets[2].asset.id == device.id
 
 			tagAssets2.size() == 4
-			tagAssets2[0].tag.color == Color.Black
+			tagAssets2[0].tag.color == Color.Green
 			tagAssets2[0].asset.id == device2.id
 			tagAssets2[1].tag.color == Color.Blue
 			tagAssets2[1].asset.id == device2.id
@@ -303,7 +303,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			List<TagAsset> tagAssets2 = tagAssetService.list(project, device2.id)
 		then: 'the assets are associated with the new tags.'
 			tagAssets.size() == 3
-			tagAssets[0].tag.color == Color.Black
+			tagAssets[0].tag.color == Color.Green
 			tagAssets[0].asset.id == device.id
 			tagAssets[1].tag.color == Color.Cyan
 			tagAssets[1].asset.id == device.id
@@ -311,7 +311,7 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			tagAssets[2].asset.id == device.id
 
 			tagAssets2.size() == 4
-			tagAssets2[0].tag.color == Color.Black
+			tagAssets2[0].tag.color == Color.Green
 			tagAssets2[0].asset.id == device2.id
 			tagAssets2[1].tag.color == Color.Blue
 			tagAssets2[1].asset.id == device2.id

@@ -1,9 +1,7 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.Application
-import com.tdsops.tm.enums.domain.ContextType
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
-
 /**
  * Represents a batch that is created when a recipe is executed and tasks are generated. This will provide
  * a way of tracking, updating and possibly deleting tasks that were generate in the cookbook.
@@ -11,9 +9,8 @@ import com.tdssrc.grails.TimeUtil
  * @author John Martin
  */
 class TaskBatch {
-
-	ContextType contextType
-	Integer contextId
+	Long   eventId
+	String context
 	String status
 
 	RecipeVersion recipeVersionUsed       // the recipeVersion used to generate the batch of tasks
@@ -30,6 +27,7 @@ class TaskBatch {
 	Date lastUpdated
 
 	static constraints = {
+		eventId nullable: true
 		dateCreated nullable: true
 		lastUpdated nullable: true
 		recipe nullable: true
@@ -63,15 +61,32 @@ class TaskBatch {
 	}
 
 	/**
-	 * Get the name of the object for which the context references
+	 * Gets the event name and or the tags, for the taskBatch, and returns them as a String
+	 *
+	 * @return The name and, or the tag names for the taskBatch
 	 */
-	String contextName() {
-		switch (contextType) {
-			case ContextType.A: return Application.get(contextId)?.assetName ?: ''
-			case ContextType.B: return MoveBundle.get(contextId)?.name ?: ''
-			case ContextType.E: return MoveEvent.get(contextId)?.name ?: ''
-			default:            return ''
+	String eventName() {
+		return MoveEvent.get(eventId)?.name ?: ''
+	}
+
+	String tagNames() {
+		List<String> event = []
+		Map context = context()
+
+		if (context.tag) {
+			return context.tag.collect { Map tag -> tag.label }.join(', ')
 		}
+
+		return ''
+	}
+
+	/**
+	 * Gets the context as a map
+	 *
+	 * @return the context json as a map
+	 */
+	Map context() {
+		context ? JsonUtil.convertJsonToMap(context) : [:]
 	}
 
 	/**
@@ -79,6 +94,6 @@ class TaskBatch {
 	 * (e.g. Application VSphere 5.0 Cluster - batch (30 tasks) )
 	 */
 	String toString() {
-		(recipe ? recipe.context + ' ' : '') + contextName() + ' - batch of ' + taskCount + ' tasks'
+		(recipe ? recipe.context + ' ' : '') + ' - batch of ' + taskCount + ' tasks'
 	}
 }

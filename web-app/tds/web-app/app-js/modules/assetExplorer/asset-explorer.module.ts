@@ -20,6 +20,9 @@ import { TaskCommentComponent } from './components/task-comment/task-comment.com
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
 import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
+import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
+import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -32,6 +35,7 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
+import { BulkChangeService } from './service/bulk-change.service';
 
 @NgModule({
 	imports: [
@@ -59,13 +63,17 @@ import { TagService } from '../assetTags/service/tag.service';
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		BulkChangeButtonComponent,
+		BulkChangeActionsComponent,
+		BulkChangeEditComponent
 	],
 	providers: [
 		AssetExplorerService,
 		TaskCommentService,
 		DependecyService,
-		TagService
+		TagService,
+		BulkChangeService
 	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
@@ -75,7 +83,10 @@ import { TagService } from '../assetTags/service/tag.service';
 		AssetEditComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		BulkChangeButtonComponent,
+		BulkChangeActionsComponent,
+		BulkChangeEditComponent
 	],
 })
 

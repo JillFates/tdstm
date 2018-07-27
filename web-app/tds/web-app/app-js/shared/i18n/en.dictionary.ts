@@ -72,7 +72,24 @@ export const en_DICTIONARY: Object = {
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
 		},
-		'SYSTEM_VIEW': 'System View'
+		'SYSTEM_VIEW': 'System View',
+		'BULK_CHANGE' : {
+			'TITLE' : 'Bulk Change',
+			'EDIT': {
+				'ADD_FIELD': 'Add Field',
+				'AFFECTED_ASSETS': 'This action will affect {param1} Assets',
+				'CONFIRM_UPDATE': 'Your about to update {param1} assets. There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
+			},
+			'DELETE': {
+				'CONFIRM_DELETE': 'Your about to delete {param1} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
+			},
+			'ACTIONS': {
+				'ADD': 'Add to existing',
+				'CLEAR': 'Clear field',
+				'REPLACE': 'Replace with',
+				'REMOVE': 'Remove these'
+			}
+		}
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',

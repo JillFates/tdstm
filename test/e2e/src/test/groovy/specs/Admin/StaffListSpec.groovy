@@ -3,7 +3,6 @@ package specs.Admin
 import geb.spock.GebReportingSpec
 import utils.CommonActions
 import pages.Admin.StaffListPage
-import pages.Admin.LandingItems.ListStaffLandingPage
 import pages.Admin.StaffCreationPage
 import pages.Admin.UserCreationPage
 import pages.Admin.UserDetailsPage
@@ -15,7 +14,7 @@ import spock.lang.Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
 
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"
@@ -51,7 +50,6 @@ class StaffListSpec extends GebReportingSpec {
             adminModule.goToAdminListStaff()
 
         then: 'Staff List Should be displayed'
-            at ListStaffLandingPage
             at StaffListPage
         and: 'We wait for the Entire in order to be properly displayed'
             waitFor { gridSize > 0 }

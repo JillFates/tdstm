@@ -20,7 +20,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
     static expectedColumns =[]
 
     //Define the names of the Application you will Create and Edit
-    static randStr = new CommonActions().getRandomString()
+    static randStr = CommonActions.getRandomString()
 
 
     def setupSpec() {

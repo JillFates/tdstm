@@ -229,30 +229,30 @@ class TagServiceSpec extends Specification {
 		when: 'calling handleMoveIds with a non null values'
 			List whereFilter = []
 			Map params = [:]
-			String joins = service.handleMoveIds(1, 1, whereFilter, params)
+			String joins = service.handleMoveIds([1], 1, whereFilter, params)
 		then: "the where filter is populated, it's corresponding params are populated, and the join query is returned."
 			joins.stripIndent() == """
 				LEFT JOIN tl.asset a
 				LEFT JOIN a.moveBundle mb
 				LEFT OUTER JOIN mb.moveEvent me
 			""".stripIndent()
-			whereFilter == ['mb.id = :moveBundleId', 'me.id = :moveEventId']
-			params == [moveBundleId:1, moveEventId:1]
+			whereFilter == ['mb.id in (:moveBundleIds)', 'me.id = :moveEventId']
+			params == [moveBundleIds:[1], moveEventId:1]
 	}
 
 	void 'Test handleMoveIds moveEventId null'() {
 		when: 'calling handleMoveIds with, moveEventId null, and moveBundleId non null values'
 			List whereFilter = []
 			Map params = [:]
-			String joins = service.handleMoveIds(1, null, whereFilter, params)
+			String joins = service.handleMoveIds([1], null, whereFilter, params)
 		then: "the where filter is populated, it's corresponding params are populated, and the join query is returned."
 			joins.stripIndent() == """
 				LEFT JOIN tl.asset a
 				LEFT JOIN a.moveBundle mb
 				LEFT OUTER JOIN mb.moveEvent me
 			""".stripIndent()
-			whereFilter == ['mb.id = :moveBundleId']
-			params == [moveBundleId:1]
+			whereFilter == ['mb.id in (:moveBundleIds)']
+			params == [moveBundleIds:[1]]
 	}
 
 	void 'Test handleMoveIds moveBundleId null'() {

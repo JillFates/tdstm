@@ -1,5 +1,4 @@
-  import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.StringAppendElement
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -11,8 +10,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
-import org.codehaus.groovy.control.ErrorCollector
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 @Slf4j(value = 'log', category = 'grails.app.controllers.MockETLController')
 @Secured('isAuthenticated()')
@@ -64,85 +61,68 @@ class MockETLController implements ControllerMethods {
     """.stripIndent().trim()
 
 
-	def index () {
+	def index(){
 
-        Project project = securityService.userCurrentProject
-        ErrorCollector errorCollector
-        String missingPropertyError
-        Integer lineNumber
+		Project project = securityService.userCurrentProject
+		ETLProcessor etlProcessor
 
-        ETLProcessor etlProcessor
+		String dataSet
+		String script
+		Map<String, ?> error
 
-        String dataSet
-        String script
+		try {
 
-        try {
+			String.mixin StringAppendElement
 
-            String.mixin StringAppendElement
+			if(params.fetch && params.file){
 
-            if (params.fetch && params.file) {
+				URLConnection connection = new URL(params.file).openConnection()
+				String userpass = "Dcorrea:boston2004"
+				String basicAuth = "Basic " + userpass.encodeAsBase64()
+				connection.setRequestProperty("Authorization", basicAuth)
+				connection.setRequestProperty('Accept', 'application/csv')
 
-                URLConnection connection = new URL(params.file).openConnection()
-                String userpass = "Dcorrea:boston2004"
-                String basicAuth = "Basic " + userpass.encodeAsBase64()
-                connection.setRequestProperty("Authorization", basicAuth)
-                connection.setRequestProperty('Accept', 'application/csv')
+				dataSet = connection.inputStream.text?.replace('"', '')
+				script = "console on"
 
-                dataSet = connection.inputStream.text?.replace('"', '')
-                script = "console on"
+			} else {
+				dataSet = params.dataSet ?: exampleDataSet
+				script = params.script ?: exampleScript
+			}
 
-            } else {
-                dataSet = params.dataSet ?: exampleDataSet
-                script = params.script ?: exampleScript
-            }
+			String fileType = 'csv'
+			if(params.filetype){
+				fileType = params.filetype
+			}
 
-	         String fileType = 'csv'
-	         if ( params.filetype ) {
-		         fileType = params.filetype
-	         }
+			log.debug("Filetype to use: {}", fileType)
 
-	         log.debug("Filetype to use: {}", fileType)
+			def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', fileType)
+			fileSystemService.initFile(fileName, os, dataSet)
 
-				def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', fileType)
+			etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
+			fileSystemService.deleteTemporaryFile(fileName)
 
+		} catch( Throwable t){
+			error = ETLProcessor.getErrorMessage(t)
+		}
 
-	         fileSystemService.initFile(fileName, os, dataSet)
+		[
+			dataSet         : dataSet,
+			script          : script?.trim(),
+			lineNumbers     : Math.max(script.readLines().size(), 10),
+			etlProcessor    : etlProcessor,
+			error           : error,
+			availableMethods: (etlProcessor?.availableMethods as JSON).toString(),
+			assetFields     : (etlProcessor?.assetFields as JSON).toString(),
+			logContent      : etlProcessor?.debugConsole?.content(),
+			jsonResult      : (etlProcessor?.finalResult()?.domains as JSON),
+			dataScriptId    : params.dataScriptId,
+			providerName    : params.providerName,
+			dataScriptName  : params.dataScriptName,
+			filename        : params.filename
+		]
 
-
-            etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
-
-            fileSystemService.deleteTemporaryFile(fileName)
-
-        } catch (MultipleCompilationErrorsException cfe) {
-            errorCollector = cfe.getErrorCollector()
-        } catch (MissingPropertyException mpe) {
-            lineNumber = mpe.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber
-            missingPropertyError = mpe.getMessage()
-        } catch (ETLProcessorException pe) {
-            missingPropertyError = pe.getMessage()
-        } catch (Exception ioe) {
-	        log.error(ioe.message, ioe)
-	        missingPropertyError = ioe.getMessage()
-        }
-
-        [
-                dataSet             : dataSet,
-                script              : script?.trim(),
-                lineNumbers         : Math.max(script.readLines().size(), 10),
-                etlProcessor        : etlProcessor,
-                errorCollector      : errorCollector,
-                lineNumber          : lineNumber,
-                availableMethods    : (etlProcessor?.availableMethods as JSON).toString(),
-                assetFields         : (etlProcessor?.assetFields as JSON).toString(),
-                missingPropertyError: missingPropertyError,
-                logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.finalResult()?.domains as JSON),
-                dataScriptId        : params.dataScriptId,
-                providerName        : params.providerName,
-                dataScriptName      : params.dataScriptName,
-                filename            : params.filename
-
-        ]
     }
 
     /**

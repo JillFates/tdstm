@@ -91,10 +91,7 @@ class ApiCatalogService implements ServiceMethods {
 	 * @return and instance of api catalog
 	 */
 	ApiCatalog findById(Long id) {
-		ApiCatalog.where {
-			project == securityService.userCurrentProject
-			id == id
-		}.get()
+		return GormUtil.findInProject(securityService.userCurrentProject, ApiCatalog, id, false)
 	}
 
 	/**
@@ -148,11 +145,35 @@ class ApiCatalogService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getCatalogMethods(Long catalogId) {
-		ApiCatalog apiCatalog = findById(catalogId)
-		if (!apiCatalog) {
-			throw new EmptyResultException("Api Catalog with ID $catalogId, not found")
-		}
+		ApiCatalog apiCatalog = GormUtil.findInProject(securityService.userCurrentProject, ApiCatalog, catalogId, true)
+		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionaryTransformed)
+	}
 
-		return ApiCatalogUtil.getCatalogMethods(apiCatalog.dictionary)
+	/**
+	 * Clone any existing api catalogs and providers associated to sourceProject (if any),
+	 * then associate those newly created tags to targetProject.
+	 *
+	 * @param sourceProject  The project from which the existing tags will be cloned.
+	 * @param targetProject  The project to which the new tags will be associated.
+	 */
+	void cloneProjectApiCatalogs(Project sourceProject, Project targetProject) {
+		List<ApiCatalog> apiCatalogs = ApiCatalog.where {
+			project == sourceProject
+		}.list()
+
+		if (!apiCatalogs.isEmpty()) {
+			apiCatalogs.each { ApiCatalog sourceApiCatalog ->
+				Provider targetProvider = providerService.cloneProvider(sourceApiCatalog.provider, targetProject)
+				ApiCatalog newApiCatalog = new ApiCatalog(
+						project: targetProject,
+						provider: targetProvider,
+						name: sourceApiCatalog.name,
+						dictionary: sourceApiCatalog.dictionary,
+						dictionaryTransformed: sourceApiCatalog.dictionaryTransformed
+				)
+				newApiCatalog.save()
+				log.debug "Cloned api catalog ${newApiCatalog.name} for project ${targetProject.toString()}"
+			}
+		}
 	}
 }

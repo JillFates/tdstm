@@ -41,7 +41,7 @@ class TaskServiceTests extends Specification {
 		task.assignedTo != null
 		AssetCommentStatus.STARTED == task.status
 		task.actFinish == null
-		task.isResolved == 0
+		task.dateResolved == null
 
 		when:
 		// Test bumping status to COMPLETED after STARTED
@@ -54,7 +54,7 @@ class TaskServiceTests extends Specification {
 		task.assignedTo != null
 		task.resolvedBy != null
 		AssetCommentStatus.COMPLETED == task.status
-		task.isResolved == 1
+		task.dateResolved != null
 
 		when:
 		// Test reverting status TO STARTED from COMPLETED
@@ -68,7 +68,7 @@ class TaskServiceTests extends Specification {
 		task.assignedTo != null
 		task.resolvedBy == null
 		AssetCommentStatus.STARTED == task.status
-		0 == task.isResolved
+		null == task.dateResolved
 	}
 
 	void testGetMoveEventRunbookRecipe() {

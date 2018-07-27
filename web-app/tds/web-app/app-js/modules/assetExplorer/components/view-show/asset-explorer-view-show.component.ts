@@ -18,6 +18,7 @@ import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-
 import { AssetQueryParams } from '../../model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { AssetExportModel } from '../../model/asset-export-model';
+import {TagModel} from '../../../assetTags/model/tag.model';
 
 declare var jQuery: any;
 @Component({
@@ -28,6 +29,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	private dataSignature: string;
 	model: ViewModel;
 	domains: DomainModel[] = [];
+	protected metadata: any = {};
 
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
@@ -39,14 +41,16 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private assetExplorerService: AssetExplorerService,
 		private stateService: StateService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>) {
-		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-			this.domains = result[0];
-			this.model = result[1];
-			this.dataSignature = JSON.stringify(this.model);
-			this.stateService.$current.data.page.title = this.model.name;
-			document.title = this.model.name;
-		}, (err) => console.log(err));
+		@Inject('fields') fields: Observable<DomainModel[]>,
+		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
+			tagList.subscribe( result => this.metadata.tagList = result);
+			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
+				this.domains = result[0];
+				this.model = result[1];
+				this.dataSignature = JSON.stringify(this.model);
+				this.stateService.$current.data.page.title = this.model.name;
+				document.title = this.model.name;
+			}, (err) => console.log(err));
 	}
 
 	ngOnInit(): void {
