@@ -76,6 +76,7 @@ class ProjectService implements ServiceMethods {
 	CustomDomainService customDomainService
 	LicenseAdminService licenseAdminService
 	TagService tagService
+	ApiCatalogService apiCatalogService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -532,6 +533,8 @@ class ProjectService implements ServiceMethods {
 		// Clone the Default Project Tags (if it has any) and add them to the new project
 		tagService.cloneProjectTags(defProject, project)
 
+		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
+		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
 	}
 
 	/**
