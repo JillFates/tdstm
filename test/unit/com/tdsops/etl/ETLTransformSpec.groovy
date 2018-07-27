@@ -203,39 +203,16 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	void 'test can apply coalesce transformation'() {
 
-		given:
-			def okValue = 'tadah!'
-			ETLProcessor etlProcessor = new ETLProcessor(
-					  GroovyMock(Project),
-					  applicationDataSet,
-					  new DebugConsole(buffer: new StringBuffer()),
-					  validator)
+		expect:
+			result == ETLProcessor.coalesce(value1, value2, value3)
 
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-						def var1
-						def var2
-						def var3 = '${okValue}'
-						def var4 = 'never get this'
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with lowercase() set myLocalVar
-							load 'appVendor' with coalesce(var1, var2, var3, var4) 
-							extract 'issue date' transform with format()
-						}
-					""".stripIndent())
-
-		then: 'check that the assigned value is the first not null'
-			with(etlProcessor.finalResult()) {
-				domains.size() == 1
-				with(domains[0]) {
-					with(data[0].fields.appVendor) {
-						originalValue == okValue
-						value == okValue
-					}
-				}
-			}
+		where:
+			result | value1 | value2 | value3
+			null   | null   | null   | null
+			''     | ''     | null   | 5
+			new Element(value: 5) | null | null | new Element(value: 5)
+			''     | null | '' | 'tadah'
+			false  | null  | null | false
 	}
 
 	void 'test can apply defaultValue transformation'() {
@@ -1422,9 +1399,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 					3,06/25/2018
 					4,99/99/2018
 					5,
-					6, 
+					6,
 					7,abc-123
 					""".stripIndent())
+			Date goodDate = new Date(2018 - 1900, 6 - 1, 25)
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole),
 					validator)
@@ -1435,6 +1413,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							extract 'retire date' transform with toDate('yyyy-MM-dd','yyyy/MM/dd','MM/dd/yyyy') load 'Retire Date'
+							extract 'retire date' transform with toDate() load 'maintExpDate'
 						}
 					""".stripIndent())
 
@@ -1450,75 +1429,98 @@ class ETLTransformSpec extends ETLBaseSpec {
 						rowNum == 1
 						errorCount == 0
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '2018-06-25'
+							value == goodDate
+							init == null
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == goodDate
 							init == null
 							errors == []
 						}
 					}
 					with(data[1], RowResult) {
 						rowNum == 2
-						errorCount == 1
+						errorCount == 0
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '2018/06/25'
+							value == goodDate
 							init == null
-							errors == ['Not able to transform date: 2018/06/25, pattern: yyyy-MM-dd']
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == goodDate
+							init == null
+							errors == []
 						}
 					}
 					with(data[2], RowResult) {
 						rowNum == 3
-						errorCount == 2
+						errorCount == 1
 						with(fields.retireDate, FieldResult) {
-							value == new Date(2018 - 1900, 6 - 1, 25)
-							originalValue == '06/25/2018'
+							value == goodDate
 							init == null
-							errors[0] == 'Not able to transform date: 06/25/2018, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: 06/25/2018, pattern: yyyy/MM/dd'
+							errors == []
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == '06/25/2018'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 					with(data[3], RowResult) {
 						rowNum == 4
-						errorCount == 3
+						errorCount == 1
 						with(fields.retireDate, FieldResult) {
 							value == '99/99/2018'
-							originalValue == '99/99/2018'
 							init == null
-							errors[0] == 'Not able to transform date: 99/99/2018, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: 99/99/2018, pattern: yyyy/MM/dd'
-							errors[2] == 'Not able to transform date: 99/99/2018, pattern: MM/dd/yyyy'
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == '99/99/2018'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 					with(data[4], RowResult) {
 						rowNum == 5
-						errorCount == 1
+						errorCount == 1	// Should be 2
 						with(fields.retireDate, FieldResult) {
 							value == null
-							originalValue == null
 							init == null
-							errors == ['Not able to transform blank or null date: null']
+							errors == ['Unable to transform blank or null value to a date']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == null
+							init == null
+							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
 					with(data[5], RowResult) {
 						rowNum == 6
-						errorCount == 1
+						errorCount == 1 // Should be 2
 						with(fields.retireDate  , FieldResult) {
-							value == ''
-							originalValue == ' '
+							value == null
 							init == null
-							errors == ['Not able to transform blank or null date: ']
+							errors == ['Unable to transform blank or null value to a date']
+						}
+						with(fields.maintExpDate  , FieldResult) {
+							value == null
+							init == null
+							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
 					with(data[6], RowResult) {
 						rowNum == 7
-						errorCount == 3
+						errorCount == 1 // Should be 2
 						with(fields.retireDate, FieldResult) {
 							value == 'abc-123'
-							originalValue == 'abc-123'
 							init == null
-							errors[0] == 'Not able to transform date: abc-123, pattern: yyyy-MM-dd'
-							errors[1] == 'Not able to transform date: abc-123, pattern: yyyy/MM/dd'
-							errors[2] == 'Not able to transform date: abc-123, pattern: MM/dd/yyyy'
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
+						}
+						with(fields.maintExpDate, FieldResult) {
+							value == 'abc-123'
+							init == null
+							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
 				}

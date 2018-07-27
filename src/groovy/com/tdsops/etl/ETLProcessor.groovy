@@ -1385,8 +1385,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL,
-				LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET,
-				LEFT_SHIFT
+				LEFT_SHIFT, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
@@ -1623,10 +1622,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param objects
 	 * @return
 	 */
-	Object coalesce(Object... values) {
-		def retVal = null
+	static Object coalesce(Object... values){
+		Object retVal
 		if ( values ) {
-			retVal = values.findResult { it }
+			retVal = values.find {
+				null != ( (it instanceof Element) ? it.value : it )
+			}
 		}
 
 		return retVal
