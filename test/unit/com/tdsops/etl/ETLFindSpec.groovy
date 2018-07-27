@@ -386,15 +386,14 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "find/elseFind statement is missing required [into] keyword"
-			ETLProcessor.getErrorMessage(e) == [
-					message: 'find/elseFind statement is missing required [into] keyword',
-					startLine:6,
-					endLine:6,
-					startColumn:null,
-					endColumn:null,
-					fatal:true
-			]
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'find/elseFind statement is missing required [into] keyword at line 6'
+				startLine == 6
+				endLine == 6
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -479,15 +478,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "find/elseFind statement is missing required [with, into] keywords"
-			ETLProcessor.getErrorMessage(e) == [
-					message: 'find/elseFind statement is missing required [with, into] keywords',
-					startLine: 6,
-					endLine: 6,
-					startColumn: null,
-					endColumn: null,
-					fatal: true
-			]
+
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'find/elseFind statement is missing required [with, into] keywords at line 6'
+				startLine == 6
+				endLine == 6
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -866,27 +865,26 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Application
-							load 'environment' with 'Production'
-							extract 'application id' load 'id'
-							find Application by 'id' with 'id' into 'id'
-						}
-						""".stripIndent())
+				console on
+				read labels
+				iterate {
+					domain Application
+					load 'environment' with 'Production'
+					extract 'application id' load 'id'
+					find Application by 'id' with 'id' into 'id'
+				}
+				""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'No project selected in the user context'
-			ETLProcessor.getErrorMessage(e) == [
-					message: 'No project selected in the user context',
-					startLine: 8,
-					endLine: 8,
-					startColumn: null,
-					endColumn: null,
-					fatal: true
-			]
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'No project selected in the user context at line 8'
+				startLine == 8
+				endLine == 8
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -1017,7 +1015,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.findCache){
+			with (etlProcessor.findCache) {
 				size() == 4
 				hitCountRate() == 0
 				get('Application', [id: '152254']) == []
@@ -1212,15 +1210,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
-			ETLProcessor.getErrorMessage(e) == [
-					message: 'You cannot use isApplication with more than one results in FINDINGS',
-					startLine: 14,
-					endLine: 14,
-					startColumn: null,
-					endColumn: null,
-					fatal: true
-			]
+
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'You cannot use isApplication with more than one results in FINDINGS at line 14'
+				startLine == 14
+				endLine == 14
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -1486,15 +1484,14 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
-			ETLProcessor.getErrorMessage(e) == [
-					message: 'Unrecognized command for with args [room] for the find / elseFind command',
-					startLine: 10,
-					endLine: 10,
-					startColumn: null,
-					endColumn: null,
-					fatal: true
-			]
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'Unrecognized command for with args [room] for the find / elseFind command at line 10'
+				startLine == 10
+				endLine == 10
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -3231,8 +3228,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					extract 'name' set nameVar
 					extract 'type' transform with substitute(map) set domainClassVar
 					domain domainClassVar.value
-					find domainClassVar.value by 'assetName' with nameVar into 'id'
-					load 'assetName' with nameVar
+					find domainClassVar.value by 'Name' with nameVar into 'id'
+					load 'Name' with nameVar
 				}
 				'''.stripIndent())
 

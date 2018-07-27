@@ -347,7 +347,7 @@ class ETLFindElement implements ETLStackableCommand {
 		}
 
 		if (missingProperties) {
-			error = "find/elseFind statement is missing required ${missingProperties} ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
 		}
 
 		return error
