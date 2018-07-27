@@ -21,6 +21,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.joda.time.DateMidnight
 import spock.lang.See
 import spock.lang.Shared
 /**
@@ -42,6 +43,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 	@Shared
 	JSONConnection jsonConnection
 
+	@Shared
+	Date          now
+	@Shared
+	Date          otherD
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
@@ -75,6 +80,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
+		now = new DateMidnight(1974,06,26).toDate()
+		otherD = new DateMidnight(2018, 7,4).toDate()
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -132,6 +139,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'desc', alias: 'DESC', type: "STRING")
 
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
@@ -228,6 +236,25 @@ class ETLTransformSpec extends ETLBaseSpec {
 					}
 				}
 			}
+	}
+
+	void 'test can apply defaultValue transformation'() {
+
+		expect:
+			result == new Element(value:value).defaultValue(dafaultVal).value
+
+		where:
+
+			result  || value     | dafaultVal
+			'abc'   || null      | 'abc'
+			'abc'   || ''        | 'abc'
+			'xyz'   || 'xyz'     | 'abc'
+			now     || null      | now
+			otherD  || otherD    | now
+			5       || null      | 5
+			42      || 42        | 5
+			5       || ''        | new Element(value:5)
+
 	}
 
 	void 'test can check syntax errors at parsing time'() {

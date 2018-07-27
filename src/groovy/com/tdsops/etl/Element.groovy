@@ -25,6 +25,15 @@ class Element implements RangeChecker {
 	 * Value with transformations applied
 	 */
 	Object value
+
+	/**
+	 * Overrides default assignation to value in case that we are assigning another Element Object
+	 * @param obj
+	 */
+	void setValue ( Object obj ) {
+		this.value = ( obj instanceof Element ) ? obj.value : obj
+	}
+
 	/**
 	 * Default o initialize value
 	 */
@@ -569,6 +578,34 @@ class Element implements RangeChecker {
 	Element plus(String value) {
 		this.value += value
 		return this
+	}
+
+	/**
+	 * Set a default value when extracting and loading values
+	 * So that I can reduce the amount of code to write and simplify the scripts
+	 * <code>
+	 *     extract 'desc' transform with defaultValue('Something') load 'Description'
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	def defaultValue(Object value) {
+		if( ! isValueSet() ) {
+			this.setValue(value)
+		}
+
+		return this
+	}
+
+	/**
+	 * checks that the wrapped value is not Null nor Blank
+	 * @return
+	 */
+	private boolean isValueSet() {
+		return ! (
+				  value == null ||
+				  (value instanceof CharSequence) && value.trim().size() == 0
+		)
 	}
 
 	/**
