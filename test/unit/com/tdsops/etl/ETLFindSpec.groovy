@@ -865,20 +865,20 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Application
-							load 'environment' with 'Production'
-							extract 'application id' load 'id'
-							find Application by 'id' with 'id' into 'id'
-						}
-						""".stripIndent())
+				console on
+				read labels
+				iterate {
+					domain Application
+					load 'environment' with 'Production'
+					extract 'application id' load 'id'
+					find Application by 'id' with 'id' into 'id'
+				}
+				""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
-			using (ETLProcessor.getErrorMessage(e)) {
-				message.startsWith('No project selected in the user context')
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'No project selected in the user context at line 8'
 				startLine == 8
 				endLine == 8
 				startColumn == null
