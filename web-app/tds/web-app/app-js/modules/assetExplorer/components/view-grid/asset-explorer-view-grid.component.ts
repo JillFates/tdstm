@@ -31,34 +31,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html',
-	styles: [`
-	.btnClear {
-		margin-right: 20px !important;
-	}
-	.btnReload{
-		padding-top:7px;
-	}
-	.grid-message {
-		width:60vw;
-		text-align:center;
-	}
-	.grid-message label{
-		font-weight: normal;
-	}
-	.application .device, .application .database, .application .storage,
-	.device .application, .device .database, .device .storage,
-	.database .device, .database .application, .database .storage,
-	.storage .device, .storage .database, .storage .application {
-		background-color:#f4f4f4;
-	}
-	.k-grid-content-locked,
-	.k-grid-header-locked {
-		border-right-width: 5px;
-		border-right-color: #ebebeb;
-	}
-	`],
-	encapsulation: ViewEncapsulation.None
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent {
 
@@ -74,6 +47,7 @@ export class AssetExplorerViewGridComponent {
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
 	typingTimeout: any;
+
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = MAX_DEFAULT;

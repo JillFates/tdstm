@@ -1,16 +1,6 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<style>
-    .asset-detail-link {
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .asset-tag.k-switch {
-        top: 3px !important;
-    }
-</style>
-
-<kendo-grid class="tds-kendo-grid without-selectabe-rows" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+<kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
