@@ -25,6 +25,7 @@ import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
 import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
 import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -1384,12 +1385,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL,
-				LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET
+				LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET,
+				LEFT_SHIFT
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
 				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
-				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE
+				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
@@ -1479,8 +1481,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 				error.fatal      = true
 			}
 		} else {
-			int lineNum = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
-			error.message = exception.getMessage() + " at line $lineNum"
+			def lineNum = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+			error.message = exception.getMessage() + (lineNum != null ? " at line $lineNum" : '')
 			error.startLine  = lineNum
 			error.endLine    = lineNum
 			error.startColumn= null
