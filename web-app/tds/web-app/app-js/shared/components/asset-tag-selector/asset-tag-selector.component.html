@@ -8,6 +8,7 @@
     </kendo-switch>
     <kendo-multiselect
             id="asset-tag-selector-component"
+            #assetTagSelectorComponent
             [data]="tagList"
             [(ngModel)]="assetSelectorModel.tags"
             [textField]="'name'"
@@ -25,4 +26,5 @@
             </div>
         </ng-template>
     </kendo-multiselect>
+    <span class="component-action-open" (click)="openTagSelector()"></span>
 </div>
