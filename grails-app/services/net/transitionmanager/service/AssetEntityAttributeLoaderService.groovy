@@ -934,6 +934,9 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		}
 
 		switch (property) {
+			case 'tagAssets':
+				// This is for the collection of tags, non implemented
+				break
 			case 'assetTag':
 				// This is a special case when the clazz is AssetEntity as we construct the assetName & assetTag if not presented
 				if (classSimpleName == 'AssetEntity') {
