@@ -167,9 +167,6 @@ class ScriptProcessorServiceSpec extends Specification {
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 
 		and:
 			String script = """
@@ -180,7 +177,7 @@ class ScriptProcessorServiceSpec extends Specification {
                     extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
-                    
+
                     find Application by 'id' with DOMAIN.id into 'id'
                 }
             """.stripIndent()
@@ -278,10 +275,6 @@ application id,vendor name,technology,location
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
-			Application.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
-
 		and:
 			String script = """
                 console on
@@ -293,7 +286,7 @@ application id,vendor name,technology,location
                     extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
-                    
+
                     find Application by 'id' with DOMAIN.id into 'id'
                 }
             """.stripIndent()
@@ -389,9 +382,6 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
 			}
@@ -446,9 +436,6 @@ application id,vendor name,technology,location
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 
 		and:
 			String script = """
@@ -459,7 +446,7 @@ application id,vendor name,technology,location
                     extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
-                    
+
                     find Application by 'id' with DOMAIN.id into 'id'
                 }
             """.stripIndent()

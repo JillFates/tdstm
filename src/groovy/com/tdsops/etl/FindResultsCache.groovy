@@ -12,7 +12,7 @@ import com.tdssrc.grails.StringUtil
  */
 class FindResultsCache {
 
-	Map<String, List<?>> cache
+	CachingLinkedHashMap<String, List<?>> cache
 	/**
 	 * Initial size of LRU findCache
 	 */
@@ -26,31 +26,35 @@ class FindResultsCache {
 	 */
 	private long hitCount = 0
 
-	FindResultsCache(Integer initialSize = MAX_ENTRIES) {
+	/**
+	 * Extending the LinkedHashMap is necessary to allow setting the MAX ENTRIES
+	 * TODO : JPM 7/2018 : split out and have constructor that accepts max and initial size
+	*/
+	public class CachingLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
-		cache = new LinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true) {
-			/**
-			 * Overrides a default implementation in LinkedHashMap and is where
-			 * we determine the policy for removing the oldest entry.
-			 * In this case, we return true when the findCache has
-			 * more entries than our defined capacity.
-			 * @param eldest The least recently inserted entry in the map, or if
-			 *           this is an access-ordered map, the least recently accessed
-			 *           entry.  This is the entry that will be removed it this
-			 *           method returns <tt>true</tt>.  If the map was empty prior
-			 *           to the <tt>put</tt> or <tt>putAll</tt> invocation resulting
-			 *           in this invocation, this will be the entry that was just
-			 *           inserted; in other words, if the map contains a single
-			 *           entry, the eldest entry is also the newest.
-			 *
-			 * @return <tt>true</tt> if the eldest entry should be removed
-			 *          from the map; <tt>false</tt> if it should be retained.
-			 */
-			@Override
-			protected boolean removeEldestEntry(Map.Entry eldest) {
-				return size() > MAX_ENTRIES
-			}
+		private int maxCacheEntries = 0
+
+		public CachingLinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder) {
+			super(initialCapacity, loadFactor, accessOrder);
+			maxCacheEntries = initialCapacity
 		}
+
+		@Override
+		protected boolean removeEldestEntry(Map.Entry eldest) {
+			return size() > maxCacheEntries
+		}
+
+		int getMaxCacheEntries() {
+			return maxCacheEntries
+		}
+	}
+
+	/**
+	 * Constructor
+	 */
+	FindResultsCache(Integer initialSize = MAX_ENTRIES) {
+		// Retain the cache max size
+		cache = new CachingLinkedHashMap<String, List<?>>(initialSize + 1, 0.75F, true)
 	}
 
 	/**
@@ -88,8 +92,19 @@ class FindResultsCache {
 		accessCount++
 		String key = generateMd5Key(domainClassName, fieldsInfo)
 		List<?> value = cache.get(key)
-		hitCount = (value == null) ? hitCount : hitCount + 1
+
+		updateHitCount(value != null)
+
 		return value
+	}
+
+	/**
+	 * Updates the hit count for reporting the hit ratio
+	 */
+	private void updateHitCount(boolean found) {
+		if (found) {
+			hitCount++
+		}
 	}
 
 	/**
@@ -113,7 +128,7 @@ class FindResultsCache {
 	 * Return the # of objects contained in the findCache
 	 */
 	Long size() {
-		return cache.size()
+		return cache ? cache.size() : 0
 	}
 
 	Long getAccessCount() {
@@ -122,6 +137,13 @@ class FindResultsCache {
 
 	Long getHitCount() {
 		return hitCount
+	}
+
+	/**
+	 * Used to access the max size of the cache
+	 */
+	Long cacheMaxSize() {
+		return cache.getMaxCacheEntries()
 	}
 
 	/**

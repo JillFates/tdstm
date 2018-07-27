@@ -5,6 +5,9 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+import groovy.transform.Memoized
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -14,8 +17,9 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.exceptions.GrailsDomainException
+import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -33,6 +37,8 @@ class GormUtilUnitSpec extends Specification {
 			!GormUtil.isDomainProperty(asset, 'bogusPropertyName')
 			GormUtil.isDomainProperty(AssetEntity, 'assetName')
 			!GormUtil.isDomainProperty(AssetEntity, 'bogusPropertyName')
+			GormUtil.isDomainProperty(AssetDependency, 'id')
+			GormUtil.isDomainProperty(AssetDependency, 'asset')
 
 		when: 'called with a non-domain class'
 			GormUtil.isDomainProperty(Specification, 'NotADomainClass')
@@ -264,5 +270,79 @@ class GormUtilUnitSpec extends Specification {
 			Application			| 'id'			| Application
 			Application			| 'sme'			| Person
 			Application			| 'url'			| Application
+	}
+
+	@See('TM-11461')
+	void 'test can memoized is a DomainClass method'() {
+		given:
+			Closure closure = Mock(Closure)
+
+			List<Class<?>> classes = [
+					com.tds.asset.Application,
+					com.tds.asset.AssetEntity,
+					com.tds.asset.Database,
+					com.tds.asset.Files,
+					com.tds.asset.AssetEntity,
+					com.tds.asset.AssetComment,
+					net.transitionmanager.domain.Person,
+					com.tds.asset.AssetComment,
+					com.tds.asset.AssetEntity,
+					net.transitionmanager.domain.Manufacturer,
+					net.transitionmanager.domain.Model,
+					com.tds.asset.AssetDependency,
+					net.transitionmanager.domain.Rack,
+					net.transitionmanager.domain.MoveBundle,
+					net.transitionmanager.domain.Room,
+					com.tds.asset.Files
+			]
+
+			List<String> propertyNames = [
+			        'id',
+					'assetName',
+					'description',
+					'environment',
+					'externalRefId',
+					'id',
+					'lastUpdated',
+					'moveBundle',
+					'priority',
+					'planStatus',
+					'supportType',
+					'validation',
+			]
+
+		when:
+			(1..400).each { int index ->
+				Date startTime = new Date()
+
+				classes.each { Class clazz ->
+
+					propertyNames.each {String propertyName ->
+
+						isDomainClass(clazz, closure)
+						Boolean isDomainProperty = GormUtil.isDomainProperty(clazz, propertyName)
+
+						if(isDomainProperty){
+							GormUtil.isReferenceProperty(clazz, propertyName)
+							GormUtil.getDomainPropertyType(clazz, propertyName)
+							GormUtil.getDomainClassOfProperty(clazz, propertyName)
+						}
+					}
+				}
+
+				Date stopTime = new Date()
+				TimeDuration timeDuration = TimeCategory.minus( stopTime, startTime )
+				println("Loop ${index}. Evaluation time: ${timeDuration.toMilliseconds()} ms (${timeDuration.toMilliseconds().intdiv(1000)} s)")
+			}
+
+		then:
+			12 * closure.call(true)
+	}
+
+	@Memoized
+	static boolean isDomainClass(Class domainClass, Closure closure) {
+		Boolean isDomainClass = GormUtil.isDomainClass(domainClass)
+		closure(isDomainClass)
+		return isDomainClass
 	}
 }
