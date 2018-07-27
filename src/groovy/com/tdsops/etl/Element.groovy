@@ -293,6 +293,20 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Transform current value in this Element instance to a Date by attempting to use
+	 * the formats 'yyyy-mm-dd' and 'yyyy/mm/dd'.
+	 *
+	 * <code>
+	 *     extract ... transform with toDate() load ...
+	 * </code>
+	 *
+	 * @return - a date instance
+	 */
+	Element toDate() {
+		return toDate('yyyy-MM-dd', 'yyyy/MM/dd')
+	}
+
+	/**
 	 * Transform current value in this Element instance to a Date
 	 * <code>
 	 *     extract ... transform with toDate('yyyy-mm-dd', 'yyyy/mm/dd', 'mm/dd/yyyy') load ...
@@ -301,26 +315,33 @@ class Element implements RangeChecker {
 	 * @param format - an array of possible date formats to use
 	 * @return - a date instance
 	 */
-	Element toDate(String... format) {
-		if (CollectionUtils.isEmpty(format)) {
+	Element toDate(String... listOfFormats) {
+		if (CollectionUtils.isEmpty(listOfFormats)) {
 			return this
 		}
 
 		// if value is blank or null then log an error
 		if (StringUtil.isBlank(value)) {
-			addToErrors("Not able to transform blank or null date: ${value}")
+			addToErrors('Unable to transform blank or null value to a date')
 			return this
 		}
 
-		for (String pattern : format) {
+		boolean formatted = false
+		for (String pattern : listOfFormats) {
 			try {
+				String ov = value
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
 				simpleDateFormat.setLenient(false)
 				value = simpleDateFormat.parse(value)
+				formatted = true
+		println "toDate() originalValue=$ov, parsed date=$value, format=$pattern"
 				break
 			} catch (Exception e) {
-				addToErrors("Not able to transform date: ${value}, pattern: ${pattern}")
+				// nothing to do
 			}
+		}
+		if (! formatted) {
+			addToErrors("Unable to transform value to a date with pattern(s) ${listOfFormats.join(', ')}")
 		}
 
 		return this
