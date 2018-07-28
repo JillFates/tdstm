@@ -286,13 +286,6 @@ export class AssetExplorerViewGridComponent {
 		if (operationResult.success) {
 			this.bulkSelectedItems = [];
 			this.onReload();
-
-			if (operationResult.message) {
-				this.notifier.broadcast({
-					name: AlertType.SUCCESS,
-					message: operationResult.message
-				});
-			}
 		}
 	}
 
