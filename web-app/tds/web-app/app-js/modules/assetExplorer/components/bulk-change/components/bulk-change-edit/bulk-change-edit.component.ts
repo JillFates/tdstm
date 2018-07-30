@@ -124,16 +124,30 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.catch((err) => console.log(err));
 	}
 
-	onDomainChange(domain: IdTextItem, index: number): void {
+	onDomainValueChange(domain: IdTextItem, index: number): void {
 		const {actions, selectedValues} = this.editRows;
+		selectedValues[index].domain = domain;
 
 		actions[index].fields =  this.getFieldsByDomain(domain);
-		selectedValues[index].field = null
+		selectedValues[index].field = null;
+	}
+
+	onFieldValueChange(field: IdTextItem, index: number): void {
+		const {selectedValues} = this.editRows;
+
+		selectedValues[index].field = field;
+	}
+
+	onActionValueChange(action: IdTextItem, index: number): void {
+		const {selectedValues} = this.editRows;
+
+		selectedValues[index].action = action;
 	}
 
 	private addRow(): any {
-		this.editRows.actions.push({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
+		this.editRows.actions.push({domains: this.assetClassList , actions: [...this.actions], fields: [] });
 		this.editRows.selectedValues.push({domain: this.defaultAssetClass, field: null, action: null, value: null});
+
 		//  get the fields for the default domain
 		this.editRows.actions[this.editRows.actions.length - 1].fields =  this.getFieldsByDomain(this.defaultAssetClass);
 	}
