@@ -31,4 +31,34 @@ class CollectionUtilsTests extends Specification {
 			['a': 1, 'b': ['bb': ['bbb': 2]]] 	| ['a': 1, 'b.bb.bbb': 2]
 			['a': 1, 'b': 2, 'c': false] 		| ['a': 1, 'b': 2, 'c': false]
 	}
+
+	void 'test deepClone of a Map'() {
+		setup:
+			Map source = [
+				a: [1,2,3],
+				b: ['Red', 'Orange', 'Yellow'],
+				c: [
+					a: [true, false, true],
+					b: 'xray',
+					c: 'zulu'
+				]
+			]
+
+		when: 'a Map instance is deepCloned'
+			Map cloned = CollectionUtils.deepClone(source)
+
+		then: 'the two maps should different objects'
+			! cloned.is(source)
+		and: 'the nested elements should be different objects'
+			! cloned.a.is(source.a)
+			! cloned.b.is(source.b)
+			! cloned.c.is(source.c)
+			! cloned.c.a.is(source.c.a)
+			! cloned.c.b.is(source.c.b)
+			! cloned.c.c.is(source.c.c)
+		and: 'the values of all of the elments are the same'
+			cloned.a == source.a
+			cloned.b == source.b
+			cloned.c == source.c
+	}
 }

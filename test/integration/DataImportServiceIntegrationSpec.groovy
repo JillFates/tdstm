@@ -1,9 +1,13 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SizeScale
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import grails.test.spock.IntegrationSpec
@@ -80,6 +84,10 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		context.record = new ImportBatchRecord(sourceRowId:1)
 
 		device.assetType = 'Server'
+		device.priority = 6
+		device.purchasePrice = 1.25
+		device.retireDate = new Date()
+
 		device.save()
 
 		device2.assetType = 'Server'
@@ -91,154 +99,38 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		otherProjectDevice.save()
 	}
 
-	/**
-	 * Used to generate the necessary initFieldsInfo map
-	 */
-	private Map initFieldsInfo() {
-		[
-			"id": [
-				"value": "",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			"asset": [
-				"value": "",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			"dependent": [
-				"value": "",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			// "createdBy": [
-			// 	"value": "Bill Z. Bubb",
-			// 	"originalValue": "",
-			// 	"error": false,
-			// 	"warn": false,
-			// 	"errors": [],
-			// 	"find": [
-			// 		"query": []
-			// 	]
-			// ],
-			"type": [
-				"value": "Hosts",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			"status": [
-				"value": "Archived",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			"dataFlowFreq": [
-				"value": "weekly",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			],
-			"c2": [
-				"value": "This is awesome",
-				"originalValue": "",
-				"error": false,
-				"warn": false,
-				"errors": [],
-				"find": [
-					"query": []
-				]
-			]
-		]
-	}
-
-	private JSONObject initFieldsInfoAsJSONObject() {
-		new JSONObject(initFieldsInfo() )
-	}
-
 	void '1. give the performQueryAndUpdateFindElement method a spin'() {
 		// performQueryAndUpdateFindElement(String propertyName, Map fieldsInfo, Map context)
 		given:
 			Object entity
 			String propertyName = 'asset'
 			String assetType = 'Server'
-			Map fieldsInfo = initFieldsInfo()
+			Map fieldsInfo = initFieldsInfoForDependency()
 
 		when: 'the query is by the assetName of an existing asset'
-			fieldsInfo[propertyName].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetName: device.assetName
-					]
-				]
-			]
+			initializeFindElement(propertyName, fieldsInfo)
+			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName: device.assetName], true, device.id)
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
 			[device] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
 
-
 		when: 'the query is by the assetName of an non-existing asset'
-			fieldsInfo[propertyName].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetName: 'A bogus asset name that does not exist for certain!'
-					]
-				]
-			]
+			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:'A bogus asset name that does not exist for certain!'], false)
+			fieldsInfo.value = ''
 		then: 'calling performQueryAndUpdateFindElement should return an empty list'
 			[] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
-
 
 		when: 'there is an asset with the same assetName in a different project'
 			// Done in spec setup
 		and: 'the query is by assetName only'
-			fieldsInfo[propertyName].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetName: device.assetName
-					]
-				]
-			]
+			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:device.assetName], true, device.id)
+			fieldsInfo.value = ''
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
 			[device] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
-
 
 		when: 'there is a second asset with the same assetType'
 			// Done in spec setup
 		and: 'the query is by the assetType only'
-			fieldsInfo[propertyName].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetType: assetType
-					]
-				]
-			]
+			setQueryElement(propertyName, fieldsInfo, 'Device', [assetType: assetType], false)
 		and: 'calling performQueryAndUpdateFindElement that should return multiple records'
 			List entities =  dataImportService._performQueryAndUpdateFindElement(propertyName, new JSONObject(fieldsInfo), context)
 		then: 'the list of entities should have 2 entities'
@@ -252,34 +144,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			(device.id in fieldsInfo[propertyName].find.results)
 			(device2.id in fieldsInfo[propertyName].find.results)
 
-
-		when: 'the query has multiple query criteria'
-			fieldsInfo[propertyName].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetName: 'bogus name so will not be found by this one',
-						assetType: assetType
-					]
-				],
-				[	domain: 'Device',
-					kv: [
-						assetName: device.assetName,
-						assetType: 'Wrong AssetType'
-					]
-				],
-				[	domain: 'Asset',
-					kv: [
-						assetName: device.assetName
-					]
-				],
-			]
-		then: 'calling performQueryAndUpdateFindElement should return the expected record'
-			[device] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, new JSONObject(fieldsInfo), context)
-		and: 'the find.matchOn should indicate the third criteria found the result'
-			3 == fieldsInfo[propertyName].find.matchOn
-		and: 'the find.results should have the id of the expected record'
-			[device.id] == fieldsInfo[propertyName].find.results
-
 	}
 
 	void '2. beat up on classOfDomainProperty'() {
@@ -287,7 +151,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 		given:
 			Class clazz
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
 		when: 'called for the identity of the object'
 			clazz = dataImportService.classOfDomainProperty('id', fieldsInfo, context)
@@ -355,7 +219,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
     void 'Test fetchEntityByFieldMetaData for no find.query specified'() {
         setup:
 			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
         when: 'called with no id and an empty query section'
 			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
@@ -369,7 +233,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
     void 'Test fetchEntityByFieldMetaData for find by field.value set to asset ID number'() {
         setup:
 			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
 		when: 'the field value contains the asset id as a numeric value'
 			fieldsInfo[property].value = device.id
@@ -384,7 +248,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void 'Test fetchEntityByFieldMetaData for find by field.value set to alternate key'() {
         setup:
 			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
 		when: 'the field value contains the alternate key value (assetName)'
 			fieldsInfo[property].value = device.assetName
@@ -396,32 +260,72 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			device.id == result.id
 	}
 
-    void 'Test fetchEntityByFieldMetaData for find by query'() {
+    void 'Test fetchEntityByFieldMetaData for #2 - id method'() {
         setup:
 			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
-		when: 'the field query contains the search by the assetName and assetType'
-			fieldsInfo[property].find.query = [
-				[	domain: 'Device',
-					kv: [
-						assetName: device.assetName,
-						assetType: device.assetType
-					]
-				]
-			]
-		and: 'field.value is empty'
-			fieldsInfo[property].value = ''
+		when: 'the field value contains the id of the entity'
+			fieldsInfo[property].value = device.id
 		and: 'the method is called'
 			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 	}
 
+    void 'Test fetchEntityByFieldMetaData for #3 - single result'() {
+        setup:
+			String property = 'asset'
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
+
+		when: 'the field query contains one result with the id of the asset'
+			fieldsInfo[property].value = device.id
+		and: 'the method is called'
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+		then: 'the expected asset should be returned'
+			device == result
+	}
+
+    void 'Test fetchEntityByFieldMetaData for #4 re-execute queries'() {
+        setup:
+			String property = 'asset'
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
+
+		when: 'the field query contains two searches with 2nd by the assetName and assetType'
+			setQueryElement(property, fieldsInfo, 'Device', [assetName: 'BOGUS NAME - ' + new Date()], false)
+			addQueryElement(property, fieldsInfo, 'Device', [assetName: device.assetName, assetType: device.assetType], false)
+		and: 'field.value is empty'
+			fieldsInfo[property].value = ''
+		and: 'the method is called'
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+		then: 'the expected asset should be returned'
+			device == result
+		and: 'the matchOn should be for the 2nd query'
+			1 == fieldsInfo[property].find.matchOn
+	}
+
+    void 'Test fetchEntityByFieldMetaData for #5 alternateKey method'() {
+        setup:
+			String property = 'asset'
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
+
+		when: 'the field query contains the search by the assetName and assetType'
+			fieldsInfo[property].value = device.assetName
+		and: 'the method is called'
+			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+		then: 'the expected asset should be returned'
+			device == result
+	}
+
+	// Need to implement
+	@Ignore
+    void 'Test fetchEntityByFieldMetaData for #6 - AssetDependency'() {
+	}
+
     void 'Test fetchEntityByFieldMetaData for caching'() {
         setup:
 			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			String newAssetName =  RandomStringUtils.randomAlphabetic(10)
 			String assetType = 'Server'
 
@@ -471,7 +375,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
     void 'Test fetchEntityByFieldMetaData method finding duplicates'() {
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			String property = 'asset'
 
 		when: 'there are two entities that have a common attribute (assetType=Server)'
@@ -496,7 +400,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
     void 'Test fetchEntityByFieldMetaData method with id reference to another project asset'() {
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			String property = 'asset'
 
 		when: 'the ETL field.value contains a numeric id of a domain entity belonging to another project'
@@ -510,7 +414,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void '4. test fetchEntityById method'() {
 		// fetchEntityById(String propertyName, JSONObject fieldsInfo, Map context)
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			String property = 'asset'
 
 		when: 'calling the method field.value for the id set the property'
@@ -579,7 +483,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void '5. test findDomainByAlternateProperty method'() {
 		// findDomainByAlternateProperty(String propertyName, JSONObject fieldsInfo, Map context)
 		setup:
-			JSONObject fieldsInfoJO = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfoJO = initFieldsInfoForDependencyAsJSONObject()
 			fieldsInfoJO.asset.value = device.assetName
 
 		when: 'calling findDomainByAlternateProperty() with name of valid device'
@@ -721,7 +625,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// addErrorToFieldsInfoOrRecord(String propertyName, JSONObject fieldsInfo, ImportBatchRecord record, Map context, String errorMsg)
 
 		when: 'we start with a new environment'
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			context.record = new ImportBatchRecord()
 		then: 'there should be no errors in the field'
 			[] == dataImportService.getFieldsInfoFieldErrors('asset', fieldsInfo)
@@ -748,7 +652,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void '11. test findAndUpdateOrCreateDependency method'() {
 		// findAndUpdateOrCreateDependency(AssetEntity primary, AssetEntity supporting, Map fieldsInfo, Map context)
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			ImportBatchRecord record = new ImportBatchRecord()
 			AssetDependency nullDependency = null
 		and: 'the primary asset has a create element'
@@ -781,7 +685,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void '12. test tallyNumberOfErrors method'() {
 		// tallyNumberOfErrors(ImportBatchRecord record, Map fieldsInfo)
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoAsJSONObject()
+			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 			ImportBatchRecord record = new ImportBatchRecord()
 		when: 'there are no errors at the record or field level'
 			// default state
@@ -853,7 +757,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			println "Calling dataImportService.transformEtlData()"
 			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
@@ -884,7 +787,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			Application application = new Application()
 			// context = dataImportService.initContextForProcessBatch( ETLDomain.Dependency )
 			String parentProperty = 'asset'
-			Map fieldsInfo = initFieldsInfo()
+			Map fieldsInfo = initFieldsInfoForDependency()
 
 		when: 'calling setDomainPropertyWithValue to set the description'
 			String description = 'This is pretty cool'
@@ -929,7 +832,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		setup:
 			AssetEntity domainObject = new AssetEntity()
 			List results
-			Map fieldsInfo = initFieldsInfo()
+			Map fieldsInfo = initFieldsInfoForDependency()
 
 		when: 'Calling for a known Manufacturer'
 			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'HP', 'asset', fieldsInfo, context)
@@ -947,4 +850,196 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			0 == results.size()
 		// and: 'An error should be logged'
 	}
+
+	void '18 Test the _hasSingleFindResult method'() {
+		setup:
+			Map fi = initFieldsInfoForDependency()
+			String fieldName = 'asset'
+
+		when: 'a field does not have any find results'
+			initializeFindElement(fieldName, fi)
+			dataImportService._hasSingleFindResult(fieldName, fi)
+		then: 'calling _hasSingleFindResult should return false'
+			! dataImportService._hasSingleFindResult(fieldName, fi)
+
+		when: 'the field has one result'
+			fi[fieldName].find.results << 123
+		then:  'calling _hasSingleFindResult should return true'
+			dataImportService._hasSingleFindResult(fieldName, fi)
+
+		when: 'the field has more than one result'
+			fi[fieldName].find.results << 456
+		then:  'calling _hasSingleFindResult should return false'
+			! dataImportService._hasSingleFindResult(fieldName, fi)
+	}
+
+	void '19 Test the _hasFindQuery method'() {
+		setup:
+			Map fieldsInfo = initFieldsInfoForDependency()
+			String fieldName = 'asset'
+
+		when: 'a field does not have any query specified'
+			initializeFindElement(fieldName, fieldsInfo)
+		then: 'calling _hasFindQuery should return false'
+			! dataImportService._hasFindQuery(fieldName, fieldsInfo)
+
+		when: 'a field has one query specified'
+			addQueryElement(fieldName, fieldsInfo, 'Application', [id:123], true, 123)
+		then: 'calling _hasFindQuery should return true'
+			dataImportService._hasFindQuery(fieldName, fieldsInfo)
+
+		when: 'a field has more than one query specified'
+			addQueryElement(fieldName, fieldsInfo, 'Application', [assetName: 'abc123'], false)
+		then: 'calling _hasFindQuery should still return true'
+			dataImportService._hasFindQuery(fieldName, fieldsInfo)
+	}
+
+	void '20 Test the bindFieldsInfoValuesToEntity method for bugs'() {
+		given: 'a fieldsInfo for a device'
+			Map fieldsInfo = initFieldsInfoForDevice()
+		and: 'a new asset saved '
+			AssetEntity server = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			context = dataImportService.initContextForProcessBatch( project, ETLDomain.Device )
+			context.record = new ImportBatchRecord(sourceRowId:1)
+
+		when: 'the fieldsInfo field values are set'
+			// fieldsInfo.id.value = server.id
+			initializeFieldElement('assetName', fieldsInfo, server.assetName)
+		and: 'String, Integer, Double, Enum and Date fields are set'
+			initializeFieldElement('assetType', fieldsInfo, AssetType.SERVER)
+			initializeFieldElement('priority', fieldsInfo, 6)
+			initializeFieldElement('purchasePrice', fieldsInfo, 1.25)
+			initializeFieldElement('retireDate', fieldsInfo, new Date())
+			// initializeFieldElement('scale', fieldsInfo, SizeScale.TB)
+		then: 'calling bindFieldsInfoValuesToEntity should not error'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
+		and: 'there should be dirty fields'
+			GormUtil.hasUnsavedChanges(server)
+
+		when: 'the server is saved'
+			server.save(failOnError:true, flush:true)
+			server.refresh()
+		then: 'there should be no unsaved changes'
+			! GormUtil.hasUnsavedChanges(server)
+		and: 'calling bindFieldsInfoValuesToEntity should not error'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
+		and: 'there should be NO dirty fields'
+			! GormUtil.hasUnsavedChanges(server)
+
+		when: 'a field is changed'
+			fieldsInfo.priority.value = 2
+		and: 'calling bindFieldsInfoValuesToEntity with that field being ignored'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, ['priority'])
+		then: 'there should be NO dirty fields'
+			! GormUtil.hasUnsavedChanges(server)
+
+		when: 'calling again without the ignore field'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
+		then: 'there should be a dirty field'
+			GormUtil.hasUnsavedChanges(server)
+		and: 'the field that is dirty should be the priority field'
+			['priority'] == server.dirtyPropertyNames
+
+		when: 'setting the bundle to a different bundle name'
+			MoveBundle mb2 = moveBundleTestHelper.createBundle(project, null)
+			initializeFieldElement('moveBundle', fieldsInfo, mb2.name)
+		and: 'calling bindFieldsInfoValuesToEntity'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
+		then: 'the server move bundle should now reference the new bundle'
+			server.moveBundle.id == mb2.id
+
+	}
+
+	// void '20 Test the _fetchEntityByFindResults method'() {
+	// 	_fetchEntityByFindResults(fieldName, fieldsInfo, context)
+	// }
+
+	/******************************************************
+	 * Utility variables and methods for the Spec
+	 ******************************************************/
+
+	// TODO get from ETL logic
+	static final Map FIND_DEF = [
+		query: [],
+		results: [],
+		errors: [],
+		matchOn: null
+	]
+
+	static final Map FIELD_DEF = [
+		value: null,
+		originalValue: null,
+		errors: [],
+		find: CollectionUtils.deepClone(FIND_DEF)
+	]
+
+	/**
+	 * Used to initialize the find element for a field
+	 */
+	private void initializeFieldElement(String fieldName, Map fieldsInfo, Object value) {
+		// Clone the Map
+		fieldsInfo.put(fieldName, CollectionUtils.deepClone(FIELD_DEF))
+		fieldsInfo[fieldName].value = value
+	}
+
+	/**
+	 * Used to initialize the find element for a field
+	 */
+	private void initializeFindElement(String fieldName, Map fieldsInfo) {
+		fieldsInfo[fieldName].find = CollectionUtils.deepClone(FIND_DEF)
+	}
+
+	/**
+	 * Used to reset the find/query element for a given property and the set a new query
+	 */
+	private void setQueryElement(String fieldName, Map fieldsInfo, String domain, Map kv, boolean matchOn, Long result=null) {
+		initializeFieldElement(fieldName, fieldsInfo, null)
+		addQueryElement(fieldName, fieldsInfo, domain, kv, matchOn, result)
+	}
+
+	/**
+	 * Used to populate the find query with a particular query
+	 */
+	private void addQueryElement(String fieldName, Map fieldsInfo, String domain, Map kv, boolean matchOn, Long result=null) {
+		if (result) {
+			fieldsInfo[fieldName].find.results << result
+		}
+		fieldsInfo[fieldName].find.query << [
+			domain: domain,
+			kv: kv
+		]
+		if (matchOn) {
+			fieldsInfo[fieldName].find.matchOn = fieldsInfo[fieldName].find.query.size()
+		}
+	}
+
+	private JSONObject initFieldsInfoForDependencyAsJSONObject() {
+		new JSONObject(initFieldsInfoForDependency())
+	}
+
+	/**
+	 * Used to generate the necessary initFieldsInfoForDependency map
+	 */
+	private Map initFieldsInfoForDependency() {
+		Map fieldsInfo = [:]
+		initializeFieldElement('id', fieldsInfo, '')
+		initializeFieldElement('asset', fieldsInfo, '')
+		initializeFieldElement('dependent', fieldsInfo, '')
+		initializeFieldElement('type', fieldsInfo, 'Hosts')
+		initializeFieldElement('status', fieldsInfo, 'Archived')
+		initializeFieldElement('dataFlowFreq', fieldsInfo, 'weekly')
+		initializeFieldElement('c2', fieldsInfo, 'This is awesome')
+		return fieldsInfo
+	}
+
+	/**
+	 * Used to generate the necessary initFieldsInfoForDevice map
+	 */
+	private Map initFieldsInfoForDevice() {
+		Map fieldsInfo = [:]
+		initializeFieldElement('id', fieldsInfo, '')
+		initializeFieldElement('assetName', fieldsInfo, '')
+		return fieldsInfo
+	}
+
 }

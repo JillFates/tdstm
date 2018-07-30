@@ -121,4 +121,21 @@ class CollectionUtils {
 					[(k): v]
 		}
 	}
+
+	/**
+	 * Used to perform a deep clone of a Map so that all of the objects are duplicated instead
+	 * of referencing the same sub elements. This is implemented by serializing the object and
+	 * then reconstituing it from the serialization.
+	 * @param originalMap - the map to be cloned
+	 * @return the cloned map object
+	 */
+	static Map deepClone(Map originalMap) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream()
+		ObjectOutputStream oos = new ObjectOutputStream(bos)
+		oos.writeObject(originalMap)
+		oos.flush()
+		ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray())
+		ObjectInputStream ois = new ObjectInputStream(bin)
+		return ois.readObject()
+	}
 }

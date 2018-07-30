@@ -948,7 +948,6 @@ class DataImportService implements ServiceMethods {
 		// 		Then set the property to the init value
 		// 		Else if new value and current value not equal new value
 		// 		Then set new value
-
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
 				recordErrorHelper(fieldName,'Modifying the field is not allowed')
@@ -1006,7 +1005,6 @@ class DataImportService implements ServiceMethods {
 							_recordChangeOnField(domain, fieldName, existingValue, refObject, isNewEntity, fieldsInfo)
 						}
 				}
-				continue
 
 			} else {
 				//
@@ -1018,8 +1016,9 @@ class DataImportService implements ServiceMethods {
 				def valueToSet = isInitValue ? initValue : value
 				existingValue = domain[fieldName]
 
-				Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
+				def fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
 				log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+				// println "bindFieldsInfoValuesToEntity() field $fieldName, value=$valueToSet, fieldClass=${fieldClassType.getName()}"
 				switch (fieldClassType) {
 					case String:
 						if ( (isInitValue && StringUtil.isBlank(domainValue)) ||  ( !isInitValue && valueToSet != domainValue) ) {
@@ -1028,6 +1027,7 @@ class DataImportService implements ServiceMethods {
 						break
 
 					case Integer:
+						// TODO : JPM 7/2018 : is a null value an error or an allowed value?
 						Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
 						if (numValueToSet == null) {
 							noErrorsEncountered = false
@@ -1052,6 +1052,7 @@ class DataImportService implements ServiceMethods {
 						break
 
 					case Date:
+						// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
 						if (valueToSet instanceof CharSequence) {
 							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
 							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
@@ -1068,20 +1069,51 @@ class DataImportService implements ServiceMethods {
 						if (! (valueToSet instanceof Date)) {
 							String columnType
 							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO8601 format')
+							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO-8601 format')
 						} else {
 							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
+								valueToSet.clearTime()
 								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
 							}
 						}
 						break
 
+					// case DateTime:
+					// 	if (valueToSet instanceof CharSequence) {
+					// 		// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
+					// 		if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
+					// 			valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+					// 		} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+					// 			valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+					// 		}
+					// 		// Attempt to parse a Date / Date Time based on the underlying database table column type
+					// 		def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+					// 		def propConfig = mapping.getPropertyConfig(fieldName)
+					// 		// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
+					// 	}
+
+					// 	if (! (valueToSet instanceof Date)) {
+					// 		String columnType
+					// 		noErrorsEncountered = false
+					// 		addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO8601 format')
+					// 	} else {
+					// 		if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
+					// 			valueToSet.clearTime()
+					// 			_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
+					// 		}
+					// 	}
+					// 	break
+
 					case Enum:
 						try {
 							// def valueToSet = valueToSet as "${fieldClassType.getName()}"
-							def enumValue = fieldClassType.valueOf(valueToSet)
+							// def enumValue = fieldClassType.valueOf(valueToSet)
+							//def enumValue = valueToSet as fieldClassType
+							def enumValue = fieldClassType.newInstance()
+							enumValue = valueToSet
+
 							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != enumValue) ) {
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
+								_recordChangeOnField(domain, fieldName, existingValue, enumValue, isNewEntity, fieldsInfo)
 							}
 						} catch (e) {
 							noErrorsEncountered = false
@@ -1089,14 +1121,24 @@ class DataImportService implements ServiceMethods {
 						}
 						break
 
+					case Double:
+						if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
+						}
+						break
+
 					default:
 						noErrorsEncountered = false
+						log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+
 						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "Import process unable to support setting type ${fieldClassType.getName()}")
 				}
+				// println "_recordChangeOnField() noErrorsEncountered=$noErrorsEncountered, ${c++}"
 			}
 		}
 
 		log.debug 'bindFieldsInfoValuesToEntity() dirty fields {}', domain.dirtyPropertyNames
+		// println "bindFieldsInfoValuesToEntity() dirty fields ${domain.dirtyPropertyNames}, noErrorsEncountered ${noErrorsEncountered}"
 
 		return noErrorsEncountered
 	}
@@ -1117,111 +1159,14 @@ class DataImportService implements ServiceMethods {
 	void _recordChangeOnField(Object domainInstance, String fieldName, Object existingValue, Object newValue, Boolean isNewEntity, Map fieldsInfo) {
 		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
-
-		domainInstance[fieldName] = newValue
-		if (! isNewEntity) {
-			fieldsInfo[fieldName].previousValue = existingValue
+		if (existingValue != newValue) {
+		 	// println "_recordChangeOnField() field $fieldName, domainValue=${domainInstance[fieldName]}, existingValue=$existingValue, newValue=$newValue"
+			domainInstance[fieldName] = newValue
+			if (! isNewEntity) {
+				fieldsInfo[fieldName].previousValue = existingValue
+			}
 		}
 	}
-
-	/**
-	 * Used to create a domain record using the "create" structure in the ETL meta-data for a specified property. If the
-	 * reference domain entity could not be created then the error(s) will be recorded into the property of fieldsInfo map.
-	 *
-	 * @param propertyName - the name of the property in the fields ETL datastructure
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return the reference domain object if successfully created
-	 */
-	// private Object createReferenceDomain(String propertyName, Map fieldsInfo, Map context) {
-	// 	Object entity
-	// 	String errorMsg
-	// 	Map createInfo
-
-	// 	log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
-	// 	while (true) {
-	// 		if (!fieldsInfo.containsKey(propertyName)) {
-	// 			errorMsg = "Property $propertyName was missing from ETL meta-data"
-	// 			break
-	// 		}
-
-	// 		createInfo = fieldsInfo[propertyName].create
-
-	// 		if (! createInfo) {
-	// 			errorMsg = "Missing necessary 'whenNotFound create' information to create new asset"
-	// 			break
-	// 		}
-
-	// 		Class domainClassToCreate = classOfDomainProperty(propertyName, fieldsInfo, context)
-	// 		if (domainClassToCreate == null) {
-	// 			errorMsg = "Unable to determine class for property $propertyName"
-	// 			break
-	// 		}
-
-	// 		// Determine what we're trying to create by looking at the property and getting the Domain class
-	// 		entity = domainClassToCreate.newInstance()
-
-	// 		// load with the values from the create key/value pairs
-	// 		List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
-	// 		for (fieldName in fieldNames) {
-	// 			errorMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
-	// 			// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered (Augusto)
-	// 			if (errorMsg) {
-	// 				break
-	// 			}
-	// 		}
-	// 		if (errorMsg) {
-	// 			break
-	// 		}
-
-	// 		//
-	// 		// Handle different required properties
-	// 		// TODO : JPM 4/2018 : Refactor to make this method smaller and more testable
-	// 		//
-
-	// 		// Project
-	// 		if (GormUtil.isDomainProperty(entity, 'project')) {
-	// 			entity.project = context.project
-	// 		}
-
-	// 		// MoveBundle
-	// 		if (GormUtil.isDomainProperty(entity, 'moveBundle') && ! entity.moveBundle ) {
-	// 			// TODO : JPM 4/2018 : The bundle may have been set with reference logic above
-	// 			entity.moveBundle = context.project.getProjectDefaultBundle()
-	// 		}
-
-	// 		if (! entity.validate() ) {
-	// 			log.debug "createReferenceDomain() failed : {}", GormUtil.allErrorsString(entity)
-	// 			// TODO : JPM 4/2018 : Change to populate field with list of i18n errors (August - good one to work on)
-	// 			// Populate field with list of errors
-	// 			// clear the error message
-	// 			// entity.discard()
-	// 			errorMsg = "Failed to create record for $propertyName : " + GormUtil.errorsAsUL(entity)
-	// 			break
-	// 		}
-
-	// 		// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
-	// 		//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
-	// 		entity.save(failOnError:true, flush:true)
-
-	// 		// Replace the cache reference of the query with that of the new entity
-	// 		String md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
-	// 		log.debug "createReferenceDomain() replaced cache $md5 with {}", entity
-	// 		// TODO : JPM 4/2018 : change to cache the ID of the object instead of the object to conserve memory
-	// 		context.cache.put(md5, entity)
-
-	// 		break
-	// 	} // while(true)
-
-	// 	if (errorMsg) {
-	// 		if (entity) {
-	// 			entity.discard()
-	// 		}
-	// 		log.warn 'createReferenceDomain() failed - property={}, error={}, create={}', propertyName, errorMsg, createInfo
-	// 		addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
-	// 	}
-
-	// 	return entity
-	// }
 
 	/**
 	 * Used in an attempt to lookup a domain record using the metadata that is provided by the
@@ -1275,6 +1220,7 @@ class DataImportService implements ServiceMethods {
 	 * 				}
 	 * 			},
 	 *
+	 * @test Integration
 	 */
 	private Object fetchEntityByFieldMetaData(String fieldName, Map fieldsInfo, Map context) {
 		// This will be populated with the entity object or error message appropriately
@@ -1432,6 +1378,7 @@ class DataImportService implements ServiceMethods {
 	 * in the fieldsInfo appropriately. If either assets can not be located then a null is returned.
 	 *
 	 * @return the Dependency if found
+	 * @test None
 	 */
 	private AssetDependency _fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
 		AssetEntity primary
@@ -1468,9 +1415,9 @@ class DataImportService implements ServiceMethods {
 	 * 		entity : The entity instance if ID was specified and found
 	 *		null : ID was not specified
 	 *		NOT_FOUND_BY_ID : if ID specified but not found
+	 * @test Integration
 	 */
-	Object fetchEntityById(Class domainClass, String fieldName, JSONObject fieldsInfo, Map context) {
-	// Object fetchEntityById(Class domainClass,  fieldName,  fieldsInfo,  context) {
+	Object fetchEntityById(Class domainClass, String fieldName, Map fieldsInfo, Map context) {
 		Object entity
 		Boolean searchedById = false
 		Boolean valueIsString = (fieldsInfo[fieldName].value instanceof CharSequence)
@@ -1495,8 +1442,9 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
 	 * @param context - the context map that the process uses to cart crap around
 	 * @return true if there is a single result otherwise false
+	 * @test Integration
 	 */
-	private Boolean _hasSingleFindResult(String propertyName, Map fieldsInfo) {
+	Boolean _hasSingleFindResult(String propertyName, Map fieldsInfo) {
 		Boolean hasSingleResult = fieldsInfo[propertyName].find?.results?.size() == 1
 		log.debug '_hasSingleFindResult() for field {} has single result? {}', propertyName, hasSingleResult
 		return hasSingleResult
@@ -1507,8 +1455,9 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
 	 * @param context - the context map that the process uses to cart crap around
 	 * @return true if there is one or more queries defined
+	 * @test Integration
 	 */
-	private Boolean _hasFindQuery(String propertyName, Map fieldsInfo) {
+	Boolean _hasFindQuery(String propertyName, Map fieldsInfo) {
 		Boolean hasFindQuery = fieldsInfo[propertyName].find?.query?.size() > 0
 		log.debug '_hasFindQuery() for field {} has find query? {}', propertyName, hasFindQuery
 		return hasFindQuery
@@ -1529,26 +1478,20 @@ class DataImportService implements ServiceMethods {
 	 */
 	private Object _fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
 		Object entity=null
-		String error=null
-		Map find = fieldsInfo[propertyName].find ?: null
-		if (find) {
-			if (find.results?.size() == 1) {
-				Long domainId = find.results[0]
-				String domainName = find.query[0].domain
-				// Get the class of the domain specified in find of the ETL script
-				Class domainClass = ETLDomain.lookup(domainName)?.getClazz()
+		if (_hasSingleFindResult(propertyName, fieldsInfo)) {
+			Map find = fieldsInfo[propertyName].find ?: null
+			Long entityId = find.results[0]
+			String domainName = find.query[0].domain
+			// Get the class of the domain specified in find of the ETL script
+			Class domainClass = ETLDomain.lookup(domainName)?.getClazz()
 
-				if (domainClass) {
-					// Now get the entity by the id in the results
-					entity = GormUtil.findInProject(context.project, domainClass, domainId)
-				} else {
-					// This really should never happen but just in case
-					throw new RuntimeException("ETL find/elseFind references invalid domain '${domainName}'")
-				}
+			if (domainClass) {
+				// Now get the entity by the id in the results
+				entity = GormUtil.findInProject(context.project, domainClass, entityId, false)
+			} else {
+				// This really should never happen but just in case
+				throw new RuntimeException("ETL find/elseFind references invalid domain '${domainName}'")
 			}
-		} else {
-			// This really should never happen but just in case
-			throw new RuntimeException('_fetchEntityByFindResults() was called when no find element was specified')
 		}
 		return entity
 	}
@@ -1572,7 +1515,7 @@ class DataImportService implements ServiceMethods {
 		} else {
 			// log.debug '_performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
-			int foundMatchOn = 0
+			int foundMatchOn = -1
 
 			// Iterate over the list of Queries until something is found
 			//  and update the find section appropriately.
@@ -1724,83 +1667,6 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to find the a domain entity or reference domain when the field.value is a String and the domain has an
-	 * alternate key defined. Note that this lookup is generally only useful for domain entities that typical have
-	 * unique names. For domains such as Application this method will more than likely return multiple results.
-	 *
-	 * @param propertyName - the property name that the id value will be used and will be populated with error if not found
-	 * @param fieldsInfo - the fields map that came from the ETL process
-	 * @return the list of domain entities found for the property
-	 */
-	// private List<Object> XXfindDomainByAlternateProperty(String propertyName, Map fieldsInfo, Map context) {
-	// 	String notFoundByID = 'Entity was not found by ID'
-	// 	List<Object> entities=[]
-
-	// 	def value = fieldsInfo[propertyName]?.value
-	// 	if ( value && (value instanceof CharSequence) ) {
-	// 		Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
-	// 		entities = GormUtil.findDomainByAlternateKey(domainClass, value, propertyName, context.project)
-	// 		log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
-	// 	}
-	// 	return entities
-	// }
-
-	/**
-	 * Used to find a single domain object by using various techniques including:
-	 *    1. By ID
-	 *    2. By find/elseFind
-	 *    3. By String value (Alternate Key or special handlers such as Person)
-	 * @param domainInstance
-	 * @param propertyName
-	 * @param value
-	 * @param fieldsInfo
-	 * @param context
-	 * @return A String if there was an error or the Entity object
-	 */
-	// private Object XXfindDomainReferenceProperty(Object domainInstance, String propertyName, Object value, Map fieldsInfo, Map context) {
-	// 	Object entity = null
-	// 	String errorMsg = null
-
-	// 	// TODO : JPM : 6/2018 : Check find results first ?
-
-	// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainInstance, propertyName)
-
-	// 	Long id = NumberUtil.isaNumber(value) ? value : null
-	// 	boolean isaString = (value instanceof CharSequence)
-	// 	if ( id == null && isaString) {
-	// 		id = NumberUtil.toPositiveLong(value)
-	// 	}
-
-	// 	log.debug 'findDomainReferenceProperty() Searching {}, property {}, value {}, isaString {}, id {}',
-	// 		refDomainClass?.getName(), propertyName, value, isaString, id
-
-	// 	if (id) {
-	// 		// Perform lookup by ID
-	// 		// TODO : JPM 4/2018 : Refactor into Gorm as a single function
-	// 		entity = GormUtil.findInProject(context.project, refDomainClass, id)
-	// 	} else if (isaString && ! StringUtil.isBlank(value)) {
-	// 		// Attempt the find the reference by the alternate key
-	// 		// List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 		// TODO : JPM 6/2018 : does _fetchEntityByAlternateKey need the propertyName argument?
-	// 		Map result = _fetchEntityByAlternateKey(refDomainClass, value, propertyName, fieldsInfo, context)
-	// 		if (result.error) {
-	// 			errorMsg = result.error
-	// 		} else {
-	// 			int numFound = result.entities.size()
-	// 			if (numFound == 1) {
-	// 				entity = result.entities[0]
-	// 			} else if (numFound > 1) {
-	// 				errorMsg = 'Multiple references found'
-	// 			}
-	// 		}
-	// 	}
-
-	// 	log.debug 'findDomainReferenceProperty() result {}', (errorMsg ?: entity)
-
-	// 	return errorMsg ?: entity
-	// }
-
-	/**
 	 * Used to determine what the actual class is of a particular domain property. In the case of AssetEntity the logic
 	 * logic needs to determine which type is actually intended based on the ETLDomain property name (e.g. Device, Asset, etc)
 	 * @param propertyName - the property to get the class type for
@@ -1914,82 +1780,6 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to set a property onto a domain object
-	 * @param domain - the domain entity to be manipulated
-	 * @param propertyName - the property to be set
-	 * @param value - the value to set onto the domain object
-	 * @param parentPropertyName - the property name of the parent property that the domain will be assigned to
-	 * @param context - the grand poopa of objects for the Import Process
-	 * @return null if successful otherwise a string containing the error message that occurred
-	 */
-	// private String setDomainPropertyWithValue(Object domainInstance, String propertyName, Object value, String parentPropertyName, Map fieldsInfo, Map context) {
-	// 	String errorMsg = null
-	// 	while (true) {
-	// 		// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
-	// 		if ( (propertyName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
-	// 			// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
-	// 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
-	// 			break
-	// 		} else {
-	// 			if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {
-	// 				// TODO : JPM 6/2018 : Error message to specific - not only for whenNotFound
-	// 				errorMsg = "Unknown field ${propertyName} in 'whenNotFound create' statement"
-	// 				break
-	// 			}
-
-	// 			// Check if the field is a reference property
-	// 			if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
-	// 				// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
-	// 				Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 				if (refObject instanceof CharSequence) {
-	// 					errorMsg = refObject
-	// 				} else {
-	// 					// Only set if different so as not to trigger the dirty flag unnecessarily
-	// 					if (domainInstance[propertyName] != refObject) {
-	// 						domainInstance[propertyName] = refObject
-	// 					}
-	// 				}
-	// 				// if (NumberUtil.isaNumber(value)) {
-	// 				// 	// Perform lookup by ID
-	// 				// 	// TODO : JPM 4/2018 : Refactor into Gorm as a single function
-	// 				// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
-	// 				// 	def entity = GormUtil.findInProject(context.project, refDomainClass, value)
-
-	// 				// 	if (entity) {
-	// 				// 		domainInstance[propertyName] = entity
-	// 				// 	} else {
-	// 				// 		errorMsg = "No reference record found for field ${propertyName} (${value}) by ID in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	}
-	// 				// 	// searchForDomainById(refDomainClass, propertyName, value, fieldsInfo, context)
-	// 				// } else if (! StringUtil.isBlank(value)) {
-	// 				// 	// Attempt the find the reference by the alternate key
-	// 				// 	List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 				// 	Integer numFound = references.size()
-	// 				// 	if (numFound == 1) {
-	// 				// 		domainInstance[propertyName] = references[0]
-	// 				// 	} else if (numFound > 1) {
-	// 				// 		errorMsg = "Multiple references found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	} else {
-	// 				// 		errorMsg = "No reference record found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	}
-	// 				// }
-	// 			} else {
-	// 				// Just a normal data type (e.g. Date, Integer, String, etc)
-	// 				// TODO : JPM 4/2018 : Need to deal with ENUM and Date being resolved
-	// 				if (domainInstance[propertyName] != value) {
-	// 					domainInstance[propertyName] = value
-	// 				}
-	// 			}
-	// 		}
-	// 		break
-	// 	}
-	// 	return errorMsg
-	// }
-
-	/**
 	 * Used to retrieve the value and initialize values from the fieldsInfo for a fieldName
 	 * @param fieldName
 	 * @param fieldsInfo
@@ -2071,11 +1861,11 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context that has a reference to the ImportBatchRecord that the error may be stuffed into
 	 * @param errorMsg - the obvious error message
 	 */
-	private void addErrorToFieldsInfoOrRecord(String propertyName, JSONObject fieldsInfo, Map context, String errorMsg) {
+	private void addErrorToFieldsInfoOrRecord(String propertyName, Map fieldsInfo, Map context, CharSequence errorMsg) {
 		if (propertyName && fieldsInfo[propertyName]) {
-			fieldsInfo[propertyName].errors << errorMsg
+			fieldsInfo[propertyName].errors << errorMsg.toString()
 		} else {
-			context.record.addError(errorMsg)
+			context.record.addError(errorMsg.toString())
 		}
 	}
 
@@ -2343,3 +2133,287 @@ class DataImportEntityCache {
 		return cache.size()
 	}
 }
+
+
+	/**
+	 * Used to set a property onto a domain object
+	 * @param domain - the domain entity to be manipulated
+	 * @param propertyName - the property to be set
+	 * @param value - the value to set onto the domain object
+	 * @param parentPropertyName - the property name of the parent property that the domain will be assigned to
+	 * @param context - the grand poopa of objects for the Import Process
+	 * @return null if successful otherwise a string containing the error message that occurred
+	 */
+	// private String setDomainPropertyWithValue(Object domainInstance, String propertyName, Object value, String parentPropertyName, Map fieldsInfo, Map context) {
+	// 	String errorMsg = null
+	// 	while (true) {
+	// 		// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
+	// 		if ( (propertyName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
+	// 			// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
+	// 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
+	// 			break
+	// 		} else {
+	// 			if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {
+	// 				// TODO : JPM 6/2018 : Error message to specific - not only for whenNotFound
+	// 				errorMsg = "Unknown field ${propertyName} in 'whenNotFound create' statement"
+	// 				break
+	// 			}
+
+	// 			// Check if the field is a reference property
+	// 			if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
+	// 				// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
+	// 				Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
+	// 				if (refObject instanceof CharSequence) {
+	// 					errorMsg = refObject
+	// 				} else {
+	// 					// Only set if different so as not to trigger the dirty flag unnecessarily
+	// 					if (domainInstance[propertyName] != refObject) {
+	// 						domainInstance[propertyName] = refObject
+	// 					}
+	// 				}
+	// 				// if (NumberUtil.isaNumber(value)) {
+	// 				// 	// Perform lookup by ID
+	// 				// 	// TODO : JPM 4/2018 : Refactor into Gorm as a single function
+	// 				// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
+	// 				// 	def entity = GormUtil.findInProject(context.project, refDomainClass, value)
+
+	// 				// 	if (entity) {
+	// 				// 		domainInstance[propertyName] = entity
+	// 				// 	} else {
+	// 				// 		errorMsg = "No reference record found for field ${propertyName} (${value}) by ID in 'whenNotFound create'"
+	// 				// 		break
+	// 				// 	}
+	// 				// 	// searchForDomainById(refDomainClass, propertyName, value, fieldsInfo, context)
+	// 				// } else if (! StringUtil.isBlank(value)) {
+	// 				// 	// Attempt the find the reference by the alternate key
+	// 				// 	List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
+	// 				// 	Integer numFound = references.size()
+	// 				// 	if (numFound == 1) {
+	// 				// 		domainInstance[propertyName] = references[0]
+	// 				// 	} else if (numFound > 1) {
+	// 				// 		errorMsg = "Multiple references found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
+	// 				// 		break
+	// 				// 	} else {
+	// 				// 		errorMsg = "No reference record found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
+	// 				// 		break
+	// 				// 	}
+	// 				// }
+	// 			} else {
+	// 				// Just a normal data type (e.g. Date, Integer, String, etc)
+	// 				// TODO : JPM 4/2018 : Need to deal with ENUM and Date being resolved
+	// 				if (domainInstance[propertyName] != value) {
+	// 					domainInstance[propertyName] = value
+	// 				}
+	// 			}
+	// 		}
+	// 		break
+	// 	}
+	// 	return errorMsg
+	// }
+
+	/**
+	 * Used to create a domain record using the "create" structure in the ETL meta-data for a specified property. If the
+	 * reference domain entity could not be created then the error(s) will be recorded into the property of fieldsInfo map.
+	 *
+	 * @param propertyName - the name of the property in the fields ETL datastructure
+	 * @param context - the context map that the process uses to cart crap around
+	 * @return the reference domain object if successfully created
+	 */
+	// private Object createReferenceDomain(String propertyName, Map fieldsInfo, Map context) {
+	// 	Object entity
+	// 	String errorMsg
+	// 	Map createInfo
+
+
+
+	// 	log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
+	// 	while (true) {
+	// 		if (!fieldsInfo.containsKey(propertyName)) {
+	// 			errorMsg = "Property $propertyName was missing from ETL meta-data"
+	// 			break
+	// 		}
+
+
+
+	// 		createInfo = fieldsInfo[propertyName].create
+
+
+
+	// 		if (! createInfo) {
+	// 			errorMsg = "Missing necessary 'whenNotFound create' information to create new asset"
+	// 			break
+	// 		}
+
+
+
+	// 		Class domainClassToCreate = classOfDomainProperty(propertyName, fieldsInfo, context)
+	// 		if (domainClassToCreate == null) {
+	// 			errorMsg = "Unable to determine class for property $propertyName"
+	// 			break
+	// 		}
+
+
+
+	// 		// Determine what we're trying to create by looking at the property and getting the Domain class
+	// 		entity = domainClassToCreate.newInstance()
+
+
+
+	// 		// load with the values from the create key/value pairs
+	// 		List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
+	// 		for (fieldName in fieldNames) {
+	// 			errorMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
+	// 			// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered (Augusto)
+	// 			if (errorMsg) {
+	// 				break
+	// 			}
+	// 		}
+	// 		if (errorMsg) {
+	// 			break
+	// 		}
+
+
+
+	// 		//
+	// 		// Handle different required properties
+	// 		// TODO : JPM 4/2018 : Refactor to make this method smaller and more testable
+	// 		//
+
+
+
+	// 		// Project
+	// 		if (GormUtil.isDomainProperty(entity, 'project')) {
+	// 			entity.project = context.project
+	// 		}
+
+
+
+	// 		// MoveBundle
+	// 		if (GormUtil.isDomainProperty(entity, 'moveBundle') && ! entity.moveBundle ) {
+	// 			// TODO : JPM 4/2018 : The bundle may have been set with reference logic above
+	// 			entity.moveBundle = context.project.getProjectDefaultBundle()
+	// 		}
+
+
+
+	// 		if (! entity.validate() ) {
+	// 			log.debug "createReferenceDomain() failed : {}", GormUtil.allErrorsString(entity)
+	// 			// TODO : JPM 4/2018 : Change to populate field with list of i18n errors (August - good one to work on)
+	// 			// Populate field with list of errors
+	// 			// clear the error message
+	// 			// entity.discard()
+	// 			errorMsg = "Failed to create record for $propertyName : " + GormUtil.errorsAsUL(entity)
+	// 			break
+	// 		}
+
+
+
+	// 		// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
+	// 		//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
+	// 		entity.save(failOnError:true, flush:true)
+
+
+
+	// 		// Replace the cache reference of the query with that of the new entity
+	// 		String md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
+	// 		log.debug "createReferenceDomain() replaced cache $md5 with {}", entity
+	// 		// TODO : JPM 4/2018 : change to cache the ID of the object instead of the object to conserve memory
+	// 		context.cache.put(md5, entity)
+
+
+
+	// 		break
+	// 	} // while(true)
+
+
+
+	// 	if (errorMsg) {
+	// 		if (entity) {
+	// 			entity.discard()
+	// 		}
+	// 		log.warn 'createReferenceDomain() failed - property={}, error={}, create={}', propertyName, errorMsg, createInfo
+	// 		addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
+	// 	}
+
+
+
+	// 	return entity
+	// }
+
+	/**
+	 * Used to find the a domain entity or reference domain when the field.value is a String and the domain has an
+	 * alternate key defined. Note that this lookup is generally only useful for domain entities that typical have
+	 * unique names. For domains such as Application this method will more than likely return multiple results.
+	 *
+	 * @param propertyName - the property name that the id value will be used and will be populated with error if not found
+	 * @param fieldsInfo - the fields map that came from the ETL process
+	 * @return the list of domain entities found for the property
+	 */
+	// private List<Object> XXfindDomainByAlternateProperty(String propertyName, Map fieldsInfo, Map context) {
+	// 	String notFoundByID = 'Entity was not found by ID'
+	// 	List<Object> entities=[]
+
+	// 	def value = fieldsInfo[propertyName]?.value
+	// 	if ( value && (value instanceof CharSequence) ) {
+	// 		Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
+	// 		entities = GormUtil.findDomainByAlternateKey(domainClass, value, propertyName, context.project)
+	// 		log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
+	// 	}
+	// 	return entities
+	// }
+
+	/**
+	 * Used to find a single domain object by using various techniques including:
+	 *    1. By ID
+	 *    2. By find/elseFind
+	 *    3. By String value (Alternate Key or special handlers such as Person)
+	 * @param domainInstance
+	 * @param propertyName
+	 * @param value
+	 * @param fieldsInfo
+	 * @param context
+	 * @return A String if there was an error or the Entity object
+	 */
+	// private Object XXfindDomainReferenceProperty(Object domainInstance, String propertyName, Object value, Map fieldsInfo, Map context) {
+	// 	Object entity = null
+	// 	String errorMsg = null
+
+	// 	// TODO : JPM : 6/2018 : Check find results first ?
+
+	// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainInstance, propertyName)
+
+	// 	Long id = NumberUtil.isaNumber(value) ? value : null
+	// 	boolean isaString = (value instanceof CharSequence)
+	// 	if ( id == null && isaString) {
+	// 		id = NumberUtil.toPositiveLong(value)
+	// 	}
+
+	// 	log.debug 'findDomainReferenceProperty() Searching {}, property {}, value {}, isaString {}, id {}',
+	// 		refDomainClass?.getName(), propertyName, value, isaString, id
+
+	// 	if (id) {
+	// 		// Perform lookup by ID
+	// 		// TODO : JPM 4/2018 : Refactor into Gorm as a single function
+	// 		entity = GormUtil.findInProject(context.project, refDomainClass, id)
+	// 	} else if (isaString && ! StringUtil.isBlank(value)) {
+	// 		// Attempt the find the reference by the alternate key
+	// 		// List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
+	// 		// TODO : JPM 6/2018 : does _fetchEntityByAlternateKey need the propertyName argument?
+	// 		Map result = _fetchEntityByAlternateKey(refDomainClass, value, propertyName, fieldsInfo, context)
+	// 		if (result.error) {
+	// 			errorMsg = result.error
+	// 		} else {
+	// 			int numFound = result.entities.size()
+	// 			if (numFound == 1) {
+	// 				entity = result.entities[0]
+	// 			} else if (numFound > 1) {
+	// 				errorMsg = 'Multiple references found'
+	// 			}
+	// 		}
+	// 	}
+
+	// 	log.debug 'findDomainReferenceProperty() result {}', (errorMsg ?: entity)
+
+	// 	return errorMsg ?: entity
+	// }
+
