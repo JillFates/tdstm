@@ -2,10 +2,12 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+@Transactional
 class ProviderService implements ServiceMethods {
 
     /**
@@ -165,5 +167,24 @@ class ProviderService implements ServiceMethods {
             provider = saveOrUpdateProvider(jsonObject)
         }
         return provider
+    }
+
+    /**
+     * Clone any existing providers associated to sourceProject (if any),
+     * then associate those newly created tags to targetProject.
+     *
+     * @param sourceProject  The project from which the existing tags will be cloned.
+     * @param targetProject  The project to which the new tags will be associated.
+     */
+    Provider cloneProvider(Provider sourceProvider, Project targetProject) {
+        Provider newProvider = new Provider(
+                project: targetProject,
+                name: sourceProvider.name,
+                description: sourceProvider.description,
+                comment: sourceProvider.comment
+        )
+        newProvider.save()
+        log.debug "Cloned provider ${newProvider.name} for project ${targetProject.toString()}"
+        return newProvider
     }
 }

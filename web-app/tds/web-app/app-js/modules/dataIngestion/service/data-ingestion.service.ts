@@ -247,7 +247,7 @@ export class DataIngestionService {
 				for (let property in result) {
 					if (result.hasOwnProperty(property)) {
 						agentMethodModel.push({
-                            id: result[property].apiMethod,
+							id: result[property].apiMethod,
 							name: result[property].name,
 							description: result[property].description,
 							endpointUrl: result[property].endpointUrl,
@@ -274,7 +274,7 @@ export class DataIngestionService {
 								}
 							},
 							methodParams: result[property].params
-						});
+});
 					}
 				}
 				result = agentMethodModel;

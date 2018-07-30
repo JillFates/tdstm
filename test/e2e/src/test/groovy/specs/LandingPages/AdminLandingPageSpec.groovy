@@ -1,19 +1,11 @@
 package specs.LandingPages
 
-import com.sun.xml.internal.ws.wsdl.writer.document.Import
 import geb.spock.GebReportingSpec
-
 // Useful for importing the Menu as part of the Landing Pages Inspection
-import pages.Admin.LandingItems.*
-
-import pages.Admin.ExportAccountsPage
-import pages.Admin.ImportAccountsPage
-
+import pages.Admin.*
 // Adding a new MenuItem
-
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-
 import spock.lang.Stepwise
 
 
@@ -60,7 +52,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToAdminPortal()
 
         then: 'We verify the AdminPortalPage loads fine'
-            at AdminPortalLandingPage
+            at AdminPortalPage
     }
 
     def "3. Verify the License Admin Landing Page"() {
@@ -69,7 +61,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToLicenseAdmin()
 
         then: 'We verify the AdminPortalPage loads fine'
-            at LicenseLandingPage
+            at LicensePage
     }
 
     def "4. Verify the Notices Landing Page"() {
@@ -78,7 +70,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToNoticesAdmin()
 
         then: 'We verify the Notice Administration page loads fine'
-            at NoticeLandingPage
+            at NoticePage
     }
 
     def "5. Verify the Role Permissions Landing Page"() {
@@ -87,7 +79,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToRolePermissions()
 
         then: 'We verify the Role Permissions page loads fine'
-            at RolePermissionLandingPage
+            at RolePermissionPage
     }
 
     def "6. Verify the Asset Options Landing Page"() {
@@ -96,7 +88,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToAssetOptions()
 
         then: 'We verify the Asset Options page loads fine'
-            at AssetOptionsLandingPage
+            at AssetOptionsPage
     }
 
     def "7. Verify the List Companies Landing Page"() {
@@ -105,7 +97,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToListCompanies()
 
         then: 'We verify the List Companies page loads fine'
-            at ListCompaniesLandingPage
+            at ListCompaniesPage
     }
 
     def "8. Verify the List Staff Landing Page"() {
@@ -114,7 +106,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToAdminListStaff()
 
         then: 'We verify the List Staff page loads fine'
-            at ListStaffLandingPage
+            at StaffListPage
     }
 
     def "9. Verify the List Users Landing Page"() {
@@ -123,7 +115,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToListUsers()
 
         then: 'We verify the List Users page loads fine'
-            at ListUsersLandingPage
+            at UserListPage
     }
 
     def "10. Verify the Import Accounts Landing Page"() {
@@ -132,7 +124,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToImportAccounts()
 
         then: 'We verify the Import Accounts page loads fine'
-            at ImportAccountsLandingPage
+            at ImportAccountsPage
     }
 
     def "11. Verify the Export Accounts Landing Page"() {
@@ -150,7 +142,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToListWorkflows()
 
         then: 'We verify the List Workflows page loads fine'
-            at ListWorkflowsLandingPage
+            at ListWorkflowsPage
     }
 
     def "13. Verify the List Manufacturers Landing Page"() {
@@ -159,7 +151,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToListManufacturers()
 
         then: 'We verify the List Manufacturers page loads fine'
-            at ListManufacturersLandingPage
+            at ListManufacturersPage
     }
 
     def "14. Verify the List Models Landing Page"() {
@@ -168,7 +160,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToListModels()
 
         then: 'We verify the List Models page loads fine'
-            at ListModelsLandingPage
+            at ListModelsPage
     }
 
     def "15. Verify the Export Mfg & Models Landing Page"() {
@@ -177,7 +169,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToExportModels()
 
         then: 'We verify the Export Mfg & Models page loads fine'
-            at ExportMfgModelsLandingPage
+            at ExportMfgModelsPage
     }
 
 }

@@ -293,11 +293,11 @@ class NewsEditorController implements ControllerMethods {
 		String commentType = params.commentType
 		if (commentType == "issue") {
 			AssetComment assetComment = AssetComment.get(params.id)
-			if (params.isResolved == '1' && assetComment.isResolved == 0) {
+			if (params.isResolved == '1' && !assetComment.isResolved()) {
 				assetComment.resolvedBy = securityService.loadCurrentPerson()
 				assetComment.dateResolved = new Date()
 			}
-			else if (!(params.isResolved == '1' && assetComment.isResolved == 1)) {
+			else if (!(params.isResolved == '1' && assetComment.isResolved())) {
 				assetComment.resolvedBy = null
 				assetComment.dateResolved = null
 			}
