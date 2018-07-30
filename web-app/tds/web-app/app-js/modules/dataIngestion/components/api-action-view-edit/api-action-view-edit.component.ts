@@ -412,7 +412,9 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
-					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+					if (this.codeMirrorComponent) {
+						this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+					}
 				});
 			});
 		}
@@ -556,14 +558,15 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Populates reaction scripts code mirrors based on the method dictionary configuration.
 	 */
 	private loadReactionScripts(): void {
-		console.log(this.apiActionModel.agentMethod.script);
 		const methodScripts = this.apiActionModel.agentMethod.script;
+		APIActionModel.createBasicReactions(this.apiActionModel);
 		for (let reactionType in methodScripts) {
 			if (methodScripts[reactionType]) {
-				console.log(methodScripts[reactionType]);
 				let match = this.apiActionModel.eventReactions.find( item => item.type === reactionType);
 				if (match) {
 					match.value = methodScripts[reactionType];
+					match.open = true;
+					match.selected = true;
 				}
 			}
 		}
