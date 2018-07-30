@@ -272,6 +272,28 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Abbreviates a String using '...' as ther replacement marker.
+	 * This will turn "Now is the time for all good men" into "Now is the time for...".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element ellipsis(int size) {
+		value = StringUtils.abbreviate(String.valueOf(value), size)
+		return this
+	}
+
+	/**
+	 * Truncates a String.
+	 * This will turn "Now is the time for all good men" into "Now is the time for".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element truncate(int size) {
+		value = String.valueOf(value).take(size)
+		return this
+	}
+
+	/**
 	 * Transform current value in this Element instance to a Long number
 	 * <code>
 	 *      load ... transformation with toLong()

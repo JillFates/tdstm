@@ -207,12 +207,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 			result == ETLProcessor.coalesce(value1, value2, value3)
 
 		where:
-			result | value1 | value2 | value3
-			null   | null   | null   | null
-			''     | ''     | null   | 5
-			new Element(value: 5) | null | null | new Element(value: 5)
-			''     | null | '' | 'tadah'
-			false  | null  | null | false
+			result || value1 | value2 | value3
+			null   || null   | null   | null
+			''     || ''     | null   | 5
+			''     || null   | ''     | 'tadah'
+			false  || null   | null   | false
+			new Element(value: 5) || null | null | new Element(value: 5)
 	}
 
 	void 'test can apply defaultValue transformation'() {
@@ -231,6 +231,30 @@ class ETLTransformSpec extends ETLBaseSpec {
 			5       || null      | 5
 			42      || 42        | 5
 			5       || ''        | new Element(value:5)
+
+	}
+
+	void 'test can apply ellipsis transformation'() {
+
+		expect:
+			result == new Element(value:value).ellipsis(len).value
+
+		where:
+
+			result         || value                    | len
+			'this is...'   || 'this is a long string'  | 10
+
+	}
+
+	void 'test can apply truncate transformation'() {
+
+		expect:
+			result == new Element(value:value).truncate(len).value
+
+		where:
+
+			result         || value                    | len
+			'this is a '   || 'this is a long string'  | 10
 
 	}
 
