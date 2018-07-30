@@ -704,7 +704,7 @@ class UserService implements ServiceMethods {
 			project == project
 			date == date
 		}.count()
-		if (count == 0) {
+		if (count == 0 && project) {
 			UserLoginProjectAccess userLoginProjectAccess = new UserLoginProjectAccess(
 					userLogin: userLogin,
 					project: project,
