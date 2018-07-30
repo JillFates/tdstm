@@ -176,7 +176,8 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     @HasPermission(Permission.ETLScriptCreate)
     def sampleData (String filename) {
         Long id = params.id?.toLong()
-        Map jsonMap = dataScriptService.parseDataFromFile(id, filename, paginationMaxRowValue())
+        String originalFileName = params.originalFileName
+        Map jsonMap = dataScriptService.parseDataFromFile(id, originalFileName, filename, paginationMaxRowValue())
         renderSuccessJson(jsonMap)
     }
 

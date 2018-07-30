@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
@@ -26,6 +27,7 @@ import java.text.DecimalFormat
 class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
+	 FileSystemService fileSystemService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],
@@ -291,11 +293,11 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (Long id, String fileName, Long maxRows) throws EmptyResultException{
+	Map parseDataFromFile (Long id, String originalFileName, String fileName, Long maxRows) throws EmptyResultException{
 		try{
 
 			if ( id ) {
-				saveSampleFile(id, fileName)
+				saveSampleFile(id, originalFileName, fileName)
 			}
 
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
@@ -473,15 +475,21 @@ class DataScriptService implements ServiceMethods{
 	 * @param id DataScript identifier
 	 * @param tmpFileName filename to store
 	 */
-	private void saveSampleFile(Long id, String tmpFileName) {
+	private void saveSampleFile(Long id, String originalFileName, String tmpFileName) {
 		DataScript ds = DataScript.get(id)
 
 		String extension = FilenameUtils.getExtension(tmpFileName)
 
-		String fileOriginalName = tmpFileName.substring(0, tmpFileName.lastIndexOf('_')) + '.' + extension
+		if(! originalFileName ) {
+			originalFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf('_')) + '.' + extension
+		}
 
-		if ( !fileOriginalName.equalsIgnoreCase(ds.originalSampleFilename) ) {
-			ds.originalSampleFilename = fileOriginalName
+		if ( !originalFileName.equalsIgnoreCase(ds.originalSampleFilename) ) {
+			if ( ds.sampleFilename ) { // delete old file associated
+				fileSystemService.deleteTemporaryFile(ds.sampleFilename)
+			}
+
+			ds.originalSampleFilename = originalFileName
 			ds.sampleFilename = tmpFileName
 			ds.save()
 		}
