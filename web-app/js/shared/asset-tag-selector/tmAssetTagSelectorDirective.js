@@ -13,7 +13,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						</script>
 						
 						<script id="asset-tag-selector-tag" type="text/x-kendo-template">
-							<div class="#:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
+							<div class="asset-tag-text #:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
 						</script>
 					</div>`,
 		restrict: 'E',
