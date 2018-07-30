@@ -260,4 +260,5 @@ databaseChangeLog = {
 	include file: '20180627-change-tag-field-to-tagAssets-for-common-fields.groovy'
 
 	include file: '20180713-drop-context-type.groovy'
+	include file: '20180730-converting-black-to-grey-tags.groovy'
 }
