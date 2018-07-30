@@ -273,8 +273,9 @@ export class DataIngestionService {
 									interval: INTERVAL.MINUTES
 								}
 							},
-							methodParams: result[property].params
-});
+							methodParams: result[property].params,
+							script: result[property].script
+						});
 					}
 				}
 				result = agentMethodModel;
