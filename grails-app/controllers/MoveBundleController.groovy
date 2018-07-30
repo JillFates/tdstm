@@ -909,14 +909,12 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
-	 * @param bundle  Move bundle id to filter for bundle
-	 * @param assignedGroup  Whether it is assigned
-	 * @param subsection  Tab name to show on the Dependency Analyzer (optional)
-	 * @param groupId  The group Id to show selected on the Dependency Analyzer (optional)
-	 * @param assetName  The asset to show selected on the Dependency Analyzer (optional)
+	 * @param console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
-	def dependencyConsole(DependencyConsoleCommand console) {
+	def dependencyConsole() {
+		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
+		validateCommandObject(console)
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
