@@ -1885,7 +1885,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = taskBatch.recipe.context()
+		def contextObj = taskBatch.context()
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
@@ -4345,7 +4345,39 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						break
 				}
 
+				// Check whether the filter includes tag fields.
+				if (filter?.tag) {
+					String tagQuery = null
+					/* Since the tag attribute in a filter can either be a single string or a list of names,
+					some work is required to ensure we have a list of names. */
+					List<String> tagNames = []
+					tagNames.addAll(filter.tag)
+					
+					map.tagList = tagNames
+
+					// Build the query based on the of tagMatch ALL or ANY (AND or OR)
+					if (filter.tagMatch == 'ALL') {
+						tagQuery = """
+									SELECT ta.asset.id 
+									FROM TagAsset ta
+									WHERE ta.tag.name in (:tagList) GROUP BY ta.asset.id HAVING count(*) = :tagListSize
+								"""
+						map.tagListSize = tagNames.size()
+					} else {
+						tagQuery = """
+								SELECT DISTINCT(ta.asset.id) 
+								FROM TagAsset ta
+								WHERE ta.tag.name in (:tagList)
+								"""
+					}
+
+					where = SqlUtil.appendToWhere(where, "a.id IN ($tagQuery)")
+
+				}
+
+
 				sql = "select a FROM AssetEntity a $join where $where"
+
 				log.debug "findAllAssetsWithFilter: sql=$sql, map=$map"
 
 				assets = AssetEntity.executeQuery(sql, map)
