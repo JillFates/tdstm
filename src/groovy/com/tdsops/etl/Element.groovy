@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import org.apache.commons.lang3.StringUtils
 
 import java.text.SimpleDateFormat
 
@@ -17,6 +18,14 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 class Element implements RangeChecker {
+	/*
+	static {
+		String.metaClass.ellipsis { int len ->
+			StringUtils.abbreviate(delegate, len)
+		}
+	}
+	*/
+
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
@@ -263,6 +272,28 @@ class Element implements RangeChecker {
 		} else {
 			value = defaultValue
 		}
+		return this
+	}
+
+	/**
+	 * Abbreviates a String using '...' as ther replacement marker.
+	 * This will turn "Now is the time for all good men" into "Now is the time for...".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element ellipsis(int size) {
+		value = StringUtils.abbreviate(String.valueOf(value), size)
+		return this
+	}
+
+	/**
+	 * Truncates a String.
+	 * This will turn "Now is the time for all good men" into "Now is the time for".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element truncate(int size) {
+		value = String.valueOf(value).take(size)
 		return this
 	}
 
