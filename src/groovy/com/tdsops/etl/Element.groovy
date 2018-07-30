@@ -278,7 +278,7 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element ellipsis(int size) {
-		value = StringUtils.abbreviate(String.valueOf(value), size)
+		value = StringUtils.abbreviate(this.toString(), size)
 		return this
 	}
 
@@ -289,7 +289,7 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element truncate(int size) {
-		value = String.valueOf(value).take(size)
+		value = this.toString().take(size)
 		return this
 	}
 
