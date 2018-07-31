@@ -234,6 +234,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	}
 
+	void 'test can apply prepend transformation'() {
+
+		expect:
+			result == new Element(value:value).prepend(param).value
+
+		where:
+
+			result         || value     | param
+			'Prefix null'  || null      | 'Prefix '
+			'Prefix data'  || 'data'    | 'Prefix '
+			'Prefix data'  || 'data'    | new Element(value:'Prefix ')
+			'Prefix ' + new DateMidnight(1974,06,26).toDate().format("yyyy-MM-dd'T'HH:mm:ssZ") || new DateMidnight(1974,06,26).toDate() | 'Prefix '
+
+	}
+
 	void 'test can check syntax errors at parsing time'() {
 
 		given:

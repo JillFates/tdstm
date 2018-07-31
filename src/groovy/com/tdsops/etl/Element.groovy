@@ -3,7 +3,9 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import org.apache.commons.lang3.StringUtils
 
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 /**
@@ -379,6 +381,19 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * prefix a value and load it into a field
+	 * @param el
+	 * @return
+	 */
+	Element prepend(Object el) {
+		if ( el ) {
+			this.value = String.valueOf(el) + this.toString()
+		}
+
+		return this
+	}
+
+	/**
 	 * Replace the first string content in the element value
 	 * <code>
 	 *      load ... transformation with replaceFirst(content, with)
@@ -453,7 +468,7 @@ class Element implements RangeChecker {
 	 */
 	Element format(String formatMask) {
 		if( ! formatMask ) {
-			switch ( value.class ) {
+			switch ( value?.class ) {
 				case Date :
 						formatMask = '%1$tY-%1$tm-%1$td'
 						break
@@ -761,6 +776,21 @@ class Element implements RangeChecker {
 
 	@Override
 	String toString() {
-		return value
+		String retVal
+		switch ( value?.class ) {
+			case Date:
+				retVal = value.format("yyyy-MM-dd'T'HH:mm:ssZ")
+				break
+
+			case [Float, Double]:
+				DecimalFormat df = new DecimalFormat("###,##0.00")
+				retVal = df.format(value)
+				break
+
+			default:
+				retVal = String.valueOf(value)
+		}
+
+		return retVal
 	}
 }
