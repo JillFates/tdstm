@@ -245,7 +245,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 			'Prefix null'  || null      | 'Prefix '
 			'Prefix data'  || 'data'    | 'Prefix '
 			'Prefix data'  || 'data'    | new Element(value:'Prefix ')
-			'Prefix ' + new DateMidnight(1974,06,26).toDate().format("yyyy-MM-dd'T'HH:mm:ssZ") || new DateMidnight(1974,06,26).toDate() | 'Prefix '
+			'Prefix ' + new DateMidnight(1974,06,26).toDate().format(Element.DATETIME_FORMAT) || new DateMidnight(1974,06,26).toDate() | 'Prefix '
+			'Prefix 12.34' || 12.34     | 'Prefix '
+			'Prefix 12.00' || 12.00     | 'Prefix '
+			'Prefix 0.00'  || 0.0       | 'Prefix '
+			'Prefix 0'     || 0         | 'Prefix '
+			'Prefix 12'    || 12        | 'Prefix '
 
 	}
 

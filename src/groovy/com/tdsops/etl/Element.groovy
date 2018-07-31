@@ -19,6 +19,9 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 class Element implements RangeChecker {
+	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+	public static final String DECIMAL_FORMAT = "###,##0.00"
+
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
@@ -473,11 +476,11 @@ class Element implements RangeChecker {
 						formatMask = '%1$tY-%1$tm-%1$td'
 						break
 
-				case [Integer, Long] :
+				case [Integer, Long, BigInteger] :
 						formatMask = '%,df'
 						break
 
-				case [Float, Double] :
+				case [Float, Double, BigDecimal] :
 						formatMask = '%,.2f'
 						break
 
@@ -779,11 +782,11 @@ class Element implements RangeChecker {
 		String retVal
 		switch ( value?.class ) {
 			case Date:
-				retVal = value.format("yyyy-MM-dd'T'HH:mm:ssZ")
+				retVal = value.format(DATETIME_FORMAT)
 				break
 
-			case [Float, Double]:
-				DecimalFormat df = new DecimalFormat("###,##0.00")
+			case [Float, Double, BigDecimal]:
+				DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
 				retVal = df.format(value)
 				break
 
