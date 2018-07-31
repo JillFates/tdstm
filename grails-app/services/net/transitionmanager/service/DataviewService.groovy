@@ -984,7 +984,7 @@ class DataviewService implements ServiceMethods {
 		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
 		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
 		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
-		'tags': [
+		'tagAssets': [
 			property: """
 				CONCAT(
 					'[',
