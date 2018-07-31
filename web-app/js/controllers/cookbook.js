@@ -1912,7 +1912,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		var postData = {
 			recipeVersionId: recVerId,
 			context: {
-				eventId: scope.contexts.selectedEvent.id,
+				eventId: (scope.contexts.selectedEvent)? scope.contexts.selectedEvent.id: null,
 				tag: getTagsIds(scope.contexts.assetSelector.tag)
 			},
 			sourceCode: source
