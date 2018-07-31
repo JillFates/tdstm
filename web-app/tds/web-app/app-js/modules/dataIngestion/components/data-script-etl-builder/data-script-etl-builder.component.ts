@@ -88,7 +88,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				this.filename = this.dataScriptModel.sampleFilename;
 				this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
 				if (this.filename && this.filename.length > 0) {
-					this.extractSampleDataFromFile();
+					this.extractSampleDataFromFile(this.dataScriptModel.originalSampleFilename);
 				}
 			}
 		}, error => console.log(error));
@@ -241,9 +241,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dialogService.extra(DataScriptSampleDataComponent, [
 			{provide: 'etlScript', useValue: this.dataScriptModel}
 		])
-			.then((filename) => {
-				this.filename = filename;
-				this.extractSampleDataFromFile();
+			.then((filename: {temporaryFileName: string, originalFileName: string}) => {
+				this.filename = filename.temporaryFileName;
+				this.extractSampleDataFromFile(filename.originalFileName);
 			})
 			.catch((err) => {
 				console.log('SampleDataDialog error occurred..');
@@ -256,8 +256,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
-	private extractSampleDataFromFile() {
-		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename).subscribe((result) => {
+	private extractSampleDataFromFile(originalFileName?: string) {
+		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName).subscribe((result) => {
 			this.sampleDataModel = result;
 			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
