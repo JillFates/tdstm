@@ -1069,7 +1069,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 				useWIP: scope.tasks.generateOpts.useWIP ,
 				autoPublish: scope.tasks.generateOpts.autoPublish ,
 				deletePrevious: scope.tasks.generateOpts.deletePrevious ,
-				eventId: scope.contexts.selectedEvent.id,
+				eventId: (scope.contexts.selectedEvent)? scope.contexts.selectedEvent.id : null,
 				tag: getTagsIds(scope.contexts.assetSelector.tag)
 			};
 			// Partially Remove Prototype
