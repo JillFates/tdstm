@@ -88,16 +88,16 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		public onUpdate(): void {
 			const modelRequest   = R.clone(this.model);
 
-			if (modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId ) {
-				modelRequest.asset.appOwner.id = modelRequest.asset.appOwner.id.personId;
+			if ((modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId) || (modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId === 0)) {
+				modelRequest.asset.appOwner.id = (modelRequest.asset.appOwner.id.personId !== 0) ? modelRequest.asset.appOwner.id.personId : null;
 			}
 
-			if (modelRequest.asset.sme && modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId ) {
-				modelRequest.asset.sme.id = modelRequest.asset.sme.id.personId;
+			if ((modelRequest.asset.sme && modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId) || (modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId === 0)) {
+				modelRequest.asset.sme.id = (modelRequest.asset.sme.id.personId !== 0) ? modelRequest.asset.sme.id.personId : null;
 			}
 
-			if (modelRequest.asset.sme2 && modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId ) {
-				modelRequest.asset.sme2.id = modelRequest.asset.sme2.id.personId;
+			if ((modelRequest.asset.sme2 && modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId) || (modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId === 0)) {
+				modelRequest.asset.sme2.id = (modelRequest.asset.sme2.id.personId !== 0) ? modelRequest.asset.sme2.id.personId : null;
 			}
 
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
