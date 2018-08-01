@@ -29,7 +29,7 @@
 		<ng-template kendoGridHeaderTemplate>
 			<div class="row">
 				<div class="col-md-12 text-center">
-					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)"></tds-checkbox>
+					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)" [overrideState]="overrideCheckboxState"></tds-checkbox>
 				</div>
 			</div>
 		</ng-template>

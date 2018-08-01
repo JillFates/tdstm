@@ -13,6 +13,18 @@ export class TDSCheckboxComponent implements OnInit {
 	@Input() hasThirdState: boolean;
 	@Output() changeState: EventEmitter<CheckboxStates> = new EventEmitter();
 	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
+	@Input()
+	set overrideState(state: CheckboxStates) {
+		if (state !== null) {
+			if (state === CheckboxStates.checked) {
+				this.transitToChecked();
+				return;
+			}
+
+			this.transitToUnchecked();
+		}
+
+	}
 	currentState: CheckboxStates;
 	private transitionHandler: Function;
 

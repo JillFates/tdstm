@@ -63,11 +63,10 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 	selectAll = false;
-	bulkItems = {};
-	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	private checkboxHelper: DataGridCheckboxHelper = new DataGridCheckboxHelper();
+	public overrideCheckboxState: CheckboxStates;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -75,6 +74,7 @@ export class AssetExplorerViewGridComponent {
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
+		this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
@@ -188,14 +188,10 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		// ##
-		/*
-		this.bulkItems = {};
-		data.assets.map(c => c.common_id).forEach(id => {
-			this.bulkItems[id] = false;
-		});
-		*/
-		// $$
+
+		if (this.checkboxHelper.getCurrentState() === CheckboxStates.checked) {
+			this.overrideCheckboxState = CheckboxStates.unchecked;
+		}
 		this.checkboxHelper.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
@@ -274,15 +270,6 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
-	onSelectAll(): void {
-		/*
-		Object.keys(this.bulkItems).forEach(key => {
-			this.bulkItems[key] = this.selectAll;
-		});
-		this.setSelectedItems();
-		*/
-	}
-
 	clearSelectAll(): void {
 		this.selectAll = false;
 	}
@@ -290,25 +277,26 @@ export class AssetExplorerViewGridComponent {
 	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
 		console.log('Asset selector has changes');
 		console.log(checkboxState);
+		this.overrideCheckboxState = null;
 		this.checkboxHelper.changeState(checkboxState);
 	}
 
 	setSelectedItem(id: string, checked: boolean): void {
 		this.checkboxHelper.selectBulkItem(id, checked);
-	}
 
-	setSelectedItems(): void {
-		/*
-		this.bulkSelectedItems = Object.keys(this.bulkItems)
-			.filter(key => this.bulkItems[key])
-			.map(value => parseInt(value, 10));
-		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
-		*/
+		const selected = this.checkboxHelper.getBulkSelectedItems();
+
+		if (selected.length === this.state.take) {
+			this.overrideCheckboxState = CheckboxStates.checked;
+			return;
+		}
+
+		this.overrideCheckboxState = CheckboxStates.unchecked;
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.bulkSelectedItems = [];
+			this.checkboxHelper.clearSelectedItems();
 			this.onReload();
 		}
 	}

@@ -10,16 +10,16 @@ export class DataGridCheckboxHelper {
 		this.bulkItems = {};
 	}
 
-	getBulkSelectedItems(): number[] {
-		return this.bulkSelectedItems;
-	}
-
 	changeState(currentState: CheckboxStates): void {
 		this.currentState = currentState;
 
 		if (!this.selectAllIfApplicable() ) {
 			this.selectBulkItems(false);
 		}
+	}
+
+	getCurrentState(): CheckboxStates {
+		return this.currentState;
 	}
 
 	private selectAllIfApplicable(): boolean {
@@ -34,11 +34,18 @@ export class DataGridCheckboxHelper {
 		return [CheckboxStates.checked, CheckboxStates.indeterminate].indexOf(this.currentState) >= 0;
 	}
 
+	clearSelectedItems(): void {
+		this.bulkSelectedItems = [];
+	}
+
 	// on init or page change
 	initializeKeysBulkItems(ids: string[]): void {
 		this.bulkItems = {};
 		ids.forEach((id: string) => this.bulkItems[id] = false);
-		this.selectAllIfApplicable();
+
+		if (this.currentState === CheckboxStates.indeterminate) {
+			this.selectBulkItems(true);
+		}
 	}
 
 	selectBulkItem(id: string, checked: boolean): void {
@@ -67,13 +74,7 @@ export class DataGridCheckboxHelper {
 			.map(value => parseInt(value, 10));
 	}
 
-	getSelectedItems(): number[] {
-		this.bulkSelectedItems = Object.keys(this.bulkItems)
-			.filter(key => this.bulkItems[key])
-			.map(value => parseInt(value, 10));
-
+	getBulkSelectedItems(): number[] {
 		return this.bulkSelectedItems;
-
-		// this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 }
