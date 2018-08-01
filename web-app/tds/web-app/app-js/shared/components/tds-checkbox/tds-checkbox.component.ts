@@ -55,21 +55,13 @@ export class TDSCheckboxComponent implements OnInit {
 	private transitionCheckValue(currentState: CheckboxStates): CheckboxStates {
 		switch (currentState)  {
 			case CheckboxStates.unchecked:
-				// this.tdsCheckbox.nativeElement.checked = true;
 				this.setAttribute('checked', true);
 				break;
 
 			case CheckboxStates.checked:
 			case CheckboxStates.indeterminate:
-				// this.tdsCheckbox.nativeElement.checked = false;
 				this.setAttribute('checked', false);
 				break;
-
-				/*
-			case CheckboxStates.indeterminate:
-				this.tdsCheckbox.nativeElement.checked = false;
-				break;
-				*/
 
 			default:
 				throw new Error('Invalid tds checkbox state');
