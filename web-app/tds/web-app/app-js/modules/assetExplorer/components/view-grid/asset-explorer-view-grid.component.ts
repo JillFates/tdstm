@@ -22,6 +22,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
 import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {DataGridCheckboxHelper} from '../../../../shared/utils/data-grid-checkbox.helper';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -66,6 +67,7 @@ export class AssetExplorerViewGridComponent {
 	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
+	private checkboxHelper: DataGridCheckboxHelper = new DataGridCheckboxHelper();
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -186,10 +188,16 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+		// ##
+		/*
 		this.bulkItems = {};
 		data.assets.map(c => c.common_id).forEach(id => {
 			this.bulkItems[id] = false;
 		});
+		*/
+		// $$
+		this.checkboxHelper.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
@@ -267,10 +275,12 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onSelectAll(): void {
+		/*
 		Object.keys(this.bulkItems).forEach(key => {
 			this.bulkItems[key] = this.selectAll;
 		});
 		this.setSelectedItems();
+		*/
 	}
 
 	clearSelectAll(): void {
@@ -280,13 +290,20 @@ export class AssetExplorerViewGridComponent {
 	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
 		console.log('Asset selector has changes');
 		console.log(checkboxState);
+		this.checkboxHelper.changeState(checkboxState);
+	}
+
+	setSelectedItem(id: string, checked: boolean): void {
+		this.checkboxHelper.selectBulkItem(id, checked);
 	}
 
 	setSelectedItems(): void {
+		/*
 		this.bulkSelectedItems = Object.keys(this.bulkItems)
 			.filter(key => this.bulkItems[key])
 			.map(value => parseInt(value, 10));
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
+		*/
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
