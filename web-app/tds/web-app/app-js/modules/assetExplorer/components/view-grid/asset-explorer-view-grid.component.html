@@ -97,7 +97,7 @@
         <!-- Asset Tags Cell Template -->
         <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
             <div>
-               <span *ngFor="let tag of convertTagsStringToList(dataItem[column.domain+'_'+column.property])" class="label tag" style="display: inline-block"
+               <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
                      [ngClass]="tag.css">{{tag.name}}</span>
             </div>
         </ng-template>

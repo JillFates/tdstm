@@ -377,12 +377,4 @@ export class AssetExplorerViewGridComponent {
 		column.filter = selectedTagsFilter;
 		this.onFilter();
 	}
-
-	/**
-	 * Tag List is coming as a String instead of an Object
-	 * @param dataItem
-	 */
-	protected convertTagsStringToList(dataItem: any): any {
-		return JSON.parse(dataItem);
-	}
 }
