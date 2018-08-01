@@ -24,6 +24,8 @@ import org.apache.http.HttpRequest
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
 import org.apache.http.NameValuePair
+import org.apache.http.NoHttpResponseException
+import org.apache.http.auth.AuthenticationException
 import org.apache.http.auth.Credentials
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.client.config.RequestConfig
@@ -108,13 +110,15 @@ class HttpProducerService {
             return reaction(invokeActionRequest(actionRequest))
         } catch (Exception e) {
             log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(e))
-            // this is used to notify tasks when something went wrong by added a task note
+            String errorMessage = translateHttpException(e)
+
+            // this is used to notify tasks when something went wrong by adding a task note
             if (actionRequest.options.hasProperty('taskId')) {
                 Long taskId = actionRequest.options.taskId
-                taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: e.message])
+                taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: errorMessage])
             }
             ApiActionResponse errorApiActionResponse = new ApiActionResponse()
-            errorApiActionResponse.error = e.message
+            errorApiActionResponse.error = errorMessage
             errorApiActionResponse.successful = false
             return errorApiActionResponse.asImmutable()
         }
@@ -172,7 +176,7 @@ class HttpProducerService {
         log.info('Action response headers: {}', apiActionResponse?.headers)
 
         if (!apiActionResponse.successful) {
-            apiActionResponse.error = httpResponse?.statusLine
+            apiActionResponse.error = getHttpResponseError(httpResponse)
             apiActionResponse.data = null
         } else {
             InputStream is = httpResponse?.entity?.content
@@ -315,6 +319,71 @@ class HttpProducerService {
 
         ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
         return apiActionResponse.asImmutable()
+    }
+
+    /**
+     * Translate a Http exception to a user readable message
+     * @param e - the Exception
+     * @return a String containing a user readable message with the http exception found
+     */
+    private String translateHttpException(Exception e) {
+        if (e instanceof UnknownHostException) {
+            return 'Unable to resolve host name (' + e.message + ')'
+        } else if (e instanceof NoHttpResponseException) {
+            return 'Unable to connect to endpoint'
+        } else {
+            return e.message
+        }
+    }
+
+    /**
+     * Get the user readable http response error corresponding to the http status code
+     * @param httpResponse - the HttpResponse
+     * @return a String containing a user readable message with the http status code found
+     */
+    private String getHttpResponseError(HttpResponse httpResponse) {
+        int statusCode = httpResponse.getStatusLine().getStatusCode()
+        if (statusCode <= 0) {
+            return 'Unable to connect to endpoint'
+        }
+
+        switch (statusCode) {
+            case 401:
+                return 'Failure due to invalid credentials (401)'
+                break
+            case 403:
+                return 'Failure due to credentials lacking necessary permission (403)'
+                break
+            case 404:
+                return 'Failure because endpoint was not found (action URL wrong or method type) (404)'
+                break
+            case 400:
+                return 'Failure due to bad request (Action improperly configured) (400)'
+                break
+            case 405:
+                return 'Failure due to incorrect Method type (incorrect Action HTTP method) (405)'
+                break
+            case 406..499:
+                return 'Endpoint reported error code 4xx'
+                break
+            case 500:
+                return 'Endpoint reported Internal Server Error (500)'
+                break
+            case 501:
+                return 'Endpoint reported method is not implemented (501)'
+                break
+            case 502:
+                return 'Endpoint reported Bad Gateway (502)'
+                break
+            case 503:
+                return 'Endpoint reported the Service Unavailable (503)'
+                break
+            case 504..599:
+                return 'Endpoint reported error code 5xx'
+                break
+            default:
+                return httpResponse?.statusLine
+        }
     }
 
     /**
