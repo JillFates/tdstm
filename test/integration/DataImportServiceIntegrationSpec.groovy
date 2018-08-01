@@ -69,6 +69,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
 	Map context
 
+	@Shared
+	Person whom = personTestHelper.createPerson()
+
 	void setupSpec() {
 
 	}
@@ -746,7 +749,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			String sampleData = 'serverName,appName\nxraysrv01,bigapp'
 
 			// Create the DataScript to be used
-			Person whom = personTestHelper.createPerson()
 			Provider provider = providerTestHelper.createProvider(project)
 			DataScript dataScript = dataScriptTestHelper.createDataScript(project, provider, whom, etlSourceCode)
 
@@ -897,20 +899,37 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	void '20 Test the bindFieldsInfoValuesToEntity method for bugs'() {
 		given: 'a fieldsInfo for a device'
 			Map fieldsInfo = initFieldsInfoForDevice()
-		and: 'a new asset saved '
+			AssetType assetType = AssetType.VM
+			Integer priority = 6
+			Double price = 1.25
+			Date retire = new Date()
+			SizeScale scale = SizeScale.TB
+			Person clientStaff1 = personTestHelper.createPerson(whom, project.client, project)
+			Person clientStaff2 = personTestHelper.createPerson(whom, project.client, project)
+
+		and: 'a new asset is instanciated'
 			AssetEntity server = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		and: 'an import context is created for Devices'
 			context = dataImportService.initContextForProcessBatch( project, ETLDomain.Device )
 			context.record = new ImportBatchRecord(sourceRowId:1)
 
 		when: 'the fieldsInfo field values are set'
-			// fieldsInfo.id.value = server.id
 			initializeFieldElement('assetName', fieldsInfo, server.assetName)
 		and: 'String, Integer, Double, Enum and Date fields are set'
-			initializeFieldElement('assetType', fieldsInfo, AssetType.SERVER)
-			initializeFieldElement('priority', fieldsInfo, 6)
-			initializeFieldElement('purchasePrice', fieldsInfo, 1.25)
-			initializeFieldElement('retireDate', fieldsInfo, new Date())
-			// initializeFieldElement('scale', fieldsInfo, SizeScale.TB)
+			initializeFieldElement('assetType', fieldsInfo, assetType)
+			initializeFieldElement('priority', fieldsInfo, priority)
+			initializeFieldElement('purchasePrice', fieldsInfo, price)
+			initializeFieldElement('retireDate', fieldsInfo, retire)
+			initializeFieldElement('scale', fieldsInfo, scale)
+			initializeFieldElement('modifiedBy', fieldsInfo, clientStaff1.toString())
+			/*
+			room/location
+			rack
+			manufacturer
+			model
+			modifiedBy (person)
+			*/
+
 		then: 'calling bindFieldsInfoValuesToEntity should not error'
 			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
 		and: 'there should be dirty fields'
@@ -921,6 +940,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			server.refresh()
 		then: 'there should be no unsaved changes'
 			! GormUtil.hasUnsavedChanges(server)
+		and: 'the device values should be as were set'
+			server.assetType == assetType.toString()
+			server.priority == priority
+			server.purchasePrice == price
+			server.retireDate == retire
+			server.scale == scale
+			server.modifiedBy == clientStaff1
 		and: 'calling bindFieldsInfoValuesToEntity should not error'
 			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
 		and: 'there should be NO dirty fields'
@@ -943,10 +969,31 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'setting the bundle to a different bundle name'
 			MoveBundle mb2 = moveBundleTestHelper.createBundle(project, null)
 			initializeFieldElement('moveBundle', fieldsInfo, mb2.name)
+		and: 'changing a reference to another person by name'
+			initializeFieldElement('modifiedBy', fieldsInfo, clientStaff2.toString())
 		and: 'calling bindFieldsInfoValuesToEntity'
 			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
 		then: 'the server move bundle should now reference the new bundle'
 			server.moveBundle.id == mb2.id
+		and: 'the priority should be changed as well'
+			server.priority == 2
+			server.modifiedBy == clientStaff2
+
+		when: 'saving the changes after the latest changes'
+			server.save(failOnError:true, flush:true)
+			server.refresh()
+		then: 'the server move bundle should now reference the new bundle'
+			server.moveBundle.id == mb2.id
+		and: 'the modifiedBy should be set to the 2nd staff'
+			server.modifiedBy == clientStaff2
+
+		when: 'changing a reference to a Person by email (uppercase to validate case-insensitive support)'
+			initializeFieldElement('modifiedBy', fieldsInfo, clientStaff1.email.toUpperCase())
+		and: 'calling bindFieldsInfoValuesToEntity'
+			dataImportService.bindFieldsInfoValuesToEntity(server, fieldsInfo, context, [])
+		then: 'the modifiedBy should be assigned to the first staff again'
+			server.modifiedBy == clientStaff1
+
 
 	}
 

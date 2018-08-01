@@ -389,6 +389,17 @@ public class GormUtil {
 	}
 
 	/**
+	 * Used to retrieve the value specified for a particular property constraint
+	 * @param domainInstance - instance of the domain being inspected
+	 * @param propertyName - the property name to inspect
+	 * @param constraintName - the name of the constraint being inspected
+	 * @return the value be it an Integer, Closure, Range, etc base on the constraint type
+	 */
+	static Object getConstraintValue(Object domainInstance, String propertyName, String constraintName) {
+		return getConstraintValue(domainInstance.getClass(), propertyName, constraintName)
+	}
+
+	/**
 	 * Used to determine if a particular domain property is a String
 	 * @param clazz - the Class object of the domain being inspected
 	 * @param propertyName - the property name to inspect

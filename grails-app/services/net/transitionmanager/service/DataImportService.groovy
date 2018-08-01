@@ -29,6 +29,8 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.domain.UserLogin
@@ -56,9 +58,11 @@ class DataImportService implements ServiceMethods {
 
 	// IOC
 	FileSystemService fileSystemService
-	ScriptProcessorService scriptProcessorService
+	PartyRelationshipService partyRelationshipService
+	PersonService personService
 	ProgressService progressService
 	Scheduler quartzScheduler
+	ScriptProcessorService scriptProcessorService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String SEARCH_BY_ID_NOT_FOUND_MSG = 'Record not found searching by id'
@@ -556,8 +560,21 @@ class DataImportService implements ServiceMethods {
 			project: project,
 
 			// The person whom is associated to this process running
-			whom: securityService.getUserLoginPerson()
+			whom: securityService.getUserLoginPerson(),
+
+			//
+			staffList: getStaffReferencesForProject(project)
 		]
+	}
+
+	/**
+	 * Used to load a list of all of the staff available to a project
+	 * @param project - the project to load staff for
+	 * @param context - the Context map used to carry all the shared data for Import logic
+	 */
+	List<Person> getStaffReferencesForProject(Project project) {
+		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
+		return partyRelationshipService.getAllCompaniesStaffPersons(companies)
 	}
 
 	/**
@@ -915,6 +932,16 @@ class DataImportService implements ServiceMethods {
 	 * Used to bind the values from the fieldsInfo into the domain but skipping over any fields specified
 	 * in the fieldsToIngnore parameter.
 	 *
+	 * Field value assignment logic:
+	 *
+	 * 		If init contains value and entity property has no value
+	 * 		Then set the property to the init value
+	 * 		Else if existin value not equal new value (including null)
+	 * 		Then set new value as
+	 *		If new value is null and field is not nullable then error
+	 * 		If field is a reference (e.g. Person)
+	 * 		Then attempt to lookup the reference object base on meta-data
+	 *
 	 * @param domain - the entity to bind the values on
 	 * @param fieldsInfo - the Map of fields and their values from the ETL process
 	 * @param fieldsToIgnore - a List of field names that should not be bound
@@ -922,7 +949,15 @@ class DataImportService implements ServiceMethods {
 	 */
 	Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
 		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
+		//		  JPM 8/2018 : Believe that this may already work. Need to test and remove TODO if so..
+
 		Boolean noErrorsEncountered = true
+
+		// Used to add errors and set flag in one line within this function
+		Closure recordErrorHelper = { fieldName, msg ->
+			noErrorsEncountered = false
+			addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, msg)
+		}
 
 		// Take the complete list of field names in fieldsInfo and remove 'id' plus any passed to the method
 		Set<String> fieldNames = fieldsInfo.keySet()
@@ -934,20 +969,8 @@ class DataImportService implements ServiceMethods {
 		fieldNames = fieldNames - fieldsToIgnore
 
 		Boolean isNewEntity = (Boolean)(domain.id == null)
-
 		String domainShortName = GormUtil.domainShortName(domain)
 
-		// Used to add errors and set flag in one line within this function
-		Closure recordErrorHelper = { fieldName, msg ->
-			noErrorsEncountered = false
-			addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, msg)
-		}
-
-		// Assignment Logic (TBD 6/2018)
-		// 		If no new value and init contains value and entity property has no value
-		// 		Then set the property to the init value
-		// 		Else if new value and current value not equal new value
-		// 		Then set new value
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
 				recordErrorHelper(fieldName,'Modifying the field is not allowed')
@@ -966,88 +989,95 @@ class DataImportService implements ServiceMethods {
 				continue
 			}
 
-			Boolean isReference = GormUtil.isReferenceProperty(domain, fieldName)
-
 			def domainValue = domain[fieldName]
 			def (value, initValue) = getValueAndInitialize(fieldName, fieldsInfo)
 			boolean isInitValue = (initValue != null)
 
+			// The field must have a value to set otherwise the logic will skip over it. As such this logic
+			// will determine if the value or init properties have a real value and set a few boolean flags.
+			def valueToSet = isInitValue ? initValue : value
+
+			Boolean isReference = GormUtil.isReferenceProperty(domain, fieldName)
+
 			// This will get populated with the domain's existing value for fields to be recorded when different
-			Object existingValue = null
+			Object existingValue = domain[fieldName]
+
+			// --------------------------------------------------
+			// Deal with setting field to NULL
+			// --------------------------------------------------
+			if (valueToSet == null) {
+				if (existingValue) {
+					// Check to see if the field is nullable
+					if (GormUtil.getConstraintValue(domain, fieldName, 'nullable')) {
+						if (isReference) {
+							existingValue = existingValue.toString()
+						}
+						_recordChangeOnField(domain, fieldName, existingValue, null, isInitValue, isNewEntity, fieldsInfo)
+					} else {
+						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Field can not be null')
+					}
+				}
+				continue
+			}
 
 			if (isReference) {
+				// --------------------------------------------------
+				// Process reference fields
+				// --------------------------------------------------
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 
-				Object refObject = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context)
-				existingValue = domain[fieldName] ? domain[fieldName].toString() : null
-				switch (refObject) {
+				valueToSet = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context, domain)
+				switch (valueToSet) {
 					case -1:
 						noErrorsEncountered = false
 						break
 
 					case null:
-						Boolean nullable = GormUtil.getConstraint(domain, fieldName, 'nullable')
-						log.debug 'bindFieldsInfoValuesToEntity() Set reference to null > isNullable={}', nullable, fieldName
-						if ( nullable != true) {
-							recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
-						} else {
-							if (existingValue != refObject) {
-								// TODO : JPM 7/2018 : need to deal with init or explicit setting
-								_recordChangeOnField(domain, fieldName, existingValue, refObject, isNewEntity, fieldsInfo)
-							}
-							domain[fieldName] = null
-						}
+						// Boolean nullable = GormUtil.getConstraint(domain, fieldName, 'nullable')
+						// log.debug 'bindFieldsInfoValuesToEntity() Set reference to null > isNullable={}', nullable, fieldName
+						// if ( nullable != true) {
+						// 	recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
+						// } else {
+						// 	_recordChangeOnField(domain, fieldName, existingValue, refObject, isInitValue, isNewEntity, fieldsInfo)
+						// 	domain[fieldName] = null
+						// }
+
+						recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
 						break
 
 					default:
-						if ( (isInitValue && domainValue == null) || (!isInitValue && domainValue != refObject) ) {
-							_recordChangeOnField(domain, fieldName, existingValue, refObject, isNewEntity, fieldsInfo)
-						}
+						_recordChangeOnField(domain, fieldName, existingValue.toString(), valueToSet, isInitValue, isNewEntity, fieldsInfo)
 				}
 
 			} else {
-				//
-				// Handle native Java data types here
-				//
-
-				// The field must have a value to set otherwise the logic will skip over it. As such this logic
-				// will determine if the value or init properties have a real value and set a few boolean flags.
-				def valueToSet = isInitValue ? initValue : value
-				existingValue = domain[fieldName]
-
+				// --------------------------------------------------
+				// Process native Java data types
+				// --------------------------------------------------
 				def fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
 				log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
 				// println "bindFieldsInfoValuesToEntity() field $fieldName, value=$valueToSet, fieldClass=${fieldClassType.getName()}"
 				switch (fieldClassType) {
 					case String:
-						if ( (isInitValue && StringUtil.isBlank(domainValue)) ||  ( !isInitValue && valueToSet != domainValue) ) {
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-						}
+						_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 						break
 
 					case Integer:
 						// TODO : JPM 7/2018 : is a null value an error or an allowed value?
 						Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
 						if (numValueToSet == null) {
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value specified must be an numeric value')
+							recordErrorHelper(fieldName, 'Value specified must be an numeric value')
 						} else {
-							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
-								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-							}
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 						}
 						break
 
 					case Long:
 						Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
 						if (numValueToSet == null) {
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value specified must be an numeric value')
+							recordErrorHelper(fieldName, 'Value specified must be an numeric value')
 						} else {
-							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != numValueToSet) ) {
-								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-							}
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 						}
 						break
 
@@ -1068,13 +1098,10 @@ class DataImportService implements ServiceMethods {
 
 						if (! (valueToSet instanceof Date)) {
 							String columnType
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO-8601 format')
+							recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO-8601 format')
 						} else {
-							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
-								valueToSet.clearTime()
-								_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-							}
+							valueToSet.clearTime()
+							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 						}
 						break
 
@@ -1106,32 +1133,28 @@ class DataImportService implements ServiceMethods {
 
 					case Enum:
 						try {
-							// def valueToSet = valueToSet as "${fieldClassType.getName()}"
-							// def enumValue = fieldClassType.valueOf(valueToSet)
-							//def enumValue = valueToSet as fieldClassType
-							def enumValue = fieldClassType.newInstance()
-							enumValue = valueToSet
+							def enumValue=null
 
-							if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != enumValue) ) {
-								_recordChangeOnField(domain, fieldName, existingValue, enumValue, isNewEntity, fieldsInfo)
+							if (valueToSet != null) {
+								if (valueToSet instanceof CharSequence) {
+									enumValue = fieldClassType.valueOf(valueToSet.toString())
+								} else if (valueToSet.getClass().getName() == fieldClassType.getName()) {
+									enumValue = valueToSet
+								}
 							}
+							_recordChangeOnField(domain, fieldName, existingValue, enumValue, isInitValue, isNewEntity, fieldsInfo)
 						} catch (e) {
-							noErrorsEncountered = false
-							addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Unable to validate ENUM value')
+							recordErrorHelper(fieldName, 'Unable to validate ENUM value')
 						}
 						break
 
 					case Double:
-						if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-						}
+						_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 						break
 
 					default:
-						noErrorsEncountered = false
 						log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
-
-						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "Import process unable to support setting type ${fieldClassType.getName()}")
+						recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
 				}
 				// println "_recordChangeOnField() noErrorsEncountered=$noErrorsEncountered, ${c++}"
 			}
@@ -1156,14 +1179,25 @@ class DataImportService implements ServiceMethods {
 	 * @param isNewEntity - flag if the record is new or existing
 	 * @param fieldsInfo - the JSON data from the import batch record
 	 */
-	void _recordChangeOnField(Object domainInstance, String fieldName, Object existingValue, Object newValue, Boolean isNewEntity, Map fieldsInfo) {
+	void _recordChangeOnField(
+		Object domainInstance,
+		String fieldName,
+		Object existingValue,
+		Object newValue,
+		Boolean isInitValue,
+		Boolean isNewEntity,
+		Map fieldsInfo
+	) {
 		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
-		if (existingValue != newValue) {
-		 	// println "_recordChangeOnField() field $fieldName, domainValue=${domainInstance[fieldName]}, existingValue=$existingValue, newValue=$newValue"
-			domainInstance[fieldName] = newValue
-			if (! isNewEntity) {
-				fieldsInfo[fieldName].previousValue = existingValue
+
+		if ( !isInitValue || (isInitValue && existingValue == null)) {
+			if (existingValue != newValue) {
+				// println "_recordChangeOnField() field $fieldName, domainValue=${domainInstance[fieldName]}, existingValue=$existingValue, newValue=$newValue"
+				domainInstance[fieldName] = newValue
+				if (! isNewEntity) {
+					fieldsInfo[fieldName].previousValue = existingValue
+				}
 			}
 		}
 	}
@@ -1173,9 +1207,10 @@ class DataImportService implements ServiceMethods {
 	 * ETL process. This method will leverage caching of the domain entities to expedite retrieval
 	 * for entities that are frequently cross-referenced (e.g. Clusters to Servers).
 	 *
-	 * @param domainClassName - the domain class name used in the ETL script
+	 * @param fieldName - the domain fieldname
 	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
 	 * @param context - the context map that the process uses to cart crap around
+	 * @param entityInstance - optional used when looking up a reference field
 	 * @return will return various results based on searches
 	 * 		entity 	: if found
 	 *		null	: if not found by alternate or query
@@ -1222,7 +1257,7 @@ class DataImportService implements ServiceMethods {
 	 *
 	 * @test Integration
 	 */
-	private Object fetchEntityByFieldMetaData(String fieldName, Map fieldsInfo, Map context) {
+	private Object fetchEntityByFieldMetaData(String fieldName, Map fieldsInfo, Map context, Object entityInstance=null) {
 		// This will be populated with the entity object or error message appropriately
 		Object entity
 
@@ -1245,7 +1280,7 @@ class DataImportService implements ServiceMethods {
 		int xyz = 0
 		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 		while (true) {
-		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
+			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 			if ( ! fieldIsInFieldsInfo && ! fieldIsId) {
 				// Shouldn't happen but just in case...
@@ -1346,12 +1381,25 @@ class DataImportService implements ServiceMethods {
 				}
 			} // if (fieldIsInFieldsInfo) {
 
-			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 			// 6. Attempt for certain domain classes (e.g. AssetDependency) that weren't found
-			if (domainClass in AssetDependency) {
-				entity = _fetchAssetDependencyByAssets(fieldsInfo, context)
+			switch (domainClass) {
+				case AssetDependency:
+					entity = _fetchAssetDependencyByAssets(fieldsInfo, context)
+					break
+
+				case Person:
+					// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
+					Person existingPerson = entityInstance ? entityInstance[fieldName] : null
+					String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
+					String errorMsg
+					(entity, errorMsg) = _fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+					if (errorMsg) {
+						// If no entity was found then we want to capture the error message to save in the cache
+						entity = errorMsg
+						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+					}
+					break
 			}
-			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 			break
 		}
@@ -1614,7 +1662,7 @@ class DataImportService implements ServiceMethods {
 			}
 
 			List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
-			int numFound = entities.size()
+			int numFound = entities ? entities.size() : 0
 			log.debug '_fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
 				domainClass.getName(), searchValue, extraCriteria, numFound
 
@@ -1664,6 +1712,70 @@ class DataImportService implements ServiceMethods {
 			}
 		}
 		return result
+	}
+
+
+	/**
+	 * Used fetch the person based on a string search value
+	 *
+	 * The logic will first check to see if the name matches that of the person currently assigned to the
+	 * field if pre-existing then if not it will then use the PersonService to lookup the person by their name.
+	 *
+	 * When errors encountered or multiple references found then an error will be recorded into the fieldsInfo appropriately.
+	 *
+	 * Note this this method is dependent on the staffList being populated in the context object for performances reasons.
+	 * It also assumes that the value is not the person ID and that there is a searchValue (not null).
+	 *
+	 * @param existingPerson - the existing person for update operations where field previously set otherwise null
+	 * @param searchValue - the name or email address of the person to fetch
+	 * @param fieldName - the field name of the Person object
+	 * @param fieldsInfo - the Map of the fields
+	 * @param context - the context containing the goodies for the import batch process
+	 * @return a list containing:
+	 *     1) the Person if found/created
+	 *     2) an error message if an error encountered or multiple references were found
+	 */
+	List _fetchPerson(Person existingPerson, String searchValue, String fieldName, Map fieldsInfo, Map context) {
+		Person person
+		String errorMsg
+		Boolean isEmail = searchValue.contains('@')
+
+		// println "*** _fetchPerson() Existing Person ${existingPerson ? existingPerson.toString() + ' ' + existingPerson.email : 'null'}, searchBy $searchValue"
+		// If the pre-existing person check if searchValue matches the person
+		if (existingPerson) {
+			if ( (isEmail && existingPerson.email.equalsIgnoreCase(searchValue) ) ||
+				 (! isEmail && existingPerson.toString().equalsIgnoreCase(searchValue))
+			) {
+				person = existingPerson
+			}
+		}
+
+		if (!person) {
+			if (isEmail) {
+				person = context.staffList.find { it.email.equalsIgnoreCase(searchValue) }
+				if (!person) {
+					errorMsg = 'Unable to find person by email address'
+				}
+			} else {
+				try {
+					Map resultMap = personService.findOrCreatePerson(searchValue, context.project, context.staffList)
+					if (resultMap) {
+						if (resultMap.isAmbiguous) {
+							errorMsg = 'Multiple references found for value'
+						} else if (resultMap.person) {
+							person = resultMap.person
+						}
+					}
+					if (!resultMap || ! resultMap.person && ! resultMap.isAmbiguous) {
+						errorMsg = 'Unable to locate person'
+					}
+				} catch (e) {
+					errorMsg = e.message
+				}
+			}
+		}
+
+		return [person, errorMsg]
 	}
 
 	/**
