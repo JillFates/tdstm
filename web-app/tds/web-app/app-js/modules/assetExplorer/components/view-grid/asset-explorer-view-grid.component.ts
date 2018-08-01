@@ -77,6 +77,7 @@ export class AssetExplorerViewGridComponent {
 		this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+				this.checkboxHelper.setPageSize(this.state.take);
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
@@ -188,10 +189,8 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+		this.overrideCheckboxState = this.checkboxHelper.getOverrideState(true);
 
-		if (this.checkboxHelper.getCurrentState() === CheckboxStates.checked) {
-			this.overrideCheckboxState = CheckboxStates.unchecked;
-		}
 		this.checkboxHelper.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
@@ -283,15 +282,7 @@ export class AssetExplorerViewGridComponent {
 
 	setSelectedItem(id: string, checked: boolean): void {
 		this.checkboxHelper.selectBulkItem(id, checked);
-
-		const selected = this.checkboxHelper.getBulkSelectedItems();
-
-		if (selected.length === this.state.take) {
-			this.overrideCheckboxState = CheckboxStates.checked;
-			return;
-		}
-
-		this.overrideCheckboxState = CheckboxStates.unchecked;
+		this.overrideCheckboxState = this.checkboxHelper.getOverrideState();
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {

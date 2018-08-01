@@ -18,10 +18,12 @@ export class TDSCheckboxComponent implements OnInit {
 		if (state !== null) {
 			if (state === CheckboxStates.checked) {
 				this.transitToChecked();
-				return;
+				this.changeState.emit(state);
+			} else {
+				this.transitToUnchecked();
+				// dont emit because it will clear all
 			}
 
-			this.transitToUnchecked();
 		}
 
 	}
@@ -32,21 +34,21 @@ export class TDSCheckboxComponent implements OnInit {
 		// start off unchecked
 		this.currentState = CheckboxStates.unchecked;
 		// depending of flag it decides the strategy to handle transitions
-		this.transitionHandler = this.hasThirdState ? this.transitionThreeStates : this.transitionTwoStates;
+		this.transitionHandler = this.hasThirdState ? this.transitionThreeStates.bind(this) : this.transitionTwoStates.bind(this);
 	}
 
-	onChange(currentState: CheckboxStates): void {
+	onChange(): void {
 		try {
 			// notify to the host the transition
-			this.changeState.emit(this.transitionHandler.bind(this)(currentState));
+			this.changeState.emit(this.transitionHandler());
 		} catch (error) {
 			console.error(error.message || error);
 		}
 	}
 
 	// handle three states transition
-	private transitionThreeStates(currentState: CheckboxStates): CheckboxStates {
-		switch (currentState)  {
+	private transitionThreeStates(): CheckboxStates {
+		switch (this.currentState)  {
 			case CheckboxStates.unchecked:
 				this.transitToChecked();
 				break;
@@ -67,8 +69,8 @@ export class TDSCheckboxComponent implements OnInit {
 	}
 
 	// handle two states transition
-	private transitionTwoStates(currentState: CheckboxStates): CheckboxStates {
-		switch (currentState)  {
+	private transitionTwoStates(): CheckboxStates {
+		switch (this.currentState)  {
 			case CheckboxStates.unchecked:
 				this.transitToChecked();
 				break;

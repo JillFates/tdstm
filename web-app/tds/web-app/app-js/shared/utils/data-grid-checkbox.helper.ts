@@ -2,12 +2,28 @@ import {CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.mode
 
 export class DataGridCheckboxHelper {
 	private currentState: CheckboxStates;
+	private pageSize: number = null;
 	bulkItems: any;
 	private bulkSelectedItems: number[];
 
 	constructor() {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
+	}
+
+	setPageSize(size: number): void {
+		this.pageSize = size;
+	}
+
+	getOverrideState(changingPage = false): CheckboxStates {
+		if (changingPage) {
+			if (this.currentState === CheckboxStates.checked) {
+				return CheckboxStates.unchecked;
+			}
+			return null;
+		}
+
+		return (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
 	}
 
 	changeState(currentState: CheckboxStates): void {
