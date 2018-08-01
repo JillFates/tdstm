@@ -33,6 +33,7 @@ import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
@@ -572,6 +573,7 @@ class DataImportService implements ServiceMethods {
 	 * @param project - the project to load staff for
 	 * @param context - the Context map used to carry all the shared data for Import logic
 	 */
+	@NotTransactional()
 	List<Person> getStaffReferencesForProject(Project project) {
 		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		return partyRelationshipService.getAllCompaniesStaffPersons(companies)
@@ -783,21 +785,22 @@ class DataImportService implements ServiceMethods {
 
 			if (entity) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
+
 				// Now add/update the remaining properties on the domain entity appropriately
 				Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
+				Boolean abandonEntity = true
+				if (!bindingOkay) {
+					log.warn 'processEntityRecord() binding values failed'
+				} else if (recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
+					log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
+				} else {
+					abandonEntity = false
+				}
 
-				// Deal with binding errors or domain contraint errors
-				if (! bindingOkay || recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
-					if (bindingOkay) {
-						// Must of been a contraints issue then
-						log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
-					} else {
-						log.warn 'processEntityRecord() binding values failed'
-					}
+				if (abandonEntity) {
 					// Damn it! Couldn't save this sucker...
 					entity.discard()
 					entity = null
-
 				} else {
 
 					// Determine the correct Operation that was performed and if the record should be saved
@@ -837,7 +840,7 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
-		if (! record.save(failOnError:false) ) {
+		if (! record.save(failOnError:false, flush:true) ) {
 			// Catch the error here but need to throw it outside the try/catch so that it gets recorded at the batch level
 			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
 			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg
@@ -947,10 +950,11 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsToIgnore - a List of field names that should not be bound
 	 * @return true if binding did not encounter any errors
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
 		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values & the create and update blocks
 		//		  JPM 8/2018 : Believe that this may already work. Need to test and remove TODO if so..
-
+		int c = 0
 		Boolean noErrorsEncountered = true
 
 		// Used to add errors and set flag in one line within this function
@@ -1012,7 +1016,7 @@ class DataImportService implements ServiceMethods {
 						if (isReference) {
 							existingValue = existingValue.toString()
 						}
-						_recordChangeOnField(domain, fieldName, existingValue, null, isInitValue, isNewEntity, fieldsInfo)
+						_recordChangeOnField(domain, fieldName, null, isInitValue, isNewEntity, fieldsInfo)
 					} else {
 						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Field can not be null')
 					}
@@ -1026,7 +1030,6 @@ class DataImportService implements ServiceMethods {
 				// --------------------------------------------------
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
-
 				valueToSet = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context, domain)
 				switch (valueToSet) {
 					case -1:
@@ -1036,10 +1039,10 @@ class DataImportService implements ServiceMethods {
 					case null:
 						// Boolean nullable = GormUtil.getConstraint(domain, fieldName, 'nullable')
 						// log.debug 'bindFieldsInfoValuesToEntity() Set reference to null > isNullable={}', nullable, fieldName
-						// if ( nullable != true) {
+						//	 if ( nullable != true) {
 						// 	recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
 						// } else {
-						// 	_recordChangeOnField(domain, fieldName, existingValue, refObject, isInitValue, isNewEntity, fieldsInfo)
+						// 	_recordChangeOnField(domain, fieldName, refObject, isInitValue, isNewEntity, fieldsInfo)
 						// 	domain[fieldName] = null
 						// }
 
@@ -1047,7 +1050,7 @@ class DataImportService implements ServiceMethods {
 						break
 
 					default:
-						_recordChangeOnField(domain, fieldName, existingValue.toString(), valueToSet, isInitValue, isNewEntity, fieldsInfo)
+						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
 				}
 
 			} else {
@@ -1057,104 +1060,83 @@ class DataImportService implements ServiceMethods {
 				def fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
 				log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
 				// println "bindFieldsInfoValuesToEntity() field $fieldName, value=$valueToSet, fieldClass=${fieldClassType.getName()}"
-				switch (fieldClassType) {
-					case String:
-						_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-						break
+				try {
+					switch (fieldClassType) {
+						case String:
+							_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+							break
 
-					case Integer:
-						// TODO : JPM 7/2018 : is a null value an error or an allowed value?
-						Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
-						if (numValueToSet == null) {
-							recordErrorHelper(fieldName, 'Value specified must be an numeric value')
-						} else {
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-						}
-						break
-
-					case Long:
-						Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
-						if (numValueToSet == null) {
-							recordErrorHelper(fieldName, 'Value specified must be an numeric value')
-						} else {
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-						}
-						break
-
-					case Date:
-						// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
-						if (valueToSet instanceof CharSequence) {
-							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
-							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
-								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						case Integer:
+							// TODO : JPM 7/2018 : is a null value an error or an allowed value?
+							Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
+							if (numValueToSet == null) {
+								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
+							} else {
+								_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, isNewEntity, fieldsInfo)
 							}
-							// Attempt to parse a Date / Date Time based on the underlying database table column type
-							def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-							def propConfig = mapping.getPropertyConfig(fieldName)
-							// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
-						}
+							break
 
-						if (! (valueToSet instanceof Date)) {
-							String columnType
-							recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO-8601 format')
-						} else {
-							valueToSet.clearTime()
-							_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-						}
-						break
+						case Long:
+							Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
+							if (numValueToSet == null) {
+								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
+							} else {
+								_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, isNewEntity, fieldsInfo)
+							}
+							break
 
-					// case DateTime:
-					// 	if (valueToSet instanceof CharSequence) {
-					// 		// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
-					// 		if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-					// 			valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-					// 		} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
-					// 			valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-					// 		}
-					// 		// Attempt to parse a Date / Date Time based on the underlying database table column type
-					// 		def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-					// 		def propConfig = mapping.getPropertyConfig(fieldName)
-					// 		// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
-					// 	}
-
-					// 	if (! (valueToSet instanceof Date)) {
-					// 		String columnType
-					// 		noErrorsEncountered = false
-					// 		addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Value must be transformed to a Date or in ISO8601 format')
-					// 	} else {
-					// 		if ( (isInitValue && domainValue == null) || ( !isInitValue && domainValue != valueToSet) ) {
-					// 			valueToSet.clearTime()
-					// 			_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isNewEntity, fieldsInfo)
-					// 		}
-					// 	}
-					// 	break
-
-					case Enum:
-						try {
-							def enumValue=null
-
-							if (valueToSet != null) {
-								if (valueToSet instanceof CharSequence) {
-									enumValue = fieldClassType.valueOf(valueToSet.toString())
-								} else if (valueToSet.getClass().getName() == fieldClassType.getName()) {
-									enumValue = valueToSet
+						case Date:
+							// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
+							if (valueToSet instanceof CharSequence) {
+								// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
+								if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
+									valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+								} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+									valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 								}
+								// Attempt to parse a Date / Date Time based on the underlying database table column type
+								def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+								def propConfig = mapping.getPropertyConfig(fieldName)
+								// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
 							}
-							_recordChangeOnField(domain, fieldName, existingValue, enumValue, isInitValue, isNewEntity, fieldsInfo)
-						} catch (e) {
-							recordErrorHelper(fieldName, 'Unable to validate ENUM value')
-						}
-						break
 
-					case Double:
-						_recordChangeOnField(domain, fieldName, existingValue, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-						break
+							if (! (valueToSet instanceof Date)) {
+								String columnType
+								recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO-8601 format')
+							} else {
+								valueToSet.clearTime()
+								_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+							}
+							break
 
-					default:
-						log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
-						recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
+						case Enum:
+							try {
+								def enumValue=null
+
+								if (valueToSet != null) {
+									if (valueToSet instanceof CharSequence) {
+										enumValue = fieldClassType.valueOf(valueToSet.toString())
+									} else if (valueToSet.getClass().getName() == fieldClassType.getName()) {
+										enumValue = valueToSet
+									}
+								}
+								_recordChangeOnField(domain, fieldName, enumValue, isInitValue, isNewEntity, fieldsInfo)
+							} catch (e) {
+								recordErrorHelper(fieldName, 'Unable to validate ENUM value')
+							}
+							break
+
+						case Double:
+							_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+							break
+
+						default:
+							log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+							recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
+					}
+				} catch (e) {
+					log.error ExceptionUtil.stackTraceToString('Error while setting property', e)
+					recordErrorHelper(fieldName, 'Error while setting property - ' + e.message)
 				}
 				// println "_recordChangeOnField() noErrorsEncountered=$noErrorsEncountered, ${c++}"
 			}
@@ -1174,7 +1156,6 @@ class DataImportService implements ServiceMethods {
 	 *
 	 * @param domainInstance - the domain entity to save values to
 	 * @param fieldName - the field to update
-	 * @param oldValue - the original value
 	 * @param newValue - the value to save
 	 * @param isNewEntity - flag if the record is new or existing
 	 * @param fieldsInfo - the JSON data from the import batch record
@@ -1182,21 +1163,28 @@ class DataImportService implements ServiceMethods {
 	void _recordChangeOnField(
 		Object domainInstance,
 		String fieldName,
-		Object existingValue,
 		Object newValue,
 		Boolean isInitValue,
 		Boolean isNewEntity,
 		Map fieldsInfo
 	) {
+		Object existingValue = domainInstance[fieldName]
+
 		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
 
 		if ( !isInitValue || (isInitValue && existingValue == null)) {
-			if (existingValue != newValue) {
-				// println "_recordChangeOnField() field $fieldName, domainValue=${domainInstance[fieldName]}, existingValue=$existingValue, newValue=$newValue"
+			boolean isMatch
+			if (existingValue && GormUtil.isDomainClass(existingValue.getClass())) {
+				// For domain references we need to compare IDs because the objects are not always the same
+				isMatch = existingValue.id == newValue.id
+			} else {
+				isMatch = existingValue == newValue
+			}
+			if (! isMatch) {
 				domainInstance[fieldName] = newValue
 				if (! isNewEntity) {
-					fieldsInfo[fieldName].previousValue = existingValue
+					fieldsInfo[fieldName].previousValue = existingValue.toString()
 				}
 			}
 		}
@@ -1625,7 +1613,7 @@ class DataImportService implements ServiceMethods {
 			// }
 
 			Map extraCriteria = [:]
-			// TODO : JPM 6/2018 : This requires that we have access to the parent instance so we can stag manufacturer or other related fields
+			// TODO : JPM 6/2018 : This requires that we have access to the parent instance so we can snag manufacturer or other related fields
 			/*
 			if (refDomainName == 'Model') {
 				// The first query of Model will be by Name + Mfg & assetType (if they are specified)
@@ -1647,70 +1635,58 @@ class DataImportService implements ServiceMethods {
 			// we need to pass the parentPropertyName into this logic...
 			switch (refDomainName) {
 				case 'Room':
+					// Get the Location field
 					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
 					break
 
 				case 'Rack':
-					extraCriteria.put('source', (referenceFieldName == 'rackSource' ? 1 : 0))
+					// Resolve the Room first
+					boolean isSource = referenceFieldName == 'rackSource'
+					String roomFieldName = isSource ? 'roomSource' : 'roomTarget'
+					if (fieldsInfo.containsKey(roomFieldName)) {
+						Room room = fetchEntityByFieldMetaData(roomFieldName, fieldsInfo, context)
+						if (! room) {
+							result.error = 'Unable to resolve room'
+						} else {
+							extraCriteria.put('room.id', room.id)
+						}
+					} else {
+						result.error = 'Room must be included to set rack'
+					}
+
+					extraCriteria.put('source', (isSource ? 1 : 0))
 					break
 
 				case 'Model':
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
-					extraCriteria.put('manufacturer.id', 96L)
+					if (fieldsInfo.containsKey('manufacturer')) {
+						Manufacturer mfg = fetchEntityByFieldMetaData('manufacturer', fieldsInfo, context)
+						if (! mfg) {
+							result.error = 'Unable to resolve manufacturer'
+						} else {
+							extraCriteria.put('manufacturer.id', mfg.id)
+						}
+					} else {
+						result.error = 'Manufacturer must be included to set model'
+					}
 					break
 			}
 
-			List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
-			int numFound = entities ? entities.size() : 0
-			log.debug '_fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
-				domainClass.getName(), searchValue, extraCriteria, numFound
+			if (! result.error) {
+				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
+				int numFound = entities ? entities.size() : 0
+				log.debug '_fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
+					domainClass.getName(), searchValue, extraCriteria, numFound
 
-			if (numFound > 0) {
-				result.entities = entities
-			} else {
-				// TODO : JPM 6/2018 : Searching here is not JUST by alternate key... Logic for the other searches should be outside this function
-				// Try a few alternative lookups based on the domain classes
-				// switch (refDomainName) {
-				// 	case 'Manufacturer':
-				// 		Manufacturer mfg = Manufacturer.where { name == searchValue }.find()
-				// 		if (mfg) {
-				// 			entities = [mfg]
-				// 		} else {
-				// 			mfg = ManufacturerAlias.where { name == searchValue }.find()?.manufacturer
-				// 			if (mfg) {
-				// 				entities = [mfg]
-				// 			}
-				// 		}
-				// 		break
-
-				// 	case 'Model':
-				// 		if (entity.manufacturer && entity.assetType) {
-				// 			// Searched already by mfg + name + assetType, so now try just by mfg + name
-				// 			extraCriteria = [manufacturer:entity.manufacturer]
-				// 			// entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
-				// 		}
-
-				// 		// If not found then try by looking up the alias of the model
-				// 		if (!entities) {
-				// 			Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()?.model
-				// 			if (model) {
-				// 				entities = [model]
-				// 			}
-				// 		}
-				// 		break
-
-				// 	case 'Person':
-				// 		// TODO : JPM 4/2018 : Implement Person lookup
-				// 		result.error = 'Person can not be resolved by alternate key'
-
-				// }
-
-				// if (entities) {
-				// 	result.entities = entities
-				// }
+				if (numFound > 0) {
+					result.entities = entities
+				} else {
+					// what to do here?
+				}
 			}
 		}
+
 		return result
 	}
 
