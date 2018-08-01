@@ -34,6 +34,7 @@
 							<input type="checkbox" [(ngModel)]="selectAll" (change)="onSelectAll()" name="selectAll">
 						</label>
 					</div>
+					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)"></tds-checkbox>
 				</div>
 			</div>
 		</ng-template>

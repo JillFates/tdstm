@@ -276,6 +276,11 @@ export class AssetExplorerViewGridComponent {
 		this.selectAll = false;
 	}
 
+	onChangeAssetsSelector(event: any): void {
+		console.log('Asset selector has changes');
+		console.log(event);
+	}
+
 	setSelectedItems(): void {
 		this.bulkSelectedItems = Object.keys(this.bulkItems)
 			.filter(key => this.bulkItems[key])

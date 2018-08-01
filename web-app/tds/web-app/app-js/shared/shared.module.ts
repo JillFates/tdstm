@@ -43,6 +43,7 @@ import { SupportsDependsComponent } from './components/supports-depends/supports
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 import { AddPersonComponent } from './components/add-person/add-person.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
+import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -93,7 +94,8 @@ import { DictionaryService } from './services/dictionary.service';
 		UIModalDecoratorDirective,
 		AddPersonComponent,
 		AssetTagSelectorComponent,
-		UIAutoCenterDirective
+		UIAutoCenterDirective,
+		TDSCheckboxComponent
 	],
 	providers: [
 		AuthService,
@@ -135,7 +137,8 @@ import { DictionaryService } from './services/dictionary.service';
 		UIModalDecoratorDirective,
 		AddPersonComponent,
 		AssetTagSelectorComponent,
-		UIAutoCenterDirective
+		UIAutoCenterDirective,
+		TDSCheckboxComponent
 	],
 	entryComponents: [
 		DynamicComponent,
