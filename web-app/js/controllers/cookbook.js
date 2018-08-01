@@ -624,7 +624,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		if (scope.recipeId > 0) {
 			var dataToSend = {
 				'context': {
-					'and': (scope.contexts.assetSelector.operator === 'AND')? true : false,
+					'tagMatch': (scope.contexts.assetSelector.operator === 'ALL')? true : false,
 					'tag': getTagsIds(scope.contexts.assetSelector.tag)
 				}
 			};
