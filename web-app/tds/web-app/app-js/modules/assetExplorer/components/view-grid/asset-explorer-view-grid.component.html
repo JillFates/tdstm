@@ -71,7 +71,7 @@
 		</ng-template>
 
         <!-- Default Generic Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tags'">
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
                        [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
@@ -80,7 +80,7 @@
             </div>
         </ng-template>
         <!-- Asset Tags Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tags'">
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tagAssets'">
             <tds-asset-tag-selector #tagSelector
                                     [tagList]="metadata.tagList"
                                     [viewFilterModel]="column.filter"
@@ -89,15 +89,15 @@
         </ng-template>
 
         <!-- Default Generic Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tags'">
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets'">
            <span [ngClass]="getCellClass(column)">
                {{dataItem[column.domain+'_'+column.property]}}
            </span>
         </ng-template>
         <!-- Asset Tags Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tags'">
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
             <div>
-               <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
+               <span *ngFor="let tag of convertTagsStringToList(dataItem[column.domain+'_'+column.property])" class="label tag" style="display: inline-block"
                      [ngClass]="tag.css">{{tag.name}}</span>
             </div>
         </ng-template>
