@@ -9,6 +9,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -20,6 +21,8 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
+import java.text.DateFormat
+
 /**
  * Service class with main database operations for Dataview.
  * @see net.transitionmanager.domain.Dataview
@@ -27,6 +30,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
+	UserPreferenceService userPreferenceService
 
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
@@ -393,6 +397,8 @@ class DataviewService implements ServiceMethods {
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
 	    def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
 
+		postProcessAssetData(assets, dataviewSpec)
+
 	    Map queryResults = previewQueryResults(assets, totalAssets[0], dataviewSpec)
 
 	    postProcessAssetQuery(queryResults, whereInfo.mixedFields)
@@ -406,6 +412,31 @@ class DataviewService implements ServiceMethods {
 	 * to perform some final operations on the assets, if needed.
 	 *
 	 * @param assets
+	 * @param mixedFieldsInfo
+	 */
+	private void postProcessAssetData(List assets, DataviewSpec dataviewSpec) {
+
+		// Convert Date type columns to user-selected timezone
+		List dateColumns = ['lastUpdated']
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
+		dataviewSpec.columns.each { Map column ->
+			if (column.property in dateColumns) {
+				int idx = dataviewSpec.columns.indexOf(column)
+				assets.each {
+					String originalDate = it[idx]
+					it[idx] = TimeUtil.formatDateTimeWithTZ(userTzId, Date.parse(TimeUtil.FORMAT_DATE_TIME_15, originalDate), formatter)
+				}
+			}
+		}
+	}
+
+	/**
+	 * After the query for assets is invoked, this method needs to be called
+	 * to perform some final operations on the query results, if needed.
+	 *
+	 * @param queryResults
 	 * @param mixedFieldsInfo
 	 */
 	private void postProcessAssetQuery(Map queryResults, Map mixedFieldsInfo) {
