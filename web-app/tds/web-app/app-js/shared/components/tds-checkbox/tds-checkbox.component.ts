@@ -17,40 +17,34 @@ export class TDSCheckboxComponent implements OnInit {
 	private transitionHandler: Function;
 
 	ngOnInit() {
+		// start off unchecked
 		this.currentState = CheckboxStates.unchecked;
-		this.transitionHandler = this.hasThirdState ? this.transitionThreeStates.bind(this) : this.transitionTwoStates.bind(this);
+		// depending of flag it decides the strategy to handle transitions
+		this.transitionHandler = this.hasThirdState ? this.transitionThreeStates : this.transitionTwoStates;
 	}
 
 	onChange(currentState: CheckboxStates): void {
 		try {
-			this.changeState.emit(this.transitionHandler(currentState));
+			// notify to the host the transition
+			this.changeState.emit(this.transitionHandler.bind(this)(currentState));
 		} catch (error) {
 			console.error(error.message || error);
 		}
 	}
 
-	private setAttribute(attribute: string, value: boolean): void {
-		this.tdsCheckbox.nativeElement[attribute] = value;
-	}
-
+	// handle three states transition
 	private transitionThreeStates(currentState: CheckboxStates): CheckboxStates {
 		switch (currentState)  {
 			case CheckboxStates.unchecked:
-				this.setCurrentState(CheckboxStates.checked);
-				this.setAttribute(INDETERMINATE_ATTRIBUTE, false)
-				this.setAttribute(CHECKED_ATTRIBUTE, true);
+				this.transitToChecked();
 				break;
 
 			case CheckboxStates.checked:
-				this.setCurrentState(CheckboxStates.indeterminate);
-				this.setAttribute(INDETERMINATE_ATTRIBUTE, true)
-				this.setAttribute(CHECKED_ATTRIBUTE, false);
+				this.transitToIndeterminate();
 				break;
 
 			case CheckboxStates.indeterminate:
-				this.setCurrentState(CheckboxStates.unchecked);
-				this.setAttribute(INDETERMINATE_ATTRIBUTE, false)
-				this.setAttribute(CHECKED_ATTRIBUTE, false);
+				this.transitToUnchecked();
 				break;
 
 			default:
@@ -60,21 +54,15 @@ export class TDSCheckboxComponent implements OnInit {
 		return this.currentState;
 	}
 
+	// handle two states transition
 	private transitionTwoStates(currentState: CheckboxStates): CheckboxStates {
 		switch (currentState)  {
 			case CheckboxStates.unchecked:
-				this.setCurrentState(CheckboxStates.checked);
-				this.setAttribute(CHECKED_ATTRIBUTE, true);
+				this.transitToChecked();
 				break;
 
 			case CheckboxStates.checked:
-				this.setCurrentState(CheckboxStates.unchecked);
-				this.setAttribute(CHECKED_ATTRIBUTE, false);
-				break;
-
-			case CheckboxStates.indeterminate:
-				this.setCurrentState(CheckboxStates.unchecked);
-				this.setAttribute(CHECKED_ATTRIBUTE, false);
+				this.transitToUnchecked();
 				break;
 
 			default:
@@ -82,6 +70,30 @@ export class TDSCheckboxComponent implements OnInit {
 		}
 
 		return this.currentState;
+	}
+
+	// transitions among states
+	private transitToChecked(): void {
+		this.setCurrentState(CheckboxStates.checked);
+		this.setAttribute(CHECKED_ATTRIBUTE, true);
+		this.setAttribute(INDETERMINATE_ATTRIBUTE, false);
+	}
+
+	private transitToIndeterminate(): void {
+		this.setCurrentState(CheckboxStates.indeterminate);
+		this.setAttribute(CHECKED_ATTRIBUTE, false);
+		this.setAttribute(INDETERMINATE_ATTRIBUTE, true);
+	}
+
+	private transitToUnchecked(): void {
+		this.setCurrentState(CheckboxStates.unchecked);
+		this.setAttribute(CHECKED_ATTRIBUTE, false);
+		this.setAttribute(INDETERMINATE_ATTRIBUTE, false);
+	}
+
+	// helpers
+	private setAttribute(attribute: string, value: boolean): void {
+		this.tdsCheckbox.nativeElement[attribute] = value;
 	}
 
 	private setCurrentState(newState: CheckboxStates): void {
