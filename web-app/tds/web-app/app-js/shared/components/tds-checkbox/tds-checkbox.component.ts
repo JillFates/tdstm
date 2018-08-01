@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, Renderer2} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 import {CheckboxStates} from './model/tds-checkbox.model';
 
 @Component({
@@ -12,42 +12,70 @@ export class TDSCheckboxComponent implements OnInit {
 	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
 	currentState: CheckboxStates;
 
-	constructor(private renderer2: Renderer2) {
-	}
-
 	ngOnInit() {
 		this.currentState = CheckboxStates.unchecked;
-		console.log('on init');
-
-		if (this.hasThirdState) {
-			this.renderer2.setAttribute(this.tdsCheckbox.nativeElement, 'indeterminate', 'true');
-			console.log('Setting indeterminated');
-		}
 	}
 
 	onChange(currentState: CheckboxStates): void {
-		this.transitionState(currentState);
-		console.log('The state is');
-		console.log(this.currentState);
+		try {
+			const stateResult = this.transitionState(currentState);
+			this.transitionCheckValue(currentState);
+			this.setAttribute('indeterminate', (stateResult === CheckboxStates.indeterminate))
+			this.changeState.emit(this.currentState);
+		} catch (error) {
+			console.error(error.message || error);
+		}
 	}
 
-	private transitionState(currentState: CheckboxStates): void {
+	private setAttribute(attribute: string, value: boolean): void {
+		this.tdsCheckbox.nativeElement[attribute] = value;
+	}
+
+	private transitionState(currentState: CheckboxStates): CheckboxStates {
 		switch (currentState)  {
 			case CheckboxStates.unchecked:
 				this.setCurrentState(CheckboxStates.checked);
 				break;
 
 			case CheckboxStates.checked:
-				this.setCurrentState(CheckboxStates.indeterminated);
+				this.setCurrentState(this.hasThirdState ? CheckboxStates.indeterminate : CheckboxStates.unchecked);
 				break;
 
-			case CheckboxStates.indeterminated:
+			case CheckboxStates.indeterminate:
 				this.setCurrentState(CheckboxStates.unchecked);
 				break;
 
 			default:
 				throw new Error('Invalid tds checkbox state');
 		}
+
+		return this.currentState;
+	}
+
+	private transitionCheckValue(currentState: CheckboxStates): CheckboxStates {
+		switch (currentState)  {
+			case CheckboxStates.unchecked:
+				// this.tdsCheckbox.nativeElement.checked = true;
+				this.setAttribute('checked', true);
+				break;
+
+			case CheckboxStates.checked:
+			case CheckboxStates.indeterminate:
+				// this.tdsCheckbox.nativeElement.checked = false;
+				this.setAttribute('checked', false);
+				break;
+
+				/*
+			case CheckboxStates.indeterminate:
+				this.tdsCheckbox.nativeElement.checked = false;
+				break;
+				*/
+
+			default:
+				throw new Error('Invalid tds checkbox state');
+		}
+
+		return this.currentState;
 	}
 
 	private setCurrentState(newState: CheckboxStates): void {

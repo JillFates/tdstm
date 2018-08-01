@@ -1,5 +1,5 @@
 export enum CheckboxStates {
 	checked,
-	indeterminated,
+	indeterminate,
 	unchecked
 }

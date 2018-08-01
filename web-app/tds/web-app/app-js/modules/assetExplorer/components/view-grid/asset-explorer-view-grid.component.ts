@@ -21,6 +21,7 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
+import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -276,9 +277,9 @@ export class AssetExplorerViewGridComponent {
 		this.selectAll = false;
 	}
 
-	onChangeAssetsSelector(event: any): void {
+	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
 		console.log('Asset selector has changes');
-		console.log(event);
+		console.log(checkboxState);
 	}
 
 	setSelectedItems(): void {
