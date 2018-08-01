@@ -50,13 +50,14 @@
                                 </div>
                                 <div class="col-sm-2 toolbar-dropdown">
                                     <kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
-                                                        [data]="batchRecordsFilter.options"
-                                                        [textField]="'name'"
-                                                        [valueField]="'id'"
-                                                        [(ngModel)]="batchRecordsFilter.selected"
-                                                        (valueChange)="onStatusFilter($event)"
-                                                        placeholder="Filter"
-                                                        class="form-control"></kendo-dropdownlist>
+                                        [data]="batchRecordsFilter.options"
+                                        [textField]="'name'"
+                                        [valueField]="'id'"
+                                        [(ngModel)]="batchRecordsFilter.selected"
+                                        (valueChange)="onStatusFilter($event)"
+                                        placeholder="Filter"
+                                        class="form-control">
+                                    </kendo-dropdownlist>
                                 </div>
                             </ng-template>
 

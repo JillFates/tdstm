@@ -110,18 +110,21 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 
 		this.fieldsInfo = [];
 		for (const fieldName of fieldNameList) {
-			this.fieldsInfo.push({
-				name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
-				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
-					? fields[fieldName].originalValue : '(null)',
-				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
-					? fields[fieldName].value : '',
-				initValue: !ValidationUtils.isEmptyObject(fields[fieldName].init)
-					? fields[fieldName].init : '',
-				errors: fields[fieldName].errors,
-				errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
-				overridedValue: null
-			});
+			// Not all rows will have all of the same fields so must check first
+			if ( fields[fieldName] !== undefined ) {
+				this.fieldsInfo.push({
+					name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
+					currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
+						? fields[fieldName].originalValue : '(null)',
+					importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
+						? fields[fieldName].value : '',
+					initValue: !ValidationUtils.isEmptyObject(fields[fieldName].init)
+						? fields[fieldName].init : '',
+					errors: fields[fieldName].errors,
+					errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
+					overridedValue: null
+				});
+			}
 		}
 		let importValues = this.fieldsInfo.map( item => item.importValue);
 		this.originalImportValues = JSON.stringify(importValues);

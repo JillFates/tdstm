@@ -1971,7 +1971,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 
 					with(data[1]) {
-						op == ImportOperationEnum.UNDETERMINED.toString()
+						op == ImportOperationEnum.TBD.toString()
 						warn == false
 						duplicate == false
 						errors == []

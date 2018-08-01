@@ -78,4 +78,8 @@ class Rack {
 			executeUpdate('update AssetEntity set rackTarget=null where rackTarget=?', [this])
 		}
 	}
+
+	String toString() {
+		tag
+	}
 }

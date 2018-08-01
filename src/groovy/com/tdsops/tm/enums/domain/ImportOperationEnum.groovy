@@ -8,9 +8,10 @@ import groovy.transform.CompileStatic
 enum ImportOperationEnum {
 
 	INSERT('Insert'),
+	UNCHANGED('Unchanged'),
 	UPDATE('Update'),
 	DELETE('Delete'),
-	UNDETERMINED('Undetermined')
+	TBD('TBD')
 
 	private String label
 
@@ -46,6 +47,6 @@ enum ImportOperationEnum {
 			}
 		}
 
-		return (opValue ?: ImportOperationEnum.UNDETERMINED)
+		return (opValue ?: ImportOperationEnum.TBD)
 	}
 }

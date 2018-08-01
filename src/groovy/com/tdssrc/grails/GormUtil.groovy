@@ -199,6 +199,17 @@ public class GormUtil {
 
 	/**
 	 * Used to access individual constraints from a domain object
+	 * @param domainInstance - a domain instance to get the constraint from
+	 * @param property - the name of the property to be accessed
+	 * @param constraintName - the individual constraint to access
+	 * @return the constraint value
+	 */
+	public static getConstraint(Object domainInstance, String property, String constraintName) {
+		getConstraint(domainInstance.getClass(), property, constraintName)
+	}
+
+	/**
+	 * Used to access individual constraints from a domain object
 	 * @param domainClass - the domain class to get the constraint from
 	 * @param property - the name of the property to be accessed
 	 * @param constraintName - the individual constraint to access
@@ -378,6 +389,17 @@ public class GormUtil {
 	}
 
 	/**
+	 * Used to retrieve the value specified for a particular property constraint
+	 * @param domainInstance - instance of the domain being inspected
+	 * @param propertyName - the property name to inspect
+	 * @param constraintName - the name of the constraint being inspected
+	 * @return the value be it an Integer, Closure, Range, etc base on the constraint type
+	 */
+	static Object getConstraintValue(Object domainInstance, String propertyName, String constraintName) {
+		return getConstraintValue(domainInstance.getClass(), propertyName, constraintName)
+	}
+
+	/**
 	 * Used to determine if a particular domain property is a String
 	 * @param clazz - the Class object of the domain being inspected
 	 * @param propertyName - the property name to inspect
@@ -529,12 +551,10 @@ public class GormUtil {
 	}
 
 	/**
-	 * Retrieve a list of domain properties. If a list of property names is given, only
-	 * those properties will be included. If a list of properties to be skipped is provided,
-	 * those properties will be excluded.
-	 * If
-	 * @param domainClass
-	 * @param properties
+	 * Provides a list of domain properties of a domain class
+	 * @param domainClass - the Domain class to interogate
+	 * @param properties - when populated it will only return those properties specified
+	 * @param skipProperties - when populated it will ignore those properties specified
 	 * @return
 	 */
 	@Memoized
@@ -572,6 +592,17 @@ public class GormUtil {
 		}
 		return domainProperties
 
+	}
+
+	/**
+	 * Provides a list of the names of domain properties of a domain class
+	 * @param domainClass
+	 * @return names of all properties of a domain
+	 */
+	static List<String> getDomainPropertyNames(Class domainClass) {
+		def dc = getDomainClass(domainClass)
+		List gdcProperties = dc.getPersistantProperties()
+		return gdcProperties.collect { it.getName() }
 	}
 
 	/**
@@ -1274,6 +1305,17 @@ public class GormUtil {
 	}
 
 	/**
+	 * Used to get the short name of the domain class for an instance
+	 *    assert domainShortName(personInstance) == 'Person'
+	 *
+	 * @param domainInstance
+	 * @return the short name of the class name
+	 */
+	static String domainShortName(Object domainInstance) {
+		domainShortName(domainInstance.getClass())
+	}
+
+	/**
 	 * Used to get the short name of the domain class
 	 *    domainShortName(net.transitionmanager.domain.Person) == 'Person'
 	 *
@@ -1324,14 +1366,24 @@ public class GormUtil {
 
 			if (extraCriteria) {
 				for (criteria in extraCriteria) {
-					hql.append(" and x.${criteria.key} = :${criteria.key}")
-					params.put(criteria.key, criteria.value)
+					String paramName = criteria.key.replaceAll(/\./, '_')
+					hql.append(" and x.${criteria.key} = :${paramName}")
+					params.put(paramName, criteria.value)
 				}
 			}
-			// println "hql = ${hql.toString()}, params=$params"
+			println "hql = ${hql.toString()}, params=$params"
 			// Try finding the entity or more...
 			entities = domainClass.findAll(hql.toString(), params)
 		}
 		return entities
+	}
+
+	/**
+	 * Used to determine if a domain instance has any unsaved changes
+	 * @param domainInstance - the instance being examined
+	 * @return true if the instance has any dirty fields
+	 */
+	static boolean hasUnsavedChanges(Object domainInstance) {
+		return domainInstance.dirtyPropertyNames.size() > 0
 	}
 }

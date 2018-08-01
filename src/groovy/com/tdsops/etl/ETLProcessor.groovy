@@ -24,6 +24,8 @@ import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
 import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.KEYWORD_IN
+import static org.codehaus.groovy.syntax.Types.KEYWORD_INSTANCEOF
 import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
@@ -1380,12 +1382,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			// Empty withe list means forbid imports
 			importsWhitelist = []
 			starImportsWhitelist = []
-			// Language tokens allowed
+			// Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
 			tokensWhitelist = [
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL,
-				LEFT_SHIFT, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET
+				LEFT_SHIFT, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, KEYWORD_IN, KEYWORD_INSTANCEOF
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
