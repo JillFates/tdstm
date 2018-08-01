@@ -180,7 +180,7 @@ class HttpProducerServiceSpec extends Specification {
 			ActionRequest actionRequest = getActionRequest(action)
 			ApiActionResponse actionResponse = service.executeCall(actionRequest)
 		then:
-			'Unable to connect to endpoint' == actionResponse.error
+			service.getHttpResponseError(0) == actionResponse.error
 	}
 
 	@See('TM-10046')
@@ -190,71 +190,68 @@ class HttpProducerServiceSpec extends Specification {
 			ActionRequest actionRequest = getActionRequest(action)
 			ApiActionResponse actionResponse = service.executeCall(actionRequest)
 		then:
-			'Failure due to bad request (Action improperly configured) (400)' == actionResponse.error
+			service.getHttpResponseError(400) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test401'
 			actionRequest = getActionRequest(action)
-		actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Failure due to invalid credentials (401)' == actionResponse.error
+			service.getHttpResponseError(401) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test403'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Failure due to credentials lacking necessary permission (403)' == actionResponse.error
+			service.getHttpResponseError(403) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test404'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Failure because endpoint was not found (action URL wrong or method type) (404)' == actionResponse.error
+			service.getHttpResponseError(404) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test405'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Failure due to incorrect Method type (incorrect Action HTTP method) (405)' == actionResponse.error
+			service.getHttpResponseError(405) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test406-499'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported error code 4xx' == actionResponse.error
+			service.getHttpResponseError(406) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test500'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported Internal Server Error (500)' == actionResponse.error
+			service.getHttpResponseError(500) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test501'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported method is not implemented (501)' == actionResponse.error
+			service.getHttpResponseError(501) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test502'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported Bad Gateway (502)' == actionResponse.error
+			service.getHttpResponseError(502) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test503'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported the Service Unavailable (503)' == actionResponse.error
+			service.getHttpResponseError(503) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test504-599'
 			actionRequest = getActionRequest(action)
 			actionResponse = service.executeCall(actionRequest)
 		then:
-			'Endpoint reported error code 5xx' == actionResponse.error
+			service.getHttpResponseError(504) == actionResponse.error
 
 	}
-
-
-
 
 }
