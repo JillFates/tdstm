@@ -1,1 +1,1 @@
-<a *ngIf="model && model !== ''" [attr.href]="urlReference" [attr.target]="target">{{urlLabel}}</a>
+<a *ngIf="model" [href]="trustedUrl" [attr.target]="target">{{label}}</a>

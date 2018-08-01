@@ -4,8 +4,18 @@
  * <tds-asset-tag-selector *ngIf="tagList" [model]="model" [tagList]="tagList" (valueChange)="onTagValueChange($event)"></tds-asset-tag-selector>
  */
 
-import {Component, EventEmitter, Input, Output, SimpleChanges, OnChanges, OnInit} from '@angular/core';
+import {
+	Component,
+	EventEmitter,
+	Input,
+	Output,
+	SimpleChanges,
+	OnChanges,
+	OnInit,
+	ViewChild,
+} from '@angular/core';
 import {TagModel} from '../../../modules/assetTags/model/tag.model';
+import {MultiSelectComponent} from '@progress/kendo-angular-dropdowns';
 
 declare var jQuery: any;
 
@@ -16,6 +26,7 @@ declare var jQuery: any;
 })
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
+	@ViewChild('assetTagSelectorComponent') assetTagSelectorComponent: MultiSelectComponent;
 	@Input('tagList') tagList: Array<TagModel>;
 	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
@@ -46,7 +57,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 
 	/**
 	 * Catch when the dropdown is opened
-	 * it works to attach classes to list if neccsary
+	 * it works to attach classes to list if necessary
 	 */
 	public onOpen(): void {
 		setTimeout(() => {
@@ -109,6 +120,13 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			tags: this.assetSelectorModel.tags,
 			operator: (this.assetSelectorModel.switch) ? 'AND' : 'OR'
 		});
+	}
+
+	/**
+	 * Helper method to open the Dropdown if required to be outside Angular
+	 */
+	public openTagSelector(): void {
+		this.assetTagSelectorComponent.toggle(true);
 	}
 
 }
