@@ -113,7 +113,10 @@
                                 <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
                                     <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
                                         <ng-template kendoGridHeaderTemplate>
-                                            <label> {{column.label}}</label>
+                                            <label>{{column.label}}</label>
+                                        </ng-template>
+                                        <ng-template kendoGridCellTemplate let-dataItem>
+                                            {{ dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE }}
                                         </ng-template>
                                     </kendo-grid-column>
                                 </kendo-grid>

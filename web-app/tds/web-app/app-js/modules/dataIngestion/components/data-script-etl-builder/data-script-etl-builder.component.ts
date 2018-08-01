@@ -18,8 +18,8 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
-import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -55,6 +55,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private testScripInterval: any;
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 
 	ngAfterViewInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
