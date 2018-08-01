@@ -30,6 +30,14 @@ enum DataScriptMode {
 }
 
 class DataScript {
+	 static enum PROPS {
+		 id, name, description, target, mode, etlSourceCode, provider, dateCreated,
+		 lastUpdated, sampleFilename, originalSampleFilename
+	 }
+	 static Set<PROPS> MINIMAL_INFO = [ PROPS.id, PROPS.name ]
+	 static Set<PROPS> ALL_INFO = PROPS.values()
+	 static Set<PROPS> SOURCE_CODE = [ PROPS.etlSourceCode, PROPS.sampleFilename, PROPS.originalSampleFilename ]
+	 static Set<PROPS> BASE_INFO = ALL_INFO - SOURCE_CODE
 
     String name
 
@@ -53,6 +61,9 @@ class DataScript {
     Date dateCreated=new Date()
     Date lastUpdated
 
+    String sampleFilename = ''
+    String originalSampleFilename = ''
+
     static belongsTo = [ project: Project, provider: Provider ]
 
     static constraints = {
@@ -62,6 +73,8 @@ class DataScript {
         lastModifiedBy nullable: true
         lastUpdated nullable: true
         etlSourceCode nullable: true
+        sampleFilename  blank: true, size: 0..255
+        originalSampleFilename  blank: true, size: 0..255
     }
 
     static mapping = {
@@ -74,28 +87,43 @@ class DataScript {
         lastModifiedBy  column: 'last_modified_by'
     }
 
+	static transients = [ 'MINIMAL_INFO', 'ALL_INFO', 'SOURCE_CODE', 'BASE_INFO' ]
+
     /**
      * Return a map representation of the DataScript instance.
      * @param minimalInfo: if set to true only the id and name will be returned.
      * @return
      */
-    Map toMap(boolean minimalInfo = false) {
-        Map map = [
-            id: id,
-            name: name
-        ]
+    Map toMap(Set<PROPS> props = null) {
 
-        if (! minimalInfo) {
-            map.description = description
-            map.target = target
-            map.mode = mode.toString()
-            map.etlSourceCode = etlSourceCode
-            map.provider = [id: provider.id, name: provider.name]
-            map.dateCreated = dateCreated
-            map.lastUpdated = lastUpdated
-        }
+	     if( ! props ) {
+		     props = ALL_INFO
+	     }
 
-        return map
+
+	     Map retVal = props.inject([:]) { map, prop ->
+		     String key = prop.name()
+		     def value
+
+		     switch( prop ) {
+			     case PROPS.mode :
+				            value = mode.toString()
+				            break
+
+			     case PROPS.provider :
+				            value = [id: provider.id, name: provider.name]
+				            break
+
+			     default:
+				            value = this."${key}"
+		     }
+
+		     map[key] = value
+
+		     return map
+	     }
+
+	    return retVal
     }
 
     /**

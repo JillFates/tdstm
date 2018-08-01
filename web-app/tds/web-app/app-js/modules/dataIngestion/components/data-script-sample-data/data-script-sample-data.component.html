@@ -32,6 +32,10 @@
 
                     <div class="row" style="margin-top: 10px;">
                         <!-- file -->
+                        <div *ngIf="OPTIONS.selected === OPTIONS.FILE && etlScriptModel.originalSampleFilename" class="col-md-12" style="margin-bottom: 5px;">
+                            <label class="control-label" >Current File:</label>
+                            <span style="margin-left: 5px;">{{etlScriptModel.originalSampleFilename}}</span>
+                        </div>
                         <div *ngIf="OPTIONS.selected === OPTIONS.FILE" class="col-md-12">
                             <kendo-upload
                                     #kendoUploadInstance="kendoUpload"

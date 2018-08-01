@@ -250,19 +250,30 @@ class FileSystemService implements InitializingBean {
     InputStream openTemporaryFile(String filename) {
         InputStream is
         validateFilename(filename)
-        if (temporaryFileExists(filename)) {
-            is = new File(temporaryDirectory + filename).newInputStream()
+	     File file = openTempFile(filename)
+        if (file.exists()) {
+            is = file.newInputStream()
         }
         return is
     }
+
+	/**
+	 * Open an temporary File and 'touches' it
+	 * @param filename
+	 * @return a file object
+	 */
+	 static File openTempFile(String filename) {
+		  File file = new File(temporaryDirectory, filename)
+		  return FileSystemUtil.touch(file)
+	 }
 
     /**
      * Used to determine if a file exists in the temporary directory
      * @param filename
      * @return true if the file exists otherwise false
      */
-    boolean temporaryFileExists(String filename) {
-        return new File(temporaryDirectory + filename).exists()
+    static boolean temporaryFileExists(String filename) {
+        return new File(temporaryDirectory, filename).exists()
     }
 
     /**
@@ -296,7 +307,7 @@ class FileSystemService implements InitializingBean {
     boolean deleteTemporaryFile(String filename) {
         validateFilename(filename)
         boolean success = false
-        File file = new File(temporaryDirectory + filename)
+        File file = new File(temporaryDirectory, filename)
         if (file.exists()) {
             success = file.delete()
         }

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {
 	FileRestrictions,
@@ -17,6 +17,7 @@ import {
 	FILE_UPLOAD_TYPE_PARAM,
 	REMOVE_FILENAME_PARAM
 } from '../../../../shared/model/constants';
+import {DataScriptModel} from '../../model/data-script.model';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -26,6 +27,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
+	protected originalFileName: any = { temporary: null, fileUploaded: null};
 	protected OPTIONS: any = {
 		FILE: 'file',
 		SERVICE: 'service',
@@ -62,6 +64,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	private apiActionOptions = [];
 
 	constructor(
+		@Inject('etlScript') protected etlScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
@@ -91,15 +94,18 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * Set the current sample data upload type and close the dialog.
 	 */
 	private onContinue(): void {
-		let filename = null;
+		let filename: any = { temporaryFileName: null, originalFileName: null};
 		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
-			filename = this.csv.filename;
+			filename.temporaryFileName = this.csv.filename;
+			filename.originalFileName = this.csv.filename;
 		}
 		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE) {
-			filename = this.webService.filename;
+			filename.temporaryFileName = this.webService.filename;
+			filename.originalFileName = this.webService.filename;
 		}
 		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE) {
-			filename = this.file.uploadedFilename;
+			filename.temporaryFileName = this.file.uploadedFilename;
+			filename.originalFileName = this.originalFileName.fileUploaded;
 		}
 		this.close(filename);
 	}
@@ -171,6 +177,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 			let filename = response.filename;
 			this.file.uploadedFilename = filename;
 			this.OPTIONS.useFileFrom = this.OPTIONS.FILE;
+			this.originalFileName.fileUploaded = this.originalFileName.temporary;
 		}
 	}
 
@@ -178,6 +185,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ETL_SCRIPT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
+		this.originalFileName.temporary = e.files[0].name;
 	}
 
 	/**
@@ -188,6 +196,8 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	private clearFilename(e?: any) {
 		this.file.uploadedFilename = null;
 		this.OPTIONS.useFileFrom = null;
+		this.originalFileName.temporary = null;
+		this.originalFileName.fileUploaded = null;
 	}
 
 	/**
