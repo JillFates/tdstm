@@ -12,7 +12,7 @@ export class TaskCommentColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 75,
+				width: 105,
 				locked: true
 			},
 			{
