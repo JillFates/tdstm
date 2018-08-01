@@ -681,7 +681,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	var getTagsIds = function(tags) {
 		var tagIds = [];
 		tags.each( function(a){
-			tagIds.push(new Number(a.id));
+			tagIds.push(parseInt(a.id));
 		})
 		return tagIds;
 	}
@@ -1056,7 +1056,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 		var getTagsIds = function(tags) {
 			var tagIds = [];
 			tags.each( function(a){
-				tagIds.push(new Number(a.id));
+				tagIds.push(parseInt(a.id));
 			})
 			return tagIds;
 		};
@@ -1904,7 +1904,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		var getTagsIds = function(tags) {
 			var tagIds = [];
 			tags.each( function(a){
-				tagIds.push(new Number(a.id));
+				tagIds.push(parseInt(a.id));
 			})
 			return tagIds;
 		};
