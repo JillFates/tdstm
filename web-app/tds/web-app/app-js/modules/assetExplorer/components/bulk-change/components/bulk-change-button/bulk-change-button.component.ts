@@ -11,6 +11,7 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 })
 export class BulkChangeButtonComponent {
 	@Input() selectedItems: number[];
+	@Input() affected: number;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 
 	constructor(private dialogService: UIDialogService) {
@@ -22,7 +23,7 @@ export class BulkChangeButtonComponent {
 	}
 
 	showBulkActions() {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems };
+		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, affected: this.affected };
 
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}

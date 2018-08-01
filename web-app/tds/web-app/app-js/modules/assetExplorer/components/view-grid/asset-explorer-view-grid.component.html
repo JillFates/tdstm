@@ -11,7 +11,7 @@
 				<label>
 					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
-			<tds-bulk-change-button [selectedItems]="checkboxHelper.getBulkSelectedItems()" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<tds-bulk-change-button [affected]="getAffectedCounter()" [selectedItems]="checkboxHelper.getBulkSelectedItems()" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 		</div>
 	    <div class="col-sm-6">
 		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">

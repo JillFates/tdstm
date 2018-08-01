@@ -9,6 +9,7 @@ export class DataGridCheckboxHelper {
 	constructor() {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
+		this.bulkSelectedItems = [];
 	}
 
 	setPageSize(size: number): void {

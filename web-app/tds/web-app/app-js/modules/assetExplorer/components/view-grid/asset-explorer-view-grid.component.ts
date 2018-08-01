@@ -186,6 +186,9 @@ export class AssetExplorerViewGridComponent {
 			clearTimeout(this.typingTimeout);
 		}
 	}
+	getAffectedCounter(): number {
+		return (this.checkboxHelper.getCurrentState() === CheckboxStates.indeterminate) ? this.gridData.total : this.checkboxHelper.getBulkSelectedItems().length;
+	}
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
