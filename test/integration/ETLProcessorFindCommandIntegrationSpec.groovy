@@ -83,9 +83,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
@@ -242,10 +239,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				iterate {
 					extract 'AssetDependencyId' load 'id'
 					find Dependency by 'id' with DOMAIN.id into 'id'
-					
+
 					// Process the PRIMARY 'asset' in the dependency
                     extract 'AssetId' load 'asset'
-					
+
 					// Set some local variables to be reused
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
@@ -371,15 +368,15 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-				
+
 					extract 'AssetDependencyId' load 'id'
 					find Dependency by 'id' with DOMAIN.id into 'id'
-					
-					// Grab the reference to the FINDINGS to be used later. 
+
+					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
 
 					if (primaryFindings.size() > 0 ){
-					    load 'comment' with 'Asset results found'		
+					    load 'comment' with 'Asset results found'
 					} else {
 					    load 'comment' with 'Asset results not found'
 					}
@@ -445,9 +442,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
@@ -464,7 +458,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				console on
 				read labels
 				domain Dependency
-				
+
 				iterate {
 					extract 'application id' load 'asset'
 					find Application by 'id' with DOMAIN.asset into 'asset'
@@ -580,9 +574,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
 					applications.findAll {
@@ -737,9 +728,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		and:
 			GroovySpy(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				if(namedParams.containsKey('id')){
 					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }*.getId()
@@ -765,13 +753,13 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				iterate {
 					extract 'AssetDependencyId' load 'id'
 					extract 'AssetId' load 'asset'
-					
+
 					find Asset by 'assetName' with SOURCE.AssetName into 'asset'
-					// Grab the reference to the FINDINGS to be used later. 
+					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
 
 					if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
-					    set comment with 'Asset results found'		
+					    set comment with 'Asset results found'
 					} else {
 					    set comment with 'Asset results not found'
 					}
@@ -841,7 +829,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-					
+
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
 					extract 'AssetName' set primaryNameVar
@@ -850,7 +838,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					find Application by 'id' with DOMAIN.asset into 'asset'
                     elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-                    
+
                     whenNotFound 'asset' create {
                         assetName primaryNameVar
                         assetClass primaryTypeVar
@@ -967,7 +955,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-					
+
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
 					extract 'AssetName' set primaryNameVar
@@ -976,7 +964,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					find Application by 'id' with DOMAIN.asset into 'asset'
                     elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-                    
+
                     whenNotFound 'asset' update {
                         assetClass Application
                         assetName primaryNameVar
@@ -1048,7 +1036,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-					
+
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
 					extract 'AssetName' set primaryNameVar
@@ -1057,7 +1045,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					find Application by 'id' with DOMAIN.asset into 'asset'
                     elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-                    
+
                     whenFound 'asset' create {
                         "TN Last Seen" NOW
                     }
@@ -1126,16 +1114,16 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-					
+
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset' 
+					find Application by 'id' with DOMAIN.asset into 'asset'
                     elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-                    
+
 					whenNotFound 'asset' create {
 						assetClass Unknown
 						assetName primaryNameVar
@@ -1209,16 +1197,16 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-					
+
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset' 
+					find Application by 'id' with DOMAIN.asset into 'asset'
                     elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
                     elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-                    
+
                     whenFound 'asset' update {
                         assetName primaryNameVar
                     }
@@ -1319,10 +1307,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				read labels
 				iterate {
 					domain Rack
-					extract 'rackId' load 'id' 
+					extract 'rackId' load 'id'
 					extract 'Location' load 'location'
 					extract 'Room' load 'room'
-			 
+
 			        find Room by 'id' with SOURCE.RoomId into 'id'
 				}
 			""".stripIndent())

@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
@@ -26,6 +27,7 @@ import java.text.DecimalFormat
 class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
+	 FileSystemService fileSystemService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],
@@ -117,6 +119,15 @@ class DataScriptService implements ServiceMethods{
         }
 
         DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
+
+	     // Check if the Sample File is still available, if not delete the temporary data
+	     if ( dataScript.sampleFilename ) {
+		     if ( ! FileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
+			     dataScript.sampleFilename = ''
+			     dataScript.originalSampleFilename = ''
+			     dataScript.save()
+		     }
+	     }
 
         return dataScript
     }
@@ -282,11 +293,16 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (String fileName, Long maxRows) throws EmptyResultException{
+	Map parseDataFromFile (Long id, String originalFileName, String fileName, Long maxRows) throws EmptyResultException{
 		try{
+
+			if ( id ) {
+				saveSampleFile(id, originalFileName, fileName)
+			}
+
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
-        switch (extension) {
+         switch (extension) {
             case 'JSON':
                 return parseDataFromJSON(fileName)
 
@@ -324,7 +340,7 @@ class DataScriptService implements ServiceMethods{
 	}
 
 	private File tempFile(String fileName) throws FileNotFoundException {
-		File inputFile = new File(FileSystemService.temporaryDirectory, fileName)
+		File inputFile = FileSystemService.openTempFile(fileName)
 		if (! inputFile.exists()) {
 			throw new FileNotFoundException(inputFile.toString())
 		}
@@ -452,5 +468,30 @@ class DataScriptService implements ServiceMethods{
 				  rows  : data
 		]
 
+	}
+
+	/**
+	 * Store the sampleFileName, if changed in the DataScript object
+	 * @param id DataScript identifier
+	 * @param tmpFileName filename to store
+	 */
+	private void saveSampleFile(Long id, String originalFileName, String tmpFileName) {
+		DataScript ds = DataScript.get(id)
+
+		String extension = FilenameUtils.getExtension(tmpFileName)
+
+		if(! originalFileName ) {
+			originalFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf('_')) + '.' + extension
+		}
+
+		if ( !originalFileName.equalsIgnoreCase(ds.originalSampleFilename) ) {
+			if ( ds.sampleFilename ) { // delete old file associated
+				fileSystemService.deleteTemporaryFile(ds.sampleFilename)
+			}
+
+			ds.originalSampleFilename = originalFileName
+			ds.sampleFilename = tmpFileName
+			ds.save()
+		}
 	}
 }

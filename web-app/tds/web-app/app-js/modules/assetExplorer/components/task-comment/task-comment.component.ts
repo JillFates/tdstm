@@ -130,7 +130,7 @@ export class TaskCommentComponent implements OnInit {
 		let singleCommentModel: SingleCommentModel = {
 			id: comment.commentInstance.id,
 			modal: {
-				title: 'Comment Detail',
+				title: (modalType === ModalType.EDIT) ?  'Edit Comment' :  'Comment Detail',
 				type: modalType
 			},
 			archive: comment.commentInstance.dateResolved !== null,

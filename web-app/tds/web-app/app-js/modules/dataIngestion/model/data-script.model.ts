@@ -59,6 +59,8 @@ export class DataScriptModel {
 	};
 	dateCreated?: Date;
 	lastUpdated?: Date;
+	sampleFilename?: string;
+	originalSampleFilename?: string;
 }
 
 export const Flatten = filter => {

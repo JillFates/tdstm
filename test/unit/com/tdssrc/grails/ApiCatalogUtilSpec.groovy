@@ -34,7 +34,7 @@ class ApiCatalogUtilSpec extends Specification {
 		setup:
 			def dictionary
 			def jsonDictionaryTransformed
-		when: 'try to tramsform an invalid json dictionary'
+		when: 'try to transform an invalid json dictionary'
 			dictionary =  '{"key": "value","key"}'
 			jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
 		then:
@@ -94,5 +94,71 @@ class ApiCatalogUtilSpec extends Specification {
 				paramName == 'HOSTNAME'
 			}
 		}
+	}
+
+	@See('TM-11427')
+	def 'test invalid reaction script code entry'() {
+		when: 'try to transform a dictionary with wrong reaction script code key'
+			def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"scriptDef": {}, ' +
+					'"script": {"NON_EXISTING_REACTION_SCRIPT": "should error"},' +
+					'"method": []}}'
+			ApiCatalogUtil.transformDictionary(dictionary)
+		then:
+			def e = thrown InvalidParamException
+			e.message == "Error transforming ApiCatalog dictionary. Invalid reaction script code entry: NON_EXISTING_REACTION_SCRIPT"
+
+	}
+
+	@See('TM-11427')
+	def 'test method without reaction script entry gets added common reaction script'() {
+		when: 'try to transform a dictionary with wrong reaction script code key'
+			def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"scriptDef": {}, ' +
+					'"script": {"DEFAULT": "// default common reaction script"},' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod"' +
+					'	}' +
+					']}}'
+			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(dictionary)
+			Map methods = ApiCatalogUtil.getCatalogMethods(jsonDictionaryTransformed)
+		then:
+			methods
+			methods.size() == 1
+			methods.containsKey('testMethod')
+			with(methods['testMethod']) {
+				apiMethod == 'testMethod'
+				script.size() == 1
+				with(script) {
+					DEFAULT == "// default common reaction script"
+				}
+			}
+	}
+
+	@See('TM-11427')
+	def 'test transform dictionary with reaction scripts and methods will contain expected reactions scripts transformed and merged'() {
+		when:
+			String jsonDictionaryTransformed = ApiCatalogUtil.transformDictionary(ApiCatalogTestHelper.DICTIONARY_WITH_SCRIPTS)
+			Map methods = ApiCatalogUtil.getCatalogMethods(jsonDictionaryTransformed)
+
+		then: 'transformed dictionary contains expected methods with reaction scripts'
+			methods
+			methods.size() == 1
+			methods.containsKey('callEndpoint')
+			with(methods['callEndpoint']) {
+				apiMethod == 'callEndpoint'
+				script.size() == 4
+				with(script) {
+					SUCCESS == "// Success script for 204 status code - nocontent\n          task.hold( 'Moving the task to hold since no content was received' )"
+					FAILED == "// a script that isn't in the dictionary.script declaration\n                    // Failed -logic to perform when API call receives 400 or 500 series HTTP error code.\n                     task.error( response.error )"
+					STATUS == "// Check the HTTP response code for a 200 OK\n          if (response.status == SC.OK) { \n            return SUCCESS \n        } else { \n            return ERROR \n        }"
+					ERROR == "// Put the task on hold and add a comment with the cause of the error\n          task.error( response.error )"
+				}
+			}
+
 	}
 }

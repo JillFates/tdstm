@@ -12,7 +12,7 @@ package com.tdsops.etl
  * @param values
  * @return
  */
-class ETLFindElement implements ETLStackableCommand{
+class ETLFindElement implements ETLStackableCommand {
 
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
@@ -205,7 +205,9 @@ class ETLFindElement implements ETLStackableCommand{
 					processor.project,
 					currentFind.kv)
 
-			processor.findCache?.put(currentFind.domain, currentFind.kv, cacheResults)
+			if (processor.findCache) {
+				processor.findCache.put(currentFind.domain, currentFind.kv, cacheResults)
+			}
 		}
 
 		return cacheResults
@@ -345,7 +347,7 @@ class ETLFindElement implements ETLStackableCommand{
 		}
 
 		if (missingProperties) {
-			error = "find/elseFind statement is missing required ${missingProperties} ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
 		}
 
 		return error

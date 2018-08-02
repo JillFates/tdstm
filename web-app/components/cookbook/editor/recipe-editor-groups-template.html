@@ -14,7 +14,7 @@
 		<div class="row">
 			<div class="col-sm-8 col-md-8 col-lg-8 tm-asset-tag-selector-container recipe-editor">
 				<label class="col-title">Tag:</label>
-				<tm-asset-tag-selector asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context"on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
+				<tm-asset-tag-selector disabled-operator="'true'" pre-selected-operator="'ANY'" asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context"on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
 			</div>
 		</div>
 		<div class="row">
@@ -32,7 +32,7 @@
 	<div class="selectors in">
 		<div class="refreshWrapper">
 			<label for="refreshGroups">
-				<a class="btn btn-default" id="refreshGroups" ng-click="groups.fetchGroups()">
+				<a class="btn btn-default" ng-disabled="!contexts.validCurrentSelection" id="refreshGroups" ng-click="groups.fetchGroups()">
 					Fetch
 				</a>
 			</label>
