@@ -46,6 +46,7 @@ class MoveBundleService implements ServiceMethods {
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+	TagService tagService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
@@ -281,7 +282,7 @@ class MoveBundleService implements ServiceMethods {
 		String virtualTypes = AssetType.virtualServerTypesAsString
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
-		String tagQuery = getTagsQuery(tagIds, tagMatch, queryParams)
+		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
 
 		def depSql = new StringBuffer("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
@@ -473,31 +474,6 @@ class MoveBundleService implements ServiceMethods {
 		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
 		return map
-	}
-
-	/**
-	 * Generates up the query for filtering by tags, if there are any.
-	 *
-	 * @param tagIds The tag ids to filter by.
-	 * @param andOp To filter multiple tag ids using AND, if true, or use OR if false.
-	 *
-	 * @return the query for filtering by tags, using AND/OR, or and empty string, if there are no tags to filter by.
-	 */
-	String getTagsQuery(List<Long> tagIds, String tagMatch, Map queryParams){
-
-		if(!tagIds){
-			return ''
-		}
-
-		if(tagMatch == 'ANY'){
-			queryParams.tagIds = tagIds
-			return "AND t.tag_id in (:tagIds)"
-
-		} else {
-			queryParams.tagIds = tagIds
-			queryParams.tagIdsSize = tagIds.size()
-			return "AND a.asset_entity_id in(SELECT ta2.asset_id FROM tag_asset ta2 WHERE ta2.tag_id in (:tagIds) GROUP BY ta2.asset_id HAVING count(*) = :tagIdsSize)"
-		}
 	}
 
 	/**
