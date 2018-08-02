@@ -38,7 +38,9 @@ export class CodeMirrorComponent implements OnInit {
 	 * @param {boolean} disable
 	 */
 	public setDisabled(disable: boolean): void {
-		this.instance.options.disableInput = disable;
+		if (this.instance && this.instance.options) {
+			this.instance.options.disableInput = disable;
+		}
 	}
 
 	public addSyntaxErrors(lineNumbers: Array<number>) {

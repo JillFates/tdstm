@@ -218,6 +218,12 @@ export class APIActionModel {
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINAL, false, ''));
 	}
 
+	/**
+	 * TODO: I think this can be removed.
+	 * @deprecated look at the api-action-view-edit.component.ts -> loadReactionScripts
+	 * @param {APIActionModel} apiActionModel
+	 * @param {string} reactionScriptsStringModel
+	 */
 	public static createReactions(apiActionModel: APIActionModel, reactionScriptsStringModel: string) {
 		let reactions = JSON.parse(reactionScriptsStringModel);
 		apiActionModel.eventReactions = [];
