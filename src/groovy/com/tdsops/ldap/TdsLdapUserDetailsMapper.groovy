@@ -53,6 +53,15 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
              userInfo.fullName = ctx.getStringAttribute('name') ?: ''
         }
 
+        // User Security Roles will be assigned one of two ways:
+        //
+        // 1. When domain.updateRoles == true
+        //    Then use LDAP roles assigned to user that are crossed references through the domain.roleMap
+        //
+        // 2. When domain.updateRoles == false
+        //    Then the user when new is assigned the domain.defaultRole
+        //    And when user is pre-existing their role(s) should be loaded from PartyRole appropriately
+
         List<String> ldapRoles = authorities?.collect { it.authority }
         List<String> roles = []
         Map<String, String> roleMap = [:]
