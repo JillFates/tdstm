@@ -1019,7 +1019,7 @@ class TaskService implements ServiceMethods {
 			}
 
 			String note
-			String newStatus = task.status
+			String netawstus = task.status
 			String status = message.status ?: 'invalid'
 
 			switch (status) {
@@ -1028,24 +1028,24 @@ class TaskService implements ServiceMethods {
 					// <SL>: What is callBack for and what if task is not automatic but status is success?
 //					if (isCallback && task.isAutomatic()) {
 						task.apiActionCompletedAt = new Date()
-						newStatus = ACS.COMPLETED
+						netawstus = ACS.COMPLETED
 //					}
 					note = 'Task was completed by API notification'
 					break
 
 				case 'error':
-					newStatus = ACS.HOLD
+					netawstus = ACS.HOLD
 					note = 'Unable to validate task status due to error: ' + message.cause
 					break
 
 				default:
-					newStatus = ACS.HOLD
+					netawstus = ACS.HOLD
 					note = 'Invalid notification format : ' + message.toString()
 					break
 			}
 
 			addNote(task, whom, note, 0)
-			setTaskStatus(task, newStatus, whom)
+			setTaskStatus(task, netawstus, whom)
 
 			log.debug "updateTaskStateByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
 			task.save()
@@ -4470,11 +4470,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	// Used by the addTagFilteringToWhere method to build TAG filtering
-	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(ta.asset.id) FROM TagAsset ta WHERE '
-	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'ta.tag.name IN (:tagNameList)'
-	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT ta.asset.id FROM TagAsset ta WHERE '
-	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY ta.asset.id HAVING count(*) >= :tagListSize'
-	static final String TAG_WHERE_ASSET_PROJECT = 'ta.asset.project.id = :projectId AND ('
+	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(ta.asset.id) FROM TagAsset taws WHERE '
+	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'taws.tag.name IN (:tagNameList)'
+	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT taws.asset.id FROM TagAsset taws WHERE '
+	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY taws.asset.id HAVING count(*) = :tagListSize'
+	static final String TAG_WHERE_ASSET_PROJECT = 'taws.asset.project.id = :projectId AND ('
 
 	/**
 	 * Used to add query logic to incorporate tag filtering that will look at the filter.tag property
@@ -4521,7 +4521,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// Iterate over the parameters
 				for (int i = 0; i < likeTags.size(); i++) {
 					String paramName = 'tagName_' + (i+1)
-					likeClauses << "ta.tag.name LIKE :$paramName"
+					likeClauses << "taws.tag.name LIKE :$paramName"
 					parametersMap.put(paramName, likeTags[i])
 				}
 				String likeClause = likeClauses.join(' OR ')

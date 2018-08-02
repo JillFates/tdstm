@@ -251,7 +251,7 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ANY +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name LIKE :tagName_1' +
+				'taws.tag.name LIKE :tagName_1' +
 				'))'
 		then: 'the SQL should be as expected'
 			expected == result
@@ -273,8 +273,8 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ANY +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name LIKE :tagName_1' +
-				' OR ta.tag.name LIKE :tagName_2' +
+				'taws.tag.name LIKE :tagName_1' +
+				' OR taws.tag.name LIKE :tagName_2' +
 				'))'
 		then: 'the SQL should be as expected'
 			expected == result
@@ -297,9 +297,9 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ANY +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name IN (:tagNameList)' +
-				' OR ta.tag.name LIKE :tagName_1' +
-				' OR ta.tag.name LIKE :tagName_2' +
+				'taws.tag.name IN (:tagNameList)' +
+				' OR taws.tag.name LIKE :tagName_1' +
+				' OR taws.tag.name LIKE :tagName_2' +
 				'))'
 			// println 'result:   ' + result
 			// println 'expected: ' + expected
@@ -328,7 +328,7 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ALL +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name IN (:tagNameList)' +
+				'taws.tag.name IN (:tagNameList)' +
 				') ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
 				')'
 		then: 'the SQL should be as expected'
@@ -352,7 +352,7 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ALL +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name IN (:tagNameList)' +
+				'taws.tag.name IN (:tagNameList)' +
 				') ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
 				')'
 		then: 'the SQL should be as expected'
@@ -376,7 +376,7 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ALL +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name LIKE :tagName_1' +
+				'taws.tag.name LIKE :tagName_1' +
 				') ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
 				')'
 		then: 'the SQL should be as expected'
@@ -400,8 +400,8 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ALL +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name LIKE :tagName_1' +
-				' OR ta.tag.name LIKE :tagName_2' +
+				'taws.tag.name LIKE :tagName_1' +
+				' OR taws.tag.name LIKE :tagName_2' +
 				') ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
 				')'
 		then: 'the SQL should be as expected'
@@ -426,9 +426,9 @@ class TaskServiceTests extends Specification {
 				'a.id IN (' +
 				service.TAG_WHERE_SUBSELECT_ALL +
 				service.TAG_WHERE_ASSET_PROJECT +
-				'ta.tag.name IN (:tagNameList)' +
-				' OR ta.tag.name LIKE :tagName_1' +
-				' OR ta.tag.name LIKE :tagName_2' +
+				'taws.tag.name IN (:tagNameList)' +
+				' OR taws.tag.name LIKE :tagName_1' +
+				' OR taws.tag.name LIKE :tagName_2' +
 				') ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
 				')'
 			println 'result:   ' + result
