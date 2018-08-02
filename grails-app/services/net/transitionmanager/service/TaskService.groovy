@@ -1019,7 +1019,7 @@ class TaskService implements ServiceMethods {
 			}
 
 			String note
-			String netawstus = task.status
+			String newStatus = task.status
 			String status = message.status ?: 'invalid'
 
 			switch (status) {
@@ -1028,24 +1028,24 @@ class TaskService implements ServiceMethods {
 					// <SL>: What is callBack for and what if task is not automatic but status is success?
 //					if (isCallback && task.isAutomatic()) {
 						task.apiActionCompletedAt = new Date()
-						netawstus = ACS.COMPLETED
+						newStatus = ACS.COMPLETED
 //					}
 					note = 'Task was completed by API notification'
 					break
 
 				case 'error':
-					netawstus = ACS.HOLD
+					newStatus = ACS.HOLD
 					note = 'Unable to validate task status due to error: ' + message.cause
 					break
 
 				default:
-					netawstus = ACS.HOLD
+					newStatus = ACS.HOLD
 					note = 'Invalid notification format : ' + message.toString()
 					break
 			}
 
 			addNote(task, whom, note, 0)
-			setTaskStatus(task, netawstus, whom)
+			setTaskStatus(task, newStatus, whom)
 
 			log.debug "updateTaskStateByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
 			task.save()
