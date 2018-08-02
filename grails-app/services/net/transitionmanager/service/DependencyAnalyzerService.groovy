@@ -94,6 +94,10 @@ class DependencyAnalyzerService implements ServiceMethods {
 	 * @return a filtered list of assets based on the nameFilter passed.
 	 */
 	List<Map> filterAssets(String nameFilter, List<Map> assets, boolean isRegex) {
+		if(!nameFilter){
+			return assets
+		}
+
 		List assetList = []
 		Pattern nameRegex
 
