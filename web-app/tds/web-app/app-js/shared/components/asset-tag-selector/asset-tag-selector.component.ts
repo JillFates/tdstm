@@ -28,6 +28,7 @@ declare var jQuery: any;
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@ViewChild('assetTagSelectorComponent') assetTagSelectorComponent: MultiSelectComponent;
 	@Input('tagList') tagList: Array<TagModel>;
+	// Used to control if the Switch is require for the UI
 	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
@@ -35,6 +36,9 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('model') model: any;
 	// Model coming from the views filters.
 	@Input('viewFilterModel') viewFilterModel: string;
+
+	// Use to control if the Switch becomes visible
+	private switchVisible = false;
 
 	private assetSelectorModel = {
 		switch: false,
@@ -46,14 +50,16 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
 		} else if (this.viewFilterModel && this.viewFilterModel.length > 0) {
-			let operatorType = (this.viewFilterModel.indexOf('|') > 0)? '|' : '&';
+			// Re-draw the element based on the Filter Model
+			let operatorType = (this.viewFilterModel.indexOf('|') > 0) ? '|' : '&';
 			let ids = this.viewFilterModel.split(operatorType);
-			ids.forEach( item => {
+			ids.forEach(item => {
 				let tag: TagModel = new TagModel();
 				tag.id = parseInt(item, 0);
 				this.assetSelectorModel.tags.push(tag);
 			});
-			this.showSwitch = this.assetSelectorModel.tags.length > 1;
+			this.switchVisible = this.assetSelectorModel.tags.length > 1;
+			this.assetSelectorModel.switch = operatorType === '&';
 		}
 	}
 
@@ -82,12 +88,12 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
 		}
 		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
-			let currentSelectedValues = changes['viewFilterModel'].currentValue.split(((!this.assetSelectorModel.switch) ? '|' : '&'));
-			this.showSwitch = currentSelectedValues && currentSelectedValues.length > 1;
+			// Do something if the View filter Model change
 		}
 		if (changes['tagList'] && changes['tagList'].currentValue !== changes['tagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
 		}
+		this.onShowHideSwitch();
 	}
 
 	/**
@@ -96,6 +102,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 */
 	public onTagValueChange(value: any): void {
 		this.onValueChange();
+		this.onShowHideSwitch();
 	}
 
 	/**
@@ -130,6 +137,13 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 */
 	public openTagSelector(): void {
 		this.assetTagSelectorComponent.toggle(true);
+	}
+
+	/**
+	 * The Switch operator will be shown only if the number of tags is major to 1
+	 */
+	private onShowHideSwitch(): void {
+		this.switchVisible = this.assetSelectorModel.tags.length > 1;
 	}
 
 }

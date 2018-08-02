@@ -1,5 +1,5 @@
 <div class="asset-tag-selector-component">
-    <kendo-switch *ngIf="showSwitch"
+    <kendo-switch *ngIf="showSwitch && switchVisible"
             class="asset-tag"
             [(ngModel)]="assetSelectorModel.switch"
             [onLabel]="'ALL'"
