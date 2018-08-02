@@ -1,5 +1,6 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey as ACDK
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
@@ -114,6 +115,9 @@ class ApiCatalogUtil {
 
 		// merge common and method reactions scripts maps
 		mergeReactionScripts(jsonDictionary)
+
+		// validate httpMethod
+		validateHttpMethod(jsonDictionary)
 
 		return jsonDictionary
 	}
@@ -287,6 +291,20 @@ class ApiCatalogUtil {
 
 			// validate method level script keys
 			scriptKeyValidator(method.get(ACDK.SCRIPT))
+		}
+	}
+
+	/**
+	 * Validates that api method has a valid ApiActionHttpMethod value provided in the method.httpMethod entry
+	 * @param jsonDictionary - a transformed api catalog dictionary
+	 */
+	private static void validateHttpMethod(JSONObject jsonDictionary) {
+		// iterate method to validate
+		jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { Map method ->
+			// validate whether method.httpMethod is valid within ApiActionHttpMethod enum
+			if (!ApiActionHttpMethod.isValidHttpMethod(method.httpMethod)) {
+				throw new InvalidParamException("Api method ${method.apiMethod} has an invalid httpMethod value: ${method.httpMethod}")
+			}
 		}
 	}
 

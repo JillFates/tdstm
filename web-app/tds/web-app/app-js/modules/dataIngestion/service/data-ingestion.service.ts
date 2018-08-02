@@ -278,7 +278,8 @@ export class DataIngestionService {
 								}
 							},
 							methodParams: result[property].params,
-							script: result[property].script
+							script: result[property].script,
+							httpMethod: result[property].httpMethod
 						});
 					}
 				}
