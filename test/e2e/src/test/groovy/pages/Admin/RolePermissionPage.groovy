@@ -1,18 +1,19 @@
-package pages.Admin.LandingItems
+package pages.Admin
 
 import geb.Page
 import modules.AdminModule
 
-class ExportMfgModelsLandingPage extends Page{
+class RolePermissionPage extends Page{
 
     static at = {
-        title == "Sync Management"
-        pageHeaderName.text() == "Export Mfg & Models"
+        title == "Show Role Permissions"
+        pageHeaderName.text() == "Role Permissions"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
+
 
 }

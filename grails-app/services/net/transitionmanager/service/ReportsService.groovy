@@ -380,7 +380,7 @@ class ReportsService implements ServiceMethods {
 			from AssetComment comment
 			where comment.assetEntity.id in (:assetIds)
 			  and commentType ='issue'
-			  and isResolved = 0
+			  and dateResolved = null 
 			  and comment.category not in (:categories)
 			  and comment.isPublished IN (:publishedValues)
 			order by comment.assetEntity.assetName
@@ -434,10 +434,10 @@ class ReportsService implements ServiceMethods {
 			from AssetComment
 			where moveEvent = :event
 			  and category in(:categories)
-			  and isResolved=:resolved
+			  and dateResolved = null
 			  and isPublished IN (:publishedValues)
 		''', [event: moveEvent, categories: ['general', 'discovery', 'planning', 'walkthru'],
-		      resolved: 0, publishedValues: publishedValues])
+		      publishedValues: publishedValues])
 
 		String eventIssues
 		if (nonAssetIssue) {

@@ -28,13 +28,15 @@ export class DataIngestionService {
 	private dataDefaultUrl = '../ws';
 	private jobProgressUrl = '../ws/progress';
 	private dataApiActionUrl = '../ws/apiAction';
-	private dataIngestionUrl = '../ws/dataingestion';
+	private readonly dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
 	private ETLScriptUploadTextURL = '../ws/fileSystem/uploadTextETLDesigner';
 	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
+	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}');
+	private readonly GET_ETL_SCRIPT_BY_ID_URL = this.dataIngestionUrl.concat('/datascript/{0}');
 
 	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
 	}
@@ -208,11 +210,13 @@ export class DataIngestionService {
 
 	/**
 	 * Get Sample Data of a File by passing the FileName to the server
+	 * @param {number} id
 	 * @param {string} fileName
+	 * @param {string} originalFileName
 	 * @returns {Observable<SampleDataModel>}
 	 */
-	getSampleData(fileName: string): Observable<SampleDataModel> {
-		return this.http.get(`${this.dataScriptUrl}/sampleData/${fileName}`)
+	getSampleData(id: number, fileName: string, originalFileName = ''): Observable<SampleDataModel> {
+		return this.http.get(this.GET_SAMPLE_DATA_URL.replace('{0}', id.toString()).replace('{1}', fileName).replace('{2}', originalFileName))
 			.map((res: Response) => {
 				let result = res.json();
 				let data: any = (result && result.status === 'success' && result.data);
@@ -247,7 +251,7 @@ export class DataIngestionService {
 				for (let property in result) {
 					if (result.hasOwnProperty(property)) {
 						agentMethodModel.push({
-                            id: result[property].apiMethod,
+							id: result[property].apiMethod,
 							name: result[property].name,
 							description: result[property].description,
 							endpointUrl: result[property].endpointUrl,
@@ -273,7 +277,8 @@ export class DataIngestionService {
 									interval: INTERVAL.MINUTES
 								}
 							},
-							methodParams: result[property].params
+							methodParams: result[property].params,
+							script: result[property].script
 						});
 					}
 				}
@@ -594,6 +599,14 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success';
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getETLScript(id: number): Observable<ApiResponseModel> {
+		return this.http.get(this.GET_ETL_SCRIPT_BY_ID_URL.replace('{0}', id.toString()) )
+			.map((res: Response) => {
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}

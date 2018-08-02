@@ -624,7 +624,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		if (scope.recipeId > 0) {
 			var dataToSend = {
 				'context': {
-					'and': (scope.contexts.assetSelector.operator === 'AND')? true : false,
+					'tagMatch': (scope.contexts.assetSelector.operator === 'ALL')? true : false,
 					'tag': getTagsIds(scope.contexts.assetSelector.tag)
 				}
 			};
@@ -681,7 +681,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	var getTagsIds = function(tags) {
 		var tagIds = [];
 		tags.each( function(a){
-			tagIds.push(new Number(a.id));
+			tagIds.push(parseInt(a.id));
 		})
 		return tagIds;
 	}
@@ -1056,7 +1056,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 		var getTagsIds = function(tags) {
 			var tagIds = [];
 			tags.each( function(a){
-				tagIds.push(new Number(a.id));
+				tagIds.push(parseInt(a.id));
 			})
 			return tagIds;
 		};
@@ -1069,7 +1069,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 				useWIP: scope.tasks.generateOpts.useWIP ,
 				autoPublish: scope.tasks.generateOpts.autoPublish ,
 				deletePrevious: scope.tasks.generateOpts.deletePrevious ,
-				eventId: scope.contexts.selectedEvent.id,
+				eventId: (scope.contexts.selectedEvent)? scope.contexts.selectedEvent.id : null,
 				tag: getTagsIds(scope.contexts.assetSelector.tag)
 			};
 			// Partially Remove Prototype
@@ -1904,7 +1904,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		var getTagsIds = function(tags) {
 			var tagIds = [];
 			tags.each( function(a){
-				tagIds.push(new Number(a.id));
+				tagIds.push(parseInt(a.id));
 			})
 			return tagIds;
 		};
@@ -1912,7 +1912,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, $h
 		var postData = {
 			recipeVersionId: recVerId,
 			context: {
-				eventId: scope.contexts.selectedEvent.id,
+				eventId: (scope.contexts.selectedEvent)? scope.contexts.selectedEvent.id: null,
 				tag: getTagsIds(scope.contexts.assetSelector.tag)
 			},
 			sourceCode: source

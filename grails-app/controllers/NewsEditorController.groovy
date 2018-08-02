@@ -117,10 +117,10 @@ class NewsEditorController implements ControllerMethods {
 			moveEventNewsQuery.append(" p.project_id = $project.id ")
 		}
 		if (viewFilter == "active") {
-			assetCommentsQuery.append(" and ac.is_resolved = 0 ")
+			assetCommentsQuery.append(" and ac.date_resolved is null ")
 			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
 		} else if (viewFilter == "archived") {
-			assetCommentsQuery.append(" and ac.is_resolved = 1 ")
+			assetCommentsQuery.append(" and ac.date_resolved is not null ")
 			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 		}
 		if (params.comment) {
@@ -215,11 +215,11 @@ class NewsEditorController implements ControllerMethods {
 		}
 
 		if (viewFilter == "active") {
-			assetCommentsQuery.append(" and ac.is_resolved = 0 ")
+			assetCommentsQuery.append(" and ac.date_resolved is null ")
 			moveEventNewsQuery.append(" and mn.is_archived = 0 ")
 		}
 		else if (viewFilter == "archived") {
-			assetCommentsQuery.append(" and ac.is_resolved = 1 ")
+			assetCommentsQuery.append(" and ac.date_resolved is not null ")
 			moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 		}
 
@@ -293,11 +293,11 @@ class NewsEditorController implements ControllerMethods {
 		String commentType = params.commentType
 		if (commentType == "issue") {
 			AssetComment assetComment = AssetComment.get(params.id)
-			if (params.isResolved == '1' && assetComment.isResolved == 0) {
+			if (params.isResolved == '1' && !assetComment.isResolved()) {
 				assetComment.resolvedBy = securityService.loadCurrentPerson()
 				assetComment.dateResolved = new Date()
 			}
-			else if (!(params.isResolved == '1' && assetComment.isResolved == 1)) {
+			else if (!(params.isResolved == '1' && assetComment.isResolved())) {
 				assetComment.resolvedBy = null
 				assetComment.dateResolved = null
 			}

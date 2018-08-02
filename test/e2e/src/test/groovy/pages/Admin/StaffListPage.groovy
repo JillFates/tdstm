@@ -7,6 +7,7 @@ import modules.CommonsModule
 class   StaffListPage extends Page {
 
     static at = {
+        title == "Staff List"
         staffPageTitle.text().trim() == "Staff List"
         pageBreadcrumbs[0].text() == "Admin"
         pageBreadcrumbs[1].text() == "Client"

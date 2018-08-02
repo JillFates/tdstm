@@ -24,6 +24,7 @@ import org.apache.http.HttpRequest
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
 import org.apache.http.NameValuePair
+import org.apache.http.NoHttpResponseException
 import org.apache.http.auth.Credentials
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.client.config.RequestConfig
@@ -90,6 +91,20 @@ class HttpProducerService {
     private static final Pattern TXT_CSV = ~/.*text\/csv.*/
     private static final Pattern XLS = ~/.*application\/vnd.ms-excel.*/
     private static final Pattern XLSX = ~/.*application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet.*/
+    private static final String HTTP_ERROR_DNS_NOT_FOUND = 'Unable to resolve host name (%s)'
+    private static final String HTTP_ERROR_NO_RESPONSE = 'Unable to connect to endpoint'
+    private static final String HTTP_ERROR_400 = 'Failure due to bad request (Action improperly configured) (400)'
+    private static final String HTTP_ERROR_401 = 'Failure due to invalid credentials (401)'
+    private static final String HTTP_ERROR_403 = 'Failure due to credentials lacking necessary permission (403)'
+    private static final String HTTP_ERROR_404 = 'Failure because endpoint was not found (action URL wrong or method type) (404)'
+    private static final String HTTP_ERROR_405 = 'Failure due to incorrect Method type (incorrect Action HTTP method) (405)'
+    private static final String HTTP_ERROR_406_499 = 'Endpoint reported error code 4xx'
+    private static final String HTTP_ERROR_500 = 'Endpoint reported Internal Server Error (500)'
+    private static final String HTTP_ERROR_501 = 'Endpoint reported method is not implemented (501)'
+    private static final String HTTP_ERROR_502 = 'Endpoint reported Bad Gateway (502)'
+    private static final String HTTP_ERROR_503 = 'Endpoint reported the Service Unavailable (503)'
+    private static final String HTTP_ERROR_504_599 = 'Endpoint reported error code 5xx'
+    private static final String HTTP_ERROR_UNKNOWN = 'Unkown error code received from endpoint. (%s)'
 
     TaskService taskService
     ApiActionService apiActionService
@@ -108,13 +123,15 @@ class HttpProducerService {
             return reaction(invokeActionRequest(actionRequest))
         } catch (Exception e) {
             log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(e))
-            // this is used to notify tasks when something went wrong by added a task note
+            String errorMessage = translateHttpException(e)
+
+            // this is used to notify tasks when something went wrong by adding a task note
             if (actionRequest.options.hasProperty('taskId')) {
                 Long taskId = actionRequest.options.taskId
-                taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: e.message])
+                taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: errorMessage])
             }
             ApiActionResponse errorApiActionResponse = new ApiActionResponse()
-            errorApiActionResponse.error = e.message
+            errorApiActionResponse.error = errorMessage
             errorApiActionResponse.successful = false
             return errorApiActionResponse.asImmutable()
         }
@@ -172,7 +189,7 @@ class HttpProducerService {
         log.info('Action response headers: {}', apiActionResponse?.headers)
 
         if (!apiActionResponse.successful) {
-            apiActionResponse.error = httpResponse?.statusLine
+            apiActionResponse.error = getHttpResponseError(apiActionResponse.status)
             apiActionResponse.data = null
         } else {
             InputStream is = httpResponse?.entity?.content
@@ -315,6 +332,70 @@ class HttpProducerService {
 
         ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
         return apiActionResponse.asImmutable()
+    }
+
+    /**
+     * Translate a Http exception to a user readable message
+     * @param e - the Exception
+     * @return a String containing a user readable message with the http exception found
+     */
+    private String translateHttpException(Exception e) {
+        if (e instanceof UnknownHostException) {
+            return String.format(HTTP_ERROR_DNS_NOT_FOUND, e.message)
+        } else if (e instanceof NoHttpResponseException) {
+            return HTTP_ERROR_NO_RESPONSE
+        } else {
+            return e.message
+        }
+    }
+
+    /**
+     * Get the user readable http response error corresponding to the http status code
+     * @param httpResponse - the HttpResponse
+     * @return a String containing a user readable message with the http status code found
+     */
+    String getHttpResponseError(int statusCode) {
+        if (statusCode <= 0) {
+            return HTTP_ERROR_NO_RESPONSE
+        }
+
+        switch (statusCode) {
+            case 400:
+                return HTTP_ERROR_400
+                break
+            case 401:
+                return HTTP_ERROR_401
+                break
+            case 403:
+                return HTTP_ERROR_403
+                break
+            case 404:
+                return HTTP_ERROR_404
+                break
+            case 405:
+                return HTTP_ERROR_405
+                break
+            case 406..499:
+                return HTTP_ERROR_406_499
+                break
+            case 500:
+                return HTTP_ERROR_500
+                break
+            case 501:
+                return HTTP_ERROR_501
+                break
+            case 502:
+                return HTTP_ERROR_502
+                break
+            case 503:
+                return HTTP_ERROR_503
+                break
+            case 504..599:
+                return HTTP_ERROR_504_599
+                break
+            default:
+                return String.format(HTTP_ERROR_UNKNOWN, statusCode)
+        }
     }
 
     /**

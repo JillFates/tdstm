@@ -3,7 +3,6 @@ package specs.Admin
 import geb.spock.GebReportingSpec
 import utils.CommonActions
 import pages.Admin.StaffListPage
-import pages.Admin.LandingItems.ListStaffLandingPage
 import pages.Admin.StaffCreationPage
 import pages.Admin.UserCreationPage
 import pages.Admin.UserDetailsPage
@@ -51,7 +50,6 @@ class StaffListSpec extends GebReportingSpec {
             adminModule.goToAdminListStaff()
 
         then: 'Staff List Should be displayed'
-            at ListStaffLandingPage
             at StaffListPage
         and: 'We wait for the Entire in order to be properly displayed'
             waitFor { gridSize > 0 }

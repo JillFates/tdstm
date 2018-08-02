@@ -70,4 +70,17 @@ class FileSystemUtil {
         return isValidExtension(extension, acceptedExtension)
     }
 
+    /**
+     * Update the File last time modified only if it exists
+     * @param file
+     * @return the same file object
+     */
+    static File touch(File file) {
+        if (file && file.exists()) {
+            file.setLastModified(System.currentTimeMillis())
+        }
+
+        return file
+    }
+
 }

@@ -506,7 +506,7 @@ class DataviewService implements ServiceMethods {
 				Map row = [:]
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
-					if(dataviewSpec.columns[index].property == 'tags'){
+					if(dataviewSpec.columns[index].property == 'tagAssets'){
 						cell = handleTags(cell)
 					}
 
@@ -984,7 +984,7 @@ class DataviewService implements ServiceMethods {
 		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
 		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
 		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
-		'tags': [
+		'tagAssets': [
 			property: """
 				CONCAT(
 					'[',

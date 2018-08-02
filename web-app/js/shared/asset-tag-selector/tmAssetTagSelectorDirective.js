@@ -1,7 +1,7 @@
 tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<!--<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" /> -->
+						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" disabled="{{disabledOperator}}" />
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -13,33 +13,38 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 						</script>
 						
 						<script id="asset-tag-selector-tag" type="text/x-kendo-template">
-							<div class="#:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
+							<div class="asset-tag-text #:data.css# #:(data.strike !== undefined)? 'striked-tag-item': ''#"">#:data.name#</div>
 						</script>
 					</div>`,
 		restrict: 'E',
 		scope: {
 			assetSelector: '=',
 			preAssetSelector: '=',
+			preSelectedOperator: '=',
+			disabledOperator: '=',
 			onChange: '&'
 		},
 		controller: function ($scope) {
-
 			// Init the Load
 			getAssetTags();
 
-			$scope.assetSelector = {
-				tag: [],
-				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR'
-			};
+			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
+				$(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
+			}
 
 			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-				onLabel: "AND",
-				offLabel: "OR",
+				onLabel: "ALL",
+				offLabel: "ANY",
 				change: function (e) {
-					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'AND' : 'OR';
+					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
 					$scope.onChange();
 				}
 			});
+
+			$scope.assetSelector = {
+				tag: [],
+				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY'
+			};
 
 			$(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
@@ -50,6 +55,8 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				change: selectTags,
 				open: selectTags,
 			});
+
+			($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
 
 			/**
 			 * Set the new Set Datasource to the element
@@ -103,6 +110,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				}
 			}
 
+
 			function getAssetTags() {
 				// At least for Cookbook it will alw
 				$http.get(utils.url.applyRootPath('/ws/tag')).success(function (data, status, headers, config) {
@@ -120,6 +128,8 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
 				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+
+				($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
 
 				$scope.onChange();
 			}

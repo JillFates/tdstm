@@ -287,7 +287,7 @@ class ReportsController implements ControllerMethods {
 								(ac?.assetEntity?.targetRoomName ?: "--")+"/"+
 								(ac?.assetEntity?.targetRackName ?: "--")+"/"+
 								(ac?.assetEntity?.targetRackPosition ?: "--")
-			if( params.reportResolveInfo == "true" || ac.isResolved != 1 ) {
+			if( params.reportResolveInfo == "true" || !ac.isResolved() ) {
 				reportFields <<['assetName':ac?.assetEntity?.assetName,
 				                'assetTag':ac?.assetEntity?.assetTag,
 				                'moveBundle' :ac?.assetEntity?.moveBundle?.name,
@@ -303,7 +303,7 @@ class ReportsController implements ControllerMethods {
 								'timezone':tzId, "rptTime": TimeUtil.formatDate(currDate), userDateFormatter: userDateFormatter,
 								'previousNote':WebUtil.listAsMultiValueString(ac.notes) ]
 			}
-			if( params.reportResolveInfo == "true" && ac.isResolved == 1 ) {
+			if( params.reportResolveInfo == "true" && ac.isResolved() ) {
 				reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null,
 								'commentType':ac.commentType == 'issue' ? 'Task' : ac.commentType,
 								'occuredAt': ac.dateResolved,
@@ -852,7 +852,7 @@ class ReportsController implements ControllerMethods {
 			def assetComment
 			List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 			List<AssetDependency> supportAssets =  assetEntity.supportedDependencies()
-			if (AssetComment.countByAssetEntityAndCommentTypeAndIsResolved(application, 'issue', 0)) {
+			if (AssetComment.countByAssetEntityAndCommentTypeAndDateResolved(application, 'issue', null)) {
 				assetComment = "issue"
 			} else if (AssetComment.countByAssetEntity(application)) {
 				assetComment = "comment"

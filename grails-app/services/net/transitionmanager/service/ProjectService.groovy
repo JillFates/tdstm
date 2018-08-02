@@ -76,6 +76,7 @@ class ProjectService implements ServiceMethods {
 	CustomDomainService customDomainService
 	LicenseAdminService licenseAdminService
 	TagService tagService
+	ApiCatalogService apiCatalogService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -532,6 +533,8 @@ class ProjectService implements ServiceMethods {
 		// Clone the Default Project Tags (if it has any) and add them to the new project
 		tagService.cloneProjectTags(defProject, project)
 
+		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
+		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
 	}
 
 	/**
@@ -1282,7 +1285,7 @@ class ProjectService implements ServiceMethods {
 			SELECT ac.project_id, count(ac.asset_comment_id) as all_count, count(ac_done.asset_comment_id) as done_count
 			FROM project p
 			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
-			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.is_resolved = 1
+			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.date_resolved IS NOT NULL
 			WHERE p.completion_date > '$sqlSearchDate'
 			GROUP BY ac.project_id
 			ORDER BY ac.project_id

@@ -14,7 +14,7 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group single-component">
-										<textarea rows="4" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" tds-autofocus></textarea>
+										<textarea rows="8" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" tds-autofocus></textarea>
 										<div *ngIf="singleCommentModel.modal.type === modalType.VIEW">{{singleCommentModel.comment}}</div>
 									</div>
 								</div>
@@ -31,41 +31,6 @@
 										</div>
 										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 											<label class="control-label label-detail text-capitalize">{{singleCommentModel.category}}</label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-3 control-label">Class:</label>
-										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
-											<kendo-dropdownlist
-													id="singleCommentClassOptions" name="singleCommentClassOptions"
-													class="form-control single-comment-dropdown" style="width: 100%;"
-													[data]="assetClassOptions"
-													[textField]="'text'"
-													[valueField]="'id'"
-													[(ngModel)]="singleCommentModel.assetClass"
-													(valueChange)="onAssetClassChange(dataItem)"
-													required>
-											</kendo-dropdownlist>
-										</div>
-										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.assetClass.text}}</label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-3 control-label">
-											Asset:
-											<span style="color: red;" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">*</span>
-										</label>
-										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type !== modalType.VIEW">
-											<tds-combobox
-													[(model)]="singleCommentModel.asset"
-													[(metaParam)]="singleCommentModel.assetClass.id"
-													[serviceRequest]="getAssetListForComboBox"
-													(valueChange)="onAssetChange($event)">
-											</tds-combobox>
-										</div>
-										<div class="col-sm-8" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
-											<label class="control-label label-detail text-capitalize">{{singleCommentModel.asset.text}}</label>
 										</div>
 									</div>
 								</div>

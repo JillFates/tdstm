@@ -901,7 +901,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'appVendor'])
+			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Application, 'appVendor').message
 
 	}
 
@@ -930,7 +930,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == StringUtil.replacePlaceholders(ETLProcessorException.UNKNOWN_DOMAIN_FIELDS_SPEC, [DOMAIN:'Application', FIELD:'vendedor'])
+			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Application, 'vendedor').message
 	}
 
 	void 'test can extract a field value and load into a domain object property name'() {
@@ -1279,9 +1279,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(Room, global: true)
-			Room.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -2633,7 +2630,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							domain Device
 							extract 'ip' transform with lowercase() set ipVar
 							extract 'srv' set srvVar
-	
+
 							lookup 'assetName' with srvVar
 							if ( LOOKUP.notFound() ) {
 								// Set the server name first time seen
@@ -2707,8 +2704,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						iterate {
 							domain Application
 							set envVar with 'Prod'
-							
-							load 'Name' with append('-', envVar) 
+
+							load 'Name' with append('-', envVar)
 						}
 					""".stripIndent())
 

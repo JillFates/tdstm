@@ -412,7 +412,9 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
-					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+					if (this.codeMirrorComponent) {
+						this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+					}
 				});
 			});
 		}
@@ -454,7 +456,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	protected onAgentValueChange(agentModel: AgentModel): void {
-		console.log();
 		if (this.lastSelectedAgentModel && this.lastSelectedAgentModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
@@ -508,7 +509,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param event
 	 */
 	protected onMethodValueChange(event: any): void {
-		console.log();
 		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
 			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
@@ -539,6 +539,8 @@ export class APIActionViewEditComponent implements OnInit {
 				this.onContextValueChange(parameter);
 			});
 			this.verifyIsValidForm();
+			// Populate Reaction Scripts if present
+			this.loadReactionScripts();
 		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
 			let agentMethod = this.agentMethodList.find((method) => {
@@ -548,6 +550,24 @@ export class APIActionViewEditComponent implements OnInit {
 				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgentMethodModel);
 			} else {
 				this.apiActionModel.agentMethod = R.clone(this.agentMethodList[0]);
+			}
+		}
+	}
+
+	/**
+	 * Populates reaction scripts code mirrors based on the method dictionary configuration.
+	 */
+	private loadReactionScripts(): void {
+		const methodScripts = this.apiActionModel.agentMethod.script;
+		APIActionModel.createBasicReactions(this.apiActionModel);
+		for (let reactionType in methodScripts) {
+			if (methodScripts[reactionType]) {
+				let match = this.apiActionModel.eventReactions.find( item => item.type === reactionType);
+				if (match) {
+					match.value = methodScripts[reactionType];
+					match.open = true;
+					match.selected = true;
+				}
 			}
 		}
 	}
