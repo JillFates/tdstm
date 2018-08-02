@@ -448,12 +448,12 @@ class RowResult {
 		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElement(findElement)
 
-		if(fieldData.find.results.isEmpty()){
+		if (fieldData.find.results.isEmpty()) {
 			this.op = ImportOperationEnum.INSERT
-		} else if (fieldData.find.results.size() == 1){
+		} else if (fieldData.find.results.size() == 1) {
 			this.op = ImportOperationEnum.UPDATE
 		} else {
-			this.op = ImportOperationEnum.UNDETERMINED
+			this.op = ImportOperationEnum.TBD
 		}
 
 		this.errorCount = fieldData.errors.size()

@@ -180,7 +180,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'IMPORT_BATCH': {
-		'MANAGE_LIST': 'Manage Dependency Batches',
+		'MANAGE_LIST': 'Manage Import Batches (ETL)',
 		'DEPENDENCY_BATCH': 'Dependency Batch',
 		'LIST': {
 			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',

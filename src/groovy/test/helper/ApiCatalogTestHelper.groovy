@@ -151,6 +151,85 @@ class ApiCatalogTestHelper {
   }
 }'''
 
+	public static final String DICTIONARY_WITH_SCRIPTS = '''{
+    "dictionary": {
+        "info": {
+            "name": "HTTP API v1",
+            "agent": "HttpAgent",
+            "docUrl": "http://about.com",
+            "provider": "Http Provider",
+            "tmVersion": {
+                "max": "4.5",
+                "min": "4.5",
+                "label": "Version 4.5.0 (Development)",
+                "publishDate": "2018-07-12"
+            },
+            "description": "Http Agent",
+            "credentialGroup": "N/A",
+            "providerVersion": {
+                "max": "1",
+                "min": "1",
+                "label": "Version 4.5.0 (Development)",
+                "publishDate": "2018-07-12"
+            }
+        },
+        "scriptDef": {
+          "ERROR_SCRIPT": "// Put the task on hold and add a comment with the cause of the error
+          task.error( response.error )", 
+          "200_SUCCESS_SCRIPT": "// Update the task status that the task completed
+          task.done()", 
+          "204_SUCCESS_SCRIPT": "// Success script for 204 status code - nocontent
+          task.hold( 'Moving the task to hold since no content was received' )"
+        },
+        "script": {
+          "STATUS": "// Check the HTTP response code for a 200 OK
+          if (response.status == SC.OK) { 
+            return SUCCESS 
+        } else { 
+            return ERROR 
+        }",  
+          "ERROR": "$scriptDef.ERROR_SCRIPT$",
+          "SUCCESS": "$scriptDef.200_SUCCESS_SCRIPT$"
+        },
+        "method": [
+            {
+                "apiMethod": "callEndpoint",
+                "name": "Call Endpoint",
+                "description": "Performs a call to an HTTP endpoint",
+                "endpointUrl": "https://SOME-DOMAIN/SOME/PATH",
+                "docUrl": "http://about.com/docs#appList",
+                "method": "invokeHttpRequest",
+                "producesData": 0,
+                "params": [
+                	"$paramDef.HOSTNAME_PARAM$"
+                ],
+                "script": {
+                    "SUCCESS": "$scriptDef.204_SUCCESS_SCRIPT$",
+                    "FAILED": "// a script that isn't in the dictionary.script declaration
+                    // Failed -logic to perform when API call receives 400 or 500 series HTTP error code.
+                     task.error( response.error )"
+                },
+            }
+        ],
+        "paramDef": {
+			"HOSTNAME_PARAM": {
+				"paramName": "HOSTNAME",
+				"description": "The ServiceNow Hostname of the instance to interact with",
+				"type": "String",
+				"context": "USER_DEF",
+				"fieldName": null,
+				"value": "Enter your FQDN to ServiceNow",
+				"required": 1,
+				"readonly": 0,
+				"encoded": 0
+		  	}
+        },
+        "variable": {},
+        "credential": {},
+        "paramGroup": {}
+    }
+}'''
+
 	ApiCatalog createApiCatalog(Project project, Provider provider) {
 		ApiCatalog apiCatalog = new ApiCatalog(
 				project: project,
