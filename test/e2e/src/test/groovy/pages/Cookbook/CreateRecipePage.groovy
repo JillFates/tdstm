@@ -11,7 +11,6 @@ class CreateRecipePage extends Page {
         cancelButton
         nameFieldLabel == "Name*"
         nameFieldContents.text() == ""
-        contextSelectorLabel2 == "Context*"
         descriptionLabel == "Description"
     }
 
@@ -23,8 +22,6 @@ class CreateRecipePage extends Page {
         cancelButton            { $("button", "ng-click":"cancel()")}
         nameFieldLabel          { $("label", for:"inputName").text()}
         nameFieldContents       { $("input#inputName")}
-        contextSelectorLabel2   { $("label", for:"contextSelector2").text()}
-        contextSelector2        { $("select#contextSelector2") }
         descriptionLabel        { $("label", for:"textareaDescription").text()}
         descriptionContents     { $("textarea#textareaDescription")}
     }
