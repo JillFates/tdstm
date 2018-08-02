@@ -4345,37 +4345,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						break
 				}
 
-				// Check whether the filter includes tag fields.
-				if (filter?.tag) {
-					String tagQuery = null
-					/* Since the tag attribute in a filter can either be a single string or a list of names,
-					some work is required to ensure we have a list of names. */
-					List<String> tagNames = []
-					tagNames.addAll(filter.tag)
-					
-					map.tagList = tagNames
+				// Add tag filtering if specified
+				addTagFilteringToWhere(filter, map,  where)
 
-					// Build the query based on the of tagMatch ALL or ANY (AND or OR)
-					if (filter.tagMatch == 'ALL') {
-						tagQuery = """
-									SELECT ta.asset.id 
-									FROM TagAsset ta
-									WHERE ta.tag.name in (:tagList) GROUP BY ta.asset.id HAVING count(*) = :tagListSize
-								"""
-						map.tagListSize = tagNames.size()
-					} else {
-						tagQuery = """
-								SELECT DISTINCT(ta.asset.id) 
-								FROM TagAsset ta
-								WHERE ta.tag.name in (:tagList)
-								"""
-					}
-
-					where = SqlUtil.appendToWhere(where, "a.id IN ($tagQuery)")
-
-				}
-
-
+				// Construct the HQL that will be used to query for the assets
 				sql = "select a FROM AssetEntity a $join where $where"
 
 				log.debug "findAllAssetsWithFilter: sql=$sql, map=$map"
@@ -4492,6 +4465,89 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		return assets
+	}
+
+	// Used by the addTagFilteringToWhere method to build TAG filtering
+	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(ta.asset.id) FROM TagAsset ta WHERE '
+	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'ta.tag.name IN (:tagNameList)'
+	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT ta.asset.id FROM TagAsset ta WHERE '
+	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY ta.asset.id HAVING count(*) = :tagListSize'
+
+	/**
+	 * Used to add query logic to incorporate tag filtering that will look at the filter.tag property
+	 * and append to the existing SQL WHERE criteria. The query will consider the tags as ANY (default) or ALL
+	 * based on the presents of the filter.tagMatch property equaling 'ALL' or 'ANY'.
+	 *
+	 * @param filter - the filter that is being applied
+	 * @param parametersMap - the map that contains all of the parameters in the SQL
+	 * @param whereSql - the SQL that is being built up for the overall query
+	 * @return the whereSql with additional SQL based on filter.tag being populated
+	 */
+	String addTagFilteringToWhere(Map filter, Map parametersMap, String whereSql) {
+		// Check whether the filter includes tag fields.
+		if (filter?.tag) {
+			List<String> tagNames = CU.asList(filter.tag)
+			int tagListSize = tagNames.size()
+
+			// Pull out the tags that have '%' in them as those will be handled with LIKE criteria
+			List<String> likeTags = tagNames.findAll { it.contains('%') }
+			if (likeTags) {
+				tagNames = tagNames - likeTags
+			}
+
+			if (likeTags.size() > 0) {
+				for (int i=0; i < likeTags.size(); i++) {
+					parametersMap.put('tagName_' + (i+1), likeTags[i])
+				}
+			}
+
+			String query = null
+			boolean needOr = false
+
+			// Closure used to build up the WHERE for any whole tags in an IN criteria
+			Closure processInTags = {
+				// Add exact match tag query
+				if (tagNames.size() > 0) {
+					query += TAG_WHERE_SUBSELECT_ANY_IN
+					parametersMap.put('tagNameList', tagNames)
+					needOr = true
+				}
+			}
+
+			// Closure used to build up the WHERE for any tags containing a % as a LIKE statement
+			Closure processLikeTags = {
+				// Add LIKE queries
+				int likeParamCnt = 0
+				for (String tag in likeTags) {
+					if (needOr) {
+						query += ' OR '
+					} else {
+						needOr = true
+					}
+					likeParamCnt++
+					String tagRef = "tagName_$likeParamCnt"
+					query += "ta.tag.name LIKE :$tagRef"
+					parametersMap.put(tagRef, tag)
+				}
+			}
+
+			// Build the query based on the of tagMatch ALL or ANY (AND or OR)
+			if (filter.tagMatch == 'ALL') {
+				query = TAG_WHERE_SUBSELECT_ALL
+				processInTags()
+				processLikeTags()
+				// Add the HAVING that will filter out all assets that do NOT have all of the tags
+				query += ' ' + TAG_WHERE_SUBSELECT_ALL_GROUPBY
+			} else {
+				query = TAG_WHERE_SUBSELECT_ANY
+				processInTags()
+				processLikeTags()
+			}
+
+			return SqlUtil.appendToWhere(whereSql, "a.id IN ($query)")
+		} else {
+			return whereSql
+		}
 	}
 
 	/**

@@ -183,6 +183,240 @@ class TaskServiceTests extends Specification {
 		msg == "Unrecognized duration value '#fubar, abc'"
 	}
 
+	def 'Test addTagFilteringToWhere with not filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [:]
+		when: 'calling addTagFilteringToWhere as an ANY with tag OneTag'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+		then: 'the SQL should be as expected'
+			'' == result
+		and: 'the params should have no values'
+			params.size() == 0
+	}
+
+	def 'Test addTagFilteringToWhere with single ANY filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [tag:'OneTag']
+		when: 'calling addTagFilteringToWhere as an ANY with tag OneTag'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected = 'a.id IN (' + service.TAG_WHERE_SUBSELECT_ANY + service.TAG_WHERE_SUBSELECT_ANY_IN + ')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 1
+			['OneTag'] == params['tagNameList']
+	}
+
+	def 'Test addTagFilteringToWhere with multipe ANY filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['Red','Blue'], tagMatch: 'ANY' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ANY +
+				service.TAG_WHERE_SUBSELECT_ANY_IN +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have two values that matches'
+			params.size() == 1
+			['Red', 'Blue'] == params['tagNameList']
+	}
+
+	def 'Test addTagFilteringToWhere with single ANY LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['R%'], tagMatch: 'ANY' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ANY +
+				'ta.tag.name LIKE :tagName_1' +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 1
+			'R%' == params['tagName_1']
+	}
+
+	def 'Test addTagFilteringToWhere with multiple ANY LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['R%', 'B%'], tagMatch: 'ANY' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ANY +
+				'ta.tag.name LIKE :tagName_1' +
+				' OR ta.tag.name LIKE :tagName_2' +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 2
+			'R%' == params['tagName_1']
+			'B%' == params['tagName_2']
+	}
+
+	def 'Test addTagFilteringToWhere with a mixture ANY EXACT and LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['Red', 'R%', 'Blue', 'G%'], tagMatch: 'ANY' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ANY +
+				'ta.tag.name IN (:tagNameList)' +
+				' OR ta.tag.name LIKE :tagName_1' +
+				' OR ta.tag.name LIKE :tagName_2' +
+				')'
+			// println 'result:   ' + result
+			// println 'expected: ' + expected
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 3
+			['Red', 'Blue'] == params['tagNameList']
+			'R%' == params['tagName_1']
+			'G%' == params['tagName_2']
+	}
+
+/***
+ ***
+ ***/
+
+	def 'Test addTagFilteringToWhere with single ALL filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [tag: 'OneTag', tagMatch: 'ALL']
+		when: 'calling addTagFilteringToWhere as an ANY with tag OneTag'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ALL +
+				'ta.tag.name IN (:tagNameList)' +
+				' ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 1
+			['OneTag'] == params['tagNameList']
+	}
+
+	def 'Test addTagFilteringToWhere with multipe ALL filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['Red','Blue'], tagMatch: 'ALL' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ALL +
+				'ta.tag.name IN (:tagNameList)' +
+				' ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have two values that matches'
+			params.size() == 1
+			['Red', 'Blue'] == params['tagNameList']
+	}
+
+	def 'Test addTagFilteringToWhere with single ALL LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['R%'], tagMatch: 'ALL' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ALL +
+				'ta.tag.name LIKE :tagName_1' +
+				' ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 1
+			'R%' == params['tagName_1']
+	}
+
+	def 'Test addTagFilteringToWhere with multiple ALL LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['R%', 'B%'], tagMatch: 'ALL' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ALL +
+				'ta.tag.name LIKE :tagName_1' +
+				' OR ta.tag.name LIKE :tagName_2' +
+				' ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
+				')'
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 2
+			'R%' == params['tagName_1']
+			'B%' == params['tagName_2']
+	}
+
+	def 'Test addTagFilteringToWhere with a mixture ALL EXACT and LIKE filter'() {
+		setup:
+			String where = ''
+			Map params = [:]
+			Map filter = [ tag: ['Red', 'R%', 'Blue', 'G%'], tagMatch: 'ALL' ]
+
+		when: 'calling addTagFilteringToWhere'
+			String result = service.addTagFilteringToWhere(filter, params, where)
+			String expected =
+				'a.id IN (' +
+				service.TAG_WHERE_SUBSELECT_ALL +
+				'ta.tag.name IN (:tagNameList)' +
+				' OR ta.tag.name LIKE :tagName_1' +
+				' OR ta.tag.name LIKE :tagName_2' +
+				' ' + service.TAG_WHERE_SUBSELECT_ALL_GROUPBY +
+				')'
+			// println 'result:   ' + result
+			// println 'expected: ' + expected
+		then: 'the SQL should be as expected'
+			expected == result
+		and: 'the params should have one value that matches'
+			params.size() == 3
+			['Red', 'Blue'] == params['tagNameList']
+			'R%' == params['tagName_1']
+			'G%' == params['tagName_2']
+	}
+
+
+
 	// Helper method used to check a task duration settings
 	private boolean checkDurations(String label, AssetComment task, int duration, TimeScale scale) {
 		assert duration == task.duration
