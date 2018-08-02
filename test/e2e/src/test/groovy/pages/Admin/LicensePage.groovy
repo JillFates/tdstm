@@ -1,14 +1,13 @@
-package pages.Admin.LandingItems
+package pages.Admin
 
 import geb.Page
 import modules.AdminModule
 
-class NoticeLandingPage extends Page {
-
+class LicensePage extends Page{
 
     static at = {
-        title == "Notice Administration"
-        pageHeaderName.text() == "Notice Administration"
+        title == "Administer Licenses"
+        pageHeaderName.text() == "Administer Licenses"
     }
 
     static content = {

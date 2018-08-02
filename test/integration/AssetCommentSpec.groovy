@@ -1,27 +1,39 @@
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang.RandomStringUtils
+import spock.lang.Shared
 import spock.lang.Specification
 
 
 class AssetCommentSpec extends Specification {
 
+    @Shared
     ApiActionTestHelper apiActionHelper
+    @Shared
     ProjectTestHelper projectHelper
+    @Shared
+    Project project1
+    @Shared
+    ApiAction action1
+    @Shared
+    ApiAction action2
+    @Shared
+    Date date = new Date()
 
-    void setup() {
+    void setupSpec() {
         apiActionHelper = new ApiActionTestHelper()
         projectHelper = new ProjectTestHelper()
+
+        //Create a project and a couple of actions
+        project1 = projectHelper.createProject()
+        action1 = apiActionHelper.createApiAction(project1)
+        action2 = apiActionHelper.createApiAction(project1)
     }
 
-    def "Test AssetComment consistency when changing actions"() {
-        setup: "Create a project and a couple of actions"
-            Project project1 = projectHelper.createProject()
-            ApiAction action1 = apiActionHelper.createApiAction(project1)
-            ApiAction action2 = apiActionHelper.createApiAction(project1)
-            Date date = new Date()
+    def "01. Test AssetComment consistency when changing actions"() {
         when: "Creating a new comment"
             AssetComment assetComment = new AssetComment()
             assetComment.with {
@@ -65,9 +77,25 @@ class AssetCommentSpec extends Specification {
             assetComment.apiActionInvokedAt == null
         and: "apiActionCompletedAt is null"
             assetComment.apiActionCompletedAt == null
-
-
     }
 
-
+    def "02. Test isResolved() method"() {
+        when: "Creating a new comment"
+            AssetComment assetComment = new AssetComment()
+            assetComment.with {
+                comment = RandomStringUtils.randomAlphabetic(10)
+                commentType = AssetCommentType.COMMENT
+                apiAction = action1
+                project = project1
+                apiActionInvokedAt = date
+                apiActionCompletedAt = date
+            }
+            Long id = assetComment.save(flush: true).id
+        then: "the isResolved() method returns false"
+            false == AssetComment.get(id).isResolved()
+        and: "if a date resolved is set on the comment"
+            assetComment.setDateResolved(TimeUtil.nowGMT())
+        then: "the isResolved() method now returns true"
+            true == AssetComment.get(id).isResolved()
+    }
 }
