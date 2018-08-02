@@ -53,10 +53,10 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
              userInfo.fullName = ctx.getStringAttribute('name') ?: ''
         }
 
-        List<String> ldapRoles = authorities.collect { it.authority }
+        List<String> ldapRoles = authorities?.collect { it.authority }
         List<String> roles = []
         Map<String, String> roleMap = [:]
-        ((Map)domain.roleMap).entrySet().each { Map.Entry<String,String> entry ->
+        ((Map)domain.roleMap)?.entrySet()?.each { Map.Entry<String,String> entry ->
             roleMap.put(entry.value.replaceFirst(/(c|C)(n|N)=/,'').toUpperCase(), entry.key)
         }
         ldapRoles.each { String role ->
@@ -65,12 +65,18 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
             }
         }
 
+        if (!domain.updateRoles && domain.defaultRole) {
+            roles.add(domain.defaultRole)
+        }
+
         if (roles.empty) {
             String msg = "User ${username} has no roles defined in the roleMap. LDAP roles returned: ${ldapRoles}"
             if (ldap.debug == true) {
                 println(msg)
             }
-            throw new NoRolesException(msg)
+            if (!domain.updateRoles && !domain.defaultRole) {
+                throw new NoRolesException(msg)
+            }
         }
 
         userInfo.roles = roles
