@@ -46,12 +46,14 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
 		} else if (this.viewFilterModel && this.viewFilterModel.length > 0) {
-			let ids = this.viewFilterModel.split('|');
+			let operatorType = (this.viewFilterModel.indexOf('|') > 0)? '|' : '&';
+			let ids = this.viewFilterModel.split(operatorType);
 			ids.forEach( item => {
 				let tag: TagModel = new TagModel();
 				tag.id = parseInt(item, 0);
 				this.assetSelectorModel.tags.push(tag);
 			});
+			this.showSwitch = this.assetSelectorModel.tags.length > 1;
 		}
 	}
 
@@ -82,7 +84,6 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
 			let currentSelectedValues = changes['viewFilterModel'].currentValue.split(((!this.assetSelectorModel.switch) ? '|' : '&'));
 			this.showSwitch = currentSelectedValues && currentSelectedValues.length > 1;
-			console.log(this.showSwitch);
 		}
 		if (changes['tagList'] && changes['tagList'].currentValue !== changes['tagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
