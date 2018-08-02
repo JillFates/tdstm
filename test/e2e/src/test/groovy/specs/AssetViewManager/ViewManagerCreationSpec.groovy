@@ -18,8 +18,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
 
     //Define the names of the Application you will Create and Edit
     static randStr = CommonActions.getRandomString()
-    static baseName = "TM8500"
-    static viewName=  randStr+" "+baseName
+    static viewName=  "QAE2E " +randStr+" View"
     def filteredName=""
 
     def setupSpec() {
@@ -29,8 +28,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
         at MenuPage
         waitFor { menuModule.goToAssetViewManager() }
     }
-    def "1. validates user can reach'my views' "() {
-        testKey = "TM-8500"
+    def "1. Validates user can reach 'my views' "() {
         given: "I am in Asset Views Page"
             at AssetViewsPage
         when: "I click on My Views"
@@ -39,7 +37,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             allViewsModule.displayed
     }
     def "2. Validates user can reach Create View Module"() {
-        testKey = "TM-8500"
         given: "I am in My Views"
             allViewsModule.displayed
         when: "I click on the CREATE button"
@@ -48,7 +45,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.displayed
     }
     def "3. Validates user can go back to asset class by Clicking on the tab"() {
-        testKey = "TM-8500"
         given: "I am in the Create View Module"
             createViewModule.displayed
         when: "I navigate out of Application options tab and I click on the tab again"
@@ -59,7 +55,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.applicationOption.displayed
     }
     def "4. Validate I can go back to Fields tab by Clicking on it"() {
-        testKey = "TM-8500"
         given: "I am in Application options"
             createViewModule.applicationOption.displayed
         when: "I click on the Fields tab"
@@ -68,7 +63,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.searchField.displayed
     }
     def "5. Filter Selected Fields and validate only those are displayed"() {
-        testKey = "TM-8500"
         given: "I am creating a view"
             createViewModule.displayed
         when: "I select random fields (checkboxes) and filter the selected ones"
@@ -78,8 +72,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
         then: "Only the selected checkboxes are displayed"
             assert(createViewModule.selectedCheckboxesDisplayed())
     }
-    def "6. Validate user can filter only Unselected fieldss"() {
-        testKey = "TM-8500"
+    def "6. Validate user can filter only Unselected fields"() {
         given: "User is creating a view"
             createViewModule.fieldsFilter.displayed
         when: "I have filtered the checkboxes by UNSELECTED"
@@ -88,7 +81,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.unselectedCheckboxesDisplayed()
     }
     def "7. Validate user can filter by field name"() {
-        testKey = "TM-8500"
         given: "The filter by name is present and all fields are diplayed"
             waitFor{createViewModule.searchField.displayed}
             waitFor{createViewModule.filterFields("All Fields")}
@@ -98,7 +90,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.filteredFieldMatchesDisplay(filteredName)
     }
     def "8. Validate chosen Filters are added below"() {
-        testKey = "TM-8500"
         given: "User is creating a view"
             createViewModule.fieldsFilter.displayed
             waitFor{createViewModule.clearSearch()}
@@ -108,7 +99,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.compareColumns()
     }
     def "9. Click preview and validate data is displayed"() {
-        testKey = "TM-8500"
         given: "Preview button is present"
             createViewModule.previewBtn.displayed
         when: "I click on the preview button"
@@ -117,7 +107,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             createViewModule.previewDataIsDisplayed()
     }
     def "10. Validate created View is listed"() {
-        testKey = "TM-8500"
         given: "User saves the created view"
             waitFor{createViewModule.firstSave()}
             at SaveViewPage
@@ -131,7 +120,6 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             vwGrid.find("tr")[1].find("a")[1].displayed
     }
     def "11. User can go the the newly crated view page"() {
-        testKey = "TM-8500"
         given: "I have filtered the view"
             println "validate the filtered view is displayed"
         when: "I click on it"

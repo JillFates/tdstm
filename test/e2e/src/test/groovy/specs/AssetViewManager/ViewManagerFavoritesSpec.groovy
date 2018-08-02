@@ -19,8 +19,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     static favView
     //Define the names of the Application you will Create and Edit
     static randStr = CommonActions.getRandomString()
-    static baseName = "TM8503"
-    static viewName=  randStr+" "+baseName
+    static viewName=  "QAE2E " +randStr+" View"
     static minimumNumberOfRows =11
 
 
@@ -56,9 +55,8 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
             }
         }
     }
-    //count number of viwes
+    //count number of views
     def "1. Validate Favorite number limit pop up is diplayed"() {
-        testKey = "TM-10911"
         given: "User is in Asset Views Page"
             at AssetViewsPage
         when: "User gets the max Favs popup"
@@ -71,7 +69,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "2. Validate there are actually 10 starred views"() {
-        testKey = "TM-10911"
         given: "User is in Asset Views Page and the limit pop up is displayed"
             at AssetViewsPage
             favLimitPopUpIsPresent()
@@ -83,7 +80,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "3. Reducing the number of favorites and increasing it will again cause the pop up to display"() {
-        testKey = "TM-10911"
         given: "User is in Asset Views Page and there are ten favorite views"
             at AssetViewsPage
         when: "The user decreases and again adds favorite views"
@@ -94,7 +90,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "4. Validate User can reach Favorite Views"() {
-        testKey = "TM-8503"
         given: "I am in Asset Views Page and the limit of favorites has not been reached"
             at AssetViewsPage
             closeFavLimitPopUp()
@@ -113,7 +108,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "5. Validates adding Favorites increases the counter on the left"(){
-        testKey = "TM-8503"
         given: "The user is in the View Manager Page"
             waitFor {goToAllViews()}
             at AssetViewsPage
@@ -125,7 +119,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "6. Validate star is off in non-fav view"(){
-        testKey = "TM-8503"
         given: "The user is in the View Manager Page"
             at AssetViewsPage
         when : "The user clicks on a non favorited view"
@@ -137,7 +130,6 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
     }
 
     def "7. Validates that the view just added as fav is listed in all"(){
-        testKey = "TM-8503"
         given: "The user is in the View page"
             at ViewPage
         when : "The user clicks on the star"
