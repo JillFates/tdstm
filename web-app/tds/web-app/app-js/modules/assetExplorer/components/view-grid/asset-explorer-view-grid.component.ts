@@ -339,7 +339,7 @@ export class AssetExplorerViewGridComponent {
 	 */
 	protected onTagFilterChange(column: ViewColumn, $event: any): void {
 		column.filter = '';
-		let operator = $event.operator && $event.operator === 'AND' ? '&' : '|';
+		let operator = $event.operator && $event.operator === 'ALL' ? '&' : '|';
 		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
 		column.filter = selectedTagsFilter;
 		this.onFilter();
