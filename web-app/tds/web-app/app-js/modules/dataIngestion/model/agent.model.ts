@@ -42,6 +42,7 @@ export class AgentMethodModel {
 	producesData?: boolean;
 	methodParams?: Array<any>;
 	script?: Array<any>;
+	httpMethod?: string;
 
 	constructor() {
 		this.name = '';

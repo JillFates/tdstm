@@ -412,9 +412,7 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
-					if (this.codeMirrorComponent) {
-						this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
-					}
+					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
 				});
 			});
 		}
@@ -540,7 +538,9 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 			this.verifyIsValidForm();
 			// Populate Reaction Scripts if present
-			this.loadReactionScripts();
+			this.populateReactionScripts();
+			// Populate HttpMethod if present
+			this.populateHttpMethod();
 		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
 			let agentMethod = this.agentMethodList.find((method) => {
@@ -557,7 +557,7 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Populates reaction scripts code mirrors based on the method dictionary configuration.
 	 */
-	private loadReactionScripts(): void {
+	private populateReactionScripts(): void {
 		const methodScripts = this.apiActionModel.agentMethod.script;
 		APIActionModel.createBasicReactions(this.apiActionModel);
 		for (let reactionType in methodScripts) {
@@ -569,6 +569,17 @@ export class APIActionViewEditComponent implements OnInit {
 					match.selected = true;
 				}
 			}
+		}
+	}
+
+	/**
+	 * Populates http method based on the Method dictionary configuration.
+	 */
+	private populateHttpMethod(): void {
+		const httpMethod = this.apiActionModel.agentMethod.httpMethod;
+		const match = this.httpMethodList.find( item => item === httpMethod);
+		if (match) {
+			this.apiActionModel.httpMethod = httpMethod;
 		}
 	}
 
