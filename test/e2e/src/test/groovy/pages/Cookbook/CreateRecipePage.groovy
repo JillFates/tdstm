@@ -29,7 +29,6 @@ class CreateRecipePage extends Page {
     def createRecipe(recipeDataMap){
         nameFieldContents = recipeDataMap.name
         nameFieldContents == recipeDataMap.name
-        contextSelector2 = recipeDataMap.context
         descriptionContents = recipeDataMap.description
         saveButton.click()
     }
