@@ -4351,7 +4351,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				where = addTagFilteringToWhere(filter, map,  where, project.id)
 
 				// Construct the HQL that will be used to query for the assets
-				sql = "select a FROM AssetEntity a $join where $where"
+				sql = "SELECT distinct(a) FROM AssetEntity a $join where $where"
 
 				log.debug "findAllAssetsWithFilter: sql=$sql, map=$map"
 
@@ -4473,7 +4473,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(ta.asset.id) FROM TagAsset ta WHERE '
 	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'ta.tag.name IN (:tagNameList)'
 	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT ta.asset.id FROM TagAsset ta WHERE '
-	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY ta.asset.id HAVING count(*) = :tagListSize'
+	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY ta.asset.id HAVING count(*) >= :tagListSize'
 	static final String TAG_WHERE_ASSET_PROJECT = 'ta.asset.project.id = :projectId AND ('
 
 	/**
@@ -4498,16 +4498,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				tagNames = tagNames - likeTags
 			}
 
-			if (likeTags.size() > 0) {
-				for (int i=0; i < likeTags.size(); i++) {
-					parametersMap.put('tagName_' + (i+1), likeTags[i])
-				}
-			}
-
 			parametersMap.put('projectId', projectId)
 
 			String query = null
-			boolean needOr = false
+
+			// Extra separator that might need to be added between the IN and LIKE expressions.
+			String clauseSeparator = ''
 
 			// Closure used to build up the WHERE for any whole tags in an IN criteria
 			Closure processInTags = {
@@ -4515,24 +4511,22 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (tagNames.size() > 0) {
 					query += TAG_WHERE_SUBSELECT_ANY_IN
 					parametersMap.put('tagNameList', tagNames)
-					needOr = true
+					clauseSeparator = ' OR '
 				}
 			}
 
 			// Closure used to build up the WHERE for any tags containing a % as a LIKE statement
 			Closure processLikeTags = {
-				// Add LIKE queries
-				int likeParamCnt = 0
-				for (String tag in likeTags) {
-					if (needOr) {
-						query += ' OR '
-					} else {
-						needOr = true
-					}
-					likeParamCnt++
-					String tagRef = "tagName_$likeParamCnt"
-					query += "ta.tag.name LIKE :$tagRef"
-					parametersMap.put(tagRef, tag)
+				List<String> likeClauses = []
+				// Iterate over the parameters
+				for (int i = 0; i < likeTags.size(); i++) {
+					String paramName = 'tagName_' + (i+1)
+					likeClauses << "ta.tag.name LIKE :$paramName"
+					parametersMap.put(paramName, likeTags[i])
+				}
+				String likeClause = likeClauses.join(' OR ')
+				if (likeClause) {
+					query = "$query$clauseSeparator$likeClause"
 				}
 			}
 
