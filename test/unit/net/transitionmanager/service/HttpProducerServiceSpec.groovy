@@ -170,7 +170,7 @@ class HttpProducerServiceSpec extends Specification {
 			ActionRequest actionRequest = getActionRequest(action)
 			ApiActionResponse actionResponse = service.executeCall(actionRequest)
 		then:
-			'Unable to resolve host name (zzz.about.yyy: nodename nor servname provided, or not known)' == actionResponse.error
+			'Unable to resolve host name (zzz.about.yyy)' == actionResponse.error
 	}
 
 	@See('TM-10046')
