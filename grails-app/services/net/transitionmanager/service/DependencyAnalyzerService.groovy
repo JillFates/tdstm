@@ -81,7 +81,7 @@ class DependencyAnalyzerService implements ServiceMethods {
 			return ' AND p.person_id = :personId'
 		}
 
-		return personId
+		return ''
 	}
 
 	/**
@@ -95,7 +95,7 @@ class DependencyAnalyzerService implements ServiceMethods {
 	 */
 	List<Map> filterAssets(String nameFilter, List<Map> assets, boolean isRegex) {
 		if(!nameFilter){
-			return assets
+			return assets*.assetId
 		}
 
 		List assetList = []
