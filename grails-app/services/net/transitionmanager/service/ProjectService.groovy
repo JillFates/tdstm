@@ -918,40 +918,46 @@ class ProjectService implements ServiceMethods {
 	 * It search for active projects and for each one retrieves specific metrics: assets, deps, users, tasks
 	 */
 	@Transactional
-	def activitySnapshot(Map dataMap) {
+	def activitySnapshot() {
 		log.info "Project Daily Metrics started."
 
-		Date startDate = findProjectDailyMetricsLastRunDay().clearTime()
+		Date startingDate = findProjectDailyMetricsLastRunDay().clearTime()
 		Date endDate = new Date().clearTime()
-
-		log.info "Project Daily Metrics will run from $startDate to $endDate"
 
 		def metricsByProject
 		List<ProjectDailyMetric> metrics
-		List<Project> projects
 		def sqlSearchDate
 
-		for (searchDate in startDate..endDate) {
+		List<Project> projects = Project.where {
+			completionDate >= endDate
+		}.list()
+
+		log.info "Project Daily Metrics will run from $startingDate  to $endDate, for Projects ${projects*.id}"
+
+		for (searchDate in startingDate..endDate) {
 
 			sqlSearchDate = TimeUtil.gmtDateSQLFormat(searchDate)
 
 			log.info "Project Daily Metrics. Processing date: $sqlSearchDate"
 
 			metricsByProject = [:]
-			metrics = []
-			projects = []
+
+			// create a ProjectDailyMetric for each Project (this list will be new for each iteration of searchDate)
+			metrics = projects.collect { project ->
+				new ProjectDailyMetric(project: project, metricDate: searchDate)
+			}
 
 			// ***************************
 			// Retrieve assets information
-			fillAssetsMetrics(metrics, metricsByProject, projects, searchDate, sqlSearchDate)
+			fillAssetsMetrics(metrics, projects)
 
 			// ***************************
 			// Retrieve tasks information
-			fillTasksMetrics(metricsByProject, sqlSearchDate)
+			fillTasksMetrics(metrics, projects)
 
 			// *********************************
 			// Retrieve dependencies information
-			fillDependenciesMetrics(metricsByProject, sqlSearchDate)
+			fillDependenciesMetrics(metrics, projects)
 
 			// **************************************
 			// Retrieve person/user login information
@@ -1183,9 +1189,8 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Function used by activitySnapshot to retrieve assets information
 	 */
-	private void fillAssetsMetrics(List metrics, Map metricsByProject, List<Project> projects, Date searchDate, String sqlSearchDate) {
+	private void fillAssetsMetrics(List metrics, List<Project> projects) {
 
-		def project
 		def assetClass
 		def assetClassOption
 
@@ -1195,7 +1200,7 @@ class ProjectService implements ServiceMethods {
 			INNER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
 			LEFT JOIN model m ON m.model_id = ae.model_id
 			INNER JOIN project p ON p.project_id = ae.project_id
-			WHERE p.completion_date > '$sqlSearchDate'
+			WHERE p.project_id in (""" + (projects*.id).join(',') + """)
 			GROUP BY ae.project_id, ae.asset_class, m.asset_type, mb.use_for_planning
 			ORDER BY ae.project_id, mb.use_for_planning
 		""")
@@ -1206,14 +1211,9 @@ class ProjectService implements ServiceMethods {
 		List assetsCountsList = jdbcTemplate.queryForList(assetsCountsQuery.toString())
 		assetsCountsList.each { Map<String, Object> it ->
 
-			if (project == null || project.id != it.project_id) {
-				project = Project.get(it.project_id)
-				projects << project
-				projectDailyMetric = new ProjectDailyMetric(project: project, metricDate: searchDate)
-				metricsByProject[project.id] = projectDailyMetric
-				metrics << projectDailyMetric
+			projectDailyMetric = metrics.find { metric ->
+				metric.project.id == it.project_id
 			}
-
 			if (!projectDailyMetric) {
 				log.error "fillAssetsMetrics() projectDailyMetric property was not properly assigned"
 				return
@@ -1277,7 +1277,7 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Function used by activitySnapshot to retrieve tasks information
 	 */
-	private def fillTasksMetrics(metricsByProject, sqlSearchDate) {
+	private def fillTasksMetrics(metrics, projects) {
 
 		def projectDailyMetric
 
@@ -1286,15 +1286,18 @@ class ProjectService implements ServiceMethods {
 			FROM project p
 			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
 			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.date_resolved IS NOT NULL
-			WHERE p.completion_date > '$sqlSearchDate'
+			WHERE p.project_id in (""" + (projects*.id).join(',') + """)
 			GROUP BY ac.project_id
 			ORDER BY ac.project_id
 		""")
 
 		def tasksCountsList = jdbcTemplate.queryForList(tasksCountsQuery.toString())
 
+
 		tasksCountsList.each {
-			projectDailyMetric = metricsByProject[it.project_id]
+			projectDailyMetric = metrics.find { metric ->
+				metric.project.id == it.project_id
+			}
 			if (projectDailyMetric) {
 				projectDailyMetric.tasksAll = it.all_count
 				projectDailyMetric.tasksDone = it.done_count
@@ -1306,7 +1309,7 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Function used by activitySnapshot to retrieve dependencies information
 	 */
-	private def fillDependenciesMetrics(metricsByProject, sqlSearchDate) {
+	private def fillDependenciesMetrics(metrics, projects) {
 
 		def projectDailyMetric
 
@@ -1315,7 +1318,7 @@ class ProjectService implements ServiceMethods {
 			FROM asset_entity ae
 			INNER JOIN asset_dependency ad ON ae.asset_entity_id = ad.asset_id
 			INNER JOIN project p ON p.project_id = ae.project_id
-			WHERE p.completion_date > '$sqlSearchDate'
+			WHERE p.project_id in (""" + (projects*.id).join(',') + """)
 			GROUP BY ae.project_id
 			ORDER BY ae.project_id
 		""")
@@ -1323,7 +1326,9 @@ class ProjectService implements ServiceMethods {
 		def dependenciesCountsList = jdbcTemplate.queryForList(dependenciesCountsQuery.toString())
 
 		dependenciesCountsList.each {
-			projectDailyMetric = metricsByProject[it.project_id]
+			projectDailyMetric = metrics.find { metric ->
+				metric.project.id == it.project_id
+			}
 			if (projectDailyMetric) {
 				projectDailyMetric.dependencyMappings = it.count
 			}
@@ -1334,7 +1339,7 @@ class ProjectService implements ServiceMethods {
 	/**
 	 * Function used by activitySnapshot to retrieve persons and user login information
 	 */
-	private void fillUsersMetrics(metricsByProject, List<Project> projects, sqlSearchDate) {
+	private void fillUsersMetrics(metrics, List<Project> projects, sqlSearchDate) {
 
 		def projectDailyMetric
 
@@ -1356,7 +1361,9 @@ class ProjectService implements ServiceMethods {
 		'''
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
-			projectDailyMetric = metricsByProject[it.projectId]
+			projectDailyMetric = metrics.find { metric ->
+				metric.project.id == it.project_id
+			}
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
 				projectDailyMetric.totalUserLogins = it.totalUserLogins
