@@ -21,6 +21,7 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
+import groovy.transform.CompileStatic
 import java.text.DateFormat
 
 /**
@@ -199,7 +200,7 @@ class DataviewService implements ServiceMethods {
 			throwNotFound = true
 		}
 
-        boolean canAccess = 
+        boolean canAccess =
 			(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) \
 			|| (dataview.project.id == securityService.userCurrentProject.id)
 
@@ -414,9 +415,16 @@ class DataviewService implements ServiceMethods {
 	 * @param assets
 	 * @param mixedFieldsInfo
 	 */
+	// @CompileStatic
 	private void postProcessAssetData(List assets, DataviewSpec dataviewSpec) {
+		// TODO : JPM 8/2018 : See TM-11726 for details
+		// 		Need to improve performance by changing looping logic and dynamically determine columns to adjust
+		// 		Should be Asset agnostic since this logic is going to be used for Dependencies and ultimately for Tasks some day too
+		// 		Should be able to make this CompileStatic
+		//		Is asset a List<List<Map>>?
+		//def m1 = System.currentTimeMillis()
 
-		// Convert Date type columns to user-selected timezone
+		// Convert Date type columns to user-selected timezone from GMT because it is to slow on front-end to do this
 		List dateColumns = ['lastUpdated']
 		String userTzId = userPreferenceService.timeZone
 		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
@@ -430,6 +438,8 @@ class DataviewService implements ServiceMethods {
 				}
 			}
 		}
+		// def m2 = System.currentTimeMillis()
+		// println "postProcessAssetData() took ${m2 - m1} msec for ${assets.size()} rows"
 	}
 
 	/**
@@ -987,17 +997,17 @@ class DataviewService implements ServiceMethods {
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
 		'appOwner'       : [property: SqlUtil.personFullName('appOwner', 'AE'),
-							type: String, namedParameter: 'appOwnerName', 
+							type: String, namedParameter: 'appOwnerName',
 							join: 'left outer join AE.appOwner',
 							alias:'appOwner'],
 		'sme'            : [property: SqlUtil.personFullName('sme', 'AE'),
-							type: String, 
-							namedParameter: 'smeName', 
+							type: String,
+							namedParameter: 'smeName',
 							join: 'left outer join AE.sme',
 							alias:'sme'],
 		'sme2'           : [property: SqlUtil.personFullName('sme2', 'AE'),
-							type: String, 
-							namedParameter: 'sme2Name', 
+							type: String,
+							namedParameter: 'sme2Name',
 							join: 'left outer join AE.sme2',
 							alias:'sme2'],
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
@@ -1025,7 +1035,7 @@ class DataviewService implements ServiceMethods {
 							json_object('id', TA.id, 'tagId', T.id, 'name', T.name, 'description', T.description, 'color', T.color)
 						),
 						''
-					), 
+					),
 					']'
 				)""",
 			type: String,
