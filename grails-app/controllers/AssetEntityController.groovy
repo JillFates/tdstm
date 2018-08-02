@@ -45,6 +45,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Recipe
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -1709,7 +1710,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			depGroups = [-1]
 		}
 
-		def assetDependentlist = []
+		List<Map> assetDependentlist = []
 		String selectionQuery = ''
 		//String mapQuery
 		def nodesQuery = []
@@ -1789,6 +1790,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		model.orderBy = orderBy
 		model.sortBy = sortOn
 		model.haveAssetEditPerm = securityService.hasPermission(Permission.AssetEdit)
+		model.tags = TagAsset.where {
+			asset.id in assetDependentlist*.assetId
+		}.projections {
+			property 'tag'
+		}.list()*.toMap() as JSON
 
 		// Switch on the desired entity type to be shown, and render the page for that type
 		switch(params.entity) {
