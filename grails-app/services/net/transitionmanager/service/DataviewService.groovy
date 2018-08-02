@@ -506,7 +506,7 @@ class DataviewService implements ServiceMethods {
 				Map row = [:]
 				columns = [columns].flatten()
 				columns.eachWithIndex { cell, index ->
-					if(dataviewSpec.columns[index].property == 'tags'){
+					if(dataviewSpec.columns[index].property == 'tagAssets'){
 						cell = handleTags(cell)
 					}
 
