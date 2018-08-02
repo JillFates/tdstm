@@ -20,7 +20,7 @@ class ProjectDailyMetricsJob {
 
 	void execute(JobExecutionContext context) {
 		try {
-			projectService.activitySnapshot(context.mergedJobDataMap)
+			projectService.activitySnapshot()
 		}
 		finally {
 			GormUtil.releaseLocalThreadMemory()
