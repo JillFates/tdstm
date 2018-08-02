@@ -44,7 +44,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	ngOnInit(): void {
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
-			this.assetSelectorModel.switch = this.model.operator === 'AND' ? true : false;
+			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
 		} else if (this.viewFilterModel && this.viewFilterModel.length > 0) {
 			let ids = this.viewFilterModel.split('|');
 			ids.forEach( item => {
@@ -79,8 +79,10 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue && !changes['model'].isFirstChange()) {
 			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
 		}
-		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue && !changes['viewFilterModel'].isFirstChange()) {
-			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
+		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
+			let currentSelectedValues = changes['viewFilterModel'].currentValue.split(((!this.assetSelectorModel.switch) ? '|' : '&'));
+			this.showSwitch = currentSelectedValues && currentSelectedValues.length > 1;
+			console.log(this.showSwitch);
 		}
 		if (changes['tagList'] && changes['tagList'].currentValue !== changes['tagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
@@ -118,7 +120,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	private onValueChange(): void {
 		this.valueChange.emit({
 			tags: this.assetSelectorModel.tags,
-			operator: (this.assetSelectorModel.switch) ? 'AND' : 'OR'
+			operator: (this.assetSelectorModel.switch) ? 'ALL' : 'ANY'
 		});
 	}
 

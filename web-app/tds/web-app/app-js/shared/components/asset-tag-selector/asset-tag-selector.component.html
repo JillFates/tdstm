@@ -2,8 +2,8 @@
     <kendo-switch *ngIf="showSwitch"
             class="asset-tag"
             [(ngModel)]="assetSelectorModel.switch"
-            [onLabel]="'AND'"
-            [offLabel]="'OR'"
+            [onLabel]="'ALL'"
+            [offLabel]="'ANY'"
             (valueChange)="onSwitchValueChange($event)">
     </kendo-switch>
     <kendo-multiselect
