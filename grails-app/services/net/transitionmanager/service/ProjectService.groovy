@@ -1285,7 +1285,7 @@ class ProjectService implements ServiceMethods {
 			SELECT ac.project_id, count(ac.asset_comment_id) as all_count, count(ac_done.asset_comment_id) as done_count
 			FROM project p
 			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
-			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.date_resolved is not null
+			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.date_resolved IS NOT NULL
 			WHERE p.project_id in (""" + (projects*.id).join(',') + """)
 			GROUP BY ac.project_id
 			ORDER BY ac.project_id

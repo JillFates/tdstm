@@ -38,7 +38,7 @@ class MoveEventNewsController implements ControllerMethods {
 			def assetCommentsQuery = new StringBuffer("""SELECT ac.asset_comment_id as id,  'I' as type,
 									now() as created,
 									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text,
-									if(is_resolved = 0, 'L','A') as state from asset_comment ac
+									if(date_resolved is null, 'L','A') as state from asset_comment ac
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
 									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
 									left join move_event me on ( me.move_event_id = mb.move_event_id )
@@ -51,11 +51,11 @@ class MoveEventNewsController implements ControllerMethods {
 									left join move_event me on ( me.move_event_id = mn.move_event_id )
 									left join project p on (p.project_id = me.project_id) where mn.move_event_id = $moveEvent.id and p.project_id = $projectId""")
 			if (state == "L") {
-				assetCommentsQuery.append(" and ac.is_resolved = 0 ")
+				assetCommentsQuery.append(" and ac.date_resolved is null ")
 				moveEventNewsQuery.append(" and mn.is_archived = 0 ")
 			}
 			else if (state == "A") {
-				assetCommentsQuery.append(" and ac.is_resolved = 1 ")
+				assetCommentsQuery.append(" and ac.date_resolved is not null ")
 				moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 			}
 			def queryForCommentsList = new StringBuffer()
