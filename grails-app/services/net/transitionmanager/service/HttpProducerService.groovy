@@ -341,7 +341,8 @@ class HttpProducerService {
      */
     private String translateHttpException(Exception e) {
         if (e instanceof UnknownHostException) {
-            return String.format(HTTP_ERROR_DNS_NOT_FOUND, e.message)
+            String unknownHost = e.message.substring(0, e.message.indexOf(':'))
+            return String.format(HTTP_ERROR_DNS_NOT_FOUND, unknownHost)
         } else if (e instanceof NoHttpResponseException) {
             return HTTP_ERROR_NO_RESPONSE
         } else {
