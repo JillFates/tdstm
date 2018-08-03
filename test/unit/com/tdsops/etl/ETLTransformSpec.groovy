@@ -44,9 +44,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 	JSONConnection jsonConnection
 
 	@Shared
-	Date          now
+	Date          now = new DateMidnight(1974,06,26).toDate()
 	@Shared
-	Date          otherD
+	Date          otherD = new DateMidnight(2018, 7,4).toDate()
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
@@ -80,8 +80,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
-		now = new DateMidnight(1974,06,26).toDate()
-		otherD = new DateMidnight(2018, 7,4).toDate()
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -243,6 +241,15 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 			result         || value                    | len
 			'this is...'   || 'this is a long string'  | 10
+			'Ye'           || 'Ye'                     | 10
+			null           || null                     | 8
+			'Wed Jun...'   || now                      | 10
+			'12...'        || 123456                   | 5
+			'12...'        || 1234.56                  | 5
+			'1.2...'       || 1.23456                  | 6
+			'1.23456'      || 1.23456                  | 7
+			'Ye'           || 'Ye'                     | 2
+
 
 	}
 
@@ -255,6 +262,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 			result         || value                    | len
 			'this is a '   || 'this is a long string'  | 10
+			'Ye'           || 'Ye'                     | 10
+			null           || null                     | 8
+			'Wed Jun 26'   || now                      | 10
+			'12345'        || 123456                   | 5
+			'1234.'        || 1234.56                  | 5
+			'1.2345'       || 1.23456                  | 6
+			'1.23456'      || 1.23456                  | 7
+			'Ye'           || 'Ye'                     | 2
 
 	}
 
