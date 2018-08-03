@@ -836,7 +836,7 @@ class DataImportService implements ServiceMethods {
 			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
 		} catch (e) {
 			record.addError(e.getMessage())
-			log.error ExceptionUtil.stackTraceToString("processEntityRecord()eError while processing record ${recordCount}", e)
+			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e)
 		}
 
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
@@ -918,7 +918,7 @@ class DataImportService implements ServiceMethods {
 
 		// createdBy
 		if ('createdBy' in propsInDomain) {
-			entity.whom = context.person
+			entity.createdBy = context.person
 		}
 
 		// owner (i.e. project.client)
@@ -1160,6 +1160,7 @@ class DataImportService implements ServiceMethods {
 	 * @param isNewEntity - flag if the record is new or existing
 	 * @param fieldsInfo - the JSON data from the import batch record
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	void _recordChangeOnField(
 		Object domainInstance,
 		String fieldName,
@@ -1245,6 +1246,7 @@ class DataImportService implements ServiceMethods {
 	 *
 	 * @test Integration
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Object fetchEntityByFieldMetaData(String fieldName, Map fieldsInfo, Map context, Object entityInstance=null) {
 		// This will be populated with the entity object or error message appropriately
 		Object entity
@@ -1254,6 +1256,11 @@ class DataImportService implements ServiceMethods {
 
 		log.debug 'fetchEntityByFieldMetaData() called with domain {} on row {}, fieldName {}, value={}',
 			context.domainShortName, context.record.sourceRowId, fieldName, fieldsInfo[fieldName]?.value
+
+		// This is a QA Easter Egg to test the error handling
+		if (fieldsInfo[fieldName]?.value == '!~! Go ahead, Make my day !~!') {
+			throw new InvalidRequestException('Do you feel lucky, punk?')
+		}
 
 		boolean foundInCache=false
 		boolean errorPreviouslyRecorded = false
@@ -1265,7 +1272,8 @@ class DataImportService implements ServiceMethods {
 
 		Class domainClass = classOfDomainProperty(fieldName, fieldsInfo, context)
 		String domainShortName = GormUtil.domainShortName(domainClass)
-		int xyz = 0
+
+		// int xyz = 0
 		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 		while (true) {
 			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
@@ -1416,6 +1424,7 @@ class DataImportService implements ServiceMethods {
 	 * @return the Dependency if found
 	 * @test None
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private AssetDependency _fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
 		AssetEntity primary
 		AssetEntity supporting
@@ -1453,6 +1462,7 @@ class DataImportService implements ServiceMethods {
 	 *		NOT_FOUND_BY_ID : if ID specified but not found
 	 * @test Integration
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	Object fetchEntityById(Class domainClass, String fieldName, Map fieldsInfo, Map context) {
 		Object entity
 		Boolean searchedById = false
@@ -1480,6 +1490,7 @@ class DataImportService implements ServiceMethods {
 	 * @return true if there is a single result otherwise false
 	 * @test Integration
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	Boolean _hasSingleFindResult(String propertyName, Map fieldsInfo) {
 		Boolean hasSingleResult = fieldsInfo[propertyName].find?.results?.size() == 1
 		log.debug '_hasSingleFindResult() for field {} has single result? {}', propertyName, hasSingleResult
@@ -1493,6 +1504,7 @@ class DataImportService implements ServiceMethods {
 	 * @return true if there is one or more queries defined
 	 * @test Integration
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	Boolean _hasFindQuery(String propertyName, Map fieldsInfo) {
 		Boolean hasFindQuery = fieldsInfo[propertyName].find?.query?.size() > 0
 		log.debug '_hasFindQuery() for field {} has find query? {}', propertyName, hasFindQuery
@@ -1512,6 +1524,7 @@ class DataImportService implements ServiceMethods {
 	 * 		entity : the entity instance referenced in find results if found
 	 *		null : the find result reference was not found, must of been deleted
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Object _fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
 		Object entity=null
 		if (_hasSingleFindResult(propertyName, fieldsInfo)) {
@@ -1542,6 +1555,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context map that the process uses to cart crap around
 	 * @return list of entities found
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private List<Object> _performQueryAndUpdateFindElement(String propertyName, Map fieldsInfo, Map context) {
 		List<Object> entities = []
 
@@ -1598,6 +1612,7 @@ class DataImportService implements ServiceMethods {
 	 *		entities: List of reference domain entities that were found
 	 * 		error: A String with any error encountered
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	Map _fetchEntityByAlternateKey(Class domainClass, String searchValue, String referenceFieldName, Map fieldsInfo, Map context) {
 		Map result = [entities: [], error: '']
 		log.debug '_fetchEntityByAlternateKey() domainClass {}, searchValue {}', domainClass.getName(), searchValue
@@ -1690,7 +1705,6 @@ class DataImportService implements ServiceMethods {
 		return result
 	}
 
-
 	/**
 	 * Used fetch the person based on a string search value
 	 *
@@ -1711,6 +1725,7 @@ class DataImportService implements ServiceMethods {
 	 *     1) the Person if found/created
 	 *     2) an error message if an error encountered or multiple references were found
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	List _fetchPerson(Person existingPerson, String searchValue, String fieldName, Map fieldsInfo, Map context) {
 		Person person
 		String errorMsg
@@ -1762,6 +1777,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the process context map
 	 * @return the class name of the property
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Class classOfDomainProperty(String propertyName, Map fieldsInfo, Map context) {
 		Class domainClassToCreate
 		ETLDomain ed
@@ -1851,6 +1867,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldNames - a set of the field names to reorder
 	 * @return the reordered list
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private List fixOrderInWhichToProcessFields(Set fieldNames) {
 		List list = fieldNames.toList()
 		// TODO : JPM 4/2018 : Disabled this functionality until I can figure out why the Set order is screwed up.
@@ -1873,6 +1890,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo
 	 * @return List containing [value, initialValue]
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private List getValueAndInitialize(String fieldName, Map fieldsInfo) {
 		def value = fieldsInfo[fieldName]['value']
 		def init = fieldsInfo[fieldName]['init']
@@ -1891,6 +1909,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo
 	 * @return the initialize value if set otherwise the value property
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Object getValueOrInitialize(String fieldName, Map fieldsInfo) {
 		def (value, init) = getValueAndInitialize(fieldName, fieldsInfo)
 		return (init != null ? init : value)
@@ -1901,6 +1920,7 @@ class DataImportService implements ServiceMethods {
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private void resetRecordAndFieldsInfoErrors(ImportBatchRecord record, Map fieldsInfo) {
 		record.errorCount = 0
 		record.resetErrors()
@@ -1919,6 +1939,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map of the fields that came from the ETL process
 	 * @return true if an error was recognized otherwise false
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Boolean recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
 		boolean errorsFound = ! domain.validate()
 
@@ -1949,6 +1970,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the context that has a reference to the ImportBatchRecord that the error may be stuffed into
 	 * @param errorMsg - the obvious error message
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private void addErrorToFieldsInfoOrRecord(String propertyName, Map fieldsInfo, Map context, CharSequence errorMsg) {
 		if (propertyName && fieldsInfo[propertyName]) {
 			fieldsInfo[propertyName].errors << errorMsg.toString()
@@ -1960,6 +1982,7 @@ class DataImportService implements ServiceMethods {
 	/**
 	 * Used to access the error list for the infoFields of a particular field/property
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private List getFieldsInfoFieldErrors(String propertyName, Map fieldsInfo) {
 		return fieldsInfo[propertyName].errors
 	}
@@ -1971,6 +1994,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map of fields from the ETL process
 	 * @return the number of errors found
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private Integer tallyNumberOfErrors(ImportBatchRecord record, Map fieldsInfo) {
 		Integer count = 0
 		for (field in fieldsInfo) {
@@ -1994,6 +2018,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the Map of all of the fields for the current row that came from the ETL process
 	 * @return the MD5 32 character String of the query element
 	 */
+	@Transactional(noRollbackFor=[Exception])
 	private String generateMd5OfFieldsInfoField(String domainShortName, String fieldName, Map fieldsInfo) {
 		StringUtil.md5Hex(
 			"${domainShortName}:${fieldName}" +
