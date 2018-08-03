@@ -82,9 +82,9 @@ class NewsEditorController implements ControllerMethods {
 		int currentPage = params.int('page', 1)
 
 		def assetCommentsQuery = new StringBuffer('''\
-			select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption, comment,
+			select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption, comment,
 			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, ac.comment_type as commentType,
-			       CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy, date_resolved as resolvedAt,
+			       CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy, ac.date_resolved as resolvedAt,
 			       resolution, ae.asset_entity_id as assetEntity
 			from asset_comment ac
 			     left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
@@ -95,7 +95,7 @@ class NewsEditorController implements ControllerMethods {
 			  and ''')
 
 		def moveEventNewsQuery = new StringBuffer('''\
-			select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
+			select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
 			       CONCAT_WS(' ', p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ', p2.first_name, p2.last_name) as resolvedBy,
 			       'news' as commentType, message as comment, resolution, date_archived as resolvedAt, null as assetEntity
 			from move_event_news mn
@@ -184,7 +184,7 @@ class NewsEditorController implements ControllerMethods {
 		def bundleId = params.moveBundle
 		MoveBundle moveBundle = bundleId ? MoveBundle.get(bundleId) : null
 
-		def assetCommentsQuery = new StringBuffer("""select ac.asset_comment_id as id, date_created as createdAt, display_option as displayOption,
+		def assetCommentsQuery = new StringBuffer("""select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption,
 									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
 									from asset_comment ac
@@ -193,7 +193,7 @@ class NewsEditorController implements ControllerMethods {
 									left join project p on (p.project_id = ae.project_id) left join person p1 on (p1.person_id = ac.created_by)
 									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """)
 
-		def moveEventNewsQuery = new StringBuffer("""select mn.move_event_news_id as id, date_created as createdAt, 'U' as displayOption,
+		def moveEventNewsQuery = new StringBuffer("""select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
 											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
 											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
 											from move_event_news mn
