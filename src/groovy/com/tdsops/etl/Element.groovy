@@ -3,7 +3,9 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import org.apache.commons.lang3.StringUtils
 
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 /**
@@ -17,6 +19,9 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 class Element implements RangeChecker {
+	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+	public static final String DECIMAL_FORMAT = "###,##0.00"
+
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
@@ -379,6 +384,19 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * prefix a value and load it into a field
+	 * @param el
+	 * @return
+	 */
+	Element prepend(Object el) {
+		if ( el ) {
+			this.value = String.valueOf(el) + this.toString()
+		}
+
+		return this
+	}
+
+	/**
 	 * Replace the first string content in the element value
 	 * <code>
 	 *      load ... transformation with replaceFirst(content, with)
@@ -453,16 +471,16 @@ class Element implements RangeChecker {
 	 */
 	Element format(String formatMask) {
 		if( ! formatMask ) {
-			switch ( value.class ) {
+			switch ( value?.class ) {
 				case Date :
 						formatMask = '%1$tY-%1$tm-%1$td'
 						break
 
-				case [Integer, Long] :
+				case [Integer, Long, BigInteger] :
 						formatMask = '%,df'
 						break
 
-				case [Float, Double] :
+				case [Float, Double, BigDecimal] :
 						formatMask = '%,.2f'
 						break
 
@@ -761,6 +779,24 @@ class Element implements RangeChecker {
 
 	@Override
 	String toString() {
-		return value
+		String retVal = null
+
+		if ( value != null ) {
+			switch (value.class) {
+				case Date:
+					retVal = value.format(DATETIME_FORMAT)
+					break
+
+				case [Float, Double, BigDecimal]:
+					DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
+					retVal = df.format(value)
+					break
+
+				default:
+					retVal = String.valueOf(value)
+			}
+		}
+
+		return retVal
 	}
 }
