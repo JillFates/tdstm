@@ -17,7 +17,7 @@ export class TagListColumnsModel {
 				label: 'Description',
 				property: 'description',
 				type: 'text',
-				width: 350,
+				width: 380,
 				locked: false
 			},
 			{
@@ -31,7 +31,7 @@ export class TagListColumnsModel {
 				label: 'Assets',
 				property: 'assets',
 				type: 'number',
-				width: 130,
+				width: 120,
 				locked: false,
 				cellStyle: {'text-align': 'center'}
 			},
