@@ -779,19 +779,22 @@ class Element implements RangeChecker {
 
 	@Override
 	String toString() {
-		String retVal
-		switch ( value?.class ) {
-			case Date:
-				retVal = value.format(DATETIME_FORMAT)
-				break
+		String retVal = null
 
-			case [Float, Double, BigDecimal]:
-				DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
-				retVal = df.format(value)
-				break
+		if ( value != null ) {
+			switch (value.class) {
+				case Date:
+					retVal = value.format(DATETIME_FORMAT)
+					break
 
-			default:
-				retVal = String.valueOf(value)
+				case [Float, Double, BigDecimal]:
+					DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
+					retVal = df.format(value)
+					break
+
+				default:
+					retVal = String.valueOf(value)
+			}
 		}
 
 		return retVal
