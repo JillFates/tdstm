@@ -1,12 +1,11 @@
 {
 	"info": {
-		"_postman_id": "08d6ea97-92a2-4750-9720-611c79941597",
+		"_postman_id": "6e09c304-f824-43e1-8cc1-6984a814b92e",
 		"name": "Bulk Change Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"_postman_id": "2d6df8d1-5cdf-4bb7-8672-acdb424d2438",
 			"name": "Sign In",
 			"event": [
 				{
@@ -78,7 +77,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "d3fcb8e4-7854-4698-a1b8-328427d5c3b9",
 			"name": "set current project",
 			"event": [
 				{
@@ -167,7 +165,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e2bc9f53-2378-4b2e-9119-6c66fa294d36",
 			"name": "create tag 1",
 			"event": [
 				{
@@ -228,7 +225,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e61a5987-b91f-4ca3-a023-a79b7cb5160a",
 			"name": "create another tag 2",
 			"event": [
 				{
@@ -289,7 +285,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "ae237ae6-b37f-45fe-988b-b486694285c9",
 			"name": "create another tag 3",
 			"event": [
 				{
@@ -350,7 +345,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "1b7ac5a1-6c59-4f97-94cd-eaab177f3d7c",
 			"name": "list tags after creating 3 tags",
 			"event": [
 				{
@@ -425,7 +419,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "25ed6f03-014b-43d4-b8f1-8a92c82dd790",
 			"name": "Get Assets",
 			"event": [
 				{
@@ -453,7 +446,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
@@ -551,7 +547,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "751145cb-3369-48f2-9244-3c38cd922e6c",
 			"name": "Bulk change actions",
 			"event": [
 				{
@@ -612,7 +607,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "fcdaa003-211e-4316-92e4-36786faeeb4b",
 			"name": "Bulk change fields",
 			"event": [
 				{
@@ -666,7 +660,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "590b5d06-7051-463e-9914-a6f394ae901a",
 			"name": "Bulk change add",
 			"event": [
 				{
@@ -718,7 +711,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "5a047835-74c3-42fc-9d8c-56c3c768091e",
 			"name": "Check the created tags for 1 asset",
 			"event": [
 				{
@@ -784,7 +776,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "6600f5a7-51db-47ae-b524-6c71a64f51f9",
 			"name": "Bulk change remove",
 			"event": [
 				{
@@ -836,7 +827,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0bc3406f-9067-4ebb-8e0e-612cbd147093",
 			"name": "List Tags for Asset 1 after Remove",
 			"event": [
 				{
@@ -898,7 +888,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "0581baff-5348-4b79-b501-4a208e97ab0c",
 			"name": "List Tags for Asset 2",
 			"event": [
 				{
@@ -964,7 +953,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "338e83a4-837f-47b5-8b51-38df3f428a5c",
 			"name": "Bulk change replace",
 			"event": [
 				{
@@ -1019,7 +1007,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "3f7327c3-89bb-4e69-b21d-814a120cca78",
 			"name": "List Tags of Asset1 after bulk replace",
 			"event": [
 				{
@@ -1085,7 +1072,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "f065e953-8e08-4cfc-b82f-4491aab83b62",
 			"name": "List Tags of Asset2",
 			"event": [
 				{
@@ -1150,7 +1136,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "9f88d2ee-e5ba-4834-8ea0-e84655b5bbf6",
 			"name": "Bulk change clear",
 			"event": [
 				{
@@ -1205,7 +1190,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "68975e0a-4749-4c2e-bb65-be5ddac88672",
 			"name": "List Tags of Asset 1 after Bulk Clear",
 			"event": [
 				{
@@ -1262,7 +1246,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "4c8e082e-1852-4b33-9c2a-82f96b12a289",
 			"name": "List Tags of Asset2",
 			"event": [
 				{
@@ -1328,7 +1311,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "6695d891-1eeb-4f48-b636-aae9bb9638d5",
 			"name": "Delete Tag",
 			"event": [
 				{
@@ -1385,7 +1367,6 @@
 			"response": []
 		},
 		{
-			"_postman_id": "e4f30938-3d7f-4e02-96da-4a881fe7a4c6",
 			"name": "Delete Tag 2",
 			"event": [
 				{
@@ -1442,13 +1423,12 @@
 			"response": []
 		},
 		{
-			"_postman_id": "8af84075-9604-466a-bc0b-0868499c2df0",
 			"name": "Delete Tag 3",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "9cdfe132-4abd-416e-b025-7516c06c2983",
+						"id": "91f38c89-ba2b-4937-8d12-7a3641917374",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -1461,7 +1441,14 @@
 							"    ",
 							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
-							"});"
+							"});",
+							"",
+							"//variable cleanup code",
+							"pm.globals.unset(\"tag_id\");",
+							"pm.globals.unset(\"tag_id2\");",
+							"pm.globals.unset(\"tag_id3\");",
+							"pm.globals.unset(\"asset1\");",
+							"pm.globals.unset(\"asset2\");"
 						]
 					}
 				}
