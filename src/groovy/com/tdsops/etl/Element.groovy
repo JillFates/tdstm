@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
  */
 class Element implements RangeChecker {
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
-	public static final String DECIMAL_FORMAT = "###,##0.00"
+	public static final String DECIMAL_FORMAT = "#0.00"
 
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
@@ -810,10 +810,10 @@ class Element implements RangeChecker {
 		if ( value != null ) {
 			switch (value.class) {
 				case Date:
-					retVal = value.format(DATETIME_FORMAT)
+					retVal = ((Date)value).format(DATETIME_FORMAT)
 					break
 
-				case [Float, Double, BigDecimal]:
+				case Number:
 					DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
 					retVal = df.format(value)
 					break

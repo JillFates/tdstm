@@ -243,11 +243,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 			'this is...'   || 'this is a long string'  | 10
 			'Ye'           || 'Ye'                     | 10
 			null           || null                     | 8
-			'Wed Jun...'   || now                      | 10
-			'12...'        || 123456                   | 5
-			'12...'        || 1234.56                  | 5
-			'1.2...'       || 1.23456                  | 6
-			'1.23456'      || 1.23456                  | 7
+			'1974-06...'   || now                      | 10
+			'1234...'      || 123456                   | 7
+			'123...'       || 1234.56                  | 6
+			'1.23'         || 1.23456                  | 6
 			'Ye'           || 'Ye'                     | 2
 
 
@@ -264,11 +263,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 			'this is a '   || 'this is a long string'  | 10
 			'Ye'           || 'Ye'                     | 10
 			null           || null                     | 8
-			'Wed Jun 26'   || now                      | 10
-			'12345'        || 123456                   | 5
-			'1234.'        || 1234.56                  | 5
-			'1.2345'       || 1.23456                  | 6
-			'1.23456'      || 1.23456                  | 7
+			'1974-06-26'   || now                      | 10
+			'123456'       || 123456                   | 6
+			'1234.5'       || 1234.56                  | 6
+			'1.23'         || 1.23456                  | 6
 			'Ye'           || 'Ye'                     | 2
 
 	}
@@ -284,12 +282,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 			'Prefix null'  || null      | 'Prefix '
 			'Prefix data'  || 'data'    | 'Prefix '
 			'Prefix data'  || 'data'    | new Element(value:'Prefix ')
-			'Prefix ' + new DateMidnight(1974,06,26).toDate().format(Element.DATETIME_FORMAT) || new DateMidnight(1974,06,26).toDate() | 'Prefix '
+			'Prefix ' + now.format(Element.DATETIME_FORMAT) || now | 'Prefix '
 			'Prefix 12.34' || 12.34     | 'Prefix '
 			'Prefix 12.00' || 12.00     | 'Prefix '
 			'Prefix 0.00'  || 0.0       | 'Prefix '
-			'Prefix 0'     || 0         | 'Prefix '
-			'Prefix 12'    || 12        | 'Prefix '
+			'Prefix 0.00'  || 0         | 'Prefix '
+			'Prefix 12.00' || 12        | 'Prefix '
 
 	}
 
