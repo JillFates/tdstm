@@ -17,8 +17,7 @@ class ViewManagerListSpec extends GebReportingSpec {
     static numberOfRows
     //Define the names of the Application you will Create and Edit
     static randStr = CommonActions.getRandomString()
-    static baseName = "TM8501"
-    static viewName=  randStr+" "+baseName
+    static viewName=  "QAE2E " +randStr+" View"
     def filteredName=""
     static listAll=["All Assets"]
     def listValidation=true
@@ -31,7 +30,6 @@ class ViewManagerListSpec extends GebReportingSpec {
         waitFor { menuModule.goToAssetViewManager() }
     }
     def "1. Validate section title and presence of 'All Views'"() {
-        testKey = "TM-8501"
         given: "I am in Asset Views Page"
             at AssetViewsPage
         when: "I click on All Views"
@@ -42,7 +40,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.moduleTitleIsCorrect("All")
     }
     def "2. Validates the listed views in Favorites are correct"(){
-        testKey = "TM-8501"
         given: "I am in the All views section"
             at AssetViewsPage
         when : "I go to favorites"
@@ -53,7 +50,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.moduleTitleIsCorrect("Favorites")
     }
     def "3. Validates the listed views in My Views are correct"(){
-        testKey = "TM-8501"
         given: "I am in the Favorites section"
             at AssetViewsPage
         when : "I go to My Views"
@@ -64,7 +60,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.moduleTitleIsCorrect("My Views")
     }
     def "4. Validates the listed views in Shared Views are correct"(){
-        testKey = "TM-8501"
         given: "I am in the My Views section"
             at AssetViewsPage
         when : "I go to Shared views"
@@ -75,7 +70,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.moduleTitleIsCorrect("Shared Views")
     }
     def "5. Validate views can be filtered by name"(){
-        testKey = "TM-8501"
         given: "User goes to All views and there is a certain number of rows"
             waitFor {viewMgrAllViews.click()}
             numberOfRows=allViewsModule.getNumberOfRows()
@@ -85,7 +79,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.validateRowNames("All Assets", false)
     }
     def "6. Validate filter is correctly removed"(){
-        testKey = "TM-8501"
         given: "User had previously filtered views by name"
             allViewsModule.filterViewByName "All Assets"
         when : "User clears the filter"
@@ -96,7 +89,6 @@ class ViewManagerListSpec extends GebReportingSpec {
 
 
     def "7. Validates the listed views in System Views are correct"(){
-        testKey = "TM-8501"
         given: "I am in the Shared Views section"
             at AssetViewsPage
         when : "I go to System Views"
@@ -107,7 +99,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.moduleTitleIsCorrect("System Views")
     }
     def "8. Erase icon is reactive"(){
-        testKey = "TM-8501"
         given: "I am in the System Views section"
             at AssetViewsPage
         when: "I go to My views and hit the erase button"
@@ -117,7 +108,6 @@ class ViewManagerListSpec extends GebReportingSpec {
             allViewsModule.confirmationRequiredIsDisplayed()
     }
     def "9. Validate user can click on a view and then go back to the list"(){
-        testKey = "TM-8501"
         given: "I am in the System Views section"
             at AssetViewsPage
         when: "I click in the first view of the list and then on View Manager breadcrumb"

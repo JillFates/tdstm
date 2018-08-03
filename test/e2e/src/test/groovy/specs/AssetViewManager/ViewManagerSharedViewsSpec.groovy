@@ -20,7 +20,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
     //Define the names of the Application you will Create and Edit
     static randStr = CommonActions.getRandomString()
 
-    static viewName= "test" +randStr+"TM8504"
+    static viewName= "QAE2E " +randStr+" Shared"
     static  initValue=""
     static user=2, pass=3
 
@@ -42,7 +42,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
             allViewsModule.validateIsShared()
     }
 
-    def "2. Validate shared view can ve viewed by a different user"() {
+    def "2. Validate shared view can be viewed by a different user"() {
         given: "User is in View Manager"
             at AssetViewsPage
         when: "The user goes to Shared Views"
