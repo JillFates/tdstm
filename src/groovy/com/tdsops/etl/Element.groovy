@@ -18,14 +18,6 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 class Element implements RangeChecker {
-	/*
-	static {
-		String.metaClass.ellipsis { int len ->
-			StringUtils.abbreviate(delegate, len)
-		}
-	}
-	*/
-
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
@@ -282,7 +274,11 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element ellipsis(int size) {
-		value = StringUtils.abbreviate(this.toString(), size)
+		try {
+			value = StringUtils.abbreviate(this.toString(), size)
+		} catch (e) {
+			addToErrors("ellipsis function error (${value} : ${value.class}) : ${e.message}")
+		}
 		return this
 	}
 
@@ -293,7 +289,7 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element truncate(int size) {
-		value = this.toString().take(size)
+		value = this.toString()?.take(size)
 		return this
 	}
 
