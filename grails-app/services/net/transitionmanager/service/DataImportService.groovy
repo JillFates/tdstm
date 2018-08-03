@@ -1273,17 +1273,13 @@ class DataImportService implements ServiceMethods {
 		Class domainClass = classOfDomainProperty(fieldName, fieldsInfo, context)
 		String domainShortName = GormUtil.domainShortName(domainClass)
 
-		// int xyz = 0
-		// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 		while (true) {
-			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 			if ( ! fieldIsInFieldsInfo && ! fieldIsId) {
 				// Shouldn't happen but just in case...
 				entity = "Reference property $fieldName is missing from ETL output"
 				break
 			}
-			// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 			//
 			// Now going to try up to 5+ different ways to find the domain entity
@@ -1299,7 +1295,6 @@ class DataImportService implements ServiceMethods {
 					foundInCache=true
 					break
 				}
-				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 				// 2. Attempt to find the domain by the ID in the property field.value (Number or String)
 				entity = fetchEntityById(domainClass, fieldName, fieldsInfo, context)
@@ -1312,7 +1307,6 @@ class DataImportService implements ServiceMethods {
 						break
 					}
 				}
-				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 				// 3. Attempt to find domain with the single result (find.results[0])
 				if ( _hasSingleFindResult(fieldName, fieldsInfo) ) {
@@ -1323,7 +1317,6 @@ class DataImportService implements ServiceMethods {
 						break
 					}
 				}
-				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 				// Fail out if the field had a previously set/resolved ID
 				if (searchedById) {
@@ -1335,7 +1328,6 @@ class DataImportService implements ServiceMethods {
 					entity = SEARCH_BY_ID_NOT_FOUND_MSG
 					break
 				}
-				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 				// 4. Attept to find domain by re-applying the find/elseFind queries
 				if ( _hasFindQuery(fieldName, fieldsInfo)) {
@@ -1352,7 +1344,6 @@ class DataImportService implements ServiceMethods {
 						break
 					}
 				}
-				// log.debug 'fetchEntityByFieldMetaData() at {}', xyz++
 
 				// 5. Attempt to find domain by alternate key (which is the least precise)
 				// If the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name)
