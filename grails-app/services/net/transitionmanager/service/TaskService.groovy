@@ -4470,7 +4470,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	// Used by the addTagFilteringToWhere method to build TAG filtering
-	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(ta.asset.id) FROM TagAsset taws WHERE '
+	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(taws.asset.id) FROM TagAsset taws WHERE '
 	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'taws.tag.name IN (:tagNameList)'
 	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT taws.asset.id FROM TagAsset taws WHERE '
 	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY taws.asset.id HAVING count(*) = :tagListSize'
