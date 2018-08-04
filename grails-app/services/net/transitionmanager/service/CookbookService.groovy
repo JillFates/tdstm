@@ -1,7 +1,5 @@
 package net.transitionmanager.service
 
-
-import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetCommentCategory
@@ -9,16 +7,18 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.security.Permission
 import org.springframework.dao.IncorrectResultSizeDataAccessException
@@ -29,13 +29,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.sql.ResultSet
 import java.sql.SQLException
 
-import com.tdsops.tm.enums.domain.ContextType
-import static com.tdsops.tm.enums.domain.ContextType.A
-import static com.tdsops.tm.enums.domain.ContextType.B
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
 import static com.tdsops.tm.enums.domain.ProjectStatus.COMPLETED
 import static net.transitionmanager.domain.Project.DEFAULT_PROJECT_ID
-
 /**
  * Handles the logic for creating recipes and running the cookbook
  *
@@ -80,7 +76,7 @@ class CookbookService implements ServiceMethods {
 	 * @param context the context
 	 * @param cloneFrom the id of the recipe to be cloned from
 	 */
-	RecipeVersion createRecipe(String recipeName, String description, String recipeContext, cloneFrom) {
+	RecipeVersion createRecipe(String recipeName, String description, cloneFrom) {
 		securityService.requirePermission Permission.RecipeCreate
 
 		Project project = securityService.getUserCurrentProjectOrException()
@@ -91,11 +87,13 @@ class CookbookService implements ServiceMethods {
 		String defaultSourceCode = ''
 		String defaultChangelog = ''
 		RecipeVersion clonedReleasedVersion
+		String context = '{}'
 
 		if (cloneFrom != null) {
 			clonedVersion = Recipe.get(cloneFrom)
 		} else {
 			Recipe defaultRecipe = Recipe.findByNameAndProject('Default', Project.getDefaultProject())
+
 			if (defaultRecipe?.releasedVersion != null) {
 				defaultSourceCode = defaultRecipe.releasedVersion.sourceCode
 				defaultChangelog = defaultRecipe.releasedVersion.changelog
@@ -103,23 +101,26 @@ class CookbookService implements ServiceMethods {
 		}
 
 		if (clonedVersion != null) {
+
+			if(!clonedVersion.project.isDefaultProject()){
+				context = clonedVersion.context
+			}
+
 			if (clonedVersion.releasedVersion != null) {
 				defaultSourceCode = clonedVersion.releasedVersion.sourceCode
-				//defaultChangelog = clonedVersion.releasedVersion.changelog
 				clonedReleasedVersion = clonedVersion.releasedVersion
 			} else {
 				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom)
+
 				if (recipeVersions)  {
 					def wip = recipeVersions[0]
 					defaultSourceCode = wip.sourceCode
-					//defaultChangelog = wip.changelog
 					clonedReleasedVersion = clonedVersion.releasedVersion
 				}
 			}
 		}
 
-		return createRecipeAndRecipeVersion(recipeName, description, recipeContext, project, defaultSourceCode,
-				defaultChangelog, clonedReleasedVersion)
+		return createRecipeAndRecipeVersion(recipeName, description, context, project, defaultSourceCode, defaultChangelog, clonedReleasedVersion)
 	}
 
 	/**
@@ -143,6 +144,7 @@ class CookbookService implements ServiceMethods {
 		RecipeVersion recipeVersion = RecipeVersion.get(recipeVersionId)
 
 		def recipe = recipeVersion.recipe
+		String context = recipe.project.isDefaultProject() ? '{}' : recipe.context()
 		boolean valid = recipe.projectId == DEFAULT_PROJECT_ID ||
 		                recipe.project == project ||
 		                projectService.getUserProjects().find() { recipe.projectId == it.id }
@@ -150,7 +152,7 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		createRecipeAndRecipeVersion(name, description, recipe.context, project, recipeVersion.sourceCode, '', recipeVersion)
+		createRecipeAndRecipeVersion(name, description, context, project, recipeVersion.sourceCode, '', recipeVersion)
 	}
 
 	/**
@@ -165,11 +167,22 @@ class CookbookService implements ServiceMethods {
 	 * @param recipeVersion original recipeVersion
 	 * @return the new RecipeVersion created with a new Recipe
 	 */
-	private RecipeVersion createRecipeAndRecipeVersion(String name, String description, String context, Project project,
-	                                                   String sourceCode, String changelog, RecipeVersion recipeVersion) {
+	private RecipeVersion createRecipeAndRecipeVersion(
+		String name,
+		String description,
+		String context,
+		Project project,
+		String sourceCode,
+		String changelog,
+		RecipeVersion recipeVersion) {
 
-		def newRecipe = new Recipe(name: name, description: description, context: context, project: project,
-				archived: false, defaultAssetId: null).save(flush:true, failOnError: true)
+		def newRecipe = new Recipe(
+			name: name,
+			description: description,
+			context: context,
+			project: project,
+			archived: false
+		).save(flush:true, failOnError: true)
 
 		new RecipeVersion(sourceCode: sourceCode, changelog: changelog, clonedFrom: recipeVersion,
 				recipe: newRecipe, versionNumber: 0, createdBy: securityService.loadCurrentPerson()).save(failOnError: true)
@@ -400,25 +413,26 @@ class CookbookService implements ServiceMethods {
 	}
 
 	/**
-	 * Returns a list of groups based on the recipeVersionId and the contextId
+	 * Returns a list of groups based on the recipeVersionId and the context
 	 *
 	 * @param recipeVersionId the id of the RecipeVersion
-	 * @param contextId the id of the context
+	 * @param context the MoveEventId and or tags
 	 * @return the list of groups
 	 */
-	def getGroups(recipeVersionId, contextId, predContextType, predSourceCode) {
-		boolean validRecipeId = recipeVersionId != null && recipeVersionId.isNumber()
+	List<Map> getGroups(Long recipeVersionId, ContextCommand context, String predSourceCode) {
+		boolean validRecipeId = recipeVersionId != null
+
 		if (!validRecipeId && predSourceCode == null) {
 			throw new EmptyResultException('Invalid recipeVersionId')
 		}
 
 		RecipeVersion recipeVersion
 		def sourceCode
-		String contextTypeValue
 
 		Project project = securityService.userCurrentProject
 		if (validRecipeId) {
 			recipeVersion = RecipeVersion.get(recipeVersionId)
+
 			if (recipeVersion == null) {
 				throw new EmptyResultException('Recipe version does not exists')
 			}
@@ -426,36 +440,19 @@ class CookbookService implements ServiceMethods {
 			def recipe = recipeVersion.recipe
 			assertProject recipe, project
 
-			contextTypeValue = recipe.context
+			context = recipe.context()
 			sourceCode = recipeVersion.sourceCode
 		} else {
-			contextTypeValue = predContextType
 			sourceCode = predSourceCode ?: ''
 		}
-		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId')
-		}
-
-		contextId = contextId.toInteger()
 
 		checkAccess(project)
 
-		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
-		/*def context = checkAccess(contextId, contextTypeKey, project)
-		if (context == null) {
-			throw new UnauthorizedException('The client does not own this context')
-		}*/
-		ContextType ct = ContextType.getByValue(contextTypeValue)
-		def context = ct.getObject(contextId)
-
-		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder())
+		def fetchedGroups = taskService.fetchGroups(parseRecipeSyntax(sourceCode), context, new StringBuilder(), project)
 		return fetchedGroups.collect({ k, v ->
 			def assets = v.collect { asset -> [id: asset.id, name: asset.assetName, assetType: asset.assetType] }
 			[name: k, assets: assets]
 		})
-	}
-
-	private checkAccess(long contextId, String contextTypeKey, Project project) {
 	}
 
 	/**
@@ -479,37 +476,15 @@ class CookbookService implements ServiceMethods {
 		}
 
 		//checkAccess(`recipe.project`)
-		Long eventId
-		Long bundleId
-		Integer applicationId
 
-		if (recipe.defaultAssetId != null) {
-			switch (recipe.context) {
-				case 'Application':
-					Application app = A.getObject(recipe.defaultAssetId)
-					if (app) {
-						eventId = app.moveBundle.moveEventId
-						bundleId = app.moveBundleId
-						applicationId = recipe.defaultAssetId
-					}
-					break
-				case 'Bundle':
-					MoveBundle mb = B.getObject(recipe.defaultAssetId)
-					if (mb) {
-						eventId = mb.moveEventId
-						bundleId = recipe.defaultAssetId
-					}
-					break
-				case 'Event':
-					eventId = recipe.defaultAssetId
-					break
-				default :
-					throw new IllegalArgumentException('Invalid context')
-			}
+		Map context = recipe.context()
+
+		context.tag.each{Map tag->
+			boolean tagExists = Tag.where{id == tag.id}.count()
+			tag.strike = !tagExists
 		}
 
-		[recipe: recipe, recipeVersion: recipeVersion, person: recipeVersion.createdBy, wip: wip,
-		 eventId: eventId, bundleId: bundleId, applicationId: applicationId]
+		[recipe: recipe, recipeVersion: recipeVersion, person: recipeVersion.createdBy, wip: wip, context: context]
 	}
 
 	/**
@@ -918,7 +893,9 @@ class CookbookService implements ServiceMethods {
 					dataFlowDirection: '',
 					type: 0,
 					status: 0
-				]
+				],
+				tag: '',
+				tagMatch: 'ANY'
 			]
 		]
 
@@ -1426,44 +1403,53 @@ class CookbookService implements ServiceMethods {
 		}
 	}
 
-	void defineRecipeContext(recipeId, contextId) {
+	/**
+	 * Saves the context to the recipe
+	 *
+	 * @param recipeId the recipe to add context(eventId/tags) to.
+	 * @param contextCommand The command object that holds the recipe context.
+	 */
+	void saveRecipeContext(Long recipeId, ContextCommand contextCommand) {
 		securityService.requirePermission Permission.RecipeEdit
 
 		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject(recipe, project)
 
-		if (contextId == null || !contextId.isNumber()) {
-			throw new EmptyResultException('Invalid contextId')
+		Map context = [
+			eventId : contextCommand.eventId,
+			tagMatch: contextCommand.tagMatch,
+			tag     : []
+		]
+
+		contextCommand.tag.each { Long tagId ->
+			Tag tag = get(Tag, tagId, project)
+
+			context.tag << [
+				id    : tag.id,
+				label : tag.name,
+				strike: false,
+				css   : tag.color.css
+			]
 		}
 
-		contextId = contextId.toInteger()
+		recipe.context = JsonUtil.convertMapToJsonString(context)
 
-		checkAccess(project)
-
-		// Commenting out the lines below because of unimplemented checkAccess(contextId, contextTypeKey, project)
-
-		/*if (!checkAccess(contextId, recipe.context, project)) {
-			throw new UnauthorizedException('''The client doesn't own this context''')
-		}*/
-
-		recipe.defaultAssetId = contextId
 		recipe.save(flush:true, failOnError: true)
 	}
 
-	void deleteRecipeContext(recipeId) {
+	void deleteRecipeContext(Long recipeId) {
 		securityService.requirePermission Permission.RecipeEdit
 
 		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
+		recipe.context = null
 
-		recipe.defaultAssetId = null
 		recipe.save(flush:true, failOnError: true)
 	}
 
 	private void assertProject(Recipe recipe, Project project) {
-		if (recipe.projectId == project.id || recipe.project == project) {
+		if (recipe.project.id == project.id || recipe.project == project) {
 			return
 		}
 

@@ -1,7 +1,5 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.AssetComment
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.WebUtil
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -12,8 +10,6 @@ class MoveEvent {
 
 	public static final String METHOD_LINEAR = 'L'
 	public static final String METHOD_MANUAL = 'M'
-
-	static final ContextType contextType = ContextType.E
 
 	JdbcTemplate jdbcTemplate
 

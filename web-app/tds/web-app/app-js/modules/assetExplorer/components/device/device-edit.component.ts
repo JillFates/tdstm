@@ -121,7 +121,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			}
 
 			// roomSourceId, roomSource(new room)
-			modelRequest.asset.roomSourceId = '-1';
+			modelRequest.asset.roomSourceId = '0';
 			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
 				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
 			}
@@ -129,7 +129,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			delete modelRequest.asset.newRoomSource;
 
 			// roomTargetId, roomTarget(new room)
-			modelRequest.asset.roomTargetId = '-1';
+			modelRequest.asset.roomTargetId = '0';
 			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
 				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
 			}

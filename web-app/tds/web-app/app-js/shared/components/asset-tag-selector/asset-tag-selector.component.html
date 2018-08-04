@@ -1,13 +1,14 @@
 <div class="asset-tag-selector-component">
-    <kendo-switch *ngIf="showSwitch"
+    <kendo-switch *ngIf="showSwitch && switchVisible"
             class="asset-tag"
             [(ngModel)]="assetSelectorModel.switch"
-            [onLabel]="'AND'"
-            [offLabel]="'OR'"
-            (valueChange)="onSwitchValueChange($event)"
-    ></kendo-switch>
+            [onLabel]="'ALL'"
+            [offLabel]="'ANY'"
+            (valueChange)="onSwitchValueChange($event)">
+    </kendo-switch>
     <kendo-multiselect
             id="asset-tag-selector-component"
+            #assetTagSelectorComponent
             [data]="tagList"
             [(ngModel)]="assetSelectorModel.tags"
             [textField]="'name'"
@@ -25,4 +26,5 @@
             </div>
         </ng-template>
     </kendo-multiselect>
+    <span class="component-action-open" (click)="openTagSelector()"></span>
 </div>

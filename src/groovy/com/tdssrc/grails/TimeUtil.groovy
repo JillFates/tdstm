@@ -686,7 +686,7 @@ class TimeUtil {
 	 * @param toTZ -  the timezone that the date will be adjusted to
 	 * @return the adjusted date
 	 */
-	private static Date moveDateFromGMTToTZ(Date date, String toTZ) {
+	private static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
 		}

@@ -3,7 +3,9 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import org.apache.commons.lang3.StringUtils
 
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
 /**
@@ -17,6 +19,9 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 class Element implements RangeChecker {
+	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+	public static final String DECIMAL_FORMAT = "#0.00"
+
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
@@ -25,6 +30,15 @@ class Element implements RangeChecker {
 	 * Value with transformations applied
 	 */
 	Object value
+
+	/**
+	 * Overrides default assignation to value in case that we are assigning another Element Object
+	 * @param obj
+	 */
+	void setValue ( Object obj ) {
+		this.value = ( obj instanceof Element ) ? obj.value : obj
+	}
+
 	/**
 	 * Default o initialize value
 	 */
@@ -258,6 +272,32 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Abbreviates a String using '...' as ther replacement marker.
+	 * This will turn "Now is the time for all good men" into "Now is the time for...".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element ellipsis(int size) {
+		try {
+			value = StringUtils.abbreviate(this.toString(), size)
+		} catch (e) {
+			addToErrors("ellipsis function error (${value} : ${value.class}) : ${e.message}")
+		}
+		return this
+	}
+
+	/**
+	 * Truncates a String.
+	 * This will turn "Now is the time for all good men" into "Now is the time for".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element truncate(int size) {
+		value = this.toString()?.take(size)
+		return this
+	}
+
+	/**
 	 * Transform current value in this Element instance to a Long number
 	 * <code>
 	 *      load ... transformation with toLong()
@@ -284,6 +324,20 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Transform current value in this Element instance to a Date by attempting to use
+	 * the formats 'yyyy-mm-dd' and 'yyyy/mm/dd'.
+	 *
+	 * <code>
+	 *     extract ... transform with toDate() load ...
+	 * </code>
+	 *
+	 * @return - a date instance
+	 */
+	Element toDate() {
+		return toDate('yyyy-MM-dd', 'yyyy/MM/dd')
+	}
+
+	/**
 	 * Transform current value in this Element instance to a Date
 	 * <code>
 	 *     extract ... transform with toDate('yyyy-mm-dd', 'yyyy/mm/dd', 'mm/dd/yyyy') load ...
@@ -292,26 +346,33 @@ class Element implements RangeChecker {
 	 * @param format - an array of possible date formats to use
 	 * @return - a date instance
 	 */
-	Element toDate(String... format) {
-		if (CollectionUtils.isEmpty(format)) {
+	Element toDate(String... listOfFormats) {
+		if (CollectionUtils.isEmpty(listOfFormats)) {
 			return this
 		}
 
 		// if value is blank or null then log an error
 		if (StringUtil.isBlank(value)) {
-			addToErrors("Not able to transform blank or null date: ${value}")
+			addToErrors('Unable to transform blank or null value to a date')
 			return this
 		}
 
-		for (String pattern : format) {
+		boolean formatted = false
+		for (String pattern : listOfFormats) {
 			try {
+				String ov = value
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
 				simpleDateFormat.setLenient(false)
 				value = simpleDateFormat.parse(value)
+				formatted = true
+		println "toDate() originalValue=$ov, parsed date=$value, format=$pattern"
 				break
 			} catch (Exception e) {
-				addToErrors("Not able to transform date: ${value}, pattern: ${pattern}")
+				// nothing to do
 			}
+		}
+		if (! formatted) {
+			addToErrors("Unable to transform value to a date with pattern(s) ${listOfFormats.join(', ')}")
 		}
 
 		return this
@@ -343,6 +404,19 @@ class Element implements RangeChecker {
 	Element trim() {
 		value = transformStringObject('trim', value) {
 			it.trim()
+		}
+
+		return this
+	}
+
+	/**
+	 * prefix a value and load it into a field
+	 * @param el
+	 * @return
+	 */
+	Element prepend(Object el) {
+		if ( el ) {
+			this.value = String.valueOf(el) + this.toString()
 		}
 
 		return this
@@ -405,6 +479,46 @@ class Element implements RangeChecker {
 	Element uppercase() {
 		value = transformStringObject('uppercase', value) {
 			it.toUpperCase()
+		}
+		return this
+	}
+
+	/**
+	 * Format this element value to the printf-style format strings
+	 * @see https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * In case that the format is not provided we use a default one to each of the following types:
+	 *    Date	                  %1$tY-%1$tm-%1$td
+	 *    Number (Integer, Long)	%,d
+	 *    Float/Decimal	         %,.2f
+	 * <code>
+	 *      load ... transform with format()
+	 * <code>
+	 * @return the element instance that received this command
+	 */
+	Element format(String formatMask) {
+		if( ! formatMask ) {
+			switch ( value?.class ) {
+				case Date :
+						formatMask = '%1$tY-%1$tm-%1$td'
+						break
+
+				case [Integer, Long, BigInteger] :
+						formatMask = '%,df'
+						break
+
+				case [Float, Double, BigDecimal] :
+						formatMask = '%,.2f'
+						break
+
+				default:
+						formatMask = '%s'
+			}
+		}
+
+		try {
+			value = String.format(formatMask, value)
+		} catch (e) {
+			addToErrors("format function error (${value} : ${value.class}) : ${e.message}")
 		}
 		return this
 	}
@@ -529,6 +643,34 @@ class Element implements RangeChecker {
 	Element plus(String value) {
 		this.value += value
 		return this
+	}
+
+	/**
+	 * Set a default value when extracting and loading values
+	 * So that I can reduce the amount of code to write and simplify the scripts
+	 * <code>
+	 *     extract 'desc' transform with defaultValue('Something') load 'Description'
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	def defaultValue(Object value) {
+		if( ! isValueSet() ) {
+			this.setValue(value)
+		}
+
+		return this
+	}
+
+	/**
+	 * checks that the wrapped value is not Null nor Blank
+	 * @return
+	 */
+	private boolean isValueSet() {
+		return ! (
+				  value == null ||
+				  (value instanceof CharSequence) && value.trim().size() == 0
+		)
 	}
 
 	/**
@@ -663,6 +805,24 @@ class Element implements RangeChecker {
 
 	@Override
 	String toString() {
-		return value
+		String retVal = null
+
+		if ( value != null ) {
+			switch (value.class) {
+				case Date:
+					retVal = ((Date)value).format(DATETIME_FORMAT)
+					break
+
+				case Number:
+					DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
+					retVal = df.format(value)
+					break
+
+				default:
+					retVal = String.valueOf(value)
+			}
+		}
+
+		return retVal
 	}
 }

@@ -111,7 +111,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
 		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
 		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true, failOnError: true)
 
@@ -137,7 +137,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange add'() {
 		setup: 'given an edit command for adding tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'add', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'add', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -151,7 +151,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange add all assets in filter'() {
 		setup: 'given an edit command for adding tags, where allAssets it true, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'add', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'add', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 			bulkChangeCommand.assetIds = []
 			bulkChangeCommand.allAssets = true
@@ -168,7 +168,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange clear'() {
 		setup: 'given an edit command for clearing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'clear', value: "[]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'clear', value: "[]")
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -182,7 +182,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange clear, all assets in filter'() {
 		setup: 'given an edit command for clearing tags, where allAssets it true, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'clear', value: "[]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'clear', value: "[]")
 			bulkChangeCommand.edits = [editCommand]
 			bulkChangeCommand.assetIds = []
 			bulkChangeCommand.allAssets = true
@@ -199,7 +199,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange replace'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'replace', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'replace', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -213,7 +213,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange replace, all assets in filter'() {
 		setup: 'given an edit command for replacing tags, where allAssets it true, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'replace', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'replace', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 			bulkChangeCommand.assetIds = []
 			bulkChangeCommand.allAssets = true
@@ -230,7 +230,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange remove'() {
 		setup: 'given an edit command for removing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'remove', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'remove', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -244,7 +244,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange remove, all assets in filter'() {
 		setup: 'given an edit command for removing tags, where allAssets it true, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'tags', action: 'remove', value: "[${tag1.id}, ${tag2.id}]")
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'remove', value: "[${tag1.id}, ${tag2.id}]")
 			bulkChangeCommand.edits = [editCommand]
 			bulkChangeCommand.assetIds = []
 			bulkChangeCommand.allAssets = true

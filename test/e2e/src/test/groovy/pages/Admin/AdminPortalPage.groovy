@@ -1,18 +1,17 @@
-package pages.Admin.LandingItems
+package pages.Admin
 
 import geb.Page
 import modules.AdminModule
 
-class ImportAccountsLandingPage extends Page{
+class AdminPortalPage extends Page {
 
     static at = {
-        title == "Import Accounts"
-        pageHeaderName.text() == "Import Accounts"
+        title == "TDS TransitionManager™ Admin Portal"
+        pageHeaderName.text() == "Admin Portal"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
-
 }

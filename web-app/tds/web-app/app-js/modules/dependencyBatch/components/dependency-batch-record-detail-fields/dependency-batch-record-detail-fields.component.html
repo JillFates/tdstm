@@ -36,8 +36,8 @@
                            title="Imported Value" [class]="'import-value'">
 	        <ng-template kendoGridCellTemplate let-dataItem>
 		        <div class="import-item-container">
-			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue"/>
-			        <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue"/>
+			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" readonly/>
+			        <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue" readonly/>
 			        <i [ngClass]="{'has-init-value': !dataItem.importValue && dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
 		        </div>
 	        </ng-template>
@@ -46,9 +46,9 @@
         <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [class]="'import-value'">
             <ng-template kendoGridCellTemplate let-dataItem>
                 <div class="import-item-container">
-                    <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" readonly/>
+                    <input *ngIf="(dataItem.importValue || dataItem.importValue === '' ) && !dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" />
 	                <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text"
-	                       class="import-value-input form-control has-init-value" [(ngModel)]="dataItem.initValue" readonly/>
+	                       class="import-value-input form-control has-init-value" [(ngModel)]="dataItem.initValue"/>
 	                <i [ngClass]="{'has-init-value': !dataItem.importValue && dataItem.initValue}"
                        *ngIf="!dataItem.importValue && dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
                 </div>

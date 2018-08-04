@@ -192,7 +192,7 @@ class ManufacturerService implements ServiceMethods {
 			if (!isValid || !alias.save(flush: true)) {
 //				log.error GormUtil.allErrorsString(alias)
 //				return null
-				throw new ServiceException("AKA or Manufacturer with same name already exist: ${name}")
+				throw new ServiceException("AKA or Manufacturer with same name already exists: ${name}")
 			}
 		}
 		return alias

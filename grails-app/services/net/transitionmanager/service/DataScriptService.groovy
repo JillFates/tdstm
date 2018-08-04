@@ -30,6 +30,7 @@ import java.text.DecimalFormat
 class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
+	 FileSystemService fileSystemService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],
@@ -121,6 +122,15 @@ class DataScriptService implements ServiceMethods{
         }
 
         DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
+
+	     // Check if the Sample File is still available, if not delete the temporary data
+	     if ( dataScript.sampleFilename ) {
+		     if ( ! FileSystemService.temporaryFileExists(dataScript.sampleFilename) ) {
+			     dataScript.sampleFilename = ''
+			     dataScript.originalSampleFilename = ''
+			     dataScript.save()
+		     }
+	     }
 
         return dataScript
     }
@@ -286,30 +296,30 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Object parseDataFromFile (String fileName, Long maxRows, GrailsParameterMap params) throws EmptyResultException{
+	Map parseDataFromFile (Long id, String originalFileName, String fileName, Long maxRows) throws EmptyResultException {
+		try {
 
-		String message
-		try{
+			if ( id ) {
+				saveSampleFile(id, originalFileName, fileName)
+			}
 
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
+			switch (extension) {
+				case 'JSON':
+					return parseDataFromJSON(fileName, maxRows, params['rootNode'])
 
-        switch (extension) {
-            case 'JSON':
-                return parseDataFromJSON(fileName, maxRows, params['rootNode'])
+				case 'CSV':
+					return parseDataFromCSV(fileName, 0, maxRows)
 
-            case 'CSV':
-                return parseDataFromCSV(fileName, 0, maxRows)
+				case ['XLS', 'XLSX'] :
+					return parseDataFromXLS(fileName, 0, 0, maxRows)
 
-            case ['XLS', 'XLSX'] :
-                return parseDataFromXLS(fileName, 0, 0, maxRows)
-
-			default :
-				message = "File format ($extension) is not supported"
+				default :
+					message = "File format ($extension) is not supported"
 			}
 
 		} catch (ex) {
 			log.info(ex.message)
-
 
 			switch(ex) {
 				case FileNotFoundException :
@@ -321,18 +331,24 @@ class DataScriptService implements ServiceMethods{
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
-				default :
+
+				default:
 					message = ex.message
 			}
 		}
 
-		if(message) {
+		if (message) {
 			throw new InvalidParamException(message)
 		}
 	}
 
-	private File tempFile(String fileName) throws FileNotFoundException {
-		File inputFile = new File(FileSystemService.temporaryDirectory, fileName)
+	/**
+	 * Used to retrieve the contents of a temporary file
+	 * @param filename - the name of the temporary file
+	 * @return the File handle of the file
+	 */
+	private File tempFile(String filename) throws FileNotFoundException {
+		File inputFile = FileSystemService.openTempFile(filename)
 		if (! inputFile.exists()) {
 			throw new FileNotFoundException(inputFile.toString())
 		}
@@ -475,5 +491,30 @@ class DataScriptService implements ServiceMethods{
 				  rows  : data
 		]
 
+	}
+
+	/**
+	 * Store the sampleFileName, if changed in the DataScript object
+	 * @param id DataScript identifier
+	 * @param tmpFileName filename to store
+	 */
+	private void saveSampleFile(Long id, String originalFileName, String tmpFileName) {
+		DataScript ds = DataScript.get(id)
+
+		String extension = FilenameUtils.getExtension(tmpFileName)
+
+		if(! originalFileName ) {
+			originalFileName = tmpFileName.substring(0, tmpFileName.lastIndexOf('_')) + '.' + extension
+		}
+
+		if ( !originalFileName.equalsIgnoreCase(ds.originalSampleFilename) ) {
+			if ( ds.sampleFilename ) { // delete old file associated
+				fileSystemService.deleteTemporaryFile(ds.sampleFilename)
+			}
+
+			ds.originalSampleFilename = originalFileName
+			ds.sampleFilename = tmpFileName
+			ds.save()
+		}
 	}
 }

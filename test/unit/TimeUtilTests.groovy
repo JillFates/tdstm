@@ -135,7 +135,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 		testDate.setHours(14)
 		testDate.setMinutes(15)
 		testDate.setSeconds(30)
-		
+
 
 		TimeUtil.createFormatterForType(userPrefFormat, formatName).format(testDate) == formatResult
 
@@ -314,30 +314,30 @@ class TimeUtilTests extends AbstractUnitSpec {
 
 			// Testing with a bigger than 99 value
 			TimeUtil.formatTimeDuration(td2) == "100:10:10"
-			
+
 			// Testing with all zeros
 			TimeUtil.formatTimeDuration(td3) == "00:00:00"
-			
+
 			//  Testing with regular values (1-digit values)
 			TimeUtil.formatTimeDuration(td4) == "01:02:03"
-			
+
 			// Testing with all the accepted fields (1-digit values).
 			TimeUtil.formatTimeDuration(td4, true, true) == "01:02:03:04:05"
-			
+
 			// Testing with seconds and without millis
 			TimeUtil.formatTimeDuration(td4, true) == "01:02:03:04"
-			
+
 			// Testing with conflicting params
 			TimeUtil.formatTimeDuration(td4, false, true) == "01:02:03"
-			
+
 			// Testing with a null TimeDuration
 			TimeUtil.formatTimeDuration(null) == "00:00:00"
-			
+
 			// Testing with a null TimeDuration, including secs and millis.
 			TimeUtil.formatTimeDuration(null, true, true) == "00:00:00:00:00"
 	}
 
-	void 'Test moveDateToGMT(Date date, String fromTZ) and moveDateFromGMTToTZ(Date date, String toTZ)'() {
+	void 'Test moveDateToGMT(Date date, String fromTZ) and adjustDateFromGMTToTZ(Date date, String toTZ)'() {
 
 		when: 'we move a java.util.Date from Japan Timezone (9 hours ahead of GMT) to GMT Time'
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyy hh");
@@ -355,7 +355,7 @@ class TimeUtilTests extends AbstractUnitSpec {
 			originalDate = sdf.parse('06/20/2017 00') // Interpret this as GMT (remember java.util.Date doesn't have Timezone info!)
 			expectedDate = sdf.parse('06/20/2017 09') // This Date should be returned when converted to GMT Japan time, (GMT+9)
 
-			resultDate = TimeUtil.moveDateFromGMTToTZ(originalDate, japanTimezone) // Move from GMT to Japan Timezone
+			resultDate = TimeUtil.adjustDateFromGMTToTZ(originalDate, japanTimezone) // Move from GMT to Japan Timezone
 		then: 'The resultDate has a 9 hours more than the originalDate'
 			resultDate.compareTo(expectedDate) == 0
 	}

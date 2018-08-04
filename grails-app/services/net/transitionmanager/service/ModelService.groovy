@@ -523,7 +523,7 @@ class ModelService implements ServiceMethods {
 			def isValid = isValidAlias(name, model)
 			alias = new ModelAlias(name: name, model: model, manufacturer: model.manufacturer)
 			if (!isValid || !alias.save()) {
-				throw new ServiceException("AKA or Model with same name already exist: ${name}")
+				throw new ServiceException("AKA or Model with same name already exists: ${name}")
 			}
 		}
 		alias

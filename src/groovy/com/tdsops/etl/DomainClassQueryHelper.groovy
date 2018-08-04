@@ -42,7 +42,7 @@ class DomainClassQueryHelper {
 	 * @return a list of assets returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
-		if(AssetEntity.isAssignableFrom(domain.clazz)){
+		if(domain.isAsset()){
 			return assetEntities(domain.clazz, project, paramsMap, returnIdOnly)
 		} else {
 			return nonAssetEntities(domain.clazz, project, paramsMap, returnIdOnly)
@@ -67,7 +67,7 @@ class DomainClassQueryHelper {
 			 where ${DOMAIN_ALIAS}.project = :project
                and ${DOMAIN_ALIAS}.assetClass = :assetClass
 			   and $hqlWhere
-			""".stripIndent()
+		""".stripIndent()
 
 		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams
 		return AssetEntity.executeQuery(hql, args, [readOnly: true])

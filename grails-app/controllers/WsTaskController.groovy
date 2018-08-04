@@ -1,23 +1,17 @@
 import com.tds.asset.AssetComment
-import com.tds.asset.TaskDependency
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
-import com.tdssrc.grails.GormUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
+import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.UnauthorizedException
-import com.tdsops.common.security.spring.HasPermission
 
 /**
  * Handles WS calls of the TaskService.
@@ -36,24 +30,27 @@ class WsTaskController implements ControllerMethods {
 	 * Publishes a TaskBatch that has been generated before
 	 */
 	@HasPermission(Permission.TaskPublish)
-	def publish() {
-		renderSuccessJson(tasksUpdated: taskService.publish(params.id))
+	def publish(Long id) {
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(tasksUpdated: taskService.publish(id, project))
 	}
 
 	/**
 	 * Unpublishes a TaskBatch that has been generated before
 	 */
 	@HasPermission(Permission.TaskPublish)
-	def unpublish() {
-		renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
+	def unpublish(Long id) {
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(tasksUpdated: taskService.unpublish(id, project))
 	}
 
 	/**
 	 * Deletes a TaskBatch.
 	 */
 	@HasPermission(Permission.TaskBatchDelete)
-	def deleteBatch() {
-		taskService.deleteBatch(params.id)
+	def deleteBatch(Long id) {
+		Project project = securityService.userCurrentProject
+		taskService.deleteBatch(id, project)
 		renderSuccessJson()
 	}
 
@@ -62,20 +59,24 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
-		def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
-			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
+		TaskGenerationCommand context = populateCommandObject(TaskGenerationCommand)
+		validateCommandObject(context)
+		Project project = securityService.userCurrentProject
+
+		def result = taskService.initiateCreateTasksWithRecipe(context, project)
 		renderSuccessJson(jobId: result.jobId)
 	}
 
 	/**
 	 * Used to lookup a TaskBatch by the Context and Recipe regardless of the recipe version
-	 * @param contextId - the record id number of the context that the TaskBatch was generated for
+	 * @param eventId - the record id number of the event that the TaskBatch was generated for
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @return A taskBatch object if found or null
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def findTaskBatchByRecipeAndContext() {
-		def result = taskService.findTaskBatchByRecipeAndContext(params.recipeId, params.contextId, params.logs)
+	def findTaskBatchByRecipeAndContext(Long recipeId, Long eventId) {
+		Project project = securityService.userCurrentProject
+		def result = taskService.findTaskBatchByRecipeAndContext(recipeId, eventId, project, params.logs)
 		renderSuccessJson(taskBatch: result)
 	}
 
@@ -83,21 +84,24 @@ class WsTaskController implements ControllerMethods {
 	 * List the TaskBatch using the parameters passed in the request
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def listTaskBatches() {
-		renderSuccessJson(list: taskService.listTaskBatches(params.recipeId, params.limitDays))
+	def listTaskBatches(Long recipeId) {
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(list: taskService.listTaskBatches(recipeId, params.limitDays, project))
 	}
 
 	/**
 	 * Gets a TaskBatch based on a id
 	 */
 	@HasPermission(Permission.TaskBatchView)
-	def retrieveTaskBatch() {
-		renderSuccessJson(taskBatch: taskService.getTaskBatch(params.id))
+	def retrieveTaskBatch(Long id) {
+		Project project = securityService.userCurrentProject
+		renderSuccessJson(taskBatch: taskService.getTaskBatch(id, project))
 	}
 
 	@HasPermission(Permission.RecipeGenerateTasks)
-	def taskReset() {
-		taskService.resetTasksOfTaskBatch(params.id)
+	def taskReset(Long id) {
+		Project project = securityService.userCurrentProject
+		taskService.resetTasksOfTaskBatch(id, project)
 		renderSuccessJson()
 	}
 

@@ -1287,8 +1287,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (taskNumbers) {
 				'in'('taskNumber', taskNumbers)
 			}
-			if (params.isResolved?.isNumber()) {
-				eq('isResolved', params.int('isResolved'))
+			if (params.isResolved) {
+				if (params.isResolved == 0) {
+					eq('dateResolved', null)
+				} else {
+					ne('dateResolved', null)
+				}
 			}
 			if (params.priority?.isNumber()) {
 				eq('priority', params.int('priority'))

@@ -43,7 +43,7 @@ class AssetEntity {
 		'priority',
 		'planStatus',
 		'supportType',
-		'tags',
+		'tagAssets',
 		'validation'
 	]
 

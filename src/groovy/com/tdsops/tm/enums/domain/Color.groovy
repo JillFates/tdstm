@@ -7,8 +7,6 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 enum Color {
-
-	Black('tag-black'),					// not used just kept for now for testing
 	Grey('tag-grey'),					//tag-color9: #e6e6e6 grey
 	Red('tag-red'),						//tag-color1: #f2d9e1 salmon
 	Orange('tag-orange'),				//tag-color8: #f2e8d9 orange

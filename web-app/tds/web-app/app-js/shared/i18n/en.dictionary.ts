@@ -72,7 +72,24 @@ export const en_DICTIONARY: Object = {
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
 		},
-		'SYSTEM_VIEW': 'System View'
+		'SYSTEM_VIEW': 'System View',
+		'BULK_CHANGE' : {
+			'TITLE' : 'Bulk Change',
+			'EDIT': {
+				'ADD_FIELD': 'Add Field',
+				'EFFECTED_ASSETS': 'This action will effect {param1} Assets',
+				'CONFIRM_UPDATE': 'You are about to update {param1} assets. There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
+			},
+			'DELETE': {
+				'CONFIRM_DELETE': 'You are about to delete {param1} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
+			},
+			'ACTIONS': {
+				'ADD': 'Add to existing',
+				'CLEAR': 'Clear field',
+				'REPLACE': 'Replace with',
+				'REMOVE': 'Remove these'
+			}
+		}
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
@@ -163,7 +180,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'IMPORT_BATCH': {
-		'MANAGE_LIST': 'Manage Dependency Batches',
+		'MANAGE_LIST': 'Manage Import Batches (ETL)',
 		'DEPENDENCY_BATCH': 'Dependency Batch',
 		'LIST': {
 			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',

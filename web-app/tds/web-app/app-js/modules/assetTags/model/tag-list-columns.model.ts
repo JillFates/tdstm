@@ -10,28 +10,28 @@ export class TagListColumnsModel {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
-				width: 200,
+				width: 170,
 				locked: false
 			},
 			{
 				label: 'Description',
 				property: 'description',
 				type: 'text',
-				width: 200,
+				width: 380,
 				locked: false
 			},
 			{
 				label: 'Color',
 				property: 'color',
 				type: 'text',
-				width: 80,
+				width: 100,
 				locked: false
 			},
 			{
 				label: 'Assets',
 				property: 'assets',
 				type: 'number',
-				width: 130,
+				width: 120,
 				locked: false,
 				cellStyle: {'text-align': 'center'}
 			},

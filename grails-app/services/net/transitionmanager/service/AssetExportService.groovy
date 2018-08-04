@@ -624,6 +624,14 @@ class AssetExportService {
 									colVal = rack.tag
 								}
 								break
+							case ~/Tags/:
+								Collection tagAssets = currentAsset[field]
+								if (tagAssets) {
+									colVal = tagAssets.tag*.name.join(",")
+								} else {
+                                    colVal = ""
+                                }
+								break
 
 							default:
 								colVal = currentAsset[field]
@@ -768,6 +776,14 @@ class AssetExportService {
 							case ~/modifiedDate/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
+							case ~/tagAssets/:
+								Collection tagAssets = app[field]
+								if (tagAssets) {
+									colVal = tagAssets.tag*.name.join(",")
+								} else {
+									colVal = ""
+								}
+								break
 							default:
 								colVal = app[field]
 						}
@@ -835,6 +851,15 @@ class AssetExportService {
 
 							case 'DepGroup':
 								colVal = assetDepBundleMap[currentDatabase.id]
+								break
+
+							case ~/Tags/:
+								Collection tagAssets = currentDatabase[field]
+								if (tagAssets) {
+									colVal = tagAssets.tag*.name.join(",")
+								} else {
+									colVal = ""
+								}
 								break
 
 							default:
@@ -909,6 +934,16 @@ class AssetExportService {
 							case 'DepGroup':
 								colVal = assetDepBundleMap[currentFile.id]
 								break
+
+							case ~/Tags/:
+								Collection tagAssets = currentFile[field]
+								if (tagAssets) {
+									colVal = tagAssets.tag*.name.join(",")
+								} else {
+									colVal = ""
+								}
+								break
+
 
 							default:
 								colVal = currentFile[field]

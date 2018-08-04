@@ -1,13 +1,10 @@
 package com.tds.asset
 
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Person
 
 class Application extends AssetEntity {
-
-	static final ContextType contextType = ContextType.A
 	static final String UNKNOWN = "Unknown"
 
 	AssetClass assetClass = AssetClass.APPLICATION

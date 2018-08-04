@@ -1,7 +1,10 @@
 package com.tdssrc.grails
 
+import com.tdsops.tm.enums.domain.ApiActionHttpMethod
+import com.tdsops.tm.enums.domain.ApiCatalogDictionaryKey as ACDK
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiCatalogCommand
+import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -78,8 +81,6 @@ import java.util.regex.Pattern
 @Slf4j
 class ApiCatalogUtil {
 
-	private static final String DICTIONARY_ROOT_ELEMENT = 'dictionary'
-	private static final String[] DICTIONARY_PRIMARY_KEYS = ['info', 'variable', 'credential', 'paramDef', 'paramGroup', 'method']
 	private static final String DOT = '.'
 	private static final Pattern BETWEEN_PARENTHESIS = ~/\((.*?)\)/
 
@@ -90,25 +91,33 @@ class ApiCatalogUtil {
 	 * @return a parsed and transformed api catalog dictionary
 	 */
 	private static def transformJsonDictionary(JSONObject jsonDictionary) {
-		if (!jsonDictionary.dictionary instanceof Map) {
+		if (!jsonDictionary.get(ACDK.DICTIONARY) instanceof Map) {
 			 throw new Exception('Dictionary must be a Map structure.')
 		}
 
 		// transform json dictionary in using the desired order of primary keys
-		DICTIONARY_PRIMARY_KEYS.each {key ->
-			def element = jsonDictionary.dictionary.get(key)
-			if (element instanceof Map) {
-				element = transformMap(element, jsonDictionary)
-			} else if (element instanceof List) {
-				element = transformArray(element, jsonDictionary)
-			} else {
-				// do element placeholder replacement if needed
-				if (element ==~ /^\$.*\$$/) {
-					element = getParam(element, jsonDictionary)
+		ACDK.DICTIONARY_KEYS.each { key ->
+			def element = jsonDictionary.get(ACDK.DICTIONARY).get(key)
+			if (element) {
+				if (element instanceof Map) {
+					element = transformMap(element, jsonDictionary)
+				} else if (element instanceof List) {
+					element = transformArray(element, jsonDictionary)
+				} else {
+					// do element placeholder replacement if needed
+					if (element ==~ /^\$.*\$$/) {
+						element = getParam(element, jsonDictionary)
+					}
 				}
+				jsonDictionary.get(ACDK.DICTIONARY).put(key, element)
 			}
-			jsonDictionary.dictionary.put(key, element)
 		}
+
+		// merge common and method reactions scripts maps
+		mergeReactionScripts(jsonDictionary)
+
+		// validate httpMethod
+		validateHttpMethod(jsonDictionary)
 
 		return jsonDictionary
 	}
@@ -176,7 +185,7 @@ class ApiCatalogUtil {
 			def paramName = getParamName(param)
 			if (paramName) {
 				// prefix param name with root dictionary element "dictionary"
-				paramName = DICTIONARY_ROOT_ELEMENT + DOT + paramName
+				paramName = ACDK.DICTIONARY_ROOT_ELEMENT + DOT + paramName
 				def paramValue = jsonDictionary
 				paramName.split('\\.').each { p ->
 					paramValue = paramValue[p]
@@ -243,6 +252,63 @@ class ApiCatalogUtil {
 	}
 
 	/**
+	 * Validate script keys are valid and belong to the ReactionScriptCode enum
+	 * @param script - script map which key is a ReactionScriptCode like SUCCESS...
+	 * @throws InvalidParamException
+	 */
+	private static void scriptKeyValidator(Map script) {
+		if (script) {
+			script.keySet().each { String key ->
+				if (ReactionScriptCode.lookup(key) == null) {
+					throw new InvalidParamException("Invalid reaction script code entry: ${key}")
+				}
+			}
+		}
+	}
+
+	/**
+	 * Merges common reaction scripts map into method reaction scripts map. Method script map has precedence so an existing
+	 * method script entry won't be overridden by common script entry.
+	 * @param jsonDictionary - a transformed api catalog dictionary
+	 */
+	private static void mergeReactionScripts(JSONObject jsonDictionary) {
+		boolean hasCommonScripts = jsonDictionary.get(ACDK.DICTIONARY).containsKey(ACDK.SCRIPT)
+
+		// validate common script keys
+		scriptKeyValidator(jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.SCRIPT))
+
+		// iterate method script map and union common scripts with missing entries in method
+		jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { Map method ->
+			if (!method.get(ACDK.SCRIPT) && hasCommonScripts) {
+				// add script entry to the method when it does not have one for further usage
+				method[ACDK.SCRIPT] = [:]
+			}
+
+			// if there are common reaction scripts let's merge them into method reaction scripts
+			if (hasCommonScripts) {
+				method[ACDK.SCRIPT] = jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.SCRIPT) + method.get(ACDK.SCRIPT)
+			}
+
+			// validate method level script keys
+			scriptKeyValidator(method.get(ACDK.SCRIPT))
+		}
+	}
+
+	/**
+	 * Validates that api method has a valid ApiActionHttpMethod value provided in the method.httpMethod entry
+	 * @param jsonDictionary - a transformed api catalog dictionary
+	 */
+	private static void validateHttpMethod(JSONObject jsonDictionary) {
+		// iterate method to validate
+		jsonDictionary.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { Map method ->
+			// validate whether method.httpMethod is valid within ApiActionHttpMethod enum
+			if (!ApiActionHttpMethod.isValidHttpMethod(method.httpMethod)) {
+				throw new InvalidParamException("Api method ${method.apiMethod} has an invalid httpMethod value: ${method.httpMethod}")
+			}
+		}
+	}
+
+	/**
 	 * Transform a api catalog dictionary placeholders to the corresponding values as params definition indicates.
 	 *
 	 * @param dictionary - a json string containing the dictionary definition
@@ -290,11 +356,11 @@ class ApiCatalogUtil {
 	 */
 	static void validateDictionaryHasPrimaryKeys(JSONObject jsonDictionary) {
 		// validate root element
-		containsKey(jsonDictionary, DICTIONARY_ROOT_ELEMENT)
+		containsKey(jsonDictionary, ACDK.DICTIONARY_ROOT_ELEMENT)
 
 		// validate primary keys
-		jsonDictionary = jsonDictionary.get(DICTIONARY_ROOT_ELEMENT)
-		DICTIONARY_PRIMARY_KEYS.each { key ->
+		jsonDictionary = jsonDictionary.get(ACDK.DICTIONARY_ROOT_ELEMENT)
+		ACDK.DICTIONARY_PRIMARY_KEYS.each { key ->
 			containsKey(jsonDictionary, key)
 		}
 	}
@@ -311,14 +377,25 @@ class ApiCatalogUtil {
 			JSONObject jsonDictionaryTransformed = JsonUtil.parseJson(dictionary)
 
 			Map methods = [:]
-			jsonDictionaryTransformed.dictionary.method.each { entry ->
-				methods.put(entry.apiMethod, entry)
+			jsonDictionaryTransformed.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { entry ->
+				methods[entry.apiMethod] = entry
 			}
 			return methods
 		} catch (Exception e) {
 			String error = String.format('Error transforming ApiCatalog dictionary. %s', e.message)
 			log.info(error)
 			throw new InvalidParamException(error)
+		}
+	}
+
+	/**
+	 * Removes unused transformed dictionary entries after dictionary has been transformed.
+	 * These entries are not going to be required at all within api actions for further system action.
+	 * @param jsonDictionary - a transform api catalog dictionary
+	 */
+	static void removeUpUnusedDictionaryTransformedEntries(JSONObject jsonDictionary) {
+		ACDK.TRANSFORMED_DICTIONARY_UNUSED_KEYS.each { String key ->
+			jsonDictionary.get(ACDK.DICTIONARY).remove(key)
 		}
 	}
 }

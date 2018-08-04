@@ -1,7 +1,7 @@
 package net.transitionmanager.domain
 
 /**
- * MetricResult - represents a single metric that is collected on a daily basic based
+ * MetricResult - represents a single metric that is collected on a daily basis based
  * on the query specified in the associated MetricDefinition. These metrics are captured
  * for each project in the instance where the the Project.recordMetrics is set to 1.
  */

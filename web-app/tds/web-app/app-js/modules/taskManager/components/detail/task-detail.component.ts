@@ -1,4 +1,4 @@
-import {Component, HostListener} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './model/task-detail.model';
@@ -19,7 +19,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/detail/task-detail.component.html',
 	styles: []
 })
-export class TaskDetailComponent extends UIExtraDialog {
+export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 	public modalType = ModalType;
 	public dateFormat: string;
@@ -43,6 +43,9 @@ export class TaskDetailComponent extends UIExtraDialog {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
+	}
+
+	ngOnInit() {
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
@@ -65,7 +68,9 @@ export class TaskDetailComponent extends UIExtraDialog {
 			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
 
 			// Get Assigned Team
-			this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
+			if (this.taskDetailModel.detail.assetComment.assignedTo) {
+				this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
+			}
 		});
 	}
 

@@ -7,7 +7,6 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { Observable } from 'rxjs/Observable';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE,
@@ -15,14 +14,13 @@ import {
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -33,43 +31,15 @@ declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html',
-	styles: [`
-	.btnClear {
-		margin-right: 20px !important;
-	}
-	.btnDelete{
-		margin: 5px 0px 0px 15px;
-	}
-	.btnReload{
-		padding-top:7px;
-	}
-	.grid-message {
-		width:60vw;
-		text-align:center;
-	}
-	.grid-message label{
-		font-weight: normal;
-	}
-	.application .device, .application .database, .application .storage,
-	.device .application, .device .database, .device .storage,
-	.database .device, .database .application, .database .storage,
-	.storage .device, .storage .database, .storage .application {
-		background-color:#f4f4f4;
-	}
-	.k-grid-content-locked,
-	.k-grid-header-locked {
-		border-right-width: 5px;
-		border-right-color: #ebebeb;
-	}
-	`],
-	encapsulation: ViewEncapsulation.None
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent {
 
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
+	@Input() metadata: any;
+	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 
 	fields = [];
 	justPlanning = false;
@@ -77,6 +47,7 @@ export class AssetExplorerViewGridComponent {
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
 	typingTimeout: any;
+
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = MAX_DEFAULT;
@@ -91,19 +62,15 @@ export class AssetExplorerViewGridComponent {
 	gridData: GridDataResult;
 	selectAll = false;
 	bulkItems = {};
-	bulkSelectedItems: string[] = [];
+	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
-		private prompt: UIPromptService,
-		private permissionService: PermissionService,
-		private assetService: AssetExplorerService,
 		private notifier: NotifierService,
-		private dialog: UIDialogService,
-		private tagService: TagService) {
+		private dialog: UIDialogService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
@@ -122,7 +89,6 @@ export class AssetExplorerViewGridComponent {
 		}, (err) => console.log(err));
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
-		this.loadTagList();
 	}
 
 	private getPreferences(): Observable<any> {
@@ -163,18 +129,13 @@ export class AssetExplorerViewGridComponent {
 			c.filter = '';
 		});
 		this.onFilter();
+		if (this.tagSelector) {
+			this.tagSelector.reset();
+		}
 	}
 
 	hasFilterApplied(): boolean {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
-	}
-
-	hasItensSelected(): boolean {
-		return this.bulkSelectedItems.length > 0;
-	}
-
-	hasAssetDeletePermission(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetDelete);
 	}
 
 	clearText(column: ViewColumn): void {
@@ -315,27 +276,16 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	setSelectedItems(): void {
-		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+		this.bulkSelectedItems = Object.keys(this.bulkItems)
+			.filter(key => this.bulkItems[key])
+			.map(value => parseInt(value, 10));
 		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 
-	onBulkDelete(): void {
-		if (this.hasAssetDeletePermission()) {
-			const message = this.bulkSelectedItems.length === 1 ? 'asset' : 'assets';
-			this.prompt.open('Confirmation Required', `You are about to delete ${this.bulkSelectedItems.length} ${message}. Click Confirm to delete the ${message} otherwise click Cancel`, 'Confirm', 'Cancel')
-				.then((res) => {
-					if (res) {
-						this.assetService.deleteAssets(this.bulkSelectedItems)
-							.subscribe(result => {
-								this.notifier.broadcast({
-									name: AlertType.SUCCESS,
-									message: result.message
-								});
-								this.bulkSelectedItems = [];
-								this.onReload();
-							}, err => console.log(err));
-					}
-				});
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		if (operationResult.success) {
+			this.bulkSelectedItems = [];
+			this.onReload();
 		}
 	}
 
@@ -384,23 +334,12 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	/**
-	 * Loads the Available Tags for the current project.
-	 */
-	private loadTagList(): void {
-		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
-			if (result.status === ApiResponseModel.API_SUCCESS && result.data) {
-				this.tagList = result.data;
-			}
-		}, error => console.log('error on GET Tag List', error));
-	}
-
-	/**
 	 * On Asset Tag Filter change, run the query.
 	 * @param $event
 	 */
 	protected onTagFilterChange(column: ViewColumn, $event: any): void {
 		column.filter = '';
-		let operator = $event.operator && $event.operator === 'AND' ? '&' : '|';
+		let operator = $event.operator && $event.operator === 'ALL' ? '&' : '|';
 		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
 		column.filter = selectedTagsFilter;
 		this.onFilter();

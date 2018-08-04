@@ -170,7 +170,7 @@ $('#reportsMenu').hide();
 </script>
 </head>
 <body>
-<tds:subHeader title="Display News and Issues" crumbs="['Planning','News and Issues']"/>
+<tds:subHeader title="Event News" crumbs="['Planning','News and Issues']"/>
 <!-- Main content -->
 <section>
 	<div>

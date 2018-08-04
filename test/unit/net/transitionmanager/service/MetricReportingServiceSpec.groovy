@@ -634,7 +634,7 @@ class MetricReportingServiceSpec extends Specification {
 	@ConfineMetaClassChanges([MetricReportingService])
 	void 'test generateDailyMetrics'() {
 
-		setup: 'Givne a function definition is saved to the database.'
+		setup: 'Given a function definition is saved to the database.'
 			service.metaClass.projectIdsForMetrics = { -> [1, 2, 3] }
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()

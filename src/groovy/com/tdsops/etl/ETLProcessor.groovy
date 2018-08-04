@@ -2,7 +2,10 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StopWatch
+import com.tdssrc.grails.TimeUtil
 import getl.data.Field
+import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -11,6 +14,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.runtime.StackTraceUtils
 
 import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
@@ -20,7 +24,10 @@ import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
 import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.KEYWORD_IN
+import static org.codehaus.groovy.syntax.Types.KEYWORD_INSTANCEOF
 import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
+import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -78,8 +85,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Static variable name definition for script name
 	 */
 	static final String ETLScriptName = 'TDSETLScript'
-
-
 	/**
 	 * Project used in some commands.
 	 */
@@ -133,6 +138,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	ETLFindElement currentFindElement
 
 	/**
+	 * Last Recently used findCache
+	 */
+	FindResultsCache findCache
+	/**
+	 * {@code StopWatch} used for measurement.
+	 */
+	StopWatch stopWatch
+
+	/**
 	 * List of command that needs to be completed.
 	 */
 	private Stack<ETLStackableCommand> commandStack = []
@@ -146,7 +160,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Safe Global transformation that checks the type before applying a transformation
 	 */
 	static Trimmer = { Element element ->
-		if(element.value instanceof CharSequence) {
+		if (element.value instanceof CharSequence) {
 			element.trim()
 		}
 	}
@@ -155,7 +169,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Safe Global transformation that checks the type before applying a transformation
 	 */
 	static Sanitizer = { Element element ->
-		if(element.value instanceof CharSequence) {
+		if (element.value instanceof CharSequence) {
 			element.sanitize()
 		}
 	}
@@ -205,6 +219,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
+		this.findCache = new FindResultsCache()
+		this.stopWatch = new StopWatch()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -222,7 +238,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
-		if(selectedDomain?.domain == domain){
+		if (selectedDomain?.domain == domain) {
 			selectedDomain.addNewRow = true
 		} else {
 			selectedDomain = new SelectedDomain(domain)
@@ -240,7 +256,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return the current instance of {@code ETLProcessor} class
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain(Element element){
+	ETLProcessor domain(Element element) {
 		return domain(element.value)
 	}
 
@@ -252,9 +268,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return the current instance of {@code ETLProcessor} class
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain(String domainName){
+	ETLProcessor domain(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
-		if(domain){
+		if (domain) {
 			return domain(domain)
 		}
 		throw ETLProcessorException.invalidDomain(domainName)
@@ -343,7 +359,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	ETLProcessor ignore (ReservedWord reservedWord) {
 		validateStack()
-		if(reservedWord == ReservedWord.record){
+		if (reservedWord == ReservedWord.record) {
 			if (!hasSelectedDomain()) {
 				throw ETLProcessorException.domainMustBeSpecified()
 			}
@@ -360,7 +376,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * Method invoked at the begin within the iterate loop
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 */
-	void topOfIterate(){
+	void topOfIterate() {
 		result.startRow()
 	}
 
@@ -370,7 +386,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param rowNum the current number de the rows
 	 * @param totalNumRows total number of rows for the current iterate loop
 	 */
-	void bottomOfIterate(Integer rowNum, Integer totalNumRows){
+	void bottomOfIterate(Integer rowNum, Integer totalNumRows) {
 		reportRowProgress(rowNum, totalNumRows)
 		result.endRow()
 	}
@@ -433,7 +449,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			throw ETLProcessorException.invalidConsoleStatus(reservedWord.name())
 		}
 		debugConsole.status = consoleStatus
-		debugConsole.info "Console status changed: $consoleStatus"
 		this
 	}
 
@@ -627,7 +642,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return
 	 */
 	Map<String, ?> set(final String variableName) {
-		if(!binding.isValidETLVariableName(variableName)){
+		if (!binding.isValidETLVariableName(variableName)) {
 			throw ETLProcessorException.invalidETLVariableName(variableName)
 		}
 		validateStack()
@@ -635,7 +650,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		return [
 			with: { value ->
 				Object localVariable = ETLValueHelper.valueOf(value)
-				if(iterateIndex){
+				if (iterateIndex) {
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
 					addGlobalVariableInBinding(variableName, localVariable)
@@ -660,7 +675,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(final String fieldName){
+	Map<String, ?> lookup(final String fieldName) {
 		validateStack()
 		lookUpFieldDefinition(selectedDomain.domain, fieldName)
 		return [
@@ -693,7 +708,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param field
 	 * @return
 	 */
-	Map<String, ?> initialize(String field){
+	Map<String, ?> initialize(String field) {
 		validateStack()
 		return [
 			with: { defaultValue ->
@@ -753,7 +768,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param element an instance of {@code Element} class
 	 * @return an instance of {@code ETLFindElement} class
 	 */
-	ETLFindElement find(Element element){
+	ETLFindElement find(Element element) {
 		return find(element.value)
 	}
 
@@ -771,9 +786,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLFindElement}
 	 */
-	ETLFindElement find(String domainName){
+	ETLFindElement find(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
-		if(domain){
+		if (domain) {
 			return find(domain)
 		}
 		throw ETLProcessorException.invalidDomain(domainName)
@@ -814,7 +829,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param element an instance of {@code Element} class
 	 * @return an instance of {@code ETLProcessor} class
 	 */
-	ETLProcessor elseFind(Element element){
+	ETLProcessor elseFind(Element element) {
 		return elseFind(element.value)
 	}
 
@@ -834,9 +849,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param domainName a domain class name
 	 * @return an instance of {@code ETLProcessor}
 	 */
-	ETLProcessor elseFind(String domainName){
+	ETLProcessor elseFind(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
-		if(domain){
+		if (domain) {
 			return elseFind(domain)
 		}
 		throw ETLProcessorException.invalidDomain(domainName)
@@ -857,7 +872,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	FoundElement whenNotFound(String fieldName) {
 		validateStack()
-		if(!currentFindElement){
+		if (!currentFindElement) {
 			throw ETLProcessorException.whenNotFoundCommandWithoutCurrentFindElement(fieldName)
 		}
 		return new WhenNotFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
@@ -875,10 +890,34 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	FoundElement whenFound(String fieldName) {
 		validateStack()
-		if(!currentFindElement){
+		if (!currentFindElement) {
 			throw ETLProcessorException.whenFoundCommandWithoutCurrentFindElement(fieldName)
 		}
 		return new WhenFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
+	}
+
+	/**
+	 * <b>Cache ETL command.</b><br>
+	 * ETL Script evaluation is using internally a findCache of find command results.
+	 * This commands enables user to define the initial size of that findCache.
+	 * <br>
+	 * If size is greater than zero it creates an instance of {@code FindResultsCache}
+	 * otherwise findCache is set as a null
+	 * <pre>
+	 *  findCache 0 // It disables findCache in find results
+	 *  findCache 100
+	 * </pre>
+	 * @param size initial size of findCache
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor findCache(Integer size) {
+		debugConsole.info("Changed findCache size from ${findCache ? findCache.cacheMaxSize():0} to ${size}")
+		if (size > 0) {
+			this.findCache = new FindResultsCache(size)
+		} else {
+			this.findCache = null
+		}
+		return this
 	}
 
 	/**
@@ -887,8 +926,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor debug(Integer index) {
-
-		if (index in (0..currentRow.size())){
+		if (index in (0..currentRow.size())) {
 			currentColumnIndex = index
 			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
 		} else {
@@ -904,7 +942,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	ETLProcessor debug(String columnName) {
 
-		if (columnsMap.containsKey(columnName)){
+		if (columnsMap.containsKey(columnName)) {
 			currentColumnIndex = columnsMap[columnName].index
 			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
 		} else {
@@ -935,13 +973,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
 
 		boolean stackViolation = false
-		if(expectedObjectOnStack == null && commandStack.size() > 0){
+		if (expectedObjectOnStack == null && commandStack.size() > 0) {
 			stackViolation = true
-		} else if(expectedObjectOnStack &&
+		} else if (expectedObjectOnStack &&
 				  (commandStack.size() == 0 || commandStack.peek() != expectedObjectOnStack) ) {
 			stackViolation = true
 		}
-		if(stackViolation){
+		if (stackViolation) {
 			ETLStackableCommand stackableCommand = commandStack.pop()
 			throw new ETLProcessorException(stackableCommand.stackableErrorMessage())
 		}
@@ -951,7 +989,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		commandStack.push(command)
 	}
 
-	ETLStackableCommand popFromStack(){
+	ETLStackableCommand popFromStack() {
 		commandStack.pop()
 	}
 
@@ -973,15 +1011,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		ETLFieldDefinition fieldSpec
 
 		if (ETLDomain.External != domain) {
-
-			if (!fieldsValidator.hasSpecs(domain, field)) {
-				throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
-			}
-
 			fieldSpec = fieldsValidator.lookup(domain, field)
-			if (!fieldSpec) {
-				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
-			}
 		}
 		return fieldSpec
 	}
@@ -1009,12 +1039,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.domain.clazz
-
-		if(!GormUtil.isDomainProperty(clazz, property)) {
+		if (!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain.domain, property)
 		}
-		if(!GormUtil.isDomainIdentifier(clazz, property) &&
-			!GormUtil.isReferenceProperty(clazz, property)){
+		if (!GormUtil.isDomainIdentifier(clazz, property) &&
+			!GormUtil.isReferenceProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainReference(selectedDomain.domain, property)
 		}
 	}
@@ -1115,7 +1144,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param foundElement
 	 */
-	void addFoundElement(FoundElement foundElement){
+	void addFoundElement(FoundElement foundElement) {
 		result.addFoundElement(foundElement)
 	}
 
@@ -1137,7 +1166,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 	}
 
-	private void initializeDefaultGlobalTransformations(){
+	private void initializeDefaultGlobalTransformations() {
 		globalTransformers.add(Trimmer)
 		globalTransformers.add(Sanitizer)
 	}
@@ -1244,7 +1273,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String fieldNameToLabel(Field field) {
-		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return field.name.trim().toLowerCase()
 		} else {
@@ -1261,7 +1290,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String labelToFieldName(String label) {
-		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return label.toLowerCase()
 		} else {
@@ -1301,7 +1330,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return an instance of ETLProcessorResult
 	 * @see com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 	 */
-	ETLProcessorResult finalResult(Boolean includeConsoleLog = false){
+	ETLProcessorResult finalResult(Boolean includeConsoleLog = false) {
 		this.result.addFieldLabelMapInResults(fieldsValidator.fieldLabelMapForResults())
 		if (includeConsoleLog) {
 			this.result.consoleLog = this.debugConsole.content()
@@ -1342,7 +1371,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see ImportCustomizer
 	 * @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration(){
+	private CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -1353,22 +1382,22 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			// Empty withe list means forbid imports
 			importsWhitelist = []
 			starImportsWhitelist = []
-			// Language tokens allowed
+			// Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
 			tokensWhitelist = [
 				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL,
-				LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET
+				LEFT_SHIFT, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, KEYWORD_IN, KEYWORD_INSTANCEOF
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map,
-				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 			    Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List
 			].asImmutable()
 		}
 
@@ -1388,12 +1417,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @return
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script, ProgressCallback progressCallback = null){
+	Object evaluate(String script, ProgressCallback progressCallback = null) {
 		return evaluate(script, defaultCompilerConfiguration(), progressCallback)
 	}
 
 	@TimedInterrupt(600l)
-	Object execute(String script){
+	Object execute(String script) {
 		Object result = new GroovyShell(
 				this.class.classLoader,
 				this.binding,
@@ -1425,27 +1454,43 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param exception an instance of {@code Throwable}
 	 * @return a Map with 2 fields: message and lineNumber
 	 */
-	static Map<String, ?> getErrorMessage(Throwable exception){
+	static Map<String, ?> getErrorMessage(Throwable exception) {
 
 		Map<String, ?> error = [:]
-		if(exception instanceof MultipleCompilationErrorsException){
-			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception).getErrorCollector().errors.find {it.source.name == ETLProcessor.ETLScriptName}
-			error.message    = syntaxErrorMessage.cause?.message
-			error.startLine  = syntaxErrorMessage.cause?.startLine
-			error.endLine    = syntaxErrorMessage.cause?.endLine
-			error.startColumn= syntaxErrorMessage.cause?.startColumn
-			error.endColumn  = syntaxErrorMessage.cause?.endColumn
-			error.fatal      = syntaxErrorMessage.cause?.fatal
-		}  else{
-			error.message = exception.getMessage()
-			error.startLine  = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
-			error.endLine    = error.startLine
+		if (exception instanceof MultipleCompilationErrorsException) {
+			SyntaxErrorMessage syntaxErrorMessage = ((MultipleCompilationErrorsException)exception)
+				.getErrorCollector().errors.find {
+					if (it instanceof org.codehaus.groovy.control.messages.SyntaxErrorMessage) {
+						return it.source?.name == ETLProcessor.ETLScriptName
+					} else {
+						return false
+					}
+				}
+			if (syntaxErrorMessage)	{
+				error.message    = syntaxErrorMessage.cause?.message
+				error.startLine  = syntaxErrorMessage.cause?.startLine
+				error.endLine    = syntaxErrorMessage.cause?.endLine
+				error.startColumn= syntaxErrorMessage.cause?.startColumn
+				error.endColumn  = syntaxErrorMessage.cause?.endColumn
+				error.fatal      = syntaxErrorMessage.cause?.fatal
+			} else {
+				error.message    = exception.message
+				error.startLine  = null
+				error.endLine    = null
+				error.startColumn= null
+				error.endColumn  = null
+				error.fatal      = true
+			}
+		} else {
+			def lineNum = exception.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.ETLScriptName }?.lineNumber
+			error.message = exception.getMessage() + (lineNum != null ? " at line $lineNum" : '')
+			error.startLine  = lineNum
+			error.endLine    = lineNum
 			error.startColumn= null
 			error.endColumn  = null
 			error.fatal      = true
 		}
 		return error
-
 	}
 
 	/**
@@ -1460,13 +1505,49 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see TimedInterrupt
 	 */
 	@TimedInterrupt(600l)
-	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null){
+	Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
 		setUpProgressIndicator(script, progressCallback)
-		Object result = new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ETLScriptName)
+
+		String tag = this.dataSetFacade.fileName()
+		this.stopWatch.begin(tag)
+
+		Object result = new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				configuration
+		).evaluate(script, ETLScriptName)
+
+		logMeasurements(this.stopWatch.lap(tag))
 		return result
 	}
 
+	/**
+	 * Logs metrics related with evaluation time and findCache hit ratio
+	 *
+	 * @param timeDuration
+	 */
+	private void logMeasurements(TimeDuration timeDuration) {
+		String ago = TimeUtil.ago(timeDuration)
+		long size = findCache ? findCache.cacheMaxSize() : 0
+		long used = findCache ? findCache.size() : 0
+		String ratio = String.format('%.1f', (findCache ? findCache.hitCountRate() : 0.0))
+
+		log.info "ETL Transformation Process took ${ago}"
+		log.info "ETL find cache - size ${size}, used ${used}, hit count ratio ${ratio}%"
+
+		debugConsole.info("Exection time: ${ago}")
+		debugConsole.info("Cache size ${size}, used ${used}, hit ratio ${ratio}%")
+
+		long totalRecords = 0
+		// Dump out the results
+		for (domain in result.domains) {
+			totalRecords += domain.data.size()
+			debugConsole.info("Domain ${domain.domain} ${domain.data.size()} records, fields: ${domain.fieldNames}")
+		}
+		String avgPerRec = String.format('%.4f', timeDuration.toMilliseconds() / (totalRecords > 0 ? totalRecords : 1))
+		debugConsole.info("Process time/record ${avgPerRec} msec")
+
+	}
 	/**
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
 	 * using this instance of the ETLProcessor.
@@ -1475,7 +1556,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
-	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration){
+	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration) {
 
 		List<Map<String, ?>> errors = []
 
@@ -1493,7 +1574,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		List errorsMap = errors.collect { error ->
 
-			if(error instanceof SyntaxErrorMessage){
+			if (error instanceof SyntaxErrorMessage) {
 				[
 					startLine  : error.cause?.startLine,
 					endLine    : error.cause?.endLine,
@@ -1530,27 +1611,46 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
-	Map<String, ?>  checkSyntax(String script){
+	Map<String, ?> checkSyntax(String script) {
 		return checkSyntax(script, defaultCompilerConfiguration())
 	}
 
+	/**
+	 * Coalesce function that is akin to that in MySQL however it would skip over a list of values
+	 * that are empty (null or blank) until a value encountered
+	 * <code>
+	 *     load 'OS' with coalesce(sshOsVar, vmOsVar, snmpOsVar, 'Unknown')
+	 * </code>
+	 * @param objects
+	 * @return
+	 */
+	static Object coalesce(Object... values){
+		Object retVal
+		if ( values ) {
+			retVal = values.find {
+				null != ( (it instanceof Element) ? it.value : it )
+			}
+		}
+
+		return retVal
+	}
 }
 
 class IterateIndex {
 	Integer pos
 	Integer size
 
-	IterateIndex(Integer size){
+	IterateIndex(Integer size) {
 		this.pos = 1
 		this.size = size
 	}
 
-	Integer next(){
+	Integer next() {
 		this.pos++
 		return this.pos
 	}
 
-	Boolean isFirst(){
+	Boolean isFirst() {
 		return this.pos == 1
 	}
 	Boolean isLast() {

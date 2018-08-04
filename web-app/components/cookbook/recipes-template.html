@@ -1,9 +1,5 @@
 <form id="gridControls" class="row-fluid clearfix form-inline groups">
-	<div class="col-md-4 col-xs-4 form-group" style="position:relative; bottom:0;">
-		<label for="contextSelector">Context:</label>
-		<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"></select>
-	</div>
-	<div class="col-md-4 col-xs-4 form-group text-center">
+	<div class="col-md-1 col-xs-1 form-group text-center">
 		<a class="btn btn-default" id="generateRecipe" ng-click="createRecipe()">
 			<img ng-src="{{applyRootPath('/icons/script_add.png')}}" />
 			Create Recipe...

@@ -186,7 +186,7 @@ importFile.splitEachLine("\t") { fields ->
 			created_by: 100, 
 			date_created: now,
 			last_updated: now, 
-			is_resolved: 0,
+			date_resolved: null,
 			must_verify: 0,
 			status: status, 
 			workflow_override: 0, 

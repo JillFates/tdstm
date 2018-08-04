@@ -163,7 +163,7 @@ class ImportBatch {
 	 */
 	Map toMap(boolean minimalInfo = false) {
 		Map providerMap = provider ? provider.toMap(true) : null
-		Map dataScriptMap = dataScript ? dataScript.toMap(true) : null
+		Map dataScriptMap = dataScript ? dataScript.toMap(DataScript.MINIMAL_INFO) : null
 		Map dataMap = [
 			id: id,
 			status: [

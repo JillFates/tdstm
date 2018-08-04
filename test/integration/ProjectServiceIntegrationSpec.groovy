@@ -2,6 +2,7 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
+import net.transitionmanager.ProjectDailyMetric
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
@@ -16,6 +17,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
+
 
 class ProjectServiceIntegrationSpec extends Specification {
 
@@ -397,5 +399,23 @@ class ProjectServiceIntegrationSpec extends Specification {
 			projectService.addTeamMember(project, ownerPerson, ['PROJ_MGR'])
 		then: 'the list of associated staff should have increased by one'
 			4 == projectService.getAssociatedStaffIds(project).size()
+	}
+
+	def '16. Test activitySnapshot method'() {
+		setup: 'Delete the metrics ran for today'
+			Date today = new Date().clearTime()
+			List metrics = ProjectDailyMetric.findAllByMetricDate(today)
+			metrics*.delete(flush: true)
+		expect: 'There are no ProjectDailyMetrics for today'
+			ProjectDailyMetric.findAllByMetricDate(today).isEmpty()
+
+		when: 'a new project is created'
+			Project newProject = projectHelper.createProject()
+		and: 'the project completion date is a date greater than today'
+			newProject.setCompletionDate(today + 1)
+		and: 'the activitySnapshot method is run in order to collect metrics'
+			projectService.activitySnapshot()
+		then: 'we have a ProjectDailyMetric associated to the new Project for today'
+			1 == ProjectDailyMetric.countByMetricDateAndProject(today, newProject)
 	}
 }

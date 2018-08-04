@@ -1,16 +1,6 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<style>
-    .asset-detail-link {
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .asset-tag.k-switch {
-        top: 3px !important;
-    }
-</style>
-
-<kendo-grid class="tds-kendo-grid without-selectabe-rows" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+<kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
@@ -21,16 +11,17 @@
 				<label>
 					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
-			<button type="button" class="btn btn-default btnDelete pull-left" id="btnDeleteAll" [disabled]="!hasItensSelected()" (click)="onBulkDelete()">
-				<i class="fa fa-fw fa-trash"></i> {{'GLOBAL.DELETE' | translate}}</button>
+			<tds-bulk-change-button [selectedItems]="bulkSelectedItems" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 		</div>
-		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
-			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		</div>
-		<div class="kendo-grid-toolbar__refresh-btn btnClear">
-			<button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
-				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
-		</div>
+	    <div class="col-sm-6">
+		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
+			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+		    </div>
+		    <div class="kendo-grid-toolbar__refresh-btn btnClear">
+			    <button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
+				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+		    </div>
+	    </div>
 	</ng-template>
 
     <!-- Select All column -->
@@ -72,7 +63,7 @@
 		</ng-template>
 
         <!-- Default Generic Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tags'">
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
                        [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
@@ -81,20 +72,22 @@
             </div>
         </ng-template>
         <!-- Asset Tags Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tags'">
-            <tds-asset-tag-selector [tagList]="tagList"
+        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tagAssets'">
+            <tds-asset-tag-selector #tagSelector
+                                    [tagList]="metadata.tagList"
+                                    [viewFilterModel]="column.filter"
                                     (valueChange)="onTagFilterChange(column, $event)">
             </tds-asset-tag-selector>
         </ng-template>
 
         <!-- Default Generic Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tags'">
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets'">
            <span [ngClass]="getCellClass(column)">
                {{dataItem[column.domain+'_'+column.property]}}
            </span>
         </ng-template>
         <!-- Asset Tags Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tags'">
+        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
             <div>
                <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
                      [ngClass]="tag.css">{{tag.name}}</span>

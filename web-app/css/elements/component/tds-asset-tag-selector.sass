@@ -21,6 +21,8 @@
       border: unset
       padding-left: 0px
       padding-right: 0px
+      .asset-tag-text
+        text-transform: initial !important
       .k-icon
         background-image: unset
         padding-top: 10px
@@ -37,12 +39,18 @@
           padding-right: 22px
       .k-select
         position: absolute
+  // When switch is On/Off. Note: Kendo use same class as inner and outside
+  .km-switch-off .km-switch-handle
+    margin-left: 4px !important
+  // -------------------------------------------------------------------
   .km-switch
     position: absolute
     right: 5px
     z-index: 2
-    top: 4px
-    font-size: 11px
+    top: 5px
+    font-size: 10px
+    width: 50px
+    height: 24px
     background: unset
     .km-switch-wrapper
       border-radius: 14px
@@ -51,7 +59,10 @@
         background: unset
     .km-switch-container
       border-radius: 14px
+      padding-top: 4px
       .km-switch-handle
+        width: 1.4em
+        height: 1.4em
         border-radius: 50%
         background-color: $baseColor !important
         cursor: pointer
@@ -61,6 +72,14 @@
         box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important
         span
           color: $black
+      .km-switch-label-on
+        left: -202%
+      .km-switch-label-off
+        left: 138%
+      .km-switch-label-on,
+      .km-switch-label-off
+        top: -3px
+        font-size: 11px
 /* Global, since Kendo popup are open outside this context */
 .asset-tag-selector-single-item
   padding-left: 18px
@@ -74,6 +93,10 @@
 .asset-tag-selector-item-selected
   .fa-check
     display: inline !important
+.hidden-tag-item
+  display: none !important
+.striked-tag-item
+  text-decoration: line-through
 /*Move into colors after merge with David Branch*/
 .tag-black
   background-color: black !important
