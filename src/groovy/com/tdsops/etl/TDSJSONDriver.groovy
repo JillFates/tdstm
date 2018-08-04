@@ -106,15 +106,21 @@ class TDSJSONDriver extends JSONDriver {
 	 * @param code
 	 */
 	private void doRead(Dataset dataset, Map params, Closure prepareCode, Closure code) {
-		if (dataset.field.isEmpty()) throw new ExceptionGETL("Fields schema is required along with the dataset")
+
+		if (dataset.field.isEmpty()) {
+			throw new ExceptionGETL('Fields schema is required along with the dataset')
+		}
+
 		String rootNode = (dataset.params.rootNode) ?: ''
 
 		String fn = fullFileNameDataset(dataset)
-		if (fn == null) throw new ExceptionGETL("\"fileName\" parameter must be defined in the dataset")
+		if (fn == null) throw new ExceptionGETL('"fileName" parameter must be defined in the dataset')
 		File f = new File(fn)
-		if (!f.exists()) throw new ExceptionGETL("File \"${fn}\" not found")
+		if (!f.exists()) {
+			throw new ExceptionGETL("ETL Import JSON file was not found")
+		}
 
-		long limit = (params.limit != null)?params.limit:0
+		long limit = (params.limit != null) ? params.limit : 0
 
 		def data = readData(dataset, params)
 

@@ -296,7 +296,8 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (Long id, String originalFileName, String fileName, Long maxRows) throws EmptyResultException {
+	Map parseDataFromFile (Long id, String originalFileName, String fileName, String rootNode, Long maxRows) throws EmptyResultException {
+		String message
 		try {
 
 			if ( id ) {
@@ -306,7 +307,7 @@ class DataScriptService implements ServiceMethods{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 			switch (extension) {
 				case 'JSON':
-					return parseDataFromJSON(fileName, maxRows, params['rootNode'])
+					return parseDataFromJSON(fileName, maxRows, rootNode)
 
 				case 'CSV':
 					return parseDataFromCSV(fileName, 0, maxRows)
