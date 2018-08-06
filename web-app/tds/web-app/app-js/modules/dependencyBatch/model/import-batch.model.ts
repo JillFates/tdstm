@@ -73,7 +73,7 @@ export class DependencyBatchColumnsModel {
 				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
-				width: 200,
+				width: 180,
 				locked: false
 			},
 			{
@@ -108,7 +108,7 @@ export class DependencyBatchColumnsModel {
 				label: 'File Name',
 				property: 'originalFilename',
 				type: 'text',
-				width: 150,
+				width: 250,
 				locked: false
 			},
 			{
