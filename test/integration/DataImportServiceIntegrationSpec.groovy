@@ -6,6 +6,7 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -21,6 +22,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.mock.web.MockMultipartFile
@@ -35,6 +37,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
     DataImportService dataImportService
+
+	@Shared
+    SecurityService securityService
 
 	@Shared
 	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
@@ -83,6 +88,10 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
 			moveBundleTestHelper.createBundle(otherProject, null))
+
+		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ADMIN}"])
+        securityService.assumeUserIdentity(adminUser.username, false)
+
 		context = dataImportService.initContextForProcessBatch( project, ETLDomain.Dependency )
 		context.record = new ImportBatchRecord(sourceRowId:1)
 
@@ -650,39 +659,32 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			['record error'] == context.record.errorListAsList()
 	}
 
-	// This method was replaced with createEntity?
-	@Ignore
-	void '11. test findAndUpdateOrCreateDependency method'() {
-		// findAndUpdateOrCreateDependency(AssetEntity primary, AssetEntity supporting, Map fieldsInfo, Map context)
+	void '11. test createEntity method for Assets'() {
+		// private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
-			ImportBatchRecord record = new ImportBatchRecord()
-			AssetDependency nullDependency = null
-		and: 'the primary asset has a create element'
-			fieldsInfo['asset'].create = [
-				assetName: device.assetName,
-				description: 'CPU 2, Memory 16,384MB',
-				environment: 'Production',
-				assetType: 'VM',
-				manufacturer: 'VMWare',
-				model: 'VM',
-				os: 'Red Hat Enterprise Linux 6 (64-bit)'
-			]
-		and: 'the supporting asset has a create element'
-			fieldsInfo['dependent'].create = [
-				assetName: device2.assetName,
-				description: 'CPU 2, Memory 16,384MB',
-				environment: 'Production',
-				assetType: 'VM',
-				manufacturer: 'VMWare',
-				model: 'VM',
-				os: 'Red Hat Enterprise Linux 6 (64-bit)'
-			]
+			Map assetFieldsInfo = [:]
 
-		when: 'the method is called'
-			def dependency = dataImportService.findAndUpdateOrCreateDependency(nullDependency, device, device2, fieldsInfo, context)
-		then: 'a new dependency should be created'
-			dependency
+		when: 'calling the createEntity for a device'
+			Object entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+		then: 'we should get an AssetEntity'
+			(entity instanceof AssetEntity)
+		and: 'the moveBundle is set to the TBD'
+			'TBD' == entity.moveBundle.name
+		and: 'the owner is the client of the project'
+			context.project.client.id == entity.owner.id
+		and: 'the project is assigned'
+			context.project.id == entity.project.id
+		and: 'the modifiedBy is the person running the import'
+			context.whom
+			entity.modifiedBy
+			context.whom.id == entity.modifiedBy.id
+
+		when: 'the fieldsInfo has a bundle defined'
+			initializeFieldElement('moveBundle', assetFieldsInfo, moveBundle.name)
+		and: 'calling createEntity'
+			entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+		then: 'the default bundle should not be assigned'
+			null == entity.moveBundle
 	}
 
 	void '12. test tallyNumberOfErrors method'() {
