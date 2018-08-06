@@ -22,6 +22,6 @@ export class UtilsPipe implements PipeTransform {
 	}
 
 	private nullObjectFilter(value: any): string {
-			return ValidationUtils.isEmptyObject(value) ? '(null)' : value;
+			return !value || value === null || ValidationUtils.isEmptyObject(value) ? '(null)' : value;
 	}
 }
