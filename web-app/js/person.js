@@ -88,7 +88,7 @@ var Person = function () {
 	
 	// performs the ajax call then loads the data into the person dialog
 	var showPersonDialog = function (personId, renderPage, redirectTo) {
-		if (personId) {
+		if (personId && personId != 0) {
 			var personDiv = getPersonDiv()
 			jQuery.ajax({
 				url : contextPath+'/person/loadGeneral',
