@@ -18,7 +18,7 @@ import {
 } from '../../../../shared/model/data-list-grid.model';
 import {CredentialViewEditComponent} from '../credential-view-edit/credential-view-edit.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
-import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
@@ -42,8 +42,8 @@ export class CredentialListComponent implements OnInit {
 		}
 	};
 	public skip = 0;
-	public pageSize = MAX_DEFAULT;
-	public defaultPageOptions = MAX_OPTIONS;
+	public pageSize = GRID_DEFAULT_PAGE_SIZE;
+	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public credentialColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
