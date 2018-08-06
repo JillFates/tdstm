@@ -3094,4 +3094,27 @@ class AssetEntityService implements ServiceMethods {
 		return strategy.saveOrUpdateAsset()
 	}
 
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets accordingly,
+	 * when performing bulk update operations on objects that have a relationship with assets,
+	 * such as TagAsset.
+	 *
+	 * @param project
+	 * @param assetQuery - query that should return a list of asset ids.
+	 * @param assetQueryParams - parameters for assetQuery
+	 */
+	void bulkBumpAssetLastUpdated(Project project, String assetQuery, Map assetQueryParams) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN ($assetQuery) AND project = :project 
+			"""
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT()]
+			params.putAll(assetQueryParams)
+			AssetEntity.executeUpdate(query, params)
+		}
+	}
+
 }
