@@ -721,7 +721,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		    with: { Object... values ->
 				List valuesAsList = values as List
 			    boolean found = result.lookupInReference(lookupFieldNames, valuesAsList)
-			    // boolean found = result.lookupInReference(lookupFieldNames, values)
 			    if (found) {
 				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			    }
