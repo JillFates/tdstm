@@ -76,6 +76,9 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException(message)
     }
 
+    static ETLProcessorException lookupFoundMultipleResults() {
+        new ETLProcessorException('The lookup command found multiple results with the criteria')
+    }
     static ETLProcessorException UnknownVariable (Object value) {
         new ETLProcessorException("Unknown variable: ${value}")
     }
