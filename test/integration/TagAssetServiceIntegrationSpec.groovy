@@ -4,24 +4,32 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.domain.TagEvent
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TagAssetService
+import net.transitionmanager.service.TagEventService
 import net.transitionmanager.service.TagService
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
+import test.helper.MoveEventTestHelper
 
 class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	TagService      tagService
 	TagAssetService tagAssetService
+	TagEventService tagEventService
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+
+	@Shared
+	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 
 	@Shared
 	FileSystemService fileSystemService
@@ -93,6 +101,21 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 	TagAsset tagAsset4
 
 	@Shared
+	MoveEvent event
+
+	@Shared
+	MoveEvent event2
+
+	@Shared
+	TagEvent tagEvent1
+
+	@Shared
+	TagEvent tagEvent2
+
+	@Shared
+	TagEvent tagEvent3
+
+	@Shared
 	Date now
 
 	void setup() {
@@ -111,6 +134,14 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 		tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true, failOnError: true)
 		tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true, failOnError: true)
 		tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true, failOnError: true)
+
+
+		event = moveEventTestHelper.createMoveEvent(project)
+		event2 = moveEventTestHelper.createMoveEvent(project)
+
+		tagEvent1 = new TagEvent(tag: tag1, event: event).save(flush: true, failOnError: true)
+		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
+		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
 
 		tagService.securityService = [
 			getUserCurrentProject  : { -> project },
@@ -223,11 +254,15 @@ class TagAssetServiceIntegrationSpec extends IntegrationSpec {
 			long tagId = tag1.id
 			List<TagAsset> tagAssets = tagAssetService.merge(project, tag2.id, tag1.id)
 			Tag tag = Tag.get(tagId)
+			List<Tag> eventTags = tagEventService.getTags(project, event.id)
+			List<Tag> event2Tags = tagEventService.getTags(project, event2.id)
 
 		then: 'the tag is deleted and all the tagAssets are updated with that tag'
 			!tag
 			tagAssets[0].tag == tag2
 			tagAssets[0].asset == device
+			eventTags.size() == 1
+			event2Tags.size() == 1
 	}
 
 	void 'Test tagMerge primary tag from another project'() {

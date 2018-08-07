@@ -35,9 +35,14 @@ class MoveEvent {
 	Date actualCompletionTime
 	Date estStartTime
 	Date estCompletionTime
+	Date lastUpdated
 
-	static hasMany = [moveBundles: MoveBundle, moveEventNewsList: MoveEventNews,
-	                  moveEventSnapshots: MoveEventSnapshot]
+	static hasMany = [
+		moveBundles       : MoveBundle,
+		moveEventNewsList : MoveEventNews,
+		moveEventSnapshots: MoveEventSnapshot,
+		tagEvent          : TagEvent
+	]
 
 	static constraints = {
 		actualCompletionTime nullable: true
@@ -56,6 +61,7 @@ class MoveEvent {
 		runbookVersion nullable: true
 		videolink nullable: true
 		apiActionBypass nullable: false
+		lastUpdated nullable: true
 	}
 
 	static mapping = {
