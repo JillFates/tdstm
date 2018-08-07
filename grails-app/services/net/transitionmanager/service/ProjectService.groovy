@@ -924,7 +924,6 @@ class ProjectService implements ServiceMethods {
 		Date startingDate = findProjectDailyMetricsLastRunDay().clearTime()
 		Date endDate = new Date().clearTime()
 
-		def metricsByProject
 		List<ProjectDailyMetric> metrics
 		def sqlSearchDate
 
@@ -939,8 +938,6 @@ class ProjectService implements ServiceMethods {
 			sqlSearchDate = TimeUtil.gmtDateSQLFormat(searchDate)
 
 			log.info "Project Daily Metrics. Processing date: $sqlSearchDate"
-
-			metricsByProject = [:]
 
 			// create a ProjectDailyMetric for each Project (this list will be new for each iteration of searchDate)
 			metrics = projects.collect { project ->
@@ -961,7 +958,7 @@ class ProjectService implements ServiceMethods {
 
 			// **************************************
 			// Retrieve person/user login information
-			fillUsersMetrics(metricsByProject, projects, sqlSearchDate)
+			fillUsersMetrics(metrics, projects, sqlSearchDate)
 
 			// Deletes any existing record
 			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
@@ -1362,7 +1359,7 @@ class ProjectService implements ServiceMethods {
 
 		jdbcTemplate.queryForList(personsCountsQuery, sqlSearchDate).each {
 			projectDailyMetric = metrics.find { metric ->
-				metric.project.id == it.project_id
+				metric.project.id == it.projectId
 			}
 			if (projectDailyMetric) {
 				projectDailyMetric.totalPersons = it.totalPersons
