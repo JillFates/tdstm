@@ -66,12 +66,12 @@ class AssetEntityService implements ServiceMethods {
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
-			(AssetClass.APPLICATION): [ 'assetName' ],
-			(AssetClass.DATABASE): [ 'assetName' ],
+			(AssetClass.APPLICATION): [ 'assetName', 'tagAssets' ],
+			(AssetClass.DATABASE): [ 'assetName', 'tagAssets' ],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName', 'tagAssets'
 			],
-			(AssetClass.STORAGE): [ 'assetName' ]
+			(AssetClass.STORAGE): [ 'assetName', 'tagAssets' ]
 	].asImmutable()
 
 	// The follow define the various properties that can be used with bindData to assign domain.properties
@@ -3072,7 +3072,7 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
-					// clone asset Tags
+					// copy asset Tags
 					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
 					if (sourceTagIds) {
 						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)

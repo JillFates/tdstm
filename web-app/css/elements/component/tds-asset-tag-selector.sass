@@ -39,12 +39,18 @@
           padding-right: 22px
       .k-select
         position: absolute
+  // When switch is On/Off. Note: Kendo use same class as inner and outside
+  .km-switch-off .km-switch-handle
+    margin-left: 4px !important
+  // -------------------------------------------------------------------
   .km-switch
     position: absolute
     right: 5px
     z-index: 2
-    top: 4px
-    font-size: 11px
+    top: 5px
+    font-size: 10px
+    width: 50px
+    height: 24px
     background: unset
     .km-switch-wrapper
       border-radius: 14px
@@ -53,7 +59,10 @@
         background: unset
     .km-switch-container
       border-radius: 14px
+      padding-top: 4px
       .km-switch-handle
+        width: 1.4em
+        height: 1.4em
         border-radius: 50%
         background-color: $baseColor !important
         cursor: pointer
@@ -63,6 +72,14 @@
         box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important
         span
           color: $black
+      .km-switch-label-on
+        left: -202%
+      .km-switch-label-off
+        left: 138%
+      .km-switch-label-on,
+      .km-switch-label-off
+        top: -3px
+        font-size: 11px
 /* Global, since Kendo popup are open outside this context */
 .asset-tag-selector-single-item
   padding-left: 18px

@@ -71,9 +71,27 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
-		super('#etlBuilder');
-		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
-		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+			super('#etlBuilder');
+			this.script = '';
+			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+			this.loadETLScript();
+	}
+
+	/**
+	 * Loads the Script from API call, If a previous sampleFilename exists or has been uploaded before then it loads the
+	 * content calling the #extractSampleDataFromFile method.
+     */
+	private loadETLScript(): void {
+		this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
+				this.dataScriptModel = result.data.dataScript;
+				this.filename = this.dataScriptModel.sampleFilename;
+				this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
+				if (this.filename && this.filename.length > 0) {
+					this.extractSampleDataFromFile(this.dataScriptModel.originalSampleFilename);
+				}
+			}
+		}, error => console.log(error));
 	}
 
 	/**
@@ -205,15 +223,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			});
 	}
 
-	private isScriptDirty(): boolean {
-		if (!this.dataScriptModel.etlSourceCode) {
-			return this.script.length > 0;
-		}
-		if (this.dataScriptModel.etlSourceCode !== this.script) {
-			return true;
-		} else {
-			return false;
-		}
+	protected isScriptDirty(): boolean {
+		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
 	}
 
 	private onScriptChange(event: { newValue: string, oldValue: string }) {
@@ -227,10 +238,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected onLoadSampleData(): void {
-		this.dialogService.extra(DataScriptSampleDataComponent, [])
-			.then((filename) => {
-				this.filename = filename;
-				this.extractSampleDataFromFile();
+		this.dialogService.extra(DataScriptSampleDataComponent, [
+			{provide: 'etlScript', useValue: this.dataScriptModel}
+		])
+			.then((filename: {temporaryFileName: string, originalFileName: string}) => {
+				this.filename = filename.temporaryFileName;
+				this.extractSampleDataFromFile(filename.originalFileName);
 			})
 			.catch((err) => {
 				console.log('SampleDataDialog error occurred..');
@@ -241,11 +254,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Call API and get the Sample Data based on the FileName already Uploaded
+	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
-	private extractSampleDataFromFile() {
-		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
+	private extractSampleDataFromFile(originalFileName?: string) {
+		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName).subscribe((result) => {
 			this.sampleDataModel = result;
+			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
+					this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
+				}
+			}, error => console.log(error));
 		});
 	}
 

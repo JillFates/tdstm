@@ -25,6 +25,6 @@ enum ApiActionHttpMethod {
 	 * @return
 	 */
 	static boolean isValidHttpMethod(String method) {
-		return EnumUtil.isValidEnum(this.class, method)
+		return EnumUtil.isValidEnum(ApiActionHttpMethod.class, method)
 	}
 }

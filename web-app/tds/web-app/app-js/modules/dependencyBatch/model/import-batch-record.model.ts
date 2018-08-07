@@ -3,7 +3,9 @@ import {EnumModel} from '../../../shared/model/enum.model';
 
 export enum BATCH_RECORD_OPERATION {
 	INSERT = 'INSERT',
-	UPDATE = 'UPDATE'
+	UPDATE = 'UPDATE',
+	UNCHANGED = 'UNCHANGED',
+	TBD = 'TBD'
 }
 
 export class ImportBatchRecordModel {

@@ -1885,7 +1885,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = taskBatch.recipe.context()
+		def contextObj = taskBatch.context()
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
@@ -4183,7 +4183,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			 * @param String[] - list of the properties to examine
 			 */
 			def addWhereConditions = { list ->
-				log.debug "addWhereConditions: Building WHERE - list:$list, filter=$filter"
+				// log.debug "addWhereConditions: Building WHERE - list:$list, filter=$filter"
 				list.each { code ->
 					if (filter?.asset?.containsKey(code)) {
 						log.debug("addWhereConditions: code $code matched")
@@ -4262,8 +4262,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
 				map.tags = contextObject.tag.collect { Map tag -> (Long) tag.id }
+				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
+
+				// When using tags, bundles are going to be ignored
 				map.remove('bIds')
-				join = 'left outer join a.tagAssets ta left outer join ta.tag t'
 			} else if (map.bIds) {
 				where = SqlUtil.appendToWhere(where, "a.moveBundle.id IN (:bIds)")
 			} else {
@@ -4345,7 +4347,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						break
 				}
 
-				sql = "select a FROM AssetEntity a $join where $where"
+				// Add tag filtering if specified
+				where = addTagFilteringToWhere(filter, map,  where, project.id)
+
+				// Construct the HQL that will be used to query for the assets
+				sql = "SELECT distinct(a) FROM AssetEntity a $join where $where"
+
 				log.debug "findAllAssetsWithFilter: sql=$sql, map=$map"
 
 				assets = AssetEntity.executeQuery(sql, map)
@@ -4460,6 +4467,88 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		return assets
+	}
+
+	// Used by the addTagFilteringToWhere method to build TAG filtering
+	static final String TAG_WHERE_SUBSELECT_ANY = 'SELECT DISTINCT(taws.asset.id) FROM TagAsset taws WHERE '
+	static final String TAG_WHERE_SUBSELECT_ANY_IN = 'taws.tag.name IN (:tagNameList)'
+	static final String TAG_WHERE_SUBSELECT_ALL = 'SELECT taws.asset.id FROM TagAsset taws WHERE '
+	static final String TAG_WHERE_SUBSELECT_ALL_GROUPBY = 'GROUP BY taws.asset.id HAVING count(*) = :tagListSize'
+	static final String TAG_WHERE_ASSET_PROJECT = 'taws.asset.project.id = :projectId AND ('
+
+	/**
+	 * Used to add query logic to incorporate tag filtering that will look at the filter.tag property
+	 * and append to the existing SQL WHERE criteria. The query will consider the tags as ANY (default) or ALL
+	 * based on the presents of the filter.tagMatch property equaling 'ALL' or 'ANY'.
+	 *
+	 * @param filter - the filter that is being applied
+	 * @param parametersMap - the map that contains all of the parameters in the SQL
+	 * @param whereSql - the SQL that is being built up for the overall query
+	 * @return the whereSql with additional SQL based on filter.tag being populated
+	 */
+	String addTagFilteringToWhere(Map filter, Map parametersMap, String whereSql, Long projectId) {
+		// Check whether the filter includes tag fields.
+		if (filter?.tag) {
+			List<String> tagNames = CU.asList(filter.tag)
+			int tagListSize = tagNames.size()
+
+			// Pull out the tags that have '%' in them as those will be handled with LIKE criteria
+			List<String> likeTags = tagNames.findAll { it.contains('%') }
+			if (likeTags) {
+				tagNames = tagNames - likeTags
+			}
+
+			parametersMap.put('projectId', projectId)
+
+			String query = null
+
+			// Extra separator that might need to be added between the IN and LIKE expressions.
+			String clauseSeparator = ''
+
+			// Closure used to build up the WHERE for any whole tags in an IN criteria
+			Closure processInTags = {
+				// Add exact match tag query
+				if (tagNames.size() > 0) {
+					query += TAG_WHERE_SUBSELECT_ANY_IN
+					parametersMap.put('tagNameList', tagNames)
+					clauseSeparator = ' OR '
+				}
+			}
+
+			// Closure used to build up the WHERE for any tags containing a % as a LIKE statement
+			Closure processLikeTags = {
+				List<String> likeClauses = []
+				// Iterate over the parameters
+				for (int i = 0; i < likeTags.size(); i++) {
+					String paramName = 'tagName_' + (i+1)
+					likeClauses << "taws.tag.name LIKE :$paramName"
+					parametersMap.put(paramName, likeTags[i])
+				}
+				String likeClause = likeClauses.join(' OR ')
+				if (likeClause) {
+					query = "$query$clauseSeparator$likeClause"
+				}
+			}
+
+			// Build the query based on the of tagMatch ALL or ANY (AND or OR)
+			if (filter.tagMatch == 'ALL') {
+				parametersMap.put('tagListSize', NumberUtil.toLong(tagListSize))
+				query = TAG_WHERE_SUBSELECT_ALL + TAG_WHERE_ASSET_PROJECT
+				processInTags()
+				processLikeTags()
+				// Add the HAVING that will filter out all assets that do NOT have all of the tags
+				query += ') ' + TAG_WHERE_SUBSELECT_ALL_GROUPBY
+			} else {
+				query = TAG_WHERE_SUBSELECT_ANY + TAG_WHERE_ASSET_PROJECT
+				processInTags()
+				processLikeTags()
+				query += ')'
+			}
+
+			return SqlUtil.appendToWhere(whereSql, "a.id IN ($query)")
+		} else {
+			return whereSql
+		}
 	}
 
 	/**

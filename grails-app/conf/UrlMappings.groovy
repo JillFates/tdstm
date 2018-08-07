@@ -804,8 +804,18 @@ class UrlMappings {
 			controller = "wsDataScript"
 			action = [
 					GET: "getDataScript",
-			        PUT: "updateDataScript",
+					PUT: "updateDataScript",
 					DELETE: "deleteDataScript"
+			]
+		}
+
+		/*
+		 * Get the sample filename related to a DataScript Object
+		 */
+		"/ws/dataingestion/datascript/$id/sampleData/$filename" {
+			controller = "wsDataScript"
+			action = [
+					  GET: "sampleData"
 			]
 		}
 

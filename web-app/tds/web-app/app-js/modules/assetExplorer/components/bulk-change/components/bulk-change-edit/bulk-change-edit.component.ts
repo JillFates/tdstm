@@ -72,16 +72,16 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 		Observable.forkJoin(this.bulkChangeService.getActions(), this.customDomainService.getCommonFieldSpecs(), this.tagService.getTags())
 			.subscribe((result: any[]) => {
-				const [actions, fields, tags] = result;
+				const [actions, fields, tagAssets] = result;
 
-				this.actions = Object.keys(actions.data.tags)
+				this.actions = Object.keys(actions.data.tagAssets)
 					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
 
 				this.commonFieldSpecs = fields;
 				this.assetClassList = this.getAssetClassList(this.commonFieldSpecs);
 
-				if (tags.status === ApiResponseModel.API_SUCCESS && tags.data) {
-					this.tagList = tags.data;
+				if (tagAssets.status === ApiResponseModel.API_SUCCESS && tagAssets.data) {
+					this.tagList = tagAssets.data;
 				}
 
 				this.addRow();
@@ -108,9 +108,9 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	onTagFilterChange(column, rowIndex, event): void {
-		const tags = event.tags || [];
+		const tagAssets = event.tags || [];
 
-		this.editRows.selectedValues[rowIndex].value =  tags.length ? `[${tags.map((tag) => tag.id).toString()}]` : '[]';
+		this.editRows.selectedValues[rowIndex].value =  tagAssets.length ? `[${tagAssets.map((tag) => tag.id).toString()}]` : '[]';
 	}
 
 	isAllInputEntered(): boolean {
@@ -124,16 +124,30 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.catch((err) => console.log(err));
 	}
 
-	onDomainChange(domain: IdTextItem, index: number): void {
+	onDomainValueChange(domain: IdTextItem, index: number): void {
 		const {actions, selectedValues} = this.editRows;
+		selectedValues[index].domain = domain;
 
 		actions[index].fields =  this.getFieldsByDomain(domain);
-		selectedValues[index].field = null
+		selectedValues[index].field = null;
+	}
+
+	onFieldValueChange(field: IdTextItem, index: number): void {
+		const {selectedValues} = this.editRows;
+
+		selectedValues[index].field = field;
+	}
+
+	onActionValueChange(action: IdTextItem, index: number): void {
+		const {selectedValues} = this.editRows;
+
+		selectedValues[index].action = action;
 	}
 
 	private addRow(): any {
-		this.editRows.actions.push({domain: 'APPLICATION', actions: [...this.actions], fields: [] });
+		this.editRows.actions.push({domains: this.assetClassList , actions: [...this.actions], fields: [] });
 		this.editRows.selectedValues.push({domain: this.defaultAssetClass, field: null, action: null, value: null});
+
 		//  get the fields for the default domain
 		this.editRows.actions[this.editRows.actions.length - 1].fields =  this.getFieldsByDomain(this.defaultAssetClass);
 	}

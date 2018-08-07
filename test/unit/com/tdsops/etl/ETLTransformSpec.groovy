@@ -44,9 +44,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 	JSONConnection jsonConnection
 
 	@Shared
-	Date          now
+	Date          now = new DateMidnight(1974,06,26).toDate()
 	@Shared
-	Date          otherD
+	Date          otherD = new DateMidnight(2018, 7,4).toDate()
 	DataSetFacade simpleDataSet
 	DataSetFacade jsonDataSet
 	DataSetFacade environmentDataSet
@@ -80,8 +80,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
-		now = new DateMidnight(1974,06,26).toDate()
-		otherD = new DateMidnight(2018, 7,4).toDate()
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -207,12 +205,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 			result == ETLProcessor.coalesce(value1, value2, value3)
 
 		where:
-			result | value1 | value2 | value3
-			null   | null   | null   | null
-			''     | ''     | null   | 5
-			new Element(value: 5) | null | null | new Element(value: 5)
-			''     | null | '' | 'tadah'
-			false  | null  | null | false
+			result || value1 | value2 | value3
+			null   || null   | null   | null
+			''     || ''     | null   | 5
+			''     || null   | ''     | 'tadah'
+			false  || null   | null   | false
+			new Element(value: 5) || null | null | new Element(value: 5)
 	}
 
 	void 'test can apply defaultValue transformation'() {
@@ -231,6 +229,65 @@ class ETLTransformSpec extends ETLBaseSpec {
 			5       || null      | 5
 			42      || 42        | 5
 			5       || ''        | new Element(value:5)
+
+	}
+
+	void 'test can apply ellipsis transformation'() {
+
+		expect:
+			result == new Element(value:value).ellipsis(len).value
+
+		where:
+
+			result         || value                    | len
+			'this is...'   || 'this is a long string'  | 10
+			'Ye'           || 'Ye'                     | 10
+			null           || null                     | 8
+			'1974-06...'   || now                      | 10
+			'1234...'      || 123456                   | 7
+			'123...'       || 1234.56                  | 6
+			'1.23'         || 1.23456                  | 6
+			'Ye'           || 'Ye'                     | 2
+
+
+	}
+
+	void 'test can apply truncate transformation'() {
+
+		expect:
+			result == new Element(value:value).truncate(len).value
+
+		where:
+
+			result         || value                    | len
+			'this is a '   || 'this is a long string'  | 10
+			'Ye'           || 'Ye'                     | 10
+			null           || null                     | 8
+			'1974-06-26'   || now                      | 10
+			'123456'       || 123456                   | 6
+			'1234.5'       || 1234.56                  | 6
+			'1.23'         || 1.23456                  | 6
+			'Ye'           || 'Ye'                     | 2
+
+	}
+
+	void 'test can apply prepend transformation'() {
+
+		expect:
+			result == new Element(value:value).prepend(param).value
+
+		where:
+
+			result         || value     | param
+			'Prefix null'  || null      | 'Prefix '
+			'Prefix data'  || 'data'    | 'Prefix '
+			'Prefix data'  || 'data'    | new Element(value:'Prefix ')
+			'Prefix ' + now.format(Element.DATETIME_FORMAT) || now | 'Prefix '
+			'Prefix 12.34' || 12.34     | 'Prefix '
+			'Prefix 12.00' || 12.00     | 'Prefix '
+			'Prefix 0.00'  || 0.0       | 'Prefix '
+			'Prefix 0.00'  || 0         | 'Prefix '
+			'Prefix 12.00' || 12        | 'Prefix '
 
 	}
 

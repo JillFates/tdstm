@@ -36,7 +36,7 @@
                     </ng-template>
 
                     <!-- Action -->
-                    <kendo-grid-command-column [width]="110">
+                    <kendo-grid-command-column [width]="150" [locked]="true">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="text-center">
                                 <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -50,23 +50,21 @@
                                 </button>
                                 <button kendoGridRemoveCommand *ngIf="canDelete()"
                                         class="btn btn-action btn-default" title="Delete">
-                                    <i class="fa fa-trash"></i>
+                                    <span class="fa fa-fw fa-trash"></span>
                                 </button>
                                 <button kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
                                         class="btn btn-action btn-default" title="Save"
                                         [disabled]="myForm.invalid || duplicateName">
-                                    <i class="fa fa-save"></i>
+                                    <span class="fa fa-fw fa-save"></span>
                                 </button>
                                 <button kendoGridCancelCommand class="btn btn-action btn-default" title="Cancel">
-                                    <i class="glyphicon glyphicon-ban-circle"></i>
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
                                 </button>
-                                <div class="extra-actions" *ngIf="(!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)">
-                                    <button *ngIf="canMerge()"
-                                            (click)="onMerge(dataItem)"
-                                            class="btn btn-action btn-default" title="Merge">
-                                        <i class="fa fa-exchange"></i>
-                                    </button>
-                                </div>
+                                <button *ngIf="((!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)) && canMerge()"
+                                        (click)="onMerge(dataItem)"
+                                        class="btn btn-action btn-default" title="Merge">
+                                    <span class="fa fa-fw fa-exchange"></span>
+                                </button>
                             </div>
                         </ng-template>
                     </kendo-grid-command-column>

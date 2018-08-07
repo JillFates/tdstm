@@ -6,8 +6,6 @@ class CookbookPage extends Page {
 
     static at = {
         waitFor {createRecipeButton.displayed}
-        contextSelectorLabel == "Context:"
-        contextSelectorDefault.text() == "All"
         createRecipeButton.text() == "Create Recipe..."
         //  TODO following item have the checkbox inside the label
         //  viewArchivedCBoxLabel == "View Archived Recipes"
@@ -22,9 +20,6 @@ class CookbookPage extends Page {
         pageBreadcrumb              { $("o1", class:"breadcrumb")}
         loadingIndicator            (required:false, wait:true){ $("#cookbookRecipesEditor").find("loading-indicator").find("div","ng-show":"isLoading")}
         successMessage              (required:false, wait:true){ $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
-        contextSelectorLabel        { $("label", for:"contextSelector").text()}
-        contextSelector             { $("select#contextSelector")}
-        contextSelectorDefault      { $("select#contextSelector").find("option", selected:"selected")}
         createRecipeButton          { $("a#generateRecipe")}
 
         createRecipeModal           (required: false, wait:true) {$ ("div", class:"modal fade in")}

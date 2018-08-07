@@ -50,7 +50,6 @@ class RecipeCreationSpec extends GebReportingSpec {
         then: 'Active Elements should be checked'
             saveButton.@disabled == "true"
             nameFieldContents.@required == "true"
-            contextSelector2.@required == "true"
             brandNewRecipeTab.parent(".active")
     }
 
@@ -63,53 +62,22 @@ class RecipeCreationSpec extends GebReportingSpec {
 
         then: 'Create Recipe Name should be created'
             nameFieldContents == "Geb Recipe Test"
-            saveButton.@disabled == "true"
-    }
-
-    def "4. Checking 'Context' selector options"() {
-        testKey = "TM-7182"
-        given: 'The User is on the Create Recipe Section'
-            at CreateRecipePage
-        when: 'The User searches by the Context Selector'
-            contextSelector2.click()
-
-        then: 'Event, Bundle and Application options should be displayed'
-            contextSelector2.$("option")[0].text() == 'Select context'
-            contextSelector2.$("option")[1].text() == 'Event'
-            contextSelector2.$("option")[2].text() == 'Bundle'
-            contextSelector2.$("option")[3].text() == 'Application'
-    }
-
-    def "5. Selecting the 'Event' context"() {
-        testKey = "TM-7183"
-        when: 'Selecting the Event Element'
-            contextSelector2 = "Event"
-
-        then: 'Event should be selected'
-            contextSelector2 == "Event"
-    }
-
-    def "6. Checking the 'Save' Button status"() {
-        testKey = "TM-XXXX"
-        when: 'The User is on the Create Recipe Section'
-            at CreateRecipePage
-
-        then: 'Save Button should be disabled'
+        and: 'Save Button should be enabled'
             saveButton.@disabled == ""
     }
 
-    def "7. Adding some description contents"() {
+    def "4. Adding some description contents"() {
         testKey = "TM-XXXX"
         given: 'The User is on the Create Recipe Section'
             at CreateRecipePage
         when: 'The User adds some description'
-            descriptionContents = "This is a Geb created recipe for an Event context"
+            descriptionContents = "This is a Geb created recipe"
 
-        then: 'Save Button should be disabled'
+        then: 'Save Button should be enabled'
             saveButton.@disable == ""
     }
 
-    def "8. Saving recipe"() {
+    def "5. Saving recipe"() {
         testKey = "TM-7184"
         def selectedRow = 0
         given: 'The User is on the Create Recipe Section'
@@ -121,25 +89,24 @@ class RecipeCreationSpec extends GebReportingSpec {
             at CookbookPage
     }
 
-    def "9. Checking the saved recipe description"() {
+    def "6. Checking the saved recipe description"() {
         testKey = "TM-7184"
         def selectedRow = 0
         when: 'The User is on the Cookbook Section'
             at CookbookPage
 
         then: 'The information that has been added should be displayed'
-            (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe for an Event context")
+            (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe")
             recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe for an Event context"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "Event"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == "e2e user"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "e2e user"
             // TODO next line will check dates for the new recipe. Verify actual local time
-            // recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == now()
-            recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == ""
-            recipeGridRowsCols.getAt(selectedRow*rowSize+6).text().trim() == "yes"
+            // recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == now()
+            recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == ""
+            recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == "yes"
     }
 
-    def "10. Check 'Editor' tab selected after recipe is created"() {
+    def "7. Check 'Editor' tab selected after recipe is created"() {
         testKey = "TM-XXXX"
         when: 'The User is on the Cookbook Section'
             at CookbookPage
