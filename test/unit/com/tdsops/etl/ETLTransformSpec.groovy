@@ -206,10 +206,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		where:
 			result || value1 | value2 | value3
-			null   || null   | null   | null
-			''     || ''     | null   | 5
-			''     || null   | ''     | 'tadah'
+			null   || null   | ''     | null
+			5      || ''     | null   | 5
+			'tadah'|| null   | ''     | 'tadah'
 			false  || null   | null   | false
+			true   || ''     | true   | 3
+			0      || ''     | 0      | 1
+			now    || ''     | null   | now
 			new Element(value: 5) || null | null | new Element(value: 5)
 	}
 
