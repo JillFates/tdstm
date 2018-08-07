@@ -3072,7 +3072,7 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
-					// clone asset Tags
+					// copy asset Tags
 					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
 					if (sourceTagIds) {
 						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)

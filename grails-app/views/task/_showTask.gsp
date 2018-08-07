@@ -22,7 +22,7 @@
 					<tr id="assignedToTrId">
 						<td valign="top" class="name"><label for="assignedTo">Person/Team:</label></td>
 						<td valign="top" class="value" id="assignedToTdId" colspan="3">
-							<span id="assignedToId" class="{{ac.assignedTo ? 'clickableText' : ''}}" js-person-id="{{ac.assignedTo}}" onclick="Person.showPersonDialog($(this).attr('js-person-id'),'generalInfoShow')">{{acData.assignedTo}}</span>&nbsp;/&nbsp;<span id="roleTdId">{{acData.roles}}</span>&nbsp;&nbsp;
+							<span id="assignedToId" class="{{ac.assignedTo != 0 ? 'clickableText' : ''}}" js-person-id="{{ac.assignedTo}}" onclick="Person.showPersonDialog($(this).attr('js-person-id'),'generalInfoShow')">{{acData.assignedTo}}</span>&nbsp;/&nbsp;<span id="roleTdId">{{acData.roles}}</span>&nbsp;&nbsp;
 							<br />
 							<input type="checkbox" id="hardAssignedShow" name="hardAssignedShow" value="0"
 								ng-checked="ac.hardAssigned == 1" ng-disabled="true" ng-model="ac.hardAssigned" />&nbsp;&nbsp;
