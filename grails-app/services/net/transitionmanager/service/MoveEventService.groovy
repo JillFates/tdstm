@@ -199,14 +199,14 @@ class MoveEventService implements ServiceMethods {
 		 * @param assetQuery - query that should return a list of asset ids.
 		 * @param assetQueryParams - parameters for assetQuery
 		 */
-		void bulkBumpMoveEventLastUpdated(Project project, String eventQuery, Map eventQueryParams) {
+		void bulkBumpMoveEventLastUpdated(Project project, List<Long>eventIds) {
 			if (project) {
 				String query = """
 					UPDATE MoveEvent SET lastUpdated = :lastUpdated
-					WHERE id IN ($eventQuery) AND project = :project 
+					WHERE id IN (:eventIds) AND project = :project
 				"""
-				Map params = [project: project, lastUpdated: TimeUtil.nowGMT()]
-				params.putAll(eventQueryParams)
+
+				Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), eventIds:eventIds]
 				MoveEvent.executeUpdate(query, params)
 			}
 		}

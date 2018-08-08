@@ -78,7 +78,7 @@ class TagEventService implements ServiceMethods {
 	 * @param tagEventIds the id of the TagEvent to remove.
 	 */
 	void removeTags(Project currentProject, List<Long> tagEventIds) {
-		Set<Long> eventIds = []
+		List<Long> eventIds = []
 
 		tagEventIds.each { Long id ->
 			TagEvent tagEvent = get(TagEvent, id, currentProject)
@@ -93,6 +93,6 @@ class TagEventService implements ServiceMethods {
 			tagEvent.delete(flush: true)
 		}
 
-		moveEventService.bulkBumpMoveEventLastUpdated(currentProject, ":eventIds", [eventIds: eventIds])
+		moveEventService.bulkBumpMoveEventLastUpdated(currentProject, eventIds)
 	}
 }
