@@ -5,7 +5,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
-import pages.Assets.NewAssetDetailsPage
+import pages.Assets.AssetDetailsPage
 import pages.AssetViewManager.ViewPage
 import jodd.util.RandomString
 
@@ -13,7 +13,6 @@ import jodd.util.RandomString
 @Stepwise
 class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
 
-    def testKey
     static testCount
     static selectedAsset=""
     static rowData= []
@@ -41,19 +40,19 @@ class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
         given: "Assets are listed for the view"
             at ViewPage
         when: "The user clicks on the asset´s name"
-            rowData= clickRandomAssetName()
+            rowData= getRandomAssetDataAndClickOnIt()
             selectedAsset=rowData.getAt(0)
         then: "Asset´s details are displayed"
-            at NewAssetDetailsPage
+            at AssetDetailsPage
         and: "The name or ID displayed in the screen matches the one clicked"
             (selectedAsset==getName())
     }
 
     def "3. Validate all row Data is displayed"() {
         given: "Assets are listed for the view"
-            at NewAssetDetailsPage
+            at AssetDetailsPage
         when: "The Asset details are displayed"
-            adModalWindow.displayed
+            assetDetailModal.displayed
             def dataDisplayed=getContent()
         then: "All the data in the row is present"
             validateDataIsPresent(rowData, dataDisplayed)

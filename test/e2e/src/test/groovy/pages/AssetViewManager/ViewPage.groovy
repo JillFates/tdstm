@@ -1,4 +1,5 @@
 package pages.AssetViewManager
+
 import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
@@ -43,9 +44,9 @@ class ViewPage extends Page{
         rows {$("[kendogridtablebody]")[1]}
     }
 
-    def clickRandomAssetName(){
+    def getRandomAssetDataAndClickOnIt(){
         //waitFor asset details to be displayed
-        commonsModule.waitForLoader()
+        commonsModule.waitForLoader(5)
         def dataList = []
         def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
         def assetName =assetNames[assetIndex].text()
@@ -58,19 +59,30 @@ class ViewPage extends Page{
         assetNames[assetIndex].click()
         dataList
     }
+    /**
+     * Clicks on THE FIRST asset with that name
+     * @param name
+     * @return
+     */
+    def openAssetByName(name){
+        nameFilter = name
+        // verify exact match and no other was found with same name
+        // otherwise we can click in other view than is required
+        def links = assetNames.findAll { it.text() == name }
+        waitFor{ links[0].click() }
+    }
 
     /**
      * saves the text of a row in a list so it can be validated later
      * @param rowIndex
      */
     def getRowData(int rowIndex){
-        def max=rows.find("tr")[rowIndex].find("td").size()
-        def rowData =[]
-        for (int i=0;i<max;i++){
-            println rows.find("tr")[rowIndex].find("td")[i].text()
-            rowData.add(rows.find("tr")[rowIndex].find("td")[i].text())
+        def assetRowDataDisplayed = rows.find("tr")[rowIndex].find("td")
+        def assetRowData = []
+        assetRowDataDisplayed.each {
+            assetRowData.add(it.text())
         }
-        rowData
+        assetRowData
     }
 
     def getViewName(){
@@ -85,10 +97,10 @@ class ViewPage extends Page{
         waitFor{exportModalContainer.isDisplayed()}
     }
 
-
     def clickViewManagerBreadCrumb(){
         waitFor{viewMgrBreadCrumb.click()}
     }
+
     def waitForHiddenModalContainer(){
         waitFor{!exportModalContainer.isDisplayed()}
     }

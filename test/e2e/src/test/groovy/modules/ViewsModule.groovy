@@ -33,6 +33,12 @@ class ViewsModule extends Module {
         common            { module CommonsModule}
     }
 
+    def openRandomView(){
+        def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
+        def editedViewName = viewsListed[willSelect].text()
+        waitFor{viewsListed[willSelect].click()}
+        editedViewName
+    }
 
     def clickCreateView(){
         createViewButton.click()
@@ -69,8 +75,8 @@ class ViewsModule extends Module {
      */
     def noVoidStarsAreDisplayed(){
         waitFor{!voidStars.displayed}
-
     }
+
     /**
      * Shared views will have a tick on the "Shared" column
      * In This section the number of rows should be the same as number of ticks.

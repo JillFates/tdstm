@@ -6,6 +6,7 @@ class ApplicationDetailsPage extends Page{
     static at = {
         waitFor {adModalWindow.displayed}
         adModalEditBtn.text().trim() == "Edit"
+        adModalDeleteBtn.text().trim() == "Delete"
         adModalCloseBtn
     }
 
@@ -21,8 +22,6 @@ class ApplicationDetailsPage extends Page{
         adModalAppOwner                 { adModalWindow.find("span","data-content":"App Owner")}
         adModalBundle                   { adModalWindow.find("span","data-content":"Bundle")}
         adModalPlanStatus               { adModalWindow.find("span","data-content":"Plan Status")}
-        adModalAssetName                {$('td.label.assetName.O').next()}
-        adModalLastUpdated              {$(".last-updated")}
 
         adModalSuppColTitles            (required:false) { adModalWindow.find("tr#deps td div",0).find("table thead tr th")}
         adModalSuppList                 (required:false) { adModalWindow.find("tr#deps td div",0).find("table tbody tr")}
@@ -31,17 +30,12 @@ class ApplicationDetailsPage extends Page{
 
         //TODO following butttons have no ID to reference them
         adModalEditBtn                  { adModalWindow.find("button", "onclick":contains("EntityCrud.showAssetEditView"))}
+        adModalDeleteBtn                { adModalWindow.find("button", name:"_action_Delete")}
         adModalCloneBtn                 { adModalWindow.find("button", name:"_action_clone")}
         adModalAddTaskBtn               { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}',''"))}
         adModalAddCommentBtn            { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}','comment'"))}
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
-        adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}//ui-button-icon-primary ui-icon
-        adModalDeleteBtn                { adModalWindow.find("button", name:"_action_Delete")}
-    }
-
-
-    def getName(){
-        adModalAssetName.text()
+        adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}
     }
 
     def closeDetailsModal(){
