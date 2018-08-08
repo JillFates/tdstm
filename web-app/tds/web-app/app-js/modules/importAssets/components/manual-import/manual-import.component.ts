@@ -68,16 +68,6 @@ export class ManualImportComponent implements OnInit {
 	}
 
     /**
-	 * Clicks link in menu so menu code can apply its parent-children relationship and attach or remove the active class accordingly rather
-	 * than navigating away from link bypassing the menu inner-workings.
-     */
-    private clickMenuButton(event: any): void {
-    	event.preventDefault();
-    	let element: HTMLElement = document.getElementById('batches') as HTMLElement;
-    	element.click();
-	}
-
-	/**
 	 * Fetch button clicked event.
 	 * Calls the process of fetch.
 	 */
