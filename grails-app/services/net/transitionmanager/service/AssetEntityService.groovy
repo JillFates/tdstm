@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -1223,21 +1224,17 @@ class AssetEntityService implements ServiceMethods {
 				'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
 			]
 			// Query for bundles in this project (sorted by name).
-			List bundleList = MoveBundle.where {
-				project == project
-			}.projections {
-				for (String prop in properties) {
-					property(prop)
+			resultBundles = MoveBundle.createCriteria().list {
+				and {
+					eq('project', project)
 				}
-			}.order("name", "asc").list()
-
-			// As 'where' doesn't include the column name, manually construct the map <column, value>
-			bundleList.each { bundle ->
-				Map bundleMap = [:]
-				for (int i = 0; i < bundleList.size(); i++) {
-					bundleMap[properties[i]] = bundle[i]
+				projections {
+					properties.each{ String prop ->
+						property(prop, prop)
+					}
 				}
-				resultBundles << bundleMap
+				order('name')
+				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
 			}
 		}
 		return resultBundles
