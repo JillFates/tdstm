@@ -33,16 +33,6 @@ class ViewsModule extends Module {
         common            { module CommonsModule}
     }
 
-    def openRandomView(){
-        common.waitForLoader()
-        def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
-        def editedViewName = viewsListed[willSelect].text()
-        interact {
-            moveToElement(viewsListed[willSelect])
-        }
-        waitFor{viewsListed[willSelect].click()}
-        editedViewName
-    }
 
     def clickCreateView(){
         createViewButton.click()

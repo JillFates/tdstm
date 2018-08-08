@@ -34,7 +34,7 @@ class NewAssetDetailsPage extends Page{
         adModalAddTaskBtn               { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}',''"))}
         adModalAddCommentBtn            { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}','comment'"))}
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
-        adModalCloseBtn                 { adModalWindow.find("button", class:"btn btn-default pull-right")}//ui-button-icon-primary ui-icon
+        adModalCloseBtn                 { adModalWindow.find("button", class:"btn btn-default pull-right")}
 
     }
 
