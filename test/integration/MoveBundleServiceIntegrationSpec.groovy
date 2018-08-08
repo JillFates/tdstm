@@ -19,6 +19,7 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.SettingService
 import org.hibernate.SessionFactory
 import spock.lang.See
+import spock.lang.Shared
 import spock.lang.Specification
 
 class MoveBundleServiceIntegrationSpec extends Specification {
@@ -34,6 +35,208 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	private MoveBundleTestHelper moveBundleHelper    = new MoveBundleTestHelper()
 	private AssetTestHelper      assetHelper         = new AssetTestHelper()
 	private SettingServiceTests  settingServiceTests = new SettingServiceTests()
+
+	@Shared
+	Project project
+
+	@Shared
+	Person person
+
+	@Shared
+	UserLogin userLogin
+
+	@Shared
+	MoveBundle pBundle
+
+	@Shared
+	MoveBundle npBundle
+
+	@Shared
+	AssetEntity asset1
+
+	@Shared
+	AssetEntity asset2
+
+	@Shared
+	AssetEntity asset3
+
+	@Shared
+	AssetEntity asset4
+
+	@Shared
+	AssetEntity asset5
+
+	@Shared
+	AssetEntity asset6
+
+	@Shared
+	AssetEntity asset7
+
+	@Shared
+	AssetEntity asset8
+
+	@Shared
+	AssetEntity asset9
+
+	@Shared
+	AssetEntity asset10
+
+	@Shared
+	AssetEntity asset11
+
+	@Shared
+	AssetEntity asset12
+
+	@Shared
+	AssetEntity asset13
+
+	@Shared
+	AssetEntity asset14
+
+	@Shared
+	AssetEntity asset15
+
+	@Shared
+	AssetDependency dep1
+
+	@Shared
+	AssetDependency dep2
+
+	@Shared
+	AssetDependency dep3
+
+	@Shared
+	AssetDependency dep4
+
+	@Shared
+	AssetDependency dep5
+
+	@Shared
+	AssetDependency dep6
+
+	@Shared
+	AssetDependency dep7
+
+	@Shared
+	AssetDependency dep8
+
+	@Shared
+	AssetDependencyBundle adb1
+
+	@Shared
+	AssetDependencyBundle adb2
+
+	@Shared
+	AssetDependencyBundle adb3
+
+	@Shared
+	AssetDependencyBundle adb4
+
+	@Shared
+	AssetDependencyBundle adb5
+
+	@Shared
+	AssetDependencyBundle adb6
+
+	@Shared
+	AssetDependencyBundle adb7
+
+	@Shared
+	AssetDependencyBundle adb8
+
+	@Shared
+	AssetDependencyBundle adb9
+
+	@Shared
+	AssetDependencyBundle adb10
+
+	@Shared
+	Tag tag1
+
+	@Shared
+	Tag tag2
+
+	@Shared
+	Tag tag3
+
+	@Shared
+	TagAsset tagAsset1
+
+	@Shared
+	TagAsset tagAsset2
+
+	@Shared
+	TagAsset tagAsset3
+
+	@Shared
+	TagAsset tagAsset4
+
+
+	void setup() {
+		project = projectHelper.createProject()
+		// 'a person'
+		person = personHelper.createPerson(null, project.client, project)
+
+		// 'a user associated to the project'
+		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
+
+		// 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
+		pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
+		npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
+
+		// 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
+		project.defaultBundle = pBundle
+
+		// 'some assets are created, and assigned to the planning bundle'
+		asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
+		asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
+		asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
+		asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
+		asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
+		asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
+		asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
+		asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
+		asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
+		asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
+
+		//'some more assets are created, and assigned to the non-planning bundle'
+		asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
+		asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
+		asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
+		asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
+		asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
+
+		//'some dependency relationships are established between this assets (see graph in TM-10261)'
+		dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
+		dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
+		dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
+		dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
+		dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
+		dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
+		dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
+		dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
+
+		Integer dependencyBundle = 1
+		adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+		adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
+
+		tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
+		tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
+		tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
+
+		tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
+		tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
+		tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
+		tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
+	}
 
 	void '01. Test lookupList with default parameters'() {
 		given: 'two projects with some bundles assigned to each'
@@ -59,11 +262,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	}
 
 	void '02. Test lookupList for specific fields and sorting criteria'() {
-		given: 'A project with a couple of bundles'
-			Project project = projectHelper.createProject()
-			moveBundleHelper.createBundle(project)
-			moveBundleHelper.createBundle(project)
-
 		when: 'requesting the id and workflowCode where the results are sorted by id'
 			List result = moveBundleService.lookupList(project, ['id', 'workflowCode'], 'id')
 		then: 'the results include fields id and workflowCode'
@@ -86,12 +284,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 
 	@See('TM-6847')
 	void '04. Test deleteBundleAndAssets method'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProjectWithDefaultBundle()
-		and: 'create a person associated with the project'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'create a user that is logged in and the project is their default'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
 		when: 'a new Bundle is created'
 			MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
 		and: 'a new Event is created'
@@ -132,43 +324,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	//@Ignore
 	@See('TM-10261')
 	void '05. Test Dependency Analyzer grouping'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true)
 		when: 'the dependency groups are generated'
 			String connectionTypes = "'Unknown', 'Runs On', 'Hosts', 'DB', 'Web', 'Backup', 'File', 'FTP/SCP', 'Replacement', 'Network', 'Power', 'Virtual Desktop'"
 			String statusTypes = "'Unknown', 'Validated', 'Questioned', 'Future'"
@@ -189,56 +344,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 
 
 	void '06. Test Dependency Console Map'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
-		and: ''
-			Integer dependencyBundle = 1
-			AssetDependencyBundle adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-
 		when: ''
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, null, null, null, null)
 		then: ''
@@ -270,64 +375,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 
 
 	void '07. Test Dependency Console Map Filtered by tags ANY tag1'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
-		and: ''
-			Integer dependencyBundle = 1
-			AssetDependencyBundle adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-		and: ''
-			Tag tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
-
-			TagAsset tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
-			TagAsset tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
-			TagAsset tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
-			TagAsset tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
 		when: ''
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ANY', null, null)
 		then: ''
@@ -349,64 +396,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	}
 
 	void '08. Test Dependency Console Map Filtered by tags ALL tag1'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
-		and: ''
-			Integer dependencyBundle = 1
-			AssetDependencyBundle adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-		and: ''
-			Tag tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
-
-			TagAsset tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
-			TagAsset tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
-			TagAsset tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
-			TagAsset tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
 		when: ''
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ALL', null, null)
 		then: ''
@@ -428,64 +417,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	}
 
 	void '09. Test Dependency Console Map Filtered by tags ANY tag1 + tag2'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
-		and: ''
-			Integer dependencyBundle = 1
-			AssetDependencyBundle adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-		and: ''
-			Tag tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
-
-			TagAsset tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
-			TagAsset tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
-			TagAsset tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
-			TagAsset tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
 		when: ''
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ANY', null, null)
 		then: ''
@@ -508,64 +439,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	}
 
 	void '10. Test Dependency Console Map Filtered by tags ALL tag1 + tag2'() {
-		setup: 'create a project'
-			Project project = projectHelper.createProject()
-		and: 'a person'
-			Person person = personHelper.createPerson(null, project.client, project)
-		and: 'a user associated to the project'
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-		and: 'create two bundles associated to the project, one planning bundle and other non-planning bundle'
-			MoveBundle pBundle = moveBundleHelper.createBundle(project, 'Planning Bundle', true)
-			MoveBundle npBundle = moveBundleHelper.createBundle(project, 'Non-planning Bundle', false)
-		and: 'set the project default bundle to our planning bundle (so this are the only two bundles for the project)'
-			project.defaultBundle = pBundle
-		and: 'some assets are created, and assigned to the planning bundle'
-			AssetEntity asset1 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset2 = assetHelper.createDevice(project, AssetType.APPLICATION, [moveBundle: pBundle])
-			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.DATABASE, [moveBundle: pBundle])
-			AssetEntity asset4 = assetHelper.createDevice(project, AssetType.FILES, [moveBundle: pBundle])
-			AssetEntity asset5 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: pBundle])
-			AssetEntity asset6 = assetHelper.createDevice(project, AssetType.STORAGE, [moveBundle: pBundle])
-			AssetEntity asset7 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset8 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset9 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-			AssetEntity asset10 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: pBundle])
-		and: 'some more assets are created, and assigned to the non-planning bundle'
-			AssetEntity asset11 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset12 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset13 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset14 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-			AssetEntity asset15 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: npBundle])
-		and: 'some dependency relationships are established between this assets (see graph in TM-10261)'
-			AssetDependency dep1 = new AssetDependency(asset: asset1, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep2 = new AssetDependency(asset: asset2, dependent: asset3).save(failOnError: true, flush: true)
-			AssetDependency dep3 = new AssetDependency(asset: asset3, dependent: asset4).save(failOnError: true, flush: true)
-			AssetDependency dep4 = new AssetDependency(asset: asset5, dependent: asset6).save(failOnError: true, flush: true)
-			AssetDependency dep5 = new AssetDependency(asset: asset9, dependent: asset10).save(failOnError: true, flush: true)
-			AssetDependency dep6 = new AssetDependency(asset: asset9, dependent: asset11).save(failOnError: true, flush: true)
-			AssetDependency dep7 = new AssetDependency(asset: asset8, dependent: asset12).save(failOnError: true, flush: true)
-			AssetDependency dep8 = new AssetDependency(asset: asset14, dependent: asset15).save(failOnError: true, flush: true)
-		and: ''
-			Integer dependencyBundle = 1
-			AssetDependencyBundle adb1 = new AssetDependencyBundle(project: project, asset: asset1, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb2 = new AssetDependencyBundle(project: project, asset: asset2, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb3 = new AssetDependencyBundle(project: project, asset: asset3, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb4 = new AssetDependencyBundle(project: project, asset: asset4, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb5 = new AssetDependencyBundle(project: project, asset: asset5, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb6 = new AssetDependencyBundle(project: project, asset: asset6, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb7 = new AssetDependencyBundle(project: project, asset: asset7, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb8 = new AssetDependencyBundle(project: project, asset: asset8, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb9 = new AssetDependencyBundle(project: project, asset: asset9, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-			AssetDependencyBundle adb10 = new AssetDependencyBundle(project: project, asset: asset10, dependencySource: 'the source', dependencyBundle: dependencyBundle++).save(failOnError: true, flush: true)
-		and: ''
-			Tag tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Black, project: project).save(flush: true, failOnError: true)
-			Tag tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
-			Tag tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: project).save(flush: true, failOnError: true)
-
-			TagAsset tagAsset1 = new TagAsset(tag: tag1, asset: asset2).save(flush: true, failOnError: true)
-			TagAsset tagAsset2 = new TagAsset(tag: tag1, asset: asset3).save(flush: true, failOnError: true)
-			TagAsset tagAsset3 = new TagAsset(tag: tag2, asset: asset4).save(flush: true, failOnError: true)
-			TagAsset tagAsset4 = new TagAsset(tag: tag3, asset: asset5).save(flush: true, failOnError: true)
 		when: ''
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ALL', null, null)
 		then: ''
