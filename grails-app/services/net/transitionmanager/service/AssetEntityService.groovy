@@ -1216,7 +1216,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return list of MoveBundles
 	 */
 	List<Map> getMoveBundles(Project project) {
-		List resultBundles = []
+		List<Map> resultBundles = []
 		if (project) {
 			// Minimize the amount of information retrieved by limiting the fields to the following list.
 			List<String> properties = [
