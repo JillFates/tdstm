@@ -94,7 +94,7 @@ class TagAssetService implements ServiceMethods {
 		}
 
 		// Bump the last updated date for all the assets involved.
-		assetEntityService.bulkBumpAssetLastUpdated(currentProject, ":assetIds", [assetIds: assetIds])
+		assetEntityService.bulkBumpAssetLastUpdated(currentProject, assetIds)
 	}
 
 	/**
