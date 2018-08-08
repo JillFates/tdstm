@@ -2,6 +2,7 @@ package com.tdsops.ldap
 
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.UserService
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper
 
-
+@Slf4j
 class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplicationAware {
 
     @Autowired
@@ -53,22 +54,37 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
              userInfo.fullName = ctx.getStringAttribute('name') ?: ''
         }
 
-        List<String> ldapRoles = authorities.collect { it.authority }
+        // User Security Roles will be assigned one of two ways:
+        //
+        // 1. When domain.updateRoles == true
+        //    Then use LDAP roles assigned to user that are crossed references through the domain.roleMap
+        //
+        // 2. When domain.updateRoles == false
+        //    Then the user when new is assigned the domain.defaultRole
+        //    And when user is pre-existing their role(s) should be loaded from PartyRole appropriately
+
         List<String> roles = []
-        Map<String, String> roleMap = [:]
-        ((Map)domain.roleMap).entrySet().each { Map.Entry<String,String> entry ->
-            roleMap.put(entry.value.replaceFirst(/(c|C)(n|N)=/,'').toUpperCase(), entry.key)
-        }
-        ldapRoles.each { String role ->
-            if (roleMap.containsKey(role)) {
-                roles.add(roleMap.get(role))
+        List<String> ldapRoles = authorities?.collect { it.authority }
+        if (domain.updateRoles && domain.updateRoles == true) {
+            Map<String, String> roleMap = [:]
+            ((Map) domain.roleMap)?.entrySet()?.each { Map.Entry<String, String> entry ->
+                roleMap.put(entry.value.replaceFirst(/(c|C)(n|N)=/, '').toUpperCase(), entry.key)
+            }
+            ldapRoles.each { String role ->
+                if (roleMap.containsKey(role)) {
+                    roles.add(roleMap.get(role))
+                }
+            }
+        } else {
+            if (domain.defaultRole) {
+                roles.add(domain.defaultRole)
             }
         }
 
         if (roles.empty) {
             String msg = "User ${username} has no roles defined in the roleMap. LDAP roles returned: ${ldapRoles}"
             if (ldap.debug == true) {
-                println(msg)
+                log.debug(msg)
             }
             throw new NoRolesException(msg)
         }
@@ -81,9 +97,9 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
         preAuthenticationChecks.check(userDetails)
 
         if (ldap.debug) {
-            println("Successfully mapped ldap context to user for username: ${username} and LDAP roles: ${ldapRoles}")
-            println("UserLogin: ${userLogin.toString()}")
-            println("UserDetails: ${userDetails.toString()}")
+            log.debug('Successfully mapped ldap context to user for username: {} and LDAP roles: {}', username, ldapRoles)
+            log.debug('UserLogin: {}', userLogin.toString())
+            log.debug('UserDetails: {}', userDetails.toString())
         }
         userDetails
     }
