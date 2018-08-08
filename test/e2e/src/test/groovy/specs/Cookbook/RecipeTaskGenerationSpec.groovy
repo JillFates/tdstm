@@ -36,7 +36,8 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    category: \'startup\',',
             '    duration: 10,',
             '      filter : [',
-            '        class: \'application\'',
+            '        class: \'application\',',
+            '        tag: \'Red\'',
             '      ],',
             '  ],',
             ']'
@@ -237,7 +238,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             at TabTaskGenPage
         when: 'The User Clicks on Generate'
             waitFor {tskGTabGenerateTasksBtn.click()}
-
+            waitForProgressBar()
         then: 'The Task should be generated showing up the Summary Section'
             at TabTaskGenTabSummaryPage
     }
