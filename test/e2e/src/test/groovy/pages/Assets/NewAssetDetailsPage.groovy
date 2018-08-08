@@ -1,7 +1,7 @@
 package pages.Assets
 import geb.Page
 
-class ApplicationDetailsPage extends Page{
+class NewAssetDetailsPage extends Page{
 
     static at = {
         waitFor {adModalWindow.displayed}
@@ -10,7 +10,7 @@ class ApplicationDetailsPage extends Page{
     }
 
     static content = {
-        adModalWindow                   (wait:true) { $("div","aria-describedby":"showEntityView","aria-labelledby":"ui-id-7")}
+        adModalWindow                   (wait:true) { $(class:"tds-angular-component-content")}
         adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title")}
         adModalPlanningContainer { adModalWindow.find(".dialog .planning-application-table")}
         // TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
@@ -30,15 +30,48 @@ class ApplicationDetailsPage extends Page{
         adModalIsDepList                (required:false) { adModalWindow.find("tr#deps td div",1).find("table tbody tr")}
 
         //TODO following butttons have no ID to reference them
-        adModalEditBtn                  { adModalWindow.find("button", "onclick":contains("EntityCrud.showAssetEditView"))}
-        adModalCloneBtn                 { adModalWindow.find("button", name:"_action_clone")}
+        adModalEditBtn                  { adModalWindow.find("button",class:"btn btn-primary pull-left")}
         adModalAddTaskBtn               { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}',''"))}
         adModalAddCommentBtn            { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}','comment'"))}
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
-        adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}//ui-button-icon-primary ui-icon
-        adModalDeleteBtn                { adModalWindow.find("button", name:"_action_Delete")}
+        adModalCloseBtn                 { adModalWindow.find("button", class:"btn btn-default pull-right")}//ui-button-icon-primary ui-icon
+
     }
 
+    def validateDataIsPresent(List rowData, List dataDisplayed){
+        boolean success=true
+        def str =""
+        try {
+            rowData.each{
+                it-> if (it!="" ){
+                    str=it
+                    if (!dataDisplayed.contains(it)){
+                        success = false
+                    }else{
+                        println str
+                    }
+                }
+            }
+        } catch(Exception e1) {
+            success = false
+        }
+        success
+    }
+
+    def getContent(){
+        def screenData =$(".valueNW")
+        def screenText=[]
+        screenText.add($('td.label.assetName.O').next().text())
+        screenData.each{
+            it-> screenText.add(it.text().trim())
+        }
+        screenText.add(getLastUpdated())
+        screenText
+    }
+
+    def getLastUpdated(){
+        adModalLastUpdated.text().split(" ")[2]+ (" ")+adModalLastUpdated.text().split(" ")[3]+ (" ")+adModalLastUpdated.text().split(" ")[4]
+    }
 
     def getName(){
         adModalAssetName.text()
@@ -49,9 +82,7 @@ class ApplicationDetailsPage extends Page{
         waitFor {!adModalWindow.displayed}
     }
 
-    def clickOnCloneButton(){
-        waitFor { adModalCloneBtn.click() }
-    }
+
 
     def getApplicationName(){
         adModalAppName.text().trim()

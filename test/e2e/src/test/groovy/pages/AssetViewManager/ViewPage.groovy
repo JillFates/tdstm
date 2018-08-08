@@ -39,6 +39,42 @@ class ViewPage extends Page{
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
         refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
+        assetNames {$(".asset-detail-name-column")}
+        rows {$("[kendogridtablebody]")[1]}
+    }
+
+    def clickRandomAssetName(){
+        //waitFor asset details to be displayed
+        commonsModule.waitForLoader()
+        def dataList = []
+        def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
+        def assetName =assetNames[assetIndex].text()
+        dataList.add(assetName)
+        def rowData =getRowData(assetIndex)
+        dataList.addAll(rowData)
+        interact {
+            moveToElement(assetNames[assetIndex])
+        }
+        assetNames[assetIndex].click()
+        dataList
+    }
+
+    /**
+     * saves the text of a row in a list so it can be validated later
+     * @param rowIndex
+     */
+    def getRowData(int rowIndex){
+        def max=rows.find("tr")[rowIndex].find("td").size()
+        def rowData =[]
+        for (int i=0;i<max;i++){
+            println rows.find("tr")[rowIndex].find("td")[i].text()
+            rowData.add(rows.find("tr")[rowIndex].find("td")[i].text())
+        }
+        rowData
+    }
+
+    def getViewName(){
+        voidStars[0].parent().parent().next().text()
     }
 
     def verifyViewTitle(title) {

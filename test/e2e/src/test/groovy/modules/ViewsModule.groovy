@@ -34,8 +34,12 @@ class ViewsModule extends Module {
     }
 
     def openRandomView(){
+        common.waitForLoader()
         def willSelect =Math.abs(new Random().nextInt() % viewsListed.size())+1
         def editedViewName = viewsListed[willSelect].text()
+        interact {
+            moveToElement(viewsListed[willSelect])
+        }
         waitFor{viewsListed[willSelect].click()}
         editedViewName
     }
@@ -134,7 +138,7 @@ class ViewsModule extends Module {
         clearFilterX.click()
     }
     /**
-     * Receives a number of ros that had been saved before in the spec and compares it ti the
+     * Receives a number of rows that had been saved before in the spec and compares it ti the
      * curren number of rows
      * @param numberOfRows
      * @return
@@ -165,13 +169,11 @@ class ViewsModule extends Module {
     }
 
     def createdDateNotEmpty(){
-
         waitFor{vwGridRows.findAll { it.find{"td[4]"}.text()!="" }}
     }
 
     def setFirstNonFavViewAsFav(){
         waitFor{voidStars[0].click()}
-
     }
 
     def goToFirstNonFavView(){
