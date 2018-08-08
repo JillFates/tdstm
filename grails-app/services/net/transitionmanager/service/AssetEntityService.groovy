@@ -1233,8 +1233,8 @@ class AssetEntityService implements ServiceMethods {
 						property(prop, prop)
 					}
 				}
+				order('name')
 				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-
 			}
 		}
 		return resultBundles
