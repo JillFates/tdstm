@@ -931,14 +931,14 @@ class MoveBundleController implements ControllerMethods {
 		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
-			console.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+			console.assignedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
 
 		def map = moveBundleService.dependencyConsoleMap(
 			project,
 			console.bundle,
 			console.tagIds,
 			console.tagMatch,
-			console.assinedGroup,
+			console.assignedGroup,
 			null,
 			false,
 			console.subsection,

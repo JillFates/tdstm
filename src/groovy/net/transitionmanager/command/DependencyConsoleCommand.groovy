@@ -5,7 +5,7 @@ class DependencyConsoleCommand {
 	Long       bundle
 	List<Long> tagIds   = []
 	String     tagMatch = 'ANY'
-	String     assinedGroup
+	String     assignedGroup
 	String     subsection
 	Long       groupId
 	String     assetName
@@ -13,7 +13,7 @@ class DependencyConsoleCommand {
 	static constraints = {
 		bundle nullable: true
 		tagMatch inList: ['ANY', 'ALL']
-		assinedGroup nullable: true
+		assignedGroup nullable: true
 		subsection nullable: true
 		groupId nullable: true
 		assetName nullable: true
