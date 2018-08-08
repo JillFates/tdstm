@@ -20,6 +20,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
+import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -255,10 +256,18 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
+	 * On refresh sample data button click.
+	 */
+	protected reloadSampleData(): void {
+		this.extractSampleDataFromFile(this.dataScriptModel.originalSampleFilename);
+	}
+
+	/**
 	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
 	private extractSampleDataFromFile(originalFileName?: string) {
-		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName).subscribe((result) => {
+		const rootNode = this.extractRootNode();
+		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName, rootNode).subscribe((result) => {
 			this.sampleDataModel = result;
 			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
@@ -267,6 +276,22 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				}
 			}, error => console.log(error));
 		});
+	}
+
+	/**
+	 * Search and extracts the rootNode value if present from the current script code.
+	 * It assumes that rootNode syntax will be: rootNode 'myRootNode'
+	 * @returns {string}
+	 */
+	private extractRootNode(): string {
+		const _rootNodeIx = this.script.indexOf('rootNode \'');
+		if (_rootNodeIx === NOT_FOUND_INDEX) {
+			return '';
+		}
+		const _rootNodeValueStartIx = _rootNodeIx + 'rootNode \''.length;
+		const _rootNodeValueEndIx = this.script.indexOf('\'', _rootNodeValueStartIx);
+		const _rootNodeValue = this.script.substring(_rootNodeValueStartIx, _rootNodeValueEndIx);
+		return _rootNodeValue;
 	}
 
 	/**

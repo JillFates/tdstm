@@ -1,3 +1,4 @@
+export const NOT_FOUND_INDEX = -1;
 export const SEARCH_QUITE_PERIOD = 600;
 export const LAST_VISITED_PAGE = 'LAST_VISITED_PAGE';
 export const LAST_SELECTED_FOLDER = 'LAST_SELECTED_FOLDER';
