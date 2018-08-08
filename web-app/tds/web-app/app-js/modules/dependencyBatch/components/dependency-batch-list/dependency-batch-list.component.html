@@ -18,7 +18,7 @@
                         [pageSize]="dataGridOperationsHelper.state.take"
                         [skip]="dataGridOperationsHelper.state.skip"
                         [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
-                        (pageChange)="dataGridOperationsHelper.pageChange($event)"
+                        (pageChange)="onPageChange($event)"
                         [resizable]="true"
                         (sortChange)="dataGridOperationsHelper.sortChange($event)"
                         [selectable]="selectableSettings"
