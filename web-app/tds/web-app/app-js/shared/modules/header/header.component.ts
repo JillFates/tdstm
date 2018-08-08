@@ -31,7 +31,7 @@ export class HeaderComponent implements AfterViewInit {
 		notifierService: NotifierService,
 		promptService: UIPromptService,
 		private renderer: Renderer2) {
-		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
+	    jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (state.$current.data.hasPendingChanges) {
 				e.preventDefault();
 				promptService.open(
@@ -80,7 +80,7 @@ export class HeaderComponent implements AfterViewInit {
 	 * Adds an active class to application top menu based on the pageMetadata.topMenu configuration.
 	 */
 	private selectTopMenuSections(): void {
-		if (!this.pageMetaData.topMenu) {
+        if (!this.pageMetaData.topMenu) {
 			// clear out any other previous active menus.
 			jQuery('li[class^="dropdown menu-parent-"]').removeClass('active');
 			jQuery('li.menu-child-item').removeClass('active');

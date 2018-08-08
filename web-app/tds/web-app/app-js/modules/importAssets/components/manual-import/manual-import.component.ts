@@ -17,6 +17,8 @@ import {
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
 
+declare var jQuery: any;
+
 @Component({
 	selector: 'manual-import',
 	templateUrl: '../tds/web-app/app-js/modules/importAssets/components/manual-import/manual-import.component.html'
@@ -63,6 +65,16 @@ export class ManualImportComponent implements OnInit {
 			this.actionOptions = result.actions;
 			this.dataScriptOptions = result.dataScripts;
 		});
+	}
+
+    /**
+	 * Clicks link in menu so menu code can apply its parent-children relationship and attach or remove the active class accordingly rather
+	 * than navigating away from link bypassing the menu inner-workings.
+     */
+    private clickMenuButton(event: any): void {
+    	event.preventDefault();
+    	let element: HTMLElement = document.getElementById('batches') as HTMLElement;
+    	element.click();
 	}
 
 	/**
