@@ -1,3 +1,13 @@
+<style>
+    .sample-data-cell-max-line-height {
+        display: block;
+        text-overflow: ellipsis;
+        max-height: 9.8em;
+        line-height: 1.4em;
+        word-break: break-word;
+    }
+</style>
+
 <div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div #resizableForm class="modal-content resizable"
@@ -121,7 +131,9 @@
                                             <label>{{column.label}}</label>
                                         </ng-template>
                                         <ng-template kendoGridCellTemplate let-dataItem>
-                                            {{ dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE }}
+                                            <div class="sample-data-cell-max-line-height" title="{{dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE}}">
+                                                {{ dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE }}
+                                            </div>
                                         </ng-template>
                                     </kendo-grid-column>
                                 </kendo-grid>

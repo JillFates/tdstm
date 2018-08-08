@@ -284,14 +284,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * @returns {string}
 	 */
 	private extractRootNode(): string {
-		const _rootNodeIx = this.script.indexOf('rootNode \'');
-		if (_rootNodeIx === NOT_FOUND_INDEX) {
-			return '';
-		}
-		const _rootNodeValueStartIx = _rootNodeIx + 'rootNode \''.length;
-		const _rootNodeValueEndIx = this.script.indexOf('\'', _rootNodeValueStartIx);
-		const _rootNodeValue = this.script.substring(_rootNodeValueStartIx, _rootNodeValueEndIx);
-		return _rootNodeValue;
+		let match = this.script.match(/\s*rootNode\s*(?:"|')(.*)(?:"|').*/);
+		let result =  (match !== null)  ? match[1] : '';
+		return result;
 	}
 
 	/**
