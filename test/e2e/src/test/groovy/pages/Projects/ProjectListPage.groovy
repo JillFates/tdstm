@@ -54,7 +54,8 @@ class ProjectListPage extends Page {
     }
 
     def getListedProjectsSize(){
-        gridSize
+        waitFor{projectGridRows[0].displayed}
+        projectGridRows.size()
     }
 
     def verifyDeletedMessage(){
