@@ -46,12 +46,22 @@ export class PreferenceService {
 		return this.http.post(this.preferenceUrlPost, body, requestOptions);
 	}
 
-	getUserTimeZone(): string {
+	/**
+	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
+	 */
+	getUserDateFormat(): string {
 		const currentUserDateFormat = this.preferences[PreferenceService.USER_PREFERENCES_DATE_FORMAT];
 		if (currentUserDateFormat) {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}
-		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
+		return DateUtils.DEFAULT_DATE_FORMAT;
+	}
+
+	/**
+	 * Used to retrieve the format to use for Date Time properties (e.g. MM/dd/YYYY hh:mm a)
+	 */
+	getUserDateTimeFormat(): string {
+		return this.getUserDateFormat() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 	}
 
 	/**
@@ -60,7 +70,7 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
+			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_DATE_FORMAT )
 			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
 	}
 
