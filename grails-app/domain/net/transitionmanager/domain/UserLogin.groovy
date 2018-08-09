@@ -71,7 +71,7 @@ class UserLogin {
 	// The list of domains and the properties that have a reference the UserLogin domain
 	static final List<Map> domainReferences = [
 		[domain: DataTransferBatch, 	onDelete:'null',   properties: ['userLogin'] ],
-		[domain: PartyRole,				onDelete:'delete', properties: ['party'] ],
+		[domain: PartyRole,				onDelete:'delete', properties: ['party'],  transform:{ it.person.userLogin = null; it.person } ],
 		[domain: PasswordHistory,		onDelete:'delete', properties: ['userLogin'] ],
 		[domain: PasswordReset,			onDelete:'delete', properties: ['userLogin'] ],
 		[domain: UserPreference,		onDelete:'delete', properties: ['userLogin'] ],
