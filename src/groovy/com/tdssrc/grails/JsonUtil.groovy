@@ -8,6 +8,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
@@ -199,10 +200,10 @@ class JsonUtil {
      */
     static Object parseFilePath(String fileName) {
         File file = new File(fileName)
-        // return JSON.parse(file.text)
+        
         String content = file.text?.trim()
         if ( StringUtils.isBlank(content) ) {
-            throw new InvalidParamException("JSON data file contains no data")
+            throw new EmptyResultException("JSON data file contains no data")
         }
 
         return JsonUtil.parseJsonObject(content)

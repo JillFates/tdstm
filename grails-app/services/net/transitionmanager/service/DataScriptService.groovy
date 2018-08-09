@@ -330,12 +330,6 @@ class DataScriptService implements ServiceMethods{
 
 				case NotOLE2FileException:
 				case InvalidParamException:
-					message = ex.getMessage()
-					// Todo: oluna TM-11588 I don't like this maybe we need another Exception for JSON?
-					if( message.startsWith('JSON') ) {
-						break
-					}
-
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
