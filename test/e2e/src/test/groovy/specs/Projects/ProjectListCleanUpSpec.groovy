@@ -8,6 +8,12 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
 
+/**
+ * This class represents the new generic asset details
+ * page
+ * @author Sebastian Bigatton
+ */
+
 @Stepwise
 class ProjectListCleanUpSpec extends GebReportingSpec {
     def testKey
@@ -72,7 +78,11 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
             filterByName baseName
         then: 'The user deletes completed projects if there are'
             deleteProjects(true)
-        and: 'A licensed project should be selected if license is requested'
+    }
+
+    def "2. Workaround to switch to a licensed Project"() {
+        testKey = "TM-XXXX"
+        when: 'The user selects a licenced project'
             def displayed = false
             try {
                 clickOnActiveProjectsButton()
@@ -88,5 +98,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
                 displayed = false
             }
             !displayed
+        then: 'A licensed project should be selected if license is requested'
+            menuModule.assertProjectName licensedProjectName
     }
 }
