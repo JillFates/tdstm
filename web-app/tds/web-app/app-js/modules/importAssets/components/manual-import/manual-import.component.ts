@@ -17,6 +17,8 @@ import {
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
 
+declare var jQuery: any;
+
 @Component({
 	selector: 'manual-import',
 	templateUrl: '../tds/web-app/app-js/modules/importAssets/components/manual-import/manual-import.component.html'
@@ -65,7 +67,7 @@ export class ManualImportComponent implements OnInit {
 		});
 	}
 
-	/**
+    /**
 	 * Fetch button clicked event.
 	 * Calls the process of fetch.
 	 */
