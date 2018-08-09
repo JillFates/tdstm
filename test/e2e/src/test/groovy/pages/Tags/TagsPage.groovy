@@ -16,20 +16,21 @@ class TagsPage extends Page{
         pageHeaderName { $("section", class:"content-header").find("h1")}
         createBtn { $('button.k-grid-add-command')}
         tagsGrid {$('div[role=grid]')}
-        tagsGridRows {tagsGrid.find(".k-grid-container tr[kendogridlogicalrow]")}
+        tagsGridDataRows {tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}
+        tagsGridActionsRows {tagsGrid.find(".k-grid-container .k-grid-content-locked tr[kendogridlogicalrow]")}
         nameFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "2").find("input")}
         //First Element of the Providers Table
-        firstTagActions { tagsGridRows.find("td", "aria-colindex": "1")[0]}
+        firstTagActions { tagsGridActionsRows.find("td", "aria-colindex": "1")[0]}
         firstTagSaveButton { firstTagActions.find(".k-grid-save-command")}
         firstTagCancelButton { firstTagActions.find(".k-grid-cancel-command")}
         firstTagEditButton { firstTagActions.find(".k-grid-edit-command")}
         firstTagRemoveButton { firstTagActions.find(".k-grid-remove-command")}
-        firstTagName { tagsGridRows.find("td", "aria-colindex": "2")[0]}
-        firstTagDesc { tagsGridRows.find("td", "aria-colindex": "3")[0]}
-        firstTagColor { tagsGridRows.find("td", "aria-colindex": "4")[0]}
-        firstTagAssets { tagsGridRows.find("td", "aria-colindex": "5")[0]}
-        firstTagDateCreated { tagsGridRows.find("td", "aria-colindex": "6")[0]}
-        firstTagLastModified { tagsGridRows.find("td", "aria-colindex": "7")[0]}
+        firstTagName { tagsGridDataRows.find("td", "aria-colindex": "2")[0]}
+        firstTagDesc { tagsGridDataRows.find("td", "aria-colindex": "3")[0]}
+        firstTagColor { tagsGridDataRows.find("td", "aria-colindex": "4")[0]}
+        firstTagAssets { tagsGridDataRows.find("td", "aria-colindex": "5")[0]}
+        firstTagDateCreated { tagsGridDataRows.find("td", "aria-colindex": "6")[0]}
+        firstTagLastModified { tagsGridDataRows.find("td", "aria-colindex": "7")[0]}
         firstTagColorSelected { firstTagColor.find("span.tag")}
         firstTagNameInput { firstTagName.find("input")}
         firstTagDescInput { firstTagDesc.find("input")}
@@ -44,7 +45,7 @@ class TagsPage extends Page{
     }
 
     def getGridRowsSize(){
-        tagsGridRows.size()
+        tagsGridDataRows.size()
     }
 
     def getTagNameText(){
