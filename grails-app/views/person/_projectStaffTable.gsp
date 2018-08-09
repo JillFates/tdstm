@@ -5,6 +5,7 @@
 			<th style="cursor: pointer;" onclick="toggleSortOrder('fullName','fullName')">Name</th>
 			<th style="cursor: pointer;" onclick="toggleSortOrder('company','company')">Company</th>
 			<th style="cursor: pointer;" onclick="toggleSortOrder('team','team')">Team</th>
+			<th style="cursor: pointer;" onclick="toggleSortOrder('email','email')">email</th>
 			<g:if test="${projectId == 0}"> <th>Project</th></g:if>
 			<g:else><th>${project?.name}</th></g:else>
 			<g:each in="${moveEventList}" var="moveEvent" >
@@ -32,6 +33,11 @@
 				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="Person.showPersonDialog(this.id,'generalInfoShow')">
 						${projectStaff?.team}
+					</span>
+				</td>
+				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap">
+					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="Person.showPersonDialog(this.id, 'generalInfoShow')">
+						${projectStaff?.email}
 					</span>
 				</td>
 				<g:if test="${projectId == 0}">
