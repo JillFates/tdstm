@@ -6,6 +6,7 @@ import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
+import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import net.transitionmanager.command.DataScriptNameValidationCommand
@@ -329,6 +330,12 @@ class DataScriptService implements ServiceMethods{
 
 				case NotOLE2FileException:
 				case InvalidParamException:
+					message = ex.getMessage()
+					// Todo: oluna TM-11588 I don't like this maybe we need another Exception for JSON?
+					if( message.startsWith('JSON') ) {
+						break
+					}
+
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
@@ -376,6 +383,12 @@ class DataScriptService implements ServiceMethods{
 			rootNode: rootNode ?: '.',
 			fileName: jsonFile)
 		DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
+
+
+		// If there are no fields it means that none was found in the rootNode location
+		if(dataSetFacade.fields().isEmpty()) {
+			throw new ExceptionGETL("No data found in specified rootNode \"${rootNode}\"")
+		}
 
 		return [
 			config: dataSetFacade.fields().collect {

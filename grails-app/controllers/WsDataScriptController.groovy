@@ -177,7 +177,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     def sampleData (String filename) {
         Long id = params.id?.toLong()
         String originalFileName = params.originalFileName
-        String rootNode = params.rootNode ?: 'data'
+        String rootNode = params.rootNode ?: ''
         Long maxRows = paginationMaxRowValue() ?: 25
         Map jsonMap = dataScriptService.parseDataFromFile(id, originalFileName, filename, rootNode, maxRows)
         renderSuccessJson(jsonMap)
