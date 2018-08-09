@@ -27,4 +27,8 @@ class ProjectDetailsPage extends Page {
     def waitForProjectCreatedMessage(projName){
         waitFor {pdPageMessage.text().contains(projName + " was created")}
     }
+
+    def clickOnDeleteButtonAndConfirm(){
+        withConfirm(true){waitFor{pdDeleteBtn.click()}}
+    }
 }
