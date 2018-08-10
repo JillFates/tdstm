@@ -14,11 +14,12 @@ import {
 } from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
+import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -26,6 +27,9 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 	providers: [TranslatePipe]
 })
 export class DependencyBatchListComponent {
+
+	public dateTimeFormat: string;
+	public userTimeZone: string;
 
 	protected BatchStatus = BatchStatus;
 	protected columnsModel: DependencyBatchColumnsModel;
@@ -57,7 +61,8 @@ export class DependencyBatchListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService) {
+		private userPreferenceService: PreferenceService
+	) {
 			this.onLoad();
 	}
 
@@ -65,6 +70,16 @@ export class DependencyBatchListComponent {
 	 * On Page Load.
 	 */
 	private onLoad(): void {
+
+		// Fetch the user preferences for their TimeZone and DateFormat
+		this.userPreferenceService.getPreferences( PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT )
+			.subscribe(
+				prefMap => {
+					this.userTimeZone = prefMap[PREFERENCES_LIST.CURR_TZ];
+					this.dateTimeFormat = DateUtils.translateDateTimeFormat(prefMap[PREFERENCES_LIST.CURRENT_DATE_FORMAT]);
+				}
+			);
+
 		this.columnsModel = new DependencyBatchColumnsModel();
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
@@ -74,6 +89,16 @@ export class DependencyBatchListComponent {
 			this.setRunningLoop();
 			this.setQueuedLoop();
 		});
+	}
+
+	/**
+	 * Used in template to forward click events from the element to the target parentNode
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 
 	/**

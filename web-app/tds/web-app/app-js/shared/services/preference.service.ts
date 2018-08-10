@@ -46,12 +46,30 @@ export class PreferenceService {
 		return this.http.post(this.preferenceUrlPost, body, requestOptions);
 	}
 
-	getUserTimeZone(): string {
+	/**
+	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
+	 */
+	getUserDateFormat(): string {
 		const currentUserDateFormat = this.preferences[PreferenceService.USER_PREFERENCES_DATE_FORMAT];
 		if (currentUserDateFormat) {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}
-		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
+		return DateUtils.DEFAULT_FORMAT_DATE;
+	}
+
+	/**
+	 * Used to retrieve the user's preferred TimeZone that which is used to display date times
+	 * based on user's preference in TM instead of the TimeZone of their computer.
+	 */
+	getUserTimeZone(): Observable<string> {
+		return this.getPreference(PREFERENCES_LIST.CURR_TZ);
+	}
+
+	/**
+	 * Used to retrieve the format to use for Date Time properties (e.g. MM/dd/YYYY hh:mm a)
+	 */
+	getUserDateTimeFormat(): string {
+		return this.getUserDateFormat() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 	}
 
 	/**
@@ -60,7 +78,7 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
+			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE )
 			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
 	}
 
@@ -88,10 +106,11 @@ export class PreferenceService {
 
 // add constants as needed
 export const PREFERENCES_LIST = {
+	ASSET_LIST_SIZE: 'assetListSize',
 	ASSET_JUST_PLANNING: 'assetJustPlanning',
-	ASSET_LIST_SIZE : 'assetListSize',
-	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
 	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
+	CURR_TZ: 'CURR_TZ',
 	DATA_SCRIPT_SIZE: 'DataScriptSize',
+	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
 	VIEW_UNPUBLISHED: 'viewUnpublished'
 };
