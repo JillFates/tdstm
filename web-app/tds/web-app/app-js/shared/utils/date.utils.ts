@@ -3,8 +3,56 @@ import * as moment from 'moment';
 
 export class DateUtils {
 
-	public static readonly DEFAULT_TIMEZONE_FORMAT = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
+
+	/**
+	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
+	 * format. It is assumed that the value has been already adjusted to the user's preferred timezone
+	 * on the server. Note that value will indicate Z that is not actually Z but that of the user's
+	 * preferred timezone.
+	 *
+	 * This is done this way because the datetimes are stored in GMT and the user can choose in the UI
+	 * to show datetimes in timezones differing from their local timezone set on their computer so
+	 * using actual dates computed correctly can get quite outrageous.
+	 *
+	 * @param prefDateTimeFormat - the user's preferred datetime format
+	 * @param dateTimeValue - the value to be converted
+	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
+	 */
+	public static formatUserDateTime(prefDateTimeFormat: String, dateTimeValue: String) {
+		if (dateTimeValue === undefined) {
+			return '';
+		}
+		return dateTimeValue.replace('Z', '').replace('T',' ');
+		// const isoPattern = /^(\d{4})-(\d{2})-(\d{2}).(\d{2}):(\d{2}):(\d{2})Z$/;
+		// let dtParts = dateTimeValue.match(isoPattern);
+		// if (dtParts.length !== 7) {
+		// 	return '';
+		// }
+
+		// let result = '';
+		// // if (prefDateTimeFormat.startsWith(this.DEFAULT_FORMAT_DATE)) {
+		// // 	result = dtParts[3] + '/' + dtParts[2] + '/' + dtParts[1];
+		// // } else {
+		// // 	result = dtParts[2] + '/' + dtParts[3] + '/' + dtParts[1];
+		// // }
+
+		// result = dtParts[1] + '/' + dtParts[2] + '/' + dtParts[3];
+
+		// let amPm = 'AM';
+		// let hour = parseInt( dtParts[4], 0);
+		// if (hour > 11) {
+		// 	amPm = 'PM';
+		// 	if (hour > 12) {
+		// 		hour = hour - 12;
+		// 		dtParts[4] = hour.toString();
+		// 	}
+		// }
+
+		// // Assemble with the time component and return the sucker
+		// return result + ' ' + dtParts[4] + ':' + dtParts[5] + amPm;
+	}
 
 	/**
 	 * Create a Date Object
@@ -82,7 +130,8 @@ export class DateUtils {
 	}
 
 	/**
-	 * Given a User Preference TimeZone format convert it to a known date format used by angular date pipe.
+	 * Used to convert a User preferred Date Format to the date format used by angular date pipe
+	 * @param dateFormat - the TM Date Format from User Preferences
 	 * @returns {string}
 	 */
 	public static translateTimeZoneFormat(dateFormat: string): string {
@@ -92,6 +141,15 @@ export class DateUtils {
 		const yearRegExp = /Y/g;
 		result = result.replace(yearRegExp, 'y');
 		return result;
+	}
+
+	/**
+	 * Used to convert a User preferred Date Format to the date format plus time used by angular date pipe
+	 * @param dateFormat - the TM Date Format from User Preferences
+	 * @returns {string}
+	 */
+	public static translateDateTimeFormat(dateFormat: string): string {
+		return this.translateTimeZoneFormat(dateFormat) + ' ' + this.DEFAULT_FORMAT_TIME;
 	}
 
 	/**

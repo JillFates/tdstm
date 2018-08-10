@@ -72,7 +72,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Domain',
 				property: 'domainClassName',
 				type: 'text',
-				width: 110,
+				width: 120,
 				locked: false
 			},
 			{
@@ -119,7 +119,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Imported At',
 				property: 'dateCreated',
 				type: 'datetime',
-				format: '{0:d}',
+				format: 'yyyy-MM-dd HH:mm:ss',
 				width: 170,
 				locked: false
 			},
@@ -127,7 +127,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'datetime',
-				format: '{0:d}',
+				format: 'yyyy-MM-dd HH:mm:ss',
 				width: 170,
 				locked: false
 			},

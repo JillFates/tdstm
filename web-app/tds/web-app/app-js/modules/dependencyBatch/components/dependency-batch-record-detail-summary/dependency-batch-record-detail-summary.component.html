@@ -8,20 +8,21 @@
         </button>
     </label>
 </div>
+
 <div class="collapse in collapsible">
         <div class="row header">
             <div class="col-sm-2">Batch ID</div>
+            <div class="col-sm-2">Domain</div>
             <div class="col-sm-2">Imported At</div>
             <div class="col-sm-2">Imported By</div>
-            <div class="col-sm-2">Domain</div>
             <div class="col-sm-2">DataScript</div>
             <div class="col-sm-2">Status</div>
         </div>
         <div class="row">
             <div class="col-sm-2">{{importBatch.id}}</div>
-            <div class="col-sm-2">{{importBatch.dateCreated | date: userPreferenceService.getUserTimeZone()}}</div>
-            <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.domainClassName}}</div>
+            <div class="col-sm-2">{{importBatch.lastUpdated | userDateTime: dateTimeFormat }}</div>
+            <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.dataScript?.name}}</div>
             <div class="col-sm-2" [ngClass]="{'error': batchHasErrors()}">
                 {{importBatch.status.label}}
