@@ -200,13 +200,12 @@ class JsonUtil {
      */
     static Object parseFilePath(String fileName) {
         File file = new File(fileName)
-        
+
         String content = file.text?.trim()
         if ( StringUtils.isBlank(content) ) {
             throw new EmptyResultException("JSON data file contains no data")
         }
-
-        return JsonUtil.parseJsonObject(content)
+        return parseJsonObject(content)
     }
 
     /**
@@ -223,9 +222,8 @@ class JsonUtil {
      * @return
      */
     static Object gpathAt(Object obj, String gpath, String separator = '.') {
-        def parts = gpath.tokenize(separator)
+        List<String> parts = gpath.tokenize(separator)
         Object property = obj
-
         for (String key in parts) {
             key = key.trim()
             if (key) {

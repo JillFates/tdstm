@@ -32,8 +32,10 @@ class TDSJSONDriver extends JSONDriver {
 		if ( !json ) {
 			json = JsonUtil.parseFilePath(((JSONDataset) dataset).fullFileName())
 		}
-
-		return JsonUtil.gpathAt(json, rootNode)
+		// println "getRootNod() json isa ${json.getClass().getName()} \n\n$json"
+		Object data = JsonUtil.gpathAt(json, rootNode)
+		// println "getRootNode() data isa ${data.getClass().getName()}\n\n$data"
+		return data
 	}
 
 	/**
@@ -43,20 +45,31 @@ class TDSJSONDriver extends JSONDriver {
 	 */
 	@Override
 	List<Field> fields(Dataset dataset) {
-		if(!dataset.field) {
+
+		if (!dataset.field) {
 			Object json = getRootNode(dataset, dataset.rootNode)
 			List nodeList
 
-			if (json instanceof List) {
-				nodeList = json as List
-			} else {
-				nodeList = [json]
+			switch (json) {
+				case List:
+					nodeList = json as List
+					break
+				case Map:
+					nodeList = [json]
+					break
+				case null:
+					throw new ExceptionGETL("Unable to parse attribute names due to empty results at rootNode '${dataset.rootNode}'")
+				default:
+					log.warn "fields() encountered unexpected type ${json.getClass().getName()}, rootNode=${dataset.rootNode}"
+					throw new ExceptionGETL("Unable to parse attribute names due to JSON structure at rootNode '${dataset.rootNode}")
 			}
 
 			// Sorted Map when creating from the nodes
 			TreeMap<String, Field> fields = [:]
 
+			// println "\n\n**** nodeList isa ${nodeList}\n\n"
 			nodeList.each { node ->
+				// println "\n\n**** node isa ${node}\n\n"
 				node.each { k, v ->
 					if(! fields.containsKey(k) ) {
 						//TODO: Set Field Type properly based v class type
@@ -64,7 +77,6 @@ class TDSJSONDriver extends JSONDriver {
 					}
 				}
 			}
-
 			dataset.field.addAll( fields.values() )
 		}
 		return dataset.field
