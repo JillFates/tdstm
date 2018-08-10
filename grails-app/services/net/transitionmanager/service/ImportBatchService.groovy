@@ -79,10 +79,10 @@ class ImportBatchService implements ServiceMethods {
 				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
 
 				// Adjust the Datetimes to the User's Timezone appropriately
-				batchMap.dateCreated = TimeUtil.adjustDateFromGMTToTZ(batchMap.dateCreated, userTzId)
-				if (batchMap.lastUpdated) {
-					batchMap.lastUpdated = TimeUtil.adjustDateFromGMTToTZ(batchMap.lastUpdated, userTzId)
-				}
+				// batchMap.dateCreated = TimeUtil.adjustDateFromGMTToTZ(batchMap.dateCreated, userTzId)
+				// if (batchMap.lastUpdated) {
+				// 	batchMap.lastUpdated = TimeUtil.adjustDateFromGMTToTZ(batchMap.lastUpdated, userTzId)
+				// }
 
 				results[batch.id] = batchMap
 			}

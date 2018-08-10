@@ -14,7 +14,7 @@ export class DependencyBatchRecordDetailSummaryComponent {
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 
 	protected summaryCollapsed = false;
-	public dateTimeFormat: string;
+	public userTimeZone: string;
 
 	constructor(private userPreferenceService: PreferenceService) {
 		this.onLoad();
@@ -24,15 +24,8 @@ export class DependencyBatchRecordDetailSummaryComponent {
 	 * On Page Load
 	 */
 	private onLoad(): void {
-		// Fetch the user preferences for their TimeZone and DateFormat
-		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.subscribe(
-				prefMap => {
-					// this.userTimeZone = prefMap[PREFERENCES_LIST.CURR_TZ];
-					// this.userTimeZone = '-0800';
-					this.dateTimeFormat = DateUtils.translateDateTimeFormat(prefMap[PREFERENCES_LIST.CURRENT_DATE_FORMAT]);
-				}
-			);
+		// Fetch the user preferences for their TimeZone
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 	}
 
 	/**

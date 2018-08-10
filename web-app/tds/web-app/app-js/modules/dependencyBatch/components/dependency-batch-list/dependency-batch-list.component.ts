@@ -72,13 +72,8 @@ export class DependencyBatchListComponent {
 	private onLoad(): void {
 
 		// Fetch the user preferences for their TimeZone and DateFormat
-		this.userPreferenceService.getPreferences( PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT )
-			.subscribe(
-				prefMap => {
-					this.userTimeZone = prefMap[PREFERENCES_LIST.CURR_TZ];
-					this.dateTimeFormat = DateUtils.translateDateTimeFormat(prefMap[PREFERENCES_LIST.CURRENT_DATE_FORMAT]);
-				}
-			);
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 
 		this.columnsModel = new DependencyBatchColumnsModel();
 		if ( !this.canRunActions() ) {
