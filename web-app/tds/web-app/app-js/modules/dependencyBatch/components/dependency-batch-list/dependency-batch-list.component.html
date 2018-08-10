@@ -136,12 +136,6 @@
                                 {{dataItem[column.property] | userDateTime: dateTimeFormat }}
                             </ng-template>
 
-                            <!--
-                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
-                                {{dataItem[column.property] | date: userPreferenceService.getUserDateFormat()}}
-                            </ng-template>
-                            -->
-
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">

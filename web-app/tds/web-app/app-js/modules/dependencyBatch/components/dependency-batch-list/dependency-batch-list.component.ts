@@ -36,8 +36,8 @@ export class DependencyBatchListComponent {
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
-		field: 'dateCreated',
-		dir: 'desc'
+		dir: 'desc',
+		field: 'dateCreated'
 	}];
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
@@ -76,7 +76,6 @@ export class DependencyBatchListComponent {
 			.subscribe(
 				prefMap => {
 					this.userTimeZone = prefMap[PREFERENCES_LIST.CURR_TZ];
-					// this.userTimeZone = '-0800';
 					this.dateTimeFormat = DateUtils.translateDateTimeFormat(prefMap[PREFERENCES_LIST.CURRENT_DATE_FORMAT]);
 				}
 			);
@@ -93,7 +92,7 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
-	 * Make the entire header clickable on Grid
+	 * Used in template to forward click events from the element to the target parentNode
 	 * @param event: any
 	 */
 	public onClickTemplate(event: any): void {
