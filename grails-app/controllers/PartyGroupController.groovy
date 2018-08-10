@@ -70,7 +70,7 @@ class PartyGroupController implements ControllerMethods {
 				SELECT party_id_to_id FROM party_relationship
 				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
 				AND role_type_code_to_id='CLIENT' AND party_id_from_id=$whom.company.id
-				)
+				) OR party_group_id = $whom.company.id
 			GROUP BY party_group_id ORDER BY
 		""")
 		query.append( " $sortIndex $sortOrder ) as companies")
