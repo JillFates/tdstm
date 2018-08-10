@@ -42,7 +42,7 @@
 				</tr>
 				<tr title="Highlights assets by Tag" class="optionRow">
 					<td colspan="3">
-						<tm-asset-tag-selector id="tmHighlighttAssetSelector" hide-operator="'true'" max-selection="1" asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context"on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
+						<tm-asset-tag-selector id="tmHighlighttAssetSelector" asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context" on-change="onDependencyAnalyzerTagSelectionChange()"></tm-asset-tag-selector>
 					</td>
 				</tr>
 			</table>

@@ -267,6 +267,14 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		return result;
 	}
 
+	/**
+	 * The following method is being injected in the current main controller scope, later is being used in the tag selector
+	 * by passing the reference from a re-compiled DOM, this make possible to communicate angular1 with a native JS call...
+	 */
+	scope.onDependencyAnalyzerTagSelectionChange = function () {
+		GraphUtil.performSearch();
+	};
+
 };
 
 tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$modal', '$window', 'utils', 'commentUtils'];

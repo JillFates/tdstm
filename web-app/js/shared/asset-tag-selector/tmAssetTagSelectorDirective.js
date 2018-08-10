@@ -2,7 +2,7 @@ var currentAngularModule = tds.cookbook || tds.comments;
 currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" disabled="{{disabledOperator}}" />
+						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked"  />
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -23,34 +23,30 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			preAssetSelector: '=',
 			preSelectedOperator: '=',
 			disabledOperator: '=',
-			hideOperator: '=',
-			maxSelection: '=',
 			onChange: '&'
 		},
 		controller: function ($scope) {
 			// Init the Load
 			// Get All Tags
 			getAssetTags();
-			// Get Tags for DA
 
 			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
 				$(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
 			}
 
-			if (!$scope.hideOperator) {
-				$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-					onLabel: "ALL",
-					offLabel: "ANY",
-					change: function (e) {
-						$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
-						$scope.onChange();
-					}
-				});
+			if($scope.disabledOperator) {
+				$('.asset-tag-selector-operator-switch').attr("disabled", true);
 			}
 
-			if($scope.hideOperator) {
-				$('.asset-tag-selector-operator-switch').hide();
-			}
+			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+				onLabel: "ALL",
+				offLabel: "ANY",
+				change: function (e) {
+					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+					$scope.onChange();
+				}
+			});
+
 
 			$scope.assetSelector = {
 				tag: [],
@@ -64,15 +60,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				itemTemplate: $("#asset-tag-selector-item").html(),
 				tagTemplate: $("#asset-tag-selector-tag").html(),
 				change: selectTags,
-				open: function(e){
-					if (!$scope.maxSelection || $scope.maxSelection > 1) {
-						selectTags();
-					} else {
-						if($scope.assetSelector.tag.length >= 1) {
-							e.preventDefault();
-						}
-					}
-				},
+				open: selectTags,
 			});
 
 			($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
