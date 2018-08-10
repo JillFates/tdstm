@@ -1,5 +1,6 @@
 import {INTERVAL} from '../model/constants';
-import * as moment from 'moment';
+
+import * as moment from 'moment-timezone';
 
 export class DateUtils {
 
@@ -16,42 +17,15 @@ export class DateUtils {
 	 * to show datetimes in timezones differing from their local timezone set on their computer so
 	 * using actual dates computed correctly can get quite outrageous.
 	 *
-	 * @param prefDateTimeFormat - the user's preferred datetime format
-	 * @param dateTimeValue - the value to be converted
+	 * @param userTimeZone the user's timezone to format the value as
+	 * @param iso8601Value a datetime value in the ISO 8601 format (yyyy-mm-DDThh:MM:ssZ)
 	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
 	 */
-	public static formatUserDateTime(prefDateTimeFormat: String, dateTimeValue: String) {
-		if (dateTimeValue === undefined) {
+	public static formatUserDateTime(userTimeZone: string, iso8601Value: string) {
+		if (iso8601Value === undefined) {
 			return '';
 		}
-		return dateTimeValue.replace('Z', '').replace('T',' ');
-		// const isoPattern = /^(\d{4})-(\d{2})-(\d{2}).(\d{2}):(\d{2}):(\d{2})Z$/;
-		// let dtParts = dateTimeValue.match(isoPattern);
-		// if (dtParts.length !== 7) {
-		// 	return '';
-		// }
-
-		// let result = '';
-		// // if (prefDateTimeFormat.startsWith(this.DEFAULT_FORMAT_DATE)) {
-		// // 	result = dtParts[3] + '/' + dtParts[2] + '/' + dtParts[1];
-		// // } else {
-		// // 	result = dtParts[2] + '/' + dtParts[3] + '/' + dtParts[1];
-		// // }
-
-		// result = dtParts[1] + '/' + dtParts[2] + '/' + dtParts[3];
-
-		// let amPm = 'AM';
-		// let hour = parseInt( dtParts[4], 0);
-		// if (hour > 11) {
-		// 	amPm = 'PM';
-		// 	if (hour > 12) {
-		// 		hour = hour - 12;
-		// 		dtParts[4] = hour.toString();
-		// 	}
-		// }
-
-		// // Assemble with the time component and return the sucker
-		// return result + ' ' + dtParts[4] + ':' + dtParts[5] + amPm;
+		return moment.tz(iso8601Value, userTimeZone).format('YYYY-MM-DD HH:mm:ss');
 	}
 
 	/**

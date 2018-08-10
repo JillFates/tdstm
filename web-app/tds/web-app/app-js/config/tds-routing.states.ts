@@ -6,7 +6,7 @@ import { TDSAppComponent } from './tds-app.component';
 import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
 import { PermissionService } from '../shared/services/permission.service';
-import { PreferenceService } from '../shared/services/preference.service';
+import { PreferenceService, PREFERENCES_LIST} from '../shared/services/preference.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { SharedStates } from '../shared/shared-routing.states';
@@ -36,7 +36,11 @@ export const tdsRoot = {
 			token: 'preferences',
 			policy: { async: 'RXWAIT', when: 'EAGER' },
 			deps: [PreferenceService],
-			resolveFn: (service: PreferenceService) => service.getPreference('CURR_DT_FORMAT')
+
+			resolveFn: (service: PreferenceService) => service.getPreferences(
+				PREFERENCES_LIST.CURR_TZ,
+				PREFERENCES_LIST.CURRENT_DATE_FORMAT
+			)
 		}
 	]
 };

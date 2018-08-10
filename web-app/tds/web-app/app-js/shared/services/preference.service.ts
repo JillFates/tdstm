@@ -61,8 +61,8 @@ export class PreferenceService {
 	 * Used to retrieve the user's preferred TimeZone that which is used to display date times
 	 * based on user's preference in TM instead of the TimeZone of their computer.
 	 */
-	getUserTimeZone(): Observable<string> {
-		return this.getPreference(PREFERENCES_LIST.CURR_TZ);
+	getUserTimeZone(): string {
+		return this.preferences[PREFERENCES_LIST.CURR_TZ];
 	}
 
 	/**
