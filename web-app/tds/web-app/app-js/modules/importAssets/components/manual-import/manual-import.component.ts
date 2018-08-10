@@ -67,7 +67,7 @@ export class ManualImportComponent implements OnInit {
 		});
 	}
 
-    /**
+	/**
 	 * Fetch button clicked event.
 	 * Calls the process of fetch.
 	 */

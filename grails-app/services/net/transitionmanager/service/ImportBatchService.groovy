@@ -60,11 +60,6 @@ class ImportBatchService implements ServiceMethods {
 		}
 
 		// Map that will contain the result that will be returned.
-
-		// These will be used to adjust the datetime columns to the user's timezone so the UI doesn't have to convert
-		String userTzId = userPreferenceService.timeZone
-    	DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
-
 		Map results = [:]
 		// Iterate over the result of the query.
 		for (batchInfo in batchStatusList) {
@@ -77,12 +72,6 @@ class ImportBatchService implements ServiceMethods {
 			} else {
 				batchMap = batch.toMap()
 				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
-
-				// Adjust the Datetimes to the User's Timezone appropriately
-				// batchMap.dateCreated = TimeUtil.adjustDateFromGMTToTZ(batchMap.dateCreated, userTzId)
-				// if (batchMap.lastUpdated) {
-				// 	batchMap.lastUpdated = TimeUtil.adjustDateFromGMTToTZ(batchMap.lastUpdated, userTzId)
-				// }
 
 				results[batch.id] = batchMap
 			}

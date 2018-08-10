@@ -37,8 +37,10 @@ export const tdsRoot = {
 			policy: { async: 'RXWAIT', when: 'EAGER' },
 			deps: [PreferenceService],
 
-			resolveFn: (service: PreferenceService) => service.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			// resolveFn: (service: PreferenceService) => service.getPreferences('CURR_DT_FORMAT', 'CURR_TZ')
+			resolveFn: (service: PreferenceService) => service.getPreferences(
+				PREFERENCES_LIST.CURR_TZ,
+				PREFERENCES_LIST.CURRENT_DATE_FORMAT
+			)
 		}
 	]
 };

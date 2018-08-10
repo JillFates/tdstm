@@ -19,7 +19,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
-import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -28,7 +27,6 @@ import { DateUtils } from '../../../../shared/utils/date.utils';
 })
 export class DependencyBatchListComponent {
 
-	public dateTimeFormat: string;
 	public userTimeZone: string;
 
 	protected BatchStatus = BatchStatus;
@@ -70,10 +68,8 @@ export class DependencyBatchListComponent {
 	 * On Page Load.
 	 */
 	private onLoad(): void {
-
 		// Fetch the user preferences for their TimeZone and DateFormat
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 
 		this.columnsModel = new DependencyBatchColumnsModel();
 		if ( !this.canRunActions() ) {
