@@ -168,7 +168,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidRootNode (String rootNode) {
-        new ETLProcessorException("Unable to find JSON rootNode with path '${rootNode}'")
+        new ETLProcessorException("Data was not found in JSON at rootNode '$rootNode'")
     }
 
     static ETLProcessorException invalidETLVariableName (String variableName) {
