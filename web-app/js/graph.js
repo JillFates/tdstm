@@ -1105,6 +1105,7 @@ var GraphUtil = (function ($) {
 		if (personFilter != '') {
 			// get the list of assets to highlight from the server
 			$.ajax({
+				method: 'POST',
 				url: tdsCommon.createAppURL('/ws/depAnalyzer/filteredAssetList'),
 				// asynchronous: true,
 				data: {'nameFilter':nameFilter, 'isRegex':isRegex, 'personId':personFilter},
