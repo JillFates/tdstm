@@ -1,4 +1,5 @@
-tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
+var currentAngularModule = tds.cookbook || tds.comments;
+currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
 						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" disabled="{{disabledOperator}}" />
@@ -22,24 +23,34 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			preAssetSelector: '=',
 			preSelectedOperator: '=',
 			disabledOperator: '=',
+			hideOperator: '=',
+			maxSelection: '=',
 			onChange: '&'
 		},
 		controller: function ($scope) {
 			// Init the Load
+			// Get All Tags
 			getAssetTags();
+			// Get Tags for DA
 
 			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
 				$(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
 			}
 
-			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-				onLabel: "ALL",
-				offLabel: "ANY",
-				change: function (e) {
-					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
-					$scope.onChange();
-				}
-			});
+			if (!$scope.hideOperator) {
+				$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+					onLabel: "ALL",
+					offLabel: "ANY",
+					change: function (e) {
+						$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+						$scope.onChange();
+					}
+				});
+			}
+
+			if($scope.hideOperator) {
+				$('.asset-tag-selector-operator-switch').hide();
+			}
 
 			$scope.assetSelector = {
 				tag: [],
@@ -53,7 +64,15 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				itemTemplate: $("#asset-tag-selector-item").html(),
 				tagTemplate: $("#asset-tag-selector-tag").html(),
 				change: selectTags,
-				open: selectTags,
+				open: function(e){
+					if (!$scope.maxSelection || $scope.maxSelection > 1) {
+						selectTags();
+					} else {
+						if($scope.assetSelector.tag.length >= 1) {
+							e.preventDefault();
+						}
+					}
+				},
 			});
 
 			($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
@@ -137,4 +156,4 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	};
 }
 
-tds.cookbook.module.directive('tmAssetTagSelector', ['$http', 'utils', tds.cookbook.directive.TmAssetTagSelectorDirective]);
+currentAngularModule.module.directive('tmAssetTagSelector', ['$http', 'utils', currentAngularModule.directive.TmAssetTagSelectorDirective]);
