@@ -1,11 +1,13 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
+import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import net.transitionmanager.command.DataScriptNameValidationCommand
@@ -332,8 +334,11 @@ class DataScriptService implements ServiceMethods{
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
-
+				case getl.exception.ExceptionGETL:
+					message = ex.message
+					break
 				default:
+					log.error ExceptionUtil.stackTraceToString(ex)
 					message = ex.message
 			}
 		}
@@ -375,7 +380,13 @@ class DataScriptService implements ServiceMethods{
 			connection: jsonCon,
 			rootNode: rootNode ?: '.',
 			fileName: jsonFile)
+
 		DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
+
+		// If there are no fields it means that none was found in the rootNode location
+		if (dataSetFacade.fields().isEmpty()) {
+			throw new ExceptionGETL("No data found at specified rootNode '${rootNode}'")
+		}
 
 		return [
 			config: dataSetFacade.fields().collect {

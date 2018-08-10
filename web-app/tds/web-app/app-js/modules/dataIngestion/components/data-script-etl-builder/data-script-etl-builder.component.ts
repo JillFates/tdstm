@@ -21,6 +21,7 @@ import {ImportAssetsService} from '../../../importAssets/service/import-assets.s
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';
+import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -101,6 +102,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	onEscKeyPressed(): void {
 		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Used to control if the Refresh Sample Data button appears on the page
+	 */
+	public showSampleDataRefresh(): boolean  {
+		return ( ! isNullOrEmptyString(this.dataScriptModel.sampleFilename));
 	}
 
 	/**
@@ -284,8 +292,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * @returns {string}
 	 */
 	private extractRootNode(): string {
-		let match = this.script.match(/\s*rootNode\s*(?:"|')(.*)(?:"|').*/);
-		let result =  (match !== null)  ? match[1] : '';
+		let match = this.script.match(/^\s*rootNode\s*(?:"|')(.*)(?:"|').*/);
+		let result = '';
+		if (match !== null && match[1] !== null) {
+			result = match[1];
+		}
 		return result;
 	}
 
