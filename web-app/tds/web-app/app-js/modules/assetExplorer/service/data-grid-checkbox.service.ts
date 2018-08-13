@@ -1,12 +1,16 @@
-import {CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.model';
+import { Injectable } from '@angular/core';
+import {CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
+import { ViewModel } from '../model/view.model';
+import { AssetExplorerService } from './asset-explorer.service';
 
-export class DataGridCheckboxHelper {
+@Injectable()
+export class DataGridCheckboxService {
 	private currentState: CheckboxStates;
 	private pageSize: number = null;
 	bulkItems: any;
 	private bulkSelectedItems: number[];
 
-	constructor() {
+	constructor(private assetExplorerService: AssetExplorerService) {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
 		this.bulkSelectedItems = [];
@@ -93,5 +97,28 @@ export class DataGridCheckboxHelper {
 
 	getBulkSelectedItems(): number[] {
 		return this.bulkSelectedItems;
+	}
+
+	getBulkAssetIds(model: ViewModel, justPlanning: boolean): void {
+		let params = {
+				offset: 0,
+				limit: 0,
+				sortDomain: model.schema.sort.domain,
+				sortProperty: model.schema.sort.property,
+				sortOrder: model.schema.sort.order,
+				filters: {
+					domains: model.schema.domains,
+					columns: model.schema.columns
+				}
+		};
+
+		if (justPlanning) {
+			params['justPlanning'] = true;
+		}
+
+		this.assetExplorerService.query(model.id, params).subscribe(result => {
+			console.log('GETTING THE RESULTS');
+			console.log(result);
+		}, err => console.log(err));
 	}
 }

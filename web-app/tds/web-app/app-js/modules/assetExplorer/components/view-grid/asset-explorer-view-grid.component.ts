@@ -21,8 +21,8 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
-import {CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
-import {DataGridCheckboxHelper} from '../../../../shared/utils/data-grid-checkbox.helper';
+import {CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {DataGridCheckboxService} from '../../service/data-grid-checkbox.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -65,11 +65,11 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
-	private checkboxHelper: DataGridCheckboxHelper = new DataGridCheckboxHelper();
 	public overrideCheckboxState: CheckboxStates;
 
 	constructor(
 		private preferenceService: PreferenceService,
+		private dataGridCheckboxService: DataGridCheckboxService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
@@ -77,7 +77,7 @@ export class AssetExplorerViewGridComponent {
 		this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-				this.checkboxHelper.setPageSize(this.state.take);
+				this.dataGridCheckboxService.setPageSize(this.state.take);
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
@@ -187,14 +187,14 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 	getAffectedCounter(): number {
-		return (this.checkboxHelper.getCurrentState() === CheckboxStates.indeterminate) ? this.gridData.total : this.checkboxHelper.getBulkSelectedItems().length;
+		return (this.dataGridCheckboxService.getCurrentState() === CheckboxStates.indeterminate) ? this.gridData.total : this.dataGridCheckboxService.getBulkSelectedItems().length;
 	}
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.overrideCheckboxState = this.checkboxHelper.getOverrideState(true);
+		this.overrideCheckboxState = this.dataGridCheckboxService.getOverrideState(true);
 
-		this.checkboxHelper.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+		this.dataGridCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
 			data: data.assets,
@@ -280,17 +280,17 @@ export class AssetExplorerViewGridComponent {
 		console.log('Asset selector has changes');
 		console.log(checkboxState);
 		this.overrideCheckboxState = null;
-		this.checkboxHelper.changeState(checkboxState);
+		this.dataGridCheckboxService.changeState(checkboxState);
 	}
 
 	setSelectedItem(id: string, checked: boolean): void {
-		this.checkboxHelper.selectBulkItem(id, checked);
-		this.overrideCheckboxState = this.checkboxHelper.getOverrideState();
+		this.dataGridCheckboxService.selectBulkItem(id, checked);
+		this.overrideCheckboxState = this.dataGridCheckboxService.getOverrideState();
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.checkboxHelper.clearSelectedItems();
+			this.dataGridCheckboxService.clearSelectedItems();
 			this.onReload();
 		}
 	}
