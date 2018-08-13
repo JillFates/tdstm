@@ -78,7 +78,7 @@ class DataScriptService implements ServiceMethods{
             description = dataScriptJson.description
             target = dataScriptJson.target
             mode = DataScriptMode.forLabel(dataScriptJson.mode)
-            etlSourceCode = dataScriptJson.etlSourceCode
+            etlSourceCode = dataScriptJson.etlSourceCode?:dataScript.etlSourceCode
             provider = providerInstance
             // if it's an existing instance, update the lastModifiedBy field
             if (id) {
