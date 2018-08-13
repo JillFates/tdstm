@@ -129,7 +129,7 @@
                                                'fa-thumbs-down red': importResult?.status === 'error'}"></i>
                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
                            </button>
-                           <a href="../dataTransferBatch/list" class="control-label col-sm-{{uiConfig.urlColSize}}">
+                           <a uiSref="tds.dependencybatch_list" class="control-label col-sm-{{uiConfig.urlColSize}}">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
                            </a>
                         </div>

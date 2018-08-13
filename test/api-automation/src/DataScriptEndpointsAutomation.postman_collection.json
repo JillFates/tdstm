@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "797f397b-6d3f-4b57-b440-bb12f74f429e",
+		"_postman_id": "e0cdbcda-a9d1-46a4-93c3-c5ccbda30719",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -76,13 +76,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "650eabd7-15d8-4522-b18f-d938035d1eef",
+						"id": "8e560fa2-dc69-4d21-9aba-f0384411fe0c",
 						"type": "text/javascript",
 						"exec": [
 							"var jsonObject = JSON.parse(responseBody);",
 							"var firstID = jsonObject.data[0].id; ",
 							"",
-							"",
+							"//sets variable value from result.",
 							"pm.environment.set(\"datascriptID\", firstID);",
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -126,16 +126,26 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dd911eb5-69ef-4114-9300-c9690a07c508",
+						"id": "2ac477f4-a029-4035-9906-73d5b1fe3d2b",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"    ",
 							"});",
 							"",
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});"
+							"    ",
+							"    ",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"var provID = jsonData.data.dataScript.provider.id; ",
+							"pm.environment.set(\"firstProvider\", provID);",
+							"",
+							"",
+							""
 						]
 					}
 				}
@@ -328,7 +338,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "881e42ca-7732-4a8d-bd02-1f7a4c12b3f0",
+						"id": "db52f2ff-5827-4226-baf2-b8c7d585a21f",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -341,7 +351,13 @@
 							"",
 							"pm.test(\"Provider Deleted\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"deleted\");",
-							"});"
+							"});",
+							"",
+							"",
+							"",
+							"//this code clears a variable that is to live within this cilection only",
+							"pm.environment.unset(\"datascriptID\");",
+							"pm.environment.unset(\"firstProvider\");"
 						]
 					}
 				}
@@ -368,6 +384,37 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "df8bc013-bd8e-4e8c-b397-9f4f6772ef30",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "83ebfea6-6bbe-4664-b01e-f26cb1326159",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "24abf044-ac3e-43a7-a1d1-bad880fc0e05",
+			"key": "uniqueDatascriptName",
+			"value": "UniqueName",
+			"type": "string",
+			"description": ""
 		}
 	]
 }

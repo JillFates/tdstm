@@ -126,16 +126,16 @@
 
                             <!-- Header Template -->
                             <ng-template kendoGridHeaderTemplate>
-                                <label>{{column.label}}</label>
+                                <div class="sortable-column" (click)="onClickTemplate($event)">
+                                    <label>{{column.label}}</label>
+                                </div>
                             </ng-template>
 
                             <!-- Cell Templates -->
-                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'lastUpdated'" let-dataItem>
-                                {{dataItem[column.property] | date: 'MM/dd/yyyy hh:mm a'}}
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'datetime'" let-dataItem>
+                                {{dataItem[column.property] | userDateTime: userTimeZone }}
                             </ng-template>
-                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
-                                {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
-                            </ng-template>
+
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
@@ -172,9 +172,9 @@
                                     </div>
                                 </ng-template>
                                 <ng-template #statusTemplate>
-                                     <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text">
+                                    <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text">
                                         {{ dataItem.status.label }}
-                                     </div>
+                                    </div>
                                 </ng-template>
                             </ng-template>
 

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8797f77d-7119-4555-bdae-08f2f35058e7",
+		"_postman_id": "ff1a49be-7cfb-4158-8ab8-f447472f4db5",
 		"name": "Tags",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -467,7 +467,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ee8384dd-0d5a-46e6-90a9-928a2a9db140",
+						"id": "f59c1c68-da14-4637-8b15-4af4348a7d97",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -480,7 +480,10 @@
 							"    ",
 							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
-							"});"
+							"});",
+							"",
+							"//cleanup code",
+							"pm.globals.unset(\"tag_id\");"
 						]
 					}
 				}

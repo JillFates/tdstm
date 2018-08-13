@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8e4d3f0c-fac0-433d-a561-7d4b29ee54ff",
+		"_postman_id": "ddf8e587-c2ea-4252-9dd3-8409e0db01a8",
 		"name": "DataBaseEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -97,7 +97,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/database/listJson",
 					"host": [
@@ -171,7 +174,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d285ff6e-cb09-4968-a631-4a99563aed2d",
+						"id": "4a0b9ec7-c9b9-43e4-a67c-6679cca45396",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -180,7 +183,11 @@
 							"",
 							"pm.test(\"Nothing found message is displayed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Oops! Nothing Found.\");",
-							"});"
+							"});",
+							"",
+							"",
+							"//This code cleans up the global variables created through code that should live only in this collection ",
+							"pm.globals.unset(\"dataBaseID\");"
 						]
 					}
 				}
