@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+
 import {CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
-import { ViewModel } from '../model/view.model';
 import { AssetExplorerService } from './asset-explorer.service';
+import { ViewSpec } from '../model/view-spec.model';
 
 @Injectable()
 export class DataGridCheckboxService {
@@ -95,20 +97,32 @@ export class DataGridCheckboxService {
 			.map(value => parseInt(value, 10));
 	}
 
-	getBulkSelectedItems(): number[] {
-		return this.bulkSelectedItems;
+	getBulkSelectedItems(id: number, model: ViewSpec, justPlanning: boolean): Promise<number[]> {
+		return new Promise((resolve, reject) => {
+			if (this.getCurrentState() === CheckboxStates.indeterminate) {
+				return this.getBulkAssetIds(id, model, justPlanning)
+					.then((result: any) => {
+						const assets = result && result.assets || [];
+						this.bulkSelectedItems = assets.map((asset) => asset.common_id)
+						return resolve(this.bulkSelectedItems);
+					})
+					.catch((err) => reject(err))
+			}
+			return resolve(this.bulkSelectedItems);
+		});
 	}
 
-	getBulkAssetIds(model: ViewModel, justPlanning: boolean): void {
+	getBulkAssetIds(id: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
 		let params = {
+				forExport: true,
 				offset: 0,
 				limit: 0,
-				sortDomain: model.schema.sort.domain,
-				sortProperty: model.schema.sort.property,
-				sortOrder: model.schema.sort.order,
+				sortDomain: model.sort.domain,
+				sortProperty: model.sort.property,
+				sortOrder: model.sort.order,
 				filters: {
-					domains: model.schema.domains,
-					columns: model.schema.columns
+					domains: model.domains,
+					columns: model.columns
 				}
 		};
 
@@ -116,9 +130,10 @@ export class DataGridCheckboxService {
 			params['justPlanning'] = true;
 		}
 
-		this.assetExplorerService.query(model.id, params).subscribe(result => {
-			console.log('GETTING THE RESULTS');
-			console.log(result);
-		}, err => console.log(err));
+		return new Promise((resolve, reject) => {
+			this.assetExplorerService.query(id, params)
+				.subscribe(result => resolve(result), err => reject(err));
+		});
+
 	}
 }

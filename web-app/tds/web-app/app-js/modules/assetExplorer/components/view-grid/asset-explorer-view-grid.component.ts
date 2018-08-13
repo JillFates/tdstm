@@ -36,7 +36,6 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent {
-
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
@@ -66,6 +65,7 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public overrideCheckboxState: CheckboxStates;
+	public bulkItems: number[] = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -185,9 +185,6 @@ export class AssetExplorerViewGridComponent {
 		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
-	}
-	getAffectedCounter(): number {
-		return (this.dataGridCheckboxService.getCurrentState() === CheckboxStates.indeterminate) ? this.gridData.total : this.dataGridCheckboxService.getBulkSelectedItems().length;
 	}
 
 	apply(data: any): void {
@@ -350,5 +347,13 @@ export class AssetExplorerViewGridComponent {
 		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
 		column.filter = selectedTagsFilter;
 		this.onFilter();
+	}
+
+	onClickBulkButton(): void {
+		this.dataGridCheckboxService.getBulkSelectedItems(1, this.model, this.justPlanning)
+			.then((results: number[]) => {
+				this.bulkItems = [...results];
+			})
+			.catch ((err) => console.log('Error:', err))
 	}
 }
