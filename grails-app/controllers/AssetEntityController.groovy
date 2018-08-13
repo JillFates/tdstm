@@ -1810,11 +1810,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		model.orderBy = orderBy
 		model.sortBy = sortOn
 		model.haveAssetEditPerm = securityService.hasPermission(Permission.AssetEdit)
-		model.tags = TagAsset.where {
-			asset.id in assetDependentlist*.assetId
-		}.projections {
-			property 'tag'
-		}.list()*.toMap() as JSON
+		if (assetDependentlist) {
+            model.tags = TagAsset.where {
+                asset.id in assetDependentlist*.assetId
+            }.projections {
+                property 'tag'
+            }.list()*.toMap() as JSON
+        }
 
 		// Switch on the desired entity type to be shown, and render the page for that type
 		switch(params.entity) {
