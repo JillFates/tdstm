@@ -59,7 +59,10 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				filter: "startswith",
 				itemTemplate: $("#asset-tag-selector-item").html(),
 				tagTemplate: $("#asset-tag-selector-tag").html(),
-				change: selectTags,
+				change: function() {
+					selectTags();
+					$scope.onChange();
+				},
 				open: selectTags,
 			});
 
@@ -137,8 +140,6 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
 				($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
-
-				$scope.onChange();
 			}
 		}
 	};
