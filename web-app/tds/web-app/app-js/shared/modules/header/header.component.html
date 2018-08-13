@@ -5,7 +5,7 @@
         <small>{{pageMetaData.instruction | translate}}</small>
     </h1>
     <ol class="breadcrumb">
-        <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}">
+        <li *ngFor="let menu of pageMetaData.menu; let last = last;" [ngClass]="{'active' : last}" >
             <a *ngIf="!last" [ngClass]="{'font-weight-bold':menu.navigateTo }" [uiSref]="menu.navigateTo">{{(menu.text || menu) | translate}}</a>
             <ng-container *ngIf="last">
                 {{ menu | translate }}

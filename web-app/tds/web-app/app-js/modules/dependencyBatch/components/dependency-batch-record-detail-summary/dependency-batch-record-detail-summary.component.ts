@@ -1,7 +1,8 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ImportBatchModel} from '../../model/import-batch.model';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'dependency-batch-record-detail-summary',
@@ -13,9 +14,18 @@ export class DependencyBatchRecordDetailSummaryComponent {
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 
 	protected summaryCollapsed = false;
+	public userTimeZone: string;
 
 	constructor(private userPreferenceService: PreferenceService) {
-		// Silence is golden
+		this.onLoad();
+	}
+
+	/**
+	 * On Page Load
+	 */
+	private onLoad(): void {
+		// Fetch the user preferences for their TimeZone
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 	}
 
 	/**

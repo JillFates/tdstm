@@ -1542,7 +1542,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 
 		def assetType = assetTypes.collect{ AssetOptions option ->
-			[type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
+			[id: option.id, type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
 		}
 
 		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
