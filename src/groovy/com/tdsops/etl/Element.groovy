@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
  */
 class Element implements RangeChecker {
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
-	public static final String DECIMAL_FORMAT = "###,##0.00"
+	public static final String DECIMAL_FORMAT = "#0.00"
 
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
@@ -160,11 +160,30 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Validation for incorrect methods on script content
+	 * Validation for incorrect methods on script content:
+	 * First we try to delegate the method call to the wrapped value
 	 * @param methodName
 	 * @param args
 	 */
 	def methodMissing(String methodName, args) {
+		// try to delegate the method to the value's class
+		if (value != null && !(value instanceof Element) ) {
+
+			def params = []
+			params.addAll(args)
+
+			try {
+				if (params) {
+					value = value."${methodName}"(params)
+				} else {
+					value = value."${methodName}"()
+				}
+
+				return this
+
+			} catch (MissingMethodException e) {}
+		}
+
 		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
 	}
@@ -268,6 +287,32 @@ class Element implements RangeChecker {
 		} else {
 			value = defaultValue
 		}
+		return this
+	}
+
+	/**
+	 * Abbreviates a String using '...' as ther replacement marker.
+	 * This will turn "Now is the time for all good men" into "Now is the time for...".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element ellipsis(int size) {
+		try {
+			value = StringUtils.abbreviate(this.toString(), size)
+		} catch (e) {
+			addToErrors("ellipsis function error (${value} : ${value.class}) : ${e.message}")
+		}
+		return this
+	}
+
+	/**
+	 * Truncates a String.
+	 * This will turn "Now is the time for all good men" into "Now is the time for".
+	 * @param size max size of the returned string
+	 * @return
+	 */
+	Element truncate(int size) {
+		value = this.toString()?.take(size)
 		return this
 	}
 
@@ -784,10 +829,10 @@ class Element implements RangeChecker {
 		if ( value != null ) {
 			switch (value.class) {
 				case Date:
-					retVal = value.format(DATETIME_FORMAT)
+					retVal = ((Date)value).format(DATETIME_FORMAT)
 					break
 
-				case [Float, Double, BigDecimal]:
+				case Number:
 					DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT)
 					retVal = df.format(value)
 					break

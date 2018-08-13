@@ -17,13 +17,13 @@ class BulkAssetChangeService implements ServiceMethods {
 	/**
 	 * A list of valid field names
 	 */
-	static final List<String> fields = ['tags']
+	static final List<String> fields = ['tagAssets']
 
 	/**
 	 * A map of field names to actions, and to the methods that support them.
 	 */
 	static final Map actions = [
-		tags: [
+		tagAssets: [
 			add    : 'bulkAdd',
 			clear  : 'bulkClear',
 			replace: 'bulkReplace',
@@ -46,7 +46,7 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Maps field names to services.
 		Map fieldToService = [
-			tags: tagAssetService
+			tagAssets: tagAssetService
 		]
 
 		if (bulkChange.allAssets) {

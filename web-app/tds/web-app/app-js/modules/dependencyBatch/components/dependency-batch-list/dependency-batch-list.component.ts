@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
-import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
+import {CellClickEvent, PageChangeEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
@@ -14,7 +14,7 @@ import {
 } from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
@@ -69,10 +69,12 @@ export class DependencyBatchListComponent {
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
 		}
-		this.getUnarchivedBatches().then( batchList => {
-			this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
-			this.setRunningLoop();
-			this.setQueuedLoop();
+		this.userPreferenceService.getImportBatchListSizePreference().subscribe( (pageSize: number) => {
+			this.getUnarchivedBatches().then( batchList => {
+				this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig, pageSize);
+				this.setRunningLoop();
+				this.setQueuedLoop();
+			});
 		});
 	}
 
@@ -552,4 +554,14 @@ export class DependencyBatchListComponent {
 		this.queuedBatches = [];
 	}
 
+	/**
+	 * On grid pagination change event.
+	 * @param {PageChangeEvent} $event
+	 */
+	protected onPageChange($event: PageChangeEvent): void {
+		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE, $event.take.toString()).subscribe( result => {
+			// nothing to do here ..
+		})
+		this.dataGridOperationsHelper.pageChange($event)
+	}
 }

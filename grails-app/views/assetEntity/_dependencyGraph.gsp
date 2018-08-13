@@ -67,7 +67,7 @@ $(document).ready(function() {
 		dataSource: {
 			transport: {
 				read: {
-					url: "${createLink(mapping: 'wsDepAnalyzer', action: 'peopleAssociatedToDepGroup')}",
+					url: "${createLink(mapping: 'wsDepAnalyzer')}",
 					dataType: "json",
 					data: {
 						depGroup: '${depGroup}'

@@ -9,7 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
-import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -34,8 +34,8 @@ export class ProviderListComponent implements OnInit {
 		}
 	};
 	public skip = 0;
-	public pageSize = MAX_DEFAULT;
-	public defaultPageOptions = MAX_OPTIONS;
+	public pageSize = GRID_DEFAULT_PAGE_SIZE;
+	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public providerColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;

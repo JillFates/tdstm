@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Observable';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
-	SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE,
+	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
 	DIALOG_SIZE
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
@@ -50,8 +50,8 @@ export class AssetExplorerViewGridComponent {
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
-	private maxDefault = MAX_DEFAULT;
-	private maxOptions = MAX_OPTIONS;
+	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
+	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
@@ -199,6 +199,7 @@ export class AssetExplorerViewGridComponent {
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+		this.setSelectedItems();
 	}
 
 	clear(): void {
@@ -329,8 +330,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onChangeJustPlanning(isChecked = false): void {
-		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
-			.subscribe(this.onReload.bind(this));
+		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString()).subscribe(() => {
+			this.onReload();
+		});
 	}
 
 	/**

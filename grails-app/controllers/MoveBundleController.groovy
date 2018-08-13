@@ -18,6 +18,7 @@ import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.DependencyConsoleCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
@@ -908,32 +909,42 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
-	 * @param bundle  Move bundle id to filter for bundle
-	 * @param assignedGroup  Whether it is assigned
-	 * @param subsection  Tab name to show on the Dependency Analyzer (optional)
-	 * @param groupId  The group Id to show selected on the Dependency Analyzer (optional)
-	 * @param assetName  The asset to show selected on the Dependency Analyzer (optional)
+	 * @param console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
-	def dependencyConsole(Long bundle, String assinedGroup, String subsection, Long groupId, String assetName) {
+	def dependencyConsole() {
+		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
+		validateCommandObject(console)
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
 		// Check for correct URL params
-		if ( subsection || groupId) { // is the drill-in URL
-			if (!(subsection && groupId)) { // If any exists, then both should be present in the URL
+		if ( console.subsection || console.groupId) { // is the drill-in URL
+			if (!(console.subsection && console.groupId)) { // If any exists, then both should be present in the URL
 				throw new InvalidParamException("Subsection and Group Id params are both required.")
 			}
-			String subsec = subsection as String // Check for valid tab name
+			String subsec = console.subsection as String // Check for valid tab name
 			if (!(subsec.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
 				throw new InvalidParamException("Invalid Subsection name: ${subsec}")
 			}
 		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
-			assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, bundle, assinedGroup, null, false, subsection, groupId, assetName)
+			console.assignedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+
+		def map = moveBundleService.dependencyConsoleMap(
+			project,
+			console.bundle,
+			console.tagIds,
+			console.tagMatch,
+			console.assignedGroup,
+			null,
+			false,
+			console.subsection,
+			console.groupId,
+			console.assetName
+		)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map
@@ -950,7 +961,7 @@ class MoveBundleController implements ControllerMethods {
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference(PREF.ASSIGNED_GROUP)?: "1"
 		render(template: 'dependencyBundleDetails',
-		       model: moveBundleService.dependencyConsoleMap(project, params.bundle, isAssigned, null))
+		       model: moveBundleService.dependencyConsoleMap(project, params.bundle, null, null, isAssigned, null))
 	}
 
 	@HasPermission(Permission.DepAnalyzerGenerate)

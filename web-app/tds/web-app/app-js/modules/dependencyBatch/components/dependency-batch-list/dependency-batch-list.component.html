@@ -18,7 +18,7 @@
                         [pageSize]="dataGridOperationsHelper.state.take"
                         [skip]="dataGridOperationsHelper.state.skip"
                         [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
-                        (pageChange)="dataGridOperationsHelper.pageChange($event)"
+                        (pageChange)="onPageChange($event)"
                         [resizable]="true"
                         (sortChange)="dataGridOperationsHelper.sortChange($event)"
                         [selectable]="selectableSettings"
@@ -130,6 +130,9 @@
                             </ng-template>
 
                             <!-- Cell Templates -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'lastUpdated'" let-dataItem>
+                                {{dataItem[column.property] | date: 'MM/dd/yyyy hh:mm a'}}
+                            </ng-template>
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
                                 {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                             </ng-template>
