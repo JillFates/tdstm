@@ -13,12 +13,12 @@
 			</div>
 			<div class="col-sm-8">
 				<g:form name="bundleForm" action="dependencyConsole">
-					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
+					<input type="hidden" name="assignedGroup" id="assignedGroup" value="${isAssigned}" />
 					Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
 					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
 					<span class="checkboxContainer" style="margin-left: 10px;">
-						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
-						<label for="assinedGroupCB" class="pointer" style="margin-left: 3px;">Show ONLY Work In Progress</label>
+						<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
+						<label for="assignedGroupCB" class="pointer" style="margin-left: 3px;">Show ONLY Work In Progress</label>
 					</span>
 					<span style="margin-left: 1em">
 						<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
@@ -49,8 +49,7 @@
 
 					<g:each in="${dependencyConsoleList}" var="asset" status="depIndex">
 						<g:if test="${depIndex == 0}">
-							<td id="span_${asset.dependencyBundle}" class="pointer" 
-								
+							<td id="span_${asset.dependencyBundle}" class="pointer" 	
 								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" 
 								title="Assets with no matching Dependencies:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 								<span class="depGroup">Remnants</span>
