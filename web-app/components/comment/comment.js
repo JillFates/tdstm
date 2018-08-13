@@ -283,6 +283,10 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		assetSelector:{}
 	};
 
+	scope.dependencyGroup =  {
+		assetSelector:{}
+	};
+
 
 	scope.onDependencyAnalyzerTagSelectionChange = function () {
 		if (scope.internal.assetSelector.tag.length >= 1) {
@@ -312,6 +316,10 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			);
 
 		}
+	};
+
+	scope.onDependencyAnalyzerGroupTagSelectionChange = function () {
+
 	};
 
 };

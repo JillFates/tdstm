@@ -5,7 +5,7 @@
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div class="message" id="messageId" style="display:none">${flash.message}</div>
 		<div class="row">
-        	<div class="col-sm-3" style="width: 260px;">
+        	<div class="col-sm-3" style="width: 260px; padding-top: 5px;">
 				<b>Dependency Groups</b>
 				<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
 				<input style="margin-left: 10px;"  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
@@ -13,18 +13,24 @@
 			</div>
 			<div class="col-sm-8">
 				<g:form name="bundleForm" action="dependencyConsole">
-					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
-					Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
-					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
-					<span class="checkboxContainer" style="margin-left: 10px;">
-						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
-						<label for="assinedGroupCB" class="pointer" style="margin-left: 3px;">Show ONLY Work In Progress</label>
-					</span>
-					<span style="margin-left: 1em">
-						<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
-							<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
-						</g:link>
-					</span>
+					<div class="col-sm-4" style="padding-top: 5px;">
+						<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
+						Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
+					</div>
+					<div class="col-sm-4">
+						<label class="tag-label">Tags:</label> <tm-asset-tag-selector id="tmHighlightGroupSelector" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+					</div>
+					<div>
+						<span class="checkboxContainer" style="margin-left: 10px;">
+							<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
+							<label for="assinedGroupCB" class="pointer" style="margin-left: 3px;">Show ONLY Work In Progress</label>
+						</span>
+						<span style="margin-left: 1em">
+							<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
+								<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
+							</g:link>
+						</span>
+					</div>
 				</g:form>
 			</div>
 		</div>

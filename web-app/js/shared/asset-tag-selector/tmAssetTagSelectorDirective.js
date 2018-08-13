@@ -25,24 +25,24 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			disabledOperator: '=',
 			onChange: '&'
 		},
-		controller: function ($scope) {
+		link: function ($scope, element) {
 			// Init the Load
 			// Get All Tags
 			getAssetTags();
 
 			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
-				$(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
+				$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
 			}
 
 			if($scope.disabledOperator) {
-				$('.asset-tag-selector-operator-switch').attr("disabled", true);
+				$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
 			}
 
-			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+			$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
 				onLabel: "ALL",
 				offLabel: "ANY",
 				change: function (e) {
-					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+					$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
 					$scope.onChange();
 				}
 			});
@@ -50,15 +50,15 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 			$scope.assetSelector = {
 				tag: [],
-				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY'
+				operator: ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY'
 			};
 
-			$(".asset-tag-selector").kendoMultiSelect({
+			$(element).find(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
 				dataValueField: "id",
 				filter: "startswith",
-				itemTemplate: $("#asset-tag-selector-item").html(),
-				tagTemplate: $("#asset-tag-selector-tag").html(),
+				itemTemplate: $(element).find("#asset-tag-selector-item").html(),
+				tagTemplate: $(element).find("#asset-tag-selector-tag").html(),
 				change: function() {
 					selectTags();
 					$scope.onChange();
@@ -66,14 +66,14 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				open: selectTags,
 			});
 
-			($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
+			($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
 
 			/**
 			 * Set the new Set Datasource to the element
 			 * @param data
 			 */
 			function setNewDataSource(data) {
-				var widget = $("#asset-tag-selector").getKendoMultiSelect();
+				var widget = $(element).find("#asset-tag-selector").getKendoMultiSelect();
 				widget.setDataSource(new kendo.data.DataSource({
 					data: data
 				}));
@@ -88,7 +88,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			function preSelectTags() {
 				if($scope.preAssetSelector && $scope.preAssetSelector.tag) {
 					var selectedTags = [];
-					var widget = $("#asset-tag-selector").getKendoMultiSelect();
+					var widget = $(element).find("#asset-tag-selector").getKendoMultiSelect();
 					var dataSource = widget.dataSource;
 
 					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
@@ -114,7 +114,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 					$scope.assetSelector.operator = false;
 
 					if(selectedTags !== '') {
-						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
+						$(element).find("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
 						selectTags();
 					}
 				}
@@ -132,14 +132,14 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 			function selectTags(e) {
 				//
-				$("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
+				$(element).find("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
 				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
-				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
-				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
+				$(element).find("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
+				$(element).find("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
-				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+				$scope.assetSelector.tag = $(element).find("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
-				($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
+				($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
 			}
 		}
 	};
