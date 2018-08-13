@@ -646,8 +646,23 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element plus(Element anotherElement) {
-		this.value += anotherElement?.value
-		return this
+		Element newElement = new Element(
+			domain: this.domain,
+			value: this.value + anotherElement?.value,
+			originalValue: this.originalValue,
+			init: this.init,
+			processor: this.processor,
+			errors: this.errors
+		)
+
+		if(this.fieldDefinition){
+			newElement.fieldDefinition = new ETLFieldDefinition(
+				name: this.fieldDefinition.name,
+				label: this.fieldDefinition.label,
+				type: this.fieldDefinition.type
+			)
+		}
+		return newElement
 	}
 
 	/**
@@ -660,8 +675,23 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element plus(String value) {
-		this.value += value
-		return this
+		Element newElement = new Element(
+			domain: this.domain,
+			value: this.value + value,
+			originalValue: this.originalValue,
+			init: this.init,
+			processor: this.processor,
+			errors: this.errors
+		)
+
+		if(this.fieldDefinition){
+			newElement.fieldDefinition = new ETLFieldDefinition(
+				name: this.fieldDefinition.name,
+				label: this.fieldDefinition.label,
+				type: this.fieldDefinition.type
+			)
+		}
+		return newElement
 	}
 
 	/**
@@ -755,9 +785,11 @@ class Element implements RangeChecker {
 	/**
 	 * Overriding Equals method for this command in an ETL script.
 	 * <code>
+	 *  .....
+	 *  if (myVar == 'Cool Stuff') {
 	 *      .....
-	 *      if (myVar == 'Cool Stuff') {*          .....
-	 *}*  </code>
+	 *	}
+	 * </code>
 	 * @param otherObject
 	 * @return
 	 */
