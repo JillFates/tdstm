@@ -13,6 +13,7 @@ class CommonsModule extends Module {
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
+        loadingIndicator { $('.loading-indicator')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -100,5 +101,13 @@ class CommonsModule extends Module {
     def getDeleteAlertMessageText(){
         waitFor{deleteAlertMessage.displayed}
         deleteAlertMessage.text()
+    }
+
+    def waitForCookbookLoadingIndicator(repeatTime = 1){
+        def count = 0
+        while (count < repeatTime) {
+            waitFor{ !loadingIndicator.hasClass("ng-hide")}
+            count = count + 1
+        }
     }
 }

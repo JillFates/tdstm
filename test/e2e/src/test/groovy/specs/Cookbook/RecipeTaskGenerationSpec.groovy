@@ -26,6 +26,18 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             description: "This is a Geb created recipe for an Event context"
     ]
     static recipeText = [
+            'groups: [',
+            '  [',
+            '    name: \'QAE2E\',',
+            '    description: \'QAE2E list\',',
+            '    filter : [',
+            '      class: \'application\',',
+            '      asset: [',
+            '        assetName: \'QAE2E%\'',
+            '      ]',
+            '    ]',
+            '  ]',
+            '],',
             'tasks: [',
             '  [',
             '    id: 1100,',
@@ -35,11 +47,10 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    team: \'APP_COORD\',',
             '    category: \'startup\',',
             '    duration: 10,',
-            '      filter : [',
-            '        class: \'application\',',
-            '        tag: \'Red\'',
-            '      ],',
-            '  ],',
+            '    filter : [',
+            '      group: \'QAE2E\'',
+            '    ]',
+            '  ]',
             ']'
     ].join('\\n')
 
@@ -54,8 +65,8 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         clickOnCreateButton()
         at CreateRecipePage
         createRecipe recipeDataMap
+        commonsModule.waitForCookbookLoadingIndicator(2)
         at CookbookPage
-        waitForLoadingIndicator(2)
         /* EDIT Recipe */
         openEditTab()
         at TabEditorPage
@@ -239,6 +250,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         when: 'The User Clicks on Generate'
             waitFor {tskGTabGenerateTasksBtn.click()}
             waitForProgressBar()
+            commonsModule.waitForCookbookLoadingIndicator()
         then: 'The Task should be generated showing up the Summary Section'
             at TabTaskGenTabSummaryPage
     }
