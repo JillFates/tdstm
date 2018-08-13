@@ -5,19 +5,20 @@
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div class="message" id="messageId" style="display:none">${flash.message}</div>
 		<div class="row">
-        	<div class="col-sm-3" style="width: 260px; padding-top: 5px;">
+        	<div class="col-sm-3" style="width: 260px; padding-top: 4px;">
 				<b>Dependency Groups</b>
 				<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
 				<input style="margin-left: 10px;"  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 				</tds:hasPermission>
 			</div>
 			<div class="col-sm-8">
-				<g:form name="bundleForm" action="dependencyConsole">
-					<div class="col-sm-4" style="padding-top: 5px;">
+				<g:form name="bundleForm" action="dependencyConsole" class="dependencyConsoleForm">
+					<div class="col-sm-4" style="padding-top: 4px;">
 						<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
 						Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
 					</div>
 					<div class="col-sm-4">
+						${tagIds} ${tagMatch}
 						<label class="tag-label">Tags:</label> <tm-asset-tag-selector id="tmHighlightGroupSelector" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
 					</div>
 					<div>

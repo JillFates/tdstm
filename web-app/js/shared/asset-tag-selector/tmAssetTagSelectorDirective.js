@@ -2,6 +2,8 @@ var currentAngularModule = tds.cookbook || tds.comments;
 currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
+						<input type="hidden" class="tag-hidden-val" name="tagIds" />
+						<input type="hidden" class="match-hidden-val" name="tagMatch" />
 						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked"  />
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
@@ -130,6 +132,14 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				}).error(function (data, status, headers, config) {});
 			}
 
+			var getTagsIds = function(tags) {
+				var tagIds = [];
+				tags.each( function(a){
+					tagIds.push(parseInt(a.id));
+				})
+				return tagIds;
+			};
+
 			function selectTags(e) {
 				//
 				$(element).find("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
@@ -140,6 +150,9 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				$scope.assetSelector.tag = $(element).find("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
 				($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
+
+				$(element).find(".tag-hidden-val").val(getTagsIds($scope.assetSelector.tag));
+				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
 			}
 		}
 	};

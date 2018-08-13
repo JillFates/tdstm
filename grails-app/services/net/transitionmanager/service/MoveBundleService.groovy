@@ -469,7 +469,11 @@ class MoveBundleService implements ServiceMethods {
 			showTabs:showTabs,
 			tabName: subsection,
 			groupId: groupId,
-			assetName: assetName]
+			assetName: assetName,
+			// Tags Properties
+			tagIds: tagIds,
+			tagMatch: tagMatch
+		]
 
 		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 

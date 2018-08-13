@@ -319,7 +319,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	};
 
 	scope.onDependencyAnalyzerGroupTagSelectionChange = function () {
-
+		$('.dependencyConsoleForm').submit();
 	};
 
 };
