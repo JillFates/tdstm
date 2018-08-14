@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.JsonUtil
+
 /**
  * <p>Row from GETL DataSet.<p>
  * <p>Every iteration in an ETLScript will use this structure to take values from the source data set.<p>
@@ -34,13 +36,25 @@ class Row {
 		Element newElement = new Element(originalValue: value,
 			value: value,
 			fieldDefinition: fieldDefinition,
-			processor: processor)
+			processor: processor
+		)
 		elementsMap[columnIndex] = newElement
 		newElement
 	}
 
-	Element getDataSetElement(Integer columnIndex) {
+	/**
+	 *	//TODO: dcorrea, complete DOCS!
+	 * @param columnIndex
+	 * @param path
+	 * @return
+	 */
+	Element getDataSetElement(Integer columnIndex, String path = null) {
 		Object value = dataSetValues[columnIndex]
+
+		if(path){
+			value = JsonUtil.gpathAt(value, path)
+		}
+
 		Element element = new Element(
 			originalValue: value,
 			value: value,

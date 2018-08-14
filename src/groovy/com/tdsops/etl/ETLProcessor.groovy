@@ -594,12 +594,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	Element extract (String columnName) {
 		validateStack()
-		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
-			throw ETLProcessorException.extractMissingColumn(columnName)
-		}
-		currentColumnIndex = columnsMap[labelToFieldName(columnName)].index
+		def (String root, String path) = columnNameParts(columnName)
 
-		doExtract()
+		if (!columnsMap.containsKey(labelToFieldName(root))) {
+			throw ETLProcessorException.extractMissingColumn(root)
+		}
+		currentColumnIndex = columnsMap[labelToFieldName(root)].index
+
+		doExtract(path)
 	}
 
 	/**
@@ -1087,11 +1089,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Private method that executes extract method command internally.
-	 * @return
+	 * Extract final implementation using {ETLProcessor#currentColumnIndex}
+	 * and a path in case of working with JSON files.
+	 * @param path
+	 * @return an instance of Element class
 	 */
-	private Element doExtract () {
-		Element element = createCurrentElement(currentColumnIndex)
+	private Element doExtract (String path = null) {
+		Element element = bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex, path))
 		element.loadedElement = false
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
@@ -1246,15 +1250,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Create the current element adding it in the ETL binding context
-	 * @param currentColumnIndex
-	 * @return
-	 */
-	private Element createCurrentElement(Integer currentColumnIndex) {
-		return bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex))
-	}
-
-	/**
 	 * Validates calls within the DSL script that can not be managed
 	 * @param methodName
 	 * @param args
@@ -1295,6 +1290,24 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			return label.toLowerCase()
 		} else {
 			return label
+		}
+	}
+
+	/**
+	 * In case of ETL is working with a JSON file,
+	 * this methods can split a column name using dot (.) notation.
+	 * <pre>
+	 * 	assert columnNameParts('data.assets') == ['data', 'assets']
+	 * 	assert columnNameParts('devices') == ['devices']
+	 * </pre>
+	 * @param columnName a string value
+	 * @return a list with 2 values: rootPath and the rest of the column name path
+	 */
+	private List columnNameParts(String columnName){
+		if (FilenameUtil.isJsonFile(dataSetFacade.fileName())) {
+			return columnName.split('\\.', 2)
+		} else {
+			return [columnName]
 		}
 	}
 
