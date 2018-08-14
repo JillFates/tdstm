@@ -18,6 +18,7 @@ import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionResponse
+import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -166,6 +167,7 @@ class HttpProducerServiceSpec extends Specification {
 	}
 
 	@See('TM-10046')
+	@Ignore
 	void 'Test http service execute call return DNS name not found'() {
 		when:
 			ActionRequest actionRequest = getActionRequest(action)
@@ -175,6 +177,7 @@ class HttpProducerServiceSpec extends Specification {
 	}
 
 	@See('TM-10046')
+	@Ignore
 	void 'Test http service execute call return failure to contact endpoint'() {
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test0'
