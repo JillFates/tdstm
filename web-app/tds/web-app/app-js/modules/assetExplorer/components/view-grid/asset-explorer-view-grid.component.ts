@@ -356,4 +356,8 @@ export class AssetExplorerViewGridComponent {
 			})
 			.catch ((err) => console.log('Error:', err))
 	}
+
+	hasSelectedItems(): boolean {
+		return this.dataGridCheckboxService.hasSelectedItems();
+	}
 }

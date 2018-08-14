@@ -88,6 +88,10 @@ export class DataGridCheckboxService {
 		this.refreshBulkSelectedItems();
 	}
 
+	hasSelectedItems(): boolean {
+		return Boolean(this.bulkSelectedItems && this.bulkSelectedItems.length);
+	}
+
 	refreshBulkSelectedItems() {
 		const keys = Object.keys(this.bulkItems);
 

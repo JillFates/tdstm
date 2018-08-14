@@ -10,6 +10,7 @@ import {BulkChangeModel, BulkActionResult} from '../../model/bulk-change.model';
 	providers: [TranslatePipe]
 })
 export class BulkChangeButtonComponent {
+	@Input() enabled: boolean ;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 	@Output() clickBulk = new EventEmitter<void>();
 	@Input()
@@ -22,6 +23,7 @@ export class BulkChangeButtonComponent {
 	private selectedItems: number[];
 
 	constructor(private dialogService: UIDialogService) {
+		this.enabled = false;
 		this.selectedItems = [];
 	}
 
