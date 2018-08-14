@@ -114,17 +114,17 @@ class GraphPoint {
 }
 
 // represents a node in the force graph
-class Node extends Point {
+class GraphNode extends Point {
 	constructor (params) {
 		super(0,0)
 		this.insideRegion = false
 		// set all the members sent from the server using the parameters list
 		if (params)
-			for (let prop of Node.INITIAL_PARAMS)
+			for (let prop of GraphNode.INITIAL_PARAMS)
 				this[prop] = params[prop]
 	}
 }
-addStaticConstant(Node, 'INITIAL_PARAMS', ['id','name','type','depBundleId','moveBundleId','moveEventId','shape','size','title','color','dependsOn','supports','assetClass','cutGroup','colorByProperties'])
+addStaticConstant(GraphNode, 'INITIAL_PARAMS', ['id','name','type','depBundleId','moveBundleId','moveEventId','shape','size','title','color','dependsOn','supports','assetClass','cutGroup','colorByProperties'])
 
 /*
  * Javascript functions used by the graph view utilizing d3

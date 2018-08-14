@@ -109,7 +109,7 @@ var links = serverParams.links
 var nodeData = serverParams.nodes
 var nodes = []
 for (let nodeParams of nodeData)
-	nodes.push(new Node(nodeParams))
+	nodes.push(new GraphNode(nodeParams))
 var colorByGroups = serverParams.colorByGroups
 var colorByGroupLabels = serverParams.colorByGroupLabels
 
@@ -463,15 +463,17 @@ function createBehaviorHandler () {
 	
 	// fires on mousedown on a node
 	function dragstart (d, i) {
-		startAlpha = GraphUtil.force.alpha()
-		dragging = true
-		clicked = true
+		if (d3.event.sourceEvent.button == 0) {
+			startAlpha = GraphUtil.force.alpha()
+			dragging = true
+			clicked = true
+		}
 		GraphUtil.captureEvent()
 	}
 
 	// fires when the user drags a node
 	function dragmove (d, i) {
-		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
+		if (((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) && dragging) {
 			let dx = d3.event.dx * zoomBehavior.scale()
 			let dy = d3.event.dy * zoomBehavior.scale()
 			// calculate alpha stuff
@@ -520,21 +522,23 @@ function createBehaviorHandler () {
 
 	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
 	function dragend (d, i) {
-		for (node of dragNodes) {
-			node.fix = false
-			node.fixed = false
+		if (d3.event.sourceEvent.button == 0) {
+			for (node of dragNodes) {
+				node.fix = false
+				node.fixed = false
+			}
+			dragNodes = []
+			var event = d3.event.sourceEvent
+			dragging = false
+			if (clicked) {
+				var mode = GraphUtil.SELECT_MODES.REPLACE
+				if (event.ctrlKey) 
+					mode = GraphUtil.SELECT_MODES.TOGGLE
+				modifyNodeSelection([d], mode)
+			}
+			d3.event.sourceEvent.preventDefault()
+			GraphUtil.captureEvent()
 		}
-		dragNodes = []
-		var event = d3.event.sourceEvent
-		dragging = false
-		if (clicked) {
-			var mode = GraphUtil.SELECT_MODES.REPLACE
-			if (event.ctrlKey) 
-				mode = GraphUtil.SELECT_MODES.TOGGLE
-			modifyNodeSelection([d], mode)
-		}
-		d3.event.sourceEvent.preventDefault()
-		GraphUtil.captureEvent()
 	}
 	
 	// Rescales the contents of the svg. Called when the user scrolls.
@@ -551,8 +555,9 @@ function createBehaviorHandler () {
 	
 	// fires when the user begins dragging a selection region
 	function selectStart (d, i) {
+		clicked = true
 		var event = d3.event.sourceEvent
-		if (event.shiftKey) {
+		if (event.shiftKey && event.button == 0) {
 			// pause the force graph while the user is selecting
 			if (GraphUtil.force.alpha() > 0) {
 				tempFreeze = true
@@ -573,7 +578,7 @@ function createBehaviorHandler () {
 	// fires whenever the user moves the mouse while selecting a region
 	function selectMove (d, i) {
 		var event = d3.event.sourceEvent
-		if (selectingRegion) {
+		if (selectingRegion && event.button == 0) {
 			// get the cursor position on the graph
 			var mPos = d3.mouse(svgContainer[0][0])
 			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
@@ -584,12 +589,14 @@ function createBehaviorHandler () {
 			GraphUtil.updateSelectionPath(cursorPosition, false)
 			// capture the mouse event to avoid further propagation/bubbling
 			GraphUtil.captureEvent()
+		} else if (d3.event.dx != 0 || d3.event.dy != 0) {
+			clicked = false
 		}
 	}
 	// fires when the user releases the mouse while selecting a region
 	function selectEnd (d, i) {
 		var event = d3.event.sourceEvent
-		if (selectingRegion) {
+		if (selectingRegion && event.button == 0) {
 			// if we paused the graph at the start of this selection, unpause it now
 			if (tempFreeze) {
 				tempFreeze = false
@@ -608,6 +615,8 @@ function createBehaviorHandler () {
 			selectingRegion = false
 			// capture the mouse event to avoid further propagation/bubbling
 			GraphUtil.captureEvent()
+		} else if (clicked) {
+			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
 		}
 	}
 }
@@ -942,7 +951,7 @@ function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
 
-		if (event.shiftKey)
+		if (event.shiftKey || event.button == 0)
 			return;
 		var validTags = ['use', 'svg', 'g', 'line'];
 		var target = event.target.correspondingUseElement || event.target;
