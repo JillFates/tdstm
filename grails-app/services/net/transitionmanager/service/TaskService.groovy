@@ -4223,6 +4223,26 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
+			/**
+			 * TM-11900 This is a hack to bypass an underlying issue where this method receives a list of tag ids
+			 * when fetching groups, but a list of maps when running the task generation. This wasn't the behavior until
+			 * a couple of days ago.
+			 */
+			def getTagIdsList = {List tags ->
+				List<Long> tagIds = []
+				tags.each {tag ->
+					def tagId
+					if (NumberUtil.isaNumber(tag)) {
+						tagId = tag
+					} else {
+						tagId = tag.id
+					}
+					tagIds << NumberUtil.toPositiveLong(tagId)
+				}
+				return tagIds
+
+			}
+
             if (filter?.asset && project) {
                 def fieldSpecs = customDomainService.fieldSpecs(project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
                 if (fieldSpecs) {
@@ -4261,7 +4281,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
-				map.tags = NumberUtil.toPositiveLongList(contextObject.tag*.id)
+				map.tags = getTagIdsList(contextObject.tag)
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
 
 				// When using tags, bundles are going to be ignored
