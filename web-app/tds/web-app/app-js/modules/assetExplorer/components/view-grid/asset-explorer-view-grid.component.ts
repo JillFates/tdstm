@@ -203,7 +203,6 @@ export class AssetExplorerViewGridComponent {
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		this.setSelectedItems();
 	}
 
 	clear(): void {
