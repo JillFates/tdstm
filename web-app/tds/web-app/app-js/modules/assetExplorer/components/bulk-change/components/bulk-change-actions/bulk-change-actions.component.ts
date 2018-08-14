@@ -34,7 +34,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		this.selectedItems = this.bulkChangeModel.selectedItems || [];
 		this.affected = this.bulkChangeModel.affected;
 		this.selectedAction = this.ACTION.Edit;
-		console.log('Selected items');
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {

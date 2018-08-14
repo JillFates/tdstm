@@ -22,15 +22,27 @@ export class DataGridCheckboxService {
 		this.pageSize = size;
 	}
 
-	getOverrideState(changingPage = false): CheckboxStates {
+	resetSelectedBulkItems() {
+		this.bulkItems = {};
+		this.bulkSelectedItems = [];
+	}
+
+	changeStateByUserInteraction(changingPage = false): CheckboxStates {
 		if (changingPage) {
 			if (this.currentState === CheckboxStates.checked) {
-				return CheckboxStates.unchecked;
+				this.currentState = CheckboxStates.unchecked;
+				this.resetSelectedBulkItems();
+				return this.currentState;
+			}
+			if (this.currentState === CheckboxStates.unchecked) {
+				this.resetSelectedBulkItems();
 			}
 			return null;
 		}
 
-		return (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
+		this.currentState =  (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
+
+		return this.currentState;
 	}
 
 	changeState(currentState: CheckboxStates): void {

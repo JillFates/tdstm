@@ -23,9 +23,7 @@ export class TDSCheckboxComponent implements OnInit {
 				this.transitToUnchecked();
 				// dont emit because it will clear all
 			}
-
 		}
-
 	}
 	currentState: CheckboxStates;
 	private transitionHandler: Function;

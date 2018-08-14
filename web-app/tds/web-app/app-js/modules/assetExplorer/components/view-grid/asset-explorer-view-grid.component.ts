@@ -189,7 +189,7 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.overrideCheckboxState = this.dataGridCheckboxService.getOverrideState(true);
+		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction(true);
 
 		this.dataGridCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
@@ -274,15 +274,14 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
-		console.log('Asset selector has changes');
-		console.log(checkboxState);
 		this.overrideCheckboxState = null;
 		this.dataGridCheckboxService.changeState(checkboxState);
 	}
 
 	setSelectedItem(id: string, checked: boolean): void {
+		this.dataGridCheckboxService.setPageSize(this.gridData.data.length);
 		this.dataGridCheckboxService.selectBulkItem(id, checked);
-		this.overrideCheckboxState = this.dataGridCheckboxService.getOverrideState();
+		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction();
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
