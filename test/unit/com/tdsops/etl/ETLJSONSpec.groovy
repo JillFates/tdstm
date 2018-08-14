@@ -16,6 +16,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -84,7 +85,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
 
@@ -155,7 +155,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can define a quoted string for the JSON DataSet'(){
 
@@ -514,7 +513,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 	}
 
-
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
 		given:
@@ -703,6 +701,84 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11181')
+	void 'test can use dot notation in extract command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   {
+					      "vm id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2,
+					         "hostname": "zulu01"
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'the ETL script is evaluated'
+			etlProcessor.evaluate("""
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'vm id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    extract 'attribs.hostname' load 'custom 3'
+				}
+				""".stripIndent())
+
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0], DomainResult) {
+				domain == ETLDomain.Device.name()
+				data.size() == 1
+
+				with(data[0], RowResult) {
+					rowNum == 1
+
+					with(fields.id, FieldResult) {
+						originalValue == 123
+						value == 123
+					}
+
+					with(fields.custom1, FieldResult) {
+						originalValue == 4096
+						value == 4096
+					}
+
+					with(data[0].fields.custom2) {
+						originalValue == 2
+						value == 2
+					}
+
+					with(data[0].fields.custom3) {
+						originalValue == 2
+						value == 2
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 
 	static final String DATASET = """
