@@ -14,7 +14,7 @@
 						[pageSize]="pageSize"
 						[resizable]="true"
 						(sortChange)="sortChange($event)"
-						[pageable]="{ pageSizes: defaultPageOptions , pageSize: pageSize, info: true}" 
+						[pageable]="{ pageSizes: defaultPageOptions , pageSize: pageSize, info: true}"
 						(cellClick)="cellClick($event)"
 						[selectable]="true"
 						(pageChange)="pageChange($event)"
@@ -29,9 +29,7 @@
 					</ng-template>
 					<kendo-grid-column *ngFor="let column of dataScriptColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 						<ng-template kendoGridHeaderTemplate>
-							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-							</div>
+							<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 							<div class="text-center">
@@ -43,12 +41,16 @@
 							<div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
 								<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
 								<ng-template #dateFilter>
-									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-									<span *ngIf="column.filter" (click)="clearValue(column)" style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									<div class="sortable-column" (click)="onClickTemplate($event)">
+										<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
+										<span *ngIf="column.filter" (click)="clearValue(column)" style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									</div>
 								</ng-template>
 								<ng-template #stringFilter>
-									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									<div class="sortable-column" (click)="onClickTemplate($event)">
+										<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+										<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									</div>
 								</ng-template>
 							</div>
 						</ng-template>

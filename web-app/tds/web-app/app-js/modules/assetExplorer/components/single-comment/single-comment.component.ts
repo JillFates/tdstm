@@ -28,7 +28,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	}
 
 	ngOnInit(): void {
-		this.dateFormatTime = this.userPreferenceService.getUserTimeZone() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
+		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 		this.loadCommentCategories();
 	}
 

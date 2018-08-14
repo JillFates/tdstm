@@ -14,6 +14,8 @@ class TagAsset {
 	static mapping = {
 		version false
 		id column: 'tag_asset_id'
+		tag lazy: false
+		asset lazy: false
 		domainClass enumType: "string"
 	}
 

@@ -255,9 +255,14 @@ class UrlMappings {
 			action = [POST:"groups"]
 		}
 
-		name wsDepAnalyzer:
-		"/ws/depAnalyzer/$action?/$id?" {
+		name wsDepAnalyzer: "/ws/depAnalyzer/peopleAssociatedToDepGroup/$id?" {
 			controller = 'wsDepAnalyzer'
+			action = [GET: ' peopleAssociatedToDepGroup']
+		}
+
+		"/ws/depAnalyzer/filteredAssetList/$id?" {
+			controller = 'wsDepAnalyzer'
+			action = [POST: ' filteredAssetList']
 		}
 
 		"/ws/event/listBundles/$id?" {

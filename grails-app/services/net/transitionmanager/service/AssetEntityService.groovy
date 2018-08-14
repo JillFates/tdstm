@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -1214,8 +1215,29 @@ class AssetEntityService implements ServiceMethods {
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
 	 */
-	List<MoveBundle> getMoveBundles(Project project) {
-		project ? MoveBundle.findAllByProject(project, [sort: 'name']) : []
+	List<Map> getMoveBundles(Project project) {
+		List<Map> resultBundles = []
+		if (project) {
+			// Minimize the amount of information retrieved by limiting the fields to the following list.
+			List<String> properties = [
+				'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+				'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+			]
+			// Query for bundles in this project (sorted by name).
+			resultBundles = MoveBundle.createCriteria().list {
+				and {
+					eq('project', project)
+				}
+				projections {
+					properties.each{ String prop ->
+						property(prop, prop)
+					}
+				}
+				order('name')
+				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+			}
+		}
+		return resultBundles
 	}
 
 	/**

@@ -160,11 +160,30 @@ class Element implements RangeChecker {
 	}
 
 	/**
-	 * Validation for incorrect methods on script content
+	 * Validation for incorrect methods on script content:
+	 * First we try to delegate the method call to the wrapped value
 	 * @param methodName
 	 * @param args
 	 */
 	def methodMissing(String methodName, args) {
+		// try to delegate the method to the value's class
+		if (value != null && !(value instanceof Element) ) {
+
+			def params = []
+			params.addAll(args)
+
+			try {
+				if (params) {
+					value = value."${methodName}"(params)
+				} else {
+					value = value."${methodName}"()
+				}
+
+				return this
+
+			} catch (MissingMethodException e) {}
+		}
+
 		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
 	}

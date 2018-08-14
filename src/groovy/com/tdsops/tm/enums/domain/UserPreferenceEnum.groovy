@@ -27,6 +27,7 @@ enum UserPreferenceEnum {
 	DRAGGABLE_RACK('DraggableRack'),
 	HIGHLIGHT_TASKS('highlightTasks'),
 	ImportApplication,
+	ImportBatchListSize,
 	ImportCabling,
 	ImportComment,
 	ImportDatabase,

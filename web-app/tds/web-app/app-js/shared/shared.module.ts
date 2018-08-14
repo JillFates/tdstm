@@ -25,6 +25,7 @@ import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive'
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 import {UIAutoCenterDirective} from './directives/autocenter-directive';
 // Shared Pipes
+import { UserDateTime } from './pipes/userDateTime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
@@ -68,6 +69,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
+		UserDateTime,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
@@ -114,6 +116,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
+		UserDateTime,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
 		TranslatePipe,

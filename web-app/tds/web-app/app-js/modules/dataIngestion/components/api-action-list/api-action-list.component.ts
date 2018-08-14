@@ -8,7 +8,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
 import {
 	COLUMN_MIN_WIDTH,
@@ -43,8 +43,8 @@ export class APIActionListComponent implements OnInit {
 	};
 
 	public skip = 0;
-	public pageSize = MAX_DEFAULT;
-	public defaultPageOptions = MAX_OPTIONS;
+	public pageSize = GRID_DEFAULT_PAGE_SIZE;
+	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public apiActionColumnModel: APIActionColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
