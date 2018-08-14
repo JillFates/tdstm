@@ -41,6 +41,12 @@ export class AssetExplorerViewGridComponent {
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@Input()
+	set viewId(viewId: number) {
+		this._viewId = viewId;
+		// changing the view reset selections
+		this.dataGridCheckboxService.setCurrentState(CheckboxStates.unchecked);
+	}
 
 	fields = [];
 	justPlanning = false;
@@ -53,6 +59,7 @@ export class AssetExplorerViewGridComponent {
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
 	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
@@ -190,7 +197,6 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction(true);
-
 		this.dataGridCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
@@ -348,7 +354,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onClickBulkButton(): void {
-		this.dataGridCheckboxService.getBulkSelectedItems(1, this.model, this.justPlanning)
+		this.dataGridCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
 			.then((results: number[]) => {
 				this.bulkItems = [...results];
 			})
