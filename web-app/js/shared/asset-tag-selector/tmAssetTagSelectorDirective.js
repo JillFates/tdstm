@@ -25,7 +25,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			preAssetSelector: '=',
 			preSelectedOperator: '=',
 			disabledOperator: '=',
-			onChange: '&'
+			onChange: '&',
 		},
 		link: function ($scope, element) {
 			// Init the Load
@@ -95,19 +95,21 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
 
-						var elementExist = dataSource.data().filter((e) => {
-							return e.id === $scope.preAssetSelector.tag[i].id
-						});
-						if (elementExist.length === 0) {
-							dataSource.add({
-								name: $scope.preAssetSelector.tag[i].label,
-								css: $scope.preAssetSelector.tag[i].css,
-								id: $scope.preAssetSelector.tag[i].id,
-								strike: true
+						if($scope.preAssetSelector.tag[i] && $scope.preAssetSelector.tag[i] !== null) {
+							var elementExist = dataSource.data().filter((e) => {
+								return e.id === $scope.preAssetSelector.tag[i].id || e.id === $scope.preAssetSelector.tag[i];
 							});
-						}
+							if (elementExist.length === 0) {
+								dataSource.add({
+									name: $scope.preAssetSelector.tag[i].label,
+									css: $scope.preAssetSelector.tag[i].css,
+									id: $scope.preAssetSelector.tag[i].id,
+									strike: true
+								});
+							}
 
-						selectedTags.push($scope.preAssetSelector.tag[i].id);
+							selectedTags.push($scope.preAssetSelector.tag[i].id || $scope.preAssetSelector.tag[i]);
+						}
 
 					}
 					dataSource.sync();
@@ -151,7 +153,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 				($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
 
-				$(element).find(".tag-hidden-val").val(getTagsIds($scope.assetSelector.tag));
+				$(element).find(".tag-hidden-val").val('['+getTagsIds($scope.assetSelector.tag)+']');
 				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
 			}
 		}
