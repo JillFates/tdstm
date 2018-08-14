@@ -175,7 +175,7 @@ class DataImportService implements ServiceMethods {
 					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
-					def batch = createImportBatch(importContext)
+					ImportBatch batch = createImportBatch(importContext)
 
 					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
 					if (batch == null) {
@@ -196,7 +196,7 @@ class DataImportService implements ServiceMethods {
 
 						// Update the reporting
 						importResults.batchesCreated++
-						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: importContext.rowsCreated ]
+						importResults.domains << [ domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated ]
 					}
 				}
 			}
