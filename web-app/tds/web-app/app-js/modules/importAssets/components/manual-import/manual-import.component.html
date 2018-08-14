@@ -120,9 +120,24 @@
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
+                            <div class="col-sm-{{uiConfig.inputColSize}}">
+                                <kendo-grid *ngIf="!importInProcess && importResult?.status === 'success'"
+                                        [data]="importResult.data.domains"
+                                        [pageSize]="100">
+                                    <kendo-grid-column title="Batch Id" field="batchId">
+                                        <ng-template kendoGridCellTemplate let-dataItem>
+                                            <a (click)="goToBatch(dataItem.batchId)" href="javascript: void(0);">
+                                                {{dataItem.batchId}}
+                                            </a>
+                                        </ng-template>
+                                    </kendo-grid-column>
+                                    <kendo-grid-column title="Domain" field="domainClass"></kendo-grid-column>
+                                    <kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
+                                </kendo-grid>
+                            </div>
                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
-                                   class="btn btn-default col-md-offset-{{uiConfig.inputColSize}} col-sm-{{uiConfig.buttonColSize}}">
+                                   class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
                                <i aria-hidden="true" class="fa"
                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importInProcess,
                                                'fa-check green': importResult?.status === 'success',
