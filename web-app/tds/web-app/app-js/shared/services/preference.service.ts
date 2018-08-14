@@ -14,6 +14,7 @@ export const PREFERENCES_LIST = {
 	ASSET_LIST_SIZE : 'assetListSize',
 	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
 	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
+	CURR_TZ: 'CURR_TZ',
 	DATA_SCRIPT_SIZE: 'DataScriptSize',
 	VIEW_UNPUBLISHED: 'viewUnpublished',
 	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize'
