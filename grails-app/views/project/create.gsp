@@ -151,7 +151,7 @@
 								data-placeholder="Please select a client">
 									<option value=""></option>
 									<g:each in="${clients}" var="client" status="i">
-									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
+									    <option value="${client.clientId}">${client.clientName}</option>
 									</g:each>
 								</select>
 								<g:hasErrors bean="${projectInstance}" field="client">
