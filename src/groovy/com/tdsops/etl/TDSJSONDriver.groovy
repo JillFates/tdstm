@@ -215,4 +215,45 @@ class TDSJSONDriver extends JSONDriver {
 		}
 	}
 
+	/**
+	 * Overriding Parent readData found a bug in line:
+	 *    data = json.parse(reader)
+	 * for some reason is not reading until the END of DATA but the END of BUFFER SIZE adding 'x0' characters
+	 * changed to:
+	 *    data = json.parseText(reader.text)
+	 * @param dataset
+	 * @param params
+	 * @return
+	 */
+	private def readData (Dataset dataset, Map params) {
+		boolean convertToList = (dataset.params.convertToList != null)?dataset.params.convertToList:false
+
+		def json = new JsonSlurper()
+		def data = null
+
+		def reader = getFileReader(dataset, params)
+		try {
+			if (!convertToList) {
+				data = json.parseText(reader.text)
+
+			} else {
+				StringBuilder sb = new StringBuilder()
+				sb << "[\n"
+				reader.eachLine {
+					sb << it
+					sb << "\n"
+				}
+				int lastObjPos = sb.lastIndexOf("}")
+				if (sb.substring(lastObjPos + 1, sb.length()).trim() == ',') sb.delete(lastObjPos + 1, sb.length())
+				sb << "\n]"
+				data = json.parseText(sb.toString())
+			}
+		}
+		finally {
+			reader.close()
+		}
+
+		return data
+	}
+
 }
