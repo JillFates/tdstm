@@ -18,8 +18,7 @@
 						Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
 					</div>
 					<div class="col-sm-4">
-						${tagIds} ${tagMatch}
-						<label class="tag-label">Tags:</label> <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="{ tag: ${tagIds} }" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+						<label class="tag-label">Tags:</label> <tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
 					</div>
 					<div>
 						<span class="checkboxContainer" style="margin-left: 10px;">

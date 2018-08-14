@@ -45,6 +45,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 				offLabel: "ANY",
 				change: function (e) {
 					$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+					$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
 					$scope.onChange();
 				}
 			});
@@ -153,7 +154,10 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 				($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
 
-				$(element).find(".tag-hidden-val").val('['+getTagsIds($scope.assetSelector.tag)+']');
+				$(element).find(".tag-hidden-val").remove();
+				$scope.assetSelector.tag.each(function (a) {
+					$(element).append('<input type="hidden" class="tag-hidden-val" name="tagIds" value="' + parseInt(a.id) + '" />');
+				});
 				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
 			}
 		}
