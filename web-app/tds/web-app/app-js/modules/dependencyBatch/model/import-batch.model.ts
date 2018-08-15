@@ -65,29 +65,77 @@ export class DependencyBatchColumnsModel {
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 100,
-				locked: false
-			},
-			{
-				label: 'Imported At',
-				property: 'lastUpdated',
-				type: 'date',
-				format: '{0:d}',
-				width: 180,
-				locked: false
-			},
-			{
-				label: 'Imported By',
-				property: 'createdBy',
-				type: 'text',
-				width: 100,
+				width: 130,
 				locked: false
 			},
 			{
 				label: 'Domain',
 				property: 'domainClassName',
 				type: 'text',
-				width: 130,
+				width: 120,
+				locked: false
+			},
+			{
+				label: 'Records',
+				property: 'recordsSummary.count',
+				type: 'number',
+				width: 80,
+				locked: false,
+				cellStyle: { 'text-align': 'right' }
+			},
+			{
+				label: 'Pending',
+				property: 'recordsSummary.pending',
+				type: 'number',
+				width: 80,
+				locked: false,
+				cellStyle: { 'text-align': 'right' }
+			},
+			{
+				label: 'Processed',
+				property: 'recordsSummary.processed',
+				type: 'number',
+				width: 90,
+				locked: false,
+				cellStyle: { 'text-align': 'right' }
+			},
+			{
+				label: 'Erred',
+				property: 'recordsSummary.erred',
+				type: 'number',
+				width: 80,
+				locked: false,
+				cellStyle: { 'text-align': 'right' }
+			},
+			{
+				label: 'Ignored',
+				property: 'recordsSummary.ignored',
+				type: 'number',
+				width: 80,
+				locked: false,
+				cellStyle: { 'text-align': 'right' }
+			},
+			{
+				label: 'Imported At',
+				property: 'dateCreated',
+				type: 'datetime',
+				format: 'yyyy-MM-dd HH:mm:ss',
+				width: 170,
+				locked: false
+			},
+			{
+				label: 'Last Updated',
+				property: 'lastUpdated',
+				type: 'datetime',
+				format: 'yyyy-MM-dd HH:mm:ss',
+				width: 170,
+				locked: false
+			},
+			{
+				label: 'Imported By',
+				property: 'createdBy',
+				type: 'text',
+				width: 120,
 				locked: false
 			},
 			{
@@ -101,51 +149,16 @@ export class DependencyBatchColumnsModel {
 				label: 'ETL Script',
 				property: 'dataScript.name',
 				type: 'text',
-				width: 130,
+				width: 160,
 				locked: false
 			},
 			{
 				label: 'File Name',
 				property: 'originalFilename',
 				type: 'text',
-				width: 250,
+				width: 150,
 				locked: false
-			},
-			{
-				label: 'Records',
-				property: 'recordsSummary.count',
-				type: 'number',
-				width: 80,
-				locked: false
-			},
-			{
-				label: 'Erred',
-				property: 'recordsSummary.erred',
-				type: 'number',
-				width: 80,
-				locked: false
-			},
-			{
-				label: 'Pending',
-				property: 'recordsSummary.pending',
-				type: 'number',
-				width: 80,
-				locked: false
-			},
-			{
-				label: 'Processed',
-				property: 'recordsSummary.processed',
-				type: 'number',
-				width: 100,
-				locked: false
-			},
-			{
-				label: 'Ignored',
-				property: 'recordsSummary.ignored',
-				type: 'number',
-				width: 80,
-				locked: false
-			},
+			}
 		];
 	}
 }

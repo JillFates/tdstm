@@ -62,7 +62,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 	}
 
 	void 'test can throw an Exception if lookup does not contain a valid field name'() {
-
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
@@ -258,12 +257,14 @@ class ETLLookupSpec extends ETLBaseSpec {
 						console on
 						read labels
 						domain Device
+						set lookupFieldNameVar with 'assetName'
 						iterate {
 							extract 'server' load 'Name' set nameVar
 							extract 'model' load 'model'
 							extract 'dependsOn' set dependsOnVar
 
-							lookup 'assetName' with dependsOnVar
+							// Test lookup with variable for the name
+							lookup lookupFieldNameVar with dependsOnVar
 							if ( LOOKUP.notFound() ) {
 								log 'Repeated asset'
 							}
@@ -399,6 +400,75 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test lookup with multiple criteria'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				set lookupFieldNameVar with 'assetName'
+				// Force the case to uppercase so that it tests the case-insensitive lookup
+				set serialNumVar with '422e2244-f78c-2012-b56a-e435d7519abf'.toUpperCase()
+				iterate {
+					extract 'Vm' load 'Name'
+					extract 'Vm Id' load 'externalRefId'
+					extract 'Vm Uuid' load 'serialNumber'
+					extract 'OS according to the VMware Tools' load 'os'
+
+					// the serialNumber is that of the 2nd row in the csv
+					lookup lookupFieldNameVar, 'serialNumber' with '59admin', serialNumVar
+					if ( LOOKUP ) {
+						load 'custom1' with 'Matched 2nd'
+					} else {
+						load 'custom1' with 'No match'
+					}
+				}
+				""".stripIndent())
+
+		then: 'Results should contain Device domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os', 'custom1'] as Set
+					data.size() == 5
+					data[0].fields.assetName.value == '59'
+					data[0].fields.externalRefId.value == 'vm-98720'
+					data[0].fields.serialNumber.value == '422e6d92-22c1-c6c1-1de8-eceec50f94bc'
+					data[0].fields.os.value == 'Red Hat Enterprise Linux 6 (64-bit)'
+					data[0].fields.custom1.value == 'No match'
+
+					data[1].fields.assetName.value == '59admin'
+					data[1].fields.externalRefId.value == 'vm-98718'
+					data[1].fields.serialNumber.value == '422e2244-f78c-2012-b56a-e435d7519abf'
+					data[1].fields.os.value == 'Red Hat Enterprise Linux 6 (64-bit)'
+					data[1].fields.custom1.value == 'Matched 2nd'
+
+					data[2].fields.assetName.value == 'APDC03'
+					data[2].fields.externalRefId.value == 'vm-44956'
+					data[2].fields.serialNumber.value == '422ea90a-b80a-81de-0d4c-6f111142c4f7'
+					data[2].fields.os.value == 'Microsoft Windows Server 2012 (64-bit)'
+					! data[2].fields.custom1
+					! data[3].fields.custom1
+					! data[4].fields.custom1
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can lookup results and used !LOOKUP to check results'() {
 
 		given:
@@ -514,7 +584,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract 'Cluster' set clusterNameVar
 
 						domain Application
-							lookup 'assetName' with clusterNameVar
+							// Testing this against the label instead of fieldName
+							lookup 'Name' with clusterNameVar
 							if ( LOOKUP.notFound() ) {
 								load 'assetName' with clusterNameVar
 
@@ -588,6 +659,52 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test the ETLProcessorResult lookupInReference method'() {
+		setup:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+			String firstAssetName = 'xraysrv01'
+			String secondAssetName = 'zuludb01'
+			ETLDomain domain = ETLDomain.Device
+			etlProcessor.result.addCurrentSelectedDomain(domain)
+			etlProcessor.iterateIndex = new IterateIndex(3)
+
+		when: 'calling lookupInReference when there is no results'
+			boolean found = etlProcessor.result.lookupInReference(['assetName'], [firstAssetName])
+		then: 'nothing should be found'
+			! found
+
+		when: 'there is an asset with name xraysrv01'
+			createResultReference(etlProcessor, domain, [assetName: firstAssetName])
+		and: 'there is a 2nd asset with a different name'
+			createResultReference(etlProcessor, domain, [assetName: secondAssetName])
+		then: 'calling lookupInReference for the 2nd server name should find a result'
+			etlProcessor.result.lookupInReference(['assetName'], [secondAssetName])
+		and: 'the resultIndex in the process should be pointing to the 2nd asset'
+			1 == etlProcessor.result.resultIndex
+
+		when: 'there is another result that has the same name as the first with a different assetType'
+			createResultReference(etlProcessor, domain, [assetName: firstAssetName, assetType: 'Blade'])
+		and: 'calling lookupInReference with a query that will result in multiple results found'
+			etlProcessor.result.lookupInReference(['assetName'], [firstAssetName])
+		then: 'an exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			ETLProcessorException.lookupFoundMultipleResults().message == e.message
+
+		when: 'calling lookupInReference with a query that will result in a single response'
+			found = etlProcessor.result.lookupInReference(['assetName', 'assetType'], [firstAssetName, 'Blade'])
+		then: 'one should be found'
+			found
+		and: 'the resultIndex should be pointing to the 3rd result'
+			2 == etlProcessor.result.resultIndex
+
+	}
+
 	static final String DependencyDataSetContent = """server,model,dependsOn
 xray01,VM,
 deltasrv03,VM,xray01
@@ -600,4 +717,26 @@ APDC03,poweredOn,False,green,APDC03.pcc.int,connected,running,green,False,,,2017
 ,apntbkup01,VMWare_ESX_50_FlashBackup",MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Microsoft Windows Server 2012 (64-bit),Microsoft Windows Server 2012 (64-bit),vm-44956,422ea90a-b80a-81de-0d4c-6f111142c4f7,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
 APESRS,poweredOn,False,green,,connected,notRunning,gray,False,,,2017-04-28T16:38:21.437802Z,1,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"69,723","69,723","69,723",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,4,none,never,,[AP_VNX5300_ESX07_PROD] APESRS/APESRS.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_DEV,apesx01.moredirect.com,SUSE Linux Enterprise 11 (64-bit),SUSE Linux Enterprise 11 (64-bit),vm-67122,422e1dd3-acd2-9e60-3720-2d69ba848df2,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
 APESX01-SCVM,poweredOn,False,green,APESX01-SCVM,connected,running,green,False,2018/01/16 16:43:22,,2018-01-16T21:43:23.155196Z,2,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"20,702","20,702","20,702",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,9,none,never,,[AP_VNX5400_ESX06_PROD] APESX01-SCVM/APESX01-SCVM.vmx,"The ""Sophos for Virtual Environments"" Appliance, part of the Sophos Endpoint Security suite of products, provides a unique integrated solution that centralizes threat protection across virtual machines.",,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Other Linux (64-bit),Ubuntu Linux (64-bit),vm-100365,422ed1b6-466d-8155-4483-fb786405a8a3,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0""".stripIndent()
+
+
+	/**
+	 * Used by the specs to build up the processor results
+	 */
+	private void createResultReference(ETLProcessor etlProcessor, ETLDomain domain, Map fieldValueMap) {
+		etlProcessor.result.startRow()
+		etlProcessor.result.findOrCreateCurrentRow()
+		// Add each element
+		fieldValueMap.each { String fieldName, Object value ->
+			Element element = new Element(
+				value: value,
+				originalValue: value,
+				fieldDefinition:  etlProcessor.lookUpFieldDefinition(domain, fieldName),
+				processor: etlProcessor
+			)
+			etlProcessor.result.loadElement(element)
+		}
+		etlProcessor.result.endRow()
+	}
+
+
 }

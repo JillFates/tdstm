@@ -96,9 +96,17 @@ class PersonController implements ControllerMethods {
 		int rowOffset = (currentPage - 1) * maxRows
 		def companyId
 		def personInstanceList
-		def filterParams = [firstname: params.firstname, middlename: params.middlename, lastname: params.lastname,
-		                    userLogin: params.userLogin, company: params.company, dateCreated: params.dateCreated,
-		                    lastUpdated: params.lastUpdated, modelScore: params.modelScore]
+		def filterParams = [
+			firstname  : params.firstname,
+			middlename : params.middlename,
+			lastname   : params.lastname,
+			userLogin  : params.userLogin,
+			email      : params.email,
+			company    : params.company,
+			dateCreated: params.dateCreated,
+			lastUpdated: params.lastUpdated,
+			modelScore : params.modelScore
+		]
 
 		// Validate that the user is sorting by a valid column
 		if (!(sortIndex in filterParams)) {
@@ -106,8 +114,9 @@ class PersonController implements ControllerMethods {
 		}
 
 		def query = new StringBuilder("""SELECT * FROM (SELECT p.person_id AS personId, p.first_name AS firstName,
-			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active,
-			date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId, IFNULL(p.model_score, 0) AS modelScore
+			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, p.email as email,
+			pg.name AS company, u.active, date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId,
+			IFNULL(p.model_score, 0) AS modelScore
 			FROM person p
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
@@ -166,11 +175,11 @@ class PersonController implements ControllerMethods {
 		String userLoginEditLink = createLink(controller:'userLogin', action:'edit')
 		String userAddPng = resource(dir: 'icons', file: 'user_add.png', absolute: false)
 		def results = personInstanceList?.collect {
-			[ cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
+			[cell: ['<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.firstname + '</a>',
 			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.middlename + '</a>',
 			'<a href="javascript:Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.lastname + '</a>',
 			genCreateEditLink(canCreate, canEdit, userLoginCreateLink, userLoginEditLink, userAddPng, it),
-			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
+			it.email, it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
 	}
 

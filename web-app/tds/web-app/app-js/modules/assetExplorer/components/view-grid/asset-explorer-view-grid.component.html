@@ -11,7 +11,7 @@
 				<label>
 					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
-			<tds-bulk-change-button [selectedItems]="bulkSelectedItems" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<tds-bulk-change-button [bulkItems]="bulkItems" [enabled]="hasSelectedItems()" (clickBulk)="onClickBulkButton()" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 		</div>
 	    <div class="col-sm-6">
 		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
@@ -29,17 +29,13 @@
 		<ng-template kendoGridHeaderTemplate>
 			<div class="row">
 				<div class="col-md-12 text-center">
-					<div class="checkbox checkbox-grid">
-						<label>
-							<input type="checkbox" [(ngModel)]="selectAll" (change)="onSelectAll()" name="selectAll">
-						</label>
-					</div>
+					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)" [overrideState]="overrideCheckboxState"></tds-checkbox>
 				</div>
 			</div>
 		</ng-template>
 		<ng-template kendoGridCellTemplate let-dataItem>
             <label class="selectall-checkbox-column text-center">
-                <input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
+	            <input type="checkbox" [checked]="dataGridCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="setSelectedItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
             </label>
 			<!--<div class="row">-->
 				<!--<div class="col-md-12 text-center">-->

@@ -56,4 +56,30 @@ export class ObjectUtils {
 		dataInstance[property] = value;
 		return JSON.stringify(dataInstance);
 	}
+
+	/**
+	 * Determine if the value passed is an object.
+	 * @param value
+	 * @returns {boolean}
+	 */
+	public static isObject(value: any): boolean {
+		return typeof value === 'object';
+	}
+
+	/**
+	 * Returns either the value, or the Object or the Array parsed as a string.
+	 * @param value
+	 * @returns {string | any}
+	 */
+	public static getValueOrObjectOrListString(value: any): string | any {
+		if (Array.isArray(value)) {
+			return JSON.stringify(value);
+			// return '(LIST)'
+		} else if (ObjectUtils.isObject(value)) {
+			return JSON.stringify(value);
+			// return '(OBJECT)'
+		} else {
+			return value;
+		}
+	}
 }

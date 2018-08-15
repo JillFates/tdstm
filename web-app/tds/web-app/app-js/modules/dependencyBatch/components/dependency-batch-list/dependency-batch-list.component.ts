@@ -27,6 +27,8 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 })
 export class DependencyBatchListComponent {
 
+	public userTimeZone: string;
+
 	protected BatchStatus = BatchStatus;
 	protected columnsModel: DependencyBatchColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
@@ -57,7 +59,8 @@ export class DependencyBatchListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService) {
+		private userPreferenceService: PreferenceService
+	) {
 			this.onLoad();
 	}
 
@@ -65,6 +68,9 @@ export class DependencyBatchListComponent {
 	 * On Page Load.
 	 */
 	private onLoad(): void {
+		// Fetch the user preferences for their TimeZone and DateFormat
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+
 		this.columnsModel = new DependencyBatchColumnsModel();
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
@@ -76,6 +82,16 @@ export class DependencyBatchListComponent {
 				this.setQueuedLoop();
 			});
 		});
+	}
+
+	/**
+	 * Used in template to forward click events from the element to the target parentNode
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 
 	/**

@@ -17,7 +17,7 @@ class ExportViewSpec extends GebReportingSpec {
 
     //Define the names of the Application you will Create and Edit
     static randStr = CommonActions.getRandomString()
-    static fileName = "ExportSystemAllAssets" + randStr
+    static fileName = "QAE2E " + randStr  + " ExportSystemAllAssets"
 
     def setupSpec() {
         testCount = 0
@@ -28,7 +28,6 @@ class ExportViewSpec extends GebReportingSpec {
     }
 
     def "1. User loads the system 'All Views' view"() {
-        testKey = "TM-8505"
         given: "The user is in View Manager Page"
             at AssetViewsPage
         when: "The user clicks on System Views"
@@ -41,7 +40,6 @@ class ExportViewSpec extends GebReportingSpec {
     }
 
     def "2. The User cancels export system 'All Views' view process"() {
-        testKey = "TM-8505"
         given: "The User is on 'All Views' view Page"
             at ViewPage
         when: 'The User clicks on Export view button'
@@ -55,7 +53,6 @@ class ExportViewSpec extends GebReportingSpec {
     }
 
     def "3. The User exports the system 'All Views' view"() {
-        testKey = "TM-8505"
         given: "The User is on 'All Views' view Page"
             at ViewPage
         when: 'The User clicks on Export view button'
@@ -72,7 +69,6 @@ class ExportViewSpec extends GebReportingSpec {
     }
 
     def "4. Verify the system 'All Views' view starts downloading"() {
-        testKey = "TM-8505"
         given: "The User is on 'All Views' view Page"
             at ViewPage
         when: 'The user browse to Downloads folder'

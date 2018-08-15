@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
-    <title>Import Assets (TM XLS)</title>
+    <title>Import Assets (TM Excel)</title>
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
     <g:javascript src="jquery/ui.progressbar.js"/>
     <g:javascript src="import.export.js"/>
@@ -90,7 +90,7 @@
 
 </head>
 <body>
-<tds:subHeader title="Import Assets (TM XLS)" crumbs="['Assets','Import Assets (TM XLS)']"/>
+<tds:subHeader title="Import Assets (TM Excel)" crumbs="['Assets','Import Assets (TM Excel)']"/>
 <g:if test="${flash.error}">
     <div class="errors">${flash.error}</div>
 </g:if>
@@ -216,7 +216,7 @@
                     <tds:hasPermission permission="${Permission.AssetImport}">
                         <div class="box-footer">
                             <button type="submit" id="run"  class="btn btn-primary">Import Spreadsheet&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
-                            <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Asset Batches: ${dataTransferBatchs}</g:link></div>
+                            <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Import Batches (Excel): ${dataTransferBatchs}</g:link></div>
                         </div>
                     </tds:hasPermission>
                 </g:form>

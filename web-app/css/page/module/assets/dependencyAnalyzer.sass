@@ -31,7 +31,7 @@ div.content-wrapper
       
       div#graphToolbarId
         height: 26px
-      
+
       // highlighting dropdown menu styles
       div#filterOptionsMenuId
         z-index: 1
@@ -96,7 +96,70 @@ div.content-wrapper
       border: 1px solid green
       & > *
         opacity: 0
-
+    div#item1,
+    div#dependencyBundleDetailsId
+      .asset-tag-selector-component
+        padding-left: 0px
+        .km-switch
+          right: 9px
+          top: 10px
+          width: 52px
+          padding-right: 3px
+          .km-switch-wrapper
+            display: none !important
+          .km-switch-container
+            .km-switch-handle
+              vertical-align: initial
+              .km-switch-label-on
+                left: -219% !important
+        .k-multiselect
+          width: 217px !important
+          .k-multiselect-wrap ul
+            max-width: 159px
+        ul li
+          padding: inherit
+          margin-right: 0px
+        div
+          padding: 0px
+        .k-widget li span:not(.k-select) div
+          padding-top: 3px !important
+          padding-bottom: 3px !important
+        span.k-icon
+          padding-top: 13px !important
+    div#dependencyBundleDetailsId
+      .asset-tag-selector-component
+        .km-switch
+          top: 5px
+        .k-widget li span:not(.k-select) div
+          padding-top: 1px !important
+          padding-bottom: 0px !important
+    .dependencyConsoleForm
+      margin-left: 15px
+      .f-column-1,
+      .f-column-2,
+      .f-column-3
+        margin-right: 10px
+      .f-column-1,
+      .f-column-2
+        select
+          height: 34px
+      .f-column-4
+        padding-top: 7px
+        .refresh-icon
+          margin-left: 20px
+      .f-column-1
+        padding-top: 7px
+        max-width: 240px
+        label
+          font-weight: bold
+          margin-right: 10px
+      .f-column-3
+        padding-top: 1px
+        label
+          position: relative
+          top: -13px
+        #tmHighlightGroupSelector
+          display: inline-block
 // styles the person highlighting kendo listbox
 #personHighlightSelectId_listbox *
   cursor: pointer

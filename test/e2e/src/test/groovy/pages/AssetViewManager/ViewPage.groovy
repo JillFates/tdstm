@@ -1,4 +1,5 @@
 package pages.AssetViewManager
+
 import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
@@ -39,6 +40,53 @@ class ViewPage extends Page{
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
         refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
+        assetNames {$(".asset-detail-name-column")}
+        rows {$("[kendogridtablebody]")[1]}
+    }
+
+    def getRandomAssetDataAndClickOnIt(){
+        //waitFor asset details to be displayed
+        commonsModule.waitForLoader(5)
+        def dataList = []
+        def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
+        def assetName =assetNames[assetIndex].text()
+        dataList.add(assetName)
+        def rowData =getRowData(assetIndex)
+        dataList.addAll(rowData)
+        interact {
+            moveToElement(assetNames[assetIndex])
+        }
+        assetNames[assetIndex].click()
+        dataList
+    }
+    /**
+     * Clicks on THE FIRST asset with that name
+     * @param name
+     * @return
+     */
+    def openAssetByName(name){
+        nameFilter = name
+        // verify exact match and no other was found with same name
+        // otherwise we can click in other view than is required
+        def links = assetNames.findAll { it.text() == name }
+        waitFor{ links[0].click() }
+    }
+
+    /**
+     * saves the text of a row in a list so it can be validated later
+     * @param rowIndex
+     */
+    def getRowData(int rowIndex){
+        def assetRowDataDisplayed = rows.find("tr")[rowIndex].find("td")
+        def assetRowData = []
+        assetRowDataDisplayed.each {
+            assetRowData.add(it.text())
+        }
+        assetRowData
+    }
+
+    def getViewName(){
+        voidStars[0].parent().parent().next().text()
     }
 
     def verifyViewTitle(title) {
@@ -49,10 +97,10 @@ class ViewPage extends Page{
         waitFor{exportModalContainer.isDisplayed()}
     }
 
-
     def clickViewManagerBreadCrumb(){
         waitFor{viewMgrBreadCrumb.click()}
     }
+
     def waitForHiddenModalContainer(){
         waitFor{!exportModalContainer.isDisplayed()}
     }
