@@ -37,10 +37,11 @@ class HttpProducerServiceSpec extends Specification {
 
 	private static final String paramsJson = """
 		[
-		  {	"param": "param1",
-			"context": "${ContextType.USER_DEF.name()}",
-			"value": "xk324-kj1i2-23ks-9sdl"
-		  }
+			{	
+				"param": "param1",
+				"context": "${ContextType.USER_DEF.name()}",
+				"value": "xk324-kj1i2-23ks-9sdl"
+			}
 		]
 	"""
 
