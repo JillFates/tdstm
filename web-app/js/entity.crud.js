@@ -1787,7 +1787,7 @@ function deleteAsset(id, value) {
 	}
 
 }
-function reloadDependencyGroupsSection(postData) {
+function reloadDependencyGroupsSection() {
 	var moveBundleId = $("#planningBundleSelectId").val();
 	var processTab = jQuery('#processDiv');
 	processTab.attr("style", "display:block");
@@ -1806,10 +1806,11 @@ function reloadDependencyGroupsSection(postData) {
 		delete String.prototype.toJSON;
 	}
 
-	if (!postData) {
-		var postData = {
-			bundle: moveBundleId
-		}
+	var postData = {
+		bundle: $('#planningBundleSelectId').val(),
+		tagIds: getTagsIds($('#tmHighlightGroupSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
+		tagMatch: $('#tmHighlightGroupSelector').find(".asset-tag-selector-operator-switch").attr('checked') ? 'ALL' : 'ANY',
+		assignedGroup: ($('#assignedGroupCB').is(':checked'))? 1:0
 	}
 
 	$.ajax({
@@ -2257,13 +2258,7 @@ var getTagsIds = function(tags) {
 };
 
 function onDependencyFiltersChange() {
-	var postData = {
-		bundle: $('#planningBundleSelectId').val(),
-		tagIds: getTagsIds($('#tmHighlightGroupSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
-		tagMatch: $('#tmHighlightGroupSelector').find(".asset-tag-selector-operator-switch").attr('checked') ? 'ALL' : 'ANY'
-	}
-
-	reloadDependencyGroupsSection(postData);
+	reloadDependencyGroupsSection();
 };
 
 function showDependencyControlDiv() {

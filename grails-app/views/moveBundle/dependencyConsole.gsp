@@ -359,10 +359,7 @@
 				}
 				return objectString
 			}
-			function assignedCheckbox(chkbox) {
-				$('#assignedGroup').val(chkbox.checked ? '1' : '0')
-				chkbox.form.submit()
-			}
+
 			function getListBySort(value,dependencyBundle,sort){
 				var bundle = $("#planningBundleSelectId").val()
 				var sortBy = $("#sortBy").val()

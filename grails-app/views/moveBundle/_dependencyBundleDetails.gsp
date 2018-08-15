@@ -5,7 +5,6 @@
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div class="message" id="messageId" style="display:none">${flash.message}</div>
 		<div class="row dependencyConsoleForm">
-			<input type="hidden" name="assignedGroup" id="assignedGroup" value="${isAssigned}" />
 			<div class="f-grid" id="angular-compiler">
 				<div class="f-column-1">
 					<label>Dependency Groups</label>
@@ -22,7 +21,7 @@
 					<tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyFiltersChange()"></tm-asset-tag-selector>
 				</div>
 				<div class="f-column-4">
-					<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
+					<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()" />
 					<label for="assignedGroupCB" class="pointer">Show ONLY Work In Progress</label>
 					<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
 						<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
