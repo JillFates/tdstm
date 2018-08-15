@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6e09c304-f824-43e1-8cc1-6984a814b92e",
+		"_postman_id": "f4b5a8c3-0135-4360-86fe-15e84b512a9e",
 		"name": "Bulk Change Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -170,7 +170,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "136629f5-1a5b-452c-8a05-441ee01248e4",
+						"id": "4a76dd62-1796-4c58-a139-47f452632851",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -185,8 +185,8 @@
 							"   ",
 							"    pm.expect(data.name).to.include(pm.variables.get(\"tagName\"));",
 							"    pm.expect(data.description).to.include('Description');",
-							"    pm.expect(data.color).to.eql('Black');",
-							"    pm.expect(data.css).to.eql('tag-black');",
+							"    pm.expect(data.color).to.eql('White');",
+							"    pm.expect(data.css).to.eql('tag-white');",
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
 							"});",
 							""
@@ -208,7 +208,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description{{$randomInt}}\",\n  \"color\":\"Black\"\n}"
+					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description{{$randomInt}}\",\n  \"color\":\"White\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -350,7 +350,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "91f7d142-00ba-4a15-b310-011716585914",
+						"id": "d8f0e729-fcfa-4a8b-b6b3-5b941f44ec63",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -369,8 +369,8 @@
 							"    ",
 							"    pm.expect(jsonData.data[thirdTolastIndex].name).to.include(pm.variables.get(\"tagName\"));",
 							"    pm.expect(jsonData.data[thirdTolastIndex].description).to.include('Description');",
-							"    pm.expect(jsonData.data[thirdTolastIndex].color).to.eql('Black');",
-							"    pm.expect(jsonData.data[thirdTolastIndex].css).to.eql('tag-black');",
+							"    pm.expect(jsonData.data[thirdTolastIndex].color).to.eql('White');",
+							"    pm.expect(jsonData.data[thirdTolastIndex].css).to.eql('tag-white');",
 							"    ",
 							"    pm.expect(jsonData.data[secondTolastIndex].name).to.include(pm.variables.get(\"tagName1\"));",
 							"    pm.expect(jsonData.data[secondTolastIndex].description).to.include('Description');",
@@ -552,7 +552,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "82e8b29a-6abf-490a-9d10-c64bbfd5799c",
+						"id": "8fcb6439-53a7-478c-8a1e-d44a6492b7ed",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -563,7 +563,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    pm.expect(jsonData.data).to.eql({",
-							"        \"tags\": {",
+							"        \"tagAssets\": {",
 							"            \"add\": \"bulkAdd\",",
 							"            \"clear\": \"bulkClear\",",
 							"            \"replace\": \"bulkReplace\",",
@@ -612,7 +612,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4c37aa29-4e68-486c-a468-85b9cc04facf",
+						"id": "eb7f4202-b02e-47c0-9015-16c8e59150f9",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -622,7 +622,7 @@
 							"pm.test(\"Tags Data\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
-							"    pm.expect(jsonData.data[0]).to.eql('tags');",
+							"    pm.expect(jsonData.data[0]).to.eql('tagAssets');",
 							"});"
 						]
 					}
@@ -694,7 +694,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}, {{asset2}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tags\", \n\t\t\t\"action\"   : \"add\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}} , {{tag_id3}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}, {{asset2}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"add\", \n\t\t\t\"value\"    : \"[{{tag_id}}, {{tag_id2}} , {{tag_id3}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -810,7 +810,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tags\", \n\t\t\t\"action\"   : \"remove\", \n\t\t\t\"value\"    : \"[{{tag_id3}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"remove\", \n\t\t\t\"value\"    : \"[{{tag_id3}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -990,7 +990,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tags\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"[{{tag_id3}}, {{tag_id2}}]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"replace\", \n\t\t\t\"value\"    : \"[{{tag_id3}}, {{tag_id2}}]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",
@@ -1173,7 +1173,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tags\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
+					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": 1,\n\t\"assetIds\": [{{asset1}}],\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"tagAssets\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"[]\"}\t\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/bulkChange",

@@ -1115,7 +1115,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, $http,
 	}
 
 	scope.$on('validContextSelection', function(evt, recipeId, contextId) {
-		scope.tasks.getTaskBatchInfo({recipeId: recipeId, contextId: contextId, logs: false});
+		scope.tasks.getTaskBatchInfo({recipeId: recipeId, eventId: contextId, logs: false});
 	});
 
 	if (state.is("recipes.detail.gentasks")) {

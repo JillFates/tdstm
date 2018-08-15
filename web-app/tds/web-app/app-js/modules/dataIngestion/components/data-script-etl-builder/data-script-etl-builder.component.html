@@ -73,8 +73,7 @@
                     <!-- Textarea code -->
                     <div class="row" *ngIf="!collapsed.code">
                         <div class="col-md-12">
-                            <code-mirror *ngIf="!script || script.length === 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
-                            <code-mirror *ngIf="script.length > 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
+                            <code-mirror #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
                         </div>
                     </div>
                     <!-- Save / Cancel buttons -->
