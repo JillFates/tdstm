@@ -227,7 +227,13 @@ var GraphUtil = (function ($) {
 			groupingControl: []
 		}
 	};
-	
+	public.LASSO_TOOL = 1; // constant to represent the lasso tool
+	public.SELECTION_ADD_TOOL = 2; // constant to represent the selection add tool
+	// the current state of each tool
+	public.toolStates = {
+		lasso: false,
+		selectionAdd: false
+	}
 	
 	
 	// ############################################################## graph UI functions ##############################################################
@@ -602,21 +608,62 @@ var GraphUtil = (function ($) {
 		}
 	}
 	
-	// updates the cursor style for the graph based on input
-	public.updateCursorStyle = function (key, state) {
+	/*
+	// handles the cursor change for a key event
+	public.handleKeyCursorChange = function (key, state) {
 		var className = ''
 		if (key == KEY_CODES.SHIFT)
 			className = 'shift_key'
 		else if (key == KEY_CODES.CTRL)
 			className = 'ctrl_key'
 		
-		var target = canvas[0][0]
 		if (state == KEY_STATE_DOWN)
-			target.classList.add(className)
+			public.updateCursorStyle(className, true)
 		else if (state == KEY_STATE_UP)
-			target.classList.remove(className)
+			public.updateCursorStyle(className, false)
+	}
+	*/
+	
+	// updates the cursor style for the graph based on input
+	public.updateCursorStyle = function (cursorClass, enabled) {
+		var target = canvas[0][0]
+		if (enabled)
+			target.classList.add(cursorClass)
+		else
+			target.classList.remove(cursorClass)
 		
 		public.forceReflow(canvas)
+	}
+	
+	// called to activate a tool for the graph (for example: the lasso select tool)
+	public.activateTool = function (tool, button) {
+		button.addClass('toolActive')
+		if (tool == public.LASSO_TOOL) {
+			public.toolStates.lasso = true
+			public.updateCursorStyle('regionSelectCursor', true)
+		} else if (tool == public.SELECTION_ADD_TOOL) {
+			public.toolStates.selectionAdd = true
+		}
+	}
+	
+	// called to deactivate a tool for the graph (for example: the lasso select tool)
+	public.deactivateTool = function (tool, button) {
+		button.removeClass('toolActive')
+		if (tool == public.LASSO_TOOL) {
+			public.toolStates.lasso = false
+			public.updateCursorStyle('regionSelectCursor', false)
+		} else if (tool == public.SELECTION_ADD_TOOL) {
+			public.toolStates.selectionAdd = false
+		}
+	}
+	
+	// toggles the active state of a tool
+	public.toggleToolState = function (tool, button) {
+		var toolActive = button.hasClass('toolActive')
+		if (toolActive)
+			public.deactivateTool(tool, button)
+		else
+			public.activateTool(tool, button)
 	}
 	
 	// ############################################################## graph data and control functions ##############################################################

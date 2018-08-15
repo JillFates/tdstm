@@ -532,7 +532,7 @@ function createBehaviorHandler () {
 			dragging = false
 			if (clicked) {
 				var mode = GraphUtil.SELECT_MODES.REPLACE
-				if (event.ctrlKey) 
+				if (event.ctrlKey || GraphUtil.toolStates.selectionAdd) 
 					mode = GraphUtil.SELECT_MODES.TOGGLE
 				modifyNodeSelection([d], mode)
 			}
@@ -557,7 +557,12 @@ function createBehaviorHandler () {
 	function selectStart (d, i) {
 		clicked = true
 		var event = d3.event.sourceEvent
-		if (event.shiftKey && event.button == 0) {
+		var regionSelectMode = (event.shiftKey || GraphUtil.toolStates.lasso)
+		var leftButtonPressed = (event.button == 0)
+		var multiselect = (event.ctrlKey || GraphUtil.toolStates.selectionAdd)
+		
+		// start the region select if the user is in region selection mode and they pressed the left mouse button
+		if (regionSelectMode && leftButtonPressed) {
 			// pause the force graph while the user is selecting
 			if (GraphUtil.force.alpha() > 0) {
 				tempFreeze = true
@@ -569,7 +574,7 @@ function createBehaviorHandler () {
 			// show the region selection layer
 			GraphUtil.selectionElements.layer.style('display','')
 			// initialize the region selection at the current point
-			GraphUtil.initializeSelectionPath(cursorPosition, event.ctrlKey)
+			GraphUtil.initializeSelectionPath(cursorPosition, multiselect)
 			selectingRegion = true
 			// capture the mouse event to avoid further propagation/bubbling
 			GraphUtil.captureEvent()
@@ -578,12 +583,15 @@ function createBehaviorHandler () {
 	// fires whenever the user moves the mouse while selecting a region
 	function selectMove (d, i) {
 		var event = d3.event.sourceEvent
-		if (selectingRegion && event.button == 0) {
+		var leftButtonPressed = (event.button == 0)
+		
+		// continue the region select if one was already in progress and the left button is held
+		if (selectingRegion && leftButtonPressed) {
 			// get the cursor position on the graph
 			var mPos = d3.mouse(svgContainer[0][0])
 			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
 			// set the mouse cursor to the crosshair while selecting
-			canvas[0][0].classList.add('shift_key')
+			GraphUtil.updateCursorStyle('regionSelectCursor', true)
 			// update the selection path based on this new position
 			GraphUtil.setTempSelectionPath(cursorPosition)
 			GraphUtil.updateSelectionPath(cursorPosition, false)
@@ -596,7 +604,10 @@ function createBehaviorHandler () {
 	// fires when the user releases the mouse while selecting a region
 	function selectEnd (d, i) {
 		var event = d3.event.sourceEvent
-		if (selectingRegion && event.button == 0) {
+		var leftButtonPressed = (event.button == 0)
+		
+		// end the region selection if the user was selecting and the left button is held
+		if (selectingRegion && leftButtonPressed) {
 			// if we paused the graph at the start of this selection, unpause it now
 			if (tempFreeze) {
 				tempFreeze = false
@@ -606,15 +617,18 @@ function createBehaviorHandler () {
 			var mPos = d3.mouse(svgContainer[0][0])
 			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
 			// set the mouse cursor back to the default
-			canvas[0][0].classList.remove('shift_key')
+			GraphUtil.updateCursorStyle('regionSelectCursor', false)
 			// hide the region select layer
 			GraphUtil.selectionElements.layer.style('display','none')
 			// finalize the selection region and filter the nodes
 			GraphUtil.updateSelectionPath(cursorPosition, true)
 			GraphUtil.filterRegionSelection()
 			selectingRegion = false
+			GraphUtil.deactivateTool(GraphUtil.LASSO_TOOL, $('#lassoButtonId'))
 			// capture the mouse event to avoid further propagation/bubbling
 			GraphUtil.captureEvent()
+		
+		// if the user wasn't in region selection mode and they clicked in place, deselect all nodes
 		} else if (clicked) {
 			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
 		}
