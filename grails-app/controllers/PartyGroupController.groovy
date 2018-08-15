@@ -16,7 +16,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PartyGroupController implements ControllerMethods {
@@ -25,7 +25,7 @@ class PartyGroupController implements ControllerMethods {
 	static defaultAction = 'list'
 
 	ControllerService controllerService
-	JdbcTemplate jdbcTemplate
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	UserPreferenceService userPreferenceService
@@ -61,6 +61,7 @@ class PartyGroupController implements ControllerMethods {
 
 		String active = params.activeUsers ?: session.getAttribute("InActive") ?: 'Y'
 
+		def queryParams = [:]
 		def query = new StringBuffer("""SELECT * FROM (
 			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
 			FROM party_group pg
@@ -69,27 +70,29 @@ class PartyGroupController implements ControllerMethods {
 			WHERE party_group_id in (
 				SELECT party_id_to_id FROM party_relationship
 				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
-				AND role_type_code_to_id='CLIENT' AND party_id_from_id=$whom.company.id
-				)
+				AND role_type_code_to_id='CLIENT' AND party_id_from_id=:whomCompanyId
+				) OR party_group_id =:whomCompanyId
 			GROUP BY party_group_id ORDER BY
 		""")
 		query.append( " $sortIndex $sortOrder ) as companies")
 
+		queryParams.whomCompanyId = whom.company.id
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
 			if(it.value) {
 				if (firstWhere) {
-					query.append(" WHERE companies.$it.key LIKE '%$it.value%'")
+					query.append(" WHERE companies.$it.key LIKE :$it.key")
 					firstWhere = false
 				}
 				else {
-					query.append(" AND companies.$it.key LIKE '%$it.value%'")
+					query.append(" AND companies.$it.key LIKE :$it.key")
 				}
+				queryParams[it.key] = "%$it.value%"
 			}
 		}
 
-		companies = jdbcTemplate.queryForList(query.toString())
+		companies = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 
 		// Limit the returned results to the user's page size and number
 		int totalRows = companies.size()

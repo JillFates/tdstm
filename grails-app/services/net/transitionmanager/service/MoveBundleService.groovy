@@ -629,7 +629,7 @@ class MoveBundleService implements ServiceMethods {
 	 * relationships are processed first.
 	 * @param projectId : Related project
 	 * @param connectionTypes : filter for asset types
-	 * @param statusTypes : filter for status tyoes
+	 * @param statusTypes : filter for status types
 	 * @param isChecked : check if should use the new criteria
 	 * @param progressKey : progress key
 	 * @return String message information
