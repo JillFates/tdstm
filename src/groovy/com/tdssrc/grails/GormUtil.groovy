@@ -20,6 +20,7 @@ import org.codehaus.groovy.grails.validation.Constraint
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.hibernate.transform.Transformers
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
@@ -1385,5 +1386,91 @@ public class GormUtil {
 	 */
 	static boolean hasUnsavedChanges(Object domainInstance) {
 		return domainInstance.dirtyPropertyNames.size() > 0
+	}
+
+	/**
+	 *
+	 * Used to return a set of property values for a given domain
+	 * @param domainClass - the domain class to query
+	 * @param propertyNames - a list of the propertyNames to select
+	 * @param sort - an array of sort parameters (e.g. [ ['name', 'asc'], ['age', 'desc'] ] )
+	 * @param maxRows - the number of rows to return, default to ALL rows
+	 * @param rowOffset - the offset into the results to return for pagination, default to first row
+	 * @return aof the rows as a map by property name
+	 */
+	static List<Map> listDomainForProperties(Project project, Class domainClass, List<String> propertyNames, List<List> sort=[], Integer maxRows=null, Integer rowOffset=null) {
+		// Fail if the class is not a domain.
+		if (!isDomainClass(domainClass)) {
+			throw new RuntimeException("Invalid domain class ${domainClass.simpleName} given.")
+		}
+		// Check that the propertyNames is neither null nor empty.
+		if (!propertyNames) {
+			throw new RuntimeException("No subset of properties was given to GormUtil.listDomainForProperties.")
+		}
+		// Check the properties to be projected are actually properties on the domain.
+		validatePropertiesExistForDomain(domainClass, propertyNames, true)
+
+		// Check the properties used for sorting are also actual properties on the domain.
+		validatePropertiesExistForDomain(domainClass, sort*.get(0), true)
+
+		// Check if 'project' is a domain property for the given class.
+		boolean hasProjectProperty = isDomainProperty(domainClass, 'project')
+		// Fail if the domain has project but the parameter is null.
+		if (hasProjectProperty && !project) {
+			throw new RuntimeException("Null project given to listDomainForProperties with a domain that has a project property.")
+		}
+
+		return domainClass.createCriteria().list {
+			// If the domain has a 'project' property, use it to filter the results.
+			if (hasProjectProperty) {
+				and {
+					eq('project', project)
+				}
+			}
+			// Restrict the properties being projected to the list of properties given.
+			projections {
+				propertyNames.each{ String prop ->
+					property(prop, prop)
+				}
+			}
+
+			// Sort the results by the fields given for sorting.
+			sort.each {List<String> sortPropList ->
+				String descAsc = 'asc'
+				if (sortPropList.size() > 1 && sortPropList[1].toUpperCase() == 'DESC') {
+					descAsc = 'desc'
+				}
+				order(sortPropList[0], descAsc)
+			}
+			// Limit the number of results if needed.
+			if (maxRows) {
+				maxResults(maxRows)
+			}
+			// Set an offset if specified.
+			if (rowOffset) {
+				firstResult(rowOffset)
+			}
+			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+		}
+	}
+
+	/**
+	 * Determine whether or not all members of a list are properties of the given domain class.
+	 * @param domainClass
+	 * @param properties
+	 * @param throwException - true: RuntimeException is thrown when a member of the list is not a property on the domain.
+	 * @return
+	 */
+	static boolean validatePropertiesExistForDomain(Class domainClass, List<String> properties, boolean throwException = false) {
+		for (property in properties) {
+			if (!isDomainProperty(domainClass, property)) {
+				if (throwException) {
+					throw new RuntimeException("Invalid property $property for domain ${domainClass.simpleName}")
+				} else {
+					return false
+				}
+			}
+		}
+		return true
 	}
 }

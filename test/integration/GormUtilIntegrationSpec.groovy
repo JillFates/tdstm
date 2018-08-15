@@ -1,31 +1,22 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
-
+import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Unroll
 import spock.lang.Ignore
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.exceptions.GrailsDomainException
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import com.tds.asset.AssetDependency
 import net.transitionmanager.domain.PartyRelationship
-
-import com.tds.asset.Database
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.Workflow
-import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import grails.validation.Validateable
@@ -34,16 +25,24 @@ class GormUtilIntegrationSpec extends Specification {
 
 	// IOC variables
 	def sessionFactory
-	PersonService personService
-	ProjectService projectService
-	PersonTestHelper personHelper
 	AssetTestHelper assetHelper
+	PersonService personService
+	PersonTestHelper personHelper
+	ProjectService projectService
 	ProjectTestHelper projectHelper
+
+	@Shared
+	Project sharedProject
 
 	def setup() {
 		assetHelper = new AssetTestHelper()
-		projectHelper = new ProjectTestHelper()
 		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
+		sharedProject = projectHelper.createProject()
+		Person person = personHelper.createPerson()
+		for (int i = 0; i < 3; i++) {
+			assetHelper.createApplication(person, sharedProject)
+		}
 	}
 
 	def "1. Test isDomainClass"() {
@@ -711,6 +710,86 @@ class GormUtilIntegrationSpec extends Specification {
 			PartyRelationship partyRelationship = GormUtil.findInProjectByAlternate(project, PartyRelationship, 'nothing should exist with this for a name')
 		then: 'a null should be returned'
 			null == partyRelationship
+	}
+
+	void '28. test listDomainForProperties general behavior'() {
+		when: 'when requesting a subset of properties (name and id) and no sort criteria'
+			List<Map> apps = GormUtil.listDomainForProperties(sharedProject, Application, ['id', 'assetName'], [['assetName', 'desc']], 200, 0)
+		then: 'no exception was thrown as all parameters are valid'
+			noExceptionThrown()
+		and: 'the list has three elements'
+			apps.size() == 3
+		and: 'elements in the list contain only the requested fields (name and id)'
+			for (Map app in apps) {
+				app.keySet().size() == 2
+				app.containsKey('id')
+				app.containsKey('assetName')
+			}
+		when: 'using limit to one result with an offset of one'
+			List<Map> otherApps = GormUtil.listDomainForProperties(sharedProject, Application, ['id', 'assetName'], [['assetName']], 1, 1)
+		then: 'the list has one element'
+			otherApps.size() == 1
+		and: 'the element is the second'
+			otherApps[0].id == apps[1].id
+		when: 'executing the request with a project with no assets'
+			Project project2 = projectHelper.createProject()
+			otherApps = GormUtil.listDomainForProperties(project2, Application, ['id', 'assetName'])
+		then: 'the list is empty'
+			otherApps.size() == 0
+		when: 'fetching objects from a class that does not have a project property, such as Person'
+			GormUtil.listDomainForProperties(null, Person, ['id', 'firstName'])
+		then: 'no exception is thrown'
+			noExceptionThrown()
+	}
+
+	void '29. test listDomainForProperties sorting'() {
+		when: 'when requesting a subset of properties (name and id) and sorted by assetName (asc)'
+			List<Map> apps = GormUtil.listDomainForProperties(sharedProject, Application, ['id', 'assetName'], [['assetName']])
+		then: 'the elements are properly sorted'
+			apps[0].assetName.toUpperCase() < apps[1].assetName.toUpperCase()
+			apps[1].assetName.toUpperCase() < apps[2].assetName.toUpperCase()
+		when: 'requesting the same subset with the opposite order (desc)'
+			List<Map> appsDesc = GormUtil.listDomainForProperties(sharedProject, Application, ['id', 'assetName'], [['assetName', 'desc']])
+		then: 'the results are sorted correctly'
+			appsDesc[0].assetName == apps[2].assetName
+			appsDesc[1].assetName == apps[1].assetName
+			appsDesc[2].assetName == apps[0].assetName
+		when: 'sorting with multiple criterias'
+			apps = GormUtil.listDomainForProperties(sharedProject, Application, ['id', 'shutdownBy', 'startupBy'], [['shutdownBy'], ['startupBy', 'asc'], ['id', 'desc']])
+		then: 'the elements are properly sorted'
+			for (int i = 0; i < apps.size() - 1; i++) {
+				(apps[i].shutdownBy < apps[i + 1].shutdownBy) ||
+					(apps[i].shutdownBy == apps[i + 1].shutdownBy && apps[i].startupBy < apps[i + 1].startupBy) ||
+					(apps[i].startupBy == apps[i + 1].startupBy && apps[i].id > apps[i + 1].id)
+			}
+	}
+
+	void '30 test listDomainForProperties under invalid scenarios '() {
+		when: 'calling with a null project'
+			GormUtil.listDomainForProperties(null, Application, ['id', 'assetName'])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+		when: 'calling with a class that is not a domain class'
+			GormUtil.listDomainForProperties(project, String, ['id', 'assetName'])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+		when: 'calling with no domain class'
+			GormUtil.listDomainForProperties(project, null, ['id', 'assetName'])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+		when: 'calling with no list of properties'
+			GormUtil.listDomainForProperties(project, null, [])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+		when: 'calling with invalid properties'
+			GormUtil.listDomainForProperties(project, Person, ['id', 'foo'])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+		when: 'calling with invalid sorting properties'
+			GormUtil.listDomainForProperties(project, Person, ['id', 'firstName', 'lastName'][['foo']])
+		then: 'a RuntimeException is thrown'
+			thrown(RuntimeException)
+
 	}
 
 }
