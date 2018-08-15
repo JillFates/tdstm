@@ -17,7 +17,7 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';

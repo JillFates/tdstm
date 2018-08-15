@@ -13,12 +13,11 @@ import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
-import { ImportAssetsModule } from '../modules/importAssets/import-assets.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
 import {AssetTagsModule} from '../modules/assetTags/asset-tags.module';
-import {DependencyBatchModule} from '../modules/importBatch/dependency-batch.module';
+import {ImportBatchModule} from '../modules/importBatch/import-batch.module';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -33,8 +32,7 @@ import {DependencyBatchModule} from '../modules/importBatch/dependency-batch.mod
 		FieldSettingsModule,
 		AssetExplorerModule,
 		DataIngestionModule,
-		ImportAssetsModule,
-		DependencyBatchModule,
+		ImportBatchModule,
 		AssetTagsModule,
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{

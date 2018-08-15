@@ -1,13 +1,12 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
-import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {ImportBatchService} from '../../service/import-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
+import {BatchStatus, ImportBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
 import {CellClickEvent, PageChangeEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {
 	DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
 	PROMPT_DELETE_ITEMS_CONFIRMATION
@@ -20,6 +19,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
 import {StateService} from '@uirouter/angular';
+import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
 
 @Component({
 	selector: 'import-batch-list',
@@ -31,7 +31,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	public userTimeZone: string;
 
 	protected BatchStatus = BatchStatus;
-	protected columnsModel: DependencyBatchColumnsModel;
+	protected columnsModel: ImportBatchColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
@@ -56,7 +56,7 @@ export class ImportBatchListComponent implements OnDestroy {
 
 	constructor(
 		private dialogService: UIDialogService,
-		private dependencyBatchService: DependencyBatchService,
+		private importBatchService: ImportBatchService,
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
@@ -73,7 +73,7 @@ export class ImportBatchListComponent implements OnDestroy {
 		// Fetch the user preferences for their TimeZone and DateFormat
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 
-		this.columnsModel = new DependencyBatchColumnsModel();
+		this.columnsModel = new ImportBatchColumnsModel();
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
 		}
@@ -127,7 +127,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * @param {ImportBatchModel} batchRecord
 	 */
 	private reloadImportBatch(batch: ImportBatchModel) {
-		this.dependencyBatchService.getImportBatch(batch.id).subscribe( (response: ApiResponseModel) => {
+		this.importBatchService.getImportBatch(batch.id).subscribe( (response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS) {
 					Object.assign(batch, response.data);
 				}
@@ -141,7 +141,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private getUnarchivedBatches(): Promise<any> {
 		let promise = new Promise((resolve, reject) => {
-			this.dependencyBatchService.getImportBatches().subscribe( (result) => {
+			this.importBatchService.getImportBatches().subscribe( (result) => {
 				if (result.status === 'success') {
 					let batches: Array<ImportBatchModel> = result.data.filter( item => {
 						return !item.archived;
@@ -163,7 +163,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Load Archived Batches.
 	 */
 	private loadArchivedBatchList(): void {
-		this.dependencyBatchService.getImportBatches().subscribe( result => {
+		this.importBatchService.getImportBatches().subscribe( result => {
 			if (result.status === 'success') {
 				let batches = result.data.filter( (item: ImportBatchModel) => {
 					return item.archived;
@@ -187,7 +187,7 @@ export class ImportBatchListComponent implements OnDestroy {
 			return;
 		}
 		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
-		this.dialogService.open(DependencyBatchDetailDialogComponent, [
+		this.dialogService.open(ImportBatchDetailDialogComponent, [
 			{ provide: ImportBatchModel, useValue: selectedBatch}
 		], DIALOG_SIZE.XXL).then(result => {
 			if (result) {
@@ -218,7 +218,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 					this.dataGridOperationsHelper.unSelectAllCheckboxes();
@@ -250,7 +250,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onUnarchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
 					this.dataGridOperationsHelper.unSelectAllCheckboxes();
@@ -282,7 +282,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onDeleteBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.deleteImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.deleteImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
@@ -328,7 +328,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onPlayButton(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.dependencyBatchService.queueImportBatches(ids).subscribe( (response: ApiResponseModel) => {
+		this.importBatchService.queueImportBatches(ids).subscribe( (response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS && response.data.QUEUE === 1) {
 					batch.status.code = BatchStatus.QUEUED.toString();
 					batch.status.label = 'Queued';
@@ -348,7 +348,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onEjectButton(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					batch.status.code = BatchStatus.PENDING.toString();
 					batch.status.label = 'Pending';
@@ -388,7 +388,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private stopBatch(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.dependencyBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.removeBatchFromRunningLoop(batch);
 				this.reloadImportBatch(batch);
@@ -459,7 +459,7 @@ export class ImportBatchListComponent implements OnDestroy {
 			}, this.PROGRESS_CHECK_INTERVAL);
 		} else {
 			for (let batch of this.runningBatches) {
-				this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
+				this.importBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
 					if (response.status === ApiResponseModel.API_SUCCESS) {
 						batch.currentProgress =  response.data.progress ? response.data.progress : 0;
 						const lastUpdated = (response.data.lastUpdated as Date);
@@ -519,7 +519,7 @@ export class ImportBatchListComponent implements OnDestroy {
 		} else {
 			for (let i = 0; i < batchList.length; i++) {
 				let batch: ImportBatchModel = batchList[i];
-				this.dependencyBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+				this.importBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
 					if (response.status === ApiResponseModel.API_SUCCESS && response.data.status.code !== BatchStatus.QUEUED) {
 						batch.status.code = (response.data as ImportBatchModel).status.code;
 						batch.status.label = (response.data as ImportBatchModel).status.label;

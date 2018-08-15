@@ -17,15 +17,15 @@ import {
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
 import {StateService} from '@uirouter/angular';
-import {ImportBatchStates} from '../../../importBatch/dependency-batch-routing.states';
+import {ImportBatchStates} from '../../import-batch-routing.states';
 
 declare var jQuery: any;
 
 @Component({
-	selector: 'manual-import',
-	templateUrl: '../tds/web-app/app-js/modules/importAssets/components/manual-import/manual-import.component.html'
+	selector: 'import-assets',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/import-assets/import-assets.component.html'
 })
-export class ManualImportComponent implements OnInit {
+export class ImportAssetsComponent implements OnInit {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
 	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();

@@ -2,12 +2,11 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 import {Observable} from 'rxjs/Observable';
 import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
-import {ImportBatchModel} from '../model/import-batch.model';
 import {ImportBatchRecordModel} from '../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
-export class DependencyBatchService {
+export class ImportBatchService {
 
 	private readonly importBatchesUrl = '../ws/import/batches';
 	private readonly importBatchUrl = '../ws/import/batch';

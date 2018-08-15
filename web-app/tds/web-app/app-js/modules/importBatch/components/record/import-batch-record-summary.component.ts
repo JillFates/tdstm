@@ -5,10 +5,10 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
-	selector: 'dependency-batch-record-detail-summary',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-record-detail-summary/dependency-batch-record-detail-summary.component.html'
+	selector: 'import-batch-record-summary',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-summary.component.html'
 })
-export class DependencyBatchRecordDetailSummaryComponent {
+export class ImportBatchRecordSummaryComponent {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;

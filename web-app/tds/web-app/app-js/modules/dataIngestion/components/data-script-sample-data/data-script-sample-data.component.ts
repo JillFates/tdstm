@@ -10,7 +10,7 @@ import {
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {
 	ETL_SCRIPT_FILE_UPLOAD_TYPE,

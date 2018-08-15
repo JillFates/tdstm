@@ -1,20 +1,20 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {ImportBatchService} from '../../service/import-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {DependencyBatchRecordDetailFieldsComponent} from '../dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component';
+import {ImportBatchRecordFieldsComponent} from './import-batch-record-fields.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {PROMPT_DEFAULT_MESSAGE_KEY, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 
 @Component({
-	selector: 'dependency-batch-record-detail',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component.html'
+	selector: 'import-batch-record-dialog',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-dialog.component.html'
 })
-export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
+export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 
-	@ViewChild('detailFieldsComponent') detailFieldsComponent: DependencyBatchRecordDetailFieldsComponent;
+	@ViewChild('detailFieldsComponent') detailFieldsComponent: ImportBatchRecordFieldsComponent;
 	private batchRecordUpdatedFlag = false;
 
 	constructor(
@@ -22,7 +22,7 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 		private batchRecord: ImportBatchRecordModel,
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe) {
-			super('#dependency-batch-record-detail');
+			super('#import-batch-record-dialog');
 	}
 
 	/**
