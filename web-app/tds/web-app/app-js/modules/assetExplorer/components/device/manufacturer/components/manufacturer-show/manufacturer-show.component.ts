@@ -37,11 +37,13 @@ export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
-		const aka = (this.deviceManufacturer.aka || [])
-			.map((aka: Aka) => aka.value);
+		if (Array.isArray(this.deviceManufacturer.aka)) {
+			const aka = (this.deviceManufacturer.aka || [])
+				.map((aka: Aka) => aka.value);
 
-		if (aka.length) {
-			this.aka = aka.join(',');
+			if (aka.length) {
+				this.aka = aka.join(',');
+			}
 		}
 	}
 
