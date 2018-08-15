@@ -1787,7 +1787,7 @@ function deleteAsset(id, value) {
 	}
 
 }
-function reloadDependencyGroupsSection() {
+function reloadDependencyGroupsSection(postData) {
 	var moveBundleId = $("#planningBundleSelectId").val();
 	var processTab = jQuery('#processDiv');
 	processTab.attr("style", "display:block");
@@ -1797,9 +1797,25 @@ function reloadDependencyGroupsSection() {
 	assetTab.attr("style", "display:none");
 	jQuery('#items1').css("display", "none");
 	$('#upArrow').css('display', 'none');
+
+	// Partially Remove Prototype
+	if(window.Prototype) {
+		delete Object.prototype.toJSON;
+		delete Array.prototype.toJSON;
+		delete Hash.prototype.toJSON;
+		delete String.prototype.toJSON;
+	}
+
+	if (!postData) {
+		var postData = {
+			bundle: moveBundleId
+		}
+	}
+
 	$.ajax({
-		type: "GET",
-		url: contextPath + '/moveBundle/dependencyBundleDetails?bundle=' + moveBundleId,
+		type: "POST",
+		data: postData,
+		url: contextPath + '/moveBundle/dependencyBundleDetails',
 		success: function (data) {
 			$('#dependencyBundleDetailsId').html(data)
 			var processTab = jQuery('#processDiv');
@@ -1808,7 +1824,7 @@ function reloadDependencyGroupsSection() {
 			assetTab.attr("style", "display:block");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
-			recompileDOM('tmHighlightGroupSelector');
+			recompileDOM('angular-compiler');
 		}
 	});
 }
@@ -2231,6 +2247,14 @@ function populateModelSelect(e,rackId){
     resp = resp.replace("model.id","model_"+rackId+"").replace("Unassigned","Select Model")
     $("#modelSpan_"+rackId).html(resp);
 }*/
+
+function onDependencyFiltersChange() {
+	var postData = {
+		bundle: $('#planningBundleSelectId').val()
+	}
+
+	reloadDependencyGroupsSection(postData);
+};
 
 function showDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('option', 'width', '480px')
