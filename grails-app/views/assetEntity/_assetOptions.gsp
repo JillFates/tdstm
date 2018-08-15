@@ -136,6 +136,7 @@
  			var dependencyTypeValue = value;
  			$("#dependencyTypeTbodyId").append("<tr id='dependencyType_"+id+"' style='cursor: pointer;'><td>"+dependencyTypeValue+"</td><td><span class=\'deleteDependency clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  			$("#dependencyType").val("");
+			sortTable($("#dependencyTypeTableId")[0]);
 		} else if(option=='dependencyStatus') {
  			var id = data.id;
  			var dependencyStatusValue = value;
@@ -146,13 +147,26 @@
  			var environmentValue = value;
  			$("#envOptionTbodyId").append("<tr id='environment_"+id+"' style='cursor: pointer;'><td>"+environmentValue+"</td><td><span class=\'deleteEnvironment clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  			$("#environment").val("");
+			sortTable($("#envOptionTableId")[0]);
 		} else if(option=='assetType') {
             var id = data.id;
             var assetTypeValue = value;
             $("#assetTypeTbodyId").append("<tr id='assetType_"+id+"' style='cursor: pointer;'><td>"+assetTypeValue+"</td><td><span class=\'deleteAssetType clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
             $("#assetType").val("");
+            sortTable($("#assetTypeTableId")[0]);
 		}
+
 	}
+
+	//Simple function to sort the tables.
+	function sortTable(table) {
+		var tbody = $('tbody', table);
+
+		tbody.find('tr').sort(function (a, b) {
+			return $('td:first', a).text().localeCompare($('td:first', b).text());
+		}).appendTo(tbody);
+	}
+
 	// invokes the controller method to delete the asset option then calls fillAssetOptions to update the UI if the call was successful
 	function deleteAssetStatus(id,option){
 		 if(option=='planStatus') {
