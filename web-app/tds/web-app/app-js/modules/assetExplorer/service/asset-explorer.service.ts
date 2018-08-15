@@ -409,19 +409,6 @@ export class AssetExplorerService {
 	}
 
 	getDeviceManufacturer(id: string): Observable<DeviceManufacturer> {
-		/*
-		const manufacturerMock = {
-			manufacturerId: 34,
-			name: 'Avocent',
-			aka: [ {id: 171, value: 'a1'}, {id: 172, value: 'a2'}, {id: 173, value: 'a3'}],
-			description: 'text with desciption',
-			corporateName: 'text with corporate name',
-			corporateLocation: 'text with corporate location',
-			website: 'text with website'
-		};
-		*/
-
-		// return Observable.of(manufacturerMock);
 		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
 		return this.http.post(url, '')
 			.map((res: Response) => res.json())

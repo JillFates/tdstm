@@ -9,12 +9,3 @@ export class DeviceManufacturer {
 	public corporateName: string;
 	public website: string;
 }
-/*
-manufacturerId: 34,
-			name: 'Avocent',
-			aka: [ {id: 171, value: 'a1'}, {id:172, value: 'a2'}, {id:173, value: 'a3'}],
-			description: 'text with desciption',
-			corporateName: 'text with corporate name',
-			corporateLocation: 'text with corporate location',
-			website: 'text with website'
- */
