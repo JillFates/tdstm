@@ -9,6 +9,7 @@ class CommonsModule extends Module {
     static content = {
         modalDialog {$('div#tdsUiDialog')}
         prompDialog {$('div#tdsUiPrompt')}
+        prompDialogButton {prompDialog.find("button")}
         deleteAlertMessage {prompDialog.find(".box-body p")}
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
@@ -85,6 +86,11 @@ class CommonsModule extends Module {
 
     def waitForPromptModalDisplayed(){
         waitFor{prompDialog.jquery.attr("class").contains("in")}
+    }
+
+    def clickOnButtonPromptModalByText(text){
+        waitFor{prompDialogButton.find{it.text().contains(text)}.click()}
+        waitForPromptModalHidden()
     }
 
     def clickOnDeleteYesPromptModal(){
