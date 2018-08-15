@@ -283,13 +283,18 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		assetSelector:{}
 	};
 
+	scope.dependencyGroup =  {
+		assetSelector:{}
+	};
+
 
 	scope.onDependencyAnalyzerTagSelectionChange = function () {
 		if (scope.internal.assetSelector.tag.length >= 1) {
 			var currentdependencyBundle = parseInt($('.depGroupSelected .depGroup').html());
 
 			var postData = {
-				tagIds: getTagsIds(scope.internal.assetSelector.tag)
+				tagIds: getTagsIds(scope.internal.assetSelector.tag),
+				// tagMatch: (scope.internal.assetSelector.operator === 'ALL') ? true : false
 			};
 
 			// Cases where is not: All, Remnants, Grouped
@@ -312,6 +317,12 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			);
 
 		}
+	};
+
+	scope.onDependencyAnalyzerGroupTagSelectionChange = function () {
+		setTimeout( function() {
+			$('.dependencyConsoleForm').submit();
+		}, 500);
 	};
 
 };
