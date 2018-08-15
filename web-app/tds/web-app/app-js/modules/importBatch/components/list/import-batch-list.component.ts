@@ -22,11 +22,11 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 import {StateService} from '@uirouter/angular';
 
 @Component({
-	selector: 'dependency-batch-list',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-list/dependency-batch-list.component.html',
+	selector: 'import-batch-list',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/list/import-batch-list.component.html',
 	providers: [TranslatePipe]
 })
-export class DependencyBatchListComponent implements OnDestroy {
+export class ImportBatchListComponent implements OnDestroy {
 
 	public userTimeZone: string;
 

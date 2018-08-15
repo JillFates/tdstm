@@ -17,7 +17,7 @@ import {
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
 import {StateService} from '@uirouter/angular';
-import {DependencyBatchStates} from '../../../importBatch/dependency-batch-routing.states';
+import {ImportBatchStates} from '../../../importBatch/dependency-batch-routing.states';
 
 declare var jQuery: any;
 
@@ -54,6 +54,7 @@ export class ManualImportComponent implements OnInit {
 		currentProgress: 0,
 	};
 	private transformInterval: any;
+	protected IMPORT_BATCH_STATES = ImportBatchStates;
 
 	constructor(
 		private importAssetsService: ImportAssetsService,
@@ -339,7 +340,7 @@ export class ManualImportComponent implements OnInit {
 	 * @param {number} id
 	 */
 	protected goToBatch(id: number): void {
-		this.stateService.get(DependencyBatchStates.DEPENDENCY_BATCH_LIST.name).data.batchId = id;
-		this.stateService.go(DependencyBatchStates.DEPENDENCY_BATCH_LIST.name);
+		this.stateService.get(ImportBatchStates.IMPORT_BATCH_LIST.name).data.batchId = id;
+		this.stateService.go(ImportBatchStates.IMPORT_BATCH_LIST.name);
 	}
 }
