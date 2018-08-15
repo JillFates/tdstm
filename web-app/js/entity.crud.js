@@ -1816,9 +1816,11 @@ function reloadDependencyGroupsSection() {
 	$.ajax({
 		type: "POST",
 		data: JSON.stringify(postData),
+		contentType : 'application/json; charset=utf-8',
+		dataType : "JSON",
 		url: contextPath + '/moveBundle/dependencyBundleDetails',
-		success: function (data) {
-			$('#dependencyBundleDetailsId').html(data)
+		complete: function (jqXHR) {
+			$('#dependencyBundleDetailsId').html(jqXHR.responseText)
 			var processTab = jQuery('#processDiv');
 			processTab.attr("style", "display:none");
 			var assetTab = jQuery('#dependencyBundleDetailsId');
