@@ -598,19 +598,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	Element extract (String columnName) {
 		validateStack()
 
+		String rootColumnName = columnName
+		String columnNamePath = null
+
 		if (FilenameUtil.isJsonFile(dataSetFacade.fileName())){
-			def (String root, String path) = extractColumnNameParts(columnName)
-
-			checkColumnName(root)
-			currentColumnIndex = columnsMap[labelToFieldName(root)].index
-			doExtract(path)
-
-		} else {
-
-			checkColumnName(columnName)
-			currentColumnIndex = columnsMap[labelToFieldName(columnName)].index
-			doExtract()
+			(rootColumnName, columnNamePath) = extractColumnNameParts(columnName)
 		}
+
+		checkColumnName(rootColumnName)
+		currentColumnIndex = columnsMap[labelToFieldName(rootColumnName)].index
+		doExtract(columnNamePath)
 	}
 
 	/**
