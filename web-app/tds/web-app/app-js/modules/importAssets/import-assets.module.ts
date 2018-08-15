@@ -16,6 +16,7 @@ import { ImportAssetsService } from './service/import-assets.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
+import {GridModule} from '@progress/kendo-angular-grid';
 
 @NgModule({
 	imports: [
@@ -26,6 +27,7 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 		BrowserAnimationsModule,
 		LayoutModule,
 		UploadModule,
+		GridModule,
 		UIRouterModule.forChild({ states: IMPORT_ASSETS_STATES }),
 	],
 	declarations: [

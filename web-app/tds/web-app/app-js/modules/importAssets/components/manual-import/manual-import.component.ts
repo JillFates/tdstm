@@ -16,6 +16,8 @@ import {
 	FILE_UPLOAD_TYPE_PARAM,
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
+import {StateService} from '@uirouter/angular';
+import {DependencyBatchStates} from '../../../dependencyBatch/dependency-batch-routing.states';
 
 declare var jQuery: any;
 
@@ -56,7 +58,8 @@ export class ManualImportComponent implements OnInit {
 	constructor(
 		private importAssetsService: ImportAssetsService,
 		private notifier: NotifierService,
-		private dataIngestionService: DataIngestionService) {
+		private dataIngestionService: DataIngestionService,
+		private stateService: StateService) {
 			this.file.fileUID = null;
 	}
 
@@ -329,5 +332,14 @@ export class ManualImportComponent implements OnInit {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
 		}
+	}
+
+	/**
+	 * Redirects to Batch List view.
+	 * @param {number} id
+	 */
+	protected goToBatch(id: number): void {
+		this.stateService.get(DependencyBatchStates.DEPENDENCY_BATCH_LIST.name).data.batchId = id;
+		this.stateService.go(DependencyBatchStates.DEPENDENCY_BATCH_LIST.name);
 	}
 }

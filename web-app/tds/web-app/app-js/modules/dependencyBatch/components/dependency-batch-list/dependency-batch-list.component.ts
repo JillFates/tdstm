@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
@@ -19,13 +19,14 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
+import {StateService} from '@uirouter/angular';
 
 @Component({
 	selector: 'dependency-batch-list',
 	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-list/dependency-batch-list.component.html',
 	providers: [TranslatePipe]
 })
-export class DependencyBatchListComponent {
+export class DependencyBatchListComponent implements OnDestroy {
 
 	public userTimeZone: string;
 
@@ -41,7 +42,8 @@ export class DependencyBatchListComponent {
 		useColumn: 'id'
 	};
 	private viewArchived = false;
-	private batchStatusLooper: any;
+	private batchRunningLoop: any;
+	private batchQueuedLoop: any;
 	private readonly PROGRESS_MAX_TRIES = 10;
 	private readonly PROGRESS_CHECK_INTERVAL = 3 * 1000;
 	private readonly STOP_BATCH_CONFIRMATION = 'IMPORT_BATCH.LIST.STOP_BATCH_CONFIRMATION';
@@ -59,8 +61,8 @@ export class DependencyBatchListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService
-	) {
+		private userPreferenceService: PreferenceService,
+		private stateService: StateService) {
 			this.onLoad();
 	}
 
@@ -78,10 +80,25 @@ export class DependencyBatchListComponent {
 		this.userPreferenceService.getImportBatchListSizePreference().subscribe( (pageSize: number) => {
 			this.getUnarchivedBatches().then( batchList => {
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig, pageSize);
+				this.preSelectBatch();
 				this.setRunningLoop();
 				this.setQueuedLoop();
 			});
 		});
+	}
+
+	/**
+	 * Checks if batchId is given and should be open.
+	 */
+	private preSelectBatch(): void {
+		if (this.stateService.$current.data && this.stateService.$current.data.batchId) {
+			const batchId = this.stateService.$current.data.batchId;
+			const match = this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
+			if (match) {
+				let cellClickEvent = { dataItem: match };
+				this.openBatchDetail(cellClickEvent);
+			}
+		}
 	}
 
 	/**
@@ -163,9 +180,9 @@ export class DependencyBatchListComponent {
 	 * Open Dialog Popups to display Batch Import detail.
 	 * @param {CellClickEvent} cellClick
 	 */
-	private openBatchDetail(cellClick: CellClickEvent): void {
+	private openBatchDetail(cellClick: any): void {
 		// prevent open detail on column 0
-		let selectedBatch: ImportBatchModel = (cellClick as any).dataItem;
+		let selectedBatch: ImportBatchModel = cellClick.dataItem;
 		if (cellClick.columnIndex === 0 ) {
 			return;
 		}
@@ -437,7 +454,7 @@ export class DependencyBatchListComponent {
 	private runningLoop(): void {
 		console.log('Running batches: ', this.runningBatches.length);
 		if (this.runningBatches.length === 0) {
-			setTimeout(() => {
+			this.batchRunningLoop = setTimeout(() => {
 				this.setRunningLoop();
 			}, this.PROGRESS_CHECK_INTERVAL);
 		} else {
@@ -464,10 +481,11 @@ export class DependencyBatchListComponent {
 						this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
 					}
 					// keep the loop running ..
-					setTimeout(() => {
+					this.batchRunningLoop = setTimeout(() => {
 						this.runningLoop();
 					}, this.PROGRESS_CHECK_INTERVAL);
 				}, error => {
+					clearTimeout(this.batchRunningLoop);
 					this.handleError(error);
 				});
 			}
@@ -495,7 +513,7 @@ export class DependencyBatchListComponent {
 	private queuedLoop(batchList: Array<ImportBatchModel>): void {
 		console.log('Queued batches: ', batchList.length);
 		if (batchList.length === 0) {
-			setTimeout(() => {
+			this.batchQueuedLoop = setTimeout(() => {
 				this.setQueuedLoop();
 			}, this.PROGRESS_CHECK_INTERVAL);
 		} else {
@@ -513,11 +531,14 @@ export class DependencyBatchListComponent {
 					// last batch to check .. launch the loop;
 					if (i === batchList.length - 1) {
 						// keep the loop running ..
-						setTimeout(() => {
+						this.batchQueuedLoop = setTimeout(() => {
 							this.setQueuedLoop();
 						}, this.PROGRESS_CHECK_INTERVAL);
 					}
-				}, error => this.handleError(error));
+				}, error => {
+					clearTimeout(this.batchQueuedLoop);
+					this.handleError(error)
+				});
 			}
 		}
 	}
@@ -577,7 +598,12 @@ export class DependencyBatchListComponent {
 	protected onPageChange($event: PageChangeEvent): void {
 		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE, $event.take.toString()).subscribe( result => {
 			// nothing to do here ..
-		})
+		});
 		this.dataGridOperationsHelper.pageChange($event)
+	}
+
+	ngOnDestroy(): void {
+		clearTimeout(this.batchRunningLoop);
+		clearTimeout(this.batchQueuedLoop);
 	}
 }
