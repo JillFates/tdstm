@@ -1815,7 +1815,7 @@ function reloadDependencyGroupsSection() {
 
 	$.ajax({
 		type: "POST",
-		data: postData,
+		data: JSON.stringify(postData),
 		url: contextPath + '/moveBundle/dependencyBundleDetails',
 		success: function (data) {
 			$('#dependencyBundleDetailsId').html(data)
