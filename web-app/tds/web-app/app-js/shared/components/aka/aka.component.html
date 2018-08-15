@@ -1,24 +1,3 @@
-<style>
-	.aka-component {
-	}
-		.aka-component .aka-items {
-			max-height: 200px;
-			overflow: auto;
-		}
-		.aka-component .aka-items .aka-item {
-			margin-top: 5px;
-		}
-		.aka-component input {
-			width: 80%;
-		}
-		.aka-component button {
-			margin-top: 10px;
-			font-weight: bold;
-		}
-		.aka-component .aka-items .delete-aka {
-			cursor: pointer;
-		}
-</style>
 <div class="aka-component">
 	<div class="aka-items">
 		<div class="aka-item" *ngFor="let aka of akas;let index = index;trackBy:trackByIndex;">
