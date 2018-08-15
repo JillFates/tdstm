@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.JsonUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -8,10 +7,7 @@ import getl.exception.ExceptionGETL
 import getl.json.JSONDataset
 import getl.json.JSONDriver
 import getl.utils.GenerationUtils
-import getl.utils.Logs
 import groovy.json.JsonSlurper
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Custom implementation of JSONDriver. It adds support for several ETL script commands.
@@ -232,24 +228,19 @@ class TDSJSONDriver extends JSONDriver {
 		def data = null
 
 		def reader = getFileReader(dataset, params)
+		
 		try {
-			if (!convertToList) {
-				data = json.parseText(reader.text)
+			String text = reader.text
 
-			} else {
-				StringBuilder sb = new StringBuilder()
-				sb << "[\n"
-				reader.eachLine {
-					sb << it
-					sb << "\n"
-				}
-				int lastObjPos = sb.lastIndexOf("}")
-				if (sb.substring(lastObjPos + 1, sb.length()).trim() == ',') sb.delete(lastObjPos + 1, sb.length())
-				sb << "\n]"
-				data = json.parseText(sb.toString())
+			if (convertToList) {
+				text = text.trim().replaceAll(',$', '')
+				text = "[$text]"
+
 			}
-		}
-		finally {
+
+			data = json.parseText(text)
+
+		} finally {
 			reader.close()
 		}
 
