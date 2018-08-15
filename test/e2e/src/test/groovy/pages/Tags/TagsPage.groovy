@@ -3,6 +3,7 @@ package pages.Tags
 import geb.Page
 import utils.CommonActions
 import modules.CommonsModule
+import geb.waiting.WaitTimeoutException
 
 class TagsPage extends Page{
     static at = {
@@ -139,5 +140,39 @@ class TagsPage extends Page{
     def getNoRecordsFoundText(){
         waitFor(2){tagsNoDataRecords.displayed}
         tagsNoDataRecords.text().trim()
+    }
+
+    def filterAndSetSelectedTag(tagName){
+        filterByName tagName
+        def selectedTagName = getTagNameText()
+        selectedTagName
+    }
+
+    def deleteTag(tagName, message){
+        clickOnDeleteButton()
+        commonsModule.clickOnButtonPromptModalByText("Confirm")
+        filterByName tagName
+        noTagsDisplayedInGrid message
+    }
+
+    def noTagsDisplayedInGrid(message){
+        try {
+            getNoRecordsFoundText() == message
+        } catch (WaitTimeoutException e){
+            false
+        }
+    }
+
+    def bulkDelete(message, maxNumberOfBulkTagsToBeDeleted, tagName) {
+        def count = 0
+        while (!noTagsDisplayedInGrid(message)) {
+            count = count + 1
+            if (count > maxNumberOfBulkTagsToBeDeleted) {
+                break
+            }
+            deleteTag tagName, message
+            filterByName tagName
+        }
+        true // done, just return true to avoid test fails
     }
 }
