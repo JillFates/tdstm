@@ -2248,9 +2248,19 @@ function populateModelSelect(e,rackId){
     $("#modelSpan_"+rackId).html(resp);
 }*/
 
+var getTagsIds = function(tags) {
+	var tagIds = [];
+	tags.each( function(a){
+		tagIds.push(parseInt(a.id));
+	})
+	return tagIds;
+};
+
 function onDependencyFiltersChange() {
 	var postData = {
-		bundle: $('#planningBundleSelectId').val()
+		bundle: $('#planningBundleSelectId').val(),
+		tagIds: getTagsIds($('#tmHighlightGroupSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
+		tagMatch: $('#tmHighlightGroupSelector').find(".asset-tag-selector-operator-switch").attr('checked') ? 'ALL' : 'ANY'
 	}
 
 	reloadDependencyGroupsSection(postData);

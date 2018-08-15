@@ -321,8 +321,10 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 
 	scope.onDependencyFiltersChange = function () {
 		var postData = {
-			bundle: $('#planningBundleSelectId').val()
-		}
+			bundle: $('#planningBundleSelectId').val(),
+			tagIds: getTagsIds(scope.dependencyGroup.assetSelector.tag),
+			tagMatch: (scope.dependencyGroup.assetSelector.operator) ? 'ALL' : 'ANY'
+		};
 
 		reloadDependencyGroupsSection(postData);
 	};
