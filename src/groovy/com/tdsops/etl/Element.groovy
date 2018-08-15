@@ -623,12 +623,12 @@ class Element implements RangeChecker {
 
 	/**
 	 * Concats Element and String values from a ETL Script and assign result String value.
-	 * It's used in this ETL script command
+	 * It's used in this ETL script command:
 	 * <code>
 	 *     extract 4 transform concat('-', myVar) load description
 	 * </code>
 	 * @param objects
-	 * @return
+	 * @return current instance of Element class
 	 */
 	Element concat(String separator, Object...values){
 		this.value = ETLTransformation.concat(separator, this.value, values)
@@ -638,60 +638,46 @@ class Element implements RangeChecker {
 
 	/**
 	 * Appends element.value content with anotherElement.value
-	 * It's used in this ETL script command
+	 * It's used in this ETL script command:
 	 * <code>
 	 *     extract 4 transform append(myVar + CE) load description
 	 * </code>
 	 * @param anotherElement an ETL Element
-	 * @return
+	 * @return a new instance of Element class
 	 */
 	Element plus(Element anotherElement) {
-		Element newElement = new Element(
-			domain: this.domain,
-			value: this.value + anotherElement?.value,
-			originalValue: this.originalValue,
-			init: this.init,
-			processor: this.processor,
-			errors: this.errors
-		)
-
-		if(this.fieldDefinition){
-			newElement.fieldDefinition = new ETLFieldDefinition(
-				name: this.fieldDefinition.name,
-				label: this.fieldDefinition.label,
-				type: this.fieldDefinition.type
-			)
-		}
-		return newElement
+		return copy(this.value + anotherElement?.value,)
 	}
 
 	/**
 	 * Appends element.value content with a String value
-	 * It's used in this ETL script command
+	 * It's used in this ETL script command:
 	 * <code>
 	 *     extract 4 transform append(myVar + '******') load description
 	 * </code>
 	 * @param anotherElement an ETL Element
-	 * @return
+	 * @return a new instance of Element class
 	 */
 	Element plus(String value) {
-		Element newElement = new Element(
+		return copy(this.value + value)
+	}
+
+	/**
+	 * It creates a new Element with value passed by parameter.
+	 * It also copies the rest of the values. It's used by Element#plus methods.
+	 * @param value
+	 * @return an new instance of Element class
+	 */
+	Element copy(Object value){
+		return new Element(
 			domain: this.domain,
-			value: this.value + value,
-			originalValue: this.originalValue,
+			value: value,
+			originalValue: value,
+			fieldDefinition: this.fieldDefinition,
 			init: this.init,
 			processor: this.processor,
 			errors: this.errors
 		)
-
-		if(this.fieldDefinition){
-			newElement.fieldDefinition = new ETLFieldDefinition(
-				name: this.fieldDefinition.name,
-				label: this.fieldDefinition.label,
-				type: this.fieldDefinition.type
-			)
-		}
-		return newElement
 	}
 
 	/**
