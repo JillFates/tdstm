@@ -1820,14 +1820,11 @@ function reloadDependencyGroupsSection() {
 		dataType : "JSON",
 		url: contextPath + '/moveBundle/dependencyBundleDetails',
 		complete: function (jqXHR) {
-			$('#dependencyBundleDetailsId').html(jqXHR.responseText)
+			$('#dependencyBundleDetailGroupContainer').html(jqXHR.responseText)
 			var processTab = jQuery('#processDiv');
 			processTab.attr("style", "display:none");
-			var assetTab = jQuery('#dependencyBundleDetailsId');
-			assetTab.attr("style", "display:block");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
-			recompileDOM('angular-compiler');
 		}
 	});
 }
