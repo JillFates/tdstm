@@ -1796,7 +1796,7 @@ function reloadDependencyGroupsSection() {
 	assetTab.attr("style", "display:none");
 	assetTab.attr("style", "display:none");
 	jQuery('#items1').css("display", "none");
-	$('#upArrow').css('display', 'none')
+	$('#upArrow').css('display', 'none');
 	$.ajax({
 		type: "GET",
 		url: contextPath + '/moveBundle/dependencyBundleDetails?bundle=' + moveBundleId,
@@ -1808,6 +1808,7 @@ function reloadDependencyGroupsSection() {
 			assetTab.attr("style", "display:block");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
+			recompileDOM('tmHighlightGroupSelector');
 		}
 	});
 }
