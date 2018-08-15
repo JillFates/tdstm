@@ -455,7 +455,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected onAgentValueChange(agentModel: AgentModel): void {
 		if (this.lastSelectedAgentModel && this.lastSelectedAgentModel.id !== 0) {
-			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
+			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentModel(agentModel, res);
 				});
@@ -508,7 +508,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected onMethodValueChange(event: any): void {
 		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
-			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
+			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentMethodModel(res);
 				});

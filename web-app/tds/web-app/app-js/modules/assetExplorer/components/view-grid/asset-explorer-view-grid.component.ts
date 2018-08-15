@@ -21,6 +21,8 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
+import {CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {DataGridCheckboxService} from '../../service/data-grid-checkbox.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -34,12 +36,17 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent {
-
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@Input()
+	set viewId(viewId: number) {
+		this._viewId = viewId;
+		// changing the view reset selections
+		this.dataGridCheckboxService.setCurrentState(CheckboxStates.unchecked);
+	}
 
 	fields = [];
 	justPlanning = false;
@@ -52,6 +59,7 @@ export class AssetExplorerViewGridComponent {
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
 	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
@@ -61,19 +69,22 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 	selectAll = false;
-	bulkItems = {};
-	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
+	public overrideCheckboxState: CheckboxStates;
+	public bulkItems: number[] = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
+		private dataGridCheckboxService: DataGridCheckboxService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
+		this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+				this.dataGridCheckboxService.setPageSize(this.state.take);
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
@@ -185,10 +196,9 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.bulkItems = {};
-		data.assets.map(c => c.common_id).forEach(id => {
-			this.bulkItems[id] = false;
-		});
+		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction(true);
+		this.dataGridCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
@@ -199,7 +209,6 @@ export class AssetExplorerViewGridComponent {
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		this.setSelectedItems();
 	}
 
 	clear(): void {
@@ -265,27 +274,24 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
-	onSelectAll(): void {
-		Object.keys(this.bulkItems).forEach(key => {
-			this.bulkItems[key] = this.selectAll;
-		});
-		this.setSelectedItems();
-	}
-
 	clearSelectAll(): void {
 		this.selectAll = false;
 	}
 
-	setSelectedItems(): void {
-		this.bulkSelectedItems = Object.keys(this.bulkItems)
-			.filter(key => this.bulkItems[key])
-			.map(value => parseInt(value, 10));
-		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
+	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
+		this.overrideCheckboxState = null;
+		this.dataGridCheckboxService.changeState(checkboxState);
+	}
+
+	setSelectedItem(id: string, checked: boolean): void {
+		this.dataGridCheckboxService.setPageSize(this.gridData.data.length);
+		this.dataGridCheckboxService.selectBulkItem(id, checked);
+		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction();
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.bulkSelectedItems = [];
+			this.dataGridCheckboxService.clearSelectedItems();
 			this.onReload();
 		}
 	}
@@ -345,5 +351,17 @@ export class AssetExplorerViewGridComponent {
 		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
 		column.filter = selectedTagsFilter;
 		this.onFilter();
+	}
+
+	onClickBulkButton(): void {
+		this.dataGridCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
+			.then((results: number[]) => {
+				this.bulkItems = [...results];
+			})
+			.catch ((err) => console.log('Error:', err))
+	}
+
+	hasSelectedItems(): boolean {
+		return this.dataGridCheckboxService.hasSelectedItems();
 	}
 }

@@ -6,7 +6,9 @@ import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
+import java.text.DateFormat
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
@@ -21,19 +23,21 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 class ImportBatchService implements ServiceMethods {
 
 	DataImportService dataImportService
+	UserPreferenceService userPreferenceService
 	Scheduler quartzScheduler
 
 	/**
-	 * Find a all batches and include the records summary information. If a batchId is given,
-	 * it will narrow down the results to that particular Import Batch.
-	 * @param project
-	 * @param batchId
-	 * @param batchStatus
-	 * @return
+	 * Find all batches and include the records summary information. If the batchId or batchStatus
+	 * parameters are specified then the results will filtered down appropriately.
+	 * @param project - the project to retrieve batches for
+	 * @param batchId - optional parameter to filter results to a single batch
+	 * @param batchStatus - optional parameter to filter results to a specified Status
+	 * @return a Map a map of each batch where the key is the ordinal position in the query (why not a list???)
 	 */
 	Map findBatchesWithSummary(Project project, Long batchId = null, ImportBatchStatusEnum batchStatus = null) {
-		/* Query the info batch and the number of records grouped by status.
-		 * This will produce a list of [batch, status, number of records] */
+
+		// Query the info batch and the number of records grouped by status in order to
+		// create a list of [batch, status, number of records]
 		List batchStatusList = ImportBatchRecord.createCriteria().list {
 			createAlias('importBatch', 'batch')
 			if (batchStatus){
@@ -68,6 +72,7 @@ class ImportBatchService implements ServiceMethods {
 			} else {
 				batchMap = batch.toMap()
 				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
+
 				results[batch.id] = batchMap
 			}
 
@@ -84,7 +89,8 @@ class ImportBatchService implements ServiceMethods {
 					batchMap['recordsSummary']['processed'] = statusCount
 					break
 			}
-			// Update the number of records for this batch.
+
+			// Update the number of records for this batch
 			batchMap['recordsSummary']['count'] += statusCount
 		}
 
@@ -108,7 +114,7 @@ class ImportBatchService implements ServiceMethods {
 			groupProperty('importBatch')
 		}
 
-		// Update the results with the erred number of records for each batch.
+		// Update the results with the erred number of records for each batch
 		for (batchErrorInfo in batchErrorsList) {
 			ImportBatch batch = (ImportBatch) batchErrorInfo[0]
 			Map batchMap = results[batch.id]

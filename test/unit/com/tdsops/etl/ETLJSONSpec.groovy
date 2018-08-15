@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import getl.exception.ExceptionGETL
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -16,6 +17,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -241,7 +243,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'Active Applications'"
+			e.message == "Data was not found in JSON at rootNode 'Active Applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -266,7 +268,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'applications'"
+			e.message == "Data was not found in JSON at rootNode 'applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -514,7 +516,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 	}
 
-
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
 		given:
@@ -736,7 +737,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			],
 			"The Applications": [
 				{
-					"application id":152254,
+					"application id":152254,       
 					"vendor name":"Microsoft",
 					"location":"ACME Data Center"
 				},

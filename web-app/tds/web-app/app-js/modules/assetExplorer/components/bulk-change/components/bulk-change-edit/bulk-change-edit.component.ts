@@ -46,7 +46,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		private tagService: TagService, private translatePipe: TranslatePipe
 	) {
 		super('#bulk-change-edit-component');
-		this.affectedAssets = this.bulkChangeModel.selectedItems.length;
+		this.affectedAssets = this.bulkChangeModel.affected;
 	}
 
 	addHandler({sender}): void {

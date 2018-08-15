@@ -10,6 +10,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -47,13 +48,24 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	};
 	private batchRecordsUpdatedFlag = false;
 	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
+	public dateTimeFormat: string;
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
 		private dependencyBatchService: DependencyBatchService,
 		private activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private userPreferenceService: PreferenceService
+	) {
 			this.prepareColumnsModel();
+			this.onLoad();
+	}
+
+	/**
+	 * On Page Load
+	 */
+	private onLoad(): void {
+		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 	}
 
 	/**

@@ -221,6 +221,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
+		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -410,7 +411,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			bindVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(row))
 
@@ -675,14 +675,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(final String fieldName) {
+	Map<String, ?> lookup(final Object fieldName) {
 		validateStack()
-		lookUpFieldDefinition(selectedDomain.domain, fieldName)
+		ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fieldName)
+
 		return [
 		    with: { value ->
-			    Object stringValue = ETLValueHelper.valueOf(value)
+			    // Object stringValue = ETLValueHelper.valueOf(value)
 
-			    boolean found = result.lookupInReference(fieldName, stringValue)
+			    boolean found = result.lookupInReference([ fieldSpec.name ], [ value ])
 			    if (found) {
 				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			    }
@@ -691,6 +692,42 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		]
 	}
 
+	/**
+	 * Lookup ETL command for multiple parameters implementation:
+	 * <pre>
+	 *  set lookupNameVar = 'assetName'
+	 *  set lookupValueVar = 'xyzzy'
+	 *  iterate {
+	 *      ...
+	 *      domain Device
+	 *      extract 'Vm' load 'Name'
+	 *      extract Cluster
+	 *      def clusterName = CE
+	 *
+	 *      lookup lookupNameVar, 'assetType' with lookupValueVar, 'clusterName'
+	 *  }
+	 * </pre>
+	 * @param fieldNames
+	 */
+	Map<String, ?>  lookup(Object... fieldNames) {
+		validateStack()
+		List<Element> lookupFieldNames = []
+		for (String fname in fieldNames) {
+			ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fname)
+			lookupFieldNames << fieldSpec.name
+		}
+
+		return [
+		    with: { Object... values ->
+				List valuesAsList = values as List
+			    boolean found = result.lookupInReference(lookupFieldNames, valuesAsList)
+			    if (found) {
+				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
+			    }
+			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+		    }
+		]
+	}
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
@@ -1172,6 +1209,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * Setup Global variables used in the Script
+	 */
+	private void initializeDefaultGlobalVariables() {
+		this.addGlobalVariableInBinding(NOW_VARNAME, new NOW())
+	}
+
+	/**
 	 * Add an Element as CURR_ELEMENT_VARNAME value as variable within the binding script context.
 	 * @param element a selected Element
 	 * @return the curent element selected in ETLProcessor
@@ -1628,7 +1672,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		Object retVal
 		if ( values ) {
 			retVal = values.find {
-				null != ( (it instanceof Element) ? it.value : it )
+				def val = ( (it instanceof Element) ? it.value : it )
+				return (val != null) && (val != '')
 			}
 		}
 

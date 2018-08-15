@@ -30,6 +30,7 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -892,7 +893,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context
 	 * @return the newly minted domain entity instance
 	 */
-	private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
+	Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
 		}
@@ -916,16 +917,16 @@ class DataImportService implements ServiceMethods {
 			}
 		}
 
-		// createdBy
-		if ('createdBy' in propsInDomain) {
-			entity.createdBy = context.person
+		// Handle Person references
+		for (String fname in ['createdBy', 'modifiedBy']) {
+			if (fname in propsInDomain && GormUtil.getDomainPropertyType(domainClass, fname) == Person ) {
+				entity[fname] = context.whom
+			}
 		}
 
 		// owner (i.e. project.client)
-		if ('owner' in propsInDomain
-			&& GormUtil.getDomainPropertyType(domainClass, 'owner') == net.transitionmanager.domain.PartyGroup
-		) {
-			entity.owner = project.client
+		if ('owner' in propsInDomain && GormUtil.getDomainPropertyType(domainClass, 'owner') == PartyGroup) {
+			entity.owner = context.project.client
 		}
 
 		return entity

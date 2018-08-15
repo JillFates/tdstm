@@ -1057,6 +1057,22 @@ var GraphUtil = (function ($) {
 		}
 	}
 
+	// highlight assets matching the id from the Group + Tag
+	public.performTagSearch = function (assetList) {
+		var nodes = public.force.nodes();
+		var highlightList = [];
+		for (var i = 0; i < nodes.length; ++i) {
+			var node = nodes[i];
+			var asset = assetList.filter( function(asset) {
+				return asset === node.id;
+			});
+			if (asset && asset.length >= 1){
+				highlightList.push(node.id);
+			}
+		}
+		public.applyHighlights(highlightList);
+	}
+
 	// highlight tasks matching the user's regex
 	public.performSearch = function () {
 

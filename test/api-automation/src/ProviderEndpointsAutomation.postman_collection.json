@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "58d21faf-d1e1-4169-8cc4-184fd4556815",
+		"_postman_id": "4dd5a0ec-ff0a-412a-af9b-66bd63c4c354",
 		"name": "Provider Endpoints Automation",
 		"description": "Set of requests for testing the Provider endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -325,7 +325,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dd1b4ba4-0f24-4f13-8981-795d964ef838",
+						"id": "a21f5e53-52ef-4e6c-b983-9bcd5efbfe01",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -338,7 +338,11 @@
 							"",
 							"pm.test(\"Provider Deleted\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"deleted\");",
-							"});"
+							"});",
+							"",
+							"//clean-up code: variables that shpuld live only during the execution",
+							"//of this collection are unset here",
+							"pm.environment.unset(\"providerID\");"
 						]
 					}
 				}
@@ -365,6 +369,44 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b9308beb-770f-401f-a729-dcfe35a6cc33",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "29404d97-884c-459a-995a-fe7dfb26d111",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "0ba2e077-56bc-46c1-898e-d6f3f13ae6ee",
+			"key": "createProvider",
+			"value": "PostmanName",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "f42aafbb-0076-4fc6-a85f-7d79871c88fd",
+			"key": "updatedName",
+			"value": "QAUpdate",
+			"type": "string",
+			"description": ""
 		}
 	]
 }
