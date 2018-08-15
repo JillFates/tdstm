@@ -14,7 +14,6 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
-import org.codehaus.groovy.runtime.StackTraceUtils
 
 import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
@@ -128,6 +127,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * A debug output assignable in the ETLProcessor creation
 	 */
 	DebugConsole debugConsole
+	/**
+	 * A cache for column name parts in case of JSON dataSet
+	 */
+	Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
 
 	List<Column> columns = []
 	Map<String, Column> columnsMap = [:]
@@ -590,18 +593,24 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *      }
 	 * <code>
 	 * @param columnName
-	 * @return
+	 * @return an instance of Element
 	 */
 	Element extract (String columnName) {
 		validateStack()
-		def (String root, String path) = columnNameParts(columnName)
 
-		if (!columnsMap.containsKey(labelToFieldName(root))) {
-			throw ETLProcessorException.extractMissingColumn(root)
+		if (FilenameUtil.isJsonFile(dataSetFacade.fileName())){
+			def (String root, String path) = extractColumnNameParts(columnName)
+
+			checkColumnName(root)
+			currentColumnIndex = columnsMap[labelToFieldName(root)].index
+			doExtract(path)
+
+		} else {
+
+			checkColumnName(columnName)
+			currentColumnIndex = columnsMap[labelToFieldName(columnName)].index
+			doExtract()
 		}
-		currentColumnIndex = columnsMap[labelToFieldName(root)].index
-
-		doExtract(path)
 	}
 
 	/**
@@ -1103,6 +1112,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * It checks if column name is a valid value for the already read lebels
+	 * @param columnName a String with a column name value
+	 * @throw ETLProcessorException in case of extracted column is missing
+	 */
+	private void checkColumnName(String columnName) {
+		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
+			throw ETLProcessorException.extractMissingColumn(columnName)
+		}
+	}
+
+	/**
 	 * Adds a loaded element with the current domain in results.
 	 * It also removes CE (currentElement) from script context.
 	 * @param domain
@@ -1297,18 +1317,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * In case of ETL is working with a JSON file,
 	 * this methods can split a column name using dot (.) notation.
 	 * <pre>
-	 * 	assert columnNameParts('data.assets') == ['data', 'assets']
-	 * 	assert columnNameParts('devices') == ['devices']
+	 * 	assert columnNameParts('data.assets') == new Tuple('data', 'assets')
+	 * 	assert columnNameParts('devices') == new Tuple('devices', null)
 	 * </pre>
 	 * @param columnName a string value
-	 * @return a list with 2 values: rootPath and the rest of the column name path
+	 * @return a Pair with 2 values: rootPath and the rest of the column name path
 	 */
-	private List columnNameParts(String columnName){
-		if (FilenameUtil.isJsonFile(dataSetFacade.fileName())) {
-			return columnName.split('\\.', 2)
-		} else {
-			return [columnName]
+	private List extractColumnNameParts(String columnName){
+
+		if(!columnNamePartsCache.containsKey(columnName)){
+			columnNamePartsCache[columnName] = columnName.split('\\.', 2).toList()
 		}
+		return columnNamePartsCache[columnName]
 	}
 
 	Column column (String columnName) {
