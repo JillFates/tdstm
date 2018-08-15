@@ -4214,7 +4214,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						if (sm) {
 							where = SqlUtil.appendToWhere(where, sm.sql)
 							if (sm.param) {
-								map[code] = sm.param
+								map[propertyName] = sm.param
 							}
 						} else {
 							log.error "SqlUtil.whereExpression unable to resolve '$propertyName' expression [${filter.asset[propertyName]}]"
@@ -4295,29 +4295,35 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						def sb = new StringBuilder('')
 
-						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
-						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)}) {
-							sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
-							addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
+						Map assetFilter = filter?.asset
+
+						if (assetFilter) {
+							// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
+							if (assetFilter.keySet().find {['sourceLocation', 'sourceRoom'].contains(it)}) {
+								sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
+								addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
+							}
+
+							if (assetFilter.containsKey('sourceRack' )) {
+								sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
+								addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
+							}
+
+							if (assetFilter.keySet().find {['targetLocation', 'targetRoom'].contains(it)}) {
+								sb.append('LEFT OUTER JOIN a.roomTarget as roomTgt ')
+								addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
+							}
+
+							if (assetFilter.containsKey('targetRack')) {
+								sb.append('LEFT OUTER JOIN a.rackTarget as rackTgt ')
+								addJoinWhereConditions('rackTgt', ['targetRack':'tag'])
+							}
 						}
 
-						if (filter?.asset?.find { it == 'sourceRack' }) {
-							sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
-							addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
-						}
 
-						if (filter?.asset?.find {['targetLocation', 'targetRoom'].contains(it)}) {
-							sb.append('LEFT OUTER JOIN a.roomtarget as roomTgt ')
-							addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
-						}
-
-						if (filter?.asset?.find { it == 'targetRack' }) {
-							sb.append('LEFT OUTER JOIN a.racktarget as rackTgt ')
-							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
-						}
-
-						sb.append("${where ?  where : ''}")
-						where = sb.toString()
+						join = "$join ${sb.toString()}"
+						//sb.append("${where ?  where : ''}")
+						//where = sb.toString()
 						break
 
 					case 'application':
