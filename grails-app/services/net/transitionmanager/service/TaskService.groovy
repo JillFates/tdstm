@@ -4322,8 +4322,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 
 						join = "$join ${sb.toString()}"
-						//sb.append("${where ?  where : ''}")
-						//where = sb.toString()
 						break
 
 					case 'application':
