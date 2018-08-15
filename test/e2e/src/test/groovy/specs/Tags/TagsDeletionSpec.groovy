@@ -10,7 +10,6 @@ import geb.waiting.WaitTimeoutException
 
 @Stepwise
 class TagsDeletionSpec extends GebReportingSpec {
-    def testKey
     static testCount
     static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
@@ -41,7 +40,7 @@ class TagsDeletionSpec extends GebReportingSpec {
 
     def cleanup() {
         String sCount = String.format("%03d", testCount)
-        println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
+        println "cleanup(): #${sCount} ${specificationContext.currentIteration.name} "
     }
 
     def filterAndSetSelectedTag(tagName){
@@ -65,7 +64,6 @@ class TagsDeletionSpec extends GebReportingSpec {
     }
 
     def "1. The User cancel erase attempt action and certifies that was not deleted"() {
-        testKey = "TM-11679"
         given: 'The User is Manage Tags Page'
             at TagsPage
         when: 'The User filters by QAE2E'
@@ -81,7 +79,6 @@ class TagsDeletionSpec extends GebReportingSpec {
     }
 
     def "2. The User deletes a custom E2E tag"(){
-        testKey = "TM-11679"
         when: 'The User filters by QAE2E'
             filterAndSetSelectedTag baseName
         and: 'The User clicks on Erase button for first row'
@@ -95,7 +92,6 @@ class TagsDeletionSpec extends GebReportingSpec {
     }
 
     def "3. Workaround to delete custom E2E tags"(){
-        testKey = "TM-11679"
         when: 'The User filters by QAE2E'
             filterAndSetSelectedTag baseName
         then: 'The user deletes custom E2E tags if there are'
