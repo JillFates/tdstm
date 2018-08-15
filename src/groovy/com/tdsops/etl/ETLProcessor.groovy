@@ -221,6 +221,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
+		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -410,7 +411,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			bindVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(row))
 
@@ -1206,6 +1206,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	private void initializeDefaultGlobalTransformations() {
 		globalTransformers.add(Trimmer)
 		globalTransformers.add(Sanitizer)
+	}
+
+	/**
+	 * Setup Global variables used in the Script
+	 */
+	private void initializeDefaultGlobalVariables() {
+		this.addGlobalVariableInBinding(NOW_VARNAME, new NOW())
 	}
 
 	/**
