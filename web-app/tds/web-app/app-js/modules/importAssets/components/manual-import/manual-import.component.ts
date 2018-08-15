@@ -5,7 +5,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
+
 import {
 	DataIngestionService,
 	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
@@ -17,7 +17,7 @@ import {
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
 import {StateService} from '@uirouter/angular';
-import {DependencyBatchStates} from '../../../dependencyBatch/dependency-batch-routing.states';
+import {DependencyBatchStates} from '../../../importBatch/dependency-batch-routing.states';
 
 declare var jQuery: any;
 

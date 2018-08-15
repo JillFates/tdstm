@@ -10,7 +10,7 @@ import {PROMPT_DEFAULT_MESSAGE_KEY, PROMPT_DEFAULT_TITLE_KEY} from '../../../../
 
 @Component({
 	selector: 'dependency-batch-record-detail',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component.html'
 })
 export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 

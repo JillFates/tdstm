@@ -14,7 +14,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
 	}

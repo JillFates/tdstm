@@ -23,7 +23,7 @@ import {StateService} from '@uirouter/angular';
 
 @Component({
 	selector: 'dependency-batch-list',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-list/dependency-batch-list.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-list/dependency-batch-list.component.html',
 	providers: [TranslatePipe]
 })
 export class DependencyBatchListComponent implements OnDestroy {

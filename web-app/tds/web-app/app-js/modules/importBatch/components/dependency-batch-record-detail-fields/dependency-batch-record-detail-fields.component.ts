@@ -11,7 +11,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component.html'
 })
 export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 

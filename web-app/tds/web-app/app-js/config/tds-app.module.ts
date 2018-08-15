@@ -14,11 +14,11 @@ import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.mod
 import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
 import { ImportAssetsModule } from '../modules/importAssets/import-assets.module';
-import {DependencyBatchModule} from '../modules/dependencyBatch/dependency-batch.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
 import {AssetTagsModule} from '../modules/assetTags/asset-tags.module';
+import {DependencyBatchModule} from '../modules/importBatch/dependency-batch.module';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
