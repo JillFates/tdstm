@@ -109,11 +109,7 @@ class CommonsModule extends Module {
         deleteAlertMessage.text()
     }
 
-    def waitForCookbookLoadingIndicator(repeatTime = 1){
-        def count = 0
-        while (count < repeatTime) {
-            waitFor{ !loadingIndicator.hasClass("ng-hide")}
-            count = count + 1
-        }
+    def blockCookbookLoadingIndicator(){
+        loadingIndicator.jquery.attr("style", "display: none !important")
     }
 }
