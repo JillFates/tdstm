@@ -43,10 +43,12 @@ class Row {
 	}
 
 	/**
-	 *	//TODO: dcorrea, complete DOCS!
-	 * @param columnIndex
-	 * @param path
-	 * @return
+	 * <p>Creates an instance of Element with column index content as a value. </p>
+	 * In case of path parameter different than nul, then it creates the value
+	 * using the GPATH over the original value.
+	 * @param columnIndex colum index position
+	 * @param path gpath used for calculate dataset value
+	 * @return an instance of Element class
 	 */
 	Element getDataSetElement(Integer columnIndex, String path = null) {
 		Object value = dataSetValues[columnIndex]
