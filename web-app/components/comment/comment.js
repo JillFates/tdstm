@@ -319,10 +319,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		}
 	};
 
-	scope.onDependencyAnalyzerGroupTagSelectionChange = function () {
-		setTimeout( function() {
-			$('.dependencyConsoleForm').submit();
-		}, 500);
+	scope.onDependencyFiltersChange = function () {
+		reloadDependencyGroupsSection();
 	};
 
 };

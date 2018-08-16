@@ -1,46 +1,7 @@
 <%@page defaultCodec="none" %>
-<%@page import="net.transitionmanager.security.Permission"%>
 <div style="margin-top: 10px;">
-	<div class="compactClass">
-		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
-		<div class="message" id="messageId" style="display:none">${flash.message}</div>
-		<div class="row">
-			<g:form name="bundleForm" action="dependencyConsole" class="dependencyConsoleForm">
-				<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
-				<div class="f-grid">
-					<div class="f-column-1">
-						<label>Dependency Groups</label>
-						<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-							<input type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
-						</tds:hasPermission>
-					</div>
-					<div class="f-column-2">
-						<label>Bundle:</label>
-						<g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
-					</div>
-					<div class="f-column-3">
-						<label>Tags:</label>
-						<tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
-					</div>
-					<div class="f-column-4">
-						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
-						<label for="assinedGroupCB" class="pointer">Show ONLY Work In Progress</label>
-						<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-							<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
-						</g:link>
-					</div>
-				</div>
-			</g:form>
-
-		</div>
-		<div class="row">
-			<div class="col-md-12">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
-		</div>
-		<div id="processDiv" style="display: none;">
-			<img src="${resource(dir:'images',file:'processing.gif')}" />
-		</div>
-	</div>
-	<div style="border: 1px solid #63A242; margin-left: 0px;">
+	<div id="dependencyBundleDetailGroupContainer">
+		<div style="border: 1px solid #63A242; margin-left: 0px;">
 		<div id="dependencyDivId" style="overflow-x:auto;">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 				<tr id="dependencyGroupsRowId" class="odd">
@@ -54,8 +15,7 @@
 
 					<g:each in="${dependencyConsoleList}" var="asset" status="depIndex">
 						<g:if test="${depIndex == 0}">
-							<td id="span_${asset.dependencyBundle}" class="pointer" 
-								
+							<td id="span_${asset.dependencyBundle}" class="pointer" 	
 								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" 
 								title="Assets with no matching Dependencies:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 								<span class="depGroup">Remnants</span>
@@ -163,6 +123,7 @@
 				</tr>
 			</table>
 		</div>
+	</div>
 	</div>
 </div>
 

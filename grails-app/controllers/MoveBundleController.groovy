@@ -909,7 +909,7 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
-	 * @param console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
+	 * @param  Console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyConsole() {
@@ -950,18 +950,34 @@ class MoveBundleController implements ControllerMethods {
 		return map
 	}
 
-	/*
-	 * Controller to render the Dependency Bundle Details
+	/**
+	 * Controller to render the Dependency Bundle Details Table.
+	 * This method is called from the Dependency Analyzer in an Ajax call to render the dependency table.
+	 * @param  Console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyBundleDetails() {
+		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
+		validateCommandObject(console)
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		// Now get the model and display results
-		def isAssigned = userPreferenceService.getPreference(PREF.ASSIGNED_GROUP)?: "1"
+		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
+				console.assignedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+		def model = moveBundleService.dependencyConsoleMap(
+				project,
+				console.bundle,
+				console.tagIds,
+				console.tagMatch,
+				console.assignedGroup,
+				null,
+				false,
+				console.subsection,
+				console.groupId,
+				console.assetName
+		)
 		render(template: 'dependencyBundleDetails',
-		       model: moveBundleService.dependencyConsoleMap(project, params.bundle, null, null, isAssigned, null))
+		       model: model)
 	}
 
 	@HasPermission(Permission.DepAnalyzerGenerate)

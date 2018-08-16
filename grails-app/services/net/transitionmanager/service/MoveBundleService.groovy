@@ -411,7 +411,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		if (isAssigned == "1") {
-			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone"}
+			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone" || it.dependencyBundle == 0}
 		}
 
 		boolean showTabs = subsection != null
