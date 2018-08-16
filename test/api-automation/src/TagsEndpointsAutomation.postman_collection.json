@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ff1a49be-7cfb-4158-8ab8-f447472f4db5",
+		"_postman_id": "28124a95-3506-47e7-a2a6-d1b7ab2d5f31",
 		"name": "Tags",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -179,7 +179,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d9446cbf-5b79-46db-b1aa-63fd1a48c14b",
+						"id": "f8f383fe-6062-4b1e-8792-b808b9474fe8",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -194,8 +194,8 @@
 							"   ",
 							"    pm.expect(data.name).to.include(pm.variables.get(\"tagName\"));",
 							"    pm.expect(data.description).to.eql('Description of a new tag.');",
-							"    pm.expect(data.color).to.eql('Black');",
-							"    pm.expect(data.css).to.eql('tag-black');",
+							"    pm.expect(data.color).to.eql('White');",
+							"    pm.expect(data.css).to.eql('tag-white');",
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
 							"});",
 							""
@@ -217,7 +217,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description of a new tag.\",\n  \"color\":\"Black\"\n}"
+					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description of a new tag.\",\n  \"color\":\"White\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -239,7 +239,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "1b8394dd-ea6d-49db-b9cf-7bdf4db19d2e",
+						"id": "8fed5574-acc9-4676-b9b3-2fa79166d923",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -257,8 +257,8 @@
 							"    ",
 							"    pm.expect(jsonData.data[lastIndex].name).to.include(pm.variables.get(\"tagName\"));",
 							"    pm.expect(jsonData.data[lastIndex].description).to.eql('Description of a new tag.');",
-							"    pm.expect(jsonData.data[lastIndex].color).to.eql('Black');",
-							"    pm.expect(jsonData.data[lastIndex].css).to.eql('tag-black');",
+							"    pm.expect(jsonData.data[lastIndex].color).to.eql('White');",
+							"    pm.expect(jsonData.data[lastIndex].css).to.eql('tag-white');",
 							"});",
 							""
 						]
@@ -548,29 +548,25 @@
 			"id": "36410f01-56e1-4c78-a457-e2e4f5cc7ac4",
 			"key": "nonExistentTag",
 			"value": "9999999999",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
 			"id": "07380e1b-c71b-4f28-bbc6-3ef8bd3d3d70",
 			"key": "updatedTagName",
 			"value": "updatedTag",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
 			"id": "08e2a793-263f-4894-999f-3fb93a31754d",
 			"key": "projectId",
 			"value": "2445",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
 			"id": "b125a2d3-6f01-4d97-9285-df5ccb7cf80c",
 			"key": "tagName",
 			"value": "newTestTag",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		}
 	]
 }
