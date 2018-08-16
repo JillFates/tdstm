@@ -70,7 +70,6 @@ class TaskBatch {
 	}
 
 	String tagNames() {
-		List<String> event = []
 		Map context = context()
 
 		if (context.tag) {
@@ -87,6 +86,16 @@ class TaskBatch {
 	 */
 	Map context() {
 		context ? JsonUtil.convertJsonToMap(context) : [:]
+	}
+
+	Map queryContext() {
+		if (context) {
+			Map queryContext = JsonUtil.convertJsonToMap(context)
+			queryContext.tag = queryContext.tag.collect{ tag-> (Long)tag.id}
+			return queryContext
+		}
+
+		return [:]
 	}
 
 	/**

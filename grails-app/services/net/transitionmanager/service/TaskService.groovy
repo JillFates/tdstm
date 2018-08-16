@@ -1761,12 +1761,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		List<AssetEntity> assets = []
 
 		if (contextObj.tag) {
-			// Get list of tags from the generation context
-			List<Long>tagIds = contextObj.tag.collect{ tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
-
 			// Query the TagAsset to get list of Assets with ANY of the tags
 			assets = TagAsset.where {
-					tag.id in tagIds
+					tag.id in contextObj.tag
 					asset.moveBundle.useForPlanning == true }.projections {
 				}.projections {
 					property 'asset'
@@ -1885,7 +1882,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = taskBatch.context()
+		def contextObj = taskBatch.queryContext()
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
