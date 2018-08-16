@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
@@ -10,10 +10,10 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
-	selector: 'dependency-batch-record-detail-fields',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component.html'
+	selector: 'import-batch-record-fields',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-fields.component.html'
 })
-export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
+export class ImportBatchRecordFieldsComponent implements OnInit {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
@@ -63,7 +63,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 
-	constructor(private dependencyBatchService: DependencyBatchService, private translatePipe: TranslatePipe) {
+	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 			this.processStatus.state = CHECK_ACTION.NONE;
 			this.saveStatus.state = CHECK_ACTION.NONE;
@@ -81,7 +81,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * Gets the Batch Record Field Details from API.
 	 */
 	private loadRecordFieldDetails(updateProcessStatus = false): void {
-		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
+		this.importBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.onBatchRecordUpdated.emit({batchRecord: result.data});
@@ -148,7 +148,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	private onIgnore(): void {
 		const ids = [this.batchRecord.id];
-		this.dependencyBatchService.ignoreBatchRecords(this.importBatch.id, ids)
+		this.importBatchService.ignoreBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadRecordFieldDetails();
@@ -164,7 +164,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	protected onInclude(): void {
 		const ids = [this.batchRecord.id];
-		this.dependencyBatchService.includeBatchRecords(this.importBatch.id, ids)
+		this.importBatchService.includeBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadRecordFieldDetails();
@@ -186,7 +186,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 				newFieldsValues.push(newFieldValue);
 			}
 		}
-		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
+		this.importBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
 				this.loadRecordFieldDetails();
 				if (result.status === ApiResponseModel.API_SUCCESS) {
@@ -204,7 +204,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	protected onProcess(): void {
 		const ids = [this.batchRecord.id];
-		this.dependencyBatchService.processBatchRecords(this.importBatch.id, ids)
+		this.importBatchService.processBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadRecordFieldDetails(true);

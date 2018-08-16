@@ -49,7 +49,7 @@ export class ImportBatchModel {
  * Configuration of the Import Batches Grid.
  * Defines the columns.
  */
-export class DependencyBatchColumnsModel {
+export class ImportBatchColumnsModel {
 	columns: Array<GridColumnModel>;
 
 	constructor() {

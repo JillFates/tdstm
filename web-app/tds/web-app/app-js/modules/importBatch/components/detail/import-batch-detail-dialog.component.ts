@@ -1,25 +1,25 @@
 import {Component, OnInit} from '@angular/core';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {ImportBatchService} from '../../service/import-batch.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
 
 @Component({
-	selector: 'dependency-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html',
+	selector: 'import-batch-detail-dialog',
+	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/detail/import-batch-detail-dialog.component.html',
 	host: {
 		'(keydown)': 'keyDownHandler($event)'
 	}
 })
-export class DependencyBatchDetailDialogComponent implements OnInit {
+export class ImportBatchDetailDialogComponent implements OnInit {
 
 	private BatchStatus = BatchStatus;
 	private columnsModel: ImportBatchRecordDetailColumnsModel;
@@ -52,7 +52,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
-		private dependencyBatchService: DependencyBatchService,
+		private importBatchService: ImportBatchService,
 		private activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private userPreferenceService: PreferenceService
@@ -79,7 +79,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * Load Import Batch Records from API.
 	 */
 	private loadImportBatchRecords(): void {
-		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.batchRecords = result.data;
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
@@ -97,7 +97,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * Load A Single Batch Record from API.
 	 */
 	private reloadSingleBatchRecord(batchRecord: ImportBatchRecordModel): void {
-		this.dependencyBatchService.getImportBatchRecordUpdated(this.importBatchModel.id, batchRecord.id).subscribe((result: ImportBatchRecordModel) => {
+		this.importBatchService.getImportBatchRecordUpdated(this.importBatchModel.id, batchRecord.id).subscribe((result: ImportBatchRecordModel) => {
 			if (result) {
 				Object.assign(batchRecord, result);
 			} else {
@@ -141,7 +141,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		if (!selectedBatchRecord || !selectedBatchRecord.id) {
 			return;
 		}
-		this.dialogService.extra(DependencyBatchRecordDetailDialogComponent, [
+		this.dialogService.extra(ImportBatchRecordDialogComponent, [
 				{provide: ImportBatchModel, useValue: this.importBatchModel},
 				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
 			], false, false)
@@ -221,7 +221,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private onIgnore(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.dependencyBatchService.ignoreBatchRecords(this.importBatchModel.id, ids)
+		this.importBatchService.ignoreBatchRecords(this.importBatchModel.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadImportBatchRecords();
@@ -237,7 +237,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private onProcess(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.dependencyBatchService.processBatchRecords(this.importBatchModel.id, ids)
+		this.importBatchService.processBatchRecords(this.importBatchModel.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadImportBatchRecords();
