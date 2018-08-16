@@ -62,7 +62,7 @@ class PartyGroupController implements ControllerMethods {
 		String active = params.activeUsers ?: session.getAttribute("InActive") ?: 'Y'
 
 		def queryParams = [:]
-		def query = new StringBuffer("""SELECT * FROM (
+		def query = new StringBuilder("""SELECT * FROM (
 			SELECT name as companyName, party_group_id as companyId, p.date_created as dateCreated, p.last_updated AS lastUpdated, IF(pr.party_id_from_id IS NULL, '','Yes') as partner
 			FROM party_group pg
 			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id

@@ -284,7 +284,7 @@ class MoveBundleService implements ServiceMethods {
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
 		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
 
-		def depSql = new StringBuffer("""SELECT
+		def depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
 			COUNT(distinct adb.asset_id) AS assetCnt,
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,

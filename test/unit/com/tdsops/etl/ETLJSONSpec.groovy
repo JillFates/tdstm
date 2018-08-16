@@ -59,7 +59,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
 	void 'test can define a rootNode for a JSON DataSet'(){

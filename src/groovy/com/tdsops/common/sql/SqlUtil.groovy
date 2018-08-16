@@ -18,7 +18,7 @@ class SqlUtil {
 	/**
 	 * Helper class that allows the concatenation of sql with and/or which only adds the logic if the query already contains content
 	 * @param query - the string buffer that contains the current WHERE clause
-	 * @param criteria - the additional criteria to append to the query (StringBuffer or String)
+	 * @param criteria - the additional criteria to append to the query (StringBuilder or String)
 	 * @param andOr - the boolean identifier (default 'and')
 	 * @return String concatenated string
 	 */
@@ -29,13 +29,9 @@ class SqlUtil {
 	/**
 	 * Used to append a clause to a SQL query string and account for the AND/OR prefix boolean
 	 * @param query - the string buffer that contains the current WHERE clause
-	 * @param criteria - the additional criteria to append to the query (StringBuffer or String)
+	 * @param criteria - the additional criteria to append to the query (StringBuilder or String)
 	 * @param andOr - the boolean identifier (default 'and')
 	 */
-	static void appendToWhere(StringBuffer query, CharSequence criteria, String andOr = 'and') {
-		if (query) query << ' ' << andOr << ' '
-		query << criteria
-	}
 	static void appendToWhere(StringBuilder query, CharSequence criteria, String andOr = 'and') {
 		if (query) query << ' ' << andOr << ' '
 		query << criteria

@@ -866,7 +866,7 @@ class PersonController implements ControllerMethods {
 			// The staffIds will help filter down who can appear in the list
 			String staffIds = staff.id.join(',')
 
-			def query = new StringBuffer("""
+			def query = new StringBuilder("""
 				SELECT * FROM (
 					SELECT pr.party_id_to_id AS personId,
 						p.last_name AS lastName,
