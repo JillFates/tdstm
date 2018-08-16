@@ -105,10 +105,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Used to control if the Refresh Sample Data button appears on the page
+	 * Used to determine if the Refresh Sample Data button appears on the page
+	 * @return true if a JSON file has been uploaded and available
 	 */
 	public showSampleDataRefresh(): boolean  {
-		return ( ! isNullOrEmptyString(this.dataScriptModel.sampleFilename));
+		return (!isNullOrEmptyString(this.dataScriptModel.sampleFilename) && this.dataScriptModel.sampleFilename.endsWith('.json'));
 	}
 
 	/**
