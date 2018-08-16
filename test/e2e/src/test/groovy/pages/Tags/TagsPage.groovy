@@ -3,6 +3,7 @@ package pages.Tags
 import geb.Page
 import utils.CommonActions
 import modules.CommonsModule
+import geb.waiting.WaitTimeoutException
 
 class TagsPage extends Page{
     static at = {
@@ -18,6 +19,7 @@ class TagsPage extends Page{
         tagsGrid {$('div[role=grid]')}
         tagsGridDataRows {tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}
         tagsGridActionsRows {tagsGrid.find(".k-grid-container .k-grid-content-locked tr[kendogridlogicalrow]")}
+        tagsNoDataRecords {tagsGrid.find(".k-grid-container .k-grid-content tr.k-grid-norecords").find("td")}
         nameFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "2").find("input")}
         //First Element of the Providers Table
         firstTagActions { tagsGridActionsRows.find("td", "aria-colindex": "1")[0]}
@@ -92,6 +94,11 @@ class TagsPage extends Page{
         commonsModule.waitForLoader(5)
     }
 
+    def clickOnDeleteButton(){
+        waitFor{firstTagRemoveButton.displayed}
+        waitFor{firstTagRemoveButton.click()}
+    }
+
     def isFirstTagRowNameNotEditable(){
         waitFor{firstTagName.displayed}
         firstTagName.children().isEmpty()
@@ -128,5 +135,44 @@ class TagsPage extends Page{
         waitFor{firstTagColors[0].displayed}
         def color = CommonActions.getRandomOption firstTagColors
         color.click()
+    }
+
+    def getNoRecordsFoundText(){
+        waitFor(2){tagsNoDataRecords.displayed}
+        tagsNoDataRecords.text().trim()
+    }
+
+    def filterAndSetSelectedTag(tagName){
+        filterByName tagName
+        def selectedTagName = getTagNameText()
+        selectedTagName
+    }
+
+    def deleteTag(tagName, message){
+        clickOnDeleteButton()
+        commonsModule.clickOnButtonPromptModalByText("Confirm")
+        filterByName tagName
+        noTagsDisplayedInGrid message
+    }
+
+    def noTagsDisplayedInGrid(message){
+        try {
+            getNoRecordsFoundText() == message
+        } catch (WaitTimeoutException e){
+            false
+        }
+    }
+
+    def bulkDelete(message, maxNumberOfBulkTagsToBeDeleted, tagName) {
+        def count = 0
+        while (!noTagsDisplayedInGrid(message)) {
+            count = count + 1
+            if (count > maxNumberOfBulkTagsToBeDeleted) {
+                break
+            }
+            deleteTag tagName, message
+            filterByName tagName
+        }
+        true // done, just return true to avoid test fails
     }
 }
