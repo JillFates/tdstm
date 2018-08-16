@@ -44,8 +44,8 @@ class Row {
 
 	/**
 	 * <p>Creates an instance of Element with column index content as a value. </p>
-	 * In case of path parameter different than nul, then it creates the value
-	 * using the GPATH over the original value.
+	 * In case of path parameter different than null, then it creates a value
+	 * using the GPATH over the original value taken from dataset.
 	 * @param columnIndex colum index position
 	 * @param path gpath used for calculate dataset value
 	 * @return an instance of Element class
