@@ -280,7 +280,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	 * by passing the reference from a re-compiled DOM, this make possible to communicate angular1 with a native JS call...
 	 */
 	scope.internal =  {
-		assetSelector:{}
+		assetSelector: {}
 	};
 
 	scope.dependencyGroup =  {
@@ -294,7 +294,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 
 			var postData = {
 				tagIds: getTagsIds(scope.internal.assetSelector.tag),
-				// tagMatch: (scope.internal.assetSelector.operator === 'ALL') ? true : false
+				tagMatch: scope.internal.assetSelector.operator
 			};
 
 			// Cases where is not: All, Remnants, Grouped
