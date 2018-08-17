@@ -125,8 +125,15 @@
                                     <i class="fa" [ngClass]="collapsed.sample ? 'fa-angle-double-right' : 'fa-angle-double-down'"></i>
                                 </button>
                             </div>
-                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="">
-                                <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
+                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data">
+                                <kendo-grid *ngIf="sampleDataGridHelper"
+                                            [data]="sampleDataGridHelper.gridData"
+                                            [height]="sampleDataModel.gridHeight"
+                                            [resizable]="true"
+                                            [pageSize]="sampleDataGridHelper.state.take"
+                                            [skip]="sampleDataGridHelper.state.skip"
+                                            [pageable]="true"
+                                            (pageChange)="sampleDataGridHelper.pageChange($event)">
                                     <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
                                         <ng-template kendoGridHeaderTemplate>
                                             <label>{{column.label}}</label>
@@ -156,18 +163,25 @@
                                     <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                               <kendo-grid [data]="domain.data" [resizable]="true" class="test-results">
-                                                    <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames;
-                                                               let columnIndex = index;"
-                                                                       title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
-                                                        <ng-template kendoGridCellTemplate let-dataItem>
-	                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
-	                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
-		                                                        {{getInitOrValue(dataItem.fields[column])}}
-		                                                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
-	                                                        </div>
-                                                        </ng-template>
-                                                    </kendo-grid-column>
+                                               <kendo-grid *ngIf="transformedDataGrids[i]"
+                                                           [data]="transformedDataGrids[i].gridData"
+                                                           [height]="'300'"
+                                                           [resizable]="true"
+                                                           [pageSize]="transformedDataGrids[i].state.take"
+                                                           [skip]="transformedDataGrids[i].state.skip"
+                                                           [pageable]="true"
+                                                           (pageChange)="transformedDataGrids[i].pageChange($event)">
+                                                                <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames"
+                                                                                   title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
+                                                                    <ng-template kendoGridCellTemplate let-dataItem>
+                                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
+                                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
+                                                                            {{getInitOrValue(dataItem.fields[column])}}
+                                                                            <i *ngIf="!dataItem.fields[column].value && dataItem.fields[column].init"
+                                                                               [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                                                                        </div>
+                                                                    </ng-template>
+                                                                </kendo-grid-column>
                                                 </kendo-grid>
                                             </div>
                                         </ng-template>

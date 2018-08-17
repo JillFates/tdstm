@@ -1,5 +1,4 @@
 import {Component, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -20,8 +19,8 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
-import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -41,6 +40,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private initialWindowStyle = null;
 	private modalOptions: DecoratorOptions;
 	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
+	protected sampleDataGridHelper: DataGridOperationsHelper;
 	private operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
@@ -48,6 +48,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
+	protected transformedDataGrids: Array<DataGridOperationsHelper>;
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 	private closeErrorsSection = false;
 	protected CHECK_ACTION = CHECK_ACTION;
@@ -55,7 +56,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		progressKey: null,
 		currentProgress: 0,
 	};
-	private testScripInterval: any;
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 
@@ -164,6 +164,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 						this.importAssetsService.getFileContent(scripTestFilename)
 							.subscribe(result => {
 								this.scriptTestResult.domains = result.domains;
+								this.transformedDataGrids = [];
+								this.scriptTestResult.domains.forEach( (domain,  index) => {
+									this.transformedDataGrids[index] = new DataGridOperationsHelper(domain.data);
+									// console.log(`${domain.domain}-${index.toString()}`);
+								});
 								this.scriptTestResult.consoleLog = result.consoleLog;
 								this.consoleSettings.scriptTestResult = this.scriptTestResult;
 							});
@@ -278,6 +283,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		const rootNode = this.extractRootNode();
 		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName, rootNode).subscribe((result) => {
 			this.sampleDataModel = result;
+			this.sampleDataGridHelper = new DataGridOperationsHelper(this.sampleDataModel.data);
 			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
@@ -370,10 +376,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * if value is present return value otherwise returns init
 	 */
-	public getInitOrValue(dataItem): string {
+	protected getInitOrValue(dataItem): string {
 		if (dataItem.value) {
 			return dataItem.value;
+		} else {
+			return (dataItem.init || '');
 		}
-		return (dataItem.init || '');
 	}
 }
