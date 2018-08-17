@@ -78,7 +78,7 @@ class TagEventService implements ServiceMethods {
 	 * @param tagEventIds the id of the TagEvent to remove.
 	 */
 	void removeTags(Project currentProject, List<Long> tagEventIds) {
-		List<Long> eventIds = []
+		Set<Long> eventIds = []
 
 		tagEventIds.each { Long id ->
 			TagEvent tagEvent = get(TagEvent, id, currentProject)

@@ -3149,7 +3149,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @param project
 	 * @param assetIds - a list of asset ids
 	 */
-	void bulkBumpAssetLastUpdated(Project project, List<Long> assetIds) {
+	void bulkBumpAssetLastUpdated(Project project, Set<Long> assetIds) {
 		if (project) {
 			String query = """
 				UPDATE AssetEntity SET lastUpdated = :lastUpdated
