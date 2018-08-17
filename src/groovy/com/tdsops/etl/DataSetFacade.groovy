@@ -1,18 +1,38 @@
 package com.tdsops.etl
 
+import getl.csv.CSVDataset
 import getl.data.Dataset
 import getl.data.Field
 import getl.excel.ExcelDataset
 import getl.json.JSONDataset
-import getl.json.JSONDriver
-import org.codehaus.groovy.grails.web.json.JSONElement
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class DataSetFacade {
 
 	private Dataset dataSet
 
+	final Boolean isJson
+	final Boolean isCsv
+	final Boolean isExcel
+
+
 	DataSetFacade(Dataset dataSet) {
 		this.dataSet = dataSet
+
+		switch (dataSet.class){
+			case JSONDataset:
+				isJson = true
+				break
+			case CSVDataset:
+				isCsv = true
+				break
+			case ExcelDataset:
+				isExcel = true
+				break
+			default:
+				throw new RuntimeException("Switch statement does not support ${dataSet.class.name}")
+		}
 	}
 
 	/**
@@ -129,15 +149,6 @@ class DataSetFacade {
 		if(!hasSheet){
 			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
 		}
-	}
-
-	/**
-	 * If the Dataset is an ExcelDataSet, it takes the sheet names from its TDSExcelDriver instances.
-	 * @return a list of sheet names
-	 */
-	List<String> getSheetNames() {
-		TDSExcelDriver excelDriver = excelDriver()
-		return excelDriver.sheetNames
 	}
 
 	/**
