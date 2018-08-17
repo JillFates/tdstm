@@ -47,7 +47,8 @@ class RecipeHistorySpec extends GebReportingSpec {
                     '    category: \'startup\',',
                     '    duration: 10,',
                     '      filter : [',
-                    '        class: \'application\'',
+                    '        class: \'application\',',
+                    '        tag: \'Red\'',
                     '      ],',
                     '  ],',
                     ']'
@@ -90,6 +91,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         waitFor { buildOutOp.click()}
         waitFor { tskGTabGenUsingWipCBox.click()}
         waitFor { tskGTabGenerateTasksBtn.click()}
+        waitForProgressBar()
         at TabTaskGenTabSummaryPage
         waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
     }

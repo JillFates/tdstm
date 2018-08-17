@@ -761,7 +761,7 @@ class ModelController implements ControllerMethods {
 					} else {
 						def sheetrows = manuSheet.getLastRowNum()
 						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuffer("(")
+							def valueList = new StringBuilder("(")
 							for(int cols = 0; cols < manuCol; cols++) {
 								valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r, "").replace("'","\\'")+"',")
 							}
@@ -801,7 +801,7 @@ class ModelController implements ControllerMethods {
 						def sheetrows = modelSheet.getLastRowNum()
 						for (int r = 1; r < sheetrows ; r++) {
 							onlyTds = false
-							def valueList = new StringBuffer("(")
+							def valueList = new StringBuilder("(")
 							def manuId
 							def createdPersonId
 							def updatedPersonId
@@ -957,7 +957,7 @@ class ModelController implements ControllerMethods {
 					} else {
 						def sheetrows = connectorSheet.getLastRowNum()
 						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuffer("(")
+							def valueList = new StringBuilder("(")
 							def modelId
 							for(int cols = 0; cols < connectorCol; cols++) {
 								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0)) {

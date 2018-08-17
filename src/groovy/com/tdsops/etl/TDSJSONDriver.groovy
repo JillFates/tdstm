@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.JsonUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -8,10 +7,7 @@ import getl.exception.ExceptionGETL
 import getl.json.JSONDataset
 import getl.json.JSONDriver
 import getl.utils.GenerationUtils
-import getl.utils.Logs
 import groovy.json.JsonSlurper
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Custom implementation of JSONDriver. It adds support for several ETL script commands.
@@ -213,6 +209,42 @@ class TDSJSONDriver extends JSONDriver {
 			}
 			code(row)
 		}
+	}
+
+	/**
+	 * Overriding Parent readData found a bug in line:
+	 *    data = json.parse(reader)
+	 * for some reason is not reading until the END of DATA but the END of BUFFER SIZE adding 'x0' characters
+	 * changed to:
+	 *    data = json.parseText(reader.text)
+	 * @param dataset
+	 * @param params
+	 * @return
+	 */
+	private def readData (Dataset dataset, Map params) {
+		boolean convertToList = (dataset.params.convertToList != null)?dataset.params.convertToList:false
+
+		def json = new JsonSlurper()
+		def data = null
+
+		def reader = getFileReader(dataset, params)
+		
+		try {
+			String text = reader.text
+
+			if (convertToList) {
+				text = text.trim().replaceAll(',$', '')
+				text = "[$text]"
+
+			}
+
+			data = json.parseText(text)
+
+		} finally {
+			reader.close()
+		}
+
+		return data
 	}
 
 }

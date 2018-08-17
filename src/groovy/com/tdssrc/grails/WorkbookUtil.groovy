@@ -573,7 +573,7 @@ class WorkbookUtil {
 
 		def createFormulaString = {
 			String validationColumnCode = columnCode(validationColumn)
-			String formula = new StringBuffer("'${validationSheet.getSheetName()}'!")
+			String formula = new StringBuilder("'${validationSheet.getSheetName()}'!")
 					  .append("\$$validationColumnCode\$$firstValidationRow:")
 					  .append("\$$validationColumnCode\$$lastValidationRow")
 					  .toString()

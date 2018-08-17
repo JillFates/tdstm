@@ -84,13 +84,13 @@ export class HeaderComponent implements AfterViewInit {
 		jQuery('li[class^="dropdown menu-parent-"]').removeClass('active');
 		jQuery('li.menu-child-item').removeClass('active');
 
-		if (this.pageMetaData.topMenu.parent) {
+		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.parent) {
 			let element = document.getElementsByClassName(this.pageMetaData.topMenu.parent)[0];
 			if (element) {
 				this.renderer.addClass(element, 'active');
 			}
 		}
-		if (this.pageMetaData.topMenu.child) {
+		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.child) {
 			let element = document.getElementsByClassName(this.pageMetaData.topMenu.child)[0];
 			if (element) {
 				this.renderer.addClass(element, 'active');
