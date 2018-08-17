@@ -30,14 +30,14 @@ class DependencyAnalyzerService implements ServiceMethods {
 		String personQuery = getPersonQuery(filter.personId, queryParams)
 
 		String query = """
-			SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName FROM asset_entity ae
-			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
-			INNER JOIN asset_dependency_bundle adb ON adb.asset_id = ae.asset_entity_id
-			LEFT OUTER JOIN person p ON p.person_id IN (app.sme_id, app.sme2_id, ae.app_owner_id)
-			LEFT OUTER JOIN tag_asset ta ON ae.asset_entity_id = ta.asset_id
+			SELECT a.asset_entity_id AS assetId, a.asset_name AS assetName FROM asset_entity a
+			LEFT OUTER JOIN application app ON app.app_id = a.asset_entity_id
+			INNER JOIN asset_dependency_bundle adb ON adb.asset_id = a.asset_entity_id
+			LEFT OUTER JOIN person p ON p.person_id IN (app.sme_id, app.sme2_id, a.app_owner_id)
+			LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
 			LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 			WHERE adb.project_id = :projectId $tagQuery $dependencyQuery $personQuery
-			Group by ae.asset_entity_id
+			Group by a.asset_entity_id
 		"""
 
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource())
