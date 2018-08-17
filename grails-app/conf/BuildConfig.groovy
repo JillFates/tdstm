@@ -17,9 +17,12 @@ grails.project.dependency.resolution = {
 		mavenLocal()
 
 		// mavenRepo 'http://repo.novus.com/releases/'
-		//mavenRepo 'http://repo.grails.org/grails/plugins'
-		//mavenRepo 'https://repo.grails.org/grails/core'
-		//grailsPlugins()
+		// mavenRepo 'http://repo.grails.org/grails/plugins'
+		// mavenRepo 'https://repo.grails.org/grails/core'
+		// grailsPlugins()
+
+		// TDS Private Repository
+		mavenRepo 'https://tm-nexus.transitionmanager.net/repository/TransitionManager-Application-Libraries'
 
 		grailsCentral()
 		mavenCentral()
@@ -33,6 +36,16 @@ grails.project.dependency.resolution = {
 		compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
 		compile 'org.apache.poi:poi:3.14'
 		compile 'xml-apis:xml-apis:1.4.01'
+
+		// LIB JARS
+		compile 'net.sourceforge.barbecue:barbecue:jar:1.5-beta1'
+		compile 'org.codelibs:jcifs:1.3.18.3'
+		compile 'org.xbib.groovy:groovy-ldap:1.0.2'
+		compile 'net.nicholaswilliams.java.licensing:licensing-core:1.1.0'
+		compile 'net.nicholaswilliams.java.licensing:licensing-licensor-base:1.1.0'
+
+		// From the Private Repo TM-NEXUS
+		compile 'com.barcodelib:barcode:1.0'
 
 		compile 'org.glassfish.external:ant:3.0-b29'
 		runtime 'mysql:mysql-connector-java:5.1.40'
@@ -78,7 +91,7 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-ldap:2.0.1'
 		compile ':spring-events:1.2'
 		// Added the acl for some testing JPM 12/2016
-		compile ':spring-security-acl:2.0.0'
+		// OLB NOT USED: compile ':spring-security-acl:2.0.0'
 		compile ':greenmail:1.3.4'
 
 		compile (':spring-security-rest:1.5.4') {
