@@ -55,7 +55,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		(simpleDataSetFileName, simpleDataSet) = buildCSVDataSet(deviceDataSetContent)
 	}
@@ -355,7 +355,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					simpleDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -375,7 +375,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	void 'test can debug a selected value for a column name'() {
 
 		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+			DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))

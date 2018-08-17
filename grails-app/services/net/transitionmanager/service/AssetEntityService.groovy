@@ -1090,7 +1090,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)*.value
+		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1106,7 +1106,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -2935,7 +2935,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	def assetTypesOf(String manufacturerId, String term) {
 		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
-			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value', order: 'asc'])
 
 			List<Map> results = assetOptions.collect { options ->
 				[id: options.value, text : options.value]

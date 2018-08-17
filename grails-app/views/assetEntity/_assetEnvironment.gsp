@@ -3,7 +3,7 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<div style="margin-top: 89px;width: auto;">
-		<table>
+		<table id="envOptionTableId">
 			<thead>
 				<tr>
 					<th colspan="2"><h3>Asset Environment</h3></th>

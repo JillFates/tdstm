@@ -1,0 +1,204 @@
+<style>
+
+</style>
+
+<!-- Main content -->
+<div class="content body tds-kendo-grid">
+    <section>
+        <div>
+            <div class="box-body box-with-empty-header">
+                <kendo-grid
+                        *ngIf="dataGridOperationsHelper"
+                        [data]="dataGridOperationsHelper.gridData"
+                        [filter]="dataGridOperationsHelper.state.filter"
+                        [filterable]="true"
+                        (filterChange)="dataGridOperationsHelper.filterChange($event)"
+                        [sort]="dataGridOperationsHelper.state.sort"
+                        [sortable]="{mode:'single'}"
+                        [pageSize]="dataGridOperationsHelper.state.take"
+                        [skip]="dataGridOperationsHelper.state.skip"
+                        [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+                        (pageChange)="onPageChange($event)"
+                        [resizable]="true"
+                        (sortChange)="dataGridOperationsHelper.sortChange($event)"
+                        [selectable]="selectableSettings"
+                        [rowSelected]="dataGridOperationsHelper.isRowSelected"
+                        (cellClick)="openBatchDetail($event)">
+
+                        <!-- Toolbar Template -->
+                        <ng-template kendoGridToolbarTemplate [position]="'top'">
+                            <button *ngIf="canBulkDelete()"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="confirmDelete()"
+                                    class="btn btn-default" id="btnBulkDelete" type="button">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
+                            </button>
+                            <button *ngIf="canBulkArchive() && !viewArchived"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="confirmArchive()"
+                                    class="btn btn-default" id="btnBulkArchive" type="button">
+                                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+                                {{ 'GLOBAL.ARCHIVE' | translate }}
+                            </button>
+                            <button *ngIf="canBulkArchive() && viewArchived"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="confirmUnarchive()"
+                                    class="btn btn-default" id="btnBulkUnArchive" type="button">
+                                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+                                {{ 'IMPORT_BATCH.LIST.UNARCHIVE' | translate }}
+                            </button>
+                            <label class="view-archived">
+                                <input name="viewArchived" type="checkbox" style="margin-right: 5px; margin-top: 2px;"
+                                       (change)="onToggleViewArchived()" [(ngModel)]="viewArchived">
+                                {{'IMPORT_BATCH.LIST.VIEW_ARCHIVED' | translate}}
+                            </label>
+                            <label class="reload-grid-button pull-right" title="Reload Batch List" (click)="onToggleViewArchived()">
+                                <span class="glyphicon glyphicon-repeat"></span>
+                            </label>
+                        </ng-template>
+
+                        <!-- Checkbox Template (Select All & Cell Content) -->
+                        <kendo-grid-column *ngIf="canBulkDelete() || canBulkArchive()" title="" [locked]="true" [filterable]="false" [width]="45">
+                            <ng-template kendoGridHeaderTemplate>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <div class="checkbox checkbox-grid">
+                                            <label>
+                                                <input type="checkbox" name="selectAll"
+                                                       [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
+                                                       (change)="dataGridOperationsHelper.onSelectAllCheckboxes()" >
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                                <label *ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.STALLED && dataItem.status.code !== BatchStatus.QUEUED"
+                                       class="selectall-checkbox-column text-center k-grid-ignore-click">
+                                    <input type="checkbox"
+                                           [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                           name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                           (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                </label>
+                            </ng-template>
+                        </kendo-grid-column>
+
+                        <!-- Action -->
+                        <kendo-grid-column *ngIf="!viewArchived"
+                                           title="Action" [locked]="true" [filterable]="false" [width]="70">
+                            <ng-template kendoGridHeaderTemplate>
+                                <label class="action-header"> Action </label>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                                <div class="k-grid-ignore-click text-center" style="cursor: default">
+                                    <button *ngIf="dataItem.status.code === 'PENDING'"
+                                            (click)="onPlayButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
+                                        <i class="fa fa-play-circle-o"></i>
+                                    </button>
+                                    <button *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
+                                            (click)="onStopButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
+                                        <i class="fa fa-stop"></i>
+                                    </button>
+                                    <button *ngIf="dataItem.status.code === 'QUEUED'"
+                                            (click)="onEjectButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
+                                        <i class="fa fa-eject"></i>
+                                    </button>
+                                </div>
+                            </ng-template>
+                        </kendo-grid-column>
+
+                        <!-- Columns -->
+                        <kendo-grid-column *ngFor="let column of columnsModel.columns"
+                                       field="{{column.property}}"
+                                       [locked]="column.locked"
+                                       format="{{column.format}}"
+                                       [headerClass]="column.headerClass ? column.headerClass : ''"
+                                       [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                                       [class]="column.cellClass ? column.cellClass : ''"
+                                       [style]="column.cellStyle ? column.cellStyle : ''"
+                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                            <!-- Header Template -->
+                            <ng-template kendoGridHeaderTemplate>
+                                <div class="sortable-column" (click)="onClickTemplate($event)">
+                                    <label>{{column.label}}</label>
+                                </div>
+                            </ng-template>
+
+                            <!-- Cell Templates -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'datetime'" let-dataItem>
+                                {{dataItem[column.property] | userDateTime: userTimeZone }}
+                            </ng-template>
+
+                            <!-- Action -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
+                                <div class="k-grid-ignore-click" style="cursor: default;">
+                                    <button *ngIf="dataItem.status.code === 'PENDING'"
+                                            (click)="onPlayButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
+                                        <i class="fa fa-play-circle-o"></i>
+                                    </button>
+                                    <button *ngIf="dataItem.status.code === 'RUNNING'"
+                                            (click)="onStopButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
+                                        <i class="fa fa-stop"></i>
+                                    </button>
+                                    <button *ngIf="dataItem.status.code === 'QUEUED'"
+                                            (click)="onEjectButton(dataItem)"
+                                            class="btn btn-action btn-default"
+                                            title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
+                                        <i class="fa fa-eject"></i>
+                                    </button>
+                                </div>
+                            </ng-template>
+
+                            <!-- Status -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
+                                <div *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
+                                <ng-template #progressBarTemplate>
+                                    <div >{{ dataItem.status.label }}</div>
+                                    <div class="progress" style="margin-bottom: 0px;">
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
+                                            {{dataItem.currentProgress}}%
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template #statusTemplate>
+                                    <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text">
+                                        {{ dataItem.status.label }}
+                                    </div>
+                                </ng-template>
+                            </ng-template>
+
+                            <!-- Filter Template -->
+                            <ng-template kendoGridFilterCellTemplate let-filter>
+                                <div class="has-feedback" *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )" style="margin-bottom:0px;">
+                                    <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
+                                    <ng-template #dateFilter>
+                                        <kendo-datepicker (valueChange)="dataGridOperationsHelper.onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+                                        <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)"
+                                              style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                    </ng-template>
+                                    <ng-template #stringFilter>
+                                        <input [(ngModel)]="column.filter" (keyup)="preProcessFilter(column)"
+                                               type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
+                                        <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                    </ng-template>
+                                </div>
+                            </ng-template>
+
+                    </kendo-grid-column>
+                </kendo-grid>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </section>
+</div>

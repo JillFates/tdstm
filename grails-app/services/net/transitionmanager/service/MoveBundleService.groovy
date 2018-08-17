@@ -284,7 +284,7 @@ class MoveBundleService implements ServiceMethods {
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
 		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
 
-		def depSql = new StringBuffer("""SELECT
+		def depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
 			COUNT(distinct adb.asset_id) AS assetCnt,
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
@@ -411,7 +411,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		if (isAssigned == "1") {
-			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone"}
+			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone" || it.dependencyBundle == 0}
 		}
 
 		boolean showTabs = subsection != null
@@ -469,7 +469,11 @@ class MoveBundleService implements ServiceMethods {
 			showTabs:showTabs,
 			tabName: subsection,
 			groupId: groupId,
-			assetName: assetName]
+			assetName: assetName,
+			// Tags Properties
+			tagIds: tagIds,
+			tagMatch: tagMatch
+		]
 
 		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
@@ -625,7 +629,7 @@ class MoveBundleService implements ServiceMethods {
 	 * relationships are processed first.
 	 * @param projectId : Related project
 	 * @param connectionTypes : filter for asset types
-	 * @param statusTypes : filter for status tyoes
+	 * @param statusTypes : filter for status types
 	 * @param isChecked : check if should use the new criteria
 	 * @param progressKey : progress key
 	 * @return String message information

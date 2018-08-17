@@ -58,7 +58,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
 	void 'test can throw an Exception if lookup does not contain a valid field name'() {

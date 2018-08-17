@@ -17,7 +17,7 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';
@@ -105,10 +105,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * Used to control if the Refresh Sample Data button appears on the page
+	 * Used to determine if the Refresh Sample Data button appears on the page
+	 * @return true if a JSON file has been uploaded and available
 	 */
 	public showSampleDataRefresh(): boolean  {
-		return ( ! isNullOrEmptyString(this.dataScriptModel.sampleFilename));
+		return (!isNullOrEmptyString(this.dataScriptModel.sampleFilename) && this.dataScriptModel.sampleFilename.endsWith('.json'));
 	}
 
 	/**

@@ -73,8 +73,7 @@
                     <!-- Textarea code -->
                     <div class="row" *ngIf="!collapsed.code">
                         <div class="col-md-12">
-                            <code-mirror *ngIf="!script || script.length === 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
-                            <code-mirror *ngIf="script.length > 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
+                            <code-mirror #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
                         </div>
                     </div>
                     <!-- Save / Cancel buttons -->
@@ -116,11 +115,11 @@
                         <div class="row">
                             <div class="col-md-12 sample-preview" >
                                 <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
-                                <!-- <span *ngIf="showSampleDataRefresh()" -->
                                 <span
-                                      class="glyphicon glyphicon-refresh"
-                                      style="margin-left: 5px; margin-top: 3px; cursor: pointer; color: #5e9fcf; font-weight: bold;"
-                                      (click)="reloadSampleData()"
+                                    *ngIf="showSampleDataRefresh()"
+                                    class="glyphicon glyphicon-refresh"
+                                    style="margin-left: 5px; margin-top: 3px; cursor: pointer; color: #5e9fcf; font-weight: bold;"
+                                    (click)="reloadSampleData()"
                                 ></span>
                                 <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
                                     <i class="fa" [ngClass]="collapsed.sample ? 'fa-angle-double-right' : 'fa-angle-double-down'"></i>

@@ -1,0 +1,77 @@
+import-batch-record-fields
+
+  $grid-left-padding: 7px
+
+  .gray-background
+    background-color: $color--grey-kendo-header
+
+  label
+    font-size: 15px
+
+  > div.row
+      margin: 0px 10px 0px 10px
+
+  .fields-filters
+    label
+      padding: 3px 0 0 0
+
+
+  .fields-container
+    margin-top: 15px !important
+
+    .fieldsFilterLabel
+      margin-top: 5px
+      padding-right: 0px
+
+    .fieldsFilter
+      padding-left: 0px
+      padding-right: 0px
+
+    .fieldsFilterText
+      .fa-times
+        cursor: pointer
+        color: #656565
+        pointer-events: all
+        margin-right: 25px
+        width: 10px
+
+    .row
+      margin: 0px 10px 0px 0px
+
+    .header
+      font-weight: 700
+      color: #656565
+
+      div
+        background-color: #f6f6f6
+
+    kendo-grid
+      .k-header
+        padding-left: $grid-left-padding
+      .k-grid-table
+        td
+          padding-left: $grid-left-padding
+        .import-value
+          padding-left: 2px
+          .import-value-input
+            padding: 1px 4px 1px 4px
+            width: 95%
+            height: inherit
+            // margin-left: 5px
+          i
+            visibility: hidden
+          i.has-init-value
+            visibility: visible
+            cursor: pointer
+          .import-item-container
+            display: flex
+            align-items: center
+            justify-content: space-between
+            input.has-init-value
+              font-style: italic
+
+    .footer
+      margin-top: 30px
+
+      button
+        margin-right: 5px

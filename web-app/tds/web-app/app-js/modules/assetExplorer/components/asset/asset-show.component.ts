@@ -20,7 +20,6 @@ import { StorageShowComponent } from '../storage/storage-show.component';
 import { AssetExplorerModule } from '../../asset-explorer.module';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {ImportBatchModel} from '../../../dependencyBatch/model/import-batch.model';
 
 @Component({
 	selector: `asset-database-show`,
