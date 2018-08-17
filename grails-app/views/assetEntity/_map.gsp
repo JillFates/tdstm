@@ -42,7 +42,7 @@
 				</tr>
 				<tr title="Highlights assets by Tag" class="optionRow">
 					<td colspan="3">
-						<tm-asset-tag-selector id="tmHighlighttAssetSelector" asset-selector="internal.assetSelector" on-change="onDependencyAnalyzerTagSelectionChange()"></tm-asset-tag-selector>
+						<tm-asset-tag-selector id="tmHighlighttAssetSelector" asset-selector="internal.assetSelector" pre-selected-operator="'ANY'" on-change="onDependencyAnalyzerTagSelectionChange()"></tm-asset-tag-selector>
 					</td>
 				</tr>
 			</table>
