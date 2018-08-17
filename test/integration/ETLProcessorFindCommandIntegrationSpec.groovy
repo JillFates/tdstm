@@ -59,7 +59,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value'(){
@@ -742,7 +742,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					validator)
 
 		when: 'The ETL script is evaluated'

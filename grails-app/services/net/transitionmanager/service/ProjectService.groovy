@@ -302,7 +302,7 @@ class ProjectService implements ServiceMethods {
 
 		// check if either of the active/inactive checkboxes are checked
 		if(params.active || params.inactive) {
-			def query = new StringBuffer(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
+			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
 					COUNT(IF(ae.asset_type = "$AssetType.FILES",1,NULL)) AS filesCount,
@@ -903,7 +903,7 @@ class ProjectService implements ServiceMethods {
 	 * @return the list of projects of the company
 	 */
 	List<Project> getProjectsWhereClient(PartyGroup company, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
-		StringBuffer query = new StringBuffer("from Project p where p.client = :client")
+		StringBuilder query = new StringBuilder("from Project p where p.client = :client")
 		Map params = [client:company]
 		if (projectStatus != ProjectStatus.ANY) {
 			query.append(" and p.completionDate ${projectStatus==ProjectStatus.ACTIVE ? '>=' : '<'} :completionDate")
@@ -1191,7 +1191,7 @@ class ProjectService implements ServiceMethods {
 		def assetClass
 		def assetClassOption
 
-		def assetsCountsQuery = new StringBuffer("""
+		def assetsCountsQuery = new StringBuilder("""
 			SELECT ae.project_id, ae.asset_class, m.asset_type, mb.use_for_planning, count(*) as count
 			FROM asset_entity ae
 			INNER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
@@ -1278,7 +1278,7 @@ class ProjectService implements ServiceMethods {
 
 		def projectDailyMetric
 
-		def tasksCountsQuery = new StringBuffer("""
+		def tasksCountsQuery = new StringBuilder("""
 			SELECT ac.project_id, count(ac.asset_comment_id) as all_count, count(ac_done.asset_comment_id) as done_count
 			FROM project p
 			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
@@ -1310,7 +1310,7 @@ class ProjectService implements ServiceMethods {
 
 		def projectDailyMetric
 
-		def dependenciesCountsQuery = new StringBuffer("""
+		def dependenciesCountsQuery = new StringBuilder("""
 			SELECT ae.project_id, count(*) as count
 			FROM asset_entity ae
 			INNER JOIN asset_dependency ad ON ae.asset_entity_id = ad.asset_id

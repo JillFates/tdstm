@@ -27,8 +27,8 @@ class GraphvizService {
         File dotFile = createDotFile(tmpDir, filenamePrefix, dotText)
 
         def dotExec = conf?.graphviz?.dotCmd
-        def sout = new StringBuffer()
-        def serr = new StringBuffer()
+        def sout = new StringBuilder()
+        def serr = new StringBuilder()
         String cmd = "$dotExec -T${graphType} -v -o ${graphFile} ${dotFile}"
         log.debug "generateSVGFromDOT: about to execute command: $cmd"
 

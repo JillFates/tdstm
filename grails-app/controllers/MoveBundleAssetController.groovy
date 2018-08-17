@@ -274,7 +274,7 @@ class MoveBundleAssetController implements ControllerMethods {
 			return
 		}
 
-		def assetsQuery = new StringBuffer('''SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,
+		def assetsQuery = new StringBuilder('''SELECT ae.asset_entity_id as id, ae.asset_name as assetName, ae.asset_tag as assetTag,
 							ae.move_bundle_id as bundle, ae.asset_type as type, ae.source_blade_chassis as chassis, ae.source_rack as rack,
 							ae.source_blade_position as bladePos, ae.source_rack_position as uposition
 							FROM asset_entity ae WHERE ae.project_id=? ''')

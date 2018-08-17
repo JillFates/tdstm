@@ -264,7 +264,7 @@ class ReportsController implements ControllerMethods {
 		if(comment == "false"){
 			commentType = "('issue')"
 		}
-		def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in $commentType ")
+		def commentsQuery = new StringBuilder("from AssetComment ac where ac.commentType in $commentType ")
 
 		if( moveBundles.size() > 4 ){
 			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.$sortBy ")
@@ -401,7 +401,7 @@ class ReportsController implements ControllerMethods {
 			def moveBundleInstance = MoveBundle.get(params.moveBundle)
 			def reportFields = []
 			def bundleName = "All Bundles"
-			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $project.id ")
+			def cablesQuery = new StringBuilder("from AssetCableMap acm where acm.assetFrom.project.id = $project.id ")
 			//if moveBundleinstance is selected (single moveBundle)
 			if( moveBundleInstance ) {
 				bundleName = moveBundleInstance?.name
@@ -792,7 +792,7 @@ class ReportsController implements ControllerMethods {
 		def currentSme
 		def applicationOwner
 
-		def query = new StringBuffer(""" SELECT a.app_id AS id
+		def query = new StringBuilder(""" SELECT a.app_id AS id
 			FROM application a
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
@@ -1254,7 +1254,7 @@ class ReportsController implements ControllerMethods {
 			def finishTime= finishTimeList ? finishTimeList[-1] : null
 			def startTime = startTimeList ? startTimeList[0] : null
 
-			def duration = new StringBuffer()
+			def duration = new StringBuilder()
 			def customParam
 			def windowColor
 			def workflow

@@ -2673,7 +2673,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
 		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
-		StringBuffer query = new StringBuffer("""
+		StringBuilder query = new StringBuilder("""
 			SELECT * FROM (
 				SELECT asset_dependency_id AS id,
 					ae.asset_name AS assetName,
@@ -2955,7 +2955,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String queryColumns = 'a.id as id, a.assetName as text'
 			String queryCount = 'COUNT(a)'
 
-			StringBuffer query = new StringBuffer("SELECT @COLS@ FROM ")
+			StringBuilder query = new StringBuilder("SELECT @COLS@ FROM ")
 
 			if (qmap.containsKey(params.assetClassOption)) {
 				def qm = qmap[params.assetClassOption]
@@ -2996,7 +2996,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					qparams.assetType = qm.assetType
 				}
 
-				StringBuffer wquery = new StringBuffer(query) // This one is set aside for later use
+				StringBuilder wquery = new StringBuilder(query) // This one is set aside for later use
 
 				query.append("ORDER BY a.assetName ASC")
 				log.debug "***** Query: $query\nParams: $qparams"

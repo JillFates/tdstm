@@ -43,7 +43,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 	def setup() {
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 		validator = createDomainClassFieldsValidator()
 	}
 

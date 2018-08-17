@@ -146,7 +146,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		applicationFieldsValidator = new ETLFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
@@ -312,7 +312,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -396,7 +396,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -483,7 +483,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -560,7 +560,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'

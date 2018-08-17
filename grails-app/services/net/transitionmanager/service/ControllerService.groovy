@@ -33,7 +33,7 @@ class ControllerService implements ServiceMethods {
 	 * @param params - the parameters
 	 */
 	void dumpParams(controller, params) {
-		StringBuffer sb = new StringBuffer('<h1>Dump of params</h1><ul>')
+		StringBuilder sb = new StringBuilder('<h1>Dump of params</h1><ul>')
 		params.each { k, v -> sb.append("<li>$k=$v</li>") }
 		sb.append('</ul>')
 		controller.render sb.toString()

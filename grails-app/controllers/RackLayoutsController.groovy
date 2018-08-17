@@ -380,7 +380,7 @@ class RackLayoutsController implements ControllerMethods {
 	 * Used to generate the HTML that represents a Rack
 	 */
 	private retrieveRackLayout(paramsMap) {
-		def rows = new StringBuffer()
+		def rows = new StringBuilder()
 		def rowspan = 1
 		def cssClass = "empty"
 		def rackStyle = ""
@@ -398,7 +398,7 @@ class RackLayoutsController implements ControllerMethods {
 		boolean printView = paramsMap.printView
 		String disconnectImgUrl = HtmlUtil.resource([dir: "icons", file: "disconnect.png"])
 		asset.each {
-			def row = new StringBuffer("<tr>")
+			def row = new StringBuilder("<tr>")
 			if (it.asset) {
 				rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 				rackStyle = it.rackStyle
@@ -406,7 +406,7 @@ class RackLayoutsController implements ControllerMethods {
 				def assetEntity = it.asset?.assetEntity
 				def assetTagsList = (it.asset?.assetTag).split("<br/>")
 				def moveBundle = ""
-				StringBuffer assetTag = new StringBuffer('')
+				StringBuilder assetTag = new StringBuilder('')
 
 				if (it.cssClass == "rack_error") {
 					assetTag.append("Devices Overlap:<br />")
@@ -662,7 +662,7 @@ class RackLayoutsController implements ControllerMethods {
 		boolean printView = bladeLayoutMap.printView
 
 		def showIconPref = userPreferenceService.getPreference(PREF.SHOW_ADD_ICONS)
-		StringBuffer bladeTable = new StringBuffer('<table class="bladeTable"><tr>')
+		StringBuilder bladeTable = new StringBuilder('<table class="bladeTable"><tr>')
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
 		def tdHeight = rowspan * 6
 		def blades
@@ -1138,7 +1138,7 @@ class RackLayoutsController implements ControllerMethods {
 		def cableDiagram = ""
 		if (assetEntity.model && ModelConnector.findByModel(assetEntity.model)) {
 			if (backView) {
-				cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
+				cableDiagram = new StringBuilder("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
 				if (assetEntity.model.rearImage && assetEntity.model.useImage == 1) {
 					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
 					cableDiagram.append("<img src=\'${createLink(controller: 'model', action: 'retrieveRearImage', id: assetEntity?.model?.id)}\' />")
@@ -1158,7 +1158,7 @@ class RackLayoutsController implements ControllerMethods {
 			}
 			else {
 				if (assetEntity.model.frontImage) {
-					cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
+					cableDiagram = new StringBuilder("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
 					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
 					cableDiagram.append("<img src=\'${createLink(controller: 'model', action: 'retrieveFrontImage', id: assetEntity?.model?.id)}\' />")
 					cableDiagram.append("</div></td></tr></table>")
