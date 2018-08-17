@@ -38,11 +38,13 @@ class MoveEvent {
 	Date dateCreated
 	Date lastUpdated
 
+	Collection tagEvents
+
 	static hasMany = [
 		moveBundles       : MoveBundle,
 		moveEventNewsList : MoveEventNews,
 		moveEventSnapshots: MoveEventSnapshot,
-		tagEvent          : TagEvent
+		tagEvents         : TagEvent
 	]
 
 	static constraints = {
