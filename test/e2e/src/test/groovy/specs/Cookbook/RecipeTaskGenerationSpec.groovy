@@ -62,10 +62,10 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         menuModule.goToTasksCookbook()
         /* CREATE Recipe */
         at CookbookPage
+        commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         clickOnCreateButton()
         at CreateRecipePage
         createRecipe recipeDataMap
-        commonsModule.waitForCookbookLoadingIndicator(2)
         at CookbookPage
         /* EDIT Recipe */
         openEditTab()
@@ -250,7 +250,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         when: 'The User Clicks on Generate'
             waitFor {tskGTabGenerateTasksBtn.click()}
             waitForProgressBar()
-            commonsModule.waitForCookbookLoadingIndicator()
         then: 'The Task should be generated showing up the Summary Section'
             at TabTaskGenTabSummaryPage
     }

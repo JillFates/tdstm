@@ -35,6 +35,7 @@ class RecipeCreationSpec extends GebReportingSpec {
         testKey = "TM-7180"
         given: 'The User is on the Cookbook Section'
             at CookbookPage
+            commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         when: 'The User clicks the "Create Recipe" Button'
             waitFor { createRecipeButton.click()}
 
