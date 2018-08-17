@@ -64,6 +64,7 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class ProjectService implements ServiceMethods {
 
@@ -77,6 +78,7 @@ class ProjectService implements ServiceMethods {
 	LicenseAdminService licenseAdminService
 	TagService tagService
 	ApiCatalogService apiCatalogService
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -359,7 +361,7 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = 'STAFF'
 			''', [company: company])
 
-		[clients: partyRelationshipService.getCompanyClients(company),
+		[clients: getAllClients(),
 		 partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
 		 managers: managers.sort { it.partyIdTo?.lastName },
 		 workflowCodes: stateEngineService.getWorkflowCode()]
@@ -1753,4 +1755,28 @@ class ProjectService implements ServiceMethods {
 			]
 		}
 	}
+
+	/**
+	 * Gets the list of clients, where each record has clientName and clientId.
+	 * @return  The list of clients.
+	 */
+	List<Map> getAllClients() {
+		Person whom = securityService.userLoginPerson
+		def companies
+		def query = """
+			SELECT name as clientName, party_group_id as clientId
+			FROM party_group pg
+			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
+			WHERE party_group_id in (
+				SELECT party_id_to_id FROM party_relationship
+				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
+				AND role_type_code_to_id='CLIENT' AND party_id_from_id=:whomCompanyId
+			) OR party_group_id=:whomCompanyId
+			ORDER BY name"""
+
+		companies = namedParameterJdbcTemplate.queryForList(query, [whomCompanyId: whom.company.id])
+		return companies
+	}
+
+
 }
