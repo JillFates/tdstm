@@ -2,6 +2,23 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
+        <g:javascript src="asset.tranman.js" />
+        <g:javascript src="entity.crud.js" />
+        <g:javascript src="model.manufacturer.js"/>
+        <g:javascript src="projectStaff.js" />
+        <g:render template="../layouts/responsiveAngularResources" />
+        <g:javascript src="progressBar.js" />
+
+        <g:javascript src="asset.comment.js" />
+        <g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
+        <g:javascript src="cabling.js"/>
+        <g:javascript src="d3/d3.js"/>
+        <g:javascript src="svg.js"/>
+        <g:javascript src="load.shapes.js"/>
+        <g:javascript src="keyevent_constants.js" />
+        <g:javascript src="graph.js" />
+        <g:javascript src="generator/runtime.js" />
+        <g:javascript src="generator/generator.js" />
         <title>Edit Event</title>
     <script type="text/javascript">
       function initialize(){
@@ -34,7 +51,7 @@
     <body>
     <tds:subHeader title="Edit Event" crumbs="['Planning','Event', 'Edit']"/> <br />
 
-    <div class="body move-event-edit">
+    <div class="body move-event-edit" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
             <!-- <h1>Edit Event</h1> -->
             <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
@@ -74,6 +91,14 @@
                                 </td>
                             </tr>
 
+                            <tr class="prop">
+                                <td class="name">
+                                    <label for="moveBundle">Tag:</label>
+                                </td>
+                                <td  style="text-align:left;" class="valueNW">
+                                    <tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+                                </td>
+                            </tr>
 
                             <tr class="prop">
                                 <td class="name">
