@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveEvent
@@ -185,4 +186,28 @@ class MoveEventService implements ServiceMethods {
 			moveEvent.delete()
 		}
 	}
+
+
+	/**
+		 * Update the lastUpdated field on a series of assets.
+		 *
+		 * This method helps to keep consistency, and update assets accordingly,
+		 * when performing bulk update operations on objects that have a relationship with assets,
+		 * such as TagAsset.
+		 *
+		 * @param project
+		 * @param assetQuery - query that should return a list of asset ids.
+		 * @param assetQueryParams - parameters for assetQuery
+		 */
+		void bulkBumpMoveEventLastUpdated(Project project, Set<Long>eventIds) {
+			if (project) {
+				String query = """
+					UPDATE MoveEvent SET lastUpdated = :lastUpdated
+					WHERE id IN (:eventIds) AND project = :project
+				"""
+
+				Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), eventIds:eventIds]
+				MoveEvent.executeUpdate(query, params)
+			}
+		}
 }
