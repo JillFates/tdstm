@@ -590,6 +590,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *      domain Application
 	 *      iterate {
 	 *          extract 'column name' load 'appName'
+	 *
+	 *          extract 'assets.device' load 'assetName'
 	 *      }
 	 * <code>
 	 * @param columnName
@@ -601,7 +603,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		String rootColumnName = columnName
 		String columnNamePath = null
 
-		if (FilenameUtil.isJsonFile(dataSetFacade.fileName())){
+		if (dataSetFacade.isJson){
 			(rootColumnName, columnNamePath) = extractColumnNameParts(columnName)
 		}
 
@@ -1285,7 +1287,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String fieldNameToLabel(Field field) {
-		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
+		if (dataSetFacade.isCsv) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return field.name.trim().toLowerCase()
 		} else {
@@ -1302,7 +1304,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String labelToFieldName(String label) {
-		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
+		if (dataSetFacade.isCsv) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return label.toLowerCase()
 		} else {
@@ -1314,8 +1316,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * In case of ETL is working with a JSON file,
 	 * this methods can split a column name using dot (.) notation.
 	 * <pre>
-	 * 	assert columnNameParts('data.assets') == new Tuple('data', 'assets')
-	 * 	assert columnNameParts('devices') == new Tuple('devices', null)
+	 * 	assert columnNameParts('data.assets') == ['data', 'assets']
+	 * 	assert columnNameParts('devices') == ['devices', null]
 	 * </pre>
 	 * @param columnName a string value
 	 * @return a Pair with 2 values: rootPath and the rest of the column name path
