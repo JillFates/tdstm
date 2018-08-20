@@ -1,6 +1,6 @@
 div.content-wrapper
   div.container
-    .body.move-event-edit
+    .body.move-event-edit,
     .body.move-event-create
       div.nav
         box-sizing: content-box !important
@@ -8,8 +8,18 @@ div.content-wrapper
         border-spacing: 2px
         border-collapse: initial
       .asset-tag-selector-component
+        .k-widget li .k-icon
+          padding-top: 13px !important
         .km-switch
+          font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif
           top: 5px
+          .km-switch-container
+            .km-switch-handle
+              vertical-align: initial
+              .km-switch-label-on
+                left: -219% !important
+              .km-switch-label-off
+                left: 146% !important
         .k-widget li span:not(.k-select) div
-          padding-top: 1px !important
-          padding-bottom: 0px !important
+          padding-top: 3px !important
+          padding-bottom: 2px !important
