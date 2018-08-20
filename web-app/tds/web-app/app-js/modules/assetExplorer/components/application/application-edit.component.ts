@@ -125,12 +125,12 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 		}
-		addPerson(companies: any[], teams: any[]): void {
+		addPerson(companies: any[], teams: any[], staffTypes: any[]): void {
 			const personModel = new PersonModel();
 
 			personModel.companies = companies;
 			personModel.teams = teams;
-			personModel.staffType = ['Contractor', 'Hourly', 'Salary'];
+			personModel.staffType = staffTypes;
 
 			this.dialogService.extra(AddPersonComponent,
 				[UIDialogService,

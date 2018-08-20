@@ -48,7 +48,7 @@
 														[valueField]="'personId'"
 														[data]="${personList as JSON}">
 													<ng-template kendoDropDownListHeaderTemplate>
-														<h4 (click)="addPerson(${partyGroupList as JSON}, ${availableRoles as JSON})">Add person</h4>
+														<h4 (click)="addPerson(${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})">Add person</h4>
 													</ng-template>
 												</kendo-dropdownlist>
 											</td>
