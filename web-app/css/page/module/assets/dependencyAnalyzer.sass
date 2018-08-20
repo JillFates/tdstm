@@ -104,7 +104,7 @@ div.content-wrapper
           right: 9px
           top: 10px
           width: 52px
-          padding-right: 3px
+          padding-right: -10px
           .km-switch-wrapper
             display: none !important
           .km-switch-container
@@ -112,6 +112,8 @@ div.content-wrapper
               vertical-align: initial
               .km-switch-label-on
                 left: -219% !important
+              .km-switch-label-off
+                left: 146% !important
         .k-multiselect
           width: 217px !important
           .k-multiselect-wrap ul
@@ -127,6 +129,8 @@ div.content-wrapper
         span.k-icon
           padding-top: 13px !important
     div#dependencyBundleDetailsId
+      .dependency-filters-container
+        margin-left: -14px
       .asset-tag-selector-component
         .km-switch
           top: 5px
@@ -157,8 +161,9 @@ div.content-wrapper
         padding-top: 1px
         label
           position: relative
-          top: -13px
+          top: 6px
         #tmHighlightGroupSelector
+          vertical-align: top
           display: inline-block
 // styles the person highlighting kendo listbox
 #personHighlightSelectId_listbox *

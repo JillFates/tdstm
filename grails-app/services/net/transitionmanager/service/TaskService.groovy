@@ -1320,7 +1320,7 @@ class TaskService implements ServiceMethods {
 	 * @return
 	 */
 	def genTableHtmlForDependencies(depTasks, task, String dependency){
-		def html = new StringBuffer("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
+		def html = new StringBuilder("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
 		def optionList = AssetComment.constraints.category.inList.toList()
 		def i=1
 		depTasks.each { depTask ->

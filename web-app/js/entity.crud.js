@@ -1796,16 +1796,33 @@ function reloadDependencyGroupsSection() {
 	assetTab.attr("style", "display:none");
 	assetTab.attr("style", "display:none");
 	jQuery('#items1').css("display", "none");
-	$('#upArrow').css('display', 'none')
+	$('#upArrow').css('display', 'none');
+
+	// Partially Remove Prototype
+	if(window.Prototype) {
+		delete Object.prototype.toJSON;
+		delete Array.prototype.toJSON;
+		delete Hash.prototype.toJSON;
+		delete String.prototype.toJSON;
+	}
+
+	var postData = {
+		bundle: $('#planningBundleSelectId').val(),
+		tagIds: getTagsIds($('#tmHighlightGroupSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
+		tagMatch: $('#tmHighlightGroupSelector').find(".asset-tag-selector-operator-switch").attr('checked') ? 'ALL' : 'ANY',
+		assignedGroup: ($('#assignedGroupCB').is(':checked'))? 1:0
+	}
+
 	$.ajax({
-		type: "GET",
-		url: contextPath + '/moveBundle/dependencyBundleDetails?bundle=' + moveBundleId,
-		success: function (data) {
-			$('#dependencyBundleDetailsId').html(data)
+		type: "POST",
+		data: JSON.stringify(postData),
+		contentType : 'application/json; charset=utf-8',
+		dataType : "JSON",
+		url: contextPath + '/moveBundle/dependencyBundleDetails',
+		complete: function (jqXHR) {
+			$('#dependencyBundleDetailGroupContainer').html(jqXHR.responseText)
 			var processTab = jQuery('#processDiv');
 			processTab.attr("style", "display:none");
-			var assetTab = jQuery('#dependencyBundleDetailsId');
-			assetTab.attr("style", "display:block");
 			$('#upArrow').css('display', 'inline');
 			$('#downArrow').css('display', 'none');
 		}
@@ -2230,6 +2247,18 @@ function populateModelSelect(e,rackId){
     resp = resp.replace("model.id","model_"+rackId+"").replace("Unassigned","Select Model")
     $("#modelSpan_"+rackId).html(resp);
 }*/
+
+var getTagsIds = function(tags) {
+	var tagIds = [];
+	tags.each( function(a){
+		tagIds.push(parseInt(a.id));
+	})
+	return tagIds;
+};
+
+function onDependencyFiltersChange() {
+	reloadDependencyGroupsSection();
+};
 
 function showDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('option', 'width', '480px')

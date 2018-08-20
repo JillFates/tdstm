@@ -154,7 +154,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -488,7 +488,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -553,7 +553,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -609,7 +609,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -683,7 +683,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -757,7 +757,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -817,7 +817,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -886,7 +886,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -915,7 +915,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -939,7 +939,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -996,7 +996,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1086,7 +1086,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1317,7 +1317,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1427,7 +1427,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1455,7 +1455,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1512,7 +1512,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1540,7 +1540,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1610,7 +1610,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1680,7 +1680,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1702,7 +1702,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1736,7 +1736,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2515,7 +2515,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2562,7 +2562,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2619,7 +2619,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -2699,7 +2699,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -2732,7 +2732,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'

@@ -152,7 +152,7 @@ class ModelService implements ServiceMethods {
 		// If the user is sorting by a valid column, order by that one instead of the default
 		sortColumn = sortColumn && filterParams.containsKey(sortColumn) ? sortColumn : "man.name, m.name"
 
-		def query = new StringBuffer("SELECT ")
+		def query = new StringBuilder("SELECT ")
 
 		// Add all the columns to the query
 		def comma = false

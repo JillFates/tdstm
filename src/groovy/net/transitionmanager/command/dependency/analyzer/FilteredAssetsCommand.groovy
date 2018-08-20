@@ -26,6 +26,6 @@ class FilteredAssetsCommand {
 		nameFilter nullable: true
 		depGroup nullable: true
 		personId nullable: true
-
+		tagMatch inList: ['ANY', 'ALL']
 	}
 }

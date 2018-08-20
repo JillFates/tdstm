@@ -664,8 +664,8 @@ class ReportsService implements ServiceMethods {
 		def dotFile = new File(tmpDir, filename + '.dot')
 		dotFile << dotText
 
-		def sout = new StringBuffer()
-		def serr = new StringBuffer()
+		def sout = new StringBuilder()
+		def serr = new StringBuilder()
 		String cmd = "$dotExec -T$graphType -v -o $targetDir$imgFilename $dotFile"
 		log.info "generateDotGraph: about to execute command: $cmd"
 		def proc = cmd.execute()
@@ -747,7 +747,7 @@ class ReportsService implements ServiceMethods {
 		}
 
 		log.debug "$assetsInBundle"
-		def titleString = new StringBuffer()
+		def titleString = new StringBuilder()
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
 		}
@@ -845,7 +845,7 @@ class ReportsService implements ServiceMethods {
 			''', [bundles: bundles, type: AssetType.DATABASE.toString()], [max: assetCap])
 		}
 
-		def titleString = new StringBuffer()
+		def titleString = new StringBuilder()
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
 		}

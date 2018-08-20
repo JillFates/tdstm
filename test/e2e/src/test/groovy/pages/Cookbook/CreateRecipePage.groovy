@@ -29,6 +29,7 @@ class CreateRecipePage extends Page {
     }
 
     def createRecipe(recipeDataMap){
+        waitFor{nameFieldContents.displayed}
         nameFieldContents = recipeDataMap.name
         nameFieldContents == recipeDataMap.name
         descriptionContents = recipeDataMap.description

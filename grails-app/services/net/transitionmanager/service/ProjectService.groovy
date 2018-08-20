@@ -64,6 +64,7 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class ProjectService implements ServiceMethods {
 
@@ -77,6 +78,7 @@ class ProjectService implements ServiceMethods {
 	LicenseAdminService licenseAdminService
 	TagService tagService
 	ApiCatalogService apiCatalogService
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -302,7 +304,7 @@ class ProjectService implements ServiceMethods {
 
 		// check if either of the active/inactive checkboxes are checked
 		if(params.active || params.inactive) {
-			def query = new StringBuffer(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
+			def query = new StringBuilder(""" SELECT *, totalAssetCount-filesCount-dbCount-appCount AS assetCount FROM
 				(SELECT p.project_id AS projId, p.project_code AS projName, p.client_id AS clientId,
 					(SELECT COUNT(*) FROM move_event me WHERE me.project_id = p.project_id) AS eventCount,
 					COUNT(IF(ae.asset_type = "$AssetType.FILES",1,NULL)) AS filesCount,
@@ -359,7 +361,7 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = 'STAFF'
 			''', [company: company])
 
-		[clients: partyRelationshipService.getCompanyClients(company),
+		[clients: getAllClients(),
 		 partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
 		 managers: managers.sort { it.partyIdTo?.lastName },
 		 workflowCodes: stateEngineService.getWorkflowCode()]
@@ -903,7 +905,7 @@ class ProjectService implements ServiceMethods {
 	 * @return the list of projects of the company
 	 */
 	List<Project> getProjectsWhereClient(PartyGroup company, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
-		StringBuffer query = new StringBuffer("from Project p where p.client = :client")
+		StringBuilder query = new StringBuilder("from Project p where p.client = :client")
 		Map params = [client:company]
 		if (projectStatus != ProjectStatus.ANY) {
 			query.append(" and p.completionDate ${projectStatus==ProjectStatus.ACTIVE ? '>=' : '<'} :completionDate")
@@ -1191,7 +1193,7 @@ class ProjectService implements ServiceMethods {
 		def assetClass
 		def assetClassOption
 
-		def assetsCountsQuery = new StringBuffer("""
+		def assetsCountsQuery = new StringBuilder("""
 			SELECT ae.project_id, ae.asset_class, m.asset_type, mb.use_for_planning, count(*) as count
 			FROM asset_entity ae
 			INNER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
@@ -1278,7 +1280,7 @@ class ProjectService implements ServiceMethods {
 
 		def projectDailyMetric
 
-		def tasksCountsQuery = new StringBuffer("""
+		def tasksCountsQuery = new StringBuilder("""
 			SELECT ac.project_id, count(ac.asset_comment_id) as all_count, count(ac_done.asset_comment_id) as done_count
 			FROM project p
 			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
@@ -1310,7 +1312,7 @@ class ProjectService implements ServiceMethods {
 
 		def projectDailyMetric
 
-		def dependenciesCountsQuery = new StringBuffer("""
+		def dependenciesCountsQuery = new StringBuilder("""
 			SELECT ae.project_id, count(*) as count
 			FROM asset_entity ae
 			INNER JOIN asset_dependency ad ON ae.asset_entity_id = ad.asset_id
@@ -1753,4 +1755,28 @@ class ProjectService implements ServiceMethods {
 			]
 		}
 	}
+
+	/**
+	 * Gets the list of clients, where each record has clientName and clientId.
+	 * @return  The list of clients.
+	 */
+	List<Map> getAllClients() {
+		Person whom = securityService.userLoginPerson
+		def companies
+		def query = """
+			SELECT name as clientName, party_group_id as clientId
+			FROM party_group pg
+			INNER JOIN party p ON party_type_id='COMPANY' AND p.party_id=pg.party_group_id
+			WHERE party_group_id in (
+				SELECT party_id_to_id FROM party_relationship
+				WHERE party_relationship_type_id = 'CLIENTS' AND role_type_code_from_id='COMPANY'
+				AND role_type_code_to_id='CLIENT' AND party_id_from_id=:whomCompanyId
+			) OR party_group_id=:whomCompanyId
+			ORDER BY name"""
+
+		companies = namedParameterJdbcTemplate.queryForList(query, [whomCompanyId: whom.company.id])
+		return companies
+	}
+
+
 }

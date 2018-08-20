@@ -1064,6 +1064,21 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/tag/event" {
+			controller = "wsTagEvent"
+			action = [
+				POST  : "create",
+				DELETE: "delete"
+			]
+		}
+
+		"/ws/tag/event/$id" {
+			controller = "wsTagEvent"
+			action = [
+				GET: "list"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

@@ -89,7 +89,7 @@ class AwsService implements InitializingBean {
 	 * Used to construct the base URL for the service with the credentials
 	 * @param service - the name of the service (sns, sqs, wfs)
 	 * @param topicName - the topic or queue name to communicate with
-	 * @param The StringBuffer with the initial URL
+	 * @param The StringBuilder with the initial URL
 	 */
 	private StringBuilder serviceUrl(String service, String topicName) {
 		StringBuilder url

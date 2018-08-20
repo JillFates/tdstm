@@ -1090,7 +1090,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)*.value
+		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1106,7 +1106,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -2935,7 +2935,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	def assetTypesOf(String manufacturerId, String term) {
 		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
-			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value', order: 'asc'])
 
 			List<Map> results = assetOptions.collect { options ->
 				[id: options.value, text : options.value]
@@ -3121,20 +3121,42 @@ class AssetEntityService implements ServiceMethods {
 	 *
 	 * This method helps to keep consistency, and update assets accordingly,
 	 * when performing bulk update operations on objects that have a relationship with assets,
-	 * such as TagAsset.
+	 * such as TagAsset. this will take in the subquery from a bulk change generated from
+	 * dataviewService.getAssetIdsHql using the field specs.
 	 *
 	 * @param project
-	 * @param assetQuery - query that should return a list of asset ids.
+	 * @param assetQuery - query generated from the field specs using dataviewService.getAssetIdsHql.
 	 * @param assetQueryParams - parameters for assetQuery
 	 */
 	void bulkBumpAssetLastUpdated(Project project, String assetQuery, Map assetQueryParams) {
 		if (project) {
 			String query = """
 				UPDATE AssetEntity SET lastUpdated = :lastUpdated
-				WHERE id IN ($assetQuery) AND project = :project 
+				WHERE id IN ($assetQuery) AND project = :project
 			"""
+
 			Map params = [project: project, lastUpdated: TimeUtil.nowGMT()]
 			params.putAll(assetQueryParams)
+			AssetEntity.executeUpdate(query, params)
+		}
+	}
+
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets.
+	 *
+	 * @param project
+	 * @param assetIds - a list of asset ids
+	 */
+	void bulkBumpAssetLastUpdated(Project project, Set<Long> assetIds) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN (:assetIds) AND project = :project
+			"""
+
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), assetIds: assetIds]
 			AssetEntity.executeUpdate(query, params)
 		}
 	}

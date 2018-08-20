@@ -1,19 +1,17 @@
 package net.transitionmanager.domain
 
-import com.tds.asset.AssetEntity
-
-class TagAsset {
+class TagEvent {
 	Date      dateCreated
 
-	static belongsTo = [tag: Tag, asset: AssetEntity]
+	static belongsTo = [tag: Tag, event: MoveEvent]
 
 	static constraints = {
-		tag unique: ['asset']
+		tag unique: ['event']
 	}
 
 	static mapping = {
 		version false
-		id column: 'tag_asset_id'
+		id column: 'tag_event_id'
 		domainClass enumType: "string"
 	}
 

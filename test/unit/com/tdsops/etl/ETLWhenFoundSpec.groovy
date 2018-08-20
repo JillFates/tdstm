@@ -82,7 +82,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
 	void 'test can create a domain when not found a instance with find command using local variables'() {

@@ -100,7 +100,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 		ETLProcessorResult.registerObjectMarshaller()
 	}
 
