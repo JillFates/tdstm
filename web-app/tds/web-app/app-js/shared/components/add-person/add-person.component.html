@@ -4,6 +4,14 @@
 	    .add-person-component .box-body {
         }
 
+	    .add-person-component .required-field {
+
+	    }
+	    .add-person-component .required-field::after {
+		    content: "*";
+		    color: red;
+	    }
+
         .add-person-component .box-body .form-group {
             margin-bottom: 10px;
         }
@@ -18,6 +26,18 @@
             .add-person-component .box-body .form-group span.remove-team {
 	            cursor: pointer;
             }
+			.add-person-component p.error-msg {
+				color: red;
+			}
+			.add-person-component .mandatory {
+				color: red;
+				text-align: right;
+				margin: 0;
+				padding: 0 30px;
+			}
+			.add-person-component .teams kendo-dropdownlist {
+				margin-top: 5px;
+			}
 </style>
 <div class="modal fade in add-person-component" id="add-person-component" data-backdrop="static" tabindex="0" role="dialog">
     <div class="modal-dialog modal-md" role="document">
@@ -32,6 +52,9 @@
                 <div class="modal-body-container">
                     <form name="addPersonForm" role="form" data-toggle="validator" #addPersonForm='ngForm' class="form-horizontal left-alignment">
                         <div class="box-body">
+	                        <div class="form-group">
+		                        <div class="col-md-12 mandatory">Fields marked ( * ) are mandatory</div>
+	                        </div>
                             <div class="form-group">
                                 <div class="col-md-3">Company:</div>
                                 <div class="col-md-9">
@@ -45,24 +68,24 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-md-3">First Name:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="firstName"></div>
+                                <div class="col-md-3 required-field">First Name:</div>
+                                <div class="col-md-9"><input type="text"  [(ngModel)]="personModel.firstName" name="firstName"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Middle Name:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="middleName"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.middleName" name="middleName"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Last Name:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="lastName"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.lastName" name="lastName"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Nick Name:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="nickName"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.nickName" name="nickName"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Title:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="title"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.title" name="title"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Staff type:</div>
@@ -76,10 +99,13 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Email:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.email" name="email"></div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('email')" [(ngModel)]="personModel.email" name="email">
+	                                <p *ngIf="errors && errors.email" class="error-msg">{{errors.email}}</p>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-md-3">Active:</div>
+                                <div class="col-md-3 required-field">Active:</div>
                                 <div class="col-md-9">
 	                                <kendo-dropdownlist
 			                                name="active"
@@ -90,24 +116,30 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Department:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="department"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.department" name="department"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Location:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="location"></div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.location" name="location"></div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Work Phone:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="workPhone"></div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('workPhone')"  [(ngModel)]="personModel.workPhone" name="workPhone">
+	                                <p *ngIf="errors && errors.workPhone" class="error-msg">{{errors.workPhone}}</p>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Mobile Phone:</div>
-                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.firstName" name="mobilePhone"></div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('mobilePhone')" [(ngModel)]="personModel.mobilePhone" name="mobilePhone">
+	                                <p *ngIf="errors && errors.mobilePhone" class="error-msg">{{errors.mobilePhone}}</p>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Team:</div>
                                 <div class="col-md-9">
-	                                <div *ngFor="let team of teams;let index=index;trackBy:trackByIndex">
+	                                <div *ngFor="let team of teams;let index=index;trackBy:trackByIndex" class="teams">
 		                                <kendo-dropdownlist
 				                                name="active"
 				                                [value]="teams[index].id"
@@ -130,10 +162,13 @@
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <button type="button" class="btn btn-primary pull-left"><span
+                <button type="button"
+                        [disabled]="!canSave()"
+                        class="btn btn-primary pull-left" (click)="save()"><span
                         class="fa fa-fw fa-floppy-o"></span> Save
                 </button>
-                <button type="button" class="btn btn-default pull-right">
+                <button type="button"
+                        class="btn btn-default pull-right" (click)="cancelCloseDialog()">
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Cancel</span>
                 </button>

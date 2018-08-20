@@ -9,9 +9,10 @@ export class PersonModel {
 	public location: string;
 	public workPhone: string;
 	public mobilePhone: string;
+	public companyId: string;
+	public staffTypeId: string;
+	public active: string;
 	public companies: any[];
 	public teams: any[];
 	public staffType: any[];
-	public companyId: string;
-	public staffTypeId: string;
 }
