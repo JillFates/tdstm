@@ -49,7 +49,6 @@ class GormUtilIntegrationSpec extends Specification {
 		for (int i = 0; i < 3; i++) {
 			assetHelper.createApplication(sharedPerson, sharedProject)
 		}
-		x++
 	}
 
 	def "1. Test isDomainClass"() {
