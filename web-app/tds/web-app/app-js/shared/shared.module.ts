@@ -139,7 +139,8 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	entryComponents: [
 		DynamicComponent,
-		DependentCommentComponent
+		DependentCommentComponent,
+		AddPersonComponent
 	]
 })
 export class SharedModule {

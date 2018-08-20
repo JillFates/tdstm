@@ -15,6 +15,8 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
+import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
+import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -122,6 +124,24 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.saveAssetTags();
 				}
 			});
+		}
+		addPerson(companies: any[], teams: any[]): void {
+			const personModel = new PersonModel();
+
+			personModel.companies = companies;
+			personModel.teams = teams;
+			personModel.staffType = ['Contractor', 'Hourly', 'Salary'];
+
+			this.dialogService.extra(AddPersonComponent,
+				[UIDialogService,
+					{
+						provide: PersonModel,
+						useValue: personModel}
+				], false, false)
+				.then((result) => {
+					console.log('Finishing add person');
+					console.log(result);
+				});
 		}
 	}
 
