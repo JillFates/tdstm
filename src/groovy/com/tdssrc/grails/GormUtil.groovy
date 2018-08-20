@@ -7,6 +7,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -1401,11 +1402,11 @@ public class GormUtil {
 	static List<Map> listDomainForProperties(Project project, Class domainClass, List<String> propertyNames, List<List> sort=[], Integer maxRows=null, Integer rowOffset=null) {
 		// Fail if the class is not a domain.
 		if (!isDomainClass(domainClass)) {
-			throw new RuntimeException("Invalid domain class ${domainClass.simpleName} given.")
+			throw new InvalidParamException("Invalid domain class ${domainClass} given.")
 		}
 		// Check that the propertyNames is neither null nor empty.
 		if (!propertyNames) {
-			throw new RuntimeException("No subset of properties was given to GormUtil.listDomainForProperties.")
+			throw new InvalidParamException("No subset of properties was given to GormUtil.listDomainForProperties.")
 		}
 		// Check the properties to be projected are actually properties on the domain.
 		validatePropertiesExistForDomain(domainClass, propertyNames, true)
@@ -1417,7 +1418,7 @@ public class GormUtil {
 		boolean hasProjectProperty = isDomainProperty(domainClass, 'project')
 		// Fail if the domain has project but the parameter is null.
 		if (hasProjectProperty && !project) {
-			throw new RuntimeException("Null project given to listDomainForProperties with a domain that has a project property.")
+			throw new InvalidParamException("Null project given to listDomainForProperties with a domain that has a project property.")
 		}
 
 		return domainClass.createCriteria().list {
@@ -1465,7 +1466,7 @@ public class GormUtil {
 		for (property in properties) {
 			if (!isDomainProperty(domainClass, property)) {
 				if (throwException) {
-					throw new RuntimeException("Invalid property $property for domain ${domainClass.simpleName}")
+					throw new InvalidParamException("Invalid property $property for domain ${domainClass.simpleName}")
 				} else {
 					return false
 				}

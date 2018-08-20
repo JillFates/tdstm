@@ -2,6 +2,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
@@ -20,7 +21,9 @@ import net.transitionmanager.domain.Workflow
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import grails.validation.Validateable
+import spock.lang.Stepwise
 
+@Stepwise
 class GormUtilIntegrationSpec extends Specification {
 
 	// IOC variables
@@ -34,15 +37,19 @@ class GormUtilIntegrationSpec extends Specification {
 	@Shared
 	Project sharedProject
 
+	@Shared
+	Person sharedPerson
+
 	def setup() {
 		assetHelper = new AssetTestHelper()
 		personHelper = new PersonTestHelper()
 		projectHelper = new ProjectTestHelper()
 		sharedProject = projectHelper.createProject()
-		Person person = personHelper.createPerson()
+		sharedPerson = personHelper.createPerson()
 		for (int i = 0; i < 3; i++) {
-			assetHelper.createApplication(person, sharedProject)
+			assetHelper.createApplication(sharedPerson, sharedProject)
 		}
+		x++
 	}
 
 	def "1. Test isDomainClass"() {
@@ -767,28 +774,28 @@ class GormUtilIntegrationSpec extends Specification {
 	void '30 test listDomainForProperties under invalid scenarios '() {
 		when: 'calling with a null project'
 			GormUtil.listDomainForProperties(null, Application, ['id', 'assetName'])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 		when: 'calling with a class that is not a domain class'
-			GormUtil.listDomainForProperties(project, String, ['id', 'assetName'])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+			GormUtil.listDomainForProperties(sharedProject, String, ['id', 'assetName'])
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 		when: 'calling with no domain class'
-			GormUtil.listDomainForProperties(project, null, ['id', 'assetName'])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+			GormUtil.listDomainForProperties(sharedProject, null, ['id', 'assetName'])
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 		when: 'calling with no list of properties'
-			GormUtil.listDomainForProperties(project, null, [])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+			GormUtil.listDomainForProperties(sharedProject, null, [])
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 		when: 'calling with invalid properties'
-			GormUtil.listDomainForProperties(project, Person, ['id', 'foo'])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+			GormUtil.listDomainForProperties(sharedProject, Person, ['id', 'foo'])
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 		when: 'calling with invalid sorting properties'
-			GormUtil.listDomainForProperties(project, Person, ['id', 'firstName', 'lastName'][['foo']])
-		then: 'a RuntimeException is thrown'
-			thrown(RuntimeException)
+			GormUtil.listDomainForProperties(sharedProject, Person, ['id', 'firstName', 'lastName'],[['foo']])
+		then: 'a InvalidParamException is thrown'
+			thrown(InvalidParamException)
 
 	}
 
