@@ -2,6 +2,9 @@ package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.command.task.batch.StoredContextCommand
+import net.transitionmanager.command.task.batch.TagCommand
+
 /**
  * Represents a batch that is created when a recipe is executed and tasks are generated. This will provide
  * a way of tracking, updating and possibly deleting tasks that were generate in the cookbook.
@@ -69,33 +72,28 @@ class TaskBatch {
 		return MoveEvent.get(eventId)?.name ?: ''
 	}
 
+	/**
+	 * Gets the list of tag names as a string for display purposes.
+	 *
+	 * @return the list of tags names as a string.
+	 */
 	String tagNames() {
-		Map context = context()
+		StoredContextCommand storedContext = context()
 
-		if (context.tag) {
-			return context.tag.collect { Map tag -> tag.label }.join(', ')
+		if (storedContext?.tag) {
+			return storedContext.tag.collect { TagCommand tag -> tag.label }.join(', ')
 		}
 
 		return ''
 	}
 
 	/**
-	 * Gets the context as a map
+	 * Gets the context as a StoredContextCommand or null if not set
 	 *
-	 * @return the context json as a map
+	 * @return the context json as a StoredContextCommand or null if not set
 	 */
-	Map context() {
-		context ? JsonUtil.convertJsonToMap(context) : [:]
-	}
-
-	Map queryContext() {
-		if (context) {
-			Map queryContext = JsonUtil.convertJsonToMap(context)
-			queryContext.tag = queryContext.tag.collect{ tag-> (Long)tag.id}
-			return queryContext
-		}
-
-		return [:]
+	StoredContextCommand context() {
+		return context ? JsonUtil.populateCommandObject(StoredContextCommand, context) : null
 	}
 
 	/**
