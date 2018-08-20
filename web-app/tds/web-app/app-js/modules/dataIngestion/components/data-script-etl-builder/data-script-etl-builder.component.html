@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <!-- Errors Panel -->
-                    <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
+                    <div *ngIf="(sampleDataHasErrors() || testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
                             <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
@@ -107,6 +107,11 @@
                                       class="form-control console"
                                       cols="30" rows="3" readonly
                                       style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
+                            <textarea *ngIf="sampleDataHasErrors()"
+                                      [(ngModel)]="sampleDataModel.errors"
+                                      class="form-control console"
+                                      cols="30" rows="3" readonly
+                                      style="cursor: default; resize: vertical;"></textarea>
                         </div>
                     </div>
                     <hr>

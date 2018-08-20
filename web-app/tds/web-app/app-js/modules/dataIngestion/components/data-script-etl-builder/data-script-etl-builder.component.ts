@@ -171,6 +171,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 								});
 								this.scriptTestResult.consoleLog = result.consoleLog;
 								this.consoleSettings.scriptTestResult = this.scriptTestResult;
+								// Finally re-load the Sample Data Preview if working with JSON files.
+								if (this.showSampleDataRefresh()) {
+									this.reloadSampleData();
+								}
 							});
 					}, 500);
 				} else {
@@ -280,16 +284,19 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
 	private extractSampleDataFromFile(originalFileName?: string) {
+		this.clearLogVariables('sampleData');
 		const rootNode = this.extractRootNode();
 		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName, rootNode).subscribe((result) => {
 			this.sampleDataModel = result;
-			this.sampleDataGridHelper = new DataGridOperationsHelper(this.sampleDataModel.data);
-			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
-					this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
-				}
-			}, error => console.log(error));
+			if (this.sampleDataModel.data) {
+				this.sampleDataGridHelper = new DataGridOperationsHelper(this.sampleDataModel.data ? this.sampleDataModel.data : []);
+				this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+					if (result.status === ApiResponseModel.API_SUCCESS) {
+						this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
+						this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
+					}
+				}, error => console.log(error));
+			}
 		});
 	}
 
@@ -318,6 +325,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	private testHasErrors(): boolean {
 		return !this.scriptTestResult.isValid && this.scriptTestResult.error && this.scriptTestResult.error.length > 0;
+	}
+
+	protected sampleDataHasErrors(): boolean {
+		return this.sampleDataModel && this.sampleDataModel.errors && this.sampleDataModel.errors.length > 0;
 	}
 
 	private syntaxHasErrors(): boolean {
@@ -352,6 +363,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 			// also clean test results
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
+		}
+		if (operation === 'sampleData') {
+			this.sampleDataModel = null;
 		}
 	}
 
