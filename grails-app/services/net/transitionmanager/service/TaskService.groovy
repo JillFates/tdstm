@@ -1763,7 +1763,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (contextObj.tag) {
 			// Query the TagAsset to get list of Assets with ANY of the tags
 			assets = TagAsset.where {
-					tag.id in contextObj.tag
+					tag.id in contextObj.getTagIds()
 					asset.moveBundle.useForPlanning == true }.projections {
 				}.projections {
 					property 'asset'
@@ -1882,7 +1882,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		Person whom = taskBatch.createdBy
 
-		def contextObj = taskBatch.queryContext()
+		def contextObj = taskBatch.context()
 		def assets = getAssocAssets(contextObj)
 
 		List<Long> bundleIds = []
@@ -1892,9 +1892,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		MoveEvent event = null
+
 		if(contextObj.eventId) {
 			event = get(MoveEvent, contextObj.eventId, settings.project)
 		}
+
 		settings.event = event
 
 		// Determine the start/completion times for the event
@@ -4278,7 +4280,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
-				map.tags = getTagIdsList(contextObject.tag)
+				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
 
 				// When using tags, bundles are going to be ignored
