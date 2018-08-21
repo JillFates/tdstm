@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.See
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -101,9 +102,10 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuilder())
+		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can find a domain Property Name with loaded Data Value'() {
 
 		given:
@@ -124,8 +126,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
 			}
 
@@ -146,6 +148,102 @@ class ETLFindSpec extends ETLBaseSpec {
 					extract 'application id' load 'id'
 
 					find Application by 'id' with SOURCE.'application id' into 'id'
+				}
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == '152254'
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152254']
+						}
+					}
+
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == '152255'
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152255']
+						}
+					}
+				}
+			}
+
+			with(etlProcessor.findCache){
+				size() == 2
+				hitCountRate() == 0
+				get('Application', [id: '152254']) == [152254l]
+				get('Application', [id: '152255']) == [152255l]
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can find a domain Property Name with loaded Data Value using a list of FindCondition'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Application
+					load 'environment' with 'Production'
+					extract 'application id' load 'id'
+
+					find Application by 'id' eq SOURCE.'application id' into 'id'
 				}
 			""".stripIndent())
 
@@ -1183,7 +1281,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
-				new DebugConsole(buffer: new StringBuilder()),
+				new DebugConsole(buffer: new StringBuffer()),
 				validator)
 
 		when: 'The ETL script is evaluated'

@@ -1,7 +1,7 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.FindCondition
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
@@ -17,6 +17,7 @@ import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
 class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
+
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
 
@@ -284,7 +285,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then: 'one result should be returned'
 			results.size() == 1
 		and: 'the return value should be an instance of the expected asset domain and id'
-			with(results.first()){
+			with(results.first()) {
 				AssetEntity.isAssignableFrom(it.getClass())
 				id == device.id
 			}
@@ -300,7 +301,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 
 		then:
 			results.size() == 1
-			with(results.first()){
+			with(results.first()) {
 				Room.isAssignableFrom(it.getClass())
 				id == room.id
 			}
@@ -371,4 +372,64 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			Exception e = thrown Exception
 			e.message == 'java.lang.String cannot be cast to java.lang.Long'
 	}
+
+	void '21. can find a Device by its id using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+
+	void '22. can find a Device by roomSource using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomSource = roomTestHelper.createRoom(project)
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('roomSource', device.roomSource.roomName)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '23. can find a Device by roomTarget using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomTarget = roomTestHelper.createRoom(project)
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('roomTarget', device.roomTarget.roomName)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
 }
