@@ -406,4 +406,29 @@ abstract class ETLBaseSpec extends Specification {
 
 		return fieldSpecs
 	}
+
+	/**
+	 * Assertions for a {@code FieldResult} instance
+	 * @param fieldResult
+	 * @param originalValue
+	 * @param value
+	 * @param initValue
+	 */
+	static void assertFieldResult(FieldResult fieldResult, Object originalValue = null, Object value = null, Object initValue = null) {
+		assert fieldResult.originalValue == originalValue
+		assert fieldResult.value == value
+		assert fieldResult.init == initValue
+	}
+
+	/**
+	 * Assertions for a {@code QueryResult} instance
+	 * @param queryResult
+	 * @param values
+	 */
+	static void assertQueryResult(QueryResult queryResult, List<List<Object>> values){
+		queryResult.kv.eachWithIndex { Map map, int i ->
+			assert [map['propertyName'], map['operator'], map['value']] == values[i]
+		}
+
+	}
 }

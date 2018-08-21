@@ -21,7 +21,10 @@ class ETLProcessorResult {
 	 */
 	@DoNotMarshall
 	ETLProcessor processor
-
+	/**
+	 * Defines JSON version for the import the process.
+	 */
+	String version = 2
 	/**
 	 * ETL info map details
 	 */
@@ -634,7 +637,18 @@ class FindResult {
 	 * @param findElement
 	 */
 	private void addQuery(ETLFindElement findElement) {
-		query.add(new QueryResult(domain: findElement.currentDomain.name(), kv: findElement.currentFind.kv))
+		query.add(
+			new QueryResult(
+				domain: findElement.currentDomain.name(),
+				kv: (List<Map<String, Object>>)findElement.currentFind.statement.conditions.collect { FindCondition condition ->
+					return [
+						propertyName: condition.propertyName,
+						operator    : condition.operator.name(),
+						value       : condition.value
+					]
+				}
+			)
+		)
 	}
 
 	/**
@@ -664,7 +678,7 @@ class FindResult {
 @ConfigureMarshalling
 class QueryResult {
 	String domain
-	Map<String, Object> kv = [:]
+	List<Map<String, Object>> kv = []
 
 
 	@Override

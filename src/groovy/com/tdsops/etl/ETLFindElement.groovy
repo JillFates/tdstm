@@ -145,11 +145,6 @@ class ETLFindElement implements ETLStackableCommand {
 		checkProject()
 		currentFind.values = checkValues(values)
 
-		currentFind.kv = [
-			currentFind.fields,
-			currentFind.values
-		].transpose().collectEntries { it }
-
 		//TODO: dcorrea filter null values in conditions
 		List<FindCondition> conditions = [
 			currentFind.fields,
@@ -444,19 +439,52 @@ class FindStatementBuilder {
 		return this
 	}
 
+	/**
+	 * Sets a value for the current find Element.
+	 * <pre>
+	 * find Application by 'id' with SOURCE.'application id' into 'id'
+	 * </pre>
+	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
+	 * @return
+	 */
+	FindStatementBuilder with(Object value) {
+		return completeCurrentCondition(FindOperator.eq, value)
+	}
+
+	/**
+	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
+	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
+	 * @return
+	 */
+	FindStatementBuilder eq(Object value){
+		return completeCurrentCondition(FindOperator.eq, value)
+	}
+
+	/**
+	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
+	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
+	 * @return
+	 */
+	FindStatementBuilder ne(Object value){
+		return completeCurrentCondition(FindOperator.ne, value)
+	}
+
 	ETLFindElement into(String propertyName){
 		return findElement.into(propertyName, this)
 	}
 
+
 	/**
-	 *
-	 * @param values
-	 * @return
+	 * Takes the current condition and set an operator and a value.
+	 * @param operator a instance of {@code FindOperator}
+	 * @param value an Object used as a {@code FindCondition} value field
+	 * @return current instance of {@code FindStatementBuilder}
 	 */
-	FindStatementBuilder eq(Object value){
-		currentCondition.defineOperator(FindOperator.eq, value)
+	private FindStatementBuilder completeCurrentCondition(FindOperator operator, Object value){
+		currentCondition.defineOperator(operator, value)
 		return this
 	}
+
 
 	/**
 	 * Validates calls within the DSL script that can not be managed

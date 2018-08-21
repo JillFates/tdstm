@@ -152,39 +152,33 @@ class ETLFindSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
 
-					with(data[0].fields.id) {
-						originalValue == '152254'
-						value == '152254'
+					with(data[0], RowResult){
+						fields.size() == 2
+						assertFieldResult(fields['environment'], 'Production', 'Production')
+						assertFieldResult(fields['id'], '152254', '152254')
 
-						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152254']
+						with(fields['id'].find, FindResult){
+							query.size() == 1
+							assertQueryResult(query[0], [
+								['id', FindOperator.eq.name(), '152254']
+							])
 						}
 					}
 
-					with(data[1].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
-
-					with(data[1].fields.id) {
-						originalValue == '152255'
-						value == '152255'
-
-						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152255']
+					with(data[1], RowResult){
+						fields.size() == 2
+						assertFieldResult(fields['environment'], 'Production', 'Production')
+						assertFieldResult(fields['id'], '152255', '152255')
+						with(fields['id'].find, FindResult){
+							query.size() == 1
+							assertQueryResult(query[0], [
+								['id', FindOperator.eq.name(), '152255']
+							])
 						}
 					}
 				}
@@ -193,9 +187,10 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == [152254l]
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
+
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
@@ -248,39 +243,33 @@ class ETLFindSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					with(data[0].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
 
-					with(data[0].fields.id) {
-						originalValue == '152254'
-						value == '152254'
+					with(data[0], RowResult){
+						fields.size() == 2
+						assertFieldResult(fields['environment'], 'Production', 'Production')
+						assertFieldResult(fields['id'], '152254', '152254')
 
-						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152254']
+						with(fields['id'].find, FindResult){
+							query.size() == 1
+							assertQueryResult(query[0], [
+								['id', FindOperator.eq.name(), '152254']
+							])
 						}
 					}
 
-					with(data[1].fields.environment) {
-						originalValue == 'Production'
-						value == 'Production'
-					}
-
-					with(data[1].fields.id) {
-						originalValue == '152255'
-						value == '152255'
-
-						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152255']
+					with(data[1], RowResult){
+						fields.size() == 2
+						assertFieldResult(fields['environment'], 'Production', 'Production')
+						assertFieldResult(fields['id'], '152255', '152255')
+						with(fields['id'].find, FindResult){
+							query.size() == 1
+							assertQueryResult(query[0], [
+								['id', FindOperator.eq.name(), '152255']
+							])
 						}
 					}
 				}
@@ -289,8 +278,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == [152254l]
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -354,9 +343,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult()) {
+			with(etlProcessor.finalResult(), ETLProcessorResult) {
 				domains.size() == 1
-				with(domains[0]) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id'] as Set
 					data.size() == 14
@@ -368,7 +357,9 @@ class ETLFindSpec extends ETLBaseSpec {
 					with(data[0].fields.id) {
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 151954l
+						assertQueryResult(find.query[0], [
+						    ['id', 'eq', 151954l]
+						])
 						find.results == [151954l]
 						find.matchOn == 0
 					}
@@ -376,7 +367,9 @@ class ETLFindSpec extends ETLBaseSpec {
 					with(data[1].fields.id) {
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 151971l
+						assertQueryResult(find.query[0], [
+							['id', 'eq', 151971l]
+						])
 						find.results == [151971l]
 						find.matchOn == 0
 					}
@@ -384,7 +377,9 @@ class ETLFindSpec extends ETLBaseSpec {
 					with(data[2].fields.id) {
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 151974l
+						assertQueryResult(find.query[0], [
+							['id', 'eq', 151974l]
+						])
 						find.results == [151974l]
 						find.matchOn == 0
 					}
@@ -394,11 +389,10 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 12
 				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
+				get('Application', [new FindCondition('id', '151954')]) == [151954l]
+				get('Application', [new FindCondition('id', '151971')]) == [151971l]
+				get('Application', [new FindCondition('id', '151974')]) == [151974l]
+				get('Application', [new FindCondition('id', '151975')]) == [151975l]
 			}
 
 		cleanup:
