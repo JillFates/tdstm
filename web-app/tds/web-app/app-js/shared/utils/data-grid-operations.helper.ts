@@ -7,7 +7,7 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
-import {MAX_DEFAULT, MAX_OPTIONS} from '../model/constants';
+import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../model/constants';
 import {DateUtils} from './date.utils';
 
 export class DataGridOperationsHelper {
@@ -23,7 +23,7 @@ export class DataGridOperationsHelper {
 			logic: 'and'
 		},
 		skip: 0,
-		take: MAX_DEFAULT
+		take: GRID_DEFAULT_PAGE_SIZE
 	};
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.index) >= 0;
 	public selectedRows = [];
@@ -31,10 +31,13 @@ export class DataGridOperationsHelper {
 	public selectAllCheckboxes = false;
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
-	public defaultPageOptions = MAX_OPTIONS;
+	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 
-	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
+	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		this.state.sort = defaultSort;
+		if (pageSize) {
+			this.state.take = pageSize;
+		}
 		this.resultSet = result;
 		if (selectableSettings) {
 			this.selectableSettings = selectableSettings;
@@ -263,19 +266,21 @@ export class DataGridOperationsHelper {
 		this.state.skip = event.skip;
 		this.state.take = event.take;
 
-		// reset the select all checkbox to un-selected.
-		this.selectAllCheckboxes = false;
-		// If current page items all are checked then Select All box should be true, otherwise false.
-		let allSelectedOnCurrentPage = true;
-		let currentPageItems: DataResult = process(this.resultSet, this.state);
-		currentPageItems.data.forEach( item => {
-			// map-key-reference inception here
-			if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
-				allSelectedOnCurrentPage = false;
-				return;
-			}
-		});
-		this.selectAllCheckboxes = allSelectedOnCurrentPage;
+		if (this.checkboxSelectionConfig && this.checkboxSelectionConfig.useColumn) {
+			// reset the select all checkbox to un-selected.
+			this.selectAllCheckboxes = false;
+			// If current page items all are checked then Select All box should be true, otherwise false.
+			let allSelectedOnCurrentPage = true;
+			let currentPageItems: DataResult = process(this.resultSet, this.state);
+			currentPageItems.data.forEach( item => {
+				// map-key-reference inception here
+				if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
+					allSelectedOnCurrentPage = false;
+					return;
+				}
+			});
+			this.selectAllCheckboxes = allSelectedOnCurrentPage;
+		}
 
 		this.loadPageData();
 	}

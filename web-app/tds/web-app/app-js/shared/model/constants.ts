@@ -1,3 +1,8 @@
+/**
+ * Use this when comparing String.indexOf() not found match. ie. myString.indexOf() === NOT_FOUND_INDEX.
+ * @type {number}
+ */
+export const NOT_FOUND_INDEX = -1;
 export const SEARCH_QUITE_PERIOD = 600;
 export const LAST_VISITED_PAGE = 'LAST_VISITED_PAGE';
 export const LAST_SELECTED_FOLDER = 'LAST_SELECTED_FOLDER';
@@ -10,8 +15,8 @@ export const PROMPT_CANCEL = 'GLOBAL.CANCEL';
 export const LOADER_IDLE_PERIOD = 150;
 export const PROGRESSBAR_INTERVAL_TIME = 1 * 1000; // Seconds
 // Pagination
-export const MAX_OPTIONS = [25, 50, 100, 250, 500, 1000];
-export const MAX_DEFAULT = 25;
+export const GRID_DEFAULT_PAGINATION_OPTIONS = [25, 50, 100, 250, 500, 1000];
+export const GRID_DEFAULT_PAGE_SIZE = 25;
 
 // KENDO UPLOAD FILE
 export const REMOVE_FILENAME_PARAM = 'filename';

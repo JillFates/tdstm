@@ -35,7 +35,7 @@ class MoveEventNewsController implements ControllerMethods {
 
 		if (moveEvent) {
 			def holdId = stateEngineService.getStateId(moveEvent.project.workflowCode, "Hold")
-			def assetCommentsQuery = new StringBuffer("""SELECT ac.asset_comment_id as id,  'I' as type,
+			def assetCommentsQuery = new StringBuilder("""SELECT ac.asset_comment_id as id,  'I' as type,
 									now() as created,
 									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text,
 									if(date_resolved is null, 'L','A') as state from asset_comment ac
@@ -45,7 +45,7 @@ class MoveEventNewsController implements ControllerMethods {
 									left join project p on (p.project_id = ae.project_id)
 									where mb.move_event_id = $moveEvent.id and  ac.comment_type = 'issue' and p.project_id = $projectId
 									and ac.status = '$AssetCommentStatus.HOLD'""")
-			def moveEventNewsQuery = new StringBuffer("""SELECT mn.move_event_news_id as id,  'N' as type,
+			def moveEventNewsQuery = new StringBuilder("""SELECT mn.move_event_news_id as id,  'N' as type,
 									date_created as created,
 									message as text, if(is_archived = 0, 'L','A') as state  from move_event_news mn
 									left join move_event me on ( me.move_event_id = mn.move_event_id )
@@ -58,7 +58,7 @@ class MoveEventNewsController implements ControllerMethods {
 				assetCommentsQuery.append(" and ac.date_resolved is not null ")
 				moveEventNewsQuery.append(" and mn.is_archived = 1 ")
 			}
-			def queryForCommentsList = new StringBuffer()
+			def queryForCommentsList = new StringBuilder()
 
 			if (type == "I") {
 				queryForCommentsList.append(assetCommentsQuery.toString())

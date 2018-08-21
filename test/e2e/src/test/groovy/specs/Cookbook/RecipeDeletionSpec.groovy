@@ -28,12 +28,10 @@ class RecipeDeletionSpec extends GebReportingSpec {
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
-        waitForLoadingIndicator()
+        commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         clickOnCreateButton()
         at CreateRecipePage
         createRecipe recipeDataMap
-        at CookbookPage
-        waitForLoadingIndicator()
     }
 
     def setup() {
@@ -50,8 +48,6 @@ class RecipeDeletionSpec extends GebReportingSpec {
         given: 'The User is on the Cookbook Section'
             at CookbookPage
         when: 'The User searches by the Recipe'
-            filterByContext recipeDataMap.context // need to play with filtering to refresh grid
-            filterByContext "All" // reset to all because AT page checking
             waitFor{ gebRecipes[0].displayed }
         and: 'The User clicks the "Delete" Button'
             withConfirm(wait: true) { deleteRecipeButtons[0].click() }

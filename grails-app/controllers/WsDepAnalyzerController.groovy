@@ -1,24 +1,20 @@
-// import grails.compiler.GrailsCompileStatic
-import grails.plugin.springsecurity.annotation.Secured
 import com.tdsops.common.security.spring.HasPermission
-import groovy.util.logging.Slf4j
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.Project
-import net.transitionmanager.security.Permission
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.service.InvalidParamException
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.dependency.analyzer.FilteredAssetsCommand
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.security.Permission
+import net.transitionmanager.service.DependencyAnalyzerService
 import org.springframework.jdbc.core.JdbcTemplate
-
 /**
  * Controller used primarily for the Dependency Analyzer
  */
-// @GrailsCompileStatic
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsDepAnalyzerController')
 class WsDepAnalyzerController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
+	DependencyAnalyzerService dependencyAnalyzerService
 
 	/** Returns a list of people that are app owners or SMEs associated to applications in a dependency group
 	 * @param depGroup - the dependency group number or 'onePlus'
@@ -51,64 +47,28 @@ class WsDepAnalyzerController implements ControllerMethods {
 	}
 
 	/**
-	 * Returns the list of the ids of the assets that should be highlighted by the given filter
-	 * @param depGroup - the dependency group number or 'onePlus'
-	 * @param nameFilter
-	 * @param personFilter
-	 * @param isRegex
-	 * @return A list of assets found by filter as JSON
+	 * Returns the list of the ids of the assets that should be highlighted, by the given filter
+	 *
+	 * @param FilteredAssetsCommand command object holding the following parameters:
+	 * nameFilter
+	 * isRegex
+	 * personId
+	 * depGroup - the dependency group number or 'onePlus'.
+	 * tagIds tags that should be used as a filter.
+	 * tagMatch how the tags ids should be combined in an OR(ANY) or with an AND(All).
+	 *
+	 * @return A list of assets found by filter as JSON.
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
 	def filteredAssetList () {
-		// validate the parameters
-		String nameFilter = params.nameFilter ? params.nameFilter.toUpperCase() : ''
-		boolean isRegex = params.isRegex == 'true'
+		FilteredAssetsCommand filter = populateCommandObject(FilteredAssetsCommand)
+		validateCommandObject(filter)
+
 		String projectId = securityService.getUserCurrentProjectId()
 
-		Long personId = NumberUtil.toPositiveLong(params.personId, null)
-		def depGroup = params.depGroup
-		if (depGroup != 'onePlus') {
-			depGroup = NumberUtil.toPositiveLong(params.depGroup, null)
-		}
+		List<Map> groupAssets =  dependencyAnalyzerService.getAssets(filter, projectId)
+		List assetList = dependencyAnalyzerService.filterAssets(filter.nameFilter.toUpperCase(), groupAssets, filter.isRegex)
 
-		StringBuilder query = new StringBuilder("""
-			SELECT DISTINCT ae.asset_entity_id AS assetId, ae.asset_name AS assetName FROM asset_entity ae
-			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
-			INNER JOIN asset_dependency_bundle adb ON adb.asset_id = ae.asset_entity_id
-			LEFT OUTER JOIN person p ON p.person_id IN (app.sme_id, app.sme2_id, ae.app_owner_id)
-			WHERE adb.project_id = ${projectId}
-		""")
-		if (depGroup == 'onePlus') {
-			query.append(' AND adb.dependency_bundle > 0')
-		} else if (depGroup != null) {
-			query.append(' AND adb.dependency_bundle = ' + depGroup )
-		}
-
-		if (personId) {
-			query.append(' AND p.person_id = ' + personId)
-		}
-
-		// TODO : SECURITY - SQL INJECTION
-
-		List<Map> groupAssets = jdbcTemplate.queryForList(query.toString())
-
-		List assetList = []
-		java.util.regex.Pattern nameRegex
-		try {
-			nameRegex = ~"${nameFilter}"
-		} catch (e) {
-			throw new InvalidParamException('The search was an invalid regex expression')
-		}
-
-		for (asset in groupAssets) {
-			if (isRegex && asset.assetName.matches(nameRegex)) {
-				assetList << asset.assetId
-			} else if (!isRegex && asset.assetName.toUpperCase().contains(nameFilter)) {
-				assetList << asset.assetId
-			}
-		}
-
-		// send the results back to the client as JSON
 		render assetList as JSON
 	}
 }

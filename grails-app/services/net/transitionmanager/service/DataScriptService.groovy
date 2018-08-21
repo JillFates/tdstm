@@ -1,11 +1,15 @@
 package net.transitionmanager.service
 
-import com.tdssrc.grails.FileSystemUtil
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
+import getl.exception.ExceptionGETL
+import getl.json.JSONConnection
+import getl.json.JSONDataset
 import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
@@ -20,6 +24,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
@@ -73,7 +78,7 @@ class DataScriptService implements ServiceMethods{
             description = dataScriptJson.description
             target = dataScriptJson.target
             mode = DataScriptMode.forLabel(dataScriptJson.mode)
-            etlSourceCode = dataScriptJson.etlSourceCode
+            etlSourceCode = dataScriptJson.etlSourceCode?:dataScript.etlSourceCode
             provider = providerInstance
             // if it's an existing instance, update the lastModifiedBy field
             if (id) {
@@ -293,33 +298,32 @@ class DataScriptService implements ServiceMethods{
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (Long id, String originalFileName, String fileName, Long maxRows) throws EmptyResultException{
-		try{
+	Map parseDataFromFile (Long id, String originalFileName, String fileName, String rootNode, Long maxRows) throws EmptyResultException {
+		String message
+		try {
 
 			if ( id ) {
 				saveSampleFile(id, originalFileName, fileName)
 			}
 
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
+			switch (extension) {
+				case 'JSON':
+					return parseDataFromJSON(fileName, maxRows, rootNode)
 
-         switch (extension) {
-            case 'JSON':
-                return parseDataFromJSON(fileName)
+				case 'CSV':
+					return parseDataFromCSV(fileName, 0, maxRows)
 
-            case 'CSV':
-                return parseDataFromCSV(fileName, 0, maxRows)
+				case ['XLS', 'XLSX'] :
+					return parseDataFromXLS(fileName, 0, 0, maxRows)
 
-            case ['XLS', 'XLSX'] :
-                return parseDataFromXLS(fileName, 0, 0, maxRows)
-
-			default :
-				throw new InvalidParamException("File format ($extension) is not supported")
+				default :
+					message = "File format ($extension) is not supported"
 			}
 
 		} catch (ex) {
-			log.error(ex.message, ex)
+			log.info(ex.message)
 
-			String message
 			switch(ex) {
 				case FileNotFoundException :
 					message = "The source data was not found"
@@ -330,17 +334,27 @@ class DataScriptService implements ServiceMethods{
 				case SuperCsvException:
 					message = "Unable to parse the source data"
 					break
-
-				default :
+				case getl.exception.ExceptionGETL:
+					message = ex.message
+					break
+				default:
+					log.error ExceptionUtil.stackTraceToString(ex)
 					message = ex.message
 			}
+		}
 
+		if (message) {
 			throw new InvalidParamException(message)
 		}
 	}
 
-	private File tempFile(String fileName) throws FileNotFoundException {
-		File inputFile = FileSystemService.openTempFile(fileName)
+	/**
+	 * Used to retrieve the contents of a temporary file
+	 * @param filename - the name of the temporary file
+	 * @return the File handle of the file
+	 */
+	private File tempFile(String filename) throws FileNotFoundException {
+		File inputFile = FileSystemService.openTempFile(filename)
 		if (! inputFile.exists()) {
 			throw new FileNotFoundException(inputFile.toString())
 		}
@@ -350,18 +364,39 @@ class DataScriptService implements ServiceMethods{
 
 	/**
 	 * Check that the File with the JSON data is ok and return the map
-	 * @param jsonFile
+	 * @param jsonFile json file name
+	 * @param maxRows max number of results requested
+	 * @param rootNode json root node used to build map fields
 	 * @return Map with the description of JSON data in the File
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
-		File inputFile = tempFile(jsonFile)
-		String text = inputFile?.text?.trim()
-		if(! text ) {
-			return EMPTY_SAMPLE_DATA_TABLE
+	Map parseDataFromJSON(String jsonFile, Long maxRows, String rootNode) throws RuntimeException {
+
+		JSONConnection jsonCon = new JSONConnection(
+			config: "json",
+			path: FileSystemService.temporaryDirectory, driver: TDSJSONDriver)
+
+		JSONDataset dataSet = new JSONDataset(
+			connection: jsonCon,
+			rootNode: rootNode ?: '.',
+			fileName: jsonFile)
+
+		DataSetFacade dataSetFacade = new DataSetFacade(dataSet)
+
+		// If there are no fields it means that none was found in the rootNode location
+		if (dataSetFacade.fields().isEmpty()) {
+			throw new ExceptionGETL("No data found at specified rootNode '${rootNode}'")
 		}
 
-		return JsonUtil.parseJson(text)
+		return [
+			config: dataSetFacade.fields().collect {
+				[
+					property: it.name,
+					type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+				]
+			},
+			rows  : dataSetFacade.rows().take(maxRows.intValue())
+		]
 	}
 
 	/**

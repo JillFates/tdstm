@@ -440,7 +440,6 @@ class CookbookService implements ServiceMethods {
 			def recipe = recipeVersion.recipe
 			assertProject recipe, project
 
-			context = recipe.context()
 			sourceCode = recipeVersion.sourceCode
 		} else {
 			sourceCode = predSourceCode ?: ''

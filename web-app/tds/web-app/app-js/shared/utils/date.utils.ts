@@ -1,10 +1,32 @@
 import {INTERVAL} from '../model/constants';
-import * as moment from 'moment';
+
+import * as moment from 'moment-timezone';
 
 export class DateUtils {
 
-	public static readonly DEFAULT_TIMEZONE_FORMAT = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
+
+	/**
+	 * Used to format an ISO 8601 Date String (e.g. 2018-08-03T20:44:15Z) to the user's preferred
+	 * format. It is assumed that the value has been already adjusted to the user's preferred timezone
+	 * on the server. Note that value will indicate Z that is not actually Z but that of the user's
+	 * preferred timezone.
+	 *
+	 * This is done this way because the datetimes are stored in GMT and the user can choose in the UI
+	 * to show datetimes in timezones differing from their local timezone set on their computer so
+	 * using actual dates computed correctly can get quite outrageous.
+	 *
+	 * @param userTimeZone the user's timezone to format the value as
+	 * @param iso8601Value a datetime value in the ISO 8601 format (yyyy-mm-DDThh:MM:ssZ)
+	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
+	 */
+	public static formatUserDateTime(userTimeZone: string, iso8601Value: string) {
+		if (iso8601Value === undefined) {
+			return '';
+		}
+		return moment.tz(iso8601Value, userTimeZone).format('YYYY-MM-DD HH:mm:ss');
+	}
 
 	/**
 	 * Create a Date Object
@@ -82,7 +104,8 @@ export class DateUtils {
 	}
 
 	/**
-	 * Given a User Preference TimeZone format convert it to a known date format used by angular date pipe.
+	 * Used to convert a User preferred Date Format to the date format used by angular date pipe
+	 * @param dateFormat - the TM Date Format from User Preferences
 	 * @returns {string}
 	 */
 	public static translateTimeZoneFormat(dateFormat: string): string {
@@ -92,6 +115,15 @@ export class DateUtils {
 		const yearRegExp = /Y/g;
 		result = result.replace(yearRegExp, 'y');
 		return result;
+	}
+
+	/**
+	 * Used to convert a User preferred Date Format to the date format plus time used by angular date pipe
+	 * @param dateFormat - the TM Date Format from User Preferences
+	 * @returns {string}
+	 */
+	public static translateDateTimeFormat(dateFormat: string): string {
+		return this.translateTimeZoneFormat(dateFormat) + ' ' + this.DEFAULT_FORMAT_TIME;
 	}
 
 	/**

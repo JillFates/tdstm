@@ -23,6 +23,7 @@ import { TaskDetailComponent } from '../taskManager/components/detail/task-detai
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
+import { TDSCheckboxComponent } from './tds-checkbox/tds-checkbox.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -36,6 +37,9 @@ import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
 import { BulkChangeService } from './service/bulk-change.service';
+import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
+import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
+import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';
 
 @NgModule({
 	imports: [
@@ -66,14 +70,18 @@ import { BulkChangeService } from './service/bulk-change.service';
 		TaskDetailComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
-		BulkChangeEditComponent
+		BulkChangeEditComponent,
+		TDSCheckboxComponent,
+		ModelDeviceShowComponent,
+		ManufacturerShowComponent
 	],
 	providers: [
 		AssetExplorerService,
 		TaskCommentService,
 		DependecyService,
 		TagService,
-		BulkChangeService
+		BulkChangeService,
+		DataGridCheckboxService
 	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
@@ -86,7 +94,10 @@ import { BulkChangeService } from './service/bulk-change.service';
 		TaskDetailComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
-		BulkChangeEditComponent
+		BulkChangeEditComponent,
+		TDSCheckboxComponent,
+		ManufacturerShowComponent,
+		ModelDeviceShowComponent
 	],
 })
 

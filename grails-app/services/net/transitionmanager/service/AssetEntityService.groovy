@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -1089,7 +1090,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)*.value
+		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1105,7 +1106,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1214,8 +1215,29 @@ class AssetEntityService implements ServiceMethods {
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
 	 */
-	List<MoveBundle> getMoveBundles(Project project) {
-		project ? MoveBundle.findAllByProject(project, [sort: 'name']) : []
+	List<Map> getMoveBundles(Project project) {
+		List<Map> resultBundles = []
+		if (project) {
+			// Minimize the amount of information retrieved by limiting the fields to the following list.
+			List<String> properties = [
+				'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+				'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+			]
+			// Query for bundles in this project (sorted by name).
+			resultBundles = MoveBundle.createCriteria().list {
+				and {
+					eq('project', project)
+				}
+				projections {
+					properties.each{ String prop ->
+						property(prop, prop)
+					}
+				}
+				order('name')
+				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+			}
+		}
+		return resultBundles
 	}
 
 	/**
@@ -2913,7 +2935,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	def assetTypesOf(String manufacturerId, String term) {
 		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
-			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value', order: 'asc'])
 
 			List<Map> results = assetOptions.collect { options ->
 				[id: options.value, text : options.value]
@@ -3072,7 +3094,7 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
-					// clone asset Tags
+					// copy asset Tags
 					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
 					if (sourceTagIds) {
 						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
@@ -3092,6 +3114,51 @@ class AssetEntityService implements ServiceMethods {
 	AssetEntity saveOrUpdateAsset(AssetCommand command) {
 		AssetSaveUpdateStrategy strategy = AssetSaveUpdateStrategy.getInstanceFor(command)
 		return strategy.saveOrUpdateAsset()
+	}
+
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets accordingly,
+	 * when performing bulk update operations on objects that have a relationship with assets,
+	 * such as TagAsset. this will take in the subquery from a bulk change generated from
+	 * dataviewService.getAssetIdsHql using the field specs.
+	 *
+	 * @param project
+	 * @param assetQuery - query generated from the field specs using dataviewService.getAssetIdsHql.
+	 * @param assetQueryParams - parameters for assetQuery
+	 */
+	void bulkBumpAssetLastUpdated(Project project, String assetQuery, Map assetQueryParams) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN ($assetQuery) AND project = :project
+			"""
+
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT()]
+			params.putAll(assetQueryParams)
+			AssetEntity.executeUpdate(query, params)
+		}
+	}
+
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets.
+	 *
+	 * @param project
+	 * @param assetIds - a list of asset ids
+	 */
+	void bulkBumpAssetLastUpdated(Project project, Set<Long> assetIds) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN (:assetIds) AND project = :project
+			"""
+
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), assetIds: assetIds]
+			AssetEntity.executeUpdate(query, params)
+		}
 	}
 
 }

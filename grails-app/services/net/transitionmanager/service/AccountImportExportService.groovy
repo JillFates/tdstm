@@ -586,8 +586,8 @@ class AccountImportExportService implements ServiceMethods {
 		List updatedAccounts = []
 
 		log.debug "postChangesToAccounts() formOptions=$formOptions - processing ${accounts.size()} accounts"
-		StringBuffer chgSB = new StringBuffer('<h2>Change History</h2>')
-		StringBuffer errorsSB = new StringBuffer('<br><h2>Errors</h2><table><tr><th width=20>Row</th><th>Name</th><th>Errors</th></tr>')
+		StringBuilder chgSB = new StringBuilder('<h2>Change History</h2>')
+		StringBuilder errorsSB = new StringBuilder('<br><h2>Errors</h2><table><tr><th width=20>Row</th><th>Name</th><th>Errors</th></tr>')
 		boolean recordedErrors = false
 
 		for (int i=0; i < accounts.size(); i++) {
@@ -736,7 +736,7 @@ class AccountImportExportService implements ServiceMethods {
 
 				if (personChanged || userChanged || teamsChanged || securityRolesChanged) {
 					chgSB.append("\r\n<br>Changes for $person ($person.id):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
-					StringBuffer changeMsg = new StringBuffer("***** Change History for $person changed:")
+					StringBuilder changeMsg = new StringBuilder("***** Change History for $person changed:")
 					accounts[i].changeHistory.each { prop, origVal ->
 						String p = prop.split(/\./)[1]
 						changeMsg.append("\n\t$prop was '$origVal' now is '${accounts[i][p]}'")
@@ -1300,7 +1300,7 @@ class AccountImportExportService implements ServiceMethods {
 		// Used to possibly filter the domain to list properties for
 		List domainCodes = ['P','U','T']
 
-		StringBuffer sb = new StringBuffer()
+		StringBuilder sb = new StringBuilder()
 		if (domainName) {
 			domainCodes = [ domainName[0] ]
 		}

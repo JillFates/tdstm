@@ -24,7 +24,5 @@
                 </div>
             </ng-template>
     </kendo-combobox>
-    <div>
-        <label class="fixed"><input type="checkbox" [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
-    </div>
+    <label class="fixed"><input type="checkbox" [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
 </div>

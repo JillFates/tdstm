@@ -1,0 +1,31 @@
+<div class="modal fade in" id="import-batch-record-dialog" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xlg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="onCancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Record Detail</h4>
+            </div>
+            <div class="modal-body" style="height: 650px; overflow: auto;">
+                <div class="modal-body-container">
+                    <section>
+                        <import-batch-record-summary
+                                [importBatch]="importBatch"
+                                [batchRecord]="batchRecord">
+                        </import-batch-record-summary>
+                        <import-batch-record-fields
+                                #detailFieldsComponent
+                                *ngIf="batchRecord"
+                                [importBatch]="importBatch"
+                                [batchRecord]="batchRecord"
+                                (onClose)="onCancelCloseDialog()"
+                                (onUpdateSuccess)="onUpdateSuccess()"
+                                (onBatchRecordUpdated)="onBatchRecordUpdated($event)">
+                        </import-batch-record-fields>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 package pages.Cookbook
 
 import geb.Page
+import modules.CommonsModule
 
 class CookbookPage extends Page {
 
@@ -44,36 +45,16 @@ class CookbookPage extends Page {
         gebRecipes                  (required: false) { recipeGridRows.find("div.ngCellText.col0")}
         taskGenerationTabContent { $("div[ui-view=taskBatchStart]")}
         taskGenerationTabRecipeName { taskGenerationTabContent.find("p")}
+        commonsModule { module CommonsModule }
     }
 
     def clickOnCreateButton(){
         waitFor { createRecipeButton.click()}
     }
 
-    def waitForSuccessBanner(){
-        waitFor { successMessage.present}
-        waitFor { !successMessage.present}
-        waitForLoadingIndicator()
-    }
-
-    def waitForLoadingIndicator(repeatTime = 1){
-        def count = 0
-        while (count < repeatTime) {
-            waitFor { loadingIndicator.hasClass("ng-hide")}
-            count = count + 1
-        }
-    }
-
     def openEditTab(){
-        editorTab.click()
+        waitFor { editorTab.click()}
         waitFor { editorTab.parent(".active") }
-    }
-
-    def filterByContext(context){
-        def options = contextSelector.find("option")
-        def option = options.find {it.text() == context}
-        option.click()
-        waitForLoadingIndicator(4) // after filtering loading appears 4 times
     }
 
     def getRecipeByName(name){
