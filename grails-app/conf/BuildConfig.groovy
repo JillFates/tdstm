@@ -40,7 +40,6 @@ grails.project.dependency.resolution = {
 		// LIB JARS
 		compile 'net.sourceforge.barbecue:barbecue:jar:1.5-beta1'
 		compile 'org.codelibs:jcifs:1.3.18.3'
-		compile 'org.xbib.groovy:groovy-ldap:1.0.2'
 		compile 'net.nicholaswilliams.java.licensing:licensing-core:1.1.0'
 		compile 'net.nicholaswilliams.java.licensing:licensing-licensor-base:1.1.0'
 
@@ -112,7 +111,7 @@ grails.project.dependency.resolution = {
 		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'
 		runtime ':jqgrid:3.8.0.1'
-		runtime ':jquery-ui:1.8.15'
+		runtime ':jquery-ui:1.10.4'
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
