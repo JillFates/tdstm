@@ -2,6 +2,7 @@
     .add-person-component {
     }
 	    .add-person-component .box-body {
+		    padding: auto 15px;
         }
 
 	    .add-person-component .required-field {
@@ -62,7 +63,7 @@
 	                                                    [data]="personModel.companies"
 	                                                    [textField]="'name'"
 	                                                    [valueField]="'id'"
-	                                                    [(ngModel)]="personModel.companyId"
+	                                                    [(ngModel)]="personModel.company"
 	                                                    class="form-control">
 	                                </kendo-dropdownlist>
                                 </div>
@@ -142,7 +143,7 @@
 	                                <div *ngFor="let team of teams;let index=index;trackBy:trackByIndex" class="teams">
 		                                <kendo-dropdownlist
 				                                name="active"
-				                                [value]="teams[index].id"
+				                                [value]="teams[index].team"
 				                                (valueChange)="onTeamSelected($event, index)"
 				                                [textField]="'description'"
 				                                [valueField]="'id'"

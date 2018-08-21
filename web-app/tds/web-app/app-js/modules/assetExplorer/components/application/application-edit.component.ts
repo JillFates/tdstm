@@ -29,7 +29,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 	class ApplicationShowComponent extends AssetCommonEdit {
 
 		defaultItem = {fullName: 'Please Select', personId: 0};
+		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
+		personList: any[] = null;
 
 		constructor(
 			@Inject('model') model: any,
@@ -125,9 +127,15 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 		}
-		addPerson(companies: any[], teams: any[], staffTypes: any[]): void {
+		onPersonSelected(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
+			if (person.personId !== this.addPersonItem.personId) {
+				return;
+			}
+
 			const personModel = new PersonModel();
 
+			personModel.asset = asset;
+			personModel.fieldName = fieldName;
 			personModel.companies = companies;
 			personModel.teams = teams;
 			personModel.staffType = staffTypes;
@@ -136,12 +144,23 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				[UIDialogService,
 					{
 						provide: PersonModel,
-						useValue: personModel}
+						useValue: personModel
+					},
+					AssetExplorerService
 				], false, false)
 				.then((result) => {
 					console.log('Finishing add person');
 					console.log(result);
+					this.personList.push({personId: result.id, fullName: result.name})
 				});
+		}
+		getPersonList(personList: any[]): any[] {
+			if (!this.personList) {
+				this.personList = personList;
+				this.personList.unshift(this.addPersonItem)
+			}
+
+			return this.personList;
 		}
 	}
 

@@ -43,13 +43,11 @@
 														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="model.asset.sme.id"
+														(selectionChange)="onPersonSelected($event,'application', 'sme1',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="${personList as JSON}">
-													<ng-template kendoDropDownListHeaderTemplate>
-														<h4 (click)="addPerson(${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})">Add person</h4>
-													</ng-template>
+														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
@@ -74,10 +72,11 @@
 													class="tm-input-control person-list"
 													name="modelAssetSme2"
 													[(ngModel)]="model.asset.sme2.id"
+													(selectionChange)="onPersonSelected($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 													[defaultItem]="defaultItem"
 													[textField]="'fullName'"
 													[valueField]="'personId'"
-													[data]="${personList as JSON}">
+													[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
@@ -101,10 +100,11 @@
 														class="tm-input-control"
 														name="modelAssetappOwner"
 														[(ngModel)]="model.asset.appOwner.id"
+														(selectionChange)="onPersonSelected($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="${personList as JSON}">
+														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>

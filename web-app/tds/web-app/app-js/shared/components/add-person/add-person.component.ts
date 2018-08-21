@@ -2,6 +2,7 @@ import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 
 import { UIExtraDialog} from '../../../shared/services/ui-dialog.service';
 import { PersonModel } from './model/person.model';
+import { AssetExplorerService } from '../../../modules/assetExplorer/service/asset-explorer.service';
 
 @Component({
 	selector: 'add-person',
@@ -12,7 +13,8 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	teams: any[] = [];
 	errors: any;
 	constructor(
-		public personModel: PersonModel) {
+		public personModel: PersonModel,
+		private assetExplorerService: AssetExplorerService) {
 		super('#add-person-component');
 		this.errors = {};
 	}
@@ -31,7 +33,8 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 			active: '',
 			companies: [],
 			teams: [] ,
-			staffType: []
+			staffType: [],
+			selectedTeams: []
 		};
 		this.personModel = Object.assign({},  defaultPerson, this.personModel)
 	}
@@ -44,7 +47,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	}
 
 	addTeam(): void {
-		const team = {id: null, data: [...this.personModel.teams]};
+		const team = {team: null, data: [...this.personModel.teams]};
 		this.teams.push(team);
 	}
 
@@ -52,15 +55,22 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 		this.teams.splice(index, 1);
 	}
 
-	onTeamSelected(id: string, index: number): void {
-		console.log(id);
-		this.teams[index].id = id;
+	onTeamSelected(team: any, index: number): void {
+		console.log(team);
+		this.teams[index].team = team;
 	}
 
 	save(): void {
 		this.validateFields()
 			.then(() => {
 				console.log('Saving results');
+				this.personModel.selectedTeams = this.teams;
+				this.assetExplorerService.savePerson(this.personModel)
+					.subscribe((result: any) => {
+						console.log('The result is:');
+						console.log(result);
+						this.close(result);
+					})
 			})
 			.catch(err => console.log('Error validating: ', err.message || err))
 	}
