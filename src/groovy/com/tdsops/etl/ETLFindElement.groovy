@@ -348,27 +348,32 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return string with errors or empty
 	 */
 	String stackableErrorMessage() {
-		String error = ''
 
-		Set<String> missingProperties = []
+		if(currentFind.statement){
+			currentFind.statement.stackableErrorMessage()
+		} else{
+			String error = ''
 
-		if (! currentFind.fields ) {
-			missingProperties << 'by'
+			Set<String> missingProperties = []
+
+			if (! currentFind.fields ) {
+				missingProperties << 'by'
+			}
+
+			if (! currentFind.values ) {
+				missingProperties << 'with'
+			}
+
+			if (! currentFind.property ) {
+				missingProperties << 'into'
+			}
+
+			if (missingProperties) {
+				error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+			}
+
+			return error
 		}
-
-		if (! currentFind.values ) {
-			missingProperties << 'with'
-		}
-
-		if (! currentFind.property ) {
-			missingProperties << 'into'
-		}
-
-		if (missingProperties) {
-			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
-		}
-
-		return error
 	}
 
 	/**
@@ -512,6 +517,33 @@ class FindStatementBuilder {
 		this.currentCondition = new FindCondition(fieldDefinition.name)
 		this.conditions.add(currentCondition)
 		return currentCondition
+	}
+
+	/**
+	 * Evaluates the required properties of the command object and
+	 * return an error string if there are any missing in the form:
+	 *    missing [x, y, z] keywords
+	 *
+	 * or an empty string if no problem was found
+	 * @return string with errors or empty
+	 */
+	String stackableErrorMessage() {
+
+		String error = ''
+
+		Set<String> missingProperties = []
+
+		if (currentCondition.isComplete()) {
+			missingProperties << 'into'
+		} else {
+			missingProperties << 'find operation'
+		}
+
+		if (missingProperties) {
+			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+		}
+
+		return error
 	}
 }
 

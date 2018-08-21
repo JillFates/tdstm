@@ -491,7 +491,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void "test exception when [with, into] keywords are not found"(){
+	void "test exception when [find operation] keywords are not found"(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -572,7 +572,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessorException e = thrown ETLProcessorException
 
 			with (ETLProcessor.getErrorMessage(e)) {
-				message == 'find/elseFind statement is missing required [with, into] keywords at line 6'
+				message == 'find/elseFind statement is missing required [find operation] keyword at line 6'
 				startLine == 6
 				endLine == 6
 				startColumn == null
