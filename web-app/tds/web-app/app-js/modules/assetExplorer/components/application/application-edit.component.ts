@@ -17,6 +17,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
+import {PersonService} from '../../../../shared/services/person.service';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -27,7 +28,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		]
 	})
 	class ApplicationShowComponent extends AssetCommonEdit {
-
 		defaultItem = {fullName: 'Please Select', personId: 0};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
@@ -133,24 +133,20 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			}
 
 			const personModel = new PersonModel();
-
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
 			personModel.companies = companies;
 			personModel.teams = teams;
 			personModel.staffType = staffTypes;
-
 			this.dialogService.extra(AddPersonComponent,
 				[UIDialogService,
 					{
 						provide: PersonModel,
 						useValue: personModel
 					},
-					AssetExplorerService
+					PersonService
 				], false, false)
 				.then((result) => {
-					console.log('Finishing add person');
-					console.log(result);
 					this.personList.push({personId: result.id, fullName: result.name})
 					this.model.asset[fieldName].id = result.id;
 				});
@@ -160,7 +156,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				this.personList = personList;
 				this.personList.unshift(this.addPersonItem)
 			}
-
 			return this.personList;
 		}
 	}

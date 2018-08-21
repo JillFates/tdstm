@@ -14,6 +14,7 @@ import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
+import { PersonService } from './services/person.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
@@ -98,6 +99,7 @@ import { DictionaryService } from './services/dictionary.service';
 	providers: [
 		AuthService,
 		PermissionService,
+		PersonService,
 		PreferenceService,
 		NotifierService,
 		UILoaderService,

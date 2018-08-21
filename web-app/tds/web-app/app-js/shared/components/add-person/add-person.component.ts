@@ -2,7 +2,7 @@ import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
 
 import { UIExtraDialog} from '../../../shared/services/ui-dialog.service';
 import { PersonModel } from './model/person.model';
-import { AssetExplorerService } from '../../../modules/assetExplorer/service/asset-explorer.service';
+import { PersonService } from '../../services/person.service';
 
 @Component({
 	selector: 'add-person',
@@ -14,7 +14,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	errors: any;
 	constructor(
 		public personModel: PersonModel,
-		private assetExplorerService: AssetExplorerService) {
+		private personService: PersonService) {
 		super('#add-person-component');
 		this.errors = {};
 	}
@@ -56,7 +56,6 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	}
 
 	onTeamSelected(team: any, index: number): void {
-		console.log(team);
 		this.teams[index].team = team;
 	}
 
@@ -65,7 +64,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 			.then(() => {
 				console.log('Saving results');
 				this.personModel.selectedTeams = this.teams;
-				this.assetExplorerService.savePerson(this.personModel)
+				this.personService.savePerson(this.personModel)
 					.subscribe((result: any) => {
 						if (result.errMsg) {
 							alert(result.errMsg);
