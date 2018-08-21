@@ -1,13 +1,19 @@
+import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.service.*
+import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidConfigurationException
-import com.tdsops.common.exceptions.InvalidLicenseException
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.service.LogicException
+import net.transitionmanager.service.UnauthorizedException
 
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
