@@ -4,21 +4,10 @@
         <meta name="layout" content="topNav" />
         <g:javascript src="asset.tranman.js" />
         <g:javascript src="entity.crud.js" />
-        <g:javascript src="model.manufacturer.js"/>
-        <g:javascript src="projectStaff.js" />
         <g:render template="../layouts/responsiveAngularResources" />
-        <g:javascript src="progressBar.js" />
-
         <g:javascript src="asset.comment.js" />
         <g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
-        <g:javascript src="cabling.js"/>
-        <g:javascript src="d3/d3.js"/>
-        <g:javascript src="svg.js"/>
-        <g:javascript src="load.shapes.js"/>
-        <g:javascript src="keyevent_constants.js" />
-        <g:javascript src="graph.js" />
-        <g:javascript src="generator/runtime.js" />
-        <g:javascript src="generator/generator.js" />
+
         <title>Edit Event</title>
     <script type="text/javascript">
       function initialize(){

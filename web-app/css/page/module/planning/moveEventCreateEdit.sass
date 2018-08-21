@@ -1,7 +1,8 @@
 div.content-wrapper
   div.container
     .body.move-event-edit,
-    .body.move-event-create
+    .body.move-event-create,
+    .body.move-event-show
       div.nav
         box-sizing: content-box !important
       table
@@ -30,3 +31,8 @@ div.content-wrapper
         .k-widget li span:not(.k-select) div
           padding-top: 3px !important
           padding-bottom: 2px !important
+    .body.move-event-show
+      table
+        td.name
+          label.tag-title
+            font-weight: 200 !important
