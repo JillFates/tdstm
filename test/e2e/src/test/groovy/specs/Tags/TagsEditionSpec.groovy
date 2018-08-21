@@ -45,7 +45,7 @@ class TagsEditionSpec extends GebReportingSpec {
     }
 
     def "1. The user cancels edition process"() {
-        given: 'The User is Manage Tags Page'
+        given: 'The User is at Manage Tags Page'
             at TagsPage
         when: 'The User filters by name'
             filterByName customTag.name
