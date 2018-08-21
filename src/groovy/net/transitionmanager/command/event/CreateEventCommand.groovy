@@ -3,7 +3,7 @@ package net.transitionmanager.command.event
 import grails.validation.Validateable
 
 /**
- * A command object used in creating a AssetTag.
+ * A command object used in creating an Event with tags.
  */
 @Validateable
 class CreateEventCommand {
