@@ -19,7 +19,7 @@ class AssetDetailsPage extends Page{
         editButton { assetDetailModal.find("button span.glyphicon-pencil")}
         closeButton { assetDetailModal.find("button span.glyphicon-ban-circle")}
 
-        adModalAssetName {$('td.label.assetName.O').next()}
+        adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
     }
 
