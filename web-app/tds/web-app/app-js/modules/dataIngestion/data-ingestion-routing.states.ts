@@ -34,7 +34,7 @@ export const dataScriptListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'DATA_INGESTION.ETL_SCRIPTS',
 			instruction: '',
-			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.ETL_SCRIPTS']
+			menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.ETL_SCRIPTS']
 		},
 		requiresAuth: true,
 	},
@@ -59,7 +59,7 @@ export const providerListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'DATA_INGESTION.PROVIDERS',
 			instruction: '',
-			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.PROVIDERS']
+			menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.PROVIDERS']
 		},
 		requiresAuth: true,
 	},
@@ -84,7 +84,7 @@ export const apiActionListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'DATA_INGESTION.API_ACTIONS',
 			instruction: '',
-			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.API_ACTIONS']
+			menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.API_ACTIONS']
 		},
 		requiresAuth: true,
 	},
@@ -109,7 +109,7 @@ export const credentialListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'DATA_INGESTION.CREDENTIALS',
 			instruction: '',
-			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.CREDENTIALS']
+			menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.CREDENTIALS']
 		},
 		requiresAuth: true,
 	},
