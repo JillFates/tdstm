@@ -99,6 +99,11 @@ class TagsPage extends Page{
         waitFor{firstTagRemoveButton.click()}
     }
 
+    def clickOnEditButton(){
+        waitFor{firstTagEditButton.displayed}
+        waitFor{firstTagEditButton.click()}
+    }
+
     def isFirstTagRowNameNotEditable(){
         waitFor{firstTagName.displayed}
         firstTagName.children().isEmpty()
