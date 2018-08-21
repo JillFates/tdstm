@@ -43,7 +43,7 @@
 														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="model.asset.sme.id"
-														(selectionChange)="onPersonSelected($event,'application', 'sme1',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														(selectionChange)="onPersonSelected($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"

@@ -67,10 +67,13 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 				this.personModel.selectedTeams = this.teams;
 				this.assetExplorerService.savePerson(this.personModel)
 					.subscribe((result: any) => {
-						console.log('The result is:');
-						console.log(result);
+						if (result.errMsg) {
+							alert(result.errMsg);
+							return;
+						}
+
 						this.close(result);
-					})
+					}, err => alert(err.message || err))
 			})
 			.catch(err => console.log('Error validating: ', err.message || err))
 	}

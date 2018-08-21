@@ -152,6 +152,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					console.log('Finishing add person');
 					console.log(result);
 					this.personList.push({personId: result.id, fullName: result.name})
+					this.model.asset[fieldName].id = result.id;
 				});
 		}
 		getPersonList(personList: any[]): any[] {
