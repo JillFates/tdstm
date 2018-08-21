@@ -322,7 +322,6 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	scope.onDependencyFiltersChange = function () {
 		reloadDependencyGroupsSection();
 	};
-
 };
 
 tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$modal', '$window', 'utils', 'commentUtils', 'commentService'];
@@ -421,6 +420,61 @@ tds.comments.controller.ListDialogController = function ($scope, $modalInstance,
 	var showComments = function (data) {
 		$scope.commentsData = data;
 	}
+
+};
+
+/**
+ * Edit Event Form
+ * This page is legacy, so this code introduce a feature just for the tags on the Edit and Create of the Form
+ */
+
+tds.comments.controller.EventEditController = function ($scope, commentService) {
+
+	$scope.validEditEvebtSubmit = false;
+	// Get the Current Event
+	$scope.moveEventInstanceId = $('.moveEventInstanceId').val();
+
+	$scope.internal =  {
+		// Server Selected Tag
+		assetSelector:{
+			operator: "ANY",
+			tag: []
+		},
+		// Current Selected Tags
+		selectedAssetSelector:{}
+	};
+
+	// Get the List of Current Tags for this Event
+	commentService.getAssetTagsForEvent($scope.moveEventInstanceId).then(
+		function (response) {
+			if (response && response.data && response.data.length >= 1) {
+				response.data.forEach(function(eventTag) {
+					var eventId = eventTag.id;
+					var tagId = eventTag.tagId;
+					eventTag.id = tagId;
+					eventTag.eventId = eventId;
+					eventTag.label = eventTag.name;
+				});
+				$scope.internal.assetSelector.tag = response.data;
+			}
+		}
+	);
+
+	/**
+	 * Event Edit Form
+	 * Perform update and delete of tags before to sent the Form
+	 */
+
+	$scope.onSubmitEventEditForm = function (event) {
+		if (!scope.validEditEvebtSubmit) {
+			event.preventDefault();
+
+			setTimeout( function() {
+				scope.validEditEvebtSubmit = true;
+				$('#submitEditEventForm').click();
+			}, 2000);
+		}
+	};
 
 };
 
@@ -1616,6 +1670,22 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var getAssetTagsForEvent = function(tagId) {
+		var deferred = q.defer();
+		http({
+			method: 'GET',
+			url: utils.url.applyRootPath('/ws/tag/event/' + tagId),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -1647,7 +1717,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		getAssetById: getAssetById,
 		updateDependencies: updateDependencies,
 		deleteDependency: deleteDependency,
-		filteredAssetList: filteredAssetList
+		filteredAssetList: filteredAssetList,
+		getAssetTagsForEvent: getAssetTagsForEvent
 	};
 
 };

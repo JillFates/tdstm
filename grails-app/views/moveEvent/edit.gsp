@@ -51,7 +51,7 @@
     <body>
     <tds:subHeader title="Edit Event" crumbs="['Planning','Event', 'Edit']"/> <br />
 
-    <div class="body move-event-edit" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
+    <div class="body move-event-edit" ng-app="tdsComments" ng-controller="tds.comments.controller.EventEditController as eventEdit">
             <!-- <h1>Edit Event</h1> -->
             <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
@@ -66,7 +66,7 @@
             </div>
             </g:hasErrors>
             <g:form method="post" >
-                <input type="hidden" name="id" value="${moveEventInstance?.id}" />
+                <input type="hidden" name="id" class="moveEventInstanceId" value="${moveEventInstance?.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -93,10 +93,10 @@
 
                             <tr class="prop">
                                 <td class="name">
-                                    <label for="moveBundle">Tag:</label>
+                                    <label class="tag-title">Tag:</label>
                                 </td>
                                 <td  style="text-align:left;" class="valueNW">
-                                    <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+                                    <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="internal.assetSelector" asset-selector="internal.selectedAssetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
                                 </td>
                             </tr>
 
@@ -207,7 +207,7 @@
                 </div>
 			<div class="buttons">
 				<span class="button">
-					<g:actionSubmit class="save" value="Update" />
+					<g:actionSubmit class="save" value="Update"  ng-click="onSubmitEventEditForm($event)" />
 				</span>
 				<span class="button">
 					<g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" />
