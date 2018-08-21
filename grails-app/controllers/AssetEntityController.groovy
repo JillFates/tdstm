@@ -1427,11 +1427,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 
 			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
-			Map updatedColumnCSS = getUpdatedColumnsCSS(it, elapsedSec)
-
 			estStartClass = estimatedColumnsCSS['estStartClass']
 			estFinishClass = estimatedColumnsCSS['estFinishClass']
-			updatedClass = updatedColumnCSS['updatedClass']
+
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
 
 			String dueDate = TimeUtil.formatDate(it.dueDate)
 
@@ -3620,19 +3619,18 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
     /**
-     * Returns a Map with the updated column CSS class name, according to
-     * the relation between that particular moment and  a particular amount of time (elapsedSec = current time - statusUpdate).
+     * Returns a String with the updated column CSS class name, according to
+     * the relation between now and a particular amount of time (elapsedSec = current time - statusUpdate).
      * If a task estimate value is not late or tardy, it returns an empty string for the class name.
      * For more information see TM-11565.
      *
      * @param  task : The task.
      * @param  elapsedSec : The elapsed time in milliseconds (elapsedSec = current time - statusUpdate).
-     * @return  A map with updateClass.
+     * @return  A String with updateClass.
      */
-    private Map getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
+    private String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
 
         String updatedClass = ''
-
 		if (task.status == AssetCommentStatus.READY) {
 			if (elapsedSec >= 600) {   // 10 minutes
 				updatedClass = 'task_late'
@@ -3647,7 +3645,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				updatedClass='task_tardy'
 			}
 		}
-        return [updatedClass: updatedClass]
+        return updatedClass
     }
 
 
