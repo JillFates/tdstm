@@ -1,5 +1,4 @@
-import {Component, ViewChild, ElementRef, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import {DeviceManufacturer} from '../../../modules/assetExplorer/components/device/manufacturer/model/device-manufacturer.model';
+import {Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Aka, AkaParent, AkaChanges } from './model/aka.model';
 import { AssetExplorerService } from '../../../modules/assetExplorer/service/asset-explorer.service';
 
@@ -8,9 +7,8 @@ import { AssetExplorerService } from '../../../modules/assetExplorer/service/ass
 	templateUrl: '../tds/web-app/app-js/shared/components/aka/aka.component.html'
 })
 export class AkaComponent implements OnInit {
-	@Input('aka') aka: Array<Aka>;
+	@Input('aka') akaCollection: Array<Aka>;
 	@Input('akaParent') akaParent: AkaParent;
-	// @Input('manufacturer') manufacturer: DeviceManufacturer;
 	@Output('modelChange') modelChange = new EventEmitter<any>();
 	clonedAkas: Array<Aka>;
 	hasError: boolean;
@@ -25,11 +23,13 @@ export class AkaComponent implements OnInit {
 
 	ngOnInit() {
 		this.cleanError();
-		this.clonedAkas = [...this.aka];
+		this.clonedAkas = [...this.akaCollection];
 
 		this.deletedAkas = [];
 		this.akas = (this.clonedAkas || [])
-			.map((aka: Aka) => aka.value);
+			.map((aka: Aka) => aka.name);
+
+		this.sendAkaChanges();
 	}
 
 	private cleanError() {
@@ -47,7 +47,7 @@ export class AkaComponent implements OnInit {
 		}
 
 		this.akas.push(aka);
-		this.clonedAkas.push({ id: null, value: aka });
+		this.clonedAkas.push({ id: null, name: aka });
 	}
 
 	trackByIndex(index: number, obj: any): any {
@@ -72,7 +72,7 @@ export class AkaComponent implements OnInit {
 				if (this.hasError && this.indexError === index) {
 					this.cleanError();
 				}
-				this.clonedAkas[index].value = aka;
+				this.clonedAkas[index].name = aka;
 				this.sendAkaChanges();
 			})
 			.catch((err) => {
@@ -111,16 +111,24 @@ export class AkaComponent implements OnInit {
 
 	sendAkaChanges() {
 		const edited = this.clonedAkas
-			.filter((aka: Aka) => aka.id);
+			.filter((aka: Aka) => aka.id)
+			.map(aka => ({id: aka.id, name: aka.name}));
 
 		const added = this.clonedAkas
-			.filter((aka: Aka) => !aka.id);
+			.filter((aka: Aka) => !aka.id)
+			.map(aka => ({id: aka.id, name: aka.name}));
 
 		const akaChanges: AkaChanges = {
 			edited,
 			added,
-			deleted: this.deletedAkas.filter((aka: Aka) => aka.id !== null)
+			deleted: this.deletedAkas
+				.filter((aka: Aka) => aka.id !== null)
+				.map(aka => ({id: aka.id, name: aka.name}))
 		};
+
+		console.log('AKA CHANGES:');
+		console.log(akaChanges);
+
 		this.modelChange.emit(akaChanges);
 	}
 

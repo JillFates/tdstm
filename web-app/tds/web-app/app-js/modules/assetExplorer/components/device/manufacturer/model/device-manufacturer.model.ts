@@ -4,7 +4,8 @@ export class DeviceManufacturer {
 	public manufacturerId: number;
 	public name: string;
 	public description: string;
-	public aka: Array<Aka>;
+	public aka: string;
+	public akaCollection: Array<Aka>;
 	public corporateLocation: string;
 	public corporateName: string;
 	public website: string;

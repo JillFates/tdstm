@@ -412,7 +412,7 @@ export class AssetExplorerService {
 		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
 		return this.http.post(url, '')
 			.map((res: Response) => res.json())
-			.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
+			.map((res: any) => res && Object.assign({aka: res.aliases || '', akaCollection: res.akaCollection}, res.manufacturer) || {})
 			.catch((error: any) => error.json());
 	}
 }

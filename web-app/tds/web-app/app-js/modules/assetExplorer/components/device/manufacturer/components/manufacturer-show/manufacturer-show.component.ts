@@ -1,8 +1,8 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import {UIDialogService, UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
 import { DeviceManufacturer} from '../../model/device-manufacturer.model';
+import { ManufacturerEditComponent } from '../manufacturer-edit/manufacturer-edit.component';
 import {Aka} from '../../../../../../../shared/components/aka/model/aka.model';
-import {DIALOG_SIZE} from '../../../../../../../shared/model/constants';
 
 @Component({
 	selector: 'device-manufacturer',
@@ -10,12 +10,10 @@ import {DIALOG_SIZE} from '../../../../../../../shared/model/constants';
 })
 export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
 	aka: string;
-	alias: string;
 	constructor(
 		private dialogService: UIDialogService,
 		public deviceManufacturer: DeviceManufacturer) {
 		super('#device-manufacturer-component');
-		this.alias = this.deviceManufacturer.aka.toString();
 	}
 
 	/***
@@ -37,17 +35,19 @@ export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
 	}
 
 	ngOnInit() {
-		if (Array.isArray(this.deviceManufacturer.aka)) {
-			const aka = (this.deviceManufacturer.aka || [])
-				.map((aka: Aka) => aka.value);
-
-			if (aka.length) {
-				this.aka = aka.join(',');
-			}
-		}
+		console.log('On Edit');
 	}
 
 	onEditManufacturer(): void {
-		console.log('On Edit manufacturer');
+		this.dialogService.extra(ManufacturerEditComponent,
+			[
+				{
+					provide: DeviceManufacturer,
+					useValue: this.deviceManufacturer
+				}
+			])
+			.then((result) => {
+				console.log(result);
+			}).catch((error) => console.log(error));
 	}
 }

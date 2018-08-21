@@ -1,0 +1,77 @@
+<div class="modal fade in device-manufacturer-edit-component" id="device-manufacturer-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Edit Manufacturer</h4>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-container">
+                    <form name="deviceManufacturerEditForm" role="form" data-toggle="validator"
+                          #deviceManufacturerEditForm='ngForm' class="form-horizontal left-alignment">
+                        <div class="box-body">
+	                        <div class="form-group">
+		                        <div class="col-md-offset-4 col-md-8"><span class="error pull-right">Fields marked ( * ) are mandatory</span></div>
+	                        </div>
+                            <div class="form-group">
+                                <div class="col-md-4">Name:<span class="error">*</span></div>
+	                            <div class="col-md-8">
+		                            <input type="text" [(ngModel)]="deviceManufacturer.name" name="name" (change)="onChange($event)">
+	                            </div>
+                            </div>
+
+	                        <div class="form-group">
+		                        <div class="col-md-4">AKA:</div>
+		                        <div class="col-md-6"> <tds-aka [aka]="deviceManufacturer.akaCollection || []"
+		                                                        [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.name}"
+		                                                        (modelChange)="onAkaChange($event)"></tds-aka></div>
+	                        </div>
+
+                            <div class="form-group">
+                                <div class="col-md-4">Description:</div>
+                                <div class="col-md-8">
+	                                <input type="text" [(ngModel)]="deviceManufacturer.description" name="description" (change)="onChange($event)">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-4">Corporate Name:</div>
+                                <div class="col-md-8">
+	                                <input type="text" [(ngModel)]="deviceManufacturer.corporateName" name="corporateName" (change)="onChange($event)">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-4">Corporate Location:</div>
+                                <div class="col-md-8">
+	                                <input type="text" [(ngModel)]="deviceManufacturer.corporateLocation" name="corporateLocation" (change)="onChange($event)">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-4">Website:</div>
+                                <div class="col-md-8">
+	                                <input type="text" [(ngModel)]="deviceManufacturer.website" name="website" (change)="onChange($event)">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer form-group-center">
+                <button [disabled]="!isEditing || !deviceManufacturer.name" type="button" class="btn btn-primary pull-left" (click)="onUpdateManufacturer()"><span
+                        class="fa fa-fw fa-floppy-o"></span> Save
+                </button>
+	            <button type="button" class="btn btn-danger pull-left" (click)="onDeleteManufacturer()"><span
+			            class="fa fa-fw fa-trash"></span> Delete
+	            </button>
+                <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <span>Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
