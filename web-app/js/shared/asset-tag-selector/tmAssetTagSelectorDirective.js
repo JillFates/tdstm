@@ -24,6 +24,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			preAssetSelector: '=',
 			preSelectedOperator: '=',
 			disabledOperator: '=',
+			hideOperator: '=',
 			onChange: '&',
 		},
 		link: function ($scope, element) {
@@ -57,28 +58,29 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			 * Regenerate the Switch, Kendo does not allow to change the value on fly
 			 */
 			function createSwitchButton() {
-				$(element).find(".asset-tag-selector-operator-switch").remove();
-				$(element).find(".km-switch").remove();
-				$(element).find(".asset-tag-selector-component").append('<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator"/>');
+				if (!$scope.hideOperator) {
+					$(element).find(".asset-tag-selector-operator-switch").remove();
+					$(element).find(".km-switch").remove();
+					$(element).find(".asset-tag-selector-component").append('<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator"/>');
 
-				if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
-					$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
-				}
-
-				if($scope.disabledOperator) {
-					$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
-				}
-
-				$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-					onLabel: "ALL",
-					offLabel: "ANY",
-					change: function (e) {
-						$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
-						// $(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
-						$scope.onChange();
+					if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
+						$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
 					}
-				});
 
+					if ($scope.disabledOperator) {
+						$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
+					}
+
+					$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+						onLabel: "ALL",
+						offLabel: "ANY",
+						change: function (e) {
+							$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+							// $(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
+							$scope.onChange();
+						}
+					});
+				}
 			}
 
 			/**

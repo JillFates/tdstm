@@ -428,9 +428,9 @@ tds.comments.controller.ListDialogController = function ($scope, $modalInstance,
  * This page is legacy, so this code introduce a feature just for the tags on the Edit and Create of the Form
  */
 
-tds.comments.controller.EventEditController = function ($scope, commentService) {
+tds.comments.controller.EventEditController = function ($scope, $q, commentService) {
 
-	$scope.validEditEvebtSubmit = false;
+	$scope.validEditEventSubmit = false;
 	// Get the Current Event
 	$scope.moveEventInstanceId = $('.moveEventInstanceId').val();
 
@@ -466,13 +466,49 @@ tds.comments.controller.EventEditController = function ($scope, commentService) 
 	 */
 
 	$scope.onSubmitEventEditForm = function (event) {
-		if (!scope.validEditEvebtSubmit) {
+		if (!$scope.validEditEventSubmit) {
 			event.preventDefault();
+			var diffNewSelection = $scope.internal.selectedAssetSelector.tag.filter((r) => !$scope.internal.assetSelector.tag.find((l) => r.id === l.id));
+			let diffDeletedSelection = $scope.internal.assetSelector.tag.filter((r) => !$scope.internal.selectedAssetSelector.tag.find((l) => r.id === l.id));
 
-			setTimeout( function() {
-				scope.validEditEvebtSubmit = true;
+			var qPromises = [];
+
+			// Partially Remove Prototype
+			if(window.Prototype) {
+				delete Object.prototype.toJSON;
+				delete Array.prototype.toJSON;
+				delete Hash.prototype.toJSON;
+				delete String.prototype.toJSON;
+			}
+
+			// To Delete
+			var deletedTagEventIds = [];
+			diffDeletedSelection.each( function(a){
+				deletedTagEventIds.push(parseInt(a.eventId));
+			});
+			if (deletedTagEventIds.length > 0) {
+				console.log({ ids: deletedTagEventIds });
+				qPromises.push(commentService.deleteAssetTagsForEvent({ ids: deletedTagEventIds }));
+			}
+
+			// To Add
+			var newTagEventIds = [];
+			diffNewSelection.each( function(a){
+				newTagEventIds.push(parseInt(a.id));
+			});
+			if (newTagEventIds.length > 0) {
+				console.log({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId})
+				qPromises.push(commentService.createAssetTagsForEvent({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId}));
+			}
+
+			$scope.validEditEventSubmit = true;
+			if (qPromises.length > 0) {
+				$q.all(qPromises).then(function(){
+					$('#submitEditEventForm').click();
+				});
+			} else {
 				$('#submitEditEventForm').click();
-			}, 2000);
+			}
 		}
 	};
 
@@ -1686,6 +1722,40 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var deleteAssetTagsForEvent = function(tagEventIds) {
+		var deferred = q.defer();
+		http({
+			method: 'DELETE',
+			url: utils.url.applyRootPath('/ws/tag/event/'),
+			data: JSON.stringify(tagEventIds),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
+	var createAssetTagsForEvent = function(tagIds) {
+		var deferred = q.defer();
+		http({
+			method: 'POST',
+			url: utils.url.applyRootPath('/ws/tag/event/'),
+			data: JSON.stringify(tagIds),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -1718,7 +1788,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		updateDependencies: updateDependencies,
 		deleteDependency: deleteDependency,
 		filteredAssetList: filteredAssetList,
-		getAssetTagsForEvent: getAssetTagsForEvent
+		getAssetTagsForEvent: getAssetTagsForEvent,
+		deleteAssetTagsForEvent: deleteAssetTagsForEvent,
+		createAssetTagsForEvent: createAssetTagsForEvent
 	};
 
 };

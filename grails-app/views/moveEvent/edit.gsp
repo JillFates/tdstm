@@ -96,7 +96,7 @@
                                     <label class="tag-title">Tag:</label>
                                 </td>
                                 <td  style="text-align:left;" class="valueNW">
-                                    <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="internal.assetSelector" asset-selector="internal.selectedAssetSelector" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+                                    <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="internal.assetSelector" asset-selector="internal.selectedAssetSelector" hide-operator="'true'" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
                                 </td>
                             </tr>
 
@@ -207,7 +207,7 @@
                 </div>
 			<div class="buttons">
 				<span class="button">
-					<g:actionSubmit class="save" value="Update"  ng-click="onSubmitEventEditForm($event)" />
+                    <input type="submit" name="_action_Update" value="Update" id="submitEditEventForm" class="save" ng-click="onSubmitEventEditForm($event)">
 				</span>
 				<span class="button">
 					<g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" />
