@@ -1135,8 +1135,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == [152254l]
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -1279,12 +1279,22 @@ class ETLFindSpec extends ETLBaseSpec {
 
 								// Validating queries
 								with(find) {
-									query[0].domain == ETLDomain.Application.name()
-									query[0].kv == [id: '152254']
 
-									query[1].domain == ETLDomain.Application.name()
-									query[1].kv == [appVendor: 'Microsoft']
+									assertQueryResult(
+										query[0],
+										ETLDomain.Application,
+										[
+											['id', 'eq', '152254']
+										]
+									)
 
+									assertQueryResult(
+										query[1],
+										ETLDomain.Application,
+										[
+											['appVendor', 'eq', 'Microsoft']
+										]
+									)
 									results == []
 									matchOn == null
 								}
@@ -1310,11 +1320,22 @@ class ETLFindSpec extends ETLBaseSpec {
 								value == '152255'
 								// Validating queries
 								with(find) {
-									query[0].domain == ETLDomain.Application.name()
-									query[0].kv == [id: '152255']
 
-									query[1].domain == ETLDomain.Application.name()
-									query[1].kv == [appVendor: 'Mozilla']
+									assertQueryResult(
+										query[0],
+										ETLDomain.Application,
+										[
+											['id', 'eq', '152255']
+										]
+									)
+
+									assertQueryResult(
+										query[1],
+										ETLDomain.Application,
+										[
+											['appVendor', 'eq', 'Mozilla']
+										]
+									)
 
 									results == [1l]
 									matchOn == 1
@@ -1330,8 +1351,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with (etlProcessor.findCache) {
 				size() == 4
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
+				get('Application', [new FindCondition('id', '152254')]) == []
+				get('Application', [new FindCondition('id', '152255')]) == []
 			}
 
 		cleanup:
@@ -1385,10 +1406,17 @@ class ETLFindSpec extends ETLBaseSpec {
 								originalValue == '152254'
 								value == '152254'
 								with(find) {
-									query[0].domain == ETLDomain.Application.name()
-									query[0].kv == [id: '152254']
-									query[1].domain == ETLDomain.Application.name()
-									query[1].kv == [appVendor: 'Microsoft']
+
+									assertQueryResult(query[0], ETLDomain.Application,
+										[
+											['id', 'eq', '152254']
+										]
+									)
+									assertQueryResult(query[1], ETLDomain.Application,
+										[
+											['appVendor', 'eq', 'Microsoft']
+										]
+									)
 								}
 								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
@@ -1406,12 +1434,18 @@ class ETLFindSpec extends ETLBaseSpec {
 								originalValue == '152255'
 								value == '152255'
 								with(find) {
-									query[0].domain == ETLDomain.Application.name()
-									query[0].kv == [id: '152255']
-									query[1].domain == ETLDomain.Application.name()
-									query[1].kv == [appVendor: 'Mozilla']
-								}
 
+									assertQueryResult(query[0], ETLDomain.Application,
+										[
+											['id', 'eq', '152255']
+										]
+									)
+									assertQueryResult(query[1], ETLDomain.Application,
+										[
+											['appVendor', 'eq', 'Mozilla']
+										]
+									)
+								}
 								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
 							with(appVendor) {
@@ -1495,7 +1529,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1870,10 +1904,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						value == 152254
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: 152254]
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application,
+							[['id', 'eq', 152254l]]
+						)
 					}
 
 					with(data[1].fields.environment) {
@@ -1886,10 +1919,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						value == 152255
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: 152255]
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 					}
 				}
 			}
@@ -1897,8 +1927,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == [152254l]
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -1966,10 +1996,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						value == 152254l
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: 152254l]
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 					}
 
 					with(data[1].fields.environment) {
@@ -1982,10 +2009,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						value == 152255l
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: 152255l]
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 					}
 				}
 			}
@@ -1993,8 +2017,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == [152254l]
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -2050,12 +2074,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == 'Application'
-									with(kv) {
-										id == '152254'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
 							}
 						}
 					}
@@ -2075,12 +2094,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == 'Application'
-									with(kv) {
-										id == '152255'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
 							}
 						}
 					}
@@ -2090,8 +2104,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == []
+				get('Application', [new FindCondition('id', '152254')]) == []
+				get('Application', [new FindCondition('id', '152255')]) == []
 			}
 
 		cleanup:
@@ -2161,12 +2175,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152254l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -2186,12 +2195,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == [152255l]
 								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -2201,8 +2205,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == [152255l]
+				get('Application', [new FindCondition('id', '152254')]) == []
+				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -2272,12 +2276,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == 'Application'
-									with(kv) {
-										id == 152254l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -2297,12 +2296,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								matchOn == 0
 								results == [152255, 152255]
-								with(query[0]) {
-									domain == 'Application'
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -2312,8 +2306,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == []
-				get('Application', [id: '152255']) == [152255l, 152255l]
+				get('Application', [new FindCondition('id', '152254')]) == []
+				get('Application', [new FindCondition('id', '152255')]) == [152255l, 152255l]
 			}
 
 		cleanup:
@@ -2463,12 +2457,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										assetName == 'ERP'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'ERP']])
 							}
 							with(create){
 								assetName == 'ERP'
@@ -2492,12 +2481,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										assetName == 'Oracle7-Cluster'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'Oracle7-Cluster']])
 							}
 							with(create){
 								assetName == 'Oracle7-Cluster'
@@ -2526,12 +2510,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Device.name()
-									with(kv) {
-										assetName == 'xraysrv001'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'xraysrv001']])
 							}
 							with(create){
 								assetName == 'xraysrv001'
@@ -2555,12 +2534,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Device.name()
-									with(kv) {
-										assetName == 'zuludb01'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'zuludb01']])
 							}
 							with(create){
 								assetName == 'zuludb01'
@@ -2662,12 +2636,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Mozilla'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
 						with(fields.appVendor) {
@@ -2702,8 +2671,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
+				get('Application', [new FindCondition('appVendor','Microsoft')]) == [152253l]
+				get('Application', [new FindCondition('appVendor', 'Mozilla')]) == []
 			}
 
 		cleanup:
@@ -2789,12 +2758,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Mozilla'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
 						with(fields.appVendor) {
@@ -2829,8 +2793,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
+				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
+				get('Application', [new FindCondition('appVendor', 'Mozilla')]) == []
 			}
 
 		cleanup:
@@ -2916,12 +2880,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Mozilla'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 						}
 						with(fields.appVendor) {
@@ -2951,13 +2910,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.findCache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -3047,12 +2999,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Mozilla'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 							}
 							with(create){
 								assetClass == ETLDomain.Application.name()
@@ -3063,13 +3010,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.findCache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -3159,12 +3099,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == [152253l]
 								matchOn == 0
 								query.size() == 1
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										appVendor == 'Microsoft'
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 							}
 							with(update){
 								assetClass == ETLDomain.Application.name()
@@ -3175,13 +3110,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.findCache){
-				size() == 2
-				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
 			}
 
 		cleanup:
@@ -3282,8 +3210,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			with(etlProcessor.findCache){
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [appVendor: 'Microsoft']) == [152253l]
-				get('Application', [appVendor: 'Mozilla']) == []
+				get('Application', [new FindCondition('appVendor', 'Microsoft')]) == [152253l]
+				get('Application', [new FindCondition('appVendor', 'Mozilla')]) == []
 			}
 
 		cleanup:
@@ -3354,12 +3282,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Application.name()
-									kv == [
-										'id': 'Microsoft'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Microsoft']])
 							}
 						}
 					}
@@ -3385,12 +3308,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Application.name()
-									kv == [
-										'id': 'Mozilla'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Mozilla']])
 							}
 						}
 					}
@@ -3584,12 +3502,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Application.name()
-									kv == [
-											'assetName': 'xray'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'xray']])
 							}
 						}
 					}
@@ -3630,12 +3543,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Device.name()
-									kv == [
-											'assetName': 'zulu'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zulu']])
 							}
 						}
 					}
@@ -3726,12 +3634,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Application.name()
-									kv == [
-											'assetName': 'xray'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'xray']])
 							}
 						}
 					}
@@ -3772,12 +3675,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								with(query[0], QueryResult){
-									domain == ETLDomain.Device.name()
-									kv == [
-											'assetName': 'zulu'
-									]
-								}
+								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zulu']])
 							}
 						}
 					}
@@ -3857,12 +3755,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152254l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -3882,12 +3775,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == [152255l]
 								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -3907,23 +3795,11 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == [152255l]
 								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255]])
 							}
 						}
 					}
 				}
-			}
-
-			with(etlProcessor.findCache){
-				size() == 2
-				hitCountRate() == 33.33
-				get('Application', [id: 152254l]) == []
-				get('Application', [id: 152255l]) == [152255l]
 			}
 
 		cleanup:
@@ -4000,12 +3876,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152254l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -4025,12 +3896,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == [152255l]
 								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -4050,12 +3916,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == [152255l]
 								matchOn == 0
-								with(query[0]) {
-									domain == ETLDomain.Application.name()
-									with(kv) {
-										id == 152255l
-									}
-								}
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
