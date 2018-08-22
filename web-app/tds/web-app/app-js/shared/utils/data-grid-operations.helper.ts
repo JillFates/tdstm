@@ -33,7 +33,7 @@ export class DataGridOperationsHelper {
 	private checkboxSelectionConfig: any;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 
-	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
+	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		this.state.sort = defaultSort;
 		if (pageSize) {
 			this.state.take = pageSize;
@@ -266,19 +266,21 @@ export class DataGridOperationsHelper {
 		this.state.skip = event.skip;
 		this.state.take = event.take;
 
-		// reset the select all checkbox to un-selected.
-		this.selectAllCheckboxes = false;
-		// If current page items all are checked then Select All box should be true, otherwise false.
-		let allSelectedOnCurrentPage = true;
-		let currentPageItems: DataResult = process(this.resultSet, this.state);
-		currentPageItems.data.forEach( item => {
-			// map-key-reference inception here
-			if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
-				allSelectedOnCurrentPage = false;
-				return;
-			}
-		});
-		this.selectAllCheckboxes = allSelectedOnCurrentPage;
+		if (this.checkboxSelectionConfig && this.checkboxSelectionConfig.useColumn) {
+			// reset the select all checkbox to un-selected.
+			this.selectAllCheckboxes = false;
+			// If current page items all are checked then Select All box should be true, otherwise false.
+			let allSelectedOnCurrentPage = true;
+			let currentPageItems: DataResult = process(this.resultSet, this.state);
+			currentPageItems.data.forEach( item => {
+				// map-key-reference inception here
+				if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
+					allSelectedOnCurrentPage = false;
+					return;
+				}
+			});
+			this.selectAllCheckboxes = allSelectedOnCurrentPage;
+		}
 
 		this.loadPageData();
 	}

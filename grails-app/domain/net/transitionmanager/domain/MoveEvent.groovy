@@ -24,7 +24,7 @@ class MoveEvent {
 	String runbookBridge2
 	String videolink
 	String runbookRecipe
-	
+
 	// API Action "By-Pass" mode feature
 	Boolean apiActionBypass = true
 
@@ -35,9 +35,17 @@ class MoveEvent {
 	Date actualCompletionTime
 	Date estStartTime
 	Date estCompletionTime
+	Date dateCreated
+	Date lastUpdated
 
-	static hasMany = [moveBundles: MoveBundle, moveEventNewsList: MoveEventNews,
-	                  moveEventSnapshots: MoveEventSnapshot]
+	Collection tagEvents
+
+	static hasMany = [
+		moveBundles       : MoveBundle,
+		moveEventNewsList : MoveEventNews,
+		moveEventSnapshots: MoveEventSnapshot,
+		tagEvents         : TagEvent
+	]
 
 	static constraints = {
 		actualCompletionTime nullable: true
@@ -56,6 +64,8 @@ class MoveEvent {
 		runbookVersion nullable: true
 		videolink nullable: true
 		apiActionBypass nullable: false
+		dateCreated nullable: true
+		lastUpdated nullable: true
 	}
 
 	static mapping = {

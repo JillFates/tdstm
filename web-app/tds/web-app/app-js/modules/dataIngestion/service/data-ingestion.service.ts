@@ -225,7 +225,13 @@ export class DataIngestionService {
 				let result = res.json();
 				let data: any = (result && result.status === 'success' && result.data);
 				let columns: any = [];
-				let sampleDataModel;
+				let sampleDataModel: SampleDataModel;
+				if (result.status === ApiResponseModel.API_ERROR && result.errors) {
+					sampleDataModel = {
+						errors: result.errors
+					};
+					return sampleDataModel;
+				}
 				if (data.config) {
 					for (let property in data.config) {
 						if (data.config.hasOwnProperty(property)) {

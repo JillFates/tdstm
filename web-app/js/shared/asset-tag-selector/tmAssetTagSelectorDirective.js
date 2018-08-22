@@ -2,9 +2,8 @@ var currentAngularModule = tds.cookbook || tds.comments;
 currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<input type="hidden" class="tag-hidden-val" name="tagIds" />
-						<input type="hidden" class="match-hidden-val" name="tagMatch" />
-						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked"  />
+						<!-- <input type="hidden" class="tag-hidden-val" name="tagIds" /> -->
+						<!-- <input type="hidden" class="match-hidden-val" name="tagMatch" /> -->
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -32,24 +31,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			// Get All Tags
 			getAssetTags();
 
-			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
-				$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
-			}
-
-			if($scope.disabledOperator) {
-				$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
-			}
-
-			$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-				onLabel: "ALL",
-				offLabel: "ANY",
-				change: function (e) {
-					$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
-					$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
-					$scope.onChange();
-				}
-			});
-
+			createSwitchButton();
 
 			$scope.assetSelector = {
 				tag: [],
@@ -70,6 +52,34 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			});
 
 			($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
+
+			/**
+			 * Regenerate the Switch, Kendo does not allow to change the value on fly
+			 */
+			function createSwitchButton() {
+				$(element).find(".asset-tag-selector-operator-switch").remove();
+				$(element).find(".km-switch").remove();
+				$(element).find(".asset-tag-selector-component").append('<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator"/>');
+
+				if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
+					$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
+				}
+
+				if($scope.disabledOperator) {
+					$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
+				}
+
+				$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+					onLabel: "ALL",
+					offLabel: "ANY",
+					change: function (e) {
+						$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+						// $(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
+						$scope.onChange();
+					}
+				});
+
+			}
 
 			/**
 			 * Set the new Set Datasource to the element
@@ -152,13 +162,22 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 				$scope.assetSelector.tag = $(element).find("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
-				($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
+				if($scope.assetSelector.tag.length > 1) {
+					$(element).find('.km-switch').show();
+				} else {
+					createSwitchButton();
+					$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+					// Hide new element
+					$(element).find('.km-switch').hide();
+				}
 
+				/*
+				Not being used, but leave it here since it can help for legacy pages
 				$(element).find(".tag-hidden-val").remove();
 				$scope.assetSelector.tag.each(function (a) {
 					$(element).append('<input type="hidden" class="tag-hidden-val" name="tagIds" value="' + parseInt(a.id) + '" />');
 				});
-				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
+				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');*/
 			}
 		}
 	};

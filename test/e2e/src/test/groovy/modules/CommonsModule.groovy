@@ -58,9 +58,9 @@ class CommonsModule extends Module {
     * */
     def setKendoDateFilter(date, calendarIconIndex = null){
         if (calendarIconIndex != null) {
-            browser.driver.executeScript("\$('.k-i-calendar')[$calendarIconIndex].click()")
+            browser.driver.executeScript("\$('kendo-datepicker span.k-select')[$calendarIconIndex].click()")
         } else {
-            browser.driver.executeScript("\$('.k-i-calendar').click()")
+            browser.driver.executeScript("\$('kendo-datepicker span.k-select').click()")
         }
         waitFor{kendoDateFilter.find{it.@title.contains(date)}.click()}
     }
@@ -109,11 +109,7 @@ class CommonsModule extends Module {
         deleteAlertMessage.text()
     }
 
-    def waitForCookbookLoadingIndicator(repeatTime = 1){
-        def count = 0
-        while (count < repeatTime) {
-            waitFor{ !loadingIndicator.hasClass("ng-hide")}
-            count = count + 1
-        }
+    def blockCookbookLoadingIndicator(){
+        loadingIndicator.jquery.attr("style", "display: none !important")
     }
 }

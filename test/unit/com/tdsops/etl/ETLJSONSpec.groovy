@@ -87,7 +87,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
 
 		given:
@@ -157,7 +156,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can define a quoted string for the JSON DataSet'(){
 
@@ -704,6 +702,164 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-11181')
+	void 'test can use dot notation in extract command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   {
+					      "vm id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2,
+					         "hostname": "zulu01"
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'the ETL script is evaluated'
+			etlProcessor.evaluate("""
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'vm id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    extract 'attribs.hostname' load 'custom3'
+				}
+				""".stripIndent())
+
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0], DomainResult) {
+				domain == ETLDomain.Device.name()
+				data.size() == 1
+
+				with(data[0], RowResult) {
+					rowNum == 1
+
+					with(fields.id, FieldResult) {
+						originalValue == 123
+						value == 123
+					}
+
+					with(fields.custom1, FieldResult) {
+						originalValue == 4096
+						value == 4096
+					}
+
+					with(data[0].fields.custom2) {
+						originalValue == 2
+						value == 2
+					}
+
+					with(data[0].fields.custom3) {
+						originalValue == 'zulu01'
+						value == 'zulu01'
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11181')
+	void 'test can use dot notation with more than one level in extract command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   {
+					      "vm id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2,
+					         "hostname": {
+					         	"value": "zulu01"
+					         }
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'the ETL script is evaluated'
+			etlProcessor.evaluate("""
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'vm id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    extract 'attribs.hostname.value' load 'custom3'
+				}
+				""".stripIndent())
+
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0], DomainResult) {
+				domain == ETLDomain.Device.name()
+				data.size() == 1
+
+				with(data[0], RowResult) {
+					rowNum == 1
+
+					with(fields.id, FieldResult) {
+						originalValue == 123
+						value == 123
+					}
+
+					with(fields.custom1, FieldResult) {
+						originalValue == 4096
+						value == 4096
+					}
+
+					with(data[0].fields.custom2) {
+						originalValue == 2
+						value == 2
+					}
+
+					with(data[0].fields.custom3) {
+						originalValue == 'zulu01'
+						value == 'zulu01'
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 
 	static final String DATASET = """

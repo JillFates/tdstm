@@ -3,7 +3,9 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
+import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
@@ -16,11 +18,53 @@ import org.springframework.jdbc.core.JdbcTemplate
 class MoveEventService implements ServiceMethods {
 
 	JdbcTemplate jdbcTemplate
+	MoveBundleService moveBundleService
+	TagEventService tagEventService
 
 	MoveEvent create(Project project, String name) {
 		MoveEvent me = new MoveEvent([project:project, name:name])
 		save me, true
 		me
+	}
+
+	/**
+	 * Used to create a new move event.
+	 *
+	 * @param event The event command object with the parameters to create a new event.
+	 * @param currentProject The current project to create an event for.
+	 *
+	 * @return the instance of the move event created, which may contain errors if the save doesn't work(failOnError: false)
+	 */
+	MoveEvent save(CreateEventCommand event, Project currentProject) {
+		MoveEvent moveEvent = new MoveEvent(
+			project: currentProject,
+			name: event.name,
+			description: event.description,
+			runbookStatus: event.runbookStatus,
+			runbookBridge1: event.runbookBridge1,
+			runbookBridge2: event.runbookBridge2,
+			videolink: event.videolink,
+			newsBarMode: event.newsBarMode,
+			estStartTime: event.estStartTime,
+			apiActionBypass: event.apiActionBypass
+		)
+
+		if (moveEvent.project.runbookOn == 1) {
+			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+		}
+
+		moveEvent.save(failOnError: false)
+
+		if (!moveEvent.hasErrors()) {
+			moveBundleService.assignMoveEvent(moveEvent, event.moveBundle)
+			moveBundleService.createManualMoveEventSnapshot(moveEvent)
+
+			if (event.tagIds) {
+				tagEventService.applyTags(currentProject, event.tagIds, moveEvent.id)
+			}
+		}
+
+		return moveEvent
 	}
 
 	/**
@@ -185,4 +229,28 @@ class MoveEventService implements ServiceMethods {
 			moveEvent.delete()
 		}
 	}
+
+
+	/**
+		 * Update the lastUpdated field on a series of assets.
+		 *
+		 * This method helps to keep consistency, and update assets accordingly,
+		 * when performing bulk update operations on objects that have a relationship with assets,
+		 * such as TagAsset.
+		 *
+		 * @param project
+		 * @param assetQuery - query that should return a list of asset ids.
+		 * @param assetQueryParams - parameters for assetQuery
+		 */
+		void bulkBumpMoveEventLastUpdated(Project project, Set<Long>eventIds) {
+			if (project) {
+				String query = """
+					UPDATE MoveEvent SET lastUpdated = :lastUpdated
+					WHERE id IN (:eventIds) AND project = :project
+				"""
+
+				Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), eventIds:eventIds]
+				MoveEvent.executeUpdate(query, params)
+			}
+		}
 }

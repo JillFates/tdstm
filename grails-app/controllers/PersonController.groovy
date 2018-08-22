@@ -870,7 +870,6 @@ class PersonController implements ControllerMethods {
 				SELECT * FROM (
 					SELECT pr.party_id_to_id AS personId,
 						p.last_name AS lastName,
-						p.email as email,
 						CONCAT(COALESCE(p.first_name,''),
 							if (p.middle_name IS NULL OR p.middle_name = '', '', ' '),
 							COALESCE(p.middle_name, ''),

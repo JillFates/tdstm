@@ -52,22 +52,9 @@ class CookbookPage extends Page {
         waitFor { createRecipeButton.click()}
     }
 
-    def waitForSuccessBanner(){
-        waitFor { successMessage.present}
-        waitFor { !successMessage.present}
-        commonsModule.waitForLoadingIndicator()
-    }
-
     def openEditTab(){
         waitFor { editorTab.click()}
         waitFor { editorTab.parent(".active") }
-    }
-
-    def filterByContext(context){
-        def options = contextSelector.find("option")
-        def option = options.find {it.text() == context}
-        option.click()
-        waitForLoadingIndicator(4) // after filtering loading appears 4 times
     }
 
     def getRecipeByName(name){

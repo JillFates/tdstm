@@ -7,6 +7,7 @@ import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.domain.TagEvent
 
 /**
  * A service for managing the relationship of Tags to Assets.
@@ -93,7 +94,7 @@ class TagAssetService implements ServiceMethods {
 		}
 
 		// Bump the last updated date for all the assets involved.
-		assetEntityService.bulkBumpAssetLastUpdated(currentProject, ":assetIds", [assetIds: assetIds])
+		assetEntityService.bulkBumpAssetLastUpdated(currentProject, assetIds)
 	}
 
 	/**
@@ -117,8 +118,16 @@ class TagAssetService implements ServiceMethods {
 			return link.save(flush: true, failOnError: false)
 		}
 
+		List<TagEvent> tagEvents = TagEvent.findAllWhere(tag: secondary)
+
+		//This will ignore nulls resulting from a duplicate key.
+		tagEvents.findResults { TagEvent link ->
+			link.tag = primary
+			return link.save(flush: true, failOnError: false)
+		}
+
 		//removes the secondary tag, and by cascade any links, that would create a duplicate key.
-		secondary.delete(failOnError:true)
+		secondary.delete(failOnError:true, flush: true)
 
 		return updatedLinks
 	}
@@ -215,7 +224,7 @@ class TagAssetService implements ServiceMethods {
 	 */
 	void bulkClear(List<Long> tagIds = null, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if (tagIds) {
-			throw InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
+			throw new InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
 		}
 
 		remove([], assetIds, assetIdsFilterQuery)
@@ -230,7 +239,7 @@ class TagAssetService implements ServiceMethods {
 	 */
 	void bulkRemove(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if(!tagIds){
-			throw InvalidParamException("Tag IDs must be specified for removal")
+			throw new InvalidParamException("Tag IDs must be specified for removal")
 		}
 
 		remove(tagIds, assetIds, assetIdsFilterQuery)
