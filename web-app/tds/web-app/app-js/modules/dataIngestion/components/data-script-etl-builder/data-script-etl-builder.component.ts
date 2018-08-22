@@ -1,4 +1,4 @@
-import {Component, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import {Component, HostListener, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
@@ -22,6 +22,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {NOT_FOUND_INDEX} from '../../../../shared/model/constants';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -98,12 +99,15 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * On EscKey Pressed close the dialog.
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
 	 */
-	onEscKeyPressed(): void {
-		this.cancelCloseDialog();
+	
+	@HostListener('keyup', ['$event']) handleKeyboardEventUp(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
-
 	/**
 	 * Used to determine if the Refresh Sample Data button appears on the page
 	 * @return true if a JSON file has been uploaded and available
@@ -198,22 +202,24 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected cancelCloseDialog(): void {
-		if (this.isScriptDirty()) {
-			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
-						this.dismiss();
-					}
-				});
-		} else {
-			const result = {
-				updated: this.operationStatus.save === 'success',
-				newEtlScriptCode: this.script
-			};
+		if (document.getElementsByClassName('tds-ui-prompt in').length == 0 && !document.querySelector(".modal-backdrop:not(.in)")) { //Ensure the dialog is not open or closing
+			if (this.isScriptDirty()) {
+				this.promptService.open(
+					'Confirmation Required',
+					'You have changes that have not been saved. Do you want to continue and lose those changes?',
+					'Confirm', 'Cancel').then(result => {
+						if (result) {
+							this.dismiss();
+						}
+					});
+			} else {
+				const result = {
+					updated: this.operationStatus.save === 'success',
+					newEtlScriptCode: this.script
+				};
 
-			this.close(result);
+				this.close(result);
+			}
 		}
 	}
 
