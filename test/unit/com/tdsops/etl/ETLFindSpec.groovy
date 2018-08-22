@@ -674,7 +674,6 @@ class ETLFindSpec extends ETLBaseSpec {
 			GroovySpy(AssetDependency, global: true)
 			AssetDependency.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				assetDependencies.findAll { it.id == args.id }*.getId()
-
 			}
 
 		and:
@@ -729,7 +728,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['id', FindOperator.eq.name(), value.toString()]
 								]
 							)
 						}
@@ -740,7 +739,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 						fields.size() == 2
 
-						with(fields['asset'].find, FieldResult){
+						with(fields['asset'].find, FindResult){
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -750,52 +749,29 @@ class ETLFindSpec extends ETLBaseSpec {
 								]
 							)
 							assertQueryResult(
-								query[0],
+								query[1],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],
+									['assetClass', FindOperator.eq.name(), 'VM']
 								]
 							)
 							assertQueryResult(
-								query[0],
+								query[2],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
 								]
 							)
 							assertQueryResult(
-								query[0],
-								ETLDomain.Application,
+								query[3],
+								ETLDomain.Asset,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
 								]
 							)
 						}
 
-					}
-
-					with(data[0].fields.asset.find) {
-						query.size() == 4
-						with(query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
-
-						with(query[3]) {
-							domain == ETLDomain.Asset.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
 					}
 				}
 			}

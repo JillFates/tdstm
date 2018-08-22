@@ -151,8 +151,11 @@ class ETLFindElement implements ETLStackableCommand {
 			currentFind.values
 		].transpose().collect { new FindCondition(it[0], it[1]) }
 
+		//TODO dcorrea. Refactor this to use same code from FindStatementBuilder and operations
+		this.currentFind.statement = new FindStatementBuilder(conditions)
+
 		if(!results?.objects){
-			findDomainObjectResults(currentFind.domain, conditions)
+			findDomainObjectResults(currentFind.domain, this.currentFind.statement.conditions)
 		}
 
 		return this
@@ -421,7 +424,7 @@ class FindStatementBuilder {
 	ETLFindElement findElement
 	FindCondition currentCondition
 
-	LinkedList<FindCondition> conditions = []
+	List<FindCondition> conditions = []
 
 	FindStatementBuilder(ETLFindElement findElement, String propertyName){
 		this.domain = findElement.currentDomain
@@ -429,6 +432,11 @@ class FindStatementBuilder {
 		this.findElement = findElement
 		changeCurrentCondition(propertyName)
 	}
+
+	FindStatementBuilder(List<FindCondition> conditions){
+		this.conditions = conditions
+	}
+
 
 	/**
 	 * <p>It adds another condition for the current instance of {@code FindStatementBuilder}</p>
