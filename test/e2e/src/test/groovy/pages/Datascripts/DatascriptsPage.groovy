@@ -90,7 +90,7 @@ class DatascriptsPage extends Page {
 
     def clickOnNameHeader(){
         scrollLeft()
-        waitFor{nameGridHeader.click()}
+        waitFor{nameGridHeader.find("a span").click()}
     }
 
     def getFirstRowDSName(){

@@ -1,0 +1,721 @@
+{
+	"info": {
+		"_postman_id": "1a31c131-eda0-40d3-b649-2aacee47a242",
+		"name": "Set task context",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign In",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "304a6227-9f54-4260-8509-381625cc96ae",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});",
+							"",
+							"pm.test(\"User Menu is displayed\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
+							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
+							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
+							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
+							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
+							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
+							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
+							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
+							"    ",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set current project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "61811bcc-2082-41cd-842f-dde12dba00ee",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Project Details is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Details\");",
+							"});",
+							"",
+							"pm.test(\"Proj Name is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Name\");",
+							"});",
+							"",
+							"pm.test(\"Proj Description is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Description\");",
+							"});",
+							"pm.test(\"Proj Client is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Client\");",
+							"});",
+							"",
+							"pm.test(\"Proj Code is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Code:\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Proj Type is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Project Type:\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Comment is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Comment:\");",
+							"});",
+							"pm.test(\"Start Date is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Start Date:\");",
+							"});",
+							"",
+							"pm.test(\"Completion Date is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Completion Date:\");",
+							"});",
+							"",
+							"pm.test(\"Associated partner is present\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Associated Partner(s):\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{projectId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f8f383fe-6062-4b1e-8792-b808b9474fe8",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"A new Tag with the expected values is created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"   ",
+							"    pm.expect(data.name).to.include(pm.variables.get(\"tagName\"));",
+							"    pm.expect(data.description).to.eql('Description of a new tag.');",
+							"    pm.expect(data.color).to.eql('White');",
+							"    pm.expect(data.css).to.eql('tag-white');",
+							"    postman.setGlobalVariable(\"tag_id\", data.id);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"{{tagName}}{{$randomInt}}\",\n  \"description\":\"Description of a new tag.\",\n  \"color\":\"White\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set RecipeID/Version",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "285820bb-8c55-4b3b-bb18-3d49ba36d5fb",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Save Recipe Version/ID\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var recipeID = jsonObject.data.list[0].recipeId;",
+							"    var recipeVersion = jsonObject.data.list[0].versionNumber;",
+							"    pm.environment.set(\"recipeID\", recipeID);",
+							"    pm.environment.set(\"recipeVersion\", recipeVersion);",
+							"",
+							"}); ",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list?",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "445749b0-c639-4bc1-a866-a341004cf47f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{recipeID}}",
+						"{{recipeVersion}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get/Set Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bdc0b5fd-08b4-4f12-8669-e80936ee68e1",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Save Recipe Version/ID\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var eventId = jsonObject.data.list[0].id;",
+							"    pm.environment.set(\"eventId\", eventId);",
+							"",
+							"}); "
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/event/listEventsAndBundles?",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"event",
+						"listEventsAndBundles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67afe231-4998-4ba5-a2cf-f6dfd4607b97",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"    var response = pm.response.json();",
+							"    var data = response.data;",
+							"    ",
+							"    pm.expect(data).to.eql({});",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n \"context\": {\n            \"eventId\": {{eventId}},\n            \"tagMatch\": \"ANY'\",\n            \"tag\": [\n            \t{{tag_id}}\n            \t]\n        }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/context/{{recipeID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"context",
+						"{{recipeID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get context after setting context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5fa7862-2176-4d58-bd9f-c891541654a8",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"The tag and Contexts are correct\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"    var response = pm.response.json();",
+							"    var data = response.data;",
+							"    var context = data.context;",
+							"    var tag = context.tag[0];",
+							"    ",
+							"  ",
+							"    pm.expect(context.eventId).to.eql(parseInt(pm.environment.get(\"eventId\")));",
+							"    pm.expect(tag.id).to.eql(parseInt(pm.globals.get(\"tag_id\")));",
+							"    ",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{recipeID}}",
+						"{{recipeVersion}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ceff77c3-18c1-4950-b866-4a4f98705a8d",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"    pm.expect(data).to.eql({});",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/context/{{recipeID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"context",
+						"{{recipeID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get context after delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3a69a307-909b-42d0-8c4a-c5c1530f5228",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"The context is empty\", function () {",
+							"    var response = pm.response.json();",
+							"    var data = response.data;",
+							"    ",
+							"    pm.expect(data.context).to.eql({});",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{recipeID}}",
+						"{{recipeVersion}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b7ebb0f0-a9fb-4226-a224-84ace90719fb",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"    pm.expect(data).to.eql({});",
+							"});",
+							"",
+							"//cleanup code",
+							"pm.globals.unset(\"tag_id\");",
+							"pm.globals.unset(\"recipeID\");",
+							"pm.globals.unset(\"recipeVersion\");",
+							"pm.globals.unset(\"eventId\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "142693fc-bfb3-4fb5-adb6-6e30d06bbd2b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1c655a7d-54e1-4471-b14e-8267f0ad8d3e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d7bcc1e4-f306-4d1a-803e-19beb646f9b0",
+			"key": "tagName",
+			"value": "newTestTag",
+			"type": "string"
+		},
+		{
+			"id": "0d40ba05-8d2b-4940-a545-5c8d1980cfa5",
+			"key": "projectId",
+			"value": "2445",
+			"type": "string"
+		}
+	]
+}

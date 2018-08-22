@@ -38,6 +38,8 @@ import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
 import { BulkChangeService } from './service/bulk-change.service';
 import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
+import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
+import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';
 
 @NgModule({
 	imports: [
@@ -69,7 +71,9 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSCheckboxComponent
+		TDSCheckboxComponent,
+		ModelDeviceShowComponent,
+		ManufacturerShowComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -91,7 +95,9 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSCheckboxComponent
+		TDSCheckboxComponent,
+		ManufacturerShowComponent,
+		ModelDeviceShowComponent
 	],
 })
 
