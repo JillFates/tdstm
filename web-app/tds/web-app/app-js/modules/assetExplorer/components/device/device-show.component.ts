@@ -32,6 +32,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			private assetService: DependecyService,
 			private modelService: ModelService,
 			private manufacturerService: ManufacturerService) {
+			this.manufacturerName = null;
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -49,6 +50,13 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 		cancelCloseDialog(): void {
 			this.activeDialog.dismiss();
+		}
+
+		getManufacturer(manufacturerName): string {
+			if (this.manufacturerName === null) {
+				this.manufacturerName = manufacturerName;
+			}
+			return this.manufacturerName;
 		}
 
 		showAssetDetailView(assetClass: string, id: number) {
@@ -103,7 +111,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							}
 						], true, false)
 						.then((result) => {
-							if (result && result.name) {
+							if (result) {
 								this.manufacturerName = result.name;
 							}
 						}).catch((error) => console.log(error));

@@ -37,14 +37,12 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 
 	public onUpdateManufacturer(): void {
 		this.isEditing = false;
-		this.manufacturerService.updateManufacturer(this.deviceManufacturer)
+		this.manufacturerService.updateManufacturer(this.deviceManufacturer, false)
 			.subscribe((result) => {
 				this.close(this.deviceManufacturer);
 
 			}, err => {
-				console.log('There is an error updating');
-				console.log(err);
-				console.log('-----');
+				alert(err.message || err);
 			})
 	}
 
@@ -65,9 +63,16 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 			'Are you sure?',
 			'Ok', 'Cancel').then(result => {
 			if (result) {
-				alert('deleting...');
+				this.manufacturerService.updateManufacturer(this.deviceManufacturer, true)
+					.subscribe((result) => {
+						this.deviceManufacturer.name = '';
+						this.close(this.deviceManufacturer);
+
+					}, err => {
+						alert(err.message || err);
+					})
 			} else {
-				alert('canceling...');
+				console.log('canceling...');
 			}
 		});
 	}

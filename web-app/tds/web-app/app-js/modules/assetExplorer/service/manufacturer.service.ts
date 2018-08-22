@@ -28,7 +28,7 @@ export class ManufacturerService {
 			.catch((error: any) => error.json());
 	}
 
-	updateManufacturer(manufacturer: DeviceManufacturer): Observable<any> {
+	getPayload(manufacturer: DeviceManufacturer, isDelete: boolean): string {
 		let body = `id=${manufacturer.id}`;
 		body += `&name=${manufacturer.name}`;
 		body += `&description=${manufacturer.description}`;
@@ -56,7 +56,16 @@ export class ManufacturerService {
 				.join('')
 		}
 
-		console.log(body);
+		if (isDelete) {
+			body += '&_action_Delete=Delete';
+		}
+
+		return body;
+
+	}
+
+	updateManufacturer(manufacturer: DeviceManufacturer, isDelete: boolean): Observable<any> {
+		const body = this.getPayload(manufacturer, isDelete);
 
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
