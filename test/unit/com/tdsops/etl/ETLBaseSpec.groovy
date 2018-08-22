@@ -6,17 +6,14 @@ import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
-import getl.excel.ExcelDriver
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFRow
 import spock.lang.Specification
 
@@ -413,22 +410,34 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param originalValue
 	 * @param value
 	 * @param initValue
+	 * @param errors
+	 * @param warn
 	 */
-	static void assertFieldResult(FieldResult fieldResult, Object originalValue = null, Object value = null, Object initValue = null) {
+	static void assertFieldResult(FieldResult fieldResult,
+								  Object originalValue = null,
+								  Object value = null,
+								  Object initValue = null,
+								  List errors = [],
+								  Boolean warn = false) {
 		assert fieldResult.originalValue == originalValue
 		assert fieldResult.value == value
 		assert fieldResult.init == initValue
+		assert fieldResult.errors == errors
+		assert fieldResult.warn == warn
 	}
 
 	/**
 	 * Assertions for a {@code QueryResult} instance
 	 * @param queryResult
+	 * @param domain
 	 * @param values
 	 */
-	static void assertQueryResult(QueryResult queryResult, List<List<Object>> values){
+	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+		assert queryResult.domain == domain.name()
 		queryResult.kv.eachWithIndex { Map map, int i ->
-			assert [map['propertyName'], map['operator'], map['value']] == values[i]
+			assert map['propertyName'] == values[i][0]
+			assert map['operator'] == values[i][1]
+			assert map['value'] == values[i][2]
 		}
-
 	}
 }

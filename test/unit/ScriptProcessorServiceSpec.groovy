@@ -2,10 +2,13 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.ETLBaseSpec
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
+import com.tdsops.etl.FindOperator
 import com.tdsops.etl.ProgressCallback
+import com.tdsops.etl.QueryResult
 import com.tdsops.etl.TDSExcelDriver
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.AssetClass
@@ -200,8 +203,13 @@ class ScriptProcessorServiceSpec extends Specification {
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152254l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152254l]
+							]
+						)
 					}
 
 					with(data[1].fields.id) {
@@ -210,8 +218,13 @@ class ScriptProcessorServiceSpec extends Specification {
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152255l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152255l]
+							]
+						)
 					}
 
 					with(data[0].fields.appVendor) {
@@ -311,8 +324,13 @@ application id,vendor name,technology,location
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152254l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152254l]
+							]
+						)
 					}
 
 					with(data[1].fields.id) {
@@ -321,8 +339,13 @@ application id,vendor name,technology,location
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152255l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152255l]
+							]
+						)
 					}
 
 					with(data[0].fields.appVendor) {
@@ -479,8 +502,13 @@ application id,vendor name,technology,location
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152254l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152254l]
+							]
+						)
 					}
 
 					with(data[1].fields.id) {
@@ -489,8 +517,13 @@ application id,vendor name,technology,location
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
-						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == 152255l
+						assertQueryResult (
+							find.query[0],
+							ETLDomain.Application,
+							[
+								['id', FindOperator.eq.name(), 152255l]
+							]
+						)
 					}
 
 					with(data[0].fields.appVendor) {
@@ -649,6 +682,22 @@ application id,vendor name,technology,location
 		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
 
 		return [fileName, new DataSetFacade(dataSet)]
+	}
+
+	/**
+	 * Assertions for a {@code QueryResult} instance
+	 * @param queryResult
+	 * @param domain
+	 * @param values
+	 */
+	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values){
+		assert queryResult.domain == domain.name()
+		queryResult.kv.eachWithIndex { Map map, int i ->
+			assert map['propertyName'] == values[i][0]
+			assert map['operator'] == values[i][1]
+			assert map['value'] == values[i][2]
+		}
+
 	}
 
 }
