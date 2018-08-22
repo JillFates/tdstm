@@ -12,7 +12,6 @@ import { DeviceModel } from './model-device/model/device-model.model';
 import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.model';
 import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
 import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
 
@@ -25,6 +24,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
+		public manufacturerName: string;
 
 		constructor(
 			private activeDialog: UIActiveDialogService,
@@ -76,7 +76,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		}
 
 		showModel(id: string): void {
-
 			this.modelService.getModelAsJSON(id)
 				.subscribe((deviceModel: DeviceModel) => {
 					this.dialogService.extra(ModelDeviceShowComponent,
@@ -93,7 +92,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		}
 
 		showManufacturer(id: string): void {
-
 			this.manufacturerService.getDeviceManufacturer(id)
 				.subscribe((deviceManufacturer: DeviceManufacturer) => {
 
@@ -105,7 +103,9 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							}
 						], true, false)
 						.then((result) => {
-							console.log(result);
+							if (result && result.name) {
+								this.manufacturerName = result.name;
+							}
 						}).catch((error) => console.log(error));
 				});
 		}

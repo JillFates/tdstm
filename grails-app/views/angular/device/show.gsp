@@ -39,7 +39,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
 									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
 										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
-											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">${assetEntity.manufacturer}</a>
+											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{ manufacturerName ||  '${assetEntity.manufacturer}' }}</a>
 										</tdsAngular:tooltipSpan>
 									</td>
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">

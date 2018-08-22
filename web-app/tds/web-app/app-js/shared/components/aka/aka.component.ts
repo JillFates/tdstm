@@ -9,7 +9,7 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
 export class AkaComponent implements OnInit {
 	@Input('aka') akaCollection: Array<Aka>;
 	@Input('akaParent') akaParent: AkaParent;
-	@Output('modelChange') modelChange = new EventEmitter<any>();
+	@Output('modelChange') modelChange = new EventEmitter<AkaChanges>();
 	clonedAkas: Array<Aka>;
 	hasError: boolean;
 	indexError: number;
@@ -17,7 +17,6 @@ export class AkaComponent implements OnInit {
 	akas: string[];
 	deletedAkas: Aka[];
 	constructor(private manufacturerService: ManufacturerService) {
-		console.log('constructor :');
 		this.akas = [];
 	}
 

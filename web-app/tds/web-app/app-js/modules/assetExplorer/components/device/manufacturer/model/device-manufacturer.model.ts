@@ -1,7 +1,7 @@
-import {Aka} from '../../../../../../shared/components/aka/model/aka.model';
+import {Aka, AkaChanges} from '../../../../../../shared/components/aka/model/aka.model';
 
 export class DeviceManufacturer {
-	public manufacturerId: number;
+	public id: number;
 	public name: string;
 	public description: string;
 	public aka: string;
@@ -9,4 +9,5 @@ export class DeviceManufacturer {
 	public corporateLocation: string;
 	public corporateName: string;
 	public website: string;
+	public akaChanges: AkaChanges
 }

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../../../../shared/directives/ui-prompt.directive';
 import { DeviceManufacturer } from '../../model/device-manufacturer.model';
+import {AkaChanges} from '../../../../../../../shared/components/aka/model/aka.model';
+import {ManufacturerService} from '../../../../../service/manufacturer.service';
 
 @Component({
 	selector: 'device-manufacturer-edit',
@@ -11,6 +13,7 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	isEditing: boolean;
 	constructor(
 		public deviceManufacturer: DeviceManufacturer,
+		private manufacturerService: ManufacturerService,
 		private prompt: UIPromptService) {
 		super('#device-manufacturer-edit-component');
 		this.isEditing = false;
@@ -20,24 +23,31 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	 * Close the Active Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.dismiss();
+		this.close(null);
 	}
 
 	/**
 	 * On EscKey Pressed close the dialog.
 	*/
 	onEscKeyPressed(): void {
-		this.cancelCloseDialog();
+		this.close(null);
 	}
 
 	public onUpdateManufacturer(): void {
 		this.isEditing = false;
+		this.manufacturerService.updateManufacturer(this.deviceManufacturer)
+			.subscribe((result) => {
+				this.close(this.deviceManufacturer);
+
+			}, err => {
+				console.log('There is an error updating');
+				console.log(err);
+				console.log('-----');
+			})
 	}
 
-	public onAkaChange(model: any): void {
-		console.log('Sending changes from aka component');
-		console.log(model);
-		console.log('-----------------------');
+	public onAkaChange(akaChanges: AkaChanges): void {
+		this.deviceManufacturer.akaChanges = akaChanges;
 		this.isEditing = true;
 	}
 

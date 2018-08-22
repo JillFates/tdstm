@@ -47,7 +47,7 @@ export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
 				}
 			])
 			.then((result) => {
-				console.log(result);
+				this.close(result);
 			}).catch((error) => console.log(error));
 	}
 }
