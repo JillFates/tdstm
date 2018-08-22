@@ -12,4 +12,3 @@ export interface DecoratorOptions {
 	isDraggable?: boolean;
 	sizeNamePreference?: string;
 }
-
