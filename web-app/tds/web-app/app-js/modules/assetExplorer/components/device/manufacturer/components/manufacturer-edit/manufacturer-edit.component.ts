@@ -78,7 +78,5 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	}
 	onValidationErrors(hasAkaValidationErrors: boolean): void {
 		this.hasAkaValidationErrors = hasAkaValidationErrors;
-		console.log('Setting the value');
-		console.log(this.hasAkaValidationErrors);
 	}
 }

@@ -1,14 +1,13 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {UIDialogService, UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
 import { DeviceManufacturer} from '../../model/device-manufacturer.model';
 import { ManufacturerEditComponent } from '../manufacturer-edit/manufacturer-edit.component';
-import {Aka} from '../../../../../../../shared/components/aka/model/aka.model';
 
 @Component({
 	selector: 'device-manufacturer',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/device/manufacturer/components/manufacturer-show/manufacturer-show.component.html'
 })
-export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
+export class ManufacturerShowComponent extends UIExtraDialog {
 	aka: string;
 	constructor(
 		private dialogService: UIDialogService,
@@ -28,14 +27,6 @@ export class ManufacturerShowComponent extends UIExtraDialog implements OnInit {
 	*/
 	onEscKeyPressed(): void {
 		this.cancelCloseDialog();
-	}
-
-	protected onUpdateComment(): void {
-		console.log('Updating component');
-	}
-
-	ngOnInit() {
-		console.log('On Edit');
 	}
 
 	onEditManufacturer(): void {

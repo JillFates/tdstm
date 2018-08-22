@@ -97,10 +97,6 @@ export class AkaComponent implements OnInit {
 			if (this.akaParent) {
 				return this.manufacturerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
 					.subscribe((result: string) => {
-						console.log('The isValid result is:');
-						console.log(result);
-						console.log('---------------------');
-
 						if (result === 'valid') {
 							return resolve('');
 						} else {
@@ -129,10 +125,6 @@ export class AkaComponent implements OnInit {
 				.filter((aka: Aka) => aka.id !== null)
 				.map(aka => ({id: aka.id, name: aka.name}))
 		};
-
-		console.log('AKA CHANGES:');
-		console.log(akaChanges);
-
 		this.modelChange.emit(akaChanges);
 	}
 

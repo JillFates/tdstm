@@ -28,7 +28,7 @@ export class ManufacturerService {
 			.catch((error: any) => error.json());
 	}
 
-	getPayload(manufacturer: DeviceManufacturer, isDelete: boolean): string {
+	getManufacturerPayload(manufacturer: DeviceManufacturer, isDelete: boolean): string {
 		let body = `id=${manufacturer.id}`;
 		body += `&name=${manufacturer.name}`;
 		body += `&description=${manufacturer.description}`;
@@ -65,7 +65,7 @@ export class ManufacturerService {
 	}
 
 	updateManufacturer(manufacturer: DeviceManufacturer, isDelete: boolean): Observable<any> {
-		const body = this.getPayload(manufacturer, isDelete);
+		const body = this.getManufacturerPayload(manufacturer, isDelete);
 
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
