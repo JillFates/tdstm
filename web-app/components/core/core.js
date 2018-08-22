@@ -302,7 +302,14 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 				if(typeof this.successWithErrors != "undefined"){
 					this.successWithErrors(data)
 				} else if (data.errors) {
-                    tdsCommon.displayWsError(xhr, data.errors, false)
+					try {
+						var json = angular.fromJson(data);
+						if (!json || !json.errors || json.errors.length <= 0) {
+							tdsCommon.displayWsError(xhr, data.errors, false);
+						}
+					} catch (e) {
+						console.warn('Unidentified Error Parameters');
+					}
                 }
 				return false;
 			}

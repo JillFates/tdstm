@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<meta name="layout" content="topNav"/>
 
-	<title>API Dictionary Catalog</title>
+	<title>API Dictionaries</title>
 	<link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css"/>
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
 	<style type="text/css">
@@ -25,13 +25,13 @@
 	</style>
 </head>
 <body>
-<tds:subHeader title="API Dictionary Catalog" crumbs="['Admin','API Dictionary Catalog']"/>
+<tds:subHeader title="API Dictionaries" crumbs="['Admin','API Dictionaries']"/>
 
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
             <label class="col-sm-4 col-form-label text-right" for="apiCatalogs" style="margin-top: 4px">
-                API Dictionary Catalog actions:
+                API Dictionaries Actions:
             </label>
             <div class="col-sm-8">
                 <select id="apiCatalogs" name="apiCatalogs" class="form-control"></select>
@@ -320,7 +320,7 @@
 
                     var options = $('select#apiCatalogs');
                     options.empty();
-                    options.append(new Option('--- Choose an API Dictionary Catalog for viewing or editing ---', '-1'));
+                    options.append(new Option('--- Choose an API Dictionary for viewing or editing ---', '-1'));
                     $.each(data.model, function(key, value) {
                         options.append(new Option(value.provider.name + ' - ' + value.name, value.id));
                     });

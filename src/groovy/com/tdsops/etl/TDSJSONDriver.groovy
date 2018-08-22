@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.JsonUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -8,10 +7,7 @@ import getl.exception.ExceptionGETL
 import getl.json.JSONDataset
 import getl.json.JSONDriver
 import getl.utils.GenerationUtils
-import getl.utils.Logs
 import groovy.json.JsonSlurper
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Custom implementation of JSONDriver. It adds support for several ETL script commands.
@@ -32,8 +28,10 @@ class TDSJSONDriver extends JSONDriver {
 		if ( !json ) {
 			json = JsonUtil.parseFilePath(((JSONDataset) dataset).fullFileName())
 		}
-
-		return JsonUtil.gpathAt(json, rootNode)
+		// println "getRootNod() json isa ${json.getClass().getName()} \n\n$json"
+		Object data = JsonUtil.gpathAt(json, rootNode)
+		// println "getRootNode() data isa ${data.getClass().getName()}\n\n$data"
+		return data
 	}
 
 	/**
@@ -43,28 +41,38 @@ class TDSJSONDriver extends JSONDriver {
 	 */
 	@Override
 	List<Field> fields(Dataset dataset) {
-		if(!dataset.field) {
+
+		if (!dataset.field) {
 			Object json = getRootNode(dataset, dataset.rootNode)
 			List nodeList
 
-			if (json instanceof List) {
-				nodeList = json as List
-			} else {
-				nodeList = [json]
+			switch (json) {
+				case List:
+					nodeList = json as List
+					break
+				case Map:
+					nodeList = [json]
+					break
+				case null:
+					throw new ExceptionGETL("Unable to parse attribute names due to empty results at rootNode '${dataset.rootNode}'")
+				default:
+					log.warn "fields() encountered unexpected type ${json.getClass().getName()}, rootNode=${dataset.rootNode}"
+					throw new ExceptionGETL("Unable to parse attribute names due to JSON structure at rootNode '${dataset.rootNode}")
 			}
-
 
 			// Sorted Map when creating from the nodes
 			TreeMap<String, Field> fields = [:]
 
+			// println "\n\n**** nodeList isa ${nodeList}\n\n"
 			nodeList.each { node ->
+				// println "\n\n**** node isa ${node}\n\n"
 				node.each { k, v ->
 					if(! fields.containsKey(k) ) {
+						//TODO: Set Field Type properly based v class type
 						fields[k] = new Field(name: k, type: Field.Type.STRING)
 					}
 				}
 			}
-
 			dataset.field.addAll( fields.values() )
 		}
 		return dataset.field
@@ -106,15 +114,21 @@ class TDSJSONDriver extends JSONDriver {
 	 * @param code
 	 */
 	private void doRead(Dataset dataset, Map params, Closure prepareCode, Closure code) {
-		if (dataset.field.isEmpty()) throw new ExceptionGETL("Fields schema is required along with the dataset")
+
+		if (dataset.field.isEmpty()) {
+			throw new ExceptionGETL('Fields schema is required along with the dataset')
+		}
+
 		String rootNode = (dataset.params.rootNode) ?: ''
 
 		String fn = fullFileNameDataset(dataset)
-		if (fn == null) throw new ExceptionGETL("\"fileName\" parameter must be defined in the dataset")
+		if (fn == null) throw new ExceptionGETL('"fileName" parameter must be defined in the dataset')
 		File f = new File(fn)
-		if (!f.exists()) throw new ExceptionGETL("File \"${fn}\" not found")
+		if (!f.exists()) {
+			throw new ExceptionGETL("ETL Import JSON file was not found")
+		}
 
-		long limit = (params.limit != null)?params.limit:0
+		long limit = (params.limit != null) ? params.limit : 0
 
 		def data = readData(dataset, params)
 
@@ -195,6 +209,42 @@ class TDSJSONDriver extends JSONDriver {
 			}
 			code(row)
 		}
+	}
+
+	/**
+	 * Overriding Parent readData found a bug in line:
+	 *    data = json.parse(reader)
+	 * for some reason is not reading until the END of DATA but the END of BUFFER SIZE adding 'x0' characters
+	 * changed to:
+	 *    data = json.parseText(reader.text)
+	 * @param dataset
+	 * @param params
+	 * @return
+	 */
+	private def readData (Dataset dataset, Map params) {
+		boolean convertToList = (dataset.params.convertToList != null)?dataset.params.convertToList:false
+
+		def json = new JsonSlurper()
+		def data = null
+
+		def reader = getFileReader(dataset, params)
+		
+		try {
+			String text = reader.text
+
+			if (convertToList) {
+				text = text.trim().replaceAll(',$', '')
+				text = "[$text]"
+
+			}
+
+			data = json.parseText(text)
+
+		} finally {
+			reader.close()
+		}
+
+		return data
 	}
 
 }

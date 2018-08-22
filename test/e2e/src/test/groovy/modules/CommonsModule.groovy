@@ -9,10 +9,12 @@ class CommonsModule extends Module {
     static content = {
         modalDialog {$('div#tdsUiDialog')}
         prompDialog {$('div#tdsUiPrompt')}
+        prompDialogButton {prompDialog.find("button")}
         deleteAlertMessage {prompDialog.find(".box-body p")}
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
+        loadingIndicator { $('.loading-indicator')}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -87,6 +89,11 @@ class CommonsModule extends Module {
         waitFor{prompDialog.jquery.attr("class").contains("in")}
     }
 
+    def clickOnButtonPromptModalByText(text){
+        waitFor{prompDialogButton.find{it.text().contains(text)}.click()}
+        waitForPromptModalHidden()
+    }
+
     def clickOnDeleteYesPromptModal(){
         waitFor{deleteAlertYesButton.click()}
         waitForPromptModalHidden()
@@ -100,5 +107,9 @@ class CommonsModule extends Module {
     def getDeleteAlertMessageText(){
         waitFor{deleteAlertMessage.displayed}
         deleteAlertMessage.text()
+    }
+
+    def blockCookbookLoadingIndicator(){
+        loadingIndicator.jquery.attr("style", "display: none !important")
     }
 }

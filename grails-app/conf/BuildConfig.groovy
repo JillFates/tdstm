@@ -57,7 +57,9 @@ grails.project.dependency.resolution = {
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
-		test 'com.stehno.ersatz:ersatz:1.7.0'
+		test ('com.stehno.ersatz:ersatz:1.7.0') {
+			excludes 'ch.qos.logback:logback-classic'
+		}
 	}
 
 	plugins {

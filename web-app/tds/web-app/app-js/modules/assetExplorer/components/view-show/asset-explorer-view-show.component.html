@@ -14,7 +14,7 @@
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li>
+                    <li *ngIf="isSystemSaveAvailable(true)">
                         <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
                     </li>
                     <li>
@@ -50,6 +50,7 @@
                                           (modelChange)="onQuery()"
                                           [edit]="false"
                                           [model]="model.schema"
+                                          [viewId]="model.id"
                                           [metadata]="metadata">
                 </asset-explorer-view-grid>
             </div>

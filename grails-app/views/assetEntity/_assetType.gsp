@@ -3,7 +3,7 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 	<div style="margin-top: 89px; margin-left: 50px; width: auto;">
-		<table>
+		<table id="assetTypeTableId">
 			<thead>
 				<tr>
 					<th colspan="2"><h3>Asset Type</h3></th>

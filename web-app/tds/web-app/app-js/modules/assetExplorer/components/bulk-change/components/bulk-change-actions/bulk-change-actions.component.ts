@@ -19,6 +19,7 @@ import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.comp
 export class BulkChangeActionsComponent extends UIExtraDialog {
 	selectedItems: number[] = [];
 	selectedAction: BulkActions;
+	affected: number;
 	ACTION = BulkActions; // Make enum visible to the view
 
 	constructor(
@@ -31,8 +32,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	) {
 		super('#bulk-change-action-component');
 		this.selectedItems = this.bulkChangeModel.selectedItems || [];
+		this.affected = this.bulkChangeModel.affected;
 		this.selectedAction = this.ACTION.Edit;
-		console.log('Selected items');
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
@@ -48,7 +49,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private editAction(): void {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems };
+		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, affected: this.bulkChangeModel.affected };
 
 		this.dialogService.extra(BulkChangeEditComponent, [
 			UIDialogService,
@@ -68,7 +69,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private confirmDelete(): Promise<boolean> {
-		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE', [this.selectedItems.length]);
+		const message = this.translatePipe.transform('ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE', [this.affected]);
 		return new Promise((resolve, reject) =>  {
 			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				message,

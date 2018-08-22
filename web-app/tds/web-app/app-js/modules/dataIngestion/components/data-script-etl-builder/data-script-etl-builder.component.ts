@@ -1,5 +1,4 @@
 import {Component, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -17,9 +16,11 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
-import {PROGRESSBAR_INTERVAL_TIME} from '../../../../shared/model/constants';
+import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
+import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -39,6 +40,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private initialWindowStyle = null;
 	private modalOptions: DecoratorOptions;
 	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
+	protected sampleDataGridHelper: DataGridOperationsHelper;
 	private operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
@@ -46,6 +48,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
+	protected transformedDataGrids: Array<DataGridOperationsHelper>;
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 	private closeErrorsSection = false;
 	protected CHECK_ACTION = CHECK_ACTION;
@@ -53,8 +56,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		progressKey: null,
 		currentProgress: 0,
 	};
-	private testScripInterval: any;
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 
 	ngAfterViewInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
@@ -99,6 +102,14 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	onEscKeyPressed(): void {
 		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Used to determine if the Refresh Sample Data button appears on the page
+	 * @return true if a JSON file has been uploaded and available
+	 */
+	public showSampleDataRefresh(): boolean  {
+		return (!isNullOrEmptyString(this.dataScriptModel.sampleFilename) && this.dataScriptModel.sampleFilename.endsWith('.json'));
 	}
 
 	/**
@@ -153,8 +164,17 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 						this.importAssetsService.getFileContent(scripTestFilename)
 							.subscribe(result => {
 								this.scriptTestResult.domains = result.domains;
+								this.transformedDataGrids = [];
+								this.scriptTestResult.domains.forEach( (domain,  index) => {
+									this.transformedDataGrids[index] = new DataGridOperationsHelper(domain.data);
+									// console.log(`${domain.domain}-${index.toString()}`);
+								});
 								this.scriptTestResult.consoleLog = result.consoleLog;
 								this.consoleSettings.scriptTestResult = this.scriptTestResult;
+								// Finally re-load the Sample Data Preview if working with JSON files.
+								if (this.showSampleDataRefresh()) {
+									this.reloadSampleData();
+								}
 							});
 					}, 500);
 				} else {
@@ -254,18 +274,44 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
+	 * On refresh sample data button click.
+	 */
+	protected reloadSampleData(): void {
+		this.extractSampleDataFromFile(this.dataScriptModel.originalSampleFilename);
+	}
+
+	/**
 	 * Call API and get the Sample Data content based on the FileName that has been already Uploaded or used.
 	 */
 	private extractSampleDataFromFile(originalFileName?: string) {
-		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName).subscribe((result) => {
+		this.clearLogVariables('sampleData');
+		const rootNode = this.extractRootNode();
+		this.dataIngestionService.getSampleData(this.dataScriptModel.id, this.filename, originalFileName, rootNode).subscribe((result) => {
 			this.sampleDataModel = result;
-			this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
-					this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
-				}
-			}, error => console.log(error));
+			if (this.sampleDataModel.data) {
+				this.sampleDataGridHelper = new DataGridOperationsHelper(this.sampleDataModel.data ? this.sampleDataModel.data : []);
+				this.dataIngestionService.getETLScript(this.dataScriptModel.id).subscribe((result: ApiResponseModel) => {
+					if (result.status === ApiResponseModel.API_SUCCESS) {
+						this.dataScriptModel.originalSampleFilename = result.data.dataScript.originalSampleFilename;
+						this.dataScriptModel.sampleFilename = result.data.dataScript.sampleFilename;
+					}
+				}, error => console.log(error));
+			}
 		});
+	}
+
+	/**
+	 * Search and extracts the rootNode value if present from the current script code.
+	 * It assumes that rootNode syntax will be: rootNode 'myRootNode'
+	 * @returns {string}
+	 */
+	private extractRootNode(): string {
+		let match = this.script.match(/^\s*rootNode\s*(?:"|')(.*)(?:"|').*/);
+		let result = '';
+		if (match !== null && match[1] !== null) {
+			result = match[1];
+		}
+		return result;
 	}
 
 	/**
@@ -279,6 +325,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	private testHasErrors(): boolean {
 		return !this.scriptTestResult.isValid && this.scriptTestResult.error && this.scriptTestResult.error.length > 0;
+	}
+
+	protected sampleDataHasErrors(): boolean {
+		return this.sampleDataModel && this.sampleDataModel.errors && this.sampleDataModel.errors.length > 0;
 	}
 
 	private syntaxHasErrors(): boolean {
@@ -314,6 +364,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			// also clean test results
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
+		if (operation === 'sampleData') {
+			this.sampleDataModel = null;
+		}
 	}
 
 	protected isCheckSyntaxDisabled(): boolean {
@@ -337,10 +390,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * if value is present return value otherwise returns init
 	 */
-	public getInitOrValue(dataItem): string {
+	protected getInitOrValue(dataItem): string {
 		if (dataItem.value) {
 			return dataItem.value;
+		} else {
+			return (dataItem.init || '');
 		}
-		return (dataItem.init || '');
 	}
 }

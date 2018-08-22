@@ -212,7 +212,7 @@
 													</tdsAngular:tooltipSpan>
 												</label>
 											</td>
-											<td class="tm-input-control-container ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
+											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
 														(modelChange)="model.asset.shutdownBy = $event"
@@ -223,13 +223,16 @@
 												</tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-											<td>
-												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''} duration" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
+											<td class="tm-input-control">
+												<input type="text" id="shutdownDuration" name="shutdownDuration"
+													   class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
+													   [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>
+												<label>m</label>
 											</td>
 										</tr>
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control-container ${standardFieldSpecs.startupBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
 														(modelChange)="model.asset.startupBy = $event"
@@ -240,7 +243,7 @@
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control-container ${standardFieldSpecs.testingBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
 														(modelChange)="model.asset.testingBy = $event"
@@ -251,8 +254,10 @@
                                                 </tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-											<td>
-												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''} duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
+											<td class="tm-input-control">
+												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
+												duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>
+												<label>m</label>
 											</td>
 										</tr>
 

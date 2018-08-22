@@ -49,7 +49,7 @@
 			<!-- Action -->
 			<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 				<div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
-					<button *ngIf="!dataItem.commentInstance.taskNumber || dataItem.commentInstance.taskNumber === 'null'"
+					<button [hidden]="!(!dataItem.commentInstance.taskNumber || dataItem.commentInstance.taskNumber === 'null')"
 							(click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</button>

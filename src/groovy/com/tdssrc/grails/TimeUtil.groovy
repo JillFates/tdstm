@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.TimeScale
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.util.Assert
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods
  */
@@ -686,21 +688,21 @@ class TimeUtil {
 	 * @param toTZ -  the timezone that the date will be adjusted to
 	 * @return the adjusted date
 	 */
+	@CompileStatic
 	private static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
-		}
-		else {
-			Calendar calendar = Calendar.getInstance();
+		} else {
+			Calendar calendar = Calendar.getInstance()
 			calendar.setTime(date)
-			TimeZone toTimeZone = TimeZone.getTimeZone(toTZ);
+			TimeZone toTimeZone = TimeZone.getTimeZone(toTZ)
 
 			// Apply the offset to move GMT time to Timezone
 			calendar.add(Calendar.MILLISECOND, toTimeZone.getRawOffset())
-
-			if (toTimeZone.inDaylightTime(calendar.getTime())) { // Apply time saving offset, if it exsist
-				calendar.add(Calendar.MILLISECOND, calendar.getTimeZone().getDSTSavings());
+			if (toTimeZone.inDaylightTime(new Date())) { // Apply time saving offset, if it exists
+				calendar.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings())
 			}
+
 			int year = calendar.get(Calendar.YEAR)
 			int month = calendar.get(Calendar.MONTH) + 1 // Calendar indexes months from 0-11 and not 1-12 as DateFormat, so we need to add 1 to construct a Date
 			int day = calendar.get(Calendar.DATE)

@@ -254,4 +254,29 @@ class TagService implements ServiceMethods {
 			}
 		}
 	}
+
+	/**
+	 * Generates up the query for filtering by tags, if there are any.
+	 *
+	 * @param tagIds The tag ids to filter by.
+	 * @param andOp To filter multiple tag ids using AND, if true, or use OR if false.
+	 *
+	 * @return the query for filtering by tags, using AND/OR, or and empty string, if there are no tags to filter by.
+	 */
+	String getTagsQuery(List<Long> tagIds, String tagMatch, Map queryParams) {
+
+		if (!tagIds) {
+			return ''
+		}
+
+		if (tagMatch == 'ANY') {
+			queryParams.tagIds = tagIds
+			return "AND t.tag_id in (:tagIds)"
+
+		} else {
+			queryParams.tagIds = tagIds
+			queryParams.tagIdsSize = tagIds.size()
+			return "AND a.asset_entity_id in(SELECT ta2.asset_id FROM tag_asset ta2 WHERE ta2.tag_id in (:tagIds) GROUP BY ta2.asset_id HAVING count(*) = :tagIdsSize)"
+		}
+	}
 }

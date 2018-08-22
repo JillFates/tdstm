@@ -40,7 +40,7 @@ class HtmlUtil {
 		def optionValue = params.optionValue
 		def optionSelected = params.optionSelected
 		def selectClass = params.selectClass ? """class="${params.selectClass}" """ : ''
-		def html = new StringBuffer("""<select id="${params.selectId}" name="${params.selectName}" ${selectClass} ${params.javascript ?:''}>""")
+		def html = new StringBuilder("""<select id="${params.selectId}" name="${params.selectName}" ${selectClass} ${params.javascript ?:''}>""")
 		def selected
 		if (params.firstOption){
 			selected = optionSelected == params.firstOption ? 'selected="selected"' : ''

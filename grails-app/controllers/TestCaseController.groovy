@@ -132,7 +132,7 @@ class TestCaseController implements ControllerMethods {
 
 	@HasPermission('ViewAdminTools')
 	def elapsed() {
-		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
+		StringBuilder sb = new StringBuilder("<h1>Testing the Elapsed Method</h1>")
 		List now = [new Date()]
 
 		sb.append("elapsed now=$now <br>")
@@ -180,7 +180,7 @@ class TestCaseController implements ControllerMethods {
 		List deleteFromPerson = ['E'], deleteFromProject = ['E', 'D']
 
 		Map map = accountImportExportService.determineTeamChanges(allTeams, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
-		StringBuffer out = new StringBuffer("Results were:<br> <pre>")
+		StringBuilder out = new StringBuilder("Results were:<br> <pre>")
 		out.append("\n\t        allTeams: $allTeams")
 		out.append("\n\t currPersonTeams: $currPersonTeams")
 		out.append("\n\t  chgPersonTeams: $chgPersonTeams")

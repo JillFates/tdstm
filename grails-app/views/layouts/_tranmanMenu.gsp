@@ -278,7 +278,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                 <li class="menu-child-item menu-parent-assets-manage-dep-batches">
-                                    <g:link class="mmlink" controller="module" action="dependencybatch" id="list">
+                                    <g:link class="mmlink" controller="module" action="importbatch" id="list">
                                         Manage Import Batches (ETL)
                                     </g:link>
                                 </li>

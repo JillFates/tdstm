@@ -292,14 +292,14 @@ class MoveEventController implements ControllerMethods {
 
 			def moveEventNews = jdbcTemplate.queryForList(moveEventNewsQuery)
 
-			def news = new StringBuffer()
+			def news = new StringBuilder()
 
 			moveEventNews.each {
 				news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
 			}
 
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
-			def transitionComment = new StringBuffer()
+			def transitionComment = new StringBuilder()
 			if (moveEvent.newsBarMode == "on") {
 				def today = new Date()
 				def currentPoolTime = new Timestamp(today.getTime())

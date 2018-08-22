@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import getl.exception.ExceptionGETL
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -16,6 +17,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 
 /**
  * Using JSON Object in ETL script. It manages the following commands:
@@ -57,7 +59,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		validator = createDomainClassFieldsValidator()
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 	}
 
 	void 'test can define a rootNode for a JSON DataSet'(){
@@ -84,7 +86,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
 
@@ -155,7 +156,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 
 	void 'test can define a quoted string for the JSON DataSet'(){
 
@@ -241,7 +241,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'Active Applications'"
+			e.message == "Data was not found in JSON at rootNode 'Active Applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -266,7 +266,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unable to find JSON rootNode with path 'applications'"
+			e.message == "Data was not found in JSON at rootNode 'applications'"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -514,7 +514,6 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 	}
 
-
 	void 'test can read and skip rows in an iterate for a JSON DataSet'(){
 
 		given:
@@ -705,6 +704,164 @@ class ETLJSONSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	@See('TM-11181')
+	void 'test can use dot notation in extract command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   {
+					      "vm id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2,
+					         "hostname": "zulu01"
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'the ETL script is evaluated'
+			etlProcessor.evaluate("""
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'vm id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    extract 'attribs.hostname' load 'custom3'
+				}
+				""".stripIndent())
+
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0], DomainResult) {
+				domain == ETLDomain.Device.name()
+				data.size() == 1
+
+				with(data[0], RowResult) {
+					rowNum == 1
+
+					with(fields.id, FieldResult) {
+						originalValue == 123
+						value == 123
+					}
+
+					with(fields.custom1, FieldResult) {
+						originalValue == 4096
+						value == 4096
+					}
+
+					with(data[0].fields.custom2) {
+						originalValue == 2
+						value == 2
+					}
+
+					with(data[0].fields.custom3) {
+						originalValue == 'zulu01'
+						value == 'zulu01'
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11181')
+	void 'test can use dot notation with more than one level in extract command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				{
+					"devices": [
+					   {
+					      "vm id": 123,
+					      "attribs": {
+					         "memory": 4096,
+					         "cpu": 2,
+					         "hostname": {
+					         	"value": "zulu01"
+					         }
+					      }
+					   }
+					]
+				}'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'the ETL script is evaluated'
+			etlProcessor.evaluate("""
+				rootNode 'devices'
+				read labels
+				domain Device
+				iterate {
+				    extract 'vm id' load 'id'
+				    extract 'attribs' set attribsVar
+				    load 'custom1' with attribsVar['memory']
+				    load 'custom2' with attribsVar.cpu
+				    extract 'attribs.hostname.value' load 'custom3'
+				}
+				""".stripIndent())
+
+		then: 'results should have one domain'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'the results contain expected values'
+			with(etlProcessor.finalResult().domains[0], DomainResult) {
+				domain == ETLDomain.Device.name()
+				data.size() == 1
+
+				with(data[0], RowResult) {
+					rowNum == 1
+
+					with(fields.id, FieldResult) {
+						originalValue == 123
+						value == 123
+					}
+
+					with(fields.custom1, FieldResult) {
+						originalValue == 4096
+						value == 4096
+					}
+
+					with(data[0].fields.custom2) {
+						originalValue == 2
+						value == 2
+					}
+
+					with(data[0].fields.custom3) {
+						originalValue == 'zulu01'
+						value == 'zulu01'
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
 	static final String DATASET = """
 		{
 			"Applications": [
@@ -736,7 +893,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			],
 			"The Applications": [
 				{
-					"application id":152254,
+					"application id":152254,       
 					"vendor name":"Microsoft",
 					"location":"ACME Data Center"
 				},
