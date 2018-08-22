@@ -181,7 +181,7 @@ class ConnectorActiveDirectory {
 				}
 
 				if (debug) {
-					StringBuffer sb = new StringBuffer()
+					StringBuilder sb = new StringBuilder()
 					memberof.each { sb.append("\n\t'$it'") }
 					log.info "$logPrefix User MemberOf (${domain.roleSearchMode.toUpperCase()}): $sb"
 				}
@@ -225,7 +225,7 @@ class ConnectorActiveDirectory {
 			userInfo.roles = roles
 
 			if (debug) {
-				def ui = new StringBuffer("User information:\n")
+				def ui = new StringBuilder("User information:\n")
 				userInfo.each { k, v -> ui.append("   $k=$v\n") }
 				log.info ui.toString()
 			}

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c105e37e-a7cf-4cf2-9d50-67f7edc8f9ea",
+		"_postman_id": "73408989-ddf7-480c-861e-ac5b6ae99fd5",
 		"name": "DeviceEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -81,13 +81,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "58cb79ad-d92d-4bf0-be2e-b5970012537f",
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Save device id\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
 							"    var devID = jsonObject.rows[0].id; ",
-							"    postman.setGlobalVariable(\"deviceID\", devID);",
+							"    pm.environment.set(\"deviceID\", devID);",
 							"    ",
 							"});"
 						]
@@ -97,7 +97,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
 					"host": [
@@ -253,7 +256,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "90e5cd79-d864-4d80-a2a7-093fb5c08d14",
+						"id": "b03948c9-cb89-43cf-ade7-135ddd35e981",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -262,7 +265,10 @@
 							"",
 							"pm.test(\"Something went wrong message is displayed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Oops! Something went wrong.\");",
-							"});"
+							"});",
+							"",
+							"//clean-up code for variables that should live within this collection only",
+							"pm.environment.unset(\"deviceID\");"
 						]
 					}
 				}

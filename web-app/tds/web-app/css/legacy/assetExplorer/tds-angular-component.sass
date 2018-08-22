@@ -34,6 +34,8 @@
     width: 50%
   .prop a
     color: #00E
+    font-weight: bold
+    cursor: pointer
   .url + .valueNW
     text-overflow: ellipsis
     overflow: hidden
@@ -78,6 +80,9 @@
         margin-bottom: 4px
     td .label_sm
       background: none repeat scroll 0% 0% #f3f4f6
+    td .tm-input-control
+      min-width: 160px
+      max-width: 160px
     div
       .highField
         label
@@ -102,6 +107,8 @@
         max-width: 100%
       input.duration
         width: 90%
+      input.duration + label
+        font-weight: normal
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,
@@ -217,7 +224,6 @@
   .dependents-grid.is-dependent-on
     margin-top: 10px
   .swapper-image
-    width: 120px
     &::before
       content: ''
       cursor: pointer
@@ -227,6 +233,7 @@
       background-size: 16px 16px
       display: inline-block
       width: 100%
+      margin-top: -5px
       height: 20px
   h1
     color: #214aa0 !important

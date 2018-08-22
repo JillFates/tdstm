@@ -1,7 +1,9 @@
-tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
+var currentAngularModule = tds.cookbook || tds.comments;
+currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 	return {
 		template: `<div class="asset-tag-selector-component">
-						<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator" checked="checked" disabled="{{disabledOperator}}" />
+						<!-- <input type="hidden" class="tag-hidden-val" name="tagIds" /> -->
+						<!-- <input type="hidden" class="match-hidden-val" name="tagMatch" /> -->
 						<select id="asset-tag-selector" class="asset-tag-selector"></select>
 						
 						<script id="asset-tag-selector-item" type="text/x-kendo-template">
@@ -22,48 +24,69 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			preAssetSelector: '=',
 			preSelectedOperator: '=',
 			disabledOperator: '=',
-			onChange: '&'
+			onChange: '&',
 		},
-		controller: function ($scope) {
+		link: function ($scope, element) {
 			// Init the Load
+			// Get All Tags
 			getAssetTags();
 
-			if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
-				$(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
-			}
-
-			$(".asset-tag-selector-operator-switch").kendoMobileSwitch({
-				onLabel: "ALL",
-				offLabel: "ANY",
-				change: function (e) {
-					$scope.assetSelector.operator = ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
-					$scope.onChange();
-				}
-			});
+			createSwitchButton();
 
 			$scope.assetSelector = {
 				tag: [],
-				operator: ($(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY'
+				operator: ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY'
 			};
 
-			$(".asset-tag-selector").kendoMultiSelect({
+			$(element).find(".asset-tag-selector").kendoMultiSelect({
 				dataTextField: "name",
 				dataValueField: "id",
 				filter: "startswith",
-				itemTemplate: $("#asset-tag-selector-item").html(),
-				tagTemplate: $("#asset-tag-selector-tag").html(),
-				change: selectTags,
+				itemTemplate: $(element).find("#asset-tag-selector-item").html(),
+				tagTemplate: $(element).find("#asset-tag-selector-tag").html(),
+				change: function() {
+					selectTags();
+					$scope.onChange();
+				},
 				open: selectTags,
 			});
 
-			($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
+			($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
+
+			/**
+			 * Regenerate the Switch, Kendo does not allow to change the value on fly
+			 */
+			function createSwitchButton() {
+				$(element).find(".asset-tag-selector-operator-switch").remove();
+				$(element).find(".km-switch").remove();
+				$(element).find(".asset-tag-selector-component").append('<input type="checkbox" class="asset-tag-selector-operator-switch" aria-label="Operator"/>');
+
+				if ($scope.preSelectedOperator && $scope.preSelectedOperator !== '') {
+					$(element).find(".asset-tag-selector-operator-switch").attr('checked', ($scope.preSelectedOperator === 'ALL') ? true : false);
+				}
+
+				if($scope.disabledOperator) {
+					$(element).find('.asset-tag-selector-operator-switch').attr("disabled", true);
+				}
+
+				$(element).find(".asset-tag-selector-operator-switch").kendoMobileSwitch({
+					onLabel: "ALL",
+					offLabel: "ANY",
+					change: function (e) {
+						$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+						// $(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');
+						$scope.onChange();
+					}
+				});
+
+			}
 
 			/**
 			 * Set the new Set Datasource to the element
 			 * @param data
 			 */
 			function setNewDataSource(data) {
-				var widget = $("#asset-tag-selector").getKendoMultiSelect();
+				var widget = $(element).find("#asset-tag-selector").getKendoMultiSelect();
 				widget.setDataSource(new kendo.data.DataSource({
 					data: data
 				}));
@@ -78,24 +101,26 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 			function preSelectTags() {
 				if($scope.preAssetSelector && $scope.preAssetSelector.tag) {
 					var selectedTags = [];
-					var widget = $("#asset-tag-selector").getKendoMultiSelect();
+					var widget = $(element).find("#asset-tag-selector").getKendoMultiSelect();
 					var dataSource = widget.dataSource;
 
 					for(var i=0; i < $scope.preAssetSelector.tag.length; i++) {
 
-						var elementExist = dataSource.data().filter((e) => {
-							return e.id === $scope.preAssetSelector.tag[i].id
-						});
-						if (elementExist.length === 0) {
-							dataSource.add({
-								name: $scope.preAssetSelector.tag[i].label,
-								css: $scope.preAssetSelector.tag[i].css,
-								id: $scope.preAssetSelector.tag[i].id,
-								strike: true
+						if($scope.preAssetSelector.tag[i] && $scope.preAssetSelector.tag[i] !== null) {
+							var elementExist = dataSource.data().filter((e) => {
+								return e.id === $scope.preAssetSelector.tag[i].id || e.id === $scope.preAssetSelector.tag[i];
 							});
-						}
+							if (elementExist.length === 0) {
+								dataSource.add({
+									name: $scope.preAssetSelector.tag[i].label,
+									css: $scope.preAssetSelector.tag[i].css,
+									id: $scope.preAssetSelector.tag[i].id,
+									strike: true
+								});
+							}
 
-						selectedTags.push($scope.preAssetSelector.tag[i].id);
+							selectedTags.push($scope.preAssetSelector.tag[i].id || $scope.preAssetSelector.tag[i]);
+						}
 
 					}
 					dataSource.sync();
@@ -104,7 +129,7 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 					$scope.assetSelector.operator = false;
 
 					if(selectedTags !== '') {
-						$("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
+						$(element).find("#asset-tag-selector").data("kendoMultiSelect").value(selectedTags);
 						selectTags();
 					}
 				}
@@ -120,21 +145,42 @@ tds.cookbook.directive.TmAssetTagSelectorDirective = function ($http, utils) {
 				}).error(function (data, status, headers, config) {});
 			}
 
+			var getTagsIds = function(tags) {
+				var tagIds = [];
+				tags.each( function(a){
+					tagIds.push(parseInt(a.id));
+				})
+				return tagIds;
+			};
+
 			function selectTags(e) {
 				//
-				$("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
+				$(element).find("#asset-tag-selector_listbox > li").find('.hidden-tag-item').parent().addClass("hidden-tag-item");
 				// There is no way to know the list of element, this is created on fly outside the boundaries of the directive
-				$("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
-				$("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
+				$(element).find("#asset-tag-selector_listbox").find("li").removeClass("asset-tag-selector-item-selected");
+				$(element).find("#asset-tag-selector_listbox").find("li.k-state-selected").addClass("asset-tag-selector-item-selected");
 
-				$scope.assetSelector.tag = $("#asset-tag-selector").data("kendoMultiSelect").dataItems();
+				$scope.assetSelector.tag = $(element).find("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
-				($scope.assetSelector.tag.length > 1)? $('.km-switch').show(): $('.km-switch').hide();
+				if($scope.assetSelector.tag.length > 1) {
+					$(element).find('.km-switch').show();
+				} else {
+					createSwitchButton();
+					$scope.assetSelector.operator = ($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY';
+					// Hide new element
+					$(element).find('.km-switch').hide();
+				}
 
-				$scope.onChange();
+				/*
+				Not being used, but leave it here since it can help for legacy pages
+				$(element).find(".tag-hidden-val").remove();
+				$scope.assetSelector.tag.each(function (a) {
+					$(element).append('<input type="hidden" class="tag-hidden-val" name="tagIds" value="' + parseInt(a.id) + '" />');
+				});
+				$(element).find(".match-hidden-val").val(($(element).find(".asset-tag-selector-operator-switch").attr('checked')) ? 'ALL' : 'ANY');*/
 			}
 		}
 	};
 }
 
-tds.cookbook.module.directive('tmAssetTagSelector', ['$http', 'utils', tds.cookbook.directive.TmAssetTagSelectorDirective]);
+currentAngularModule.module.directive('tmAssetTagSelector', ['$http', 'utils', currentAngularModule.directive.TmAssetTagSelectorDirective]);

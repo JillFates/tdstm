@@ -9,7 +9,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
 import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
-import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
@@ -33,9 +33,9 @@ export class DataScriptListComponent implements OnInit {
 		}
 	};
 
-	public pageSize = MAX_DEFAULT;
+	public pageSize = GRID_DEFAULT_PAGE_SIZE;
 	public skip = 0;
-	public defaultPageOptions = MAX_OPTIONS;
+	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public dataScriptColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;

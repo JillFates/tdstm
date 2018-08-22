@@ -486,7 +486,7 @@ class RoomController implements ControllerMethods {
 		query += " order by $sort $order"
 		def entities = AssetEntity.findAll(query,[project:project, excludeAssetType:excludeAssetType, assetClass: AssetClass.DEVICE ])
 		
-		def html = new StringBuffer()
+		def html = new StringBuilder()
 		html.append("""
 			<div class="dialog" >
 			<table id="listDiv">
@@ -529,7 +529,7 @@ class RoomController implements ControllerMethods {
 		String hql = 'from AssetEntity where ' + middle + "project=:projectId and assetType = 'Blade'"
 		List<AssetEntity> entities = AssetEntity.executeQuery(hql, [projectId: securityService.userCurrentProjectId])
 		
-		def html = new StringBuffer()
+		def html = new StringBuilder()
 		
 		def bladeAsset = AssetEntity.get(params.blade)
 		def bladeAssetId = bladeAsset?.id

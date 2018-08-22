@@ -14,7 +14,6 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
-import org.codehaus.groovy.runtime.StackTraceUtils
 
 import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
@@ -128,6 +127,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * A debug output assignable in the ETLProcessor creation
 	 */
 	DebugConsole debugConsole
+	/**
+	 * A cache for column name parts in case of JSON dataSet
+	 */
+	Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
 
 	List<Column> columns = []
 	Map<String, Column> columnsMap = [:]
@@ -221,6 +224,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
+		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
 
@@ -410,7 +414,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			bindVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(row))
 
@@ -587,19 +590,26 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *      domain Application
 	 *      iterate {
 	 *          extract 'column name' load 'appName'
+	 *
+	 *          extract 'assets.device' load 'assetName'
 	 *      }
 	 * <code>
 	 * @param columnName
-	 * @return
+	 * @return an instance of Element
 	 */
 	Element extract (String columnName) {
 		validateStack()
-		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
-			throw ETLProcessorException.extractMissingColumn(columnName)
-		}
-		currentColumnIndex = columnsMap[labelToFieldName(columnName)].index
 
-		doExtract()
+		String rootColumnName = columnName
+		String columnNamePath = null
+
+		if (dataSetFacade.isJson){
+			(rootColumnName, columnNamePath) = extractColumnNameParts(columnName)
+		}
+
+		checkColumnName(rootColumnName)
+		currentColumnIndex = columnsMap[labelToFieldName(rootColumnName)].index
+		doExtract(columnNamePath)
 	}
 
 	/**
@@ -675,14 +685,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(final String fieldName) {
+	Map<String, ?> lookup(final Object fieldName) {
 		validateStack()
-		lookUpFieldDefinition(selectedDomain.domain, fieldName)
+		ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fieldName)
+
 		return [
 		    with: { value ->
-			    Object stringValue = ETLValueHelper.valueOf(value)
+			    // Object stringValue = ETLValueHelper.valueOf(value)
 
-			    boolean found = result.lookupInReference(fieldName, stringValue)
+			    boolean found = result.lookupInReference([ fieldSpec.name ], [ value ])
 			    if (found) {
 				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			    }
@@ -691,6 +702,42 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		]
 	}
 
+	/**
+	 * Lookup ETL command for multiple parameters implementation:
+	 * <pre>
+	 *  set lookupNameVar = 'assetName'
+	 *  set lookupValueVar = 'xyzzy'
+	 *  iterate {
+	 *      ...
+	 *      domain Device
+	 *      extract 'Vm' load 'Name'
+	 *      extract Cluster
+	 *      def clusterName = CE
+	 *
+	 *      lookup lookupNameVar, 'assetType' with lookupValueVar, 'clusterName'
+	 *  }
+	 * </pre>
+	 * @param fieldNames
+	 */
+	Map<String, ?>  lookup(Object... fieldNames) {
+		validateStack()
+		List<Element> lookupFieldNames = []
+		for (String fname in fieldNames) {
+			ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fname)
+			lookupFieldNames << fieldSpec.name
+		}
+
+		return [
+		    with: { Object... values ->
+				List valuesAsList = values as List
+			    boolean found = result.lookupInReference(lookupFieldNames, valuesAsList)
+			    if (found) {
+				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
+			    }
+			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+		    }
+		]
+	}
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
@@ -1087,15 +1134,28 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Private method that executes extract method command internally.
-	 * @return
+	 * Extract final implementation using {ETLProcessor#currentColumnIndex}
+	 * and a path in case of working with JSON files.
+	 * @param path
+	 * @return an instance of Element class
 	 */
-	private Element doExtract () {
-		Element element = createCurrentElement(currentColumnIndex)
+	private Element doExtract (String path = null) {
+		Element element = bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex, path))
 		element.loadedElement = false
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
+	}
+
+	/**
+	 * It checks if column name is a valid value for the already read lebels
+	 * @param columnName a String with a column name value
+	 * @throw ETLProcessorException in case of extracted column is missing
+	 */
+	private void checkColumnName(String columnName) {
+		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
+			throw ETLProcessorException.extractMissingColumn(columnName)
+		}
 	}
 
 	/**
@@ -1169,6 +1229,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	private void initializeDefaultGlobalTransformations() {
 		globalTransformers.add(Trimmer)
 		globalTransformers.add(Sanitizer)
+	}
+
+	/**
+	 * Setup Global variables used in the Script
+	 */
+	private void initializeDefaultGlobalVariables() {
+		this.addGlobalVariableInBinding(NOW_VARNAME, new NOW())
 	}
 
 	/**
@@ -1246,15 +1313,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
-	 * Create the current element adding it in the ETL binding context
-	 * @param currentColumnIndex
-	 * @return
-	 */
-	private Element createCurrentElement(Integer currentColumnIndex) {
-		return bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex))
-	}
-
-	/**
 	 * Validates calls within the DSL script that can not be managed
 	 * @param methodName
 	 * @param args
@@ -1273,7 +1331,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String fieldNameToLabel(Field field) {
-		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
+		if (dataSetFacade.isCsv) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return field.name.trim().toLowerCase()
 		} else {
@@ -1290,12 +1348,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @see getl.data.Field#name
 	 */
 	private String labelToFieldName(String label) {
-		if (FilenameUtil.isCsvFile(dataSetFacade.fileName())) {
+		if (dataSetFacade.isCsv) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
 			return label.toLowerCase()
 		} else {
 			return label
 		}
+	}
+
+	/**
+	 * In case of ETL is working with a JSON file,
+	 * this methods can split a column name using dot (.) notation.
+	 * <pre>
+	 * 	assert columnNameParts('data.assets') == ['data', 'assets']
+	 * 	assert columnNameParts('devices') == ['devices', null]
+	 * </pre>
+	 * @param columnName a string value
+	 * @return a Pair with 2 values: rootPath and the rest of the column name path
+	 */
+	private List extractColumnNameParts(String columnName){
+
+		if(!columnNamePartsCache.containsKey(columnName)){
+			columnNamePartsCache[columnName] = columnName.split('\\.', 2).toList()
+		}
+		return columnNamePartsCache[columnName]
 	}
 
 	Column column (String columnName) {
@@ -1628,7 +1704,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		Object retVal
 		if ( values ) {
 			retVal = values.find {
-				null != ( (it instanceof Element) ? it.value : it )
+				def val = ( (it instanceof Element) ? it.value : it )
+				return (val != null) && (val != '')
 			}
 		}
 

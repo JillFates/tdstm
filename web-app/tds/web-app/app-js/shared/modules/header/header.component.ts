@@ -80,22 +80,20 @@ export class HeaderComponent implements AfterViewInit {
 	 * Adds an active class to application top menu based on the pageMetadata.topMenu configuration.
 	 */
 	private selectTopMenuSections(): void {
-		if (!this.pageMetaData.topMenu) {
-			// clear out any other previous active menus.
-			jQuery('li[class^="dropdown menu-parent-"]').removeClass('active');
-			jQuery('li.menu-child-item').removeClass('active');
-		} else {
-			if (this.pageMetaData.topMenu.parent) {
-				let element = document.getElementsByClassName(this.pageMetaData.topMenu.parent)[0];
-				if (element) {
-					this.renderer.addClass(element, 'active');
-				}
+		// clear out any other previous active menus.
+		jQuery('li[class^="dropdown menu-parent-"]').removeClass('active');
+		jQuery('li.menu-child-item').removeClass('active');
+
+		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.parent) {
+			let element = document.getElementsByClassName(this.pageMetaData.topMenu.parent)[0];
+			if (element) {
+				this.renderer.addClass(element, 'active');
 			}
-			if (this.pageMetaData.topMenu.child) {
-				let element = document.getElementsByClassName(this.pageMetaData.topMenu.child)[0];
-				if (element) {
-					this.renderer.addClass(element, 'active');
-				}
+		}
+		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.child) {
+			let element = document.getElementsByClassName(this.pageMetaData.topMenu.child)[0];
+			if (element) {
+				this.renderer.addClass(element, 'active');
 			}
 		}
 	}

@@ -43,7 +43,7 @@ class CookbookSpec extends GebReportingSpec {
         testKey = "TM-XXXX"
         when: 'The User is in the Cookbook Section'
             at CookbookPage
-
+            commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         then: 'Active Elements should be present'
             pageTitle.text().trim() == "Cookbook"
             taskGenerationTab.parent(".active")

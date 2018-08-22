@@ -8,6 +8,11 @@ import {AssetEditComponent} from '../asset/asset-edit.component';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import { DeviceModel } from './model-device/model/device-model.model';
+import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.model';
+import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
+import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 declare var jQuery: any;
 
@@ -22,7 +27,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		constructor(
 			private activeDialog: UIActiveDialogService,
 			private dialogService: UIDialogService,
-			private assetService: DependecyService) {
+			private assetService: DependecyService,
+			private assetExplorerService: AssetExplorerService) {
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -64,6 +70,41 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
 				DIALOG_SIZE.XLG);
+		}
+
+		showModel(id: string): void {
+
+			this.assetExplorerService.getModelAsJSON(id)
+				.subscribe((deviceModel: DeviceModel) => {
+					this.dialogService.extra(ModelDeviceShowComponent,
+						[UIDialogService,
+							{
+								provide: DeviceModel,
+								useValue: deviceModel
+							}
+						], true, false)
+						.then((result) => {
+							console.log(result);
+						}).catch((error) => console.log(error));
+				});
+		}
+
+		showManufacturer(id: string): void {
+
+			this.assetExplorerService.getDeviceManufacturer(id)
+				.subscribe((deviceManufacturer: DeviceManufacturer) => {
+
+					this.dialogService.extra(ManufacturerShowComponent,
+						[UIDialogService,
+							{
+								provide: DeviceManufacturer,
+								useValue: deviceManufacturer
+							}
+						], true, false)
+						.then((result) => {
+							console.log(result);
+						}).catch((error) => console.log(error));
+				});
 		}
 
 	}

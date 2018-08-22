@@ -154,7 +154,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -488,7 +488,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -553,7 +553,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -609,7 +609,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -683,7 +683,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -757,7 +757,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -817,7 +817,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -886,7 +886,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -915,7 +915,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -939,7 +939,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -996,7 +996,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1086,7 +1086,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1317,7 +1317,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1427,7 +1427,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1455,7 +1455,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1512,7 +1512,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1540,7 +1540,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1610,7 +1610,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1680,7 +1680,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1702,7 +1702,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1736,7 +1736,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2515,7 +2515,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2562,7 +2562,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -2619,7 +2619,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -2685,6 +2685,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 				}
 			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 
 	@See('TM-10726')
@@ -2694,7 +2699,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					new DebugConsole(buffer: new StringBuilder()),
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -2712,5 +2717,66 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'exception should be thrown'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'No such property: append'
+	}
+
+	@See('TM-11530')
+	void 'test can use set command with local variables'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				FirstName,LastName
+				Tony,Baker
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'firstname' set firstNameVar
+					assert firstNameVar == 'Tony'
+					
+					extract 'lastname' set lastNameVar
+					assert lastNameVar == 'Baker'
+					
+					set fullNameVar with firstNameVar + ' ' + lastNameVar
+					assert firstNameVar == 'Tony'
+					assert lastNameVar == 'Baker'
+					assert fullNameVar == 'Tony Baker'
+					
+					load 'description' with fullNameVar
+				}
+				""".stripIndent())
+
+		then: 'Results should contain correctly set full name'
+			with (etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						with(fields.description, FieldResult) {
+							originalValue == 'Tony Baker'
+							value == 'Tony Baker'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 }

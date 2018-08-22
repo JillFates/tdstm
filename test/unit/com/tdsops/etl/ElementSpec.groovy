@@ -50,6 +50,23 @@ class ElementSpec extends Specification {
 			new Element(value: null).toDate('yyyy-MM-dd').value == null
 	}
 
+	void 'test Element methodMissing function, delegate to wrapped value' () {
+		given:
+			String strValue = "Test String"
+			int intValue = 1974
+			int intValue2 = 1000
+			Date dateValue = new Date()
+
+		expect:
+			new Element(value: strValue).size() == new Element(value: strValue.size())
+			new Element(value: strValue).substring(1, 4) == 'est'
+
+			new Element(value: intValue).power(2) == new Element(value: intValue.power(2))
+			new Element(value: intValue) - intValue2 == new Element(value: (intValue - intValue2) )
+
+			new Element(value: dateValue).getTime() == new Element(value: dateValue.getTime())
+	}
+
 	void 'test Exception if String function applied to Non String Element' () {
 		given:
 			int value = 100

@@ -31,6 +31,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
+        commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         clickOnCreateButton()
         at CreateRecipePage
         createRecipe recipeDataMap

@@ -3011,7 +3011,7 @@ class ImportService implements ServiceMethods {
 						}
 
 						if (dtaAttrib != null) {
-							// Add the SQL VALUES(...) to the sqlValues StringBuffer for the current spreadsheet cell
+							// Add the SQL VALUES(...) to the sqlValues StringBuilder for the current spreadsheet cell
 							errorMsg = rowToImportValues(sheetInfo, sqlValues, sheetObject, r, cols, dtaAttrib, assetId, dataTransferBatch.id)
 							if (errorMsg) {
 								rowHasErrors = true

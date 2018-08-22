@@ -77,11 +77,11 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'EFFECTED_ASSETS': 'This action will effect {param1} Assets',
-				'CONFIRM_UPDATE': 'You are about to update {param1} assets. There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
+				'EFFECTED_ASSETS': 'This action will effect {param1} Asset(s)',
+				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
 			},
 			'DELETE': {
-				'CONFIRM_DELETE': 'You are about to delete {param1} assets. There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
+				'CONFIRM_DELETE': 'You are about to delete {param1} Asset(s). There is no undo for this action. Click confirm to delete the assets, otherwise click Cancel'
 			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
@@ -146,7 +146,8 @@ export const en_DICTIONARY: Object = {
 				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.',
 				'FIELD_WILL_BE_INITIALIZED': 'Field will be initialized with the value shown for new records or existing records where the field has no value.'
 			}
-		}
+		},
+		'PROJECT': 'Project'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
@@ -172,7 +173,7 @@ export const en_DICTIONARY: Object = {
 			'OR': 'or',
 			'TRANSFORM_WITH_DATA_SCRIPT': 'Transform with ETL Script:',
 			'LOAD_TRANSFORMED_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
-			'GOTO_MANAGE_ASSET_BATCHES': 'Go to Manage Asset Batches',
+			'GOTO_MANAGE_ASSET_BATCHES': 'Manage Import Batches (ETL)',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',
@@ -181,7 +182,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'IMPORT_BATCH': {
 		'MANAGE_LIST': 'Manage Import Batches (ETL)',
-		'DEPENDENCY_BATCH': 'Dependency Batch',
+		'IMPORT_BATCH': 'Import Batch',
 		'LIST': {
 			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',
 			'REMOVE_FROM_QUEUE': 'Remove from queue',

@@ -133,7 +133,7 @@ class FilesController implements ControllerMethods {
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-		def query = new StringBuffer("""SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+		def query = new StringBuilder("""SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
 										 me.move_event_id AS event,
 										 if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS
 		commentsStatus, """)

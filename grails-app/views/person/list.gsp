@@ -79,11 +79,12 @@
 					$("#formId").submit();
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
-					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'User Company', 'Date Created', 'Last Updated'"
+					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'Email', 'User Company', 'Date Created', 'Last Updated'"
 					colModel="{name:'firstname', width:'80'},
 						{name:'middlename', width:'80'},
 						{name:'lastname', index: 'lastname', width:'80'},
 						{name:'userLogin', width:'80'},
+						{name:'email',width:'100'},
 						{name:'company',width:'100'},
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
