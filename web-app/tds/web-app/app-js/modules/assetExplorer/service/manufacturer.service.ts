@@ -13,11 +13,11 @@ export class ManufacturerService {
 	private manufacturerUrl = '/tdstm/manufacturer';
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
-	isValidAlias(alias: string, id: number, parentName: string): Observable<boolean> {
+	isValidAlias(alias: string, id: number, parentName: string): Observable<string> {
 		const url = `${this.manufacturerUrl}/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
 
 		return this.http.get(url, '')
-			.map((res: any) => res === 'valid')
+			.map((res: any) => res.text())
 	}
 
 	getDeviceManufacturer(id: string): Observable<DeviceManufacturer> {

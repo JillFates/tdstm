@@ -68,6 +68,7 @@ export class AkaComponent implements OnInit {
 
 		this.validateAka(aka, index)
 			.then(() => {
+				console.log('There is no errors');
 				if (this.hasError && this.indexError === index) {
 					this.cleanError();
 				}
@@ -75,6 +76,7 @@ export class AkaComponent implements OnInit {
 				this.sendAkaChanges();
 			})
 			.catch((err) => {
+				console.log('There is errors');
 				this.indexError = index;
 				this.hasError = true;
 				this.errorMessage = err;
@@ -86,24 +88,28 @@ export class AkaComponent implements OnInit {
 			// check if services is already present
 			const foundRepeated = this.akas.filter((aka: string) => aka === newAka);
 			if (foundRepeated && foundRepeated.length && foundRepeated.length > 1) {
-				reject(`AKA ${newAka} already entered` );
+				return reject(`AKA ${newAka} already entered` );
 			}
 
 			if (!newAka || newAka.trim()  === '') {
-				reject(`AKA is empty`);
+				return reject(`AKA is empty`);
 			}
 
 			if (this.akaParent) {
-				this.manufacturerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
-					.subscribe((isValid: boolean) => {
-						if (isValid) {
-							resolve('');
+				return this.manufacturerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
+					.subscribe((result: string) => {
+						console.log('The isValid result is:');
+						console.log(result);
+						console.log('---------------------');
+
+						if (result === 'valid') {
+							return resolve('');
 						} else {
-							resolve(`AKA ${newAka} Already entered`);
+							return reject(`AKA ${newAka} Already entered`);
 						}
 				});
 			} else {
-				resolve('');
+				return resolve('');
 			}
 		});
 	}
