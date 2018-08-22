@@ -13,6 +13,8 @@ import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.mod
 import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
 import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
+import {ModelService} from '../../service/model.service';
+import {ManufacturerService} from '../../service/manufacturer.service';
 
 declare var jQuery: any;
 
@@ -28,7 +30,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			private activeDialog: UIActiveDialogService,
 			private dialogService: UIDialogService,
 			private assetService: DependecyService,
-			private assetExplorerService: AssetExplorerService) {
+			private modelService: ModelService,
+			private manufacturerService: ManufacturerService) {
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -74,7 +77,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 		showModel(id: string): void {
 
-			this.assetExplorerService.getModelAsJSON(id)
+			this.modelService.getModelAsJSON(id)
 				.subscribe((deviceModel: DeviceModel) => {
 					this.dialogService.extra(ModelDeviceShowComponent,
 						[UIDialogService,
@@ -91,7 +94,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 		showManufacturer(id: string): void {
 
-			this.assetExplorerService.getDeviceManufacturer(id)
+			this.manufacturerService.getDeviceManufacturer(id)
 				.subscribe((deviceManufacturer: DeviceManufacturer) => {
 
 					this.dialogService.extra(ManufacturerShowComponent,

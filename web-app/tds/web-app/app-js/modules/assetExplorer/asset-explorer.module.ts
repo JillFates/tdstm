@@ -41,6 +41,8 @@ import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
 import { BulkChangeService } from './service/bulk-change.service';
 import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
+import { ManufacturerService } from './service/manufacturer.service';
+import { ModelService } from  './service/model.service';
 
 @NgModule({
 	imports: [
@@ -83,7 +85,9 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		DependecyService,
 		TagService,
 		BulkChangeService,
-		DataGridCheckboxService
+		DataGridCheckboxService,
+		ManufacturerService,
+		ModelService
 	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [

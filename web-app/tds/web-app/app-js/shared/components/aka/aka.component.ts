@@ -1,6 +1,6 @@
 import {Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Aka, AkaParent, AkaChanges } from './model/aka.model';
-import { AssetExplorerService } from '../../../modules/assetExplorer/service/asset-explorer.service';
+import { ManufacturerService} from '../../../modules/assetExplorer/service/manufacturer.service';
 
 @Component({
 	selector: 'tds-aka',
@@ -16,7 +16,7 @@ export class AkaComponent implements OnInit {
 	errorMessage: string;
 	akas: string[];
 	deletedAkas: Aka[];
-	constructor(private assetExplorerService: AssetExplorerService) {
+	constructor(private manufacturerService: ManufacturerService) {
 		console.log('constructor :');
 		this.akas = [];
 	}
@@ -95,7 +95,7 @@ export class AkaComponent implements OnInit {
 			}
 
 			if (this.akaParent) {
-				this.assetExplorerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
+				this.manufacturerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
 					.subscribe((isValid: boolean) => {
 						if (isValid) {
 							resolve('');
