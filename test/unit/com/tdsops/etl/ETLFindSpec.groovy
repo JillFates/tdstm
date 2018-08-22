@@ -789,6 +789,182 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.moveBundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }*.getId()
+			}
+
+		and:
+			GroovySpy(AssetDependency, global: true)
+			AssetDependency.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				assetDependencies.findAll { it.id == args.id }*.getId()
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+							extract 'AssetDependencyId' load 'id'
+							find Dependency by 'id' eq DOMAIN.id into 'id'
+
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
+
+							find Application by 'id' eq DOMAIN.asset into 'asset'
+   							elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' eq SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
+
+						}
+						""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
+
+					// Validates command: find Application of asset by id with DOMAIN.asset
+					(1..14).eachWithIndex { int value, int index ->
+						with(data[index].fields.id.find) {
+							query.size() == 1
+							assertQueryResult(
+								query[0],
+								ETLDomain.Dependency,
+								[
+									['id', FindOperator.eq.name(), value.toString()]
+								]
+							)
+						}
+					}
+
+					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+					with(data[0], RowResult){
+
+						fields.size() == 2
+
+						with(fields['asset'].find, FindResult){
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Application,
+								[
+									['id', FindOperator.eq.name(), '151954']
+								]
+							)
+							assertQueryResult(
+								query[1],
+								ETLDomain.Application,
+								[
+									['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],
+									['assetClass', FindOperator.eq.name(), 'VM']
+								]
+							)
+							assertQueryResult(
+								query[2],
+								ETLDomain.Application,
+								[
+									['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+								]
+							)
+							assertQueryResult(
+								query[3],
+								ETLDomain.Asset,
+								[
+									['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+								]
+							)
+						}
+
+					}
+				}
+			}
+
+			with(etlProcessor.findCache){
+				size() == 12
+				hitCountRate() == 7.14
+				get('Application', [new FindCondition('id', '151954')]) == [151954l]
+				get('Application', [new FindCondition('id', '151971')]) == [151971l]
+				get('Application', [new FindCondition('id', '151974')]) == [151974l]
+				get('Application', [new FindCondition('id', '151975')]) == [151975l]
+			}
+
+		cleanup:
+			if(fileName)  service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
 		given:
