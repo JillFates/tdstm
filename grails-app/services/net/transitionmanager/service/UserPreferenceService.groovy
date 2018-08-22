@@ -38,15 +38,15 @@ class UserPreferenceService implements ServiceMethods {
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb']
 
 	// TODO - TM-6569 - Refactor the Map definition with the closures
-	private static final Map<String, Map> prefCodeConstraints = [
-		viewUnpublished:  [type: 'boolean'],
-		assetJustPlanning: [type: 'boolean'],
-		RefreshEventDB:   [type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
-		RefreshTaskMgr:   [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		RefreshMyTasks:   [type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
-		RefreshTaskGraph: [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		RefreshTimeline:  [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		depGraph:         [type: 'string', validator: { String value ->
+	private static final EnumMap<UserPreferenceEnum, Map> prefCodeConstraints = [
+			(UserPreferenceEnum.VIEW_UNPUBLISHED): 	[type: 'boolean'],
+			(UserPreferenceEnum.ASSET_JUST_PLANNING): [type: 'boolean'],
+			(UserPreferenceEnum.EVENTDB_REFRESH): 	[type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
+			(UserPreferenceEnum.TASKMGR_REFRESH): 	[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.MYTASKS_REFRESH): 	[type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.TASKGRAPH_REFRESH): [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.TIMELINE_REFRESH): 	[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.DEP_GRAPH):         [type: 'string', validator: { String value ->
 			def prefs = JSON.parse(value)
 
 			if (!(prefs.colorBy in depGraphColorBy)) {
@@ -65,7 +65,7 @@ class UserPreferenceService implements ServiceMethods {
 
 			return true
 		}],
-		archGraph: [type: 'string', validator: { String value ->
+			(UserPreferenceEnum.ARCH_GRAPH): [type: 'string', validator: { String value ->
 			def prefs = JSON.parse(value)
 
 			for (label in archGraphCheckboxLabels) {
@@ -85,7 +85,7 @@ class UserPreferenceService implements ServiceMethods {
 
 			return true
 		}],
-		legendTwistieState: [type: 'string', validator: { String value ->
+			(UserPreferenceEnum.LEGEND_TWISTIE_STATE): [type: 'string', validator: { String value ->
 			def prefs = value.split(',')
 			if (prefs.length == 0) {
 				return true // it means is just empty (nothing open)

@@ -45,7 +45,7 @@ enum UserPreferenceEnum {
 	MOVE_BUNDLE,
 	MOVE_EVENT,
 	MYTASKS_MOVE_EVENT_ID,
-	MYTASKS_REFRESH,
+	MYTASKS_REFRESH('RefreshMyTasks'),
 	PARTY_GROUP('PARTYGROUP'),
 	Physical_Columns,
 	PRINT_LABEL_QUANTITY('printLabelQuantity'),
