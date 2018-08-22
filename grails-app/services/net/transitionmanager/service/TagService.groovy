@@ -256,10 +256,10 @@ class TagService implements ServiceMethods {
 	}
 
 	/**
-	 * Generates up the query for filtering by tags, if there are any.
+	 * Generates up the query for filtering by tags, if there are any. To use this the asset_entity table must be joined with the alias a.
 	 *
 	 * @param tagIds The tag ids to filter by.
-	 * @param andOp To filter multiple tag ids using AND, if true, or use OR if false.
+	 * @param tagMatch To filter multiple tag ids using AND/All Logic,, or use OR/ANY logic.
 	 *
 	 * @return the query for filtering by tags, using AND/OR, or and empty string, if there are no tags to filter by.
 	 */
@@ -278,5 +278,26 @@ class TagService implements ServiceMethods {
 			queryParams.tagIdsSize = tagIds.size()
 			return "AND a.asset_entity_id in(SELECT ta2.asset_id FROM tag_asset ta2 WHERE ta2.tag_id in (:tagIds) GROUP BY ta2.asset_id HAVING count(*) = :tagIdsSize)"
 		}
+	}
+
+	/**
+	 * Generates the joins used for a query using tags. To use this the asset_entity table must be joined with the alias a.
+	 *
+	 * @param tagIds The tag ids to filter by.
+	 * @param tagMatch To filter multiple tag ids using AND/All Logic,, or use OR/ANY logic.
+	 *
+	 * @return  the joins for a query that uses tags. If there are tag ids and the tag match is set to any, then the tag joins are added,
+	 * otherwise the tag joins are not added, because of the way the tags are filtered in get TagsQuery(sub select).
+	 */
+	String getTagsJoin(List<Long> tagIds, String tagMatch) {
+
+		if (tagIds && tagMatch == 'ANY') {
+			return """
+					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
+					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+				"""
+		}
+
+		return ''
 	}
 }
