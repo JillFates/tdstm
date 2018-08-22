@@ -10,6 +10,7 @@ export class AkaComponent implements OnInit {
 	@Input('aka') akaCollection: Array<Aka>;
 	@Input('akaParent') akaParent: AkaParent;
 	@Output('modelChange') modelChange = new EventEmitter<AkaChanges>();
+	@Output('validationErrors') validationErrors = new EventEmitter<boolean>();
 	clonedAkas: Array<Aka>;
 	hasError: boolean;
 	indexError: number;
@@ -35,11 +36,10 @@ export class AkaComponent implements OnInit {
 		this.errorMessage = '';
 		this.indexError = -1;
 		this.hasError = false;
+		this.validationErrors.emit(false);
 	}
 
 	onAdd(aka: string): void {
-		// check if there is empty aka
-
 		const foundEmpty = this.akas.filter((aka: string) => (aka || '').trim() === '');
 		if (foundEmpty && foundEmpty.length) {
 			return;
@@ -68,7 +68,6 @@ export class AkaComponent implements OnInit {
 
 		this.validateAka(aka, index)
 			.then(() => {
-				console.log('There is no errors');
 				if (this.hasError && this.indexError === index) {
 					this.cleanError();
 				}
@@ -76,7 +75,7 @@ export class AkaComponent implements OnInit {
 				this.sendAkaChanges();
 			})
 			.catch((err) => {
-				console.log('There is errors');
+				this.validationErrors.emit(true);
 				this.indexError = index;
 				this.hasError = true;
 				this.errorMessage = err;

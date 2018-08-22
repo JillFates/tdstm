@@ -11,12 +11,14 @@ import {ManufacturerService} from '../../../../../service/manufacturer.service';
 })
 export class ManufacturerEditComponent extends UIExtraDialog {
 	isEditing: boolean;
+	hasAkaValidationErrors: boolean;
 	constructor(
 		public deviceManufacturer: DeviceManufacturer,
 		private manufacturerService: ManufacturerService,
 		private prompt: UIPromptService) {
 		super('#device-manufacturer-edit-component');
 		this.isEditing = false;
+		this.hasAkaValidationErrors = false;
 	}
 
 	/***
@@ -47,8 +49,10 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	}
 
 	public onAkaChange(akaChanges: AkaChanges): void {
+		if (this.deviceManufacturer.akaChanges) {
+			this.isEditing = true;
+		}
 		this.deviceManufacturer.akaChanges = akaChanges;
-		this.isEditing = true;
 	}
 
 	public onChange(event: any): void {
@@ -66,5 +70,10 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 				alert('canceling...');
 			}
 		});
+	}
+	onValidationErrors(hasAkaValidationErrors: boolean): void {
+		this.hasAkaValidationErrors = hasAkaValidationErrors;
+		console.log('Setting the value');
+		console.log(this.hasAkaValidationErrors);
 	}
 }

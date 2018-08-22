@@ -1,6 +1,6 @@
 <div class="modal fade in device-manufacturer-edit-component" id="device-manufacturer-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content" [style.width.px]="400">
+        <div class="modal-content" [style.width.px]="450">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -26,6 +26,7 @@
 		                        <div class="col-md-4">AKA:</div>
 		                        <div class="col-md-6"> <tds-aka [aka]="deviceManufacturer.akaCollection || []"
 		                                                        [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.name}"
+		                                                        (validationErrors)="onValidationErrors($event)"
 		                                                        (modelChange)="onAkaChange($event)"></tds-aka></div>
 	                        </div>
 
@@ -61,7 +62,8 @@
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <button [disabled]="!isEditing || !deviceManufacturer.name" type="button" class="btn btn-primary pull-left" (click)="onUpdateManufacturer()"><span
+                <button [disabled]="!isEditing || !deviceManufacturer.name || hasAkaValidationErrors"
+                        type="button" class="btn btn-primary pull-left" (click)="onUpdateManufacturer()"><span
                         class="fa fa-fw fa-floppy-o"></span> Save
                 </button>
 	            <button type="button" class="btn btn-danger pull-left" (click)="onDeleteManufacturer()"><span
