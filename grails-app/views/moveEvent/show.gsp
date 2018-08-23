@@ -3,11 +3,18 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
-        <title>Show Event</title>
+		<g:javascript src="asset.tranman.js" />
+		<g:javascript src="entity.crud.js" />
+		<g:render template="../layouts/responsiveAngularResources" />
+
+		<g:javascript src="asset.comment.js" />
+		<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
+        <title>Show Event </title>
     </head>
     <body>
 		<tds:subHeader title="Event Details" crumbs="['Planning','Event', 'Details']"/>
-        <div class="body">
+        <div class="body move-event-show" ng-app="tdsComments" ng-controller="tds.comments.controller.EventEditController as eventEdit">
+			<input type="hidden" name="id" class="moveEventInstanceId" value="${moveEventInstance?.id}" />
             <div class="nav" style="border: 1px solid #CCCCCC; height: 25px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
 				<span class="menuButton"><g:link class="create" controller="task" action="taskGraph"
@@ -18,7 +25,7 @@
             <div class="message">${flash.message}</div>
             </g:if>
             <div id="messageDiv" class="message" style="display: none;"></div>
-            <div class="dialog">
+            <div class="dialog ">
                 <table>
                     <tbody>
                         <tr class="prop">
@@ -29,6 +36,14 @@
                             <td class="name">Description:</td>
                             <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'description')}</td>
                         </tr>
+					<tr class="prop">
+						<td class="name"><label class="tag-title">Tag:</label></td>
+						<td style="text-align:left;" class="valueNW asset-tag-selector-component-content">
+							<span class="label tag {{tag.css}}" ng-repeat="tag in internal.assetSelector.tag">
+								{{tag.name}}
+							</span>
+						</td>
+					</tr>
                         <tr class="prop">
                             <td class="name">Bundles:</td>
                             <td style="text-align:left;" class="valueNW">
