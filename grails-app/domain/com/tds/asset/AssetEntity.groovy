@@ -217,6 +217,7 @@ class AssetEntity {
 	Integer    rateOfChange
 	Person     modifiedBy
 	Collection tagAssets
+	Collection comments
 
 	Date dateCreated
 	Date lastUpdated
