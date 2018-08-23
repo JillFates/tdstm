@@ -8,6 +8,12 @@ import {AssetEditComponent} from '../asset/asset-edit.component';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import { DeviceModel } from './model-device/model/device-model.model';
+import { DeviceManufacturer } from './manufacturer/model/device-manufacturer.model';
+import { ModelDeviceShowComponent } from './model-device/components/model-device-show/model-device-show.component';
+import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
+import {ModelService} from '../../service/model.service';
+import {ManufacturerService} from '../../service/manufacturer.service';
 
 declare var jQuery: any;
 
@@ -18,11 +24,15 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
+		public manufacturerName: string;
 
 		constructor(
 			private activeDialog: UIActiveDialogService,
 			private dialogService: UIDialogService,
-			private assetService: DependecyService) {
+			private assetService: DependecyService,
+			private modelService: ModelService,
+			private manufacturerService: ManufacturerService) {
+			this.manufacturerName = null;
 		}
 
 		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -40,6 +50,13 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 		cancelCloseDialog(): void {
 			this.activeDialog.dismiss();
+		}
+
+		getManufacturer(manufacturerName): string {
+			if (this.manufacturerName === null) {
+				this.manufacturerName = manufacturerName;
+			}
+			return this.manufacturerName;
 		}
 
 		showAssetDetailView(assetClass: string, id: number) {
@@ -64,6 +81,41 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
 				DIALOG_SIZE.XLG);
+		}
+
+		showModel(id: string): void {
+			this.modelService.getModelAsJSON(id)
+				.subscribe((deviceModel: DeviceModel) => {
+					this.dialogService.extra(ModelDeviceShowComponent,
+						[UIDialogService,
+							{
+								provide: DeviceModel,
+								useValue: deviceModel
+							}
+						], true, false)
+						.then((result) => {
+							console.log(result);
+						}).catch((error) => console.log(error));
+				});
+		}
+
+		showManufacturer(id: string): void {
+			this.manufacturerService.getDeviceManufacturer(id)
+				.subscribe((deviceManufacturer: DeviceManufacturer) => {
+
+					this.dialogService.extra(ManufacturerShowComponent,
+						[UIDialogService,
+							{
+								provide: DeviceManufacturer,
+								useValue: deviceManufacturer
+							}
+						], true, false)
+						.then((result) => {
+							if (result) {
+								this.manufacturerName = result.name;
+							}
+						}).catch((error) => console.log(error));
+				});
 		}
 
 	}

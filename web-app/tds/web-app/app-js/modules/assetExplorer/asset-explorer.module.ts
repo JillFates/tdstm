@@ -24,6 +24,9 @@ import { BulkChangeButtonComponent } from './components/bulk-change/components/b
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
 import { TDSCheckboxComponent } from './tds-checkbox/tds-checkbox.component';
+import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
+import { ManufacturerEditComponent } from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
+import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -38,6 +41,8 @@ import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
 import { BulkChangeService } from './service/bulk-change.service';
 import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
+import { ManufacturerService } from './service/manufacturer.service';
+import { ModelService } from  './service/model.service';
 
 @NgModule({
 	imports: [
@@ -69,7 +74,10 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSCheckboxComponent
+		TDSCheckboxComponent,
+		ModelDeviceShowComponent,
+		ManufacturerShowComponent,
+		ManufacturerEditComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -77,7 +85,9 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		DependecyService,
 		TagService,
 		BulkChangeService,
-		DataGridCheckboxService
+		DataGridCheckboxService,
+		ManufacturerService,
+		ModelService
 	],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
@@ -91,7 +101,10 @@ import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
-		TDSCheckboxComponent
+		TDSCheckboxComponent,
+		ManufacturerShowComponent,
+		ManufacturerEditComponent,
+		ModelDeviceShowComponent
 	],
 })
 
