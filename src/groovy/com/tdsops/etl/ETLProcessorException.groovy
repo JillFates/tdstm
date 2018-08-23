@@ -76,6 +76,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException(message)
     }
 
+    static ETLProcessorException lookupFoundMultipleResults() {
+        new ETLProcessorException('The lookup command found multiple results with the criteria')
+    }
+
     static ETLProcessorException UnknownVariable (Object value) {
         new ETLProcessorException("Unknown variable: ${value}")
     }
@@ -165,7 +169,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidRootNode (String rootNode) {
-        new ETLProcessorException("Unable to find JSON rootNode with path '${rootNode}'")
+        new ETLProcessorException("Data was not found in JSON at rootNode '$rootNode'")
     }
 
     static ETLProcessorException invalidETLVariableName (String variableName) {
@@ -217,6 +221,5 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException incorrectFindCommandStructure() {
         new ETLProcessorException('Incorrect structure for find command')
     }
-
 }
 

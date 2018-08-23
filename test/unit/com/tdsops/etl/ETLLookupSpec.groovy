@@ -189,10 +189,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					  GMDEMO,
-					  dataSet,
-					  debugConsole,
-					  validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -414,27 +414,26 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-				console on
-				read labels
-				domain Device
-				set lookupFieldNameVar with 'assetName'
-				// Force the case to uppercase so that it tests the case-insensitive lookup
-				set serialNumVar with '422e2244-f78c-2012-b56a-e435d7519abf'.toUpperCase()
-				iterate {
-					extract 'Vm' load 'Name'
-					extract 'Vm Id' load 'externalRefId'
-					extract 'Vm Uuid' load 'serialNumber'
-					extract 'OS according to the VMware Tools' load 'os'
+						console on
+						read labels
+						domain Device
+						set lookupFieldNameVar with 'assetName'
+						set serialNumVar with '422e2244-f78c-2012-b56a-e435d7519abf'
+						iterate {
+							extract 'Vm' load 'Name'
+							extract 'Vm Id' load 'externalRefId'
+							extract 'Vm Uuid' load 'serialNumber'
+							extract 'OS according to the VMware Tools' load 'os'
 
-					// the serialNumber is that of the 2nd row in the csv
-					lookup lookupFieldNameVar, 'serialNumber' with '59admin', serialNumVar
-					if ( LOOKUP ) {
-						load 'custom1' with 'Matched 2nd'
-					} else {
-						load 'custom1' with 'No match'
-					}
-				}
-				""".stripIndent())
+							// the serialNumber is that of the 2nd row in the csv
+							lookup lookupFieldNameVar, 'serialNumber' with '59admin', serialNumVar
+							if ( LOOKUP ) {
+								load 'custom1' with 'Matched 2nd'
+							} else {
+								load 'custom1' with 'No match'
+							}
+						}
+						""".stripIndent())
 
 		then: 'Results should contain Device domain results associated'
 			with(etlProcessor.finalResult()) {

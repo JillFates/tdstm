@@ -2510,7 +2510,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'xraysrv001']])
+								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'xraysrv001']])
 							}
 							with(create){
 								assetName == 'xraysrv001'
@@ -2534,7 +2534,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'zuludb01']])
+								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zuludb01']])
 							}
 							with(create){
 								assetName == 'zuludb01'

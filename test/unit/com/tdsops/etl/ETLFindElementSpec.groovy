@@ -108,7 +108,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLFindElement find = new ETLFindElement(processor, domainClass, 1)
 
 		and: 'an Element class as a local variable'
-			Element srcNameVar = new Element(original_aaValue: aConditionValue, value: aConditionValue, processor: processor)
+			Element srcNameVar = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
 
 		and: 'it adds an eq statement'
 			find.by aPropertyName eq srcNameVar
@@ -258,7 +258,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
-				conditions.size() == 2
+				conditions.size() == 1
 				with(conditions[0], FindCondition) {
 					propertyName == 'assetName'
 					operator == FindOperator.ne
@@ -293,7 +293,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
-				conditions.size() == 2
+				conditions.size() == 1
 				with(conditions[0], FindCondition) {
 					propertyName == 'assetName'
 					operator == FindOperator.nseq
@@ -328,7 +328,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
-				conditions.size() == 2
+				conditions.size() == 1
 				with(conditions[0], FindCondition) {
 					propertyName == 'assetName'
 					operator == FindOperator.lt

@@ -335,6 +335,9 @@ class DomainClassQueryHelper {
 			case FindOperator.ne:
 				sentence = " ${property} != :${namedParameter}\n"
 				break
+			case FindOperator.nseq:
+				sentence = " ${property} != :${namedParameter}\n"
+				break
 
 			default:
 				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")

@@ -275,6 +275,7 @@ class ETLProcessorResult {
 		}
 	}
 
+
 	/**
 	 * Look up a field name that contain a value equals to the value and if found then the current
 	 * result reference will be move back to a previously processed row for the domain. This is done
@@ -310,22 +311,67 @@ class ETLProcessorResult {
 	 *  }
 	 * </pre>
 	 * If the value is found, then it is used in the following commands during the iteration
-	 * @param fieldName - the field to examine for a match
-	 * @param value - the value that the field should have
+	 * @param fieldNames - A list of the field elements to examine for a match
+	 * @param values - A list of the values to compare the fields against
 	 * @return true if the data row was found otherwise false
 	 */
-	boolean lookupInReference(String fieldName, String value) {
-		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
-		Integer lookupPosition = reference.data.findIndexOf { RowResult dataRow ->
-			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
+	// boolean lookupInReference(String fieldName, String value) {
+	// 	// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
+	// 	Integer lookupPosition = reference.data.findIndexOf { RowResult dataRow ->
+	// 		dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
+	// 	}
+	// 	if(lookupPosition >= 0){
+	// 		resultIndex = lookupPosition
+	// 		return true
+	// 	} else {
+	// 		return false
+	// 	}
+	// }
+	boolean lookupInReference(List<String> fieldNames, List<Object> valuesFromETL) {
+
+		// First go through the list of values and pluck out value from an ETL variable or other types
+		List<Object> values = valuesFromETL.collect { ETLValueHelper.valueOf(it) }
+
+		// This closure will iterate through all of the rows and return the indexes of those
+		// rows that match all of the fields specified in the 'lookup' command. String evaluations
+		// will be done with case-insensitivity.
+		int rowNum = 0
+		List<Integer> positions = reference.data.findIndexValues { RowResult row ->
+			boolean matched = true
+			int i = 0
+			rowNum++
+			for (String fname in fieldNames) {
+				if (row.fields.containsKey(fname)) {
+					Object rowValue = row.fields[fname].value
+
+					// Determine if the value is a String
+					if (rowValue instanceof CharSequence && values[i] instanceof CharSequence ) {
+						matched = rowValue.equalsIgnoreCase(values[i].toString())
+					} else {
+						matched = rowValue == values[i]
+					}
+				} else {
+					// Missing the field so no match
+					matched = false
+				}
+				if (!matched) {
+					break
+				}
+				i++
+			}
+			return matched
 		}
-		if(lookupPosition >= 0){
-			resultIndex = lookupPosition
-			return true
-		} else {
-			return false
+
+		int size = positions.size()
+		if (size > 1) {
+			throw ETLProcessorException.lookupFoundMultipleResults()
+		} else if (size == 1) {
+			this.resultIndex = positions[0]
 		}
+
+		return (size == 1)
 	}
+
 
 	/**
 	 * Register an instance of AnnotationDrivenObjectMarshaller for ETLProcessorResult

@@ -2,6 +2,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.FindCondition
+import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
@@ -424,6 +425,25 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				project,
 				[
 					new FindCondition('roomTarget', device.roomTarget.roomName)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+
+	void '24. can find a Device by using ne in a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id, FindOperator.ne)
 				]
 			)
 
