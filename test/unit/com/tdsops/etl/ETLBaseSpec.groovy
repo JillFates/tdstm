@@ -428,6 +428,7 @@ abstract class ETLBaseSpec extends Specification {
 
 	/**
 	 * Assertions for a {@code QueryResult} instance
+	 * //TODO dcorrea add an example
 	 * @param queryResult
 	 * @param domain
 	 * @param values

@@ -16,6 +16,7 @@ import groovy.transform.CompileStatic
 @ConfigureMarshalling
 class ETLProcessorResult {
 
+	static final Integer CURRENT_VERSION = 2
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
@@ -24,7 +25,7 @@ class ETLProcessorResult {
 	/**
 	 * Defines JSON version for the import the process.
 	 */
-	String version = 2
+	Integer version = CURRENT_VERSION
 	/**
 	 * ETL info map details
 	 */

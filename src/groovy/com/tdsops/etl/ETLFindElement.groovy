@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import groovy.transform.CompileStatic
+
 /**
  * ETL find command implementation.
  * <code>
@@ -395,7 +398,6 @@ class ETLFindElement implements ETLStackableCommand {
 		currentFind.statement = new FindStatementBuilder(this, propertyName)
 		return currentFind.statement
 	}
-
 }
 
 /**
@@ -416,176 +418,4 @@ class CurrentFind {
 	Integer matchOn
 
 	FindStatementBuilder statement
-}
-
-class FindStatementBuilder {
-
-	ETLDomain domain
-	ETLProcessor processor
-	ETLFindElement findElement
-	FindCondition currentCondition
-
-	List<FindCondition> conditions = []
-
-	FindStatementBuilder(ETLFindElement findElement, String propertyName){
-		this.domain = findElement.currentDomain
-		this.processor = findElement.processor
-		this.findElement = findElement
-		changeCurrentCondition(propertyName)
-	}
-
-	FindStatementBuilder(List<FindCondition> conditions){
-		this.conditions = conditions
-	}
-
-
-	/**
-	 * <p>It adds another condition for the current instance of {@code FindStatementBuilder}</p>
-	 * <pre>
-	 * find Device by 'assetName' eq srcNameVar and 'IP Address' contains srcIPVar
-	 * find Device by 'assetName' like srcNameVar+'%' and 'Tier' in ['Gold','Silver']
-	 * </pre>
-	 * @param propertyName
-	 * @return
-	 */
-	FindStatementBuilder and(String propertyName) {
-		changeCurrentCondition(propertyName)
-		return this
-	}
-
-	/**
-	 * Sets a value for the current find Element.
-	 * <pre>
-	 * find Application by 'id' with SOURCE.'application id' into 'id'
-	 * </pre>
-	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
-	 * @return
-	 */
-	FindStatementBuilder with(Object value) {
-		return completeCurrentCondition(FindOperator.eq, value)
-	}
-
-	/**
-	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
-	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
-	 * @return
-	 */
-	FindStatementBuilder eq(Object value){
-		return completeCurrentCondition(FindOperator.eq, value)
-	}
-
-	/**
-	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
-	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
-	 * @return
-	 */
-	FindStatementBuilder ne(Object value){
-		return completeCurrentCondition(FindOperator.ne, value)
-	}
-
-	ETLFindElement into(String propertyName){
-		return findElement.into(propertyName, this)
-	}
-
-
-	/**
-	 * Takes the current condition and set an operator and a value.
-	 * @param operator a instance of {@code FindOperator}
-	 * @param value an Object used as a {@code FindCondition} value field
-	 * @return current instance of {@code FindStatementBuilder}
-	 */
-	private FindStatementBuilder completeCurrentCondition(FindOperator operator, Object value){
-		currentCondition.defineOperator(operator, value)
-		return this
-	}
-
-
-	/**
-	 * Validates calls within the DSL script that can not be managed
-	 * @param methodName
-	 * @param args
-	 */
-	def methodMissing (String methodName, args) {
-		processor.log("Method missing: ${methodName}, args: ${args}", DebugConsole.LevelMessage.ERROR)
-		throw ETLProcessorException.methodMissing(methodName, args)
-	}
-
-	/**
-	 * Change the current FindCondition validating previously the current status of the previous one.
-	 * It also looks up the propertyName definition in order to use a field name or a field label
-	 * @param FindCondition the currentCondition for an instance of {@code FindStatementBuilder}
-	 * @see FindStatementBuilder#currentCondition
-	 * @see ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
-	 */
-	private FindCondition changeCurrentCondition(String propertyName){
-		if(currentCondition && !currentCondition.isComplete()){
-			throw ETLProcessorException.incorrectFindCommandStructure()
-		}
-
-		ETLFieldDefinition fieldDefinition = processor.lookUpFieldDefinition(domain, propertyName)
-		this.currentCondition = new FindCondition(fieldDefinition.name)
-		this.conditions.add(currentCondition)
-		return currentCondition
-	}
-
-	/**
-	 * Evaluates the required properties of the command object and
-	 * return an error string if there are any missing in the form:
-	 *    missing [x, y, z] keywords
-	 *
-	 * or an empty string if no problem was found
-	 * @return string with errors or empty
-	 */
-	String stackableErrorMessage() {
-
-		String error = ''
-
-		Set<String> missingProperties = []
-
-		if (currentCondition.isComplete()) {
-			missingProperties << 'into'
-		} else {
-			missingProperties << 'find operation'
-		}
-
-		if (missingProperties) {
-			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
-		}
-
-		return error
-	}
-}
-
-enum FindOperator {
-
-	eq, ne, nseq, lt, le, gt, like
-}
-
-class FindCondition {
-
-	String propertyName
-	FindOperator operator
-	Object value
-
-	FindCondition(String propertyName) {
-		this.propertyName = propertyName
-	}
-
-	FindCondition(String propertyName, Object value, FindOperator operator = FindOperator.eq) {
-		this.propertyName = propertyName
-		defineOperator(operator, value)
-	}
-
-	void defineOperator(FindOperator operator, Object value) {
-		this.operator = operator
-		this.value = ETLValueHelper.valueOf(value)
-	}
-
-	Boolean isComplete() {
-		return this.propertyName && this.operator
-	}
-
-	String toString() {
-		return "$propertyName ${operator.name()} $value"
-	}
 }

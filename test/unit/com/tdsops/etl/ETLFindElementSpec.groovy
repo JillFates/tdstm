@@ -1,10 +1,13 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.JsonUtil
+import grails.converters.JSON
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
 import net.transitionmanager.domain.Project
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
@@ -47,6 +50,31 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLDomain.Rack        || true
 	}
 
+	void 'test can build a list of conditions from a JSON object'(){
+
+		given: 'an instance on JSON Object'
+			List json = JsonUtil.parseJsonList('''
+				[
+					{ "propertyName": "assetName", "operator":"notContains", "value": "prod"},
+					{ "propertyName": "priority", "operator":"gt", "value": 4}
+				]
+			''')
+
+		when: 'FindCondition is used to build a list of conditions'
+			List<FindCondition> conditions = FindCondition.buildCriteria(json)
+
+		then: 'a list of conditions was built'
+			conditions.size() == 2
+			conditions[0].propertyName == 'assetName'
+			conditions[0].operator == FindOperator.notContains
+			conditions[0].value == 'prod'
+
+			conditions[1].propertyName == 'priority'
+			conditions[1].operator == FindOperator.gt
+			conditions[1].value == 4
+
+	}
+
 	@Unroll
 	void 'test can assign a #anotherDomainClass domain in an elseFind element with #domainClass as a main domain'() {
 
@@ -80,7 +108,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLFindElement find = new ETLFindElement(processor, domainClass, 1)
 
 		and: 'an Element class as a local variable'
-			Element srcNameVar = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
+			Element srcNameVar = new Element(original_aaValue: aConditionValue, value: aConditionValue, processor: processor)
 
 		and: 'it adds an eq statement'
 			find.by aPropertyName eq srcNameVar
@@ -205,4 +233,108 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use ne in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'it appends an eq statement'
+			find.by 'assetName' ne 'zulu01'  \
+ 				   into 'id'
+
+		then:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 2
+				with(conditions[0], FindCondition) {
+					propertyName == 'assetName'
+					operator == FindOperator.ne
+					value == 'zulu01'
+					it.isComplete()
+				}
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use nseq in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'it appends an eq statement'
+			find.by 'assetName' nseq 'zulu01'  \
+ 				   into 'id'
+
+		then:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 2
+				with(conditions[0], FindCondition) {
+					propertyName == 'assetName'
+					operator == FindOperator.nseq
+					value == 'zulu01'
+					it.isComplete()
+				}
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use lt in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'it appends an eq statement'
+			find.by 'assetName' lt 'zulu01'  \
+ 				   into 'id'
+
+		then:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 2
+				with(conditions[0], FindCondition) {
+					propertyName == 'assetName'
+					operator == FindOperator.lt
+					value == 'zulu01'
+					it.isComplete()
+				}
+			}
+	}
 }

@@ -382,7 +382,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			List results = DomainClassQueryHelper.where(ETLDomain.Device,
 				project,
 				[
-					new FindCondition('id', device.id)
+					new FindCondition('id', device.id, 'eq')
 				]
 			)
 

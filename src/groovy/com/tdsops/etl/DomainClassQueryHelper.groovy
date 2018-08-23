@@ -264,7 +264,7 @@ class DomainClassQueryHelper {
 
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 				hqlParams[namedParameter] = condition.value
-				String where = " ${property}.id = :${namedParameter}\n"
+				String where = buildSentenceWithOperation(property, condition.operator, namedParameter)
 
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
@@ -283,7 +283,7 @@ class DomainClassQueryHelper {
 
 
 
-				return " ${property} = :${namedParameter}\n"
+				return buildSentenceWithOperation(property, condition.operator, namedParameter)
 			}
 
 		}.join(' and ')
@@ -313,6 +313,36 @@ class DomainClassQueryHelper {
 			getJoinForField(clazz, condition.propertyName)
 		}.join('  ')
 	}
+
+	/**
+	 * It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator
+	 * <pre>
+	 *
+	 *
+	 * </pre>
+	 * @param property a String
+	 * @param operator a {@code FindOperator} parameter to be used in the HQl sentence
+	 * @param namedParameter a named parameter param for the HQL sentence
+	 * @return a HQL sentence defined by a property operator and named parameter
+	 */
+	static String buildSentenceWithOperation(String property, FindOperator operator, String namedParameter){
+
+		String sentence
+		switch (operator){
+			case FindOperator.eq:
+				sentence = " ${property} = :${namedParameter}\n"
+				break
+			case FindOperator.ne:
+				sentence = " ${property} != :${namedParameter}\n"
+				break
+
+			default:
+				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")
+
+		}
+		return sentence
+	}
+
 
 	static Map otherAlternateKeys = [
 		locationSource: [
