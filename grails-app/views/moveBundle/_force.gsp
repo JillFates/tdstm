@@ -605,7 +605,8 @@ function createBehaviorHandler () {
 	function selectEnd (d, i) {
 		var event = d3.event.sourceEvent
 		var leftButtonPressed = (event.button == 0)
-		
+		var multiselect = (event.ctrlKey || GraphUtil.toolStates.selectionAdd)
+
 		// end the region selection if the user was selecting and the left button is held
 		if (selectingRegion && leftButtonPressed) {
 			// if we paused the graph at the start of this selection, unpause it now
@@ -629,7 +630,7 @@ function createBehaviorHandler () {
 			GraphUtil.captureEvent()
 		
 		// if the user wasn't in region selection mode and they clicked in place, deselect all nodes
-		} else if (clicked) {
+		} else if (clicked && !multiselect) {
 			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
 		}
 	}
