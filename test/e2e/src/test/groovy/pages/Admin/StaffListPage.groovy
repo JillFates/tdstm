@@ -41,6 +41,8 @@ class   StaffListPage extends Page {
         staffGridRows               { staffView.find("table#personIdGrid").find("tr.ui-widget-content","role":"row")}
         gridSize                    { staffGridRows.size()}
         rowSize                     { staffGridHeaderCols.size()}
+        //Grid Columns
+        emailColumn                 {$("#jqgh_email")}
 
         selectAllStaffCBox          { columnsHeader.find("input#cb_personIdGrid")}
 
