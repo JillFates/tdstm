@@ -26,7 +26,7 @@ databaseChangeLog = {
 						def mapForTags = settingsJson.fields.findAll { it.field in dateColumns }
 
 						mapForTags.each { Map map ->
-							map.control = "DataTime"
+							map.control = "DateTime"
 						}
 					}
 					return settingsJson
