@@ -1415,22 +1415,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
+
 			// clear out the CSS classes for overDue
 			dueClass = ''
-
-			if (it.estFinish) {
-				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
-				elapsedSec = elapsed.toMilliseconds() / 1000
-				if (elapsedSec > 300) {
-					dueClass = 'task_overdue'
-				}
+			if (it.dueDate && it.dueDate < nowGMT) {
+				dueClass = 'task_overdue'
+			}
+			if (it.estFinish < nowGMT) {
+				Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
+				estStartClass = estimatedColumnsCSS['estStartClass']
+				estFinishClass = estimatedColumnsCSS['estFinishClass']
 			}
 
-			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
-			estStartClass = estimatedColumnsCSS['estStartClass']
-			estFinishClass = estimatedColumnsCSS['estFinishClass']
-
-			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
 
 			String dueDate = TimeUtil.formatDate(it.dueDate)
 
