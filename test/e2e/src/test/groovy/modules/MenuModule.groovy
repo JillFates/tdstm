@@ -6,13 +6,6 @@ class MenuModule extends Module {
 
     static at = {
 
-        projectsItem.text().trim()          == "Projects"
-        projectsActiveItem.text().trim()    == "Active Projects"
-        projectsCurrentItem.text().contains() == "Details" // TODO add the project name as test property
-        projectsMailItem.text().trim()      == "User Activation Emails"
-        projectsStaffItem.text().trim()     == "Project Staff"
-        projectsFieldsSetItem.text().trim() == "Asset Field Settings"
-
         assetsItem.text().trim()            == "Assets"
         assetsSections[0].text().trim()     == "Assets"
         assetsSummaryItem.text().trim()     == "Summary Table"
@@ -46,19 +39,6 @@ class MenuModule extends Module {
     static content = {
         menuContainer       { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
         menuBar             { menuContainer.find("div#navbar-collapse")}
-
-        projectsItem            { menuBar.find("li.menu-parent-projects") }
-        projectsMenu            { projectsItem.find("ul",class:"dropdown-menu menu-item-expand")}
-        projectsActiveItem      { projectsMenu.find("li.menu-projects-active-projects")}
-        projectsCurrentItem     { projectsMenu.find("li.menu-projects-current-project")}
-        projectsStaffItem       { projectsMenu.find("li.menu-projects-user-activation")}
-        projectsMailItem        { projectsMenu.find("li.menu-projects-user-activation")}
-        projectsFieldsSetItem   { projectsMenu.find("li.menu-projects-field-settings")}
-        projectsProviders       { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/provider/list")}
-        projectsCredentials     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/credential/list")}
-        projectsDatascripts     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
-        projectsActions         { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/action/list")}
-        projectsTags            { projectsMenu.find("li.menu-projects-tags")}
 
         assetsItem              { menuBar.find("li.menu-parent-assets")}
         assetsMenu              { assetsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -127,34 +107,9 @@ class MenuModule extends Module {
         }
     }
 
-    def goToProjectsActive(){
-        selectMenu(projectsItem)
-        selectItem(projectsActiveItem)
-    }
-
     def goToApplications(){
         selectMenu(assetsItem)
         selectItem(assetsApplicationsItem)
-    }
-
-    def goToProviders(){
-        selectMenu(projectsItem)
-        selectItem(projectsProviders)
-    }
-
-    def goToCredentials(){
-        selectMenu(projectsItem)
-        selectItem(projectsCredentials)
-    }
-
-    def goToDatascripts(){
-        selectMenu(projectsItem)
-        selectItem(projectsDatascripts)
-    }
-
-    def goToActions(){
-        selectMenu(projectsItem)
-        selectItem(projectsActions)
     }
 
     def goToTasksManager(){
@@ -185,9 +140,5 @@ class MenuModule extends Module {
         projectName.text().contains(name)
     }
 
-    def goToTagsPage(){
-        selectMenu projectsItem
-        selectItem projectsTags
-    }
 
 }
