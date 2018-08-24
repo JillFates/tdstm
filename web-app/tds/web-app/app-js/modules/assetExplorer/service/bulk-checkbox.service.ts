@@ -95,9 +95,12 @@ export class BulkCheckboxService {
 		this.bulkItems = {};
 		ids.forEach((id: string) => this.bulkItems[id] = false);
 
-		if (this.currentState === CheckboxStates.indeterminate) {
-			this.changeCheckStateBulkItems(true);
-		}
+		this.handlePageChange();
+	}
+
+	private handlePageChange(): void {
+		let state = this.currentState === CheckboxStates.indeterminate ? CheckboxStates.indeterminate : CheckboxStates.unchecked;
+		this.setStateSubject.next({current: state, affectItems: true});
 	}
 
 	private selectBulkItem(id: string, checked: boolean): void {

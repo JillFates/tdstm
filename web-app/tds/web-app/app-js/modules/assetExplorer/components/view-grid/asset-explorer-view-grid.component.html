@@ -2,7 +2,7 @@
 
 <kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+ (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">

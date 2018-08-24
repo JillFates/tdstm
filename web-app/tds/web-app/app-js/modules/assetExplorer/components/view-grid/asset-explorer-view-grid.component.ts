@@ -272,9 +272,11 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
+	/*
 	clearSelectAll(): void {
 		this.selectAll = false;
 	}
+	*/
 
 	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
 		// this.overrideCheckboxState = null;
