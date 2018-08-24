@@ -30,13 +30,16 @@
 		<ng-template kendoGridHeaderTemplate>
 			<div class="row">
 				<div class="col-md-12 text-center">
-					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)" [overrideState]="overrideCheckboxState"></tds-checkbox>
+					<tds-checkbox name="assetsSelector"
+					              [hasThirdState]="true"
+					              (changeState)="onChangeBulkCheckbox($event)"
+					              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
 				</div>
 			</div>
 		</ng-template>
 		<ng-template kendoGridCellTemplate let-dataItem>
             <label class="selectall-checkbox-column text-center">
-	            <input type="checkbox" [checked]="dataGridCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="setSelectedItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
+	            <input type="checkbox" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
             </label>
 			<!--<div class="row">-->
 				<!--<div class="col-md-12 text-center">-->

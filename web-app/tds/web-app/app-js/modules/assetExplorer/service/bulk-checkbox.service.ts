@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
-import {CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
+import {CheckboxStates, CheckboxState} from '../tds-checkbox/model/tds-checkbox.model';
 import { AssetExplorerService } from './asset-explorer.service';
 import { ViewSpec } from '../model/view-spec.model';
 
 @Injectable()
 export class BulkCheckboxService {
+	public setStateSubject: Subject<CheckboxState> = new Subject<CheckboxState>();
 	private currentState: CheckboxStates;
 	private pageSize: number = null;
 	bulkItems: any;
@@ -27,45 +28,61 @@ export class BulkCheckboxService {
 		this.bulkSelectedItems = [];
 	}
 
+	private hasSelectedAllItems(): boolean {
+		return this.bulkSelectedItems.length === this.pageSize
+	}
+
+	/*
 	changeStateByUserInteraction(changingPage = false): CheckboxStates {
 		if (changingPage) {
-			if (this.currentState === CheckboxStates.checked) {
-				this.currentState = CheckboxStates.unchecked;
+			if (this.current === CheckboxStates.checked) {
+				this.current = CheckboxStates.unchecked;
 				this.resetSelectedBulkItems();
-				return this.currentState;
+				return this.current;
 			}
-			if (this.currentState === CheckboxStates.unchecked) {
+			if (this.current === CheckboxStates.unchecked) {
 				this.resetSelectedBulkItems();
 			}
 			return null;
 		}
 
-		this.currentState =  (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
+		this.current =  (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
 
-		return this.currentState;
+		return this.current;
 	}
+	*/
 
-	changeState(currentState: CheckboxStates): void {
-		this.currentState = currentState;
+	changeState(state: CheckboxState): void {
+		this.currentState = state.current;
 
-		if (!this.selectAllIfApplicable() ) {
-			this.selectBulkItems(false);
+		if (state.affectItems) {
+			const select = this.canSelectAll();
+
+			this.changeCheckStateBulkItems(select);
 		}
+
+		/*
+		if (!this.selectAllIfApplicable() ) {
+			this.changeCheckStateBulkItems(false);
+		}
+		*/
 	}
 
 	private getCurrentState(): CheckboxStates {
 		return this.currentState;
 	}
 
+	/*
 	private selectAllIfApplicable(): boolean {
 		if (this.canSelectAll()) {
-			this.selectBulkItems(true);
+			this.changeCheckStateBulkItems(true);
 			return true;
 		}
 		return false;
 	}
+	*/
 
-	canSelectAll(): boolean {
+	private canSelectAll(): boolean {
 		return [CheckboxStates.checked, CheckboxStates.indeterminate].indexOf(this.currentState) >= 0;
 	}
 
@@ -79,24 +96,27 @@ export class BulkCheckboxService {
 		ids.forEach((id: string) => this.bulkItems[id] = false);
 
 		if (this.currentState === CheckboxStates.indeterminate) {
-			this.selectBulkItems(true);
+			this.changeCheckStateBulkItems(true);
 		}
 	}
 
-	selectBulkItem(id: string, checked: boolean): void {
+	private selectBulkItem(id: string, checked: boolean): void {
 		this.bulkItems[id] = checked;
 		this.refreshBulkSelectedItems();
+
+		this.currentState =  this.hasSelectedAllItems() ? CheckboxStates.checked : CheckboxStates.unchecked;
+		this.setStateSubject.next({current: this.currentState, affectItems: false});
 	}
 
 	getValueBulkItem(id: string): boolean {
 		return this.bulkItems[id];
 	}
 
-	selectBulkItems(select: boolean): void {
+	changeCheckStateBulkItems(checkState: boolean): void {
 		const keys = Object.keys(this.bulkItems);
 
 		// update bulk items
-		keys.forEach(key => this.bulkItems[key] = select);
+		keys.forEach(key => this.bulkItems[key] = checkState);
 		this.refreshBulkSelectedItems();
 	}
 
@@ -104,7 +124,7 @@ export class BulkCheckboxService {
 		return Boolean(this.bulkSelectedItems && this.bulkSelectedItems.length);
 	}
 
-	refreshBulkSelectedItems() {
+	private refreshBulkSelectedItems() {
 		const keys = Object.keys(this.bulkItems);
 
 		// update edit bulk items
@@ -155,4 +175,12 @@ export class BulkCheckboxService {
 	setCurrentState(state: CheckboxStates): void {
 		this.currentState = state;
 	}
+
+	// ------
+	checkItem(id: string, checked: boolean, currentPageSize: number): void {
+		this.setPageSize(currentPageSize);
+		this.selectBulkItem(id, checked);
+		// this.changeStateByUserInteraction();
+	}
+
 }

@@ -5,6 +5,6 @@ export enum CheckboxStates {
 }
 
 export interface CheckboxState {
-	currentState: CheckboxStates;
+	current: CheckboxStates;
 	affectItems: boolean;
 }

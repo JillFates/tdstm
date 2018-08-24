@@ -18,7 +18,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
-import {CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 
 const {
@@ -68,7 +68,7 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
-	public overrideCheckboxState: CheckboxStates;
+	// public overrideCheckboxState: CheckboxStates;
 	public bulkItems: number[] = [];
 
 	constructor(
@@ -78,7 +78,7 @@ export class AssetExplorerViewGridComponent {
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
-		this.overrideCheckboxState = null;
+		// this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
@@ -193,7 +193,8 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.overrideCheckboxState = this.bulkCheckboxService.changeStateByUserInteraction(true);
+
+		// this.overrideCheckboxState = this.bulkCheckboxService.changeStateByUserInteraction(true);
 		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
@@ -275,15 +276,19 @@ export class AssetExplorerViewGridComponent {
 		this.selectAll = false;
 	}
 
-	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
-		this.overrideCheckboxState = null;
+	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
+		// this.overrideCheckboxState = null;
 		this.bulkCheckboxService.changeState(checkboxState);
 	}
 
-	setSelectedItem(id: string, checked: boolean): void {
+	checkItem(id: string, checked: boolean): void {
+		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
+		/*
+		REMOVE IT
 		this.bulkCheckboxService.setPageSize(this.gridData.data.length);
 		this.bulkCheckboxService.selectBulkItem(id, checked);
 		this.overrideCheckboxState = this.bulkCheckboxService.changeStateByUserInteraction();
+		*/
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
