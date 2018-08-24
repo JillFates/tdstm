@@ -42,7 +42,7 @@ class MockETLController implements ControllerMethods {
             extract 3 transform with uppercase() load 'description'
         
             set environmentVar with 'Production'
-            find Application by 'id' with applicationIdVar into 'id'
+            find Application by 'id' eq applicationIdVar into 'id'
             whenNotFound 'id' create {
                 assetClass Device
                 environment 'Name' 
@@ -56,7 +56,7 @@ class MockETLController implements ControllerMethods {
             domain Device
             extract 1 load 'id' set deviceIdVar
             extract 'model name' transform with uppercase() load 'Name'
-            find Device by 'id' with deviceIdVar into 'id'
+            find Device by 'id' eq deviceIdVar into 'id'
         }\
     """.stripIndent().trim()
 

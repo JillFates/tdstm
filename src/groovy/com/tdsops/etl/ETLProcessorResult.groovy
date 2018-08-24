@@ -372,16 +372,13 @@ class ETLProcessorResult {
 		return (size == 1)
 	}
 
-
 	/**
 	 * Register an instance of AnnotationDrivenObjectMarshaller for ETLProcessorResult
 	 */
 	static void registerObjectMarshaller() {
 		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 	}
-
 }
-
 
 /**
  * <pre>
@@ -687,7 +684,7 @@ class FindResult {
 		query.add(
 			new QueryResult(
 				domain: findElement.currentDomain.name(),
-				kv: (List<Map<String, Object>>)findElement.currentFind.statement.conditions.collect { FindCondition condition ->
+				criteria: (List<Map<String, Object>>)findElement.currentFind.statement.conditions.collect { FindCondition condition ->
 					return [
 						propertyName: condition.propertyName,
 						operator    : condition.operator.name(),
@@ -713,7 +710,10 @@ class FindResult {
  *	"query": [
  *		{
  *			"domain": "Application",
- *			"kv": {"id": null},
+ *			"criteria": [
+ *				{"propertyName": "assetName", "operator": "eq","value": "zulu01"},
+ *				{"propertyName": "priority", "operator": "gt","value": 2},
+ *			],
  *	    	"error" : "Named parameter [id] value may not be null"
  *		},
  *	]
@@ -725,8 +725,7 @@ class FindResult {
 @ConfigureMarshalling
 class QueryResult {
 	String domain
-	List<Map<String, Object>> kv = []
-
+	List<Map<String, Object>> criteria = []
 
 	@Override
 	String toString() {
@@ -734,7 +733,7 @@ class QueryResult {
 			.concat( "domain=")
 			.concat(domain)
 			.concat(", kv=")
-			.concat(kv.toString())
+			.concat(criteria.toString())
 			.concat('}')
 
 	}

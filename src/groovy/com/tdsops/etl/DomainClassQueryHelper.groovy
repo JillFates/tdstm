@@ -371,6 +371,12 @@ class DomainClassQueryHelper {
 			case FindOperator.notInList:
 				sentence = " ${property} not in :${namedParameter}\n"
 				break
+			case FindOperator.between:
+				sentence = " ${property} between :${namedParameter}\n"
+				break
+			case FindOperator.notBetween:
+				sentence = " ${property} not between :${namedParameter}\n"
+				break
 
 
 			default:

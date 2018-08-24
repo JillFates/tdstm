@@ -90,7 +90,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		otherProjectDevice.save()
 	}
 
-
 	void '1. can find a Device by its id'() {
 
 		given:
@@ -104,7 +103,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-//	@IgnoreRest
 	void '2. can find a Device by roomSource'() {
 
 		given:
@@ -533,7 +531,11 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			List results = DomainClassQueryHelper.where(ETLDomain.Room,
 				project,
 				[
-					new FindCondition('roomName', [room.roomName, 'anotherValue'], FindOperator.inList)
+					new FindCondition(
+						'roomName',
+						[room.roomName, 'anotherValue'],
+						FindOperator.inList
+					)
 				]
 			)
 
@@ -551,11 +553,40 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			List results = DomainClassQueryHelper.where(ETLDomain.Room,
 				project,
 				[
-					new FindCondition('roomName', [room.roomName, 'anotherValue'], FindOperator.notInList)
+					new FindCondition(
+						'roomName',
+						[room.roomName, 'anotherValue'],
+						FindOperator.notInList
+					)
 				]
 			)
 
 		then:
 			results.size() == 0
+	}
+
+	@IgnoreRest
+	void '31. can find a Room by a roomName using a notInList FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.priority = 6
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'priority',
+						(4..6),
+						FindOperator.between
+					)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
 	}
 }
