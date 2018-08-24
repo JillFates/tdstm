@@ -9,31 +9,15 @@ const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 	selector: 'tds-checkbox',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/tds-checkbox/tds-checkbox.component.html'
 })
-
 export class TDSCheckboxComponent implements OnInit {
 	@Input() hasThirdState: boolean;
 	@Input() setStateSubject: Subject<CheckboxState>;
 	@Output() changeState: EventEmitter<CheckboxState> = new EventEmitter();
 	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
-	/*
-	@Input()
-	set overrideState(state: CheckboxStates) {
-		if (state !== null) {
-			if (state === CheckboxStates.checked) {
-				this.transitToChecked();
-				this.changeState.emit(state);
-			} else {
-				this.transitToUnchecked();
-				// dont emit because it will clear all
-			}
-		}
-	}
-	*/
 	currentState: CheckboxStates;
 	private transitionHandler: Function;
 
 	ngOnInit() {
-
 		this.setStateSubject
 			.subscribe((state: CheckboxState) => {
 				switch (state.current) {

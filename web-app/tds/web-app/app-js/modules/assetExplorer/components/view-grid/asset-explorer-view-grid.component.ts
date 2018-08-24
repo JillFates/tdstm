@@ -368,4 +368,9 @@ export class AssetExplorerViewGridComponent {
 	hasSelectedItems(): boolean {
 		return this.bulkCheckboxService.hasSelectedItems();
 	}
+
+	getSelectedItemsCount(): number {
+		const allCounter = (this.gridData && this.gridData.total) || 0;
+		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
+	}
 }

@@ -32,26 +32,6 @@ export class BulkCheckboxService {
 		return this.bulkSelectedItems.length === this.pageSize
 	}
 
-	/*
-	changeStateByUserInteraction(changingPage = false): CheckboxStates {
-		if (changingPage) {
-			if (this.current === CheckboxStates.checked) {
-				this.current = CheckboxStates.unchecked;
-				this.resetSelectedBulkItems();
-				return this.current;
-			}
-			if (this.current === CheckboxStates.unchecked) {
-				this.resetSelectedBulkItems();
-			}
-			return null;
-		}
-
-		this.current =  (this.bulkSelectedItems.length === this.pageSize) ? CheckboxStates.checked : CheckboxStates.unchecked;
-
-		return this.current;
-	}
-	*/
-
 	changeState(state: CheckboxState): void {
 		this.currentState = state.current;
 
@@ -60,27 +40,11 @@ export class BulkCheckboxService {
 
 			this.changeCheckStateBulkItems(select);
 		}
-
-		/*
-		if (!this.selectAllIfApplicable() ) {
-			this.changeCheckStateBulkItems(false);
-		}
-		*/
 	}
 
 	private getCurrentState(): CheckboxStates {
 		return this.currentState;
 	}
-
-	/*
-	private selectAllIfApplicable(): boolean {
-		if (this.canSelectAll()) {
-			this.changeCheckStateBulkItems(true);
-			return true;
-		}
-		return false;
-	}
-	*/
 
 	private canSelectAll(): boolean {
 		return [CheckboxStates.checked, CheckboxStates.indeterminate].indexOf(this.currentState) >= 0;
@@ -127,6 +91,11 @@ export class BulkCheckboxService {
 		return Boolean(this.bulkSelectedItems && this.bulkSelectedItems.length);
 	}
 
+	getSelectedItemsCount(allCounter: number): number {
+		const items = this.bulkSelectedItems || [];
+		return this.currentState === CheckboxStates.indeterminate ? allCounter : items.length;
+	}
+
 	private refreshBulkSelectedItems() {
 		const keys = Object.keys(this.bulkItems);
 
@@ -151,7 +120,7 @@ export class BulkCheckboxService {
 		});
 	}
 
-	getBulkAssetIds(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
+	private getBulkAssetIds(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
 		let params = {
 				forExport: true,
 				offset: 0,
@@ -179,11 +148,9 @@ export class BulkCheckboxService {
 		this.currentState = state;
 	}
 
-	// ------
 	checkItem(id: string, checked: boolean, currentPageSize: number): void {
 		this.setPageSize(currentPageSize);
 		this.selectBulkItem(id, checked);
-		// this.changeStateByUserInteraction();
 	}
 
 }
