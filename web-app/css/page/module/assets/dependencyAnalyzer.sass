@@ -11,7 +11,7 @@ div.content-wrapper
         &.floating
           position: fixed
           top: 0px
-          left: 800px
+          left: 850px
           z-index: 110
           margin-left: 0px
           border: 1px solid green
@@ -28,7 +28,15 @@ div.content-wrapper
       &.fullscreen div#filterOptionsMenuId.open
         left: 366px
         top: 20px
-      
+      &:not(.fullscreen)
+        div#toolsContainerId
+          z-index: auto
+          &.graphPanel
+            z-index: 1
+        div#svgContainerId
+          z-index: auto
+          div#svgTranslatorId
+            z-index: 0
       div#graphToolbarId
         height: 26px
       
