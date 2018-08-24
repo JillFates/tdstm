@@ -151,20 +151,26 @@ class ImportBatchRecord {
 		]
 
 		if (minimalInfo) {
+			// Populate the currentValues map with the current values from the fieldsInfo
+			// for each field specified in the batch
+			//
 
 			Map info = fieldsInfoAsMap()
 			Map currentValues = [:]
 			Map initValues = [:]
-          	// Populate the currentValues map with the valus from the fieldsInfo
+
 			for ( fieldName in importBatch.fieldNameListAsList() ) {
+				def value = null
 				def initVal = null
 
 				if (info.containsKey(fieldName)) {
 					def record = ( info[fieldName] ?: [:] )
-                  	currentValues[fieldName] = record.value
+
+					value = record.value
 					initVal = record.init
 				}
 
+				currentValues[fieldName] = value
 
 				if ( initVal ) {
 					initValues[fieldName] = initVal
