@@ -11,6 +11,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: 'import-batch-detail-dialog',
@@ -265,5 +266,31 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		if ($event && $event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
+	}
+
+	/**
+	 * Determines which value to print on the batch record dynamic values, can be direct value, init or null.
+	 * @returns {string}
+	 */
+	protected getInitOrValue(dataItem: ImportBatchRecordModel, column: GridColumnModel): string {
+		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
+		if (isEmptyVal && dataItem.init) {
+			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
+			return  !isEmptyInit ? dataItem.init[column.properties[1]] : '(null)';
+		}
+		return isEmptyVal ? '(null)' : dataItem.currentValues[column.properties[1]];
+	}
+
+	/**
+	 * Determines if value of current record value is INIT value.
+	 * @returns {string}
+	 */
+	protected hasInitVal(dataItem: ImportBatchRecordModel, column: GridColumnModel): boolean {
+		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
+		if (isEmptyVal && dataItem.init) {
+			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
+			return  !isEmptyInit;
+		}
+		return false;
 	}
 }

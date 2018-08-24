@@ -154,11 +154,33 @@ class ImportBatchRecord {
 			// Populate the currentValues map with the current values from the fieldsInfo
 			// for each field specified in the batch
 			//
-			domainMap.currentValues = [:]
+
 			Map info = fieldsInfoAsMap()
+			Map currentValues = [:]
+			Map initValues = [:]
+
 			for ( fieldName in importBatch.fieldNameListAsList() ) {
-				def value = (info.containsKey(fieldName) ? info[fieldName].value : null)
-				domainMap.currentValues[fieldName] = value
+				def value = null
+				def initVal = null
+
+				if (info.containsKey(fieldName)) {
+					def record = ( info[fieldName] ?: [:] )
+
+					value = record.value
+					initVal = record.init
+				}
+
+				currentValues[fieldName] = value
+
+				if ( initVal ) {
+					initValues[fieldName] = initVal
+				}
+			}
+
+			domainMap.currentValues = currentValues
+
+			if ( initValues ) {
+				domainMap.init = initValues
 			}
 		} else {
 			// Populate the full errors and fieldsInfo sections instead of the currentValues
