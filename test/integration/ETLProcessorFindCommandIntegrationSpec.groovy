@@ -7,6 +7,8 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.FindCondition
+import com.tdsops.etl.QueryResult
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -102,7 +104,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					domain Application
 					load 'environment' with 'Production'
 					extract 'application id' load 'id'
-					find Application by 'id' with SOURCE.'application id' into 'id'
+					find Application by 'id' eq SOURCE.'application id' into 'id'
 				}
 			""".stripIndent())
 
@@ -121,10 +123,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						value == '152254'
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152254']
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152254']])
 					}
 
 					with(data[1].fields.environment) {
@@ -137,10 +136,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						value == '152255'
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152255']
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152255']])
 					}
 				}
 			}
@@ -148,8 +144,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: 152254l]) == [152254l]
-				get('Application', [id: 152255l]) == [152255l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', 152254l)]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', 152255l)]) == [152255l]
 			}
 
 		cleanup:
@@ -248,8 +244,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 				}
 			""".stripIndent())
 
@@ -271,48 +267,21 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					(1..14).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							with(query[0]) {
-								domain == ETLDomain.Dependency.name()
-								kv.id == value.toString()
-							}
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
 						}
 					}
 
 					// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
 					with(data[0].fields.asset.find) {
 						query.size() == 3
-						with(query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetType == 'VM'
-						}
-
-						with(query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 					}
 				}
-			}
-
-			with(etlProcessor.findCache) {
-				size() == 48
-				hitCountRate() == 14.29
-				get('Dependency', [id: '1']) == []
-				get('Application', [id: 151954l]) == []
-				get('Application', [assetName: 'ACMEVMPROD01', assetType: 'VM']) == []
-				get('Application', [assetName: 'VMWare Vcenter']) == []
-				get('Dependency', [id: '2']) == []
-				get('Application', [id: 151971l]) == []
-				get('Application', [assetName: 'ACMEVMPROD18', assetType: 'VM']) == []
-				get('Dependency', [id: '3']) == []
-				get('Application', [id: 151974l]) == []
-				get('Application', [assetName: 'ACMEVMPROD21', assetType: 'VM']) == []
 			}
 
 		cleanup:
@@ -370,7 +339,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				iterate {
 
 					extract 'AssetDependencyId' load 'id'
-					find Dependency by 'id' with DOMAIN.id into 'id'
+					find Dependency by 'id' eq DOMAIN.id into 'id'
 
 					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
@@ -396,10 +365,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					(1..13).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							with(query[0]) {
-								domain == ETLDomain.Dependency.name()
-								kv.id == value.toString()
-							}
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
 						}
 					}
 					// Validates command: set comment with 'Asset results found'
@@ -411,7 +377,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				size() == 14
 				hitCountRate() == 0
 				[1..14].each {
-					get('Dependency', [id: it.toString()]) == []
+					get(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
 				}
 			}
 
@@ -461,7 +427,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 				iterate {
 					extract 'application id' load 'asset'
-					find Application by 'id' with DOMAIN.asset into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
 				}
 			""".stripIndent())
 
@@ -486,8 +452,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -602,8 +568,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					load 'environment' with 'Production'
 					extract 'vendor name' load 'Vendor'
 					extract 'application id' load 'id'
-					find Application by 'id' with SOURCE.'application id' into 'id'
-					elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
+					find Application by 'id' eq SOURCE.'application id' into 'id'
+					elseFind Application by 'appVendor' eq DOMAIN.appVendor into 'id' warn 'found without asset id field'
 				}
 			""".stripIndent())
 
@@ -625,11 +591,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							query[0].domain == ETLDomain.Application.name()
-							query[0].kv == [id: '152254']
-
-							query[1].domain == ETLDomain.Application.name()
-							query[1].kv == [appVendor: 'Microsoft']
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 						}
 					}
 
@@ -645,12 +608,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							query[0].domain == ETLDomain.Application.name()
-							query[0].kv == [id: '152255']
-
-							query[1].domain == ETLDomain.Application.name()
-							query[1].kv == [appVendor: 'Mozilla']
-
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 						}
 
 						fields.id.warn
@@ -661,9 +620,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 3
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == []
-				get('Application', [appVendor: 'Mozilla']) == [152253l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == []
+				get(ETLDomain.Application.name(), [new FindCondition('appVendor', 'Mozilla')]) == [152253l]
 			}
 
 		cleanup:
@@ -754,7 +713,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetDependencyId' load 'id'
 					extract 'AssetId' load 'asset'
 
-					find Asset by 'assetName' with SOURCE.AssetName into 'asset'
+					find Asset by 'assetName' eq SOURCE.AssetName into 'asset'
 					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
 
@@ -835,9 +794,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenNotFound 'asset' create {
                         assetName primaryNameVar
@@ -864,21 +823,12 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					with(data[0].fields.asset) {
 
 						find.query.size() == 3
-						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 
 						// whenNotFound create command assertions
 						create.assetName == 'ACMEVMPROD01'
@@ -891,10 +841,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151954')]) == [151954l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151971')]) == [151971l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151974')]) == [151974l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151975')]) == [151975l]
 			}
 
 		cleanup:
@@ -961,9 +911,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenNotFound 'asset' update {
                         assetClass Application
@@ -1042,9 +992,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenFound 'asset' create {
                         "TN Last Seen" NOW
@@ -1120,9 +1070,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
 					whenNotFound 'asset' create {
 						assetClass Unknown
@@ -1203,9 +1153,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenFound 'asset' update {
                         assetName primaryNameVar
@@ -1228,39 +1178,20 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					]
 
 					with(data[0].fields.asset) {
-
 						find.query.size() == 3
-						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 					}
 				}
 			}
 
 			with(etlProcessor.findCache) {
-				size() == 22
+				size() == 12
 				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == []
-				get('Application', [assetName: 'VMWare Vcenter']) == []
-				get('Application', [id: '151971']) == []
-				get('Application', [id: '151974']) == []
-				get('Application', [id: '151975']) == []
-				get('Application', [id: '151978']) == []
-				get('Application', [assetName: 'V Cluster Prod']) == []
-				get('Application', [id: '151990']) == []
-				get('Application', [assetName: 'VMWare Vcenter Test']) == []
 			}
 
 		cleanup:
@@ -1311,7 +1242,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'Location' load 'location'
 					extract 'Room' load 'room'
 
-			        find Room by 'id' with SOURCE.RoomId into 'id'
+			        find Room by 'id' eq SOURCE.RoomId into 'id'
 				}
 			""".stripIndent())
 
@@ -1343,15 +1274,6 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						find.query.size() == 0
 					}
 				}
-			}
-
-			with(etlProcessor.findCache) {
-				size() == 4
-				hitCountRate() == 0
-				get('Room', [id: '100']) == []
-				get('Room', [id: '102']) == []
-//				get('Room', [id: '741']) == [741l]
-//				get('Room', [id: '742']) == [742l]
 			}
 
 		cleanup:
@@ -1646,4 +1568,19 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 		return fieldSpecs
 	}
 
+	/**
+	 * Assertions for a {@code QueryResult} instance
+	 * //TODO dcorrea add an example
+	 * @param queryResult
+	 * @param domain
+	 * @param values
+	 */
+	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+		assert queryResult.domain == domain.name()
+		queryResult.criteria.eachWithIndex { Map map, int i ->
+			assert map['propertyName'] == values[i][0]
+			assert map['operator'] == values[i][1]
+			assert map['value'] == values[i][2]
+		}
+	}
 }
