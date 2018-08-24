@@ -72,9 +72,6 @@ class MenuModule extends Module {
         tasksGenHistoryItem     { tasksMenu.find("li.menu-parent-tasks-generation-history")}
         tasksImportItem         { tasksMenu.find("li.menu-parent-tasks-import-tasks")}
 
-        projectName             { menuContainer.find("li a#nav-project-name")}
-        projectLicenseIcon      { menuContainer.find("li a.licensing-error-warning i.fa-warning")}
-
         userMenu {$(class:"user-menu")}
         logoutBtn {userMenu.find(class:"pull-right")}
 
@@ -136,9 +133,6 @@ class MenuModule extends Module {
         selectItem(assetsAllAssetsItem)
     }
 
-    def assertProjectName(name){
-        projectName.text().contains(name)
-    }
 
 
 }

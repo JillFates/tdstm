@@ -105,4 +105,8 @@ class ProjectsModule extends Module {
         selectItem projectsStaffItem
     }
 
+    def assertProjectName(name){
+        projectName.text().contains(name)
+    }
+
 }
