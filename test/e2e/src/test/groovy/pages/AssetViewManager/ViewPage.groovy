@@ -215,7 +215,7 @@ class ViewPage extends Page{
     }
 
     def waitForBulkChangeButtonDisabled(){
-        waitFor{bulkChangeButton.@disabled == true}
+        waitFor{bulkChangeButton.@disabled == "true"}
     }
 
     def filterByAssetClass(text){

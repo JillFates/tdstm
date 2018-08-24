@@ -1,15 +1,11 @@
 package specs.Assets
 
-import jdk.nashorn.internal.ir.annotations.Ignore
 import pages.AssetViewManager.ViewPage
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import jodd.util.RandomString
 import geb.spock.GebReportingSpec
-import modules.CommonsModule
 import spock.lang.Stepwise
-import spock.lang.Ignore
 
 
 @Stepwise
