@@ -13,6 +13,7 @@ class ViewPage extends Page{
         view (wait:true) { $("section","class":"page-asset-explorer-config")}
         sectionHeaderTitle { $("section.content-header h1")}
         clearBtn {$("button", id:"btnClear")}
+        bulkChangeButton {$('#btnBulkChange')}
         exportViewButton {$("button", id:"btnExport")}
         exportModalContainer {$('#tdsUiDialog')}
         fileNameField {exportModalContainer.find("input", id: "fileName")}
@@ -37,6 +38,11 @@ class ViewPage extends Page{
         nameFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("span")}
         assetClassFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("input",type:"text")}
         assetClassFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("span")}
+        descriptionFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("input")}
+        descriptionFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("span.fa-times")}
+        environmentFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("input")}
+        environmentFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("span.fa-times")}
+        allFilterXIcons {$('td[kendogridfiltercell] span.fa-times')}
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
         refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
@@ -172,20 +178,17 @@ class ViewPage extends Page{
         return flag
     }
 
-    def checkedItems(){
-        def flag = true
-        for(int i=0;i<allItemsCheckbox.size();i++){
-            if(allItemsCheckbox[i].value()==false){
-                flag=false
-                break
-            }
+    def checkedItems(checked = true){
+        allItemsCheckbox.each{
+            assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }
-        return flag
+        true // return true to avoid failure in spoke verification, if fails it will be in above assert
     }
 
     def checkJustPlanning(){
-        if(justPlanningCheck.value()==false)
-            waitFor{justPlanningCheck.click()}
+        if(justPlanningCheck.value()==false){
+            clickOnJustPlanningCheckbox()
+        }
     }
 
     def checkAllItems(){
@@ -194,8 +197,61 @@ class ViewPage extends Page{
         }
     }
 
+    def clickOnJustPlanningCheckbox(){
+        waitFor{justPlanningCheck.click()}
+        commonsModule.waitForLoader 2
+    }
+
     def clickOnSelectAllAssets(){
         waitFor{selectAllChecks.click()}
     }
-}
 
+    def getSelectIndeterminateState(){
+        selectAllChecks.jquery.prop('indeterminate')
+    }
+
+    def waitForBulkChangeButtonDisplayed(){
+        waitFor{bulkChangeButton.displayed}
+    }
+
+    def waitForBulkChangeButtonDisabled(){
+        waitFor{bulkChangeButton.@disabled == true}
+    }
+
+    def filterByAssetClass(text){
+        waitFor{assetClassFilter.displayed}
+        assetClassFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def filterByDescription(text){
+        waitFor{descriptionFilter.displayed}
+        descriptionFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def filterByEnvironment(text){
+        waitFor{environmentFilter.displayed}
+        environmentFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def clearAllAppliedFilters(){
+        allFilterXIcons.each{
+            it.click()
+            commonsModule.waitForLoader 2
+        }
+    }
+
+    def getFilterAssetClassText(){
+        assetClassFilter.value()
+    }
+
+    def getFilterDescriptionText(){
+        descriptionFilter.value()
+    }
+
+    def getFilterEnvironmentText(){
+        environmentFilter.value()
+    }
+}
