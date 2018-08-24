@@ -441,4 +441,24 @@ abstract class ETLBaseSpec extends Specification {
 			assert map['value'] == values[i][2]
 		}
 	}
+
+	/**
+	 * Assert if a {@code FindCondition} is complete and the rest of the fields are correct
+	 * @param condition
+	 * @param propertyName
+	 * @param operator
+	 * @param value
+	 */
+	static void assertFindConditionComplete(
+		FindCondition condition,
+		String propertyName,
+		FindOperator operator,
+		Object value,
+		Boolean isComplete = true
+	){
+		assert propertyName == condition.propertyName
+		assert operator == condition.operator
+		assert value == condition.value
+		assert condition.isComplete() == isComplete
+	}
 }

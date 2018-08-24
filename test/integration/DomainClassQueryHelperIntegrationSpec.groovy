@@ -12,6 +12,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -103,7 +104,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-
+//	@IgnoreRest
 	void '2. can find a Device by roomSource'() {
 
 		given:
@@ -433,7 +434,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == device.id
 	}
 
-
 	void '24. can find a Device by using ne in a FindCondition'() {
 
 		given:
@@ -448,8 +448,114 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			)
 
 		then:
-			results.size() == 1
-			results.first() == device.id
+			!results.contains(device.id)
 	}
 
+	void '25. can find a Room by a roomName using a like FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName + '%', FindOperator.like)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	// TODO: dcorrea Review with John
+	void '26. can find a Room by a roomName using a notLike FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', 'asasa%', FindOperator.notLike)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+
+	void '27. can find a Room by a roomName using a contains FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName, FindOperator.contains)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	void '28. can find a Room by a roomName using a notContains FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName, FindOperator.notContains)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '29. can find a Room by a roomName using a inList FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', [room.roomName, 'anotherValue'], FindOperator.inList)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	void '30. can find a Room by a roomName using a notInList FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', [room.roomName, 'anotherValue'], FindOperator.notInList)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
 }

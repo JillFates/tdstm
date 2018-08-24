@@ -152,6 +152,7 @@ class FindStatementBuilder {
 	FindStatementBuilder like(Object value){
 		return completeCurrentCondition(FindOperator.like, value)
 	}
+
 	/**
 	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
 	 * <p>checks a non-match of a partial string field for, must include % appropriately</p>
@@ -202,6 +203,10 @@ class FindStatementBuilder {
 	 */
 	FindStatementBuilder inList(Object value){
 		return completeCurrentCondition(FindOperator.inList, value)
+	}
+
+	FindStatementBuilder inList(List<Object> values){
+		return completeCurrentCondition(FindOperator.inList, values)
 	}
 
 	/**
@@ -255,6 +260,17 @@ class FindStatementBuilder {
 	 */
 	private FindStatementBuilder completeCurrentCondition(FindOperator operator, Object value){
 		currentCondition.defineOperator(operator, value)
+		return this
+	}
+
+	/**
+	 * Takes the current condition and set an operator and a list of value.
+	 * @param operator a instance of {@code FindOperator}
+	 * @param values a list of Objects Object to be used as a {@code FindCondition} value field
+	 * @return current instance of {@code FindStatementBuilder}
+	 */
+	private FindStatementBuilder completeCurrentCondition(FindOperator operator, List<Object> values){
+		currentCondition.defineOperator(operator, values)
 		return this
 	}
 

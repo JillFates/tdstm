@@ -2,12 +2,10 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.JsonUtil
-import grails.converters.JSON
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
 import net.transitionmanager.domain.Project
-import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
@@ -50,7 +48,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLDomain.Rack        || true
 	}
 
-	void 'test can build a list of conditions from a JSON object'(){
+	void 'test can build a list of conditions from a JSON object'() {
 
 		given: 'an instance on JSON Object'
 			List json = JsonUtil.parseJsonList('''
@@ -117,12 +115,7 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete() == isComplete
 				conditions.size() == 1
-				with(conditions[0], FindCondition) {
-					propertyName == aPropertyName
-					operator == FindOperator.eq
-					value == aConditionValue
-					it.isComplete() == isComplete
-				}
+				assertFindConditionComplete(conditions[0], aPropertyName, FindOperator.eq, aConditionValue, isComplete)
 			}
 
 		where:
@@ -147,26 +140,15 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete() == isComplete
 				conditions.size() == 2
-				with(conditions[0], FindCondition) {
-					propertyName == 'assetName'
-					operator == FindOperator.eq
-					value == 'zulu01'
-					it.isComplete() == isComplete
-				}
-				with(conditions[1], FindCondition) {
-					propertyName == aPropertyName
-					operator == FindOperator.eq
-					value == aConditionValue
-					it.isComplete() == isComplete
-				}
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.eq, 'zulu01')
+				assertFindConditionComplete(conditions[1], aPropertyName, FindOperator.eq, aConditionValue, isComplete)
 			}
 
 		where:
 			domainClass      | aPropertyName | aConditionValue || isComplete
-			ETLDomain.Device | 'ipAddress'  | '192.168.1.100' || true
-			ETLDomain.Device | 'ipAddress'  | null            || true
+			ETLDomain.Device | 'ipAddress'   | '192.168.1.100' || true
+			ETLDomain.Device | 'ipAddress'   | null            || true
 	}
-
 
 	void 'test can throw an ETLProcessorException if find command was incorrectly prepared'() {
 
@@ -174,13 +156,13 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
 
 		when: 'it appends an eq statement'
-			find.by 'assetName'\
- 				   and 'IP Address' eq '192.168.1.100'  \
- 				   into 'id'
+			find.by 'assetName' \
+ 				    and 'IP Address' eq '192.168.1.100'   \
+ 				    into 'id'
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == 'Incorrect structure for find command'
 				startLine == null
 				endLine == null
@@ -189,7 +171,6 @@ class ETLFindElementSpec extends ETLBaseSpec {
 				fatal == true
 			}
 	}
-
 
 	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can add find statement in ETL Processor results'() {
@@ -210,26 +191,16 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an eq statement'
-			find.by 'assetName' eq 'zulu01'  \
- 				   and 'IP Address' eq '192.168.1.100'  \
- 				   into 'id'
+			find.by 'assetName' eq 'zulu01'   \
+ 				    and 'IP Address' eq '192.168.1.100'   \
+ 				    into 'id'
 
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 2
-				with(conditions[0], FindCondition) {
-					propertyName == 'assetName'
-					operator == FindOperator.eq
-					value == 'zulu01'
-					it.isComplete()
-				}
-				with(conditions[1], FindCondition) {
-					propertyName == 'ipAddress'
-					operator == FindOperator.eq
-					value == '192.168.1.100'
-					it.isComplete()
-				}
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.eq, 'zulu01')
+				assertFindConditionComplete(conditions[1], 'ipAddress', FindOperator.eq, '192.168.1.100')
 			}
 	}
 
@@ -252,19 +223,13 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			}
 
 		when: 'it appends an eq statement'
-			find.by 'assetName' ne 'zulu01'  \
- 				   into 'id'
+			find.by 'assetName' ne 'zulu01' into 'id'
 
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
-				with(conditions[0], FindCondition) {
-					propertyName == 'assetName'
-					operator == FindOperator.ne
-					value == 'zulu01'
-					it.isComplete()
-				}
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.ne, 'zulu01')
 			}
 	}
 
@@ -286,20 +251,14 @@ class ETLFindElementSpec extends ETLBaseSpec {
 				[]
 			}
 
-		when: 'it appends an eq statement'
-			find.by 'assetName' nseq 'zulu01'  \
- 				   into 'id'
+		when: 'it appends an nseq statement'
+			find.by 'assetName' nseq 'zulu01' into 'id'
 
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
-				with(conditions[0], FindCondition) {
-					propertyName == 'assetName'
-					operator == FindOperator.nseq
-					value == 'zulu01'
-					it.isComplete()
-				}
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.nseq, 'zulu01')
 			}
 	}
 
@@ -321,20 +280,333 @@ class ETLFindElementSpec extends ETLBaseSpec {
 				[]
 			}
 
-		when: 'it appends an eq statement'
-			find.by 'assetName' lt 'zulu01'  \
- 				   into 'id'
+		when: 'it appends an lt statement'
+			find.by 'priority' lt 3 into 'id'
 
 		then:
 			with(find.currentFind.statement, FindStatementBuilder) {
 				currentCondition.isComplete()
 				conditions.size() == 1
-				with(conditions[0], FindCondition) {
-					propertyName == 'assetName'
-					operator == FindOperator.lt
-					value == 'zulu01'
-					it.isComplete()
-				}
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.lt, 3)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use le in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'it appends an le statement'
+			find.by 'priority' le 3 into 'id'
+
+		then:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.le, 3)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use gt in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an gt statement'
+			find.by 'priority' gt 4 into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.gt, 4)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use ge in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an ge statement'
+			find.by 'priority' ge 4 into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.ge, 4)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use like in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an like statement'
+			find.by 'Name' like 'zulu%' into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.like, 'zulu%')
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use notLike in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an notLike statement'
+			find.by 'Name' notLike 'zulu%' into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.notLike, 'zulu%')
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use contains in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an contains statement'
+			find.by 'Name' contains 'zulu' into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.contains, 'zulu')
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use notContains in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an notContains statement'
+			find.by 'Name' notContains 'zulu' into 'id'
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'assetName', FindOperator.notContains, 'zulu')
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use inList in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an inList statement'
+			find.by('Environment').inList(['QA', 'Development']).into('id')
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'environment', FindOperator.inList, ['QA', 'Development'])
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use notInList in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an notInList statement'
+			find.by('Environment').notInList(['QA', 'Development']).into('id')
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'environment', FindOperator.notInList, ['QA', 'Development'])
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use between in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an between statement'
+			find.by('priority').between(4..6).into('id')
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.between, 4..6)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can use notBetween in a find statement in ETL Processor results'() {
+
+		given: 'an instance of ETLFindElement class'
+			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Device, 1)
+
+		and: 'an instance of ETLProcessor correctly configured'
+			processor.domain ETLDomain.Dependency
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+			processor.pushIntoStack find
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		and: 'it appends an notBetween statement'
+			find.by('priority').notBetween(4..6).into('id')
+
+		expect:
+			with(find.currentFind.statement, FindStatementBuilder) {
+				currentCondition.isComplete()
+				conditions.size() == 1
+				assertFindConditionComplete(conditions[0], 'priority', FindOperator.notBetween, 4..6)
 			}
 	}
 }

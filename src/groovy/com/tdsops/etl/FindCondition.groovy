@@ -28,6 +28,11 @@ class FindCondition {
 		this.value = ETLValueHelper.valueOf(value)
 	}
 
+	void defineOperator(FindOperator operator, List<Object> values) {
+		this.operator = operator
+		this.value = values.collect {ETLValueHelper.valueOf(it)}
+	}
+
 	Boolean isComplete() {
 		return this.propertyName && this.operator
 	}
