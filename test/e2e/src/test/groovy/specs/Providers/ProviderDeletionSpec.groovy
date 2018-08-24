@@ -26,7 +26,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToProviders()
+        projectsModule.goToProviders()
         at ProvidersPage
         // create first provider to be delete
         waitFor{createBtn.click()}
@@ -58,7 +58,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "1. The user opens the first created provider"() {
-        testKey = "TM-11148"
         given: 'The User is on the Providers Page'
             at ProvidersPage
         and: 'Filters by the provider name'
@@ -72,7 +71,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "2. The user clicks on delete button in details modal and gets warning message"() {
-        testKey = "TM-11148"
         given: 'The user is on the Provider Detail pop up'
             at ProvidersDetailPage
         when: 'The user clicks on delete button'
@@ -84,7 +82,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "3. The user clicks on No button and provider is not deleted"() {
-        testKey = "TM-11148"
         given: 'The User is on the providers delete confirmation modal'
             at ProvidersDetailPage
         and: 'The user clicks on No button'
@@ -100,7 +97,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "4. The user opens again first provider created"() {
-        testKey = "TM-11148"
         given: 'The user clicks the created provider'
             clickOnFirstProviderName()
         when: 'The user clicks Delete button'
@@ -111,7 +107,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "5. The user deletes the first provider created"() {
-        testKey = "TM-11148"
         given: 'The user is in confirmation modal'
             commonsModule.waitForPromptModalDisplayed()
         when: 'The User clicks on Yes button in confirmation modal'
@@ -123,7 +118,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "6. The user verifies first provider is deleted"() {
-        testKey = "TM-11148"
         given: 'Providers list page is displayed'
             at ProvidersPage
         when: 'Filters by the first provider Name'
@@ -135,7 +129,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "7. The user searches for second created provider"() {
-        testKey = "TM-11148"
         given: 'The User is on the Providers Page'
             at ProvidersPage
         when: 'Filters by the provider Name'
@@ -145,7 +138,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "8. The user clicks on delete button in grid and gets warning message"() {
-        testKey = "TM-11148"
         given: 'The user is in providers grid and has filtered by provider name'
             at ProvidersPage
         when: 'The user clicks on delete action button in grid'
@@ -157,7 +149,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "9. The user clicks on No and second provider is not deleted"() {
-        testKey = "TM-11148"
         given: 'The User is on the Providers delete confirmation modal'
             commonsModule.waitForPromptModalDisplayed()
         and: 'The user clicks on No button'
@@ -171,7 +162,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "10. The user opens again second provider created"() {
-        testKey = "TM-11148"
         given: 'The user is in providers grid and has filtered by provider name'
             at ProvidersPage
         when: 'The user clicks on delete action button in providers grid'
@@ -181,7 +171,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "11. The user deletes the provider created"() {
-        testKey = "TM-11148"
         given: 'The user is in confirmation modal'
             commonsModule.waitForPromptModalDisplayed()
         when: 'The User clicks on Yes button in confirmation modal'
@@ -191,7 +180,6 @@ class ProviderDeletionSpec extends GebReportingSpec{
     }
 
     def "12. The user verifies second provider is deleted"() {
-        testKey = "TM-11148"
         given: 'Providers list page is displayed'
             at ProvidersPage
         when: 'Filters by the first provider Name'
