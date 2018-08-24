@@ -23,6 +23,6 @@ enum FindOperator {
 	notInList,
 	between,
 	notBetween,
-	is, /*is null,
-	not /*not null */
+	isNull,    /* is  null */
+	isNotNull  /* not null */
 }

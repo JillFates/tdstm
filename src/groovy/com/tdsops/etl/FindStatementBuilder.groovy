@@ -248,6 +248,33 @@ class FindStatementBuilder {
 		return completeCurrentCondition(FindOperator.notBetween, value)
 	}
 
+	/**
+	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
+	 * <p>Checks for field being null</p>
+	 * <pre>
+	 *  find Device by 'custom1' is null
+	 * </pre>
+	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
+	 * @return
+	 */
+	FindStatementBuilder is(Object value){
+		return completeCurrentCondition(FindOperator.isNull, value)
+	}
+
+	/**
+	 * Adds a new {@code FindCondition} in current {@code FindStatementBuilder}
+	 * <p>checks for field not being null</p>
+	 * <pre>
+	 *  find Device by 'custom1' not null
+	 * </pre>
+	 * @param value an Object instance to be set in FindStatementBuilder#currentCondition
+	 * @return
+	 */
+	FindStatementBuilder not(Object value){
+		return completeCurrentCondition(FindOperator.isNotNull, value)
+	}
+
+
 	ETLFindElement into(String propertyName){
 		return findElement.into(propertyName, this)
 	}
@@ -280,9 +307,8 @@ class FindStatementBuilder {
 	 * @param args
 	 */
 	def methodMissing (String methodName, args) {
-		processor.log("Method missing: ${methodName}, args: ${args}", DebugConsole.LevelMessage.ERROR)
-		//TODO: dcorrea Unrecognized find criteria operator [xxx] specified. Options are eq, ne, ...
-		throw ETLProcessorException.methodMissing(methodName, args)
+		processor.log("Unrecognized find criteria: ${methodName}, args: ${args}", DebugConsole.LevelMessage.ERROR)
+		throw ETLProcessorException.unrecognizedFindCriteria(methodName)
 	}
 
 	/**

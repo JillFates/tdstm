@@ -264,8 +264,7 @@ class DomainClassQueryHelper {
 
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 
-				def (String where, Object hqlParam) = buildSentenceAndHqlParam(condition, property, namedParameter)
-				hqlParams[namedParameter] = hqlParam
+				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
@@ -276,11 +275,10 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				def (String where, Object hqlParam) = buildSentenceAndHqlParam(condition, property, namedParameter)
+				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				// If user is trying to use find command by id, automatically we convert that value to a long
 				if(condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
-					hqlParams[namedParameter] = NumberUtil.toPositiveLong(condition.value)
-				} else {
-					hqlParams[namedParameter] = hqlParam
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
 				}
 
 				return where
@@ -316,74 +314,97 @@ class DomainClassQueryHelper {
 
 
 	/**
-	 * It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator
+	 * <p>It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator</p>
+	 * <p>IT also calculate the necessary named parameters to complete the HQL sentnce</p>
 	 * <pre>
 	 *
 	 *
 	 * </pre>
 	 * @param condition a {@code FindCondition} parameter to be used in the HQl sentence
 	 * @param namedParameter a named parameter param for the HQL sentence
+	 * @param hqlParams
 	 * @return a HQL sentence defined by a property operator and named parameter
 	 */
-	static List buildSentenceAndHqlParam(FindCondition condition, String property, String namedParameter){
+	static String buildSentenceAndHqlParam(FindCondition condition, String property, String namedParameter, Map<String, ?> hqlParams){
 
 		String sentence
-		Object hqlParam = condition.value
+
 		switch (condition.operator){
 			case FindOperator.eq:
 				sentence = " ${property} = :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.ne:
 				sentence = " ${property} != :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.nseq: //TODO: Review it with John
 				sentence = " ${property} != :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.lt:
 				sentence = " ${property} < :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.le:
 				sentence = " ${property} <= :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.gt:
 				sentence = " ${property} > :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.ge:
 				sentence = " ${property} >= :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.like:
 				sentence = " ${property} like :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.notLike:
 				sentence = " ${property} not like :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.contains:
 				sentence = " ${property} like :${namedParameter}\n"
-				hqlParam = '%' + condition.value + '%'
+				hqlParams[namedParameter] = '%' + condition.value + '%'
 				break
 			case FindOperator.notContains:
 				sentence = " ${property} not like :${namedParameter}\n"
-				hqlParam = '%' + condition.value + '%'
+				hqlParams[namedParameter] = '%' + condition.value + '%'
 				break
 			case FindOperator.inList:
 				sentence = " ${property} in :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.notInList:
 				sentence = " ${property} not in :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
 				break
 			case FindOperator.between:
-				sentence = " ${property} between :${namedParameter}\n"
+				sentence = " ${property} between :${namedParameter}_first and :${namedParameter}_last\n"
+				hqlParams[namedParameter + '_first'] = condition.value.first()
+				hqlParams[namedParameter + '_last'] = condition.value.last()
 				break
 			case FindOperator.notBetween:
-				sentence = " ${property} not between :${namedParameter}\n"
+				sentence = " ${property} not between :${namedParameter}_first and :${namedParameter}_last\n"
+				hqlParams[namedParameter + '_first'] = condition.value.first()
+				hqlParams[namedParameter + '_last'] = condition.value.last()
 				break
-
+			case FindOperator.isNull:
+				sentence = " ${property} is null\n"
+				break
+			case FindOperator.isNotNull:
+				sentence = " ${property} is not null\n"
+				break
 
 			default:
 				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")
 
 		}
-		return [sentence, hqlParam]
+
+		return sentence
 	}
 
 

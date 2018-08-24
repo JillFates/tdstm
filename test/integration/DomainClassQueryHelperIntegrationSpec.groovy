@@ -12,7 +12,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -565,8 +564,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.size() == 0
 	}
 
-	@IgnoreRest
-	void '31. can find a Room by a roomName using a notInList FindCondition'() {
+	void '31. can find a Room by a roomName using a between FindCondition'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -588,5 +586,75 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then:
 			results.size() == 1
 			results.first() == device.id
+	}
+
+	void '32. can find a Room by a roomName using a notBetween FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.priority = 6
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'priority',
+						(4..6),
+						FindOperator.notBetween
+					)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '33. can find a Room by a roomName using a null FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.department = null
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'department',
+						null,
+						FindOperator.isNull
+					)
+				]
+			)
+
+		then:
+			results.size() > 0
+			results.contains(device.id)
+	}
+
+	void '34. can find a Room by a roomName using a is not null FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.department = null
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'department',
+						null,
+						FindOperator.isNotNull
+					)
+				]
+			)
+
+		then:
+			results.size() == 0
 	}
 }

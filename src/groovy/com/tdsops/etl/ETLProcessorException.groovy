@@ -32,6 +32,11 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unrecognized command $method with args $args")
     }
 
+    static ETLProcessorException unrecognizedFindCriteria (String method) {
+        //TODO: dcorrea Unrecognized find criteria operator [xxx] specified. Options are eq, ne, ...
+        new ETLProcessorException("Unrecognized find criteria operator [$method] specified. Options are ${FindOperator.values()*.name()}")
+    }
+
     static ETLProcessorException methodMissingInFindCommand (String method, args) {
         new ETLProcessorException("Unrecognized command $method with args $args for the find / elseFind command")
     }
