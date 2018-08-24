@@ -1149,26 +1149,6 @@ class ETLFindSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
-			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					dataSet,
@@ -1191,6 +1171,45 @@ class ETLFindSpec extends ETLBaseSpec {
 			ETLProcessorException e = thrown ETLProcessorException
 			with (ETLProcessor.getErrorMessage(e)) {
 				message == 'No project selected in the user context at line 8'
+				startLine == 8
+				endLine == 8
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can throw an Exception if find command uses an invalid Find Operator'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Application
+					load 'environment' with 'Production'
+					extract 'application id' load 'id'
+					find Application by 'id' equality 'id' into 'id'
+				}
+				""".stripIndent())
+
+		then: 'It throws an Exception because project was not defined'
+			ETLProcessorException e = thrown ETLProcessorException
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'Unrecognized find criteria operator [equality] specified. Options are [eq, ne, nseq, lt, le, gt, ge, like, notLike, contains, notContains, inList, notInList, between, notBetween, isNull, isNotNull] at line 8'
 				startLine == 8
 				endLine == 8
 				startColumn == null

@@ -1,6 +1,8 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
@@ -476,13 +478,12 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			List results = DomainClassQueryHelper.where(ETLDomain.Room,
 				project,
 				[
-					new FindCondition('roomName', 'asasa%', FindOperator.notLike)
+					new FindCondition('roomName', room.roomName + '%', FindOperator.notLike)
 				]
 			)
 
 		then:
-			results.size() == 1
-			results.first() == room.id
+			results.size() == 0
 	}
 
 
@@ -657,4 +658,23 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then:
 			results.size() == 0
 	}
+
+	void '35. can throw an Exception in case of using an invalid FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id, 'equality')
+				]
+			)
+
+		then: 'It throws an Exception because project was not defined'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
+	}
+
 }

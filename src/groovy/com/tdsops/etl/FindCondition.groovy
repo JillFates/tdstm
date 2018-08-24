@@ -20,7 +20,7 @@ class FindCondition {
 
 	FindCondition(String propertyName, Object value, String operator) {
 		this.propertyName = propertyName
-		defineOperator(operator as FindOperator, value)
+		defineOperator(FindOperator.lookup(operator), value)
 	}
 
 	void defineOperator(FindOperator operator, Object value) {
