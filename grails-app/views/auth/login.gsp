@@ -27,7 +27,7 @@
 	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.dialog.css')}"/>
 	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'jquery-ui-smoothness.css')}"/>
 	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css"
-		  href="${resource(dir: 'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness', file: 'jquery-ui-1.8.15.custom.css')}"/>
+		  href="${resource(dir: 'plugins/jquery-ui-1.10.4/jquery-ui/themes/ui-lightness', file: 'jquery-ui-1.10.4.custom.css')}"/>
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 	<g:javascript src="jquery-1.9.1.js"/>
