@@ -6,7 +6,7 @@ import { AssetExplorerService } from './asset-explorer.service';
 import { ViewSpec } from '../model/view-spec.model';
 
 @Injectable()
-export class DataGridCheckboxService {
+export class BulkCheckboxService {
 	private currentState: CheckboxStates;
 	private pageSize: number = null;
 	bulkItems: any;
@@ -53,7 +53,7 @@ export class DataGridCheckboxService {
 		}
 	}
 
-	getCurrentState(): CheckboxStates {
+	private getCurrentState(): CheckboxStates {
 		return this.currentState;
 	}
 
