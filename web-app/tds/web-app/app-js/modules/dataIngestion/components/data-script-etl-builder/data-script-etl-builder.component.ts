@@ -1,5 +1,4 @@
-import {Component, HostListener, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Component, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
 import 'rxjs/add/operator/finally';
 
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -22,7 +21,6 @@ import {ImportAssetsService} from '../../../importBatch/service/import-assets.se
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
-import {KEYSTROKE} from '../../../../shared/model/constants';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
