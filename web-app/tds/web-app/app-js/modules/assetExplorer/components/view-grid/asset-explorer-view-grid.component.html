@@ -16,7 +16,7 @@
 			                        (clickBulk)="onClickBulkButton()"
 			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 			<div *ngIf="hasSelectedItems()" class="selected-assets">
-				Asset(s) selected <span class="badge badge-light">{{getSelectedItemsCount()}}</span>
+				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 			</div>
 		</div>
 	    <div class="col-sm-6 filters-section">

@@ -68,7 +68,6 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
-	// public overrideCheckboxState: CheckboxStates;
 	public bulkItems: number[] = [];
 
 	constructor(
@@ -78,7 +77,6 @@ export class AssetExplorerViewGridComponent {
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
-		// this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
@@ -194,7 +192,6 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 
-		// this.overrideCheckboxState = this.bulkCheckboxService.changeStateByUserInteraction(true);
 		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
@@ -272,25 +269,12 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
-	/*
-	clearSelectAll(): void {
-		this.selectAll = false;
-	}
-	*/
-
 	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
-		// this.overrideCheckboxState = null;
 		this.bulkCheckboxService.changeState(checkboxState);
 	}
 
-	checkItem(id: string, checked: boolean): void {
+	checkItem(id: number, checked: boolean): void {
 		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
-		/*
-		REMOVE IT
-		this.bulkCheckboxService.setPageSize(this.gridData.data.length);
-		this.bulkCheckboxService.selectBulkItem(id, checked);
-		this.overrideCheckboxState = this.bulkCheckboxService.changeStateByUserInteraction();
-		*/
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
