@@ -11,25 +11,17 @@ export class BulkCheckboxService {
 	private currentState: CheckboxStates;
 	private pageSize: number = null;
 	bulkItems: any;
-	private bulkSelectedItems: number[];
 	private excludedBag: ExcludedAssetsBag;
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
-		this.bulkSelectedItems = [];
 		this.excludedBag = new ExcludedAssetsBag();
 	}
 
 	setPageSize(size: number): void {
 		this.pageSize = size;
 	}
-
-	resetSelectedBulkItems() {
-		this.bulkItems = {};
-		this.bulkSelectedItems = [];
-	}
-
 
 	changeState(state: CheckboxState): void {
 		this.currentState = state.current;
@@ -39,7 +31,6 @@ export class BulkCheckboxService {
 		}
 
 		if (state.affectItems) {
-			// this.resetExcluded();
 			const select = this.canSelectAll();
 			this.changeCheckStateBulkItems(select);
 		}
@@ -72,16 +63,14 @@ export class BulkCheckboxService {
 
 		// update bulk items
 		keys.forEach(key => this.bulkItems[key] = checkState);
-		this.refreshBulkSelectedItems();
 	}
 
 	hasSelectedItems(): boolean {
-		return Boolean(this.bulkSelectedItems && this.bulkSelectedItems.length);
+		return this.getBulkItemsSelectedAsArray().length > 0;
 	}
 
 	getSelectedItemsCount(allCounter: number): number {
-		const items = this.bulkSelectedItems || [];
-		console.log('Items length:', items.length);
+		const items =  this.getBulkItemsSelectedAsArray() || [];
 		return this.isIndeterminateState()  ? allCounter - this.excludedBag.getAssets().length : items.length;
 	}
 
@@ -101,14 +90,14 @@ export class BulkCheckboxService {
 					.then((result: any) => {
 						const assets = result && result.assets || [];
 						// TODO side effect
-						this.bulkSelectedItems = assets.map((asset) => asset.common_id)
+						const selectedItems = assets.map((asset) => asset.common_id)
 							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
 
-						return resolve(this.bulkSelectedItems);
+						return resolve(selectedItems);
 					})
 					.catch((err) => reject(err))
 			}
-			return resolve(this.bulkSelectedItems);
+			return resolve(this.getBulkItemsSelectedAsArray());
 		});
 	}
 
@@ -116,18 +105,14 @@ export class BulkCheckboxService {
 		this.setStateSubject.next({current: CheckboxStates.unchecked, affectItems: true});
 	}
 
-
-	private refreshBulkSelectedItems() {
-		const keys = Object.keys(this.bulkItems);
-
-		// update edit bulk items
-		this.bulkSelectedItems = keys
+	private getBulkItemsSelectedAsArray(): number[] {
+		return Object.keys(this.bulkItems)
 			.filter(key => this.bulkItems[key])
 			.map(value => parseInt(value, 10));
 	}
 
 	private hasSelectedAllItems(): boolean {
-		return this.bulkSelectedItems.length === this.pageSize
+		return this.getBulkItemsSelectedAsArray().length === this.pageSize
 	}
 
 	private canSelectAll(): boolean {
@@ -155,7 +140,6 @@ export class BulkCheckboxService {
 
 	private selectBulkItem(id: number, checked: boolean): void {
 		this.bulkItems[id] = checked;
-		this.refreshBulkSelectedItems();
 
 		if (this.isIndeterminateState()) {
 			if (checked) {
