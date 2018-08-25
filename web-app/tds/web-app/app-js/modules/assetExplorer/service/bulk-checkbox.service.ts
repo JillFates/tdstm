@@ -44,7 +44,6 @@ export class BulkCheckboxService {
 		if (state.affectItems) {
 			// this.resetExcluded();
 			const select = this.canSelectAll();
-
 			this.changeCheckStateBulkItems(select);
 		}
 	}
@@ -129,6 +128,15 @@ export class BulkCheckboxService {
 		return this.isIndeterminateState()  ? allCounter - this.excludedBag.getAssets().length : items.length;
 	}
 
+	handleFiltering(): void {
+		if (this.canSelectAll()) {
+			// on filtering select all
+			this.excludedBag.clean();
+			this.changeCheckStateBulkItems(true);
+		}
+
+	}
+
 	private refreshBulkSelectedItems() {
 		const keys = Object.keys(this.bulkItems);
 
@@ -144,7 +152,10 @@ export class BulkCheckboxService {
 				return this.getBulkAssetIds(viewId, model, justPlanning)
 					.then((result: any) => {
 						const assets = result && result.assets || [];
+						// TODO side effect
 						this.bulkSelectedItems = assets.map((asset) => asset.common_id)
+							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
+
 						return resolve(this.bulkSelectedItems);
 					})
 					.catch((err) => reject(err))
@@ -192,12 +203,6 @@ class ExcludedAssetsBag {
 
 	clean(): void {
 		this.assets = [];
-		/*
-		while(this.assets.length)  {
-			const asset = this.assets.pop();
-			delete this.bulkItems[asset]
-		}
-		*/
 	}
 	add(id): void {
 		this.remove(id);

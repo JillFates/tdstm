@@ -1,8 +1,7 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
 <kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)" (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">

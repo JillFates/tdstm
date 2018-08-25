@@ -145,6 +145,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clearText(column: ViewColumn): void {
+		this.bulkCheckboxService.handleFiltering();
 		if (column.filter) {
 			column.filter = '';
 			this.state.skip = 0;
@@ -184,6 +185,8 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
+		this.bulkCheckboxService.handleFiltering();
+
 		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
