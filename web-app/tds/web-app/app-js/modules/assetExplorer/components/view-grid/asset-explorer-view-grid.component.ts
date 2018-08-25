@@ -282,7 +282,7 @@ export class AssetExplorerViewGridComponent {
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.bulkCheckboxService.clearSelectedItems();
+			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
 	}

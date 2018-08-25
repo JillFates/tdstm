@@ -30,9 +30,6 @@ export class BulkCheckboxService {
 		this.bulkSelectedItems = [];
 	}
 
-	private hasSelectedAllItems(): boolean {
-		return this.bulkSelectedItems.length === this.pageSize
-	}
 
 	changeState(state: CheckboxState): void {
 		this.currentState = state.current;
@@ -48,12 +45,8 @@ export class BulkCheckboxService {
 		}
 	}
 
-	private canSelectAll(): boolean {
-		return [CheckboxStates.checked, CheckboxStates.indeterminate].indexOf(this.currentState) >= 0;
-	}
-
-	clearSelectedItems(): void {
-		this.bulkSelectedItems = [];
+	setCurrentState(state: CheckboxStates): void {
+		this.currentState = state;
 	}
 
 	// on init or page change
@@ -63,42 +56,6 @@ export class BulkCheckboxService {
 
 		this.handlePageChange();
 		this.setExcludedAssets();
-	}
-
-	private handlePageChange(): void {
-		let state = this.isIndeterminateState() ? CheckboxStates.indeterminate : CheckboxStates.unchecked;
-		this.setStateSubject.next({current: state, affectItems: true});
-	}
-
-	private setExcludedAssets(): void {
-		if (this.isIndeterminateState()) {
-			const bulkKeys = Object.keys(this.bulkItems);
-
-			this.excludedBag.getAssets()
-				.filter((key: number) => bulkKeys.indexOf(key.toString()) >= 0)
-				.forEach((id: number) => this.bulkItems[id] = false);
-		}
-	}
-
-	private isIndeterminateState(): boolean {
-		return this.currentState === CheckboxStates.indeterminate;
-	}
-
-	private selectBulkItem(id: number, checked: boolean): void {
-		this.bulkItems[id] = checked;
-		this.refreshBulkSelectedItems();
-
-		if (this.isIndeterminateState()) {
-			if (checked) {
-				this.excludedBag.remove(id);
-			} else {
-				this.excludedBag.add(id);
-			}
-		} else {
-			this.excludedBag.clean();
-			this.currentState =  this.hasSelectedAllItems() ? CheckboxStates.checked : CheckboxStates.unchecked;
-			this.setStateSubject.next({current: this.currentState, affectItems: false});
-		}
 	}
 
 	checkItem(id: number, checked: boolean, currentPageSize: number): void {
@@ -137,15 +94,6 @@ export class BulkCheckboxService {
 
 	}
 
-	private refreshBulkSelectedItems() {
-		const keys = Object.keys(this.bulkItems);
-
-		// update edit bulk items
-		this.bulkSelectedItems = keys
-			.filter(key => this.bulkItems[key])
-			.map(value => parseInt(value, 10));
-	}
-
 	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<number[]> {
 		return new Promise((resolve, reject) => {
 			if (this.isIndeterminateState()) {
@@ -162,6 +110,64 @@ export class BulkCheckboxService {
 			}
 			return resolve(this.bulkSelectedItems);
 		});
+	}
+
+	uncheckItems(): void {
+		this.setStateSubject.next({current: CheckboxStates.unchecked, affectItems: true});
+	}
+
+
+	private refreshBulkSelectedItems() {
+		const keys = Object.keys(this.bulkItems);
+
+		// update edit bulk items
+		this.bulkSelectedItems = keys
+			.filter(key => this.bulkItems[key])
+			.map(value => parseInt(value, 10));
+	}
+
+	private hasSelectedAllItems(): boolean {
+		return this.bulkSelectedItems.length === this.pageSize
+	}
+
+	private canSelectAll(): boolean {
+		return [CheckboxStates.checked, CheckboxStates.indeterminate].indexOf(this.currentState) >= 0;
+	}
+
+	private handlePageChange(): void {
+		let state = this.isIndeterminateState() ? CheckboxStates.indeterminate : CheckboxStates.unchecked;
+		this.setStateSubject.next({current: state, affectItems: true});
+	}
+
+	private setExcludedAssets(): void {
+		if (this.isIndeterminateState()) {
+			const bulkKeys = Object.keys(this.bulkItems);
+
+			this.excludedBag.getAssets()
+				.filter((key: number) => bulkKeys.indexOf(key.toString()) >= 0)
+				.forEach((id: number) => this.bulkItems[id] = false);
+		}
+	}
+
+	private isIndeterminateState(): boolean {
+		return this.currentState === CheckboxStates.indeterminate;
+	}
+
+	private selectBulkItem(id: number, checked: boolean): void {
+		this.bulkItems[id] = checked;
+		this.refreshBulkSelectedItems();
+
+		if (this.isIndeterminateState()) {
+			if (checked) {
+				this.excludedBag.remove(id);
+			} else {
+				this.excludedBag.add(id);
+			}
+		} else {
+			this.excludedBag.clean();
+			this.currentState =  this.hasSelectedAllItems() ? CheckboxStates.checked : CheckboxStates.unchecked;
+			this.setStateSubject.next({current: this.currentState, affectItems: false});
+		}
 	}
 
 	private getBulkAssetIds(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
@@ -188,9 +194,7 @@ export class BulkCheckboxService {
 		});
 	}
 
-	setCurrentState(state: CheckboxStates): void {
-		this.currentState = state;
-	}
+
 }
 
 // handle store temporally assets excluded from items selected
