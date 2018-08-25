@@ -177,8 +177,6 @@ export class BulkCheckboxService {
 				.subscribe(result => resolve(result), err => reject(err));
 		});
 	}
-
-
 }
 
 // handle store temporally assets excluded from items selected

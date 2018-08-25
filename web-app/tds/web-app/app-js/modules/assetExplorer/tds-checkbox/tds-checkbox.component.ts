@@ -14,7 +14,7 @@ export class TDSCheckboxComponent implements OnInit {
 	@Input() setStateSubject: Subject<CheckboxState>;
 	@Output() changeState: EventEmitter<CheckboxState> = new EventEmitter();
 	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
-	currentState: CheckboxStates;
+	private currentState: CheckboxStates;
 	private transitionHandler: Function;
 
 	ngOnInit() {
