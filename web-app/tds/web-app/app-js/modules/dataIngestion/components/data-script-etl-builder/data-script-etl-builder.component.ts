@@ -97,7 +97,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			}
 		}, error => console.log(error));
 	}
-	
+
 	/**
 	 * Used to determine if the Refresh Sample Data button appears on the page
 	 * @return true if a JSON file has been uploaded and available
@@ -201,24 +201,22 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected cancelCloseDialog(): void {
-		if (document.getElementsByClassName('tds-ui-prompt in').length == 0 && !document.querySelector(".modal-backdrop:not(.in)")) { //Ensure the dialog is not open or closing
-			if (this.isScriptDirty()) {
-				this.promptService.open(
-					'Confirmation Required',
-					'You have changes that have not been saved. Do you want to continue and lose those changes?',
-					'Confirm', 'Cancel').then(result => {
-						if (result) {
-							this.dismiss();
-						}
-					});
-			} else {
-				const result = {
-					updated: this.operationStatus.save === 'success',
-					newEtlScriptCode: this.script
-				};
+		if (this.isScriptDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel').then(result => {
+					if (result) {
+						this.dismiss();
+					}
+				});
+		} else {
+			const result = {
+				updated: this.operationStatus.save === 'success',
+				newEtlScriptCode: this.script
+			};
 
-				this.close(result);
-			}
+			this.close(result);
 		}
 	}
 
