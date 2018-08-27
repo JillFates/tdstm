@@ -14,7 +14,7 @@
 				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 			</div>
 			<div class="checkbox just-planning">
-				<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning">
+				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning">
 				<label>Just Planning</label>
 			</div>
 		</div>
@@ -45,7 +45,7 @@
 
 		<ng-template kendoGridCellTemplate let-dataItem>
             <label class="selectall-checkbox-column text-center">
-	            <input type="checkbox" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
+	            <input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
             </label>
 		</ng-template>
 	</kendo-grid-column>
