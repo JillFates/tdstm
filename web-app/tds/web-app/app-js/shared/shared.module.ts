@@ -15,7 +15,8 @@ import { ComponentCreatorService } from '../shared/services/component-creator.se
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 // Shared Directives
-import {UIAutofocusDirective} from './directives/autofocus-directive';
+import { UIAutofocusDirective } from './directives/autofocus-directive';
+import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
@@ -68,6 +69,7 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	declarations: [
 		UIAutofocusDirective,
+		UIHandleEscapeDirective,
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
@@ -117,6 +119,7 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	exports: [UILoaderDirective,
 		UIAutofocusDirective,
+		UIHandleEscapeDirective,
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
