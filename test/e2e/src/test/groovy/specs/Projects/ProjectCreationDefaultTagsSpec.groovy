@@ -117,7 +117,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         given: 'The user is in Menu'
             at MenuPage
         when: 'The user searches for the selected project'
-            menuModule.assertProjectName projName
+            projectsModule.assertProjectName projName
         then: 'A licensed project should be selected if license is requested'
             def displayed = false
             try {

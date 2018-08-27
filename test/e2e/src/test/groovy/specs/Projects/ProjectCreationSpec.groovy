@@ -112,10 +112,10 @@ class ProjectCreationSpec extends GebReportingSpec {
                 projectNameFilter = licensedProjectName
                 waitFor {projectNameGridField.find("a", text: licensedProjectName).first().click()}
                 at MenuPage
-                waitFor {menuModule.projectName}
+                waitFor {projectsModule.projectName}
                 projectsModule.assertProjectName(licensedProjectName)
                 // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = menuModule.projectLicenseIcon.isDisplayed()
+                displayed = projectsModule.projectLicenseIcon.isDisplayed()
             } catch (RequiredPageContentNotPresent e) {
                 // Try failed because license icon is not present so a Licensed project is selected now
                 displayed = false

@@ -71,7 +71,7 @@ class MenuModule extends Module {
         tasksCookbookItem       { tasksMenu.find("li.menu-parent-tasks-cookbook")}
         tasksGenHistoryItem     { tasksMenu.find("li.menu-parent-tasks-generation-history")}
         tasksImportItem         { tasksMenu.find("li.menu-parent-tasks-import-tasks")}
-
+        projectName { menuContainer.find("li a#nav-project-name")}
         userMenu {$(class:"user-menu")}
         logoutBtn {userMenu.find(class:"pull-right")}
 
@@ -133,6 +133,8 @@ class MenuModule extends Module {
         selectItem(assetsAllAssetsItem)
     }
 
-
+    def assertProjectName(name){
+        projectName.text().contains(name)
+    }
 
 }
