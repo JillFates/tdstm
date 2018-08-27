@@ -91,6 +91,11 @@ grails.project.dependency.resolution = {
 		compile ':spring-events:1.2'
 		// Added the acl for some testing JPM 12/2016
 		// OLB NOT USED: compile ':spring-security-acl:2.0.0'
+
+		/*
+		 * TODO: OLB, We have a compilation dependency for the Following plugin in the UnitTest,
+		 *       it is safe to build the war file ignoring the test cases???
+		 */
 		compile ':greenmail:1.3.4'
 
 		compile (':spring-security-rest:1.5.4') {
@@ -115,7 +120,6 @@ grails.project.dependency.resolution = {
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
-		runtime ':console:1.5.12'
 		runtime ':xss-sanitizer:0.4.0'
 
 		/*
@@ -126,5 +130,10 @@ grails.project.dependency.resolution = {
 		// runtime ':cache-headers:1.1.7'
 
 		test ':functional-test:1.2.7'
+
+		// don't include plugins in production
+		if ( Environment.current != Environment.PRODUCTION ) {
+			compile ":console:1.5.12"
+		}
 	}
 }
