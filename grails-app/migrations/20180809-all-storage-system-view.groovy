@@ -51,15 +51,6 @@ databaseChangeLog = {
                             {"domain":"device","property":"size","width":200,"locked":false,"edit":false,"label":"Size","filter":""},
                             {"domain":"device","property":"scale","width":200,"locked":false,"edit":false,"label":"Scale","filter":""},
                             {"domain":"device","property":"rateOfChange","width":200,"locked":false,"edit":false,"label":"Rate Of Change","filter":""},
-                            {"domain":"device","property":"custom1","width":200,"locked":false,"edit":false,"label":"Power State","filter":""},
-                            {"domain":"device","property":"custom2","width":200,"locked":false,"edit":false,"label":"Clean Power Off","filter":""},
-                            {"domain":"device","property":"custom3","width":200,"locked":false,"edit":false,"label":"Cost Basis","filter":""},
-                            {"domain":"device","property":"custom4","width":200,"locked":false,"edit":false,"label":"Custom4","filter":""},
-                            {"domain":"device","property":"custom5","width":200,"locked":false,"edit":false,"label":"Custom5","filter":""},
-                            {"domain":"device","property":"custom6","width":200,"locked":false,"edit":false,"label":"Custom6","filter":""},
-                            {"domain":"common","property":"custom7","width":200,"locked":false,"edit":false,"label":"CNN","filter":""},
-                            {"domain":"device","property":"custom8","width":200,"locked":false,"edit":false,"label":"Custom8","filter":""},
-                            {"domain":"common","property":"custom9","width":200,"locked":false,"edit":false,"label":"IPs","filter":""},
                             {"domain": "device","edit": false,"filter": "Array|Disk|NAS|SAN|SAN Switch|Storage|Tape|Tape Library|Virtual Tape Library","label": "Device Type","locked": false,"property": "assetType","width": 200}        
                         ]
                     }
@@ -97,16 +88,7 @@ databaseChangeLog = {
                             {"domain":"storage","property":"size","width":200,"locked":false,"edit":false,"label":"Size","filter":""},
                             {"domain":"storage","property":"scale","width":200,"locked":false,"edit":false,"label":"Scale","filter":""},
                             {"domain":"storage","property":"rateOfChange","width":200,"locked":false,"edit":false,"label":"Rate Of Change","filter":""},
-                            {"domain":"common","property":"supportType","width":200,"locked":false,"edit":false,"label":"Support","filter":""},
-                            {"domain":"storage","property":"custom1","width":200,"locked":false,"edit":false,"label":"Network Interfaces","filter":""},
-                            {"domain":"storage","property":"custom2","width":200,"locked":false,"edit":false,"label":"Custom2","filter":""},
-                            {"domain":"storage","property":"custom3","width":200,"locked":false,"edit":false,"label":"Cost Basis","filter":""},
-                            {"domain":"storage","property":"custom4","width":200,"locked":false,"edit":false,"label":"Custom4","filter":""},
-                            {"domain":"storage","property":"custom5","width":200,"locked":false,"edit":false,"label":"Custom5","filter":""},
-                            {"domain":"storage","property":"custom6","width":200,"locked":false,"edit":false,"label":"Custom6","filter":""},
-                            {"domain":"common","property":"custom7","width":200,"locked":false,"edit":false,"label":"CNN","filter":""},
-                            {"domain":"storage","property":"custom8","width":200,"locked":false,"edit":false,"label":"Custom8","filter":""},
-                            {"domain":"common","property":"custom9","width":200,"locked":false,"edit":false,"label":"IPs","filter":""}
+                            {"domain":"common","property":"supportType","width":200,"locked":false,"edit":false,"label":"Support","filter":""}
                         ]
                     }
                     '''.stripIndent()
