@@ -6,34 +6,6 @@ class MenuModule extends Module {
 
     static at = {
 
-        assetsItem.text().trim()            == "Assets"
-        assetsSections[0].text().trim()     == "Assets"
-        assetsSummaryItem.text().trim()     == "Summary Table"
-        assetsAllAssetsItem.text().trim()   == "All Assets"
-        assetsApplicationsItem.text().trim()== "Applications"
-        assetsDevicesItem.text().trim()     == "Devices"
-        assetsServersItem.text().trim()     == "Servers"
-        assetsDatabasesItem.text().trim()   == "Databases"
-        assetsStorageItem.text().trim()     == "Storage-Devices"
-        assetsLogicalItem.text().trim()     == "Storage-Logical"
-        assetsDependItem.text().trim()      == "Dependencies"
-        assetsCommentsItem.text().trim()    == "Comments"
-        assetsDepAnalyzerItem.text().trim() == "Dependency Analyzer"
-        assetsArchGraphItem.text().trim()   == "Architecture Graph"
-        assetsImportItem.text().trim()      == "Import Assets"
-        assetsManageBatchesItem.text().trim() == "Manage Batches"
-        assetsExportItem.text().trim()      == "Import Assets"
-        assetsViewManagerItem.text().trim() == "View Manager"
-
-        tasksItem.text().trim()             == "Tasks"
-        tasksSections[0].text().trim()      == "Tasks"
-        tasksMyTasksItem.text().trim()      == "My Tasks ( " +taskCount+ " )"
-        tasksManagerItem.text().trim()      == "Task Manager"
-        tasksGraphItem.text().trim()        == "Task Graph"
-        tasksTimelineItem.text().trim()     == "Task Timeline"
-        tasksCookbookItem.text().trim()     == "Cookbook"
-        tasksGenHistoryItem.text().trim()   == "Generation History"
-        tasksImportItem.text().trim()       == "Import Tasks"
     }
 
     static content = {

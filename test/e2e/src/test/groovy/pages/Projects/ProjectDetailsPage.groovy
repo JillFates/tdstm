@@ -22,7 +22,6 @@ class ProjectDetailsPage extends Page {
         pdEditBtn { $("input", type:"submit",class:"edit", name:"_action_Edit")}
         pdDeleteBtn { $("input", type:"submit",class:"delete", name:"_action_Delete")}
         pdFieldSetBtn { $("input", type:"button",class:"show")}
-        //menuModule { module MenuModule}
         projectsModule { module ProjectsModule}
     }
 

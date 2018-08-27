@@ -6,12 +6,6 @@ class ProjectsModule extends Module {
 
     static at = {
 
-        projectsItem.text().trim()          == "Projects"
-        projectsActiveItem.text().trim()    == "Active Projects"
-        projectsCurrentItem.text().contains() == "Details" // TODO add the project name as test property
-        projectsMailItem.text().trim()      == "User Activation Emails"
-        projectsStaffItem.text().trim()     == "Project Staff"
-        projectsFieldsSetItem.text().trim() == "Asset Field Settings"
 
     }
 
