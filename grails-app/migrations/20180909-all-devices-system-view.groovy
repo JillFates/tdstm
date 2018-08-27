@@ -50,16 +50,7 @@ databaseChangeLog = {
                             {"domain":"device","property":"railType","width":200,"locked":false,"edit":false,"label":"Rail Type","filter":""},
                             {"domain":"device","property":"size","width":200,"locked":false,"edit":false,"label":"Size","filter":""},
                             {"domain":"device","property":"scale","width":200,"locked":false,"edit":false,"label":"Scale","filter":""},
-                            {"domain":"device","property":"rateOfChange","width":200,"locked":false,"edit":false,"label":"Rate Of Change","filter":""},
-                            {"domain":"device","property":"custom1","width":200,"locked":false,"edit":false,"label":"Power State","filter":""},
-                            {"domain":"device","property":"custom2","width":200,"locked":false,"edit":false,"label":"Clean Power Off","filter":""},
-                            {"domain":"device","property":"custom3","width":200,"locked":false,"edit":false,"label":"Cost Basis","filter":""},
-                            {"domain":"device","property":"custom4","width":200,"locked":false,"edit":false,"label":"Custom4","filter":""},
-                            {"domain":"device","property":"custom5","width":200,"locked":false,"edit":false,"label":"Custom5","filter":""},
-                            {"domain":"device","property":"custom6","width":200,"locked":false,"edit":false,"label":"Custom6","filter":""},
-                            {"domain":"common","property":"custom7","width":200,"locked":false,"edit":false,"label":"CNN","filter":""},
-                            {"domain":"device","property":"custom8","width":200,"locked":false,"edit":false,"label":"Custom8","filter":""},
-                            {"domain":"common","property":"custom9","width":200,"locked":false,"edit":false,"label":"IPs","filter":""}
+                            {"domain":"device","property":"rateOfChange","width":200,"locked":false,"edit":false,"label":"Rate Of Change","filter":""}
                         ]
                     }
                     '''.stripIndent()
@@ -122,15 +113,6 @@ databaseChangeLog = {
                             {"domain":"device","property":"size","width":200,"locked":false,"edit":false,"label":"Size","filter":""},
                             {"domain":"device","property":"scale","width":200,"locked":false,"edit":false,"label":"Scale","filter":""},
                             {"domain":"device","property":"rateOfChange","width":200,"locked":false,"edit":false,"label":"Rate Of Change","filter":""},
-                            {"domain":"device","property":"custom1","width":200,"locked":false,"edit":false,"label":"Power State","filter":""},
-                            {"domain":"device","property":"custom2","width":200,"locked":false,"edit":false,"label":"Clean Power Off","filter":""},
-                            {"domain":"device","property":"custom3","width":200,"locked":false,"edit":false,"label":"Cost Basis","filter":""},
-                            {"domain":"device","property":"custom4","width":200,"locked":false,"edit":false,"label":"Custom4","filter":""},
-                            {"domain":"device","property":"custom5","width":200,"locked":false,"edit":false,"label":"Custom5","filter":""},
-                            {"domain":"device","property":"custom6","width":200,"locked":false,"edit":false,"label":"Custom6","filter":""},
-                            {"domain":"common","property":"custom7","width":200,"locked":false,"edit":false,"label":"CNN","filter":""},
-                            {"domain":"device","property":"custom8","width":200,"locked":false,"edit":false,"label":"Custom8","filter":""},
-                            {"domain":"common","property":"custom9","width":200,"locked":false,"edit":false,"label":"IPs","filter":""},
                             {"domain": "device","edit": false,"filter": "Server|Appliance|Blade|VM|Virtual","label": "Device Type","locked": false,"property": "assetType","width": 200}
                         ]
                     }
