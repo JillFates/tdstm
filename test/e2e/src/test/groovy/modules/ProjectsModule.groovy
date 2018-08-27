@@ -95,6 +95,11 @@ class ProjectsModule extends Module {
         selectItem(projectsDatascripts)
     }
 
+    def goToActions(){
+        selectMenu(projectsItem)
+        selectItem(projectsActions)
+    }
+
     def goToTagsPage(){
         selectMenu projectsItem
         selectItem projectsTags

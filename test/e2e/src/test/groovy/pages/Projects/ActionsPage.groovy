@@ -7,7 +7,6 @@ class ActionsPage extends Page {
 
     static at = {
         modaltitle.text() == "API Actions"
-        createActionBtn.value() == "Create Action"
     }
 
     static content = {

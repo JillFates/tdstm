@@ -51,7 +51,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Active Projects page'
             projectsModule.goToProjectsActive()
 
-        then: 'The Project List Page is loaded successfully'
+        then: 'The Active Projects Page is loaded successfully'
             at ProjectListPage
     }
 
@@ -59,7 +59,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Project Details page'
             projectsModule.goToProjectsDetails()
 
-        then: 'The Project List Page is loaded successfully'
+        then: 'The PProject Details Page is loaded successfully'
             at ProjectDetailsPage
     }
 
@@ -99,7 +99,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Asset Field Settings page'
             projectsModule.goToProviders()
 
-        then: 'The Asset Field Settings Page is loaded successfully'
+        then: 'The Providers Page is loaded successfully'
             at ProvidersPage
     }
 
@@ -107,7 +107,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Asset Field Settings page'
             projectsModule.goToCredentials()
 
-        then: 'The Asset Field Settings Page is loaded successfully'
+        then: 'The Credentials Page is loaded successfully'
             at CredentialsPage
     }
 
@@ -118,4 +118,13 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         then: 'The ETL Scripts Page is loaded successfully'
             at DatascriptsPage
     }
+
+    def "11. Verify the Actions Landing Page"() {
+        when: 'The user goes to Actions page'
+            projectsModule.goToActions()
+
+        then: 'The ActionsPage is loaded successfully'
+            at ActionsPage
+    }
+
 }
