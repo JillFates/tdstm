@@ -22,6 +22,7 @@ import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
+import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
@@ -67,18 +68,16 @@ class DataImportService implements ServiceMethods {
 	ScriptProcessorService scriptProcessorService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
-	static final String SEARCH_BY_ID_NOT_FOUND_MSG = 'Record not found searching by id'
+	static final String SEARCH_BY_ID_NOT_FOUND_MSG = SearchQueryHelper.SEARCH_BY_ID_NOT_FOUND_MSG
+	static final String WHEN_NOT_FOUND_PROPER_USE_MSG = SearchQueryHelper.WHEN_NOT_FOUND_PROPER_USE_MSG
+	static final String FIND_FOUND_MULTIPLE_REFERENCES_MSG = SearchQueryHelper.FIND_FOUND_MULTIPLE_REFERENCES_MSG
+	static final String ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG = SearchQueryHelper.ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
+	static final String PROPERTY_NAME_NOT_IN_FIELDS = SearchQueryHelper.PROPERTY_NAME_NOT_IN_FIELDS
+	static final String PROPERTY_NAME_NOT_IN_DOMAIN = SearchQueryHelper.PROPERTY_NAME_NOT_IN_DOMAIN
 	static final String NO_FIND_QUERY_SPECIFIED_MSG = 'No find/findElse specified for property'
-	static final String WHEN_NOT_FOUND_PROPER_USE_MSG = "whenNotFound create only applicable for reference properties"
-	static final String FIND_FOUND_MULTIPLE_REFERENCES_MSG = 'Multiple records found for find/elseFind criteria'
-	static final String ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG = 'Multiple records found with current value'
-
-	// TODO : JPM 4/2018 : Augusto - Get these to work first
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
-	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field {propertyName} was not found in ETL dataset"
-	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field {propertyName} in domain"
 
-	static final Integer NOT_FOUND_BY_ID = -1
+	static final Integer NOT_FOUND_BY_ID = SearchQueryHelper.NOT_FOUND_BY_ID
 	static final Integer FOUND_MULTIPLE = -2
 
 	static final List<String> PROPERTIES_THAT_CANNOT_BE_MODIFIED = [
@@ -1200,9 +1199,13 @@ class DataImportService implements ServiceMethods {
 	) {
 		Object existingValue = domainInstance[fieldName]
 
-		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
-			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
+		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
+			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity, isInitValue
 
+		// for domain com.tds.asset.Application.environment
+		// existingValue=Production,
+		// newValue=QA,
+		// isNewRecord=false
 		if ( !isInitValue || (isInitValue && existingValue == null)) {
 			boolean isMatch
 			if (existingValue && GormUtil.isDomainClass(existingValue.getClass())) {
@@ -1212,7 +1215,9 @@ class DataImportService implements ServiceMethods {
 				isMatch = existingValue == newValue
 			}
 			if (! isMatch) {
+				log.debug '_recordChangeOnField() changed field {} to {}', fieldName, newValue
 				domainInstance[fieldName] = newValue
+				log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
 				if (! isNewEntity) {
 					fieldsInfo[fieldName].previousValue = existingValue.toString()
 				}
@@ -1790,97 +1795,6 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to determine what the actual class is of a particular domain property. In the case of AssetEntity the logic
-	 * logic needs to determine which type is actually intended based on the ETLDomain property name (e.g. Device, Asset, etc)
-	 * @param propertyName - the property to get the class type for
-	 * @param fieldsInfo - the ETL info on the fields of the entity
-	 * @param context - the process context map
-	 * @return the class name of the property
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Class classOfDomainProperty(String propertyName, Map fieldsInfo, Map context) {
-		Class domainClassToCreate
-		ETLDomain ed
-		String errorMsg
-
-		if (! GormUtil.isDomainProperty(context.domainClass, propertyName)) {
-			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			log.debug 'classOfDomainProperty() {}', errorMsg
-		} else {
-			while ( true ) {
-				if (propertyName == 'id') {
-					domainClassToCreate = context.domainClass
-					break
-				}
-
-				if (! fieldsInfo.containsKey(propertyName)) {
-					errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
-					log.debug 'classOfDomainProperty() {}', errorMsg
-					break
-				}
-
-				Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(context.domainClass, propertyName)
-				Boolean isReferenceProperty = GormUtil.isReferenceProperty(context.domainClass, propertyName)
-				log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
-
-				// propertyName MUST be a reference or identifier for this function otherwise record an error
-				if (! ( isIdentifierProperty || isReferenceProperty ) ) {
-					errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG
-					log.debug 'classOfDomainProperty() {}', errorMsg
-					break
-				}
-
-				if (isIdentifierProperty) {
-					log.debug 'classOfDomainProperty() is the identifier'
-					domainClassToCreate = context.domainClass
-					break
-				}
-
-				// Get the type for the property of domain class being processed by the batch
-				domainClassToCreate = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
-
-				if (isReferenceProperty) {
-					// We need to try and resolve what class to create. Most times it is just the class type of the property in the
-					// parent domain. In the case of AssetEntity however the class could be AssetEntity, Application, Database, etc.
-					// In order to know which the assumption is that there will be a find.query and that the first search is going to
-					//be precisely what that DataScript developer intended to be created.
-
-					String classShortName = GormUtil.domainShortName(domainClassToCreate)
-					if (classShortName in ['AssetEntity']) {
-						// Try looking for the exact class type in the find.query
-						List query = fieldsInfo[propertyName].find?.query
-						if (query?.size() > 0) {
-							ed = ETLDomain.lookup(query[0].domain)
-							domainClassToCreate = ed.getClazz()
-						} else {
-							// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
-							Map createInfo = fieldsInfo[propertyName].create ?: [:]
-							if (createInfo.containsKey('assetClass')) {
-								ed = ETLDomain.lookup(createInfo['assetClass'])
-								domainClassToCreate = ed.getClazz()
-							}
-						}
-					}
-					break
-				}
-
-				break
-			}
-		}
-
-		if (errorMsg) {
-			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
-		}
-
-		log.debug 'classOfDomainProperty() for property {} for class {} type is {}',
-			propertyName,
-			context.domainClass.getName(),
-			( domainClassToCreate ? domainClassToCreate.getName() : 'Not a Reference' )
-
-		return domainClassToCreate
-	}
-
-	/**
 	 * Used to swap around the order of properties when processing fields
 	 * For some functionality the order of the fields will be critial that one or more are done ahead of others such
 	 * as Manufacturer and Model.
@@ -2118,6 +2032,25 @@ class DataImportService implements ServiceMethods {
 		}
 
 		return entity
+	}
+
+	/**
+	 * Used to determine what the actual class is of a particular domain property. In the case of AssetEntity the logic
+	 * logic needs to determine which type is actually intended based on the ETLDomain property name (e.g. Device, Asset, etc)
+	 * @param propertyName - the property to get the class type for
+	 * @param fieldsInfo - the ETL info on the fields of the entity
+	 * @param context - the context with all sorts of stuff being passed around
+	 * @return the Class of the property
+	 */
+	@Transactional(noRollbackFor=[Exception])
+	Class classOfDomainProperty(String fieldName, Map fieldsInfo, Map context) {
+		Class clazz
+		String errorMsg
+		(clazz, errorMsg) = SearchQueryHelper.classOfDomainProperty(fieldName, fieldsInfo, context.domainClass)
+		if (errorMsg) {
+			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
+		}
+		return clazz
 	}
 
 	/**
