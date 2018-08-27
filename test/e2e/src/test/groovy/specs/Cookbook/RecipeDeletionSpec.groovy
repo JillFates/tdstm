@@ -20,6 +20,8 @@ class RecipeDeletionSpec extends GebReportingSpec {
             context: "Event",
             description: "This is a Geb created recipe for an Event context"
     ]
+    static maxNumberOfBulkRecipesToBeDeleted = 4 // custom E2E recipe to remove in workaround test
+    static recipesNameList = [baseName, "Geb Recipe Test"]
 
     def setupSpec() {
         testCount = 0
@@ -44,16 +46,23 @@ class RecipeDeletionSpec extends GebReportingSpec {
     }
 
     def "1. Recipe deletion"() {
-        testKey = "TM-7243"
         given: 'The User is on the Cookbook Section'
             at CookbookPage
         when: 'The User searches by the Recipe'
             waitFor{ gebRecipes[0].displayed }
         and: 'The User clicks the "Delete" Button'
             withConfirm(wait: true) { deleteRecipeButtons[0].click() }
+            waitForSuccessMessage()
         then: 'Recipe count is reduced to 1'
             waitFor{ gebRecipes[0].displayed }
             getRecipeByName(recipeDataMap.name) == null
+    }
+
+    def "2. Workaround to delete custom E2E tags"(){
+        when: 'The User waits first recipe is displayed in grid'
+            waitForFirstRecipeDisplayed()
+        then: 'The user deletes custom E2E tags if there are'
+            bulkDelete maxNumberOfBulkRecipesToBeDeleted, recipesNameList
     }
 }
 
