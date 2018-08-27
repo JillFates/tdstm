@@ -25,15 +25,15 @@
                       (click)="clearTextFilter()"></span>
             </div>
         </ng-template>
-        <kendo-grid-column title="Name" field="name"></kendo-grid-column>
+        <kendo-grid-column title="Name" field="name" [width]="100"></kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.INSERT && batchRecord.status.code === BatchStatus.PENDING"
-                           title="Current Value" [class]="'gray-background'">
+                           title="Current Value" [class]="'gray-background'" [width]="150">
         </kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE && batchRecord.status.code === BatchStatus.PENDING"
-                           title="Current Value" field="currentValue">
+                           title="Current Value" field="currentValue" [width]="150">
         </kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.status.code === BatchStatus.COMPLETED"
-                           title="Imported Value" [class]="'import-value'">
+                           title="Imported Value" [class]="'import-value'" [width]="150">
 	        <ng-template kendoGridCellTemplate let-dataItem>
 		        <div class="import-item-container">
 			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" readonly/>
@@ -42,8 +42,7 @@
 		        </div>
 	        </ng-template>
         </kendo-grid-column>
-
-        <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [class]="'import-value'">
+        <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [class]="'import-value'" [width]="150">
             <ng-template kendoGridCellTemplate let-dataItem>
                 <div class="import-item-container">
                     <input *ngIf="(dataItem.importValue || dataItem.importValue === '' ) && !dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" />
@@ -52,6 +51,11 @@
 	                <i [ngClass]="{'has-init-value': !dataItem.importValue && dataItem.initValue}"
                        *ngIf="!dataItem.importValue && dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
                 </div>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Reference" [width]="100">
+            <ng-template kendoGridCellTemplate let-dataItem>
+                ...
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">
