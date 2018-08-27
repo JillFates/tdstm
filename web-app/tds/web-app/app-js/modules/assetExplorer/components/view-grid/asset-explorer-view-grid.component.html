@@ -6,16 +6,16 @@
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 		<div class="col-sm-6 bulkchange-section">
-			<div class="checkbox pull-left">
-				<label>
-					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
-			</div>
 			<tds-bulk-change-button [bulkItems]="bulkItems"
 			                        [enabled]="hasSelectedItems()"
 			                        (clickBulk)="onClickBulkButton()"
 			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 			<div *ngIf="hasSelectedItems()" class="selected-assets">
 				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+			</div>
+			<div class="checkbox just-planning">
+				<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning">
+				<label>Just Planning</label>
 			</div>
 		</div>
 	    <div class="col-sm-6 filters-section">
