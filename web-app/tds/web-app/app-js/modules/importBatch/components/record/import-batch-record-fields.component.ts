@@ -8,6 +8,9 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ImportBatchRecordDialogComponent} from './import-batch-record-dialog.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ImportBatchRecordFieldsInfoComponent} from './import-batch-record-fields-info.component';
 
 @Component({
 	selector: 'import-batch-record-fields',
@@ -63,7 +66,10 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 
-	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
+	constructor(
+		private importBatchService: ImportBatchService,
+		private translatePipe: TranslatePipe,
+		private dialogService: UIDialogService) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 			this.processStatus.state = CHECK_ACTION.NONE;
 			this.saveStatus.state = CHECK_ACTION.NONE;
@@ -281,5 +287,16 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 */
 	private handleError(e): void {
 		console.log(e);
+	}
+
+	/**
+	 * TODO: documentation.
+	 */
+	protected onOpenFieldInfo($field: any): void {
+		console.log($field);
+		this.dialogService.extra(ImportBatchRecordFieldsInfoComponent, [], false, false)
+			.then((result) => {
+				// TODO: code.
+			}).catch( result => { console.log('dismissed'); });
 	}
 }

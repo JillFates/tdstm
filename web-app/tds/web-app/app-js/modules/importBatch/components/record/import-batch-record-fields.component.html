@@ -30,10 +30,10 @@
                            title="Current Value" [class]="'gray-background'" [width]="150">
         </kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE && batchRecord.status.code === BatchStatus.PENDING"
-                           title="Current Value" field="currentValue" [width]="150">
+                           title="Current Value" field="currentValue" [width]="200">
         </kendo-grid-column>
         <kendo-grid-column *ngIf="batchRecord.status.code === BatchStatus.COMPLETED"
-                           title="Imported Value" [class]="'import-value'" [width]="150">
+                           title="Imported Value" [class]="'import-value'" [width]="200">
 	        <ng-template kendoGridCellTemplate let-dataItem>
 		        <div class="import-item-container">
 			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" readonly/>
@@ -42,7 +42,7 @@
 		        </div>
 	        </ng-template>
         </kendo-grid-column>
-        <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [class]="'import-value'" [width]="150">
+        <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [width]="200" [class]="'import-value'">
             <ng-template kendoGridCellTemplate let-dataItem>
                 <div class="import-item-container">
                     <input *ngIf="(dataItem.importValue || dataItem.importValue === '' ) && !dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" />
@@ -53,9 +53,11 @@
                 </div>
             </ng-template>
         </kendo-grid-column>
-        <kendo-grid-column title="Reference" [width]="100">
+        <kendo-grid-column title="Reference" [width]="80">
             <ng-template kendoGridCellTemplate let-dataItem>
-                ...
+                <i *ngIf="true" (click)="onOpenFieldInfo(dataItem)" title="View Create Reference Detail" class="fa fa-plus-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="true" title="View Update Reference Detail" class="fa fa-pencil-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="true" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">
