@@ -18,6 +18,7 @@ tds.admin.controller.MainController = function (scope, modal, utils, adminServic
 		"<p>You are about to unlock user account, press Confirm to continue or press Cancel to abort.</p>"
 
 		$("#unlockUserDialog").html(msg)
+		
 		$("#unlockUserDialog").dialog({
 	      buttons : {
 	        "Confirm" : function() {

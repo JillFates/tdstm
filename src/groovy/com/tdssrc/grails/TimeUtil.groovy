@@ -137,7 +137,7 @@ class TimeUtil {
 	static String ago(TimeDuration duration, String format = SHORT) {
 		StringBuilder ago = new StringBuilder()
 		String space
-		
+
 		int days = duration.days
 		int hours = duration.hours
 		int minutes = duration.minutes

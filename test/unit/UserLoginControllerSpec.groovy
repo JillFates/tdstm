@@ -25,7 +25,7 @@ class UserLoginControllerSpec extends AbstractUnitSpec {
 		lockoutString == 'Indefinitely'
 	}
 	
-	void testLockoutDateIndefinite() {
+	void testLockoutDateNotIndefinite() {
 		setup:
 		Calendar cal = Calendar.getInstance();
 		Date today = cal.getTime();

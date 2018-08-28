@@ -61,11 +61,10 @@ class UserLoginController implements ControllerMethods {
 	def generateLockoutTimeString(lockedTime) {
 		def timeRemaining = TimeUtil.ago(TimeUtil.nowGMT(), lockedTime)
 		def numYears = 0
-		if(timeRemaining.contains("y"))
-		{
+		if (timeRemaining.contains("y")) {
 			numYears = Integer.parseInt(timeRemaining.substring(0,timeRemaining.indexOf('y')))
 		}
-		return numYears>=10 ? "Indefinitely":timeRemaining
+		return numYears >= 10 ? "Indefinitely":timeRemaining
 	}
 	
 	@HasPermission(Permission.UserView)
@@ -154,7 +153,7 @@ class UserLoginController implements ControllerMethods {
 		else
 			userLogins = []
 			
-			String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
+		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
