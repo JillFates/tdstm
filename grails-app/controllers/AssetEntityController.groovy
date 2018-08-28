@@ -90,6 +90,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
+	static Integer MINUTES_CONSIDERED_TARDY = 300
+	static Integer MINUTES_CONSIDERED_LATE = 600
 
 	// This is a has table that sets what status from/to are available
 	private static final Map statusOptionForRole = [
@@ -3629,16 +3631,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
         String updatedClass = ''
 		if (task.status == AssetCommentStatus.READY) {
-			if (elapsedSec >= 600) {   // 10 minutes
+			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
 				updatedClass = 'task_late'
-			} else if (elapsedSec >= 300) {  // 5 minutes
+			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
 				updatedClass = 'task_tardy'
 			}
 		} else if (task.status == AssetCommentStatus.STARTED) {
 			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
-			if (dueInSecs >= 600) {
+			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
 				updatedClass='task_late'
-			} else if (dueInSecs >= 300) {
+			} else if (dueInSecs >= MINUTES_CONSIDERED_TARDY) {
 				updatedClass='task_tardy'
 			}
 		}
