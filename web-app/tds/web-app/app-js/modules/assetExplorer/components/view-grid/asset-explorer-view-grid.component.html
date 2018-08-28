@@ -14,11 +14,12 @@
 			<tds-bulk-change-button [bulkItems]="bulkItems" [enabled]="hasSelectedItems()" (clickBulk)="onClickBulkButton()" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 		</div>
 	    <div class="col-sm-6">
-		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
+		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload component-action-reload">
 			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		    </div>
 		    <div class="kendo-grid-toolbar__refresh-btn btnClear">
-			    <button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
+			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear" [disabled]="!hasFilterApplied()"
+			            (click)="onClearFilters()">
 				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		    </div>
 	    </div>
@@ -51,7 +52,7 @@
 	<kendo-grid-column *ngFor="let column of model.columns; let i = index" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>
-			<div class="sortable-column" (click)="onClickTemplate($event)">
+			<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 				<div [ngClass]="{'field-not-found': column?.notFound }">
 					<label class="text-delimited" for=""> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 				</div>
@@ -63,7 +64,7 @@
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
                        [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
-                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
                       aria-hidden="true"></span>
             </div>
         </ng-template>
