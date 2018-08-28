@@ -14,7 +14,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
     static testCount
     static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
-    static maxNumberOfBulkRecipesToBeDeleted = 1 // custom E2E recipe to remove in workaround test
+    static maxNumberOfBulkRecipesToBeDeleted = 4 // custom E2E recipe to remove in workaround test
     static recipesNameList = [baseName, "Geb Recipe Test"]
 
     def setupSpec() {
