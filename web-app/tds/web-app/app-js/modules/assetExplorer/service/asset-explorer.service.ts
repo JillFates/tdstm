@@ -8,7 +8,6 @@ import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/co
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {DeviceModel} from '../components/device/model-device/model/device-model.model';
-import {DeviceManufacturer} from '../components/device/manufacturer/model/device-manufacturer.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -391,28 +390,5 @@ export class AssetExplorerService {
 		}
 
 		return dependencies;
-	}
-
-	isValidAlias(alias: string, id: number, parentName: string): Observable<boolean> {
-		const url = `/tdstm/manufacturer/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
-
-		return this.http.get(url, '')
-			.map((res: any) => res === 'valid')
-	}
-
-	getModelAsJSON(id: string): Observable<DeviceModel> {
-		const url = '/tdstm/model/retrieveModelAsJSON?id=' + id;
-
-		return this.http.post(url, '')
-			.map((res: Response) => res.json())
-			.catch((error: any) => error.json());
-	}
-
-	getDeviceManufacturer(id: string): Observable<DeviceManufacturer> {
-		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
-		return this.http.post(url, '')
-			.map((res: Response) => res.json())
-			.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
-			.catch((error: any) => error.json());
 	}
 }

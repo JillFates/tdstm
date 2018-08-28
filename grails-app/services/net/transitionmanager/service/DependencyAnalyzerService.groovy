@@ -26,6 +26,7 @@ class DependencyAnalyzerService implements ServiceMethods {
 		Map queryParams = [projectId: projectId]
 
 		String tagQuery = tagService.getTagsQuery(filter.tagIds, filter.tagMatch, queryParams)
+		String tagJoins = tagService.getTagsJoin(filter.tagIds, filter.tagMatch)
 		String dependencyQuery = getDependencyQuery(filter.depGroup, queryParams)
 		String personQuery = getPersonQuery(filter.personId, queryParams)
 
@@ -34,8 +35,7 @@ class DependencyAnalyzerService implements ServiceMethods {
 			LEFT OUTER JOIN application app ON app.app_id = a.asset_entity_id
 			INNER JOIN asset_dependency_bundle adb ON adb.asset_id = a.asset_entity_id
 			LEFT OUTER JOIN person p ON p.person_id IN (app.sme_id, app.sme2_id, a.app_owner_id)
-			LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-			LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+			$tagJoins
 			WHERE adb.project_id = :projectId $tagQuery $dependencyQuery $personQuery
 			Group by a.asset_entity_id
 		"""

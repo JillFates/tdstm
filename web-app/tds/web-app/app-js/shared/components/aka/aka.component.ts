@@ -1,53 +1,52 @@
-import {Component, ViewChild, ElementRef, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import {DeviceManufacturer} from '../../../modules/assetExplorer/components/device/manufacturer/model/device-manufacturer.model';
+import {Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Aka, AkaParent, AkaChanges } from './model/aka.model';
-import { AssetExplorerService } from '../../../modules/assetExplorer/service/asset-explorer.service';
+import { ManufacturerService} from '../../../modules/assetExplorer/service/manufacturer.service';
 
 @Component({
 	selector: 'tds-aka',
 	templateUrl: '../tds/web-app/app-js/shared/components/aka/aka.component.html'
 })
 export class AkaComponent implements OnInit {
-	@Input('aka') aka: Array<Aka>;
+	@Input('aka') akaCollection: Array<Aka>;
 	@Input('akaParent') akaParent: AkaParent;
-	// @Input('manufacturer') manufacturer: DeviceManufacturer;
-	@Output('modelChange') modelChange = new EventEmitter<any>();
+	@Output('modelChange') modelChange = new EventEmitter<AkaChanges>();
+	@Output('validationErrors') validationErrors = new EventEmitter<boolean>();
 	clonedAkas: Array<Aka>;
 	hasError: boolean;
 	indexError: number;
 	errorMessage: string;
 	akas: string[];
 	deletedAkas: Aka[];
-	constructor(private assetExplorerService: AssetExplorerService) {
-		console.log('constructor :');
+	constructor(private manufacturerService: ManufacturerService) {
 		this.akas = [];
 	}
 
 	ngOnInit() {
 		this.cleanError();
-		this.clonedAkas = [...this.aka];
+		this.clonedAkas = [...this.akaCollection];
 
 		this.deletedAkas = [];
 		this.akas = (this.clonedAkas || [])
-			.map((aka: Aka) => aka.value);
+			.map((aka: Aka) => aka.name);
+
+		this.sendAkaChanges();
 	}
 
 	private cleanError() {
 		this.errorMessage = '';
 		this.indexError = -1;
 		this.hasError = false;
+		this.validationErrors.emit(false);
 	}
 
 	onAdd(aka: string): void {
-		// check if there is empty aka
-
 		const foundEmpty = this.akas.filter((aka: string) => (aka || '').trim() === '');
 		if (foundEmpty && foundEmpty.length) {
 			return;
 		}
 
 		this.akas.push(aka);
-		this.clonedAkas.push({ id: null, value: aka });
+		this.clonedAkas.push({ id: null, name: aka });
 	}
 
 	trackByIndex(index: number, obj: any): any {
@@ -72,10 +71,11 @@ export class AkaComponent implements OnInit {
 				if (this.hasError && this.indexError === index) {
 					this.cleanError();
 				}
-				this.clonedAkas[index].value = aka;
+				this.clonedAkas[index].name = aka;
 				this.sendAkaChanges();
 			})
 			.catch((err) => {
+				this.validationErrors.emit(true);
 				this.indexError = index;
 				this.hasError = true;
 				this.errorMessage = err;
@@ -87,39 +87,43 @@ export class AkaComponent implements OnInit {
 			// check if services is already present
 			const foundRepeated = this.akas.filter((aka: string) => aka === newAka);
 			if (foundRepeated && foundRepeated.length && foundRepeated.length > 1) {
-				reject(`AKA ${newAka} already entered` );
+				return reject(`AKA ${newAka} already entered` );
 			}
 
 			if (!newAka || newAka.trim()  === '') {
-				reject(`AKA is empty`);
+				return reject(`AKA is empty`);
 			}
 
 			if (this.akaParent) {
-				this.assetExplorerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
-					.subscribe((isValid: boolean) => {
-						if (isValid) {
-							resolve('');
+				return this.manufacturerService.isValidAlias(newAka, this.akaParent.id, this.akaParent.name)
+					.subscribe((result: string) => {
+						if (result === 'valid') {
+							return resolve('');
 						} else {
-							resolve(`AKA ${newAka} Already entered`);
+							return reject(`AKA ${newAka} Already entered`);
 						}
 				});
 			} else {
-				resolve('');
+				return resolve('');
 			}
 		});
 	}
 
 	sendAkaChanges() {
 		const edited = this.clonedAkas
-			.filter((aka: Aka) => aka.id);
+			.filter((aka: Aka) => aka.id)
+			.map(aka => ({id: aka.id, name: aka.name}));
 
 		const added = this.clonedAkas
-			.filter((aka: Aka) => !aka.id);
+			.filter((aka: Aka) => !aka.id)
+			.map(aka => ({id: aka.id, name: aka.name}));
 
 		const akaChanges: AkaChanges = {
 			edited,
 			added,
-			deleted: this.deletedAkas.filter((aka: Aka) => aka.id !== null)
+			deleted: this.deletedAkas
+				.filter((aka: Aka) => aka.id !== null)
+				.map(aka => ({id: aka.id, name: aka.name}))
 		};
 		this.modelChange.emit(akaChanges);
 	}

@@ -1,3 +1,44 @@
 div.content-wrapper
   div.execution-phase-wrapper
     margin-left: 20px
+
+.planning-dashboard
+  display: flex
+  min-height: 200px
+
+  .discovery-phase, .analysis-phase
+    flex-basis: 25%
+
+  .execution-phase
+    flex-basis: 50%
+
+// small viewports
+@media (max-width: 1000px)
+  .planning-dashboard
+    flex-wrap: wrap
+
+    .discovery-phase, .analysis-phase, .execution-phase
+      flex-basis: 100%
+
+// medium viewports
+@media (min-width: 1001px) and (max-width: 1200px)
+  .planning-dashboard
+    flex-wrap: wrap
+
+    .discovery-phase, .analysis-phase
+      flex-basis: 49%
+
+    .execution-phase
+      flex-basis: 100%
+
+
+// laptop, desktop, up
+@media (min-width: 1201px)
+  .planning-dashboard
+    display: flex
+
+    .discovery-phase, .analysis-phase
+      flex-basis: 25%
+
+    .execution-phase
+      flex-basis: 49%

@@ -281,4 +281,76 @@ class TagServiceSpec extends Specification {
 			whereFilter == []
 			params == [:]
 	}
+
+	void 'Test getTagsQuery with ids, tagMatch: ANY'(){
+		setup:
+			Map queryParams = [:]
+		when:
+			String query = service.getTagsQuery([1, 2, 3], 'ANY', queryParams)
+		then:
+			query == "AND t.tag_id in (:tagIds)"
+			queryParams == ['tagIds': [1, 2, 3]]
+	}
+
+	void 'Test getTagsQuery with ids, tagMatch: ALL'() {
+		setup:
+			Map queryParams = [:]
+		when:
+			String query = service.getTagsQuery([1, 2, 3], 'ALL', queryParams)
+		then:
+			query == "AND a.asset_entity_id in(SELECT ta2.asset_id FROM tag_asset ta2 WHERE ta2.tag_id in (:tagIds) GROUP BY ta2.asset_id HAVING count(*) = :tagIdsSize)"
+			queryParams == ['tagIds': [1, 2, 3], tagIdsSize: 3]
+	}
+
+	void 'Test getTagsQuery with  no ids, tagMatch: ANY'() {
+		setup:
+			Map queryParams = [:]
+		when:
+			String query = service.getTagsQuery([], 'ANY', queryParams)
+		then:
+			query == ""
+			queryParams == [:]
+	}
+
+	void 'Test getTagsQuery with  no ids, tagMatch: ALL'() {
+		setup:
+			Map queryParams = [:]
+		when:
+			String query = service.getTagsQuery([], 'ALL', queryParams)
+		then:
+			query == ""
+			queryParams == [:]
+	}
+
+
+	void 'Test getTagsJoin with ids, tagMatch: ANY'() {
+			when:
+				String query = service.getTagsJoin([1,2,3], 'ANY')
+			then:
+				query.stripIndent() == """
+					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
+					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+				""".stripIndent()
+	}
+
+	void 'Test getTagsJoin with ids, tagMatch: ALL'() {
+		when:
+			String query = service.getTagsJoin([1, 2, 3], 'ALL')
+		then:
+			query == ''
+	}
+
+	void 'Test getTagsJoin with no ids, tagMatch: ANY'() {
+		when:
+			String query = service.getTagsJoin([], 'ANY')
+		then:
+			query == ''
+	}
+
+	void 'Test getTagsJoin with no ids, tagMatch: ALL'() {
+		when:
+			String query = service.getTagsJoin([], 'ALL')
+		then:
+			query == ''
+	}
 }

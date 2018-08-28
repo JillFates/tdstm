@@ -73,8 +73,6 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
             getCheckSyntaxButtonVisibility() == "true"
             getViewConsoleButtonVisibility() == "true"
             getSaveButtonVisibility() == "true"
-        and: 'No records available text is being displayed in the Sample Data Preview section'
-            getNoRecordsInSampleDataText().contains("No records available")
     }
 
     def "2. The user opens Sample Data modal"() {
