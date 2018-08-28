@@ -140,7 +140,11 @@
                                 <span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.errorCount}}</span>
                             </ng-template>
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'dynamicValue'" let-dataItem>
-                                <span>{{ dataItem[column.properties[0]][column.properties[1]] | utils: NULL_OBJECT_PIPE }}</span>
+                                <span [ngClass]="{'has-init': hasInitVal(dataItem, column)}">
+                                    {{ getInitOrValue(dataItem, column) }}
+                                </span>
+                                <i *ngIf="hasInitVal(dataItem, column)" style="padding-left: 5px;" class="fa fa-w fa-info has-init"
+                                   [title]="'DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED' | translate"></i>
                             </ng-template>
 
                         </kendo-grid-column>

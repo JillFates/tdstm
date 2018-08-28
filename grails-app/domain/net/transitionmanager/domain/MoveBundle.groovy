@@ -17,6 +17,7 @@ class MoveBundle extends Party {
 	Room sourceRoom
 	Room targetRoom
 	Boolean tasksCreated = false
+	Collection assets
 
 	static String alternateKey = 'name'
 

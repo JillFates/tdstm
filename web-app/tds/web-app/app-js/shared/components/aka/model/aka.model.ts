@@ -4,7 +4,7 @@ export interface AkaParent {
 }
 export interface Aka {
 	id: number;
-	value: string;
+	name: string;
 }
 
 export interface AkaChanges {
