@@ -57,7 +57,7 @@ class UserLoginController implements ControllerMethods {
 
 		[companyId: companyId, partyGroupList: partyGroupList,listJsonUrl: listJsonUrl]
 	}
-	
+
 	def generateLockoutTimeString(lockedTime) {
 		def timeRemaining = TimeUtil.ago(TimeUtil.nowGMT(), lockedTime)
 		def numYears = 0
@@ -66,7 +66,7 @@ class UserLoginController implements ControllerMethods {
 		}
 		return numYears >= 10 ? "Indefinitely":timeRemaining
 	}
-	
+
 	@HasPermission(Permission.UserView)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'username'
@@ -152,9 +152,9 @@ class UserLoginController implements ControllerMethods {
 			userLogins = userLogins[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
 		else
 			userLogins = []
-			
+
 		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
-		
+
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
 			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: generateLockoutTimeString(it.locked), failedLoginAttempts: it.failedAttempts],
@@ -179,7 +179,7 @@ class UserLoginController implements ControllerMethods {
 		List roleList = RoleType.where {
             type == RoleType.SECURITY
         }.list()
-		
+
 		String cellValue = [
 			id: showUser.id,
 			username: showUser.username,
