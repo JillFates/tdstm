@@ -120,6 +120,7 @@ class TimeUtil {
 
 	/**
 	 * Returns a string that represents the time in shorthand that follows these rules:
+	 * >= 1 year - ##y ##d ##h ##s
 	 * > 24 hours - ##d ##h ##s
 	 * > 1 hour - ##h ##m ##s
 	 * <= 90 minutes - ##m ##s
@@ -136,16 +137,17 @@ class TimeUtil {
 	static String ago(TimeDuration duration, String format = SHORT) {
 		StringBuilder ago = new StringBuilder()
 		String space
-
+		
 		int days = duration.days
 		int hours = duration.hours
 		int minutes = duration.minutes
 		int seconds = duration.seconds
-
+		int years = Math.floor(days/365)
+		days = days % 365
 		// local closure to do the borrowing math on the d:h:m:s appropriately
-		def adjustForNegative = { ggrand, grand, parent, value, factor ->
+		def adjustForNegative = { gggrand, ggrand, grand, parent, value, factor ->
 			if (value < 0) {
-				if (ggrand == 0 && grand == 0 && parent == 0) {
+				if (gggrand == 0 && ggrand == 0 && grand == 0 && parent == 0) {
 					// We stop borrowing and just flip the value from negative to positive
 					value *= -1
 				}
@@ -171,16 +173,21 @@ class TimeUtil {
 			return [value, parent]
 		}
 
-		if (days < 0 || hours < 0 || minutes < 0 || seconds < 0) {
-			(seconds, minutes) = adjustForNegative(days, hours, minutes, seconds, 60)
-			(minutes, hours) = adjustForNegative(0, days, hours, minutes, 60)
-			(hours, days) = adjustForNegative(0, 0, days, hours, 60)
+		if (years < 0 || days < 0 || hours < 0 || minutes < 0 || seconds < 0) {
+			(seconds, minutes) = adjustForNegative(years, days, hours, minutes, seconds, 60)
+			(minutes, hours) = adjustForNegative(0, years, days, hours, minutes, 60)
+			(hours, days) = adjustForNegative(0, 0, years, days, hours, 24)
+			(days, years) = adjustForNegative(0, 0, 0, years, days, 365)
 
 			ago << '-'
 		}
 
+		if (years != 0) {
+			ago       	<< years   << (format == SHORT ? 'y' : (format == FULL ? '-year' : '-yr') + (years == 1 ? '' : 's'))
+		}
 		if (days != 0) {
-			ago          << days    << (format == SHORT ? 'd' : '-day' + (days == 1 ? '' : 's'))
+			space = ago.length() > 1 ? ' ' : ''
+			ago << space << days    << (format == SHORT ? 'd' : '-day' + (days == 1 ? '' : 's'))
 		}
 		// Hours
 		if (hours != 0) {

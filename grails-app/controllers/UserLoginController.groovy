@@ -143,12 +143,19 @@ class UserLoginController implements ControllerMethods {
 			userLogins = userLogins[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
 		else
 			userLogins = []
-
-		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
-
+			
+			String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
+		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
-			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts: it.failedAttempts],
+			def timeRemaining = TimeUtil.ago(TimeUtil.nowGMT(), it.locked)
+			def numYears = 0;
+			if(timeRemaining.contains("y"))
+			{
+				numYears = Integer.parseInt(timeRemaining.substring(0,timeRemaining.indexOf('y')))
+			}
+			
+			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: numYears>=10 ? "Indefinitely":timeRemaining, failedLoginAttempts: it.failedAttempts],
 			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
 			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
@@ -170,7 +177,7 @@ class UserLoginController implements ControllerMethods {
 		List roleList = RoleType.where {
             type == RoleType.SECURITY
         }.list()
-
+		
 		String cellValue = [
 			id: showUser.id,
 			username: showUser.username,

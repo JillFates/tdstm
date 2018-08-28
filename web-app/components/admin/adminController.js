@@ -18,7 +18,6 @@ tds.admin.controller.MainController = function (scope, modal, utils, adminServic
 		"<p>You are about to unlock user account, press Confirm to continue or press Cancel to abort.</p>"
 
 		$("#unlockUserDialog").html(msg)
-
 		$("#unlockUserDialog").dialog({
 	      buttons : {
 	        "Confirm" : function() {
@@ -31,6 +30,7 @@ tds.admin.controller.MainController = function (scope, modal, utils, adminServic
 	    });
 
 	    $("#unlockUserDialog").dialog("open");
+	    $(".ui-dialog").css("width","330px")
 	    $("#unlockUserDialog").parent().find(".ui-dialog-buttonpane").css('width', 'auto')
 
 		/*

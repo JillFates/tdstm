@@ -102,6 +102,16 @@ class TimeUtilTests extends AbstractUnitSpec {
 		then:
 		'-48s' == TimeUtil.ago(delta)
 	}
+	
+	void testAgoWithYears() {
+		given:
+		TimeDuration start = new TimeDuration(0, 20, 5, 0)
+		TimeDuration end = new TimeDuration(366,0, 20, 5, 0)
+		TimeDuration diff = end - start
+		
+		expect:
+		'1y 1d' == TimeUtil.ago(diff)
+	}
 
 	void testParseDate() {
 		given:
