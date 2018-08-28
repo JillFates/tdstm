@@ -251,8 +251,9 @@ class DashboardController implements ControllerMethods {
 
 		def summaryDetail = 'No active tasks were found.'
 		if (taskSummary.taskList.size() > 0) {
-			summaryDetail = taskSummary.taskList.size() + ' assigned tasks with ' + totalDuration +
-					' of duration' + (dueTaskCount ? ' (' + dueTaskCount + ' are over due).' : '.')
+            summaryDetail = taskSummary.taskList.size() + ' assigned tasks' +
+                    (totalDuration ? ' with a total duration of ' + totalDuration : ' ') +
+							' (' + taskSummary.taskList.size() - dueTaskCount + ' are over due)'
 		}
 
 		Map data = [taskList: result, summaryDetail: summaryDetail]
