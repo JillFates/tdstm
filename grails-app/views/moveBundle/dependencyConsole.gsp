@@ -481,5 +481,6 @@
 
 		</script>
 		<div style="display: none;" id="graphSVGContainer"></div>
+		<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	</body>
 </html>

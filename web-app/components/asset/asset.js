@@ -9,17 +9,10 @@ tds.assets = tds.assets || {};
 tds.assets.controller = tds.assets.controller || {};
 tds.assets.service = tds.assets.service || {};
 
-
-/*****************************************
- * Assets module configuration
- */
-tds.assets.module = angular.module('tdsAssets', ['tdsCore', 'tdsComments']);
-
-
 /*****************************************
  * Controller for assets
  */
-tds.assets.controller.MainController = function($rootScope, $scope, $q, assetService) {
+tds.assets.controller.MainController = function($rootScope, $scope, assetService) {
 
 	//assetScope is used after it creates dynamic dom elements to $compile
 	$rootScope.assetScope = $scope;
@@ -103,7 +96,7 @@ tds.assets.controller.MainController = function($rootScope, $scope, $q, assetSer
 	};
 };
 
-tds.assets.controller.MainController.$inject = ['$rootScope', '$scope', '$q', 'assetService'];
+tds.assets.controller.MainController.$inject = ['$rootScope', '$scope', 'assetService'];
 
 /************************
  * SERVICES
@@ -174,6 +167,11 @@ tds.assets.service.AssetService = function (utils, $http, $q) {
 
 };
 
+/*****************************************
+ * Assets module configuration
+ */
+tds.assets.module = angular.module('tdsAssets', ['tdsCore', 'tdsComments']);
+
 tds.assets.module.factory('assetService', ['utils', '$http', '$q', tds.assets.service.AssetService]);
 
 
@@ -189,7 +187,7 @@ function getAssetsList(value, type) {
  * Function used to recompile the dynamic code generated
  */
 function recompileAssetDOM(elementId, compileScope) {
-	var objDom = $('[ng-app]');
+	var objDom = $("[ng-app='tdsAssets']");
 	var injector = angular.element(objDom).injector();
 	if (injector) {
 		injector.invoke(function ($rootScope, $compile) {
@@ -208,8 +206,17 @@ function recompileAssetDOM(elementId, compileScope) {
 /**
  * Get the current Angular $scope Context
  * Being used for pages outside Angular
+ * It search first for the asset app if not, default for the existing one
  */
 function getCurrentAngularContext() {
-	var objDom = $('[ng-app]');
-	return angular.element(objDom).scope();
+	// Review if we are inside another context, always take the first one
+	if($('[ng-app]').not( "[ng-app='tdsAssets']").length > 0) {
+		var element = angular.element($("[ng-app='tdsAssets']"));
+		var isInitialized = element.injector();
+		if (!isInitialized) {
+			angular.bootstrap($("[ng-app='tdsAssets']"), ['tdsAssets']);
+		}
+	}
+
+	return angular.element($("[ng-app='tdsAssets']")).scope();
 }
