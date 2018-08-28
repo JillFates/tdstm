@@ -193,12 +193,12 @@
                             <li class="menu-parent-item">Assets</li>
                             <li class="menu-child-item menu-parent-assets-summary-table">
                                 <g:link class="mmlink" controller="assetEntity" action="assetSummary">
-                                    <g:img uri="/icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
+                                    <g:img uri="${resource(dir:'icons',file:'application_view_columns.png')}" width="16" height="16" alt="Summary Table" /> Summary Table
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer">
                                 <g:link class="mmlink" mapping="assetViewShow" id="1">
-                                    <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
+                                    <g:img uri="${resource(dir:'icons',file:'magnifier.png')}" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-application-list">
@@ -234,26 +234,26 @@
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
                                 <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <g:img uri="/icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
+                                    <g:img uri="${resource(dir:'icons',file:'bricks.png')}" width="16" height="16" alt="Dependencies" /> Dependencies
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-comments-list">
                                 <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments" /> Comments
+                                    <g:img uri="${resource(dir:'icons',file:'comments.png')}" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>
                             </li>
                             <li class="divider"></li>
                             <tds:hasPermission permission="${Permission.DepAnalyzerView}">
                                 <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                     <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <g:img uri="/icons/brick_magnify.png" width="16" height="16" alt="Dependency Analyzer" /> Dependency Analyzer
+                                        <g:img uri="${resource(dir:'icons',file:'brick_magnify.png')}" width="16" height="16" alt="Dependency Analyzer" /> Dependency Analyzer
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
                                 <li class="menu-child-item menu-parent-assets-architecture-graph">
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <g:img uri="/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph" /> Architecture Graph
+                                        <g:img uri="${resource(dir:'icons',file:'chart_organisation.png')}" width="16" height="16" alt="Architecture Graph" /> Architecture Graph
                                     </g:link>
                                 </li>
                             </tds:hasPermission>

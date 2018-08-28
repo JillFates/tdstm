@@ -164,10 +164,10 @@ function scrollTeams(){
 <g:if test="${teamMatrixSize > 18}" >
     <div id="scrollTeamsIcon" class="text-right toprightcontent teamScrollButton">
          <a id="scrollTeamsLeftIcon" href="javascript:void(0);" onclick="scrollTeams();">
-            <img src="/tdstm/static/images/right_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+            <img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
           </a>
           <a id="scrollTeamsRightIcon" href="javascript:void(0);" onclick="scrollTeams();" style="display: none;">
-            <img src="/tdstm/static/images/left_arrow.png" alt="back" border="0" width="16" height="23" align="right">
+            <img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
           </a>
      </div>
 </g:if>

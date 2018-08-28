@@ -102,7 +102,6 @@ grails.project.dependency.resolution = {
 		runtime ':jquery-ui:1.8.15'
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
-		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
 		runtime ':console:1.5.12'
 		runtime ':xss-sanitizer:0.4.0'
 

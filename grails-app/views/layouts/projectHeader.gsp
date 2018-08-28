@@ -219,13 +219,13 @@ int minPasswordLength = tds.minPasswordLength()
 						<ul>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="assetSummary">
-									<g:img uri="/icons/application_view_columns.png" width="16" height="16"/>
+									<g:img uri="${resource(dir:'icons',file:'application_view_columns.png')}" width="16" height="16"/>
 									<div>Summary Table</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="module" action="asset" id="views">
-									<g:img uri="/icons/magnifier.png" width="16" height="16"/>
+									<g:img uri="${resource(dir:'icons',file:'magnifier.png')}" width="16" height="16"/>
 									<div>View Manager</div>
 								</g:link>
 							</li>
@@ -267,20 +267,20 @@ int minPasswordLength = tds.minPasswordLength()
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-									<g:img uri="/icons/comments.png" width="16" height="16"/>
+									<g:img uri="${resource(dir:'icons',file:'comments.png')}" width="16" height="16"/>
 									<div>Comments</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-									<g:img uri="/icons/bricks.png" width="16" height="16"/>
+									<g:img uri="${resource(dir:'icons',file:'bricks.png')}" width="16" height="16"/>
 									<div>Dependencies</div>
 								</g:link>
 							</li>
 							<tds:hasPermission permission="${Permission.DepAnalyzerView}">
 							  <li>
 							  	<g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-							  		<g:img uri="/icons/brick_magnify.png" width="16" height="16"/>
+									<g:img uri="${resource(dir:'icons',file:'brick_magnify.png')}" width="16" height="16"/>
 										<div>Dependency Analyzer</div>
 							  	</g:link>
 							  </li>
@@ -288,7 +288,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission="${Permission.ArchitectureView}">
 							  <li>
 							  	<g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-							  		<g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
+							  		<g:img uri="${resource(dir:'icons',file:'chart_organisation.png')}" width="16" height="16"/>
 										<div>Architecture Graph</div>
 							  	</g:link>
 							  </li>
