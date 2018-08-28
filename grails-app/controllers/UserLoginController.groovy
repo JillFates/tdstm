@@ -57,7 +57,17 @@ class UserLoginController implements ControllerMethods {
 
 		[companyId: companyId, partyGroupList: partyGroupList,listJsonUrl: listJsonUrl]
 	}
-
+	
+	def generateLockoutTimeString(lockedTime) {
+		def timeRemaining = TimeUtil.ago(TimeUtil.nowGMT(), lockedTime)
+		def numYears = 0
+		if(timeRemaining.contains("y"))
+		{
+			numYears = Integer.parseInt(timeRemaining.substring(0,timeRemaining.indexOf('y')))
+		}
+		return numYears>=10 ? "Indefinitely":timeRemaining
+	}
+	
 	@HasPermission(Permission.UserView)
 	def listJson() {
 		String sortIndex = params.sidx ?: 'username'
@@ -148,14 +158,7 @@ class UserLoginController implements ControllerMethods {
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
-			def timeRemaining = TimeUtil.ago(TimeUtil.nowGMT(), it.locked)
-			def numYears = 0;
-			if(timeRemaining.contains("y"))
-			{
-				numYears = Integer.parseInt(timeRemaining.substring(0,timeRemaining.indexOf('y')))
-			}
-			
-			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: numYears>=10 ? "Indefinitely":timeRemaining, failedLoginAttempts: it.failedAttempts],
+			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: generateLockoutTimeString(it.locked), failedLoginAttempts: it.failedAttempts],
 			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
 			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
