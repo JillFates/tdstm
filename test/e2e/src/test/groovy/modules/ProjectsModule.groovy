@@ -4,11 +4,6 @@ import geb.Module
 
 class ProjectsModule extends Module {
 
-    static at = {
-
-
-    }
-
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
         menuBar { menuContainer.find("div#navbar-collapse")}
