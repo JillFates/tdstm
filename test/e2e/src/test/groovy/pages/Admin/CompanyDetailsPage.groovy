@@ -17,11 +17,8 @@ class CompanyDetailsPage extends Page{
         deleteButton { $("input[value=Delete]")}
         message { $("div.message")}
         labelColumn { $("td.name")}
-        //nameField { $("td.name").find{it.text().contains("Name").next()}
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
-        //dateCreated { $("td.name").find{it.text().contains("Date Created")}.next()}
-        //dateUpdated { $("td.name").find{it.text().contains("Date Updated")}.next()}
     }
 
     def getCompanyNameText(){
