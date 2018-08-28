@@ -54,6 +54,7 @@ tds.assets.controller.MainController = function($rootScope, $scope, $q, assetSer
 					}
 					// Create the component
 					recompileAssetDOM('tmAssetTagSelector');
+					recompileAssetDOM('tmAssetTagViewSelector');
 				}
 			);
 		}

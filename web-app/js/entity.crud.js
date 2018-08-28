@@ -695,14 +695,14 @@ var EntityCrud = (function ($) {
 	/**
 	 * Invoke the angular scope from a non angular section to load the Asset Tags for the View
 	 */
-	pub.loadAssetTags = function() {
+	pub.loadAssetTags = function(assetId) {
 		// Getting the Context
 		var $angularScope;
 		if (typeof getCurrentAngularContext !== "undefined") {
 			$angularScope = getCurrentAngularContext();
 			if ($angularScope) {
 				// Asset Main Controller
-				$angularScope.loadAssetTags($('#assetId').val());
+				$angularScope.loadAssetTags(assetId  || $('#assetId').val());
 			}
 		}
 	};
