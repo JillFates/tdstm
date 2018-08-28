@@ -19,6 +19,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DependencyConsoleCommand
+import net.transitionmanager.command.bundle.AssetsAssignmentCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
@@ -1023,23 +1024,17 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	/**
-	 * Assigns one or more assets to a specified bundle
+	 * Assigns one or more assets to a specified bundle, and add tags
 	 */
 	@HasPermission(Permission.AssetEdit)
-	def saveAssetsToBundle() {
+	def assetsAssignment() {
+		AssetsAssignmentCommand assetsAssignment = populateCommandObject(AssetsAssignmentCommand)
+		validateCommandObject(assetsAssignment)
+
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def assetArray = params.assetVal
-		def moveBundleInstance = MoveBundle.get(params.moveBundle)
-		session.ASSIGN_BUNDLE = params.moveBundle
-		def assetList = assetArray.split(",")
-		assetList.each {assetId ->
-			def assetInstance = AssetEntity.get(assetId)
-			assetInstance.moveBundle = moveBundleInstance
-			assetInstance.planStatus = params.planStatus
-			saveWithWarnings assetInstance
-		}
+		moveBundleService.assignAssets(assetsAssignment.assets, assetsAssignment.tagIds,assetsAssignment.moveBundle, assetsAssignment.planStatus, project)
 
 		forward(controller: "assetEntity", action: "retrieveLists",
 			     params: [entity: params.assetType, dependencyBundle: session.getAttribute('dependencyBundle')])
