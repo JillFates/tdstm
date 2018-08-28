@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
@@ -8,9 +8,7 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {ImportBatchRecordDialogComponent} from './import-batch-record-dialog.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ImportBatchRecordFieldsInfoComponent} from './import-batch-record-fields-info.component';
 
 @Component({
 	selector: 'import-batch-record-fields',
@@ -65,6 +63,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	protected popup: any = { show: false, offset: {}, margin: {horizontal: 2, vertical: 2}, position: 'fixed'};
 
 	constructor(
 		private importBatchService: ImportBatchService,
@@ -290,13 +289,11 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	}
 
 	/**
-	 * TODO: documentation.
+	 * Opens and positions the popup based on the click event.
+	 * @param {MouseEvent} $event
 	 */
-	protected onOpenFieldInfo($field: any): void {
-		console.log($field);
-		this.dialogService.extra(ImportBatchRecordFieldsInfoComponent, [], false, false)
-			.then((result) => {
-				// TODO: code.
-			}).catch( result => { console.log('dismissed'); });
+	protected onShowPopup($event: MouseEvent): void {
+		this.popup.offset = { left: $event.pageX, top: $event.pageY};
+		this.popup.show = true;
 	}
 }

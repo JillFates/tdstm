@@ -21,7 +21,6 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 import {ImportAssetsComponent} from './components/import-assets/import-assets.component';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {LayoutModule} from '@progress/kendo-angular-layout';
-import {ImportBatchRecordFieldsInfoComponent} from './components/record/import-batch-record-fields-info.component';
 
 @NgModule({
 	imports: [
@@ -43,7 +42,6 @@ import {ImportBatchRecordFieldsInfoComponent} from './components/record/import-b
 		ImportBatchRecordDialogComponent,
 		ImportBatchRecordSummaryComponent,
 		ImportBatchRecordFieldsComponent,
-		ImportBatchRecordFieldsInfoComponent,
 		ImportAssetsComponent
 	],
 	providers: [
@@ -61,8 +59,7 @@ import {ImportBatchRecordFieldsInfoComponent} from './components/record/import-b
 	],
 	entryComponents: [
 		ImportBatchDetailDialogComponent,
-		ImportBatchRecordDialogComponent,
-		ImportBatchRecordFieldsInfoComponent
+		ImportBatchRecordDialogComponent
 	],
 })
 
