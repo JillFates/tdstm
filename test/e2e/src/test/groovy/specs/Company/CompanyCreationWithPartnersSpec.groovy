@@ -1,5 +1,9 @@
 package specs.Company
 
+/**
+ * @author Sebastian Bigatton
+ */
+
 import geb.spock.GebReportingSpec
 import utils.CommonActions
 import pages.Admin.CompanyCreationPage
