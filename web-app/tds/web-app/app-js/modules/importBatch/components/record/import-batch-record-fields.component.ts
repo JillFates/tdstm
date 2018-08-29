@@ -279,6 +279,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadRecordFieldDetails(true);
+					// TODO : This is not updating the datagrid to show the posted information correctly
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on Process batch record.');

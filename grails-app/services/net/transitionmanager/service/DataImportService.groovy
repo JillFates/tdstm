@@ -873,8 +873,8 @@ class DataImportService implements ServiceMethods {
 		Object entity
 		log.debug 'findOrCreateEntity() called'
 
-		// entity = fetchEntityByFieldMetaData('id', fieldsInfo, context)
 		entity = SearchQueryHelper.findEntityByMetaData('id', fieldsInfo, context)
+		// Any errors from the function call will be stuffed into context
 		recordAnySearchQueryHelperErrors('id', fieldsInfo, context)
 
 		if (entity == -1) {
@@ -1043,7 +1043,6 @@ class DataImportService implements ServiceMethods {
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
 				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
-				// valueToSet = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context, domain)
 
 				switch (valueToSet) {
 					case -1:
@@ -1221,10 +1220,6 @@ class DataImportService implements ServiceMethods {
 		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity, isInitValue
 
-		// for domain com.tds.asset.Application.environment
-		// existingValue=Production,
-		// newValue=QA,
-		// isNewRecord=false
 		if ( !isInitValue || (isInitValue && existingValue == null)) {
 			boolean isMatch
 			if (existingValue && GormUtil.isDomainClass(existingValue.getClass())) {
