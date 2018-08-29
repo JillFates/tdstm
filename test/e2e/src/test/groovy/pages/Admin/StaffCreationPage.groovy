@@ -26,5 +26,6 @@ class StaffCreationPage extends Page {
         scModalSaveBtn                  { scModalWindow.find("input", class:"save")}
         scModalCancelBtn                { scModalWindow.find("input#cancelBId")}
         scModalCloseBtn                 { scModalWindow.find("button", "class":"ui-dialog-titlebar-close")}
+        scEmail                         {$("#email")}
     }
 }
