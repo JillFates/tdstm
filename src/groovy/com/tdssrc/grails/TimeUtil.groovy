@@ -179,7 +179,7 @@ class TimeUtil {
 			(minutes, hours) = adjustForNegative(0, years, days, hours, minutes, 60)
 			(hours, days) = adjustForNegative(0, 0, years, days, hours, 24)
 			(days, years) = adjustForNegative(0, 0, 0, years, days, 365)
-			// Add an adjustment for years, so it doesn't break when values such as -1y being converted to --1y
+			// Add an adjustment for years, so it doesn't break when handling values such as -1y, which were being converted to --1y
 			(years, millenia) = adjustForNegative(0, 0, 0, 0, years, 1000)
 
 			ago << '-'
