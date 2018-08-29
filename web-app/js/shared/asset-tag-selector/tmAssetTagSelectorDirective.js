@@ -167,7 +167,7 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 
 				$scope.assetSelector.tag = $(element).find("#asset-tag-selector").data("kendoMultiSelect").dataItems();
 
-				if($scope.assetSelector.tag.length > 1) {
+				if($scope.assetSelector.tag.length > 1 && !$scope.hideOperator) {
 					$(element).find('.km-switch').show();
 				} else {
 					createSwitchButton();
