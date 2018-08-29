@@ -132,7 +132,7 @@
 							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
 								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | uppercase | translate}} Fields</label>
 								<ng-template #defaultField>
-									<label style="width:100%;padding-left:25px;" class="{{field.imp}}">
+									<label style="width:100%;padding-left:25px;" class="{{field.imp}} text-delimited" title="{{field.label}}">
 										<input type="checkbox" (change)="onFieldSelection(field)" name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 								</ng-template>
 							</div>
