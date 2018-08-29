@@ -2,6 +2,7 @@ package pages.Cookbook
 
 import geb.Page
 import modules.CommonsModule
+import geb.waiting.WaitTimeoutException
 
 class CookbookPage extends Page {
 
@@ -20,7 +21,7 @@ class CookbookPage extends Page {
         pageTitle                   (wait:true) { $("section", 	class:"content-header").find("h1")}
         pageBreadcrumb              { $("o1", class:"breadcrumb")}
         loadingIndicator            (required:false, wait:true){ $("#cookbookRecipesEditor").find("loading-indicator").find("div","ng-show":"isLoading")}
-        successMessage              (required:false, wait:true){ $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
+        successMessage              { $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
         createRecipeButton          { $("a#generateRecipe")}
 
         createRecipeModal           (required: false, wait:true) {$ ("div", class:"modal fade in")}
@@ -58,10 +59,68 @@ class CookbookPage extends Page {
     }
 
     def getRecipeByName(name){
-        gebRecipes.find{it.text().trim() == name}
+        gebRecipes.find{it.text().trim().contains(name)}
     }
 
     def getRecipeNameDisplayedInTaskGenerationTab(){
         taskGenerationTabRecipeName.text()
+    }
+
+    def deleteRecipeByGivenSelector(recipeNameSelector){
+        def recipeName = recipeNameSelector.text().trim()
+        withConfirm(wait: true) {
+            recipeNameSelector.parent().parent().parent().parent().parent().find("a.actions.remove").click()
+        }
+        waitForSuccessMessage()
+        assert getRecipeByName(recipeName) == null, "${recipeName} recipe still displayed"
+    }
+
+    def waitForSuccessMessage(){
+        def displayed = false
+        try {
+            waitFor(2){successMessage.displayed}
+            displayed = true
+            waitFor(2){!successMessage.displayed}
+        } catch (WaitTimeoutException e){
+            // we are good, banner is not present in html
+            assert displayed
+        }
+    }
+
+    def getRecipesByName(recipeNames){
+        def found
+        recipeNames.each{
+            found = getRecipeByName it
+        }
+        found
+    }
+
+    def waitForFirstRecipeDisplayed(){
+        waitFor{gebRecipes[0].displayed}
+    }
+
+    /**
+     * Bulk delete recipes
+     * @param maxNumberOfBulkRecipesToBeDeleted
+     * @param recipeNames = list of names to find and delete
+     * @author Sebastian Bigatton
+     */
+    def bulkDelete(maxNumberOfBulkRecipesToBeDeleted, recipeNames) {
+        def count = 0
+        while (getRecipesByName(recipeNames)) {
+            count = count + 1
+            if (count > maxNumberOfBulkRecipesToBeDeleted) {
+                break
+            }
+            def deletedRecipe = false
+            recipeNames.each{ recipe ->
+                def recipeToBeDeletedSelector = getRecipeByName recipe
+                if (recipeToBeDeletedSelector && !deletedRecipe) {
+                    deleteRecipeByGivenSelector recipeToBeDeletedSelector
+                    deletedRecipe = true
+                }
+            }
+        }
+        true // done, just return true to avoid test fails
     }
 }
