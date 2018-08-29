@@ -102,12 +102,6 @@ class   StaffListPage extends Page {
         commonsModule.waitForLoadingMessage()
     }
 
-    def filterByCompany(usrName){
-        waitFor{lastNameFilter.displayed}
-        userNameFilter=usrName
-        commonsModule.waitForLoadingMessage()
-    }
-
     def getGridRowsSize(){
         gridSize
     }
