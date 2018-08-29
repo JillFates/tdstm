@@ -4,6 +4,7 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -875,18 +876,31 @@ digraph runbook {
 	}
 
 	/**
-	 * Used in MyTask to set user preference for printername and quantity .
-	 * @param prefFor - Key
-	 * @param selected : value
+	 * Used in MyTask to set user preference for printername and quantity, we can get a key-vaulue or
+	 * a json with a list of permissions to Change
+	 * @param preference - Key
+	 * @param value
 	 */
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
-		def key = params.prefFor
-		def selected = params.list('selected[]')[0] ?:params.selected
-		if (selected) {
-			userPreferenceService.setPreference(key, selected)
-			session.setAttribute(key,selected)
+		Map json
+
+		if (request.format == "json") {
+			json = request.JSON
+
+		} else {
+			json = [:]
+			def key = params.preference
+			def value = params.value
+			if (value) {
+				json[key] = value
+			}
 		}
+
+		json.each { key, value ->
+			userPreferenceService.setPreference(key, value)
+		}
+
 		render true
 	}
 
@@ -1577,7 +1591,7 @@ function goBack() { window.history.back() }
 		             dueDate: dueDate, assignToSelect: assignToSelect, assetEntity: assetComment.assetEntity,
 		             cartQty: cartQty, project: project, customs: customs]
 		if (isCleaner) {
-			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY)
+			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY) ?: UserPreferenceEnum.DEFAULT_VALUES[PREF.PRINT_LABEL_QUANTITY]
 			model.prefPrinter = userPreferenceService.getPreference(PREF.PRINTER_NAME)
 		}
 

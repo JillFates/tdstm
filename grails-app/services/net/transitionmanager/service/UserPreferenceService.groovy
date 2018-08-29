@@ -21,12 +21,6 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 
 @Slf4j
 class UserPreferenceService implements ServiceMethods {
-	// defaults holds global defaults for certain values
-	// TODO - load these from application settings
-	protected static final Map<String, Object> defaults = [
-		CURR_TZ        :'GMT',
-		PRINTER_COPIES : 2
-	]
 
 	private static final List<String> depGraphCheckboxLabels = [
 		'bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
@@ -210,7 +204,7 @@ class UserPreferenceService implements ServiceMethods {
 				def previousValue = session.getAttribute(preferenceCode)
 				if (previousValue == null || previousValue != userPreference.value) {
 					session.setAttribute(preferenceCode, userPreference.value)
-					session.setAttribute(preferenceCode, userPreference.value)
+
 				}
 			}
 			return true
