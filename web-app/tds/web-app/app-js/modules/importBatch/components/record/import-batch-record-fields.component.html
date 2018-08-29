@@ -8,7 +8,7 @@
         <div style="border: 1px solid #656565; min-width: 400px;">
             <div style="padding-top: 5px;padding-right: 3px;background-color: #5f9fcf;display:  inline-block;padding-left: 10px;width:  100%;">
                 <label style="float: left;display: inline;padding-right: 0;color: #ffffff;">
-                    Create Reference
+                    {{popup.title}}
                 </label>
                 <i style="float: right;cursor: pointer;font-size: smaller;color: #ffffff;display: inline;margin-top: 5px;margin-right:  5px;"
                    class="glyphicon glyphicon-remove" (click)="popup.show=false"></i>
@@ -73,9 +73,9 @@
         </kendo-grid-column>
         <kendo-grid-column title="Reference" [width]="80">
             <ng-template kendoGridCellTemplate let-dataItem>
-                <i *ngIf="true" (click)="onShowPopup($event, 'create')" title="View Create Reference Detail" class="fa fa-plus-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
-                <i *ngIf="true" (click)="onShowPopup($event)" title="View Update Reference Detail" class="fa fa-pencil-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
-                <i *ngIf="true" (click)="onShowPopup($event)" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="true" (click)="onShowPopup($event, 'create', dataItem)" title="View Create Reference Detail" class="fa fa-plus-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="true" (click)="onShowPopup($event, 'update', dataItem)" title="View Update Reference Detail" class="fa fa-pencil-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="true" (click)="onShowPopup($event, 'find', dataItem)" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">

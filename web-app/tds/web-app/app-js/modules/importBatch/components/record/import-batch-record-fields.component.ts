@@ -63,7 +63,13 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
-	protected popup: any = { show: false, offset: {}, margin: {horizontal: 2, vertical: 2}, position: 'fixed'};
+	protected popup: any = {
+		title: '',
+		show: false,
+		offset: {},
+		margin: {horizontal: 2, vertical: 2},
+		position: 'fixed'
+	};
 
 	constructor(
 		private importBatchService: ImportBatchService,
@@ -288,12 +294,25 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		console.log(e);
 	}
 
+	protected popupField: any = null;
 	/**
 	 * Opens and positions the popup based on the click event.
 	 * @param {MouseEvent} $event
 	 */
-	protected onShowPopup($event: MouseEvent): void {
+	protected onShowPopup($event: MouseEvent, type: 'create'|'update'|'find', field: any): void {
+		console.log(field);
+		this.popupField = field;
+		this.popup.title = this.getPopupTitle(type);
 		this.popup.offset = { left: $event.pageX, top: $event.pageY};
 		this.popup.show = true;
+	}
+
+	private getPopupTitle(type: 'create'|'update'|'find'): string {
+		switch (type) {
+			case 'create': return 'Create Reference';
+			case 'update': return 'Update Reference';
+			case 'find': return 'Find Results';
+			default: return '';
+		}
 	}
 }
