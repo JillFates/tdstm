@@ -48,6 +48,12 @@ class ETLProcessorResult {
 	 */
 	String consoleLog = ''
 
+	/**
+	 * Last {@code FieldResult} loaded by `load` command
+	 */
+	@DoNotMarshall
+	Element latestLoadedField
+
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
@@ -89,6 +95,7 @@ class ETLProcessorResult {
 		currentRow.ignore = false
 		reference.addFieldName(element)
 		currentRow.addLoadElement(element)
+		latestLoadedField = element
 	}
 
 	/**

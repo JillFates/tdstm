@@ -905,6 +905,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * Fetch ETL results
+	 * <pre>
+	 * 	 find Device by 'assetName' eq SOURCE.assetName into 'id'
+	 * 	 fetch 'id' fields 'Name', 'U Size', 'upos' set deviceVar
+	 * </pre>
+	 * @param fieldName a
+	 * @return
+	 */
+	FetchFacade fetch(String fieldName){
+		validateStack()
+		return new FetchFacade(this, fieldName)
+	}
+
+
+	/**
 	 * WhenFound ETL command. It defines what should based on find command results
 	 * <pre>
 	 *		whenNotFound 'asset' create {
