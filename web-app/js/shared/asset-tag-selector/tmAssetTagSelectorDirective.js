@@ -32,6 +32,8 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			// Init the Load
 			// Get All Tags
 			getAssetTags();
+			// Prevents an autoclose when being opened from a dialog
+			var preventAutoClose = true;
 
 			createSwitchButton();
 
@@ -50,7 +52,17 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 					selectTags();
 					$scope.onChange();
 				},
-				open: selectTags,
+				close: function(e){
+					if(preventAutoClose)  {
+						e.preventDefault();
+					}
+				},
+				open: function(e){
+					selectTags();
+					setTimeout(function(){
+						preventAutoClose = false;
+					}, 500);
+				},
 			});
 
 			($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
