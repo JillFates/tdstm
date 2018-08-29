@@ -227,6 +227,7 @@ export class DataScriptViewEditComponent implements OnInit {
 					this.etlScriptCode.updated = result.updated;
 					this.etlScriptCode.code = result.newEtlScriptCode;
 				}
-			});
+			})
+			.catch(error => console.log('Cancel datascript designer'));
 	}
 }
