@@ -85,6 +85,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	// Contains the Current/Previous value column label based on the state of the record
 	protected currentPreviousColumnLabel = '';
 
 	// Create vars of Enums to be used in the html
@@ -104,8 +105,6 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	ngOnInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		this.loadRecordFieldDetails();
-
-		// Returns the Current/Previous value column name based on the state of the record
 		this.currentPreviousColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
 	}
 
@@ -116,10 +115,13 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.importBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
+
+					// TODO : Fix the parent batchRecord reassignment and this code should be able to be removed
 					// The parent gets updated with the following emit but the this.batchRecord never gets updated
 					if (result.data['existingRecord']) {
 						this.batchRecord.existingRecord = result.data.existingRecord;
 					}
+
 					this.onBatchRecordUpdated.emit({batchRecord: result.data});
 					this.buildGridData(result.data.fieldsInfo);
 					this.processStatus.state = CHECK_ACTION.NONE;
