@@ -569,7 +569,8 @@ class MoveBundleController implements ControllerMethods {
 					unassignedAppCount = ua[2]
 					assignedAppCount = applicationCount - unassignedAppCount
 					movedAppCount = ua[3]
-					confirmedAppCount = movedAppCount + ua[4] + ua[5]
+					lockedAppCount = ua[5]
+					confirmedAppCount = movedAppCount + ua[4] + lockedAppCount
 					break
 				case AssetClass.DATABASE:
 					unassignedDbCount = ua[2]; break
