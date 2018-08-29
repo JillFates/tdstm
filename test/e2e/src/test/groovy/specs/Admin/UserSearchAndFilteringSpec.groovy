@@ -37,6 +37,38 @@ class UserSearchAndFilteringSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        /**
+         * the following code is part of the setup in order to create the data
+         * that will be validated
+         */
+        adminModule.goToAdminListStaff()
+        at StaffListPage
+        waitFor {createStaffBtn.click()}
+        at StaffCreationPage
+        scModalFirstName = firstName
+        scModalMiddleName = middleName
+        scModalLastName = lastName
+        scModalAddTeam.click()
+        waitFor {scModalTeamSelector.present}
+        scModalTeamSelector = teamName
+        waitFor { scModalSaveBtn.click() }
+        at StaffListPage
+        firstNameFilter = firstName
+        waitFor{$("td","role":"gridcell",title:" Create User").find("a").click()}
+        at UserCreationPage
+        ucUsername = userName
+        ucEmail = userEmail
+        waitFor {ucPassword.click()}
+        ucPassword = userPass
+        waitFor { ucConfirmPassword.click()}
+        ucConfirmPassword = userPass
+        waitFor { ucConfirmPassword.click()}
+        ucConfirmPassword = userPass
+        ucProjectSelector = userProject
+        ucAdminRoleCB.value(true)
+        waitFor { ucSaveBtn.click() }
+        at UserDetailsPage
+        adminModule.goToListUsers()
     }
 
     def setup() {
@@ -61,41 +93,14 @@ class UserSearchAndFilteringSpec extends GebReportingSpec {
         given: 'The user is at User List page'
             at UserListPage
         when: 'The user filters by an inexistnt user'
-            filterByUsername(userName)
+            filterByUsername("inexistentUser "+randStr)
         then: 'There are no rows returned'
             !rowsDisplayed()
     }
 
     def "3. New staff and user are created and filters can be applied to find the user"() {
         given: 'A staff member is created, and a user for it'
-            adminModule.goToAdminListStaff()
-            at StaffListPage
-            waitFor {createStaffBtn.click()}
-            at StaffCreationPage
-            scModalFirstName = firstName
-            scModalMiddleName = middleName
-            scModalLastName = lastName
-            scModalAddTeam.click()
-            waitFor {scModalTeamSelector.present}
-            scModalTeamSelector = teamName
-            waitFor { scModalSaveBtn.click() }
-            at StaffListPage
-            firstNameFilter = firstName
-            waitFor{$("td","role":"gridcell",title:" Create User").find("a").click()}
-            at UserCreationPage
-            ucUsername = userName
-            ucEmail = userEmail
-            waitFor {ucPassword.click()}
-            ucPassword = userPass
-            waitFor { ucConfirmPassword.click()}
-            ucConfirmPassword = userPass
-            waitFor { ucConfirmPassword.click()}
-            ucConfirmPassword = userPass
-            ucProjectSelector = userProject
-            ucAdminRoleCB.value(true)
-            waitFor { ucSaveBtn.click() }
-            at UserDetailsPage
-            adminModule.goToListUsers()
+
             at UserListPage
         when: 'The user just created is filtered by userName'
             filterByUsername(userName)
