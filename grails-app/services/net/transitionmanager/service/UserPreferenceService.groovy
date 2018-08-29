@@ -198,6 +198,9 @@ class UserPreferenceService implements ServiceMethods {
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
+			// we use the 'value' part of the Enum
+			preferenceCode = userPreferenceEnum.value()
+
 			// Note that session does not exist for Quartz jobs so we should check for a session object
 			if (session) {
 				// Set or update the session with the new value 
