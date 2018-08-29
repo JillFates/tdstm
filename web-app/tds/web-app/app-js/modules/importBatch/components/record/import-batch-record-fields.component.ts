@@ -3,7 +3,7 @@ import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {process, State} from '@progress/kendo-data-query';
+import {DataResult, GroupDescriptor, process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -19,11 +19,16 @@ export enum CurrentValueAction {
 	EditInit = 'EditInit'
 };
 
+export enum FieldInfoType {
+	CREATE,
+	UPDATE,
+	FIND
+}
+
 @Component({
 	selector: 'import-batch-record-fields',
 	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-fields.component.html'
 })
-
 export class ImportBatchRecordFieldsComponent implements OnInit {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
@@ -49,8 +54,8 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		modified: boolean,
 		errors: Array<string>,
 		errorsAsString: string,
-		// ???
-		overridedValue: string
+		// Fields Popup Information (Create, Update, Info)
+		create: any, update: any, find: any
 	}>;
 
 	private state: State = {
@@ -92,12 +97,16 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		margin: {horizontal: 2, vertical: 2},
 		position: 'fixed'
 	};
+	protected popupGridData: DataResult;
+	protected popupGridGroups: Array<GroupDescriptor> = [{field: 'domain'}];
+
 	// Contains the Current/Previous value column label based on the state of the record
 	protected currentPreviousColumnLabel = '';
 
 	// Create vars of Enums to be used in the html
 	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
 	protected CurrentValueAction = CurrentValueAction;
+	protected FieldInfoType = FieldInfoType;
 	protected BatchStatus = BatchStatus;
 
 	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
@@ -202,7 +211,9 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 					modified: modified,
 					errors: fields[fieldName].errors,
 					errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
-					overridedValue: null
+					create: !ValidationUtils.isEmptyObject(fields[fieldName].create) ? fields[fieldName].create : null,
+					update: !ValidationUtils.isEmptyObject(fields[fieldName].update) ? fields[fieldName].update : null,
+					find: !ValidationUtils.isEmptyObject(fields[fieldName].find) ? fields[fieldName].find : null,
 				});
 			}
 		}
@@ -364,24 +375,46 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		console.log(e);
 	}
 
-	protected popupField: any = null;
 	/**
 	 * Opens and positions the popup based on the click event.
 	 * @param {MouseEvent} $event
 	 */
-	protected onShowPopup($event: MouseEvent, type: 'create'|'update'|'find', field: any): void {
-		console.log(field);
-		this.popupField = field;
+	protected onShowPopup($event: MouseEvent, type: FieldInfoType, field: any): void {
+		let typeString = this.FieldInfoType[type].toLowerCase();
+		this.buildPopupFieldData(field[typeString]);
 		this.popup.title = this.getPopupTitle(type);
 		this.popup.offset = { left: $event.pageX, top: $event.pageY};
 		this.popup.show = true;
 	}
 
-	private getPopupTitle(type: 'create'|'update'|'find'): string {
+	/**
+	 * Builds the popup grid field info data.
+	 * @param field
+	 */
+	private buildPopupFieldData(field: any): void {
+		let popupFields: Array<any> = [];
+		for (let fieldName in field) {
+			if (field[fieldName]) {
+				popupFields.push({
+					domain: this.importBatch.domainClassName,
+					fieldName: fieldName,
+					value: field[fieldName]
+				});
+			}
+		}
+		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
+	}
+
+	/**
+	 * Returns the proper popup field info title.
+	 * @param {FieldInfoType} type
+	 * @returns {string}
+	 */
+	private getPopupTitle(type: FieldInfoType): string {
 		switch (type) {
-			case 'create': return 'Create Reference';
-			case 'update': return 'Update Reference';
-			case 'find': return 'Find Results';
+			case FieldInfoType.CREATE: return 'Create Reference';
+			case FieldInfoType.UPDATE: return 'Update Reference';
+			case FieldInfoType.FIND: return 'Find Results';
 			default: return '';
 		}
 	}

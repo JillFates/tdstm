@@ -1,11 +1,12 @@
 <div class="fields-container row" *ngIf="fieldsInfo">
 
+    <!-- Fields Info Popup -->
     <kendo-popup #infoPopup *ngIf="popup.show"
                  [margin]="popup.margin"
                  [popupClass]="'content popup'"
                  [offset]="popup.offset"
                  [positionMode]="popup.position">
-        <div style="border: 1px solid #656565; min-width: 400px;">
+        <div style="border: 1px solid #656565; min-width: 300px;">
             <div style="padding-top: 5px;padding-right: 3px;background-color: #5f9fcf;display:  inline-block;padding-left: 10px;width:  100%;">
                 <label style="float: left;display: inline;padding-right: 0;color: #ffffff;">
                     {{popup.title}}
@@ -14,6 +15,16 @@
                    class="glyphicon glyphicon-remove" (click)="popup.show=false"></i>
             </div>
             <div style="padding: 15px 15px 15px 15px;">
+                <kendo-grid [data]="popupGridData" style="width: 300px;"
+                            [groupable]="false" [group]="popupGridGroups">
+                    <kendo-grid-column [title]="'Domain'" field="domain" [width]="1">
+                        <ng-template kendoGridGroupHeaderTemplate let-group let-field="field" let-value="value">
+                            Domain: {{value}}
+                        </ng-template>
+                    </kendo-grid-column>
+                    <kendo-grid-column [title]="'Field Name'" field="fieldName"></kendo-grid-column>
+                    <kendo-grid-column [title]="'Value'" field="value"></kendo-grid-column>
+                </kendo-grid>
             </div>
         </div>
     </kendo-popup>
@@ -58,35 +69,35 @@
         <kendo-grid-column [width]="200" title="Imported Value" [class]="'import-value'">
             <ng-template kendoGridCellTemplate let-dataItem>
                 <div class="import-item-container">
-                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowValue"
+                    <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowValue"
                         [style.font-weight]="dataItem.modified === true ? 'bold' : 'normal'">
                         {{dataItem.importValue}}
                     </div>
-                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowInit" class="has-init-value">
+                    <div *ngIf="dataItem.currentValueAction === CurrentValueAction.ShowInit" class="has-init-value">
                         {{dataItem.initValue}}
                     </div>
-                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditValue"
+                    <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditValue"
                         type="text"
                         class="import-value-input form-control"
                         [(ngModel)]="dataItem.importValue"
                         [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
                     />
-                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditInit"
+                    <input *ngIf="dataItem.currentValueAction === CurrentValueAction.EditInit"
                         type="text"
                         class="has-init-value import-value-input form-control"
                         [(ngModel)]="dataItem.initValue"
                     />
-                    <span *ngIf="(dataItem.currentValueAction == CurrentValueAction.ShowInit || dataItem.currentValueAction == CurrentValueAction.EditInit)">
-                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                    <span *ngIf="(dataItem.currentValueAction === CurrentValueAction.ShowInit || dataItem.currentValueAction === CurrentValueAction.EditInit)">
+                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info has-init-value"></i>
                     </span>
                 </div>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Reference" [width]="80">
             <ng-template kendoGridCellTemplate let-dataItem>
-                <i *ngIf="true" (click)="onShowPopup($event, 'create', dataItem)" title="View Create Reference Detail" class="fa fa-plus-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
-                <i *ngIf="true" (click)="onShowPopup($event, 'update', dataItem)" title="View Update Reference Detail" class="fa fa-pencil-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
-                <i *ngIf="true" (click)="onShowPopup($event, 'find', dataItem)" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="dataItem.create" (click)="onShowPopup($event, FieldInfoType.CREATE, dataItem)" title="View Create Reference Detail" class="fa fa-plus-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="dataItem.update" (click)="onShowPopup($event, FieldInfoType.UPDATE, dataItem)" title="View Update Reference Detail" class="fa fa-pencil-square" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
+                <i *ngIf="dataItem.find" (click)="onShowPopup($event, FieldInfoType.FIND, dataItem)" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
             </ng-template>
         </kendo-grid-column>
 
