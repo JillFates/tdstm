@@ -15,10 +15,19 @@ class UserListPage extends Page{
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
         usernameFilter { $("#gs_username")}
+        personFilter {$("#gs_fullname")}
         usernames { $("[aria-describedby=userLoginIdGrid_username] a")}
         fullnames { $("[aria-describedby=userLoginIdGrid_fullname] a")}
         userDeletedMessage { $(".message")}
         commonsModule { module CommonsModule }
+        adminModule { module AdminModule}
+
+        gridRows {$("#userLoginIdGrid").find("role":"row")}
+        gridSize {gridRows.size()}
+    }
+
+    def rowsDisplayed(){
+        gridRows.displayed
     }
 
     def filterByUsername(username){
@@ -43,5 +52,11 @@ class UserListPage extends Page{
 
     def getGridRowsSize(){
         usernames.size()
+    }
+    /**
+     * The filed is used to filter by First and/or Last name
+     */
+    def filterByPerson(person){
+        personFilter = person
     }
 }
