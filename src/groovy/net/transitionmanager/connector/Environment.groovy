@@ -1,4 +1,4 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 /*
  * Represents the environment that a set of credentials is used for

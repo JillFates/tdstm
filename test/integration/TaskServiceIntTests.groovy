@@ -147,7 +147,7 @@ class TaskServiceIntTests extends IntegrationSpec {
             ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
 
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, agentMethod: 'executeCall',
+            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
             callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
 
@@ -176,7 +176,7 @@ class TaskServiceIntTests extends IntegrationSpec {
             ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
 
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, agentMethod: 'executeCall',
+            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
             methodParams: '[]', reactionScripts: '{"SUCCESS": "task.done()","STATUS": "return SUCCESS","ERROR": "task.error( response.error )", "DEFAULT": "task.error( response.error )"}', reactionScriptsValid: 1,
             callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
 

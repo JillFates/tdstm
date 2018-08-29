@@ -1,10 +1,10 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 import groovy.transform.CompileStatic
 
 /*
- * Represents the Agent Class/Party that an Agent works with have been created for. It is used to
- * help keep ApiCredential, ApiAction and Agent classes logically associated together.
+ * Represents the Connector Class/Party that an Connector works with have been created for. It is used to
+ * help keep ApiCredential, ApiAction and Connector classes logically associated together.
  */
 @CompileStatic
 enum ContextType {

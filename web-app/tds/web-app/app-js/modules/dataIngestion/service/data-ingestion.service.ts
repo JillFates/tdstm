@@ -254,7 +254,7 @@ export class DataIngestionService {
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
-		return this.http.get(`${this.dataApiActionUrl}/agent/${agentId}`)
+		return this.http.get(`${this.dataApiActionUrl}/connector/${agentId}`)
 			.map((res: Response) => {
 				let result = res.json();
 				let agentMethodModel = new Array<AgentMethodModel>();
@@ -355,7 +355,7 @@ export class DataIngestionService {
 			description: model.description,
 			provider: { id: model.provider.id },
 			apiCatalog: { id: model.agentClass.id },
-			agentMethod: model.agentMethod.id,
+			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
 			docUrl: model.docUrl,

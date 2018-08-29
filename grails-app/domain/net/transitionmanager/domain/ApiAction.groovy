@@ -4,7 +4,7 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
@@ -20,7 +20,7 @@ import java.util.regex.Matcher
  * invoked by the TransitionManager application in Tasks and other places.
  */
 @Slf4j
-@ToString(includes='name, agentMethod, provider', includeNames=true, includePackage=false)
+@ToString(includes='name, connectorMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
 	String name
@@ -29,8 +29,8 @@ class ApiAction {
 	// Indicates the catalog to use when invoking the action
 	ApiCatalog apiCatalog
 
-	// The method on the agent to invoke
-	String agentMethod
+	// The method on the connector to invoke
+	String connectorMethod
 
 	Provider provider
 
@@ -67,12 +67,12 @@ class ApiAction {
 	Integer pollingInterval = 0
 
 	// The credentials that should be used with the method
-	// ApiCredential agentCredential
+	// ApiCredential connectorCredential
 
 	// The method that the async response should call to return response
 	String callbackMethod = ''
 
-	// Optional credentials required by the agent.
+	// Optional credentials required by the connector.
 	Credential credential
 
 	// Determines how async API calls notify the completion of an action invocation
@@ -119,7 +119,7 @@ class ApiAction {
 	]
 
 	static constraints = {
-		agentMethod size: 1..64
+		connectorMethod size: 1..64
 		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
@@ -145,7 +145,7 @@ class ApiAction {
 
 	static mapping = {
 		columns {
-			agentMethod 	sqlType: 'varchar(64)'
+			connectorMethod 	sqlType: 'varchar(64)'
 			callbackMode 	sqlType: 'varchar(64)'
 			callbackMethod	sqlType: 'varchar(64)'
 			asyncQueue 		sqlType: 'varchar(64)'
@@ -157,7 +157,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsList', 'agent']
+	static transients = ['methodParamsList', 'connector']
 
 	/*
 	 * Used to determine if the action is performed asyncronously

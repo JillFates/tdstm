@@ -11,10 +11,10 @@ import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.agent.AbstractAgent
-import net.transitionmanager.agent.CallbackMode
-import net.transitionmanager.agent.DictionaryItem
-import net.transitionmanager.agent.GenericHttpAgent
+import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.connector.CallbackMode
+import net.transitionmanager.connector.DictionaryItem
+import net.transitionmanager.connector.GenericHttpConnector
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
@@ -94,7 +94,7 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to invoke an agent method with a given context
+	 * Used to invoke an connector method with a given context
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
@@ -142,11 +142,11 @@ class ApiActionService implements ServiceMethods {
 				if (!action.asyncQueue) {
 					throw new InvalidConfigurationException("Action $action missing required message queue name")
 				}
-				def agent = agentInstanceForAction(action)
+				def connector = connectorInstanceForAction(action)
 
 				// Lets try to invoke the method
-				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', agent.name, action.agentMethod, action.asyncQueue, remoteMethodParams
-				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
+				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', connector.name, action.connectorMethod, action.asyncQueue, remoteMethodParams
+				connector."${action.connectorMethod}"(action.asyncQueue, remoteMethodParams)
 			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
 				// add additional data to the api action execution to have it available when needed
 				Map optionalRequestParams = [
@@ -157,8 +157,8 @@ class ApiActionService implements ServiceMethods {
 						apiAction: apiActionToMap(action)
 				]
 
-				// get api action agent instance
-				def agent = agentInstanceForAction(action)
+				// get api action connector instance
+				def connector = connectorInstanceForAction(action)
 
 				// construct action request object and pass options params
 				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
@@ -234,13 +234,13 @@ class ApiActionService implements ServiceMethods {
 				}
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
-				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.agentMethod, actionRequest
+				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest
 				try {
 					if (context?.moveEvent?.apiActionBypass) {
-						log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.agentMethod, actionRequest)
+						log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest)
 						taskFacade.byPassed()
 					} else {
-						agent.invoke(methodDef, actionRequest)
+						connector.invoke(methodDef, actionRequest)
 					}
 				} catch (Exception e) {
 					log.warn(e.message)
@@ -258,7 +258,7 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to invoke an agent method within action parameters solely.
+	 * Used to invoke an connector method within action parameters solely.
 	 * @param action - the ApiAction to be invoked
 	 * @return
 	 */
@@ -270,8 +270,8 @@ class ApiActionService implements ServiceMethods {
 		// Get the method definition of the Action configured Api Catalog
 		DictionaryItem methodDef = methodDefinition(action)
 
-		// get the agent instance
-		def agent = agentInstanceForAction(action)
+		// get the connector instance
+		def connector = connectorInstanceForAction(action)
 
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = buildMethodParamsWithContext(action, null)
@@ -303,12 +303,12 @@ class ApiActionService implements ServiceMethods {
 			}
 		}
 
-		log.debug 'About to invoke the following command: {}.{} with params {}', action.apiCatalog.name, action.agentMethod, remoteMethodParams
+		log.debug 'About to invoke the following command: {}.{} with params {}', action.apiCatalog.name, action.connectorMethod, remoteMethodParams
 
 		// execute action and return any result that were returned
 		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
 		try {
-			return agent.invoke(methodDef, actionRequest)
+			return connector.invoke(methodDef, actionRequest)
 		} finally {
 			ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 		}
@@ -321,25 +321,25 @@ class ApiActionService implements ServiceMethods {
 	 * @return A map with the defined ApiAction property names and values from the context
 	 */
 	private Map buildMethodParamsWithContext (ApiAction action, Object context) {
-		AbstractAgent agent = agentInstanceForAction(action)
+		AbstractConnector connector = connectorInstanceForAction(action)
 
-		// This just does a call back on the Agent class to get the built up parameters
-		agent.buildMethodParamsWithContext(action, context)
+		// This just does a call back on the Connector class to get the built up parameters
+		connector.buildMethodParamsWithContext(action, context)
 	}
 
 	/**
 	 * Used to retrieve the method definition (aka Dictionary Item) for a give ApiAction
 	 * @param action - the ApiAction object to lookup the method definition
 	 * @return the method definition
-	 * @throws InvalidRequestException if the method name is invalid or the agent is not implemented
+	 * @throws InvalidRequestException if the method name is invalid or the connector is not implemented
 	 */
 	DictionaryItem methodDefinition (ApiAction action) {
 		Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
-		Map<String, ?> method = dict[action?.agentMethod]
+		Map<String, ?> method = dict[action?.connectorMethod]
 
 		if (!method) {
 			throw new InvalidRequestException(
-					"Action class ${action?.apiCatalog?.name} method ${action?.agentMethod} not implemented")
+					"Action class ${action?.apiCatalog?.name} method ${action?.connectorMethod} not implemented")
 		}
 
 		DictionaryItem methodDef = new DictionaryItem(method)
@@ -347,14 +347,14 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to retrieve an instance of Agent class that will handle the method
+	 * Used to retrieve an instance of Connector class that will handle the method
 	 * @param action - the ApiAction to be used to invoke the method
-	 * @return the Agent class instance to invoke the method on
+	 * @return the Connector class instance to invoke the method on
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
-	AbstractAgent agentInstanceForAction (ApiAction action) {
-		// for now returning a generic agent instance to be able to re-use all abstract agent methods
-		GenericHttpAgent.newInstance()
+	AbstractConnector connectorInstanceForAction (ApiAction action) {
+		// for now returning a generic connector instance to be able to re-use all abstract connector methods
+		GenericHttpConnector.newInstance()
 	}
 
 	/**
@@ -631,10 +631,10 @@ class ApiActionService implements ServiceMethods {
 		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
-		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		// If all the properties are required, the entry for the ConnectorClass has to be overriden with the following map.
 		if (!minimalInfo) {
-			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap.agentClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
+			AbstractConnector connector = connectorInstanceForAction(apiAction)
+			apiActionMap.connectorClass = [id: apiAction.apiCatalog.id, name: apiAction.apiCatalog.name]
 			apiActionMap.version = apiAction.version
 		}
 

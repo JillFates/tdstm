@@ -27,7 +27,7 @@ class ApiCatalogTestHelper {
         "publishDate": "2018-12-13"
       },
       "docUrl": "http://about.com",
-      "agent": "HttpAgent|AwsAgent|PowerShell|BashShell",
+      "connector": "HttpConnector|AwsConnector|PowerShell|BashShell",
       "credentialGroup": "x"
     },
     "variable": {
@@ -158,7 +158,7 @@ class ApiCatalogTestHelper {
     "dictionary": {
         "info": {
             "name": "HTTP API v1",
-            "agent": "HttpAgent",
+            "connector": "HttpConnector",
             "docUrl": "http://about.com",
             "provider": "Http Provider",
             "tmVersion": {
@@ -167,7 +167,7 @@ class ApiCatalogTestHelper {
                 "label": "Version 4.5.0 (Development)",
                 "publishDate": "2018-07-12"
             },
-            "description": "Http Agent",
+            "description": "Http Connector",
             "credentialGroup": "N/A",
             "providerVersion": {
                 "max": "1",
