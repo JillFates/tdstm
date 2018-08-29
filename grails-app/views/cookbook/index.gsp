@@ -26,7 +26,6 @@
 
 	<g:javascript src="angular/plugins/angular-ui-router.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />

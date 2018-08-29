@@ -25,13 +25,14 @@
             <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
             <div class="fieldsFilter col-sm-2">
                 <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
-                                    [data]="fieldsFilter.options"
-                                    [textField]="'text'"
-                                    [valueField]="'value'"
-                                    [(ngModel)]="fieldsFilter.selected"
-                                    (valueChange)="onFieldsFilter($event)"
-                                    placeholder="Filter"
-                                    class="form-control input-sm"></kendo-dropdownlist>
+                    [data]="fieldsFilter.options"
+                    [textField]="'text'"
+                    [valueField]="'value'"
+                    [(ngModel)]="fieldsFilter.selected"
+                    (valueChange)="onFieldsFilter($event)"
+                    placeholder="Filter"
+                    class="form-control input-sm">
+                </kendo-dropdownlist>
             </div>
             <div class="fieldsFilterText col-sm-3">
                 <input [(ngModel)]="fieldsFilter.nameFilter.value"
@@ -44,30 +45,40 @@
             </div>
         </ng-template>
         <kendo-grid-column title="Name" field="name" [width]="100"></kendo-grid-column>
-        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.INSERT && batchRecord.status.code === BatchStatus.PENDING"
-                           title="Current Value" [class]="'gray-background'" [width]="150">
+
+        <!-- Current / Previous Column Label -->
+        <kendo-grid-column [width]="200"
+            [title]="currentPreviousColumnLabel"
+            field="currentPreviousValue"
+            [class]="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE ? '' : 'gray-background'"
+        >
         </kendo-grid-column>
-        <kendo-grid-column *ngIf="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE && batchRecord.status.code === BatchStatus.PENDING"
-                           title="Current Value" field="currentValue" [width]="200">
-        </kendo-grid-column>
-        <kendo-grid-column *ngIf="batchRecord.status.code === BatchStatus.COMPLETED"
-                           title="Imported Value" [class]="'import-value'" [width]="200">
-	        <ng-template kendoGridCellTemplate let-dataItem>
-		        <div class="import-item-container">
-			        <input *ngIf="dataItem.importValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" readonly/>
-			        <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.initValue" readonly/>
-			        <i [ngClass]="{'has-init-value': !dataItem.importValue && dataItem.initValue}" *ngIf="dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
-		        </div>
-	        </ng-template>
-        </kendo-grid-column>
-        <kendo-grid-column title="Import Value" *ngIf="showActionButtons()" [width]="200" [class]="'import-value'">
+
+        <!-- Imported Value Column Label -->
+        <kendo-grid-column [width]="200" title="Imported Value" [class]="'import-value'">
             <ng-template kendoGridCellTemplate let-dataItem>
                 <div class="import-item-container">
-                    <input *ngIf="(dataItem.importValue || dataItem.importValue === '' ) && !dataItem.initValue" type="text" class="import-value-input form-control" [(ngModel)]="dataItem.importValue" />
-	                <input *ngIf="!dataItem.importValue && dataItem.initValue" type="text"
-	                       class="import-value-input form-control has-init-value" [(ngModel)]="dataItem.initValue"/>
-	                <i [ngClass]="{'has-init-value': !dataItem.importValue && dataItem.initValue}"
-                       *ngIf="!dataItem.importValue && dataItem.initValue" [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowValue"
+                        [style.font-weight]="dataItem.modified === true ? 'bold' : 'normal'">
+                        {{dataItem.importValue}}
+                    </div>
+                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowInit" class="has-init-value">
+                        {{dataItem.initValue}}
+                    </div>
+                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditValue"
+                        type="text"
+                        class="import-value-input form-control"
+                        [(ngModel)]="dataItem.importValue"
+                        [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
+                    />
+                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditInit"
+                        type="text"
+                        class="has-init-value import-value-input form-control"
+                        [(ngModel)]="dataItem.initValue"
+                    />
+                    <span *ngIf="(dataItem.currentValueAction == CurrentValueAction.ShowInit || dataItem.currentValueAction == CurrentValueAction.EditInit)">
+                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                    </span>
                 </div>
             </ng-template>
         </kendo-grid-column>
@@ -78,6 +89,8 @@
                 <i *ngIf="true" (click)="onShowPopup($event, 'find', dataItem)" title="View Find Results" class="fa fa-search" style="cursor: pointer; font-size: 17px; margin-right: 5px;"></i>
             </ng-template>
         </kendo-grid-column>
+
+        <!-- Errors Column -->
         <kendo-grid-column title="Error(s)">
             <ng-template kendoGridCellTemplate let-dataItem >
                 <div *ngFor="let error of dataItem.errors" class="error">
