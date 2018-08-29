@@ -59,4 +59,12 @@ class UserListPage extends Page{
     def filterByPerson(person){
         personFilter = person
     }
+    /**
+     * validates the user displayed is the one expected
+     */
+    def isExpectedUser(userName, firstName, lastName){
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+    }
 }

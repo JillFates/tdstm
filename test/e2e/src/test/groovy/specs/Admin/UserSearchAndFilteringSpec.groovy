@@ -11,6 +11,10 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import pages.Admin.UserListPage
 
+/**
+ * @author ingrid
+ */
+
 @Stepwise
 class UserSearchAndFilteringSpec extends GebReportingSpec {
     def testKey
@@ -96,26 +100,20 @@ class UserSearchAndFilteringSpec extends GebReportingSpec {
         when: 'The user just created is filtered by userName'
             filterByUsername(userName)
         then: 'The user is found'
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+            isExpectedUser(userName,firstName,lastName)
     }
 
     def "4. User can be filtered by name"(){
         when: "The user flters by first name"
             filterByPerson(firstName)
         then: "the user is found"
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+            isExpectedUser(userName,firstName,lastName)
     }
 
     def "5. User can be filtered by last name"(){
         when: "The user flters by last name"
             filterByPerson(lastName)
         then: "the user is found"
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+            isExpectedUser(userName,firstName,lastName)
     }
 }
