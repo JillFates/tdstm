@@ -39,18 +39,16 @@ class DatascriptCreationSpec extends GebReportingSpec{
 
 
     def "1. The user navigates to the Datascripts Section"() {
-        testKey = "TM-XXXX"
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The user goes to the Datascripts page'
-            menuModule.goToDatascripts()
+            projectsModule.goToDatascripts()
 
         then: 'The Datascripts Page loads with no problem'
             at DatascriptsPage
     }
 
     def "2. Open the Create Datascripts pop up and close it"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Datascript landing page'
             at DatascriptsPage
         when: 'The user clicks the Create Datascripts Button'
@@ -63,7 +61,6 @@ class DatascriptCreationSpec extends GebReportingSpec{
     }
 
     def "3. Create a Datascript"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Datascripts landing page'
             at DatascriptsPage
         and: 'Opens the Create Datascript pop up'
@@ -84,7 +81,6 @@ class DatascriptCreationSpec extends GebReportingSpec{
     }
 
     def "4. Close the detail pop up and search the Datascript"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Datascript Detail pop up page after a Datascript was created'
             at DatascriptDetailsPage
         when: 'The user closes the details pop up'

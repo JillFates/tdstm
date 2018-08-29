@@ -3,6 +3,7 @@ package pages.Datascripts
 import geb.Page
 import modules.CommonsModule
 import geb.Browser
+import modules.ProjectsModule
 
 class DatascriptsPage extends Page {
     static at = {
@@ -34,6 +35,7 @@ class DatascriptsPage extends Page {
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
         firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
+        projectsModule { module ProjectsModule}
     }
 
     def filterByName(name){

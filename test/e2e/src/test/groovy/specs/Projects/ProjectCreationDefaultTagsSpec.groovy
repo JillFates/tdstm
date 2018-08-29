@@ -36,7 +36,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToProjectsActive()
+        projectsModule.goToProjectsActive()
         at ProjectListPage
     }
 
@@ -50,7 +50,6 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     }
 
     def "1. Open Create Project Page"() {
-        testKey = "TM-11374"
         given: 'The User is on the Project List Page'
             at ProjectListPage
         when: 'The User clicks on Create Project button'
@@ -60,7 +59,6 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     }
 
     def "2. Create Project and certify header name"() {
-        testKey = "TM-11374"
         given: 'The User is on the Project Create Page'
             at ProjectCreationPage
         when: 'The User fills all required fields'
@@ -72,15 +70,14 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         and: 'Message saying project created is displayed'
             waitForProjectCreatedMessage projName
         and: 'Project name is displayed in menu bar'
-            menuModule.assertProjectName projName
+            projectsModule.assertProjectName projName
     }
 
     def "3. The User navigates to Tags Page and verifies default tags created"(){
-        testKey = "TM-11374"
         given: 'The User is in Menu'
             at MenuPage
         when: 'The User clicks on Project > Tags'
-            menuModule.goToTagsPage()
+            projectsModule.goToTagsPage()
         then: 'Manage Tags Page should be displayed'
             at TagsPage
         and: 'Certify four default tags were created'
@@ -88,7 +85,6 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     }
 
     def "4. The User verifies default tags info displayed"(){
-        testKey = "TM-11374"
         given: 'The User is in Manage Tags page'
             at TagsPage
         when: 'The User filters by GDPR'
@@ -118,26 +114,25 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     }
 
     def "5. Workaround to switch to a licensed Project"() {
-        testKey = "TM-11374"
         given: 'The user is in Menu'
             at MenuPage
         when: 'The user searches for the selected project'
-            menuModule.assertProjectName projName
+            projectsModule.assertProjectName projName
         then: 'A licensed project should be selected if license is requested'
             def displayed = false
             try {
                 // Check if license icon is displayed
-                menuModule.projectLicenseIcon.displayed
+                projectsModule.projectLicenseIcon.displayed
                 // Select a licensed project
-                menuModule.goToProjectsActive()
+                projectsModule.goToProjectsActive()
                 at ProjectListPage
                 filterByName licensedProjectName
                 clickOnProjectByName licensedProjectName
                 at MenuPage
-                waitFor {menuModule.projectName}
-                menuModule.assertProjectName licensedProjectName
+                waitFor {projectsModule.projectName}
+                projectsModule.assertProjectName licensedProjectName
                 // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = menuModule.projectLicenseIcon.displayed
+                displayed = projectsModule.projectLicenseIcon.displayed
             } catch (RequiredPageContentNotPresent e) {
                 // Try failed because license icon is not present so a Licensed project is selected now
                 displayed = false
