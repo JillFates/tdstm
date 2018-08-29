@@ -7,6 +7,7 @@ import {Permission} from '../../../shared/model/permission.model';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
+import {DeviceModel} from '../components/device/model-device/model/device-model.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

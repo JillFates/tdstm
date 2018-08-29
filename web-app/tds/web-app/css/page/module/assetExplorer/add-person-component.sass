@@ -1,0 +1,23 @@
+.add-person-component
+  .box-body
+    padding: auto 15px
+  .required-field::after
+    content: "*"
+    color: red
+  .box-body .form-group
+    margin-bottom: 10px
+    input
+      width: 80%
+    kendo-dropdownlist
+      width: 40%
+    span.remove-team
+      cursor: pointer
+  p.error-msg
+    color: $color-message-error--red
+  .mandatory
+    color: red
+    text-align: right
+    margin: 0
+    padding: 0 30px
+  .teams kendo-dropdownlist
+    margin-top: 5px

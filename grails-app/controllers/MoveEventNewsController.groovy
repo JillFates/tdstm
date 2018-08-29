@@ -46,7 +46,7 @@ class MoveEventNewsController implements ControllerMethods {
 									where mb.move_event_id = $moveEvent.id and  ac.comment_type = 'issue' and p.project_id = $projectId
 									and ac.status = '$AssetCommentStatus.HOLD'""")
 			def moveEventNewsQuery = new StringBuilder("""SELECT mn.move_event_news_id as id,  'N' as type,
-									date_created as created,
+									mn.date_created as created,
 									message as text, if(is_archived = 0, 'L','A') as state  from move_event_news mn
 									left join move_event me on ( me.move_event_id = mn.move_event_id )
 									left join project p on (p.project_id = me.project_id) where mn.move_event_id = $moveEvent.id and p.project_id = $projectId""")

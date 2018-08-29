@@ -64,8 +64,8 @@ $(document).ready(function() {
 		<div class="execution-phase-wrapper">
 
 <%-- Analysis Phase --%>
-			<div class="dashboardContainer">
-				<div class="dashboard_div col-sm-12" style="min-width: 280px; width: 280px;" >
+			<div class="planning-dashboard">
+				<div class="dashboard_div discovery-phase">
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
                         <!-- Applications Validated Progressbar -->
@@ -189,7 +189,7 @@ $(document).ready(function() {
 				</div>
 
 	            <%-- Analysis Phase --%>
-				<div class="dashboard_div col-sm-12" style="min-width:280px; width: 280px;" >
+				<div class="dashboard_div analysis-phase">
 					<span class="dashboard_head">Analysis & Planning Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 						<%-- Applications Assigned Bar --%>
@@ -371,7 +371,7 @@ $(document).ready(function() {
 
 	<%-- Execution Phase Section --%>
 
-				<div class="dashboard_div col-sm-12 col-md-12">
+				<div class="dashboard_div execution-phase">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 

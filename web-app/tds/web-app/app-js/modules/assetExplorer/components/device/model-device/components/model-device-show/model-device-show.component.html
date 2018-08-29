@@ -1,0 +1,67 @@
+<div class="modal fade in model-device-show-component" id="model-device-show-component" data-backdrop="static"
+     tabindex="-1" role="dialog">
+	<form id="editModelForm" action="/tdstm/model/edit" method="post" target="_blank">
+		<div class="modal-dialog modal-sm" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">Show Model</h4>
+				</div>
+				<div class="modal-body">
+					<div class="modal-body-container">
+						<div class="box-body">
+							<div class="form-group">
+								<div class="col-md-6">Manufacturer:</div>
+								<div class="col-md-6">{{deviceModel.manufacturer}}</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Model Name:</div>
+								<div class="col-md-6">{{deviceModel.modelName}}</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">AKA:</div>
+								<div class="col-md-6">{{deviceModel.aka}}</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Asset Type:</div>
+								<div class="col-md-6">{{deviceModel.assetType}}</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Usize:</div>
+								<div class="col-md-6">{{deviceModel.usize}}</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Power(max/design/avg):</div>
+								<div class="col-md-6">
+									{{deviceModel.powerNameplate}}/{{deviceModel.powerUse}}/{{deviceModel.powerDesign}}
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Source TDS:</div>
+								<div class="col-md-6">
+									<input type="checkbox" name="sourceTDS" disabled="disabled"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">Notes:</div>
+								<div class="col-md-6"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer form-group-center">
+					<input name="id" type="hidden" id="show_modelId" value="{{deviceModel.id}}">
+					<button type="submit" class="btn btn-primary pull-left" (click)="onEditModel()"><span
+							class="fa fa-fw fa-floppy-o"></span> Edit
+					</button>
+					<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
+						<span class="glyphicon glyphicon-ban-circle"></span>
+						<span>Cancel</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

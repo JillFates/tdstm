@@ -283,6 +283,7 @@ class MoveBundleService implements ServiceMethods {
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
 		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
+		String tagJoins = tagService.getTagsJoin(tagIds, tagMatch)
 
 		def depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
@@ -304,8 +305,7 @@ class MoveBundleService implements ServiceMethods {
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			LEFT OUTER JOIN model m ON a.model_id=m.model_id
-			LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-			LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+			$tagJoins
 			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
 				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
 				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id

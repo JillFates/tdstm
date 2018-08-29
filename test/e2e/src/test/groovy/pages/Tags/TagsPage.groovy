@@ -21,6 +21,9 @@ class TagsPage extends Page{
         tagsGridActionsRows {tagsGrid.find(".k-grid-container .k-grid-content-locked tr[kendogridlogicalrow]")}
         tagsNoDataRecords {tagsGrid.find(".k-grid-container .k-grid-content tr.k-grid-norecords").find("td")}
         nameFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "2").find("input")}
+        nameFilterRemove { nameFilter.next("span")}
+        descFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "3").find("input")}
+        descFilterRemove { descFilter.next("span")}
         //First Element of the Providers Table
         firstTagActions { tagsGridActionsRows.find("td", "aria-colindex": "1")[0]}
         firstTagSaveButton { firstTagActions.find(".k-grid-save-command")}
@@ -44,6 +47,19 @@ class TagsPage extends Page{
     def filterByName(name){
         waitFor{nameFilter.displayed}
         nameFilter = name
+    }
+
+    def filterByDescription(description){
+        waitFor{descFilter.displayed}
+        descFilter = description
+    }
+
+    def removeNameFilter(){
+        nameFilterRemove.click()
+    }
+
+    def removeDescFilter(){
+        descFilterRemove.click()
     }
 
     def getGridRowsSize(){
@@ -97,6 +113,11 @@ class TagsPage extends Page{
     def clickOnDeleteButton(){
         waitFor{firstTagRemoveButton.displayed}
         waitFor{firstTagRemoveButton.click()}
+    }
+
+    def clickOnEditButton(){
+        waitFor{firstTagEditButton.displayed}
+        waitFor{firstTagEditButton.click()}
     }
 
     def isFirstTagRowNameNotEditable(){
@@ -174,5 +195,11 @@ class TagsPage extends Page{
             filterByName tagName
         }
         true // done, just return true to avoid test fails
+    }
+
+    def verifyTagInformation(name, description){
+        getGridRowsSize() == 1
+        getTagNameText() == name
+        getTagDescriptionText() == description
     }
 }
