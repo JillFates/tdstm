@@ -7,7 +7,6 @@ import com.tdsops.etl.ETLDomain
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-// import com.tdsops.etl.DataImportHelper
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.Manufacturer
@@ -31,14 +30,37 @@ class SearchQueryHelper {
 	static final String WHEN_NOT_FOUND_PROPER_USE_MSG = "whenNotFound create only applicable for reference properties"
 	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field {propertyName} was not found in ETL dataset"
 	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field {propertyName} in domain"
+	static final String NO_FIND_QUERY_SPECIFIED_MSG = 'No find/findElse specified for property'
 
 	@Lazy
 	private static PersonService personService = { -> (PersonService) ApplicationContextHolder.getBean('personService', PersonService) }()
 
 	/**
+	 * Used to initialize the errors list that will be stuffed into the context object
+	 */
+	static private void initSearchQueryHelperErrors(Map context, Boolean reset=false) {
+		if (reset) {
+			context.searchQueryHelperErrors = []
+		} else if (! context.containsKey('searchQueryHelperErrors')) {
+			context.searchQueryHelperErrors = []
+		}
+	}
+
+	/**
+	 * Used to add an error to the error list that is stuffed into the context object
+	 */
+	static private void recordError(Map context, String errorMsg) {
+		initSearchQueryHelperErrors(context)
+		context.searchQueryHelperErrors << errorMsg
+	}
+
+	/**
 	 * Used in an attempt to lookup a domain record using the metadata that is provided by the
 	 * ETL process. This method will leverage caching of the domain entities to expedite retrieval
-	 * for entities that are frequently cross-referenced (e.g. Clusters to Servers).
+	 * for entities that are frequently cross-referenced (e.g. Clusters to Servers) when the context
+	 * contains a cache reference.
+	 *
+	 * An errors that occur during this process will be recorded into the context.searchQueryHelperErrors.
 	 *
 	 * @param fieldName - the domain fieldname
 	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
@@ -90,13 +112,16 @@ class SearchQueryHelper {
 	 *
 	 * @test Integration
 	 */
-	static Object findEntityByMetaData(String fieldName, JSONObject fieldsInfo, Map context=null, Object entityInstance=null) {
+	static Object findEntityByMetaData(String fieldName, Map fieldsInfo, Map context=null, Object entityInstance=null) {
 		// This will be populated with the entity object or error message appropriately
 		Object entity
 
 		if (context == null) {
 			context = [:]
 		}
+
+		// Initialize the errors placeholder that this or any of the support functions might set an error
+		initSearchQueryHelperErrors(context, true)
 
 		// This will be used to check/set cache for previously searched items
 		String md5
@@ -199,6 +224,7 @@ class SearchQueryHelper {
 				if (findResult.error) {
 					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, findResult.error)
 					entity = findResult.error
+					recordError(context, findResult.error)
 					break
 				} else {
 					int qtyFound = findResult.entities?.size() ?: 0
@@ -230,6 +256,7 @@ class SearchQueryHelper {
 						// If no entity was found then we want to capture the error message to save in the cache
 						entity = errorMsg
 						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+						recordError(context, errorMsg)
 					}
 					break
 			}
@@ -247,6 +274,7 @@ class SearchQueryHelper {
 		if ( (entity instanceof CharSequence) ) {
 			if (! errorPreviouslyRecorded) {
 				// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, entity)
+				recordError(context, entity)
 			}
 			entity = -1
 		}
@@ -446,9 +474,12 @@ class SearchQueryHelper {
 	private static List<Object> performQueryAndUpdateFindElement(String propertyName, Map fieldsInfo, Map context) {
 		List<Object> entities = []
 
+		initSearchQueryHelperErrors(context)
+
 		// If the lookup is for a reference field then it is mandatory in the script to account for this via
 		if ( ! fieldsInfo[propertyName].find?.query || fieldsInfo[propertyName].find.query.size() == 0 ) {
 			// addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, NO_FIND_QUERY_SPECIFIED_MSG)
+			recordError(context, NO_FIND_QUERY_SPECIFIED_MSG)
 		} else {
 			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
@@ -480,6 +511,7 @@ class SearchQueryHelper {
 			// Record error on the field if more than one entity was found
 			if (recordsFound > 1) {
 				// addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, FIND_FOUND_MULTIPLE_REFERENCES_MSG)
+				recordError(context, FIND_FOUND_MULTIPLE_REFERENCES_MSG)
 			}
 		}
 
@@ -578,7 +610,7 @@ class SearchQueryHelper {
 					boolean isSource = referenceFieldName == 'rackSource'
 					String roomFieldName = isSource ? 'roomSource' : 'roomTarget'
 					if (fieldsInfo.containsKey(roomFieldName)) {
-						Room room = fetchEntityByFieldMetaData(roomFieldName, fieldsInfo, context)
+						Room room = findEntityByMetaData(roomFieldName, fieldsInfo, context)
 						if (! room) {
 							result.error = 'Unable to resolve room'
 						} else {
@@ -595,7 +627,7 @@ class SearchQueryHelper {
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
 					if (fieldsInfo.containsKey('manufacturer')) {
-						Manufacturer mfg = fetchEntityByFieldMetaData('manufacturer', fieldsInfo, context)
+						Manufacturer mfg = findEntityByMetaData('manufacturer', fieldsInfo, context)
 						if (! mfg) {
 							result.error = 'Unable to resolve manufacturer'
 						} else {
@@ -685,6 +717,57 @@ class SearchQueryHelper {
 		}
 
 		return [person, errorMsg]
+	}
+
+	/**
+	 * Used to generate the MD5 value of the Map that is used to query for a domain of a particular
+	 * fieldName. This will toString the Map of fieldName query names/values in order to create an unique key
+	 * that can be used to cache the results afterward.
+	 *
+	 * The MD5 string will be composed like the following:
+	 *		Dependency:asset
+	 *		:value=123:
+	 *		query=[[assetName:"xraysrv01", assetType:"VM"]]
+	 *
+	 * @param fieldName - the name of the field to fetch the Query element from the map
+	 * @param fieldsInfo - the Map of all of the fields for the current row that came from the ETL process
+	 * @return the MD5 32 character String of the query element
+	 */
+	static String generateMd5OfFieldsInfoField(String domainShortName, String fieldName, Map fieldsInfo) {
+		StringUtil.md5Hex(
+			"${domainShortName}:${fieldName}" +
+			":value=${fieldsInfo[fieldName].value}:query=" +
+			( fieldsInfo[fieldName].find.containsKey('query') ? fieldsInfo[fieldName].find.query.toString() : 'NO-QUERY-SPECIFIED')
+		)
+	}
+
+	/**
+	 * Used to retrieve the value and initialize values from the fieldsInfo for a fieldName
+	 * @param fieldName
+	 * @param fieldsInfo
+	 * @return List containing [value, initialValue]
+	 */
+	static List getValueAndInitialize(String fieldName, Map fieldsInfo) {
+		def value = fieldsInfo[fieldName]['value']
+		def init = fieldsInfo[fieldName]['init']
+
+		// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
+		// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
+		// extra test.  See ticket TM-10981.
+		value = (value instanceof groovy.json.internal.LazyMap) ? null : value
+		init = (init instanceof groovy.json.internal.LazyMap) ? null : init
+		return [value, init]
+	}
+
+	/**
+	 * Returns the initialize value or value from the fieldsInfo of a field
+	 * @param fieldName
+	 * @param fieldsInfo
+	 * @return the initialize value if set otherwise the value property
+	 */
+	static Object getValueOrInitialize(String fieldName, Map fieldsInfo) {
+		def (value, init) = getValueAndInitialize(fieldName, fieldsInfo)
+		return (init != null ? init : value)
 	}
 
 }

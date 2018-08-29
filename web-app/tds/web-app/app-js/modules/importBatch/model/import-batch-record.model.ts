@@ -20,8 +20,8 @@ export class ImportBatchRecordModel {
 	warn: number;
 	currentValues: any;
 	// A HashMap of the field values from the existing record which is only populated when the record is PENDING
-//	existingRecord: { [path: string]: string; };
-	existingRecord: any;
+	existingRecord: { [path: string]: string; };
+	// existingRecord: any;
 }
 
 export class ImportBatchRecordDetailColumnsModel {

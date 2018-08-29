@@ -85,7 +85,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
-	protected previousCurrentColumnLabel = '';
+	protected currentPreviousColumnLabel = '';
 
 	// Create vars of Enums to be used in the html
 	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
@@ -106,8 +106,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.loadRecordFieldDetails();
 
 		// Returns the Current/Previous value column name based on the state of the record
-		this.previousCurrentColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
-		this.saveStatus.state = this.saveStatus.state;
+		this.currentPreviousColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
 	}
 
 	/**
@@ -148,15 +147,19 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.fieldsInfo = [];
 		for (const fieldName of fieldNameList) {
 
+			// Determine if the fieldName exists in the current record since not all records have all of the fields
+			if (fields[fieldName] === undefined) {
+				continue;
+			}
+
 			// Determine the currentPreviousValue based on update and the batch status
 			let currentPreviousValue = '';
-			let modified: boolean = false ;
+			let modified = false;
 			if (this.batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE) {
 				// Before POSTING the record
 				if (this.batchRecord.status.code === BatchStatus.PENDING) {
 					// Use current record property
-					// currentPreviousValue = '';	//existingRecord
-					currentPreviousValue = this.batchRecord.existingRecord[fieldName]
+					currentPreviousValue = this.batchRecord.existingRecord[fieldName];
 				} else {
 					// After the POSTING the record
 					if ('previousValue' in fields[fieldName] && !ValidationUtils.isEmptyObject(fields[fieldName].previousValue)) {
@@ -172,7 +175,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			if (this.batchRecord.status.code === BatchStatus.PENDING) {
 				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.EditValue : CurrentValueAction.EditInit
 			} else {
-				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.ShowValue : CurrentValueAction.ShowInit
+				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.ShowValue : CurrentValueAction.ShowInit;
 			}
 
 			// Not all rows will have all of the same fields so must check first

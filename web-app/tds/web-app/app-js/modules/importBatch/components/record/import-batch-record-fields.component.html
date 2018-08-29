@@ -7,13 +7,14 @@
             <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
             <div class="fieldsFilter col-sm-2">
                 <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
-                                    [data]="fieldsFilter.options"
-                                    [textField]="'text'"
-                                    [valueField]="'value'"
-                                    [(ngModel)]="fieldsFilter.selected"
-                                    (valueChange)="onFieldsFilter($event)"
-                                    placeholder="Filter"
-                                    class="form-control input-sm"></kendo-dropdownlist>
+                    [data]="fieldsFilter.options"
+                    [textField]="'text'"
+                    [valueField]="'value'"
+                    [(ngModel)]="fieldsFilter.selected"
+                    (valueChange)="onFieldsFilter($event)"
+                    placeholder="Filter"
+                    class="form-control input-sm">
+                </kendo-dropdownlist>
             </div>
             <div class="fieldsFilterText col-sm-3">
                 <input [(ngModel)]="fieldsFilter.nameFilter.value"
@@ -30,7 +31,7 @@
         <!-- Current / Previous Column Label -->
         <!-- TODO change this method to a property on the component -->
         <kendo-grid-column
-            title="{{currentPreviousColumnLabel}}"
+            [title]="currentPreviousColumnLabel"
             field="currentPreviousValue"
             [class]="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE ? '' : 'gray-background'"
         >
@@ -51,6 +52,7 @@
                         type="text"
                         class="import-value-input form-control"
                         [(ngModel)]="dataItem.importValue"
+                        [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
                     />
                     <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditInit"
                         type="text"
