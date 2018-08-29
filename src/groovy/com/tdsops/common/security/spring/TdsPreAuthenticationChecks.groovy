@@ -60,7 +60,7 @@ class TdsPreAuthenticationChecks implements UserDetailsChecker, InitializingBean
 				String tzId = userPreferenceService.getTimeZone()
 
 				String lockoutUntil = TimeUtil.formatDateTimeWithTZ(tzId, TimeUtil.defaultFormatType, userLogin.lockedOutUntil, TimeUtil.FORMAT_DATE_TIME)
-				def lockoutTimeLeft = TimeUtil.ago(TimeUtil.nowGMT(), userLogin.lockedOutUntil)
+				String lockoutTimeLeft = TimeUtil.ago(TimeUtil.nowGMT(), userLogin.lockedOutUntil)
 				 //Checks whether there are either years or more than 7 days in the time remaining
 				def shouldContactSupport = lockoutTimeLeft.contains("y") || (lockoutTimeLeft.contains("d") && Integer.parseInt(lockoutTimeLeft.substring(0,lockoutTimeLeft.indexOf('d')))>=7)
 				String instructionsMessage = shouldContactSupport ? '. Contact Support to have your account unlocked.':'. You may wait or contact support to have your account unlocked.'
