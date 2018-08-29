@@ -2629,7 +2629,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		json.each { key, value ->
 			userPreferenceService.setPreference(key, value)
-			session.setAttribute(key, value)
 		}
 
 		render true
