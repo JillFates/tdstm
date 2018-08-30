@@ -25,6 +25,7 @@ declare var jQuery: any;
 export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
+	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
 
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
 	private dataGridDependsOnHelper: DataGridOperationsHelper;
@@ -60,11 +61,17 @@ export class SupportsDependsComponent implements OnInit {
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
 			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+			if (this.dataGridDependsOnHelper) {
+				this.initDone.emit(this.model);
+			}
 		});
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
 			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			if (this.dataGridSupportsOnHelper) {
+				this.initDone.emit(this.model);
+			}
 		});
 
 	}

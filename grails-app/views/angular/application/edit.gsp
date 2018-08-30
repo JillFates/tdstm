@@ -276,7 +276,7 @@
 					</tr>
 					<!-- Dependencies -->
 					<tr id="deps">
-						<tds-supports-depends [(model)]="model"></tds-supports-depends>
+						<tds-supports-depends (initDone)="onInitDependenciesDone($event)"  [(model)]="model"></tds-supports-depends>
 					</tr>
 				</table>
 			</form>

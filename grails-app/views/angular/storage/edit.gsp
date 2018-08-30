@@ -114,7 +114,7 @@
                     <!-- Dependencies -->
                     <tr id="deps">
                         <td valign="top" colspan="2">
-                            <tds-supports-depends [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
+                            <tds-supports-depends [(model)]="model" (initDone)="onInitDependenciesDone($event)" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
                         </td>
                     </tr>
                 </table>
