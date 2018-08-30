@@ -32,6 +32,7 @@ class FetchFacade {
 	ETLProcessor processor
 	String propertyName
 	List<String> fieldNames = []
+	Map<String, ETLFieldDefinition> fieldDefinitionMap = [:]
 
 	FetchFacade(ETLProcessor processor, String propertyName) {
 		this.processor = processor
@@ -56,7 +57,9 @@ class FetchFacade {
 	 * @return current instance of FetchFacade
 	 */
 	FetchFacade fields(List<String> fields) {
-		fields.each { processor.lookUpFieldDefinitionForCurrentDomain(it) }
+		this.fieldDefinitionMap = fields.collectEntries { String fieldName ->
+			[(fieldName): processor.lookUpFieldDefinitionForCurrentDomain(fieldName)]
+		}
 		this.fieldNames = fields
 		return this
 	}
@@ -83,49 +86,20 @@ class FetchFacade {
 	 */
 	private Map<String, Object> doFetch() {
 
-		Element latestLoadedField = processor.result.latestLoadedField
-		if (latestLoadedField && latestLoadedField.fieldDefinition) {
-			return doFetchBy(latestLoadedField)
-		} else if (processor.currentFindElement) {
-			return doFetchByFindElseFind()
-		} else {
+		RowResult rowResult = processor.result.currentRow()
+
+		if(!rowResult){
 			throw ETLProcessorException.incorrectFetchCommandUse()
 		}
-	}
-
-	/**
-	 * Executes a fetch command based on a {@code Element}
-	 * @param element
-	 * @return a Map with fields values
-	 */
-	private Map<String, Object> doFetchBy(Element element) {
-
-		if (element.fieldDefinition.name == 'id') {
-			return doFetchByID(element)
-		} else {
-			return doFetchByAlternateKey(element)
-		}
-	}
-
-	/**
-	 * Executes a fetch command based on an Alternate Key
-	 * @param element
-	 * @return a Map with fields values
-	 */
-	private Map<String, Object> doFetchByAlternateKey(Element element) {
 
 		Map<String, Object> context = [
 			project    : processor.project,
 			domainClass: processor.selectedDomain.domain.clazz
 		]
 
-		Map fieldsInfo = [
-			(element.fieldDefinition.name): element.value
-		]
-
 		Object objectResult = SearchQueryHelper.findEntityByMetaData(
 			this.propertyName,
-			fieldsInfo,
+			rowResult.fields,
 			context,
 			null
 		)
@@ -134,54 +108,9 @@ class FetchFacade {
 	}
 
 	/**
-	 * Executes a fetch command based on an ID
-	 * @param element
-	 * @return a Map with fields values
-	 */
-	private Map<String, Object> doFetchByID(Element element) {
-
-		Map<String, Object> context = [
-			project    : processor.project,
-			domainClass: processor.selectedDomain.domain.clazz
-		]
-
-		Map fieldsInfo = [
-			id: element.value
-		]
-
-		Object objectResult = SearchQueryHelper.findEntityByMetaData(
-			this.propertyName,
-			fieldsInfo,
-			context,
-			null
-		)
-
-		return objectResult ? buildMapResults(objectResult) : null
-	}
-
-	/**
-	 * Executes a fetch command based on an find/elseFind
-	 * @return a Map with fields values
-	 */
-	private Map<String, Object> doFetchByFindElseFind() {
-		Map<String, Object> context = [
-			project    : processor.project,
-			domainClass: ETLDomain.valueOf(processor.currentFindElement.currentFind.domain).clazz
-		]
-
-		Object objectResult = SearchQueryHelper.findEntityByMetaData(
-			this.propertyName,
-			processor.currentFindElement.currentFind.kv,
-			context,
-			null
-		)
-
-		return objectResult ? buildMapResults(objectResult) : null
-	}
-
-	/**
-	 * It builds fetch command results based onf field names configures.
-	 * If user did not select fields, it returns all the object results properties
+	 * <p>It builds fetch command results based onf field names configures.</p>
+	 * <p>If user did not select fields, it returns all the object results properties.</p>
+	 * <p></p>
 	 * @param objectResult an Object used to build the Map results
 	 * @return a map with fields results
 	 */
@@ -189,10 +118,13 @@ class FetchFacade {
 
 		if (fieldNames) {
 			return fieldNames.collectEntries { String fieldName ->
-				[(fieldName): objectResult[fieldName]]
+				ETLFieldDefinition fieldDefinition = fieldDefinitionMap[fieldName]
+				[(fieldName): objectResult[fieldDefinition.name]]
 			}
 		} else {
-			return objectResult.properties
+			return [
+			    id: objectResult.id
+			]
 		}
 	}
 

@@ -100,43 +100,40 @@ class ETLFetchSpec extends ETLBaseSpec {
 	@ConfineMetaClassChanges([SearchQueryHelper])
 	void 'test can fetch results by find command retrieving a list of fields'() {
 
-		given: 'a domain defined'
+		given: 'a domain defined and a loaded element'
 			processor.domain ETLDomain.Device
 			processor.iterateIndex = new IterateIndex(0)
 			processor.currentRow = new Row([], processor)
+			// load 'manufacturer' with 'PM10'
+			processor.load('manufacturer').with('PM10')
 
 		and: 'a find element'
 			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Model, 1)
-			find.by 'manufacturer' with 'PM10'
+			find.by 'manufacturer' with 'PM10' into 'manufacturer'
 			processor.pushIntoStack find
 			processor.currentFindElement = find
 
 		and:
 			mockFor(SearchQueryHelper)
-			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context , Object entityInstance ->
+			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
 				assert context.domainClass == Model
 				assert fieldName == 'model'
-				assert fieldsInfo == [
-					manufacturer: 'PM10'
-				]
+				assert fieldsInfo['manufacturer'].value == 'PM10'
+
 				Model model = new Model(modelName: 'PM10', usize: 1)
 				return new AssetEntity(assetClass: AssetClass.DEVICE, assetName: 'A1 PDU1 A', priority: 2, model: model)
-
 			}
 
-		and: 'a fetch command'
-			FetchFacade fetch = new FetchFacade(processor, 'Model')
-
-		when: 'It is configured with fields'
-			Map myVar = fetch.set 'myVar'
+		when: 'a fetch command that is is configured with fields'
+			Map myVar = new FetchFacade(processor, 'Model').set 'myVar'
 
 		then:
 			with(myVar, Map) {
 				assetName == 'A1 PDU1 A'
 				priority == 2
 
-				with(model){
+				with(model) {
 					modelName == 'PM10'
 					usize == 1
 				}
@@ -161,17 +158,47 @@ class ETLFetchSpec extends ETLBaseSpec {
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
 				assert fieldName == 'id'
-				assert fieldsInfo == [
-					id: deviceId
-				]
+				assert fieldsInfo['id'].originalValue == deviceId
+				assert fieldsInfo['id'].value == deviceId
+
 				return new AssetEntity(id: deviceId, assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', priority: 2)
 			}
 
-		and: 'a fetch command for the id property'
-			FetchFacade fetch = new FetchFacade(processor, 'id')
+		when: 'a fetch command for the id property that it is not configured with fields is set it in a local var'
+			Map myVar = new FetchFacade(processor, 'id').set 'myVar'
 
-		when: 'It is configured with fields and set it in a local var'
-			Map myVar = fetch.fields 'assetName', 'priority' set 'myVar'
+		then: 'results contains field values previous defined in Fetch command'
+			with(myVar, Map) {
+				id == deviceId
+			}
+	}
+
+	@ConfineMetaClassChanges([SearchQueryHelper])
+	void 'test can fetch results by ID defining fields'() {
+
+		given: 'a domain already defined in an ETL processor instance'
+			processor.domain ETLDomain.Device
+			processor.iterateIndex = new IterateIndex(0)
+			processor.currentRow = new Row([], processor)
+
+		and: 'an extracted and loaded id value'
+			Long deviceId = 123456l
+			processor.load('Id').with(deviceId)
+
+		and: 'a mocked instance of SearchQueryHelper'
+			mockFor(SearchQueryHelper)
+			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
+				assert context.project.getId() == projectId
+				assert context.domainClass == AssetEntity
+				assert fieldName == 'id'
+				assert fieldsInfo['id'].originalValue == deviceId
+				assert fieldsInfo['id'].value == deviceId
+
+				return new AssetEntity(id: deviceId, assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', priority: 2)
+			}
+
+		when: 'a fetch command for the id property taht it is configured with fields is set it in a local var'
+			Map myVar = new FetchFacade(processor, 'id').fields 'assetName', 'priority' set 'myVar'
 
 		then: 'results contains field values previous defined in Fetch command'
 			with(myVar, Map) {
@@ -198,9 +225,8 @@ class ETLFetchSpec extends ETLBaseSpec {
 				assert context.project.getId() == projectId
 				assert context.domainClass == AssetEntity
 				assert fieldName == 'id'
-				assert fieldsInfo == [
-					id: deviceId
-				]
+				assert fieldsInfo['id'].value == deviceId
+
 				return new AssetEntity(id: deviceId, assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', priority: 2)
 			}
 
@@ -226,6 +252,7 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.currentRow = new Row([], processor)
 
 		and: 'an extracted and loaded Manufacturer'
+			Manufacturer manufacturer = new Manufacturer(id: 123456, name: 'Avocent Biteme', description: 'Avocent Biteme', corporateName: 'HP')
 			// command: "load 'Manufacturer' with 'Avocent Biteme' "
 			processor.load('Manufacturer').with('Avocent Biteme')
 
@@ -233,12 +260,11 @@ class ETLFetchSpec extends ETLBaseSpec {
 			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
-				assert context.domainClass == Manufacturer
+				assert context.domainClass == AssetEntity
 				assert fieldName == 'manufacturer'
-				assert fieldsInfo == [
-					manufacturer: 'Avocent Biteme'
-				]
-				return Manufacturer(name: 'Avocent Biteme', description: 'Avocent Biteme', corporateName: 'HP')
+				assert fieldsInfo['manufacturer'].value == 'Avocent Biteme'
+
+				return manufacturer
 			}
 
 		when: 'fetch command is executed'
@@ -247,9 +273,7 @@ class ETLFetchSpec extends ETLBaseSpec {
 
 		then:
 			with(myVar, Map) {
-				name == 'Avocent Biteme'
-				description == 'Avocent Biteme'
-				corporateName == 'HP'
+				id == manufacturer.id
 			}
 	}
 }

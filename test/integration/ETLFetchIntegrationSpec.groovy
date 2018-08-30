@@ -4,6 +4,9 @@ import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
@@ -29,13 +32,14 @@ class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
 		debugConsole = Mock()
 	}
 
-	void 'test can fetch results by ID requesting particular fields'() {
+	void 'test can fetch results by ID'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.assetName = 'AGPM'
 			device.environment = 'Production'
 			device.os = 'Microsoft'
+
 			device.ipAddress = '192.168.1.10'
 			device.save(failOnError: true, flush: true)
 
@@ -54,14 +58,70 @@ ${device.id},${device.assetName}""".stripIndent())
 			etlProcessor.evaluate("""
 				console on
 				read labels
+
+				domain Device
 				iterate {
-					domain Device
+					
+					extract 'asset id' load 'id'
+					fetch 'id' set deviceVar
+ 					
+					if(deviceVar){
+						assert deviceVar.id == ${device.id}
+					}
+				}
+			""".stripIndent())
+
+		then: 'Results should contain results'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can fetch results by ID requesting particular fields'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+
+			device.ipAddress = '192.168.1.10'
+			device.save(failOnError: true, flush: true)
+
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+asset id,asset name
+12323434,A1 PDU1 A
+${device.id},${device.assetName}""".stripIndent())
+
+			ETLProcessor etlProcessor = new ETLProcessor(
+				project,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				
+				iterate {
+					
 					extract 'asset id' load 'id'
 					fetch 'id' fields 'Environment', 'OS', 'IP Address' set deviceVar
 					
-					assert deviceVar.'Environment' == 'Production'
-					assert deviceVar.'OS' == 'Microsoft'
-					assert deviceVar.'IP Address' == '192.168.1.10'
+					if(deviceVar){
+						assert deviceVar.id == null
+						assert deviceVar.assetName == null
+						assert deviceVar.'Environment' == 'Production'
+						assert deviceVar.'OS' == 'Microsoft'
+						assert deviceVar.'IP Address' == '192.168.1.10'
+					}
 				}
 			""".stripIndent())
 
@@ -85,12 +145,28 @@ ${device.id},${device.assetName}""".stripIndent())
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
+
+			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName      : "PowerEdge 1950",
+				manufacturer   : manufacturer,
+				assetType      : "Server",
+				poweruse       : 1200,
+				connectorLabel : "PE5",
+				type           : "Power",
+				connectorPosX  : 250,
+				connectorPosY  : 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
 			device.save(failOnError: true, flush: true)
 
+
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-asset id,asset name
-12323434,A1 PDU1 A
-${device.id},${device.assetName}""".stripIndent())
+asset id,asset name, model
+12323434,A1 PDU1 A,Dell 11111
+${device.id},${device.assetName},${device.model.modelName}""".stripIndent())
 
 			ETLProcessor etlProcessor = new ETLProcessor(
 				project,
@@ -102,21 +178,31 @@ ${device.id},${device.assetName}""".stripIndent())
 			etlProcessor.evaluate("""
 				console on
 				read labels
+				domain Device
+				
 				iterate {
-					domain Device
-					extract 'asset id' load 'id'
-					find Device by 'assetName' with SOURCE.'asset name' into 'id'
-					fetch 'id' fields 'Environment', 'OS', 'IP Address' set deviceVar
 					
-					assert deviceVar.'Environment' == 'Production'
-					assert deviceVar.'OS' == 'Microsoft'
-					assert deviceVar.'IP Address' == '192.168.1.10'
+					extract 'model' set modelNameVar
+					find Model by 'manufacturer' with modelNameVar into 'model'
+					fetch 'Model' set modelVar
+					if(!modelVar){
+						assert modelVar.id == ${model.id}
+						
+						whenNotFound 'Model' create Model {
+							name modelNameVar
+						}	
+						
+					} else {
+						assert modelVar.id == null
+					}
 				}
 			""".stripIndent())
 
 		then: 'Results should contain results'
 			with(etlProcessor.finalResult()) {
 				domains.size() == 1
+
+
 			}
 
 		cleanup:
@@ -127,18 +213,21 @@ ${device.id},${device.assetName}""".stripIndent())
 
 	void 'test can fetch results by Alternate Key'() {
 
-		given:
+		given: 'a defined manufacturer assigned to an Device domain'
+			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
+
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 			device.assetName = 'AGPM'
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
+			device.manufacturer = manufacturer
 			device.save(failOnError: true, flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-asset id,asset name
-12323434,A1 PDU1 A
-${device.id},${device.assetName}""".stripIndent())
+asset id,asset name,mfg
+12323434,A1 PDU1 A,Dell2332
+${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 
 			ETLProcessor etlProcessor = new ETLProcessor(
 				project,
@@ -146,19 +235,19 @@ ${device.id},${device.assetName}""".stripIndent())
 				debugConsole,
 				validator)
 
-		when: 'The ETL script is evaluated'
+		when: 'The ETL script with fetch command is evaluated'
 			etlProcessor.evaluate("""
 				console on
 				read labels
+				domain Device
 				iterate {
-					domain Device
-					extract 'asset id' load 'id'
-					find Device by 'assetName' with SOURCE.'asset name' into 'id'
-					fetch 'id' fields 'Environment', 'OS', 'IP Address' set deviceVar
+					// Load the manufacturer with the alternate key
+					extract 'mfg' load 'Manufacturer' set mfgNameVar
+					fetch 'Manufacturer' set mfgVar
 					
-					assert deviceVar.'Environment' == 'Production'
-					assert deviceVar.'OS' == 'Microsoft'
-					assert deviceVar.'IP Address' == '192.168.1.10'
+					if(mfgVar){
+						assert mfgVar.id == ${manufacturer.id} 
+					}
 				}
 			""".stripIndent())
 
