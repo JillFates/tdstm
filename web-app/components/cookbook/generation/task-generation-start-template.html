@@ -3,7 +3,7 @@
 
 	<div class="container-fluid task-generation-container">
 		<div class="row">
-			<div class="col-sm-4 col-md-3 col-lg-3">
+			<div class="col-sm-6 col-md-3 col-lg-3">
 				<div class="form-group">
 					<label class="col-title" for="eventSelect">Event:</label>
 					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
@@ -11,11 +11,11 @@
 					</select>
 				</div>
 			</div>
-			<div class="col-sm-4 col-md-3 col-lg-3 tm-asset-tag-selector-container">
+			<div class="col-sm-6 col-md-6 col-lg-6 tm-asset-tag-selector-container">
 				<label class="col-title">Tag:</label>
 				<tm-asset-tag-selector disabled-operator="'true'" pre-selected-operator="'ANY'" asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context" on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
 			</div>
-			<div class="col-sm-2 col-md-2 col-lg-2 settings-container">
+			<div class="col-sm-6 col-md-2 col-lg-2 settings-container">
 				<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
 					Set as Default
 				</a>
