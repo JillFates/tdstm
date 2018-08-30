@@ -1460,7 +1460,7 @@ public class GormUtil {
 	 * @param domainClass
 	 * @param properties
 	 * @param throwException - true: RuntimeException is thrown when a member of the list is not a property on the domain.
-	 * @return
+	 * @return true: all elements in the list are valid domain properties. false otherwise.
 	 */
 	static boolean validatePropertiesExistForDomain(Class domainClass, List<String> properties, boolean throwException = false) {
 		for (property in properties) {

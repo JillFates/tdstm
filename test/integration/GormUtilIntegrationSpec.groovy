@@ -23,7 +23,6 @@ import net.transitionmanager.service.ProjectService
 import grails.validation.Validateable
 import spock.lang.Stepwise
 
-@Stepwise
 class GormUtilIntegrationSpec extends Specification {
 
 	// IOC variables
