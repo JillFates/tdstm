@@ -68,7 +68,7 @@ class AssetEntityService implements ServiceMethods {
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
 			(AssetClass.APPLICATION): [ 'assetName', 'tagAssets' ],
-			(AssetClass.DATABASE): [ 'assetName', 'tagAssets' ],
+			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
 				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName', 'tagAssets'
 			],
