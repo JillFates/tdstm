@@ -386,6 +386,10 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			this.buildPopupFieldDataForFindObject(field[typeString]);
 		} else {
 			this.buildPopupFieldData(field[typeString]);
+			// this ugly will be removed when the BE returns the correct domain on the create/update object.
+			if (field.find && field.find.query && field.find.query.length > 0) {
+				this.popup.domain = field.find.query[0].domain;
+			}
 		}
 		this.popup.type = type;
 		this.popup.title = this.getPopupTitle(type);
@@ -403,14 +407,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		for (let fieldName in field) {
 			if (field[fieldName]) {
 				popupFields.push({
-					domainIndex: 0,
-					domainName: '?',
 					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
 					value: field[fieldName]
 				});
 			}
 		}
-		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
+		this.popupGridData = process(popupFields, {});
 	}
 
 	/**
@@ -423,6 +425,11 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		let popupFields: Array<any> = [];
 		field.query.forEach( (item, index) => {
 			const domain = item.domain;
+			let recordsFound = null;
+			if (matchOn && results && matchOn === index && results.length > 0) {
+				recordsFound = results.length;
+				this.popup.results = results;
+			}
 			for (let fieldName in item.kv) {
 				if (item.kv[fieldName]) {
 					popupFields.push({
@@ -430,7 +437,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 						domainName: domain,
 						fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
 						value: item.kv[fieldName],
-						results: null
+						recordsFound: recordsFound
 					});
 				}
 			}
