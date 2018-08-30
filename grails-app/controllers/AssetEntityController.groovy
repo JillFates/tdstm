@@ -2612,22 +2612,22 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 * @param value
 	 */
 	@HasPermission(Permission.AssetImport)
-	def setImportPerferences() {
-		Map json
+	def setImportPreferences() {
+		Map preferencesMap
 
 		if (request.format == "json") {
-			json = request.JSON
+			preferencesMap = request.JSON
 
 		} else {
-			json = [:]
+			preferencesMap = [:]
 			def key = params.preference
 			def value = params.value
 			if (value) {
-				json[key] = value
+				preferencesMap[key] = value
 			}
 		}
 
-		json.each { key, value ->
+		preferencesMap.each { key, value ->
 			userPreferenceService.setPreference(key, value)
 		}
 
