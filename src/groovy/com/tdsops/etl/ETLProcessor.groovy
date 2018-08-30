@@ -1122,6 +1122,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	void addGlobalVariableInBinding(String variableName, Object value) {
 		binding.addGlobalVariable(variableName, value)
 	}
+
+	/**
+	 * Check in the binding if a variable has been declared already
+	 * @param varName
+	 * @return
+	 */
+	boolean hasVariable(String varName) {
+		binding.hasVariable(varName)
+	}
+
 	/**
 	 * Adds a new row in the list of rows
 	 * @param rowIndex
