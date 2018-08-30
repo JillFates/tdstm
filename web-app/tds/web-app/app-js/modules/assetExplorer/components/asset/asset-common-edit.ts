@@ -3,6 +3,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {HostListener, Inject, OnInit} from '@angular/core';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
@@ -27,7 +28,8 @@ export class AssetCommonEdit implements OnInit {
 		protected dialogService: UIDialogService,
 		protected notifierService: NotifierService,
 		protected tagService: TagService,
-		protected metadata: any) {
+		protected metadata: any,
+		private promptService: UIPromptService) {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
@@ -105,5 +107,16 @@ export class AssetCommonEdit implements OnInit {
 	 */
 	protected onDependenciesValidationChange(validForm: boolean): void {
 		this.isDependenciesValidForm = validForm;
+	}
+
+	protected prompSaveChanges(): void {
+		this.promptService.open(
+			'Confirmation Required',
+			'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.cancelCloseDialog();
+			}
+		});
 	}
 }
