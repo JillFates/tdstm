@@ -28,7 +28,7 @@ class TagsEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToTagsPage()
+        projectsModule.goToTagsPage()
         at TagsPage
         clickOnCreateTagButton()
         fillInFields customTag
