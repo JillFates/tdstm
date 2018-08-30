@@ -16,10 +16,10 @@
 				<tm-asset-tag-selector disabled-operator="'true'" pre-selected-operator="'ANY'" asset-selector="contexts.assetSelector" pre-asset-selector="editor.selectedRVersion.context" on-change="contexts.onAssetSelectorChange()"></tm-asset-tag-selector>
 			</div>
 			<div class="col-sm-6 col-md-2 col-lg-2 settings-container">
-				<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
+				<a class="component-action-set-default-context" id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
 					Set as Default
 				</a>
-				<a id="clearDefaultContext" ng-show="contexts.enableClearDefaultContext" ng-click="contexts.clearRecipeDefaultContext()">
+				<a class="component-action-clear-default-context" id="clearDefaultContext" ng-show="contexts.enableClearDefaultContext" ng-click="contexts.clearRecipeDefaultContext()">
 					Clear Default
 				</a>
 			</div>
@@ -40,7 +40,7 @@
 	</div>	
 	<div class="generateWrapper">
 		<label for="generateTask">
-			<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
+			<a class="btn btn-default has-spinner component-action-generate-tasks" id="generateTask" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
 				<span class="spinner"><i class="icon-spin icon-refresh"></i></span>
 				<img ng-src="{{applyRootPath('/icons/table_gear.png')}}" />
 				Generate Tasks
