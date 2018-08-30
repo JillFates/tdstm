@@ -150,4 +150,8 @@ class CommonsModule extends Module {
             moveToElement element
         }
     }
+
+    def isListOfElements(selector){
+        selector.size() > 1
+    }
 }

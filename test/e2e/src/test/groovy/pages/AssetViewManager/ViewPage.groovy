@@ -3,6 +3,7 @@ package pages.AssetViewManager
 import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
+import utils.CommonActions
 
 class ViewPage extends Page{
 
@@ -236,6 +237,12 @@ class ViewPage extends Page{
         commonsModule.waitForLoader 2
     }
 
+    def filterByName(text){
+        waitFor{nameFilter.displayed}
+        nameFilter = text
+        commonsModule.waitForLoader 2
+    }
+
     def clearAllAppliedFilters(){
         allFilterXIcons.each{
             it.click()
@@ -253,5 +260,95 @@ class ViewPage extends Page{
 
     def getFilterEnvironmentText(){
         environmentFilter.value()
+    }
+
+	/**
+	* Method gets random assets from passed param, selects them if there are more than one asset found and returns
+	* a list of names of selected assets displayed in name column (list = one or more asset names)
+	* @param numberOfAssetsToBeSelected = int
+	* @author Sebastian Bigatton
+	*/
+    def selectRandomAssetsAndGetNames(numberOfAssetsToBeSelected){
+        def assetNames = []
+        if (!commonsModule.isListOfElements(allItemsCheckbox)) { // if not list just click on selector
+            clickOnCheckboxByName allItemsCheckbox
+            assetNames.add getAssetNameFromGivenCheckboxSelector(allItemsCheckbox)
+        } else { // else get random number of assets, click on them and add names to the list
+            // validates available checkboxes are more than passed number, otherwise selects displayed
+            def maxNumberToSelect = allItemsCheckbox.size() < numberOfAssetsToBeSelected ? allItemsCheckbox.size() : numberOfAssetsToBeSelected
+            def checkboxes = CommonActions.getRandomOptions allItemsCheckbox, maxNumberToSelect
+            def checkbox
+            checkboxes.each { input ->
+                checkbox = allItemsCheckbox.find{it.attr("name") == input.jquery.prop("name")}
+                clickOnCheckboxByName checkbox
+                assetNames.add getAssetNameFromGivenCheckboxSelector(checkbox)
+            }
+        }
+        assetNames
+    }
+
+    def clickOnCheckboxByName(checkbox){
+        waitFor{checkbox.click()}
+        waitFor{getCheckedInputStatus(checkbox) == true} // verify its checked
+    }
+
+    def getCheckedInputStatus(element){
+        element.jquery.prop('checked') // returns true or false
+    }
+
+    def getAssetNameFromGivenCheckboxSelector(element){
+        element.parent().parent().next().find("span.asset-detail-name-column").text()
+    }
+
+    def clickOnBulkChangeButton(){
+        waitForBulkChangeButtonDisplayed()
+        waitFor{bulkChangeButton.click()}
+    }
+
+    /**
+     * Method gets a list of checked assets in page, iterates in passed names and compares them
+     * with checked assets names
+     * @param names = string array list with asset name(s)
+     * @author Sebastian Bigatton
+     */
+    def verifyCheckedInputAssetsByName(names){
+        def checkedAssetsInput = getAllCheckedInputs()
+        def isChecked = false
+        names.each{ assetName ->
+            // compare and find displayed name with passed name
+            if (checkedAssetsInput.find{getAssetNameFromGivenCheckboxSelector(it) == assetName}){
+                isChecked = true
+            }
+            assert isChecked
+        }
+        true // to avoid spoke step fails
+    }
+
+    def getAllCheckedInputs(){
+        allItemsCheckbox.findAll{getCheckedInputStatus(it) == true} // returns list checked input elements
+    }
+
+    /**
+     * Method gets a checkbox name identifier and returns a map of associated asset name and checkbox name
+     * @param names = string array list with asset name(s)
+     * @author Sebastian Bigatton
+     */
+    def getAllCheckedInputNameMap(names){
+        def checkBoxNameMap = [:]
+        def checkbox
+        names.each{ assetName ->
+            // find displayed name with passed name of checked inputs
+            checkbox = getAllCheckedInputs().find{getAssetNameFromGivenCheckboxSelector(it) == assetName}
+            checkBoxNameMap.put(assetName, checkbox.attr("name"))
+        }
+        checkBoxNameMap
+    }
+
+    def verifyDeletedAssetsByCheckboxName(assetsMap){
+        assetsMap.each{ assetName, checkboxName ->
+            filterByName assetName
+            assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            clearAllAppliedFilters()
+        }
     }
 }
