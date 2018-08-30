@@ -15,14 +15,11 @@ import {
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
-import {CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
-import {DataGridCheckboxService} from '../../service/data-grid-checkbox.service';
+import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -45,7 +42,7 @@ export class AssetExplorerViewGridComponent {
 	set viewId(viewId: number) {
 		this._viewId = viewId;
 		// changing the view reset selections
-		this.dataGridCheckboxService.setCurrentState(CheckboxStates.unchecked);
+		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 	}
 
 	fields = [];
@@ -71,20 +68,18 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
-	public overrideCheckboxState: CheckboxStates;
 	public bulkItems: number[] = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
-		private dataGridCheckboxService: DataGridCheckboxService,
+		private bulkCheckboxService: BulkCheckboxService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
-		this.overrideCheckboxState = null;
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-				this.dataGridCheckboxService.setPageSize(this.state.take);
+				this.bulkCheckboxService.setPageSize(this.state.take);
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
@@ -150,6 +145,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clearText(column: ViewColumn): void {
+		this.bulkCheckboxService.handleFiltering();
 		if (column.filter) {
 			column.filter = '';
 			this.state.skip = 0;
@@ -189,6 +185,8 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
+		this.bulkCheckboxService.handleFiltering();
+
 		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
@@ -196,8 +194,8 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction(true);
-		this.dataGridCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+
+		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
 
 		this.gridData = {
 			data: data.assets,
@@ -274,24 +272,17 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
-	clearSelectAll(): void {
-		this.selectAll = false;
+	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
+		this.bulkCheckboxService.changeState(checkboxState);
 	}
 
-	onChangeAssetsSelector(checkboxState: CheckboxStates): void {
-		this.overrideCheckboxState = null;
-		this.dataGridCheckboxService.changeState(checkboxState);
-	}
-
-	setSelectedItem(id: string, checked: boolean): void {
-		this.dataGridCheckboxService.setPageSize(this.gridData.data.length);
-		this.dataGridCheckboxService.selectBulkItem(id, checked);
-		this.overrideCheckboxState = this.dataGridCheckboxService.changeStateByUserInteraction();
+	checkItem(id: number, checked: boolean): void {
+		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.dataGridCheckboxService.clearSelectedItems();
+			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
 	}
@@ -354,7 +345,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onClickBulkButton(): void {
-		this.dataGridCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
+		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
 			.then((results: number[]) => {
 				this.bulkItems = [...results];
 			})
@@ -362,6 +353,11 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	hasSelectedItems(): boolean {
-		return this.dataGridCheckboxService.hasSelectedItems();
+		return this.bulkCheckboxService.hasSelectedItems();
+	}
+
+	getSelectedItemsCount(): number {
+		const allCounter = (this.gridData && this.gridData.total) || 0;
+		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
 	}
 }
