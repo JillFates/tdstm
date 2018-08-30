@@ -621,7 +621,7 @@ class Element implements RangeChecker {
 	 * * @param variableName
 	 * @return
 	 */
-	Element set(String variableName) {
+	Element set(Object variableName) {
 		if ( !(variableName instanceof String) || processor.hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 
