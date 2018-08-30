@@ -18,7 +18,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static baseName = "acmevmdev05"
+    static baseName = "QAE2E"
     @Shared
     static assetNames = []
     @Shared
