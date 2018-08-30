@@ -73,13 +73,13 @@ class   StaffListPage extends Page {
 
 
     def filterByFirstName(fName){
-        waitFor{lastNameFilter.displayed}
+        waitFor{firstNameFilter.displayed}
         firstNameFilter=fName
         commonsModule.waitForLoadingMessage()
     }
 
     def filterByMiddleName(mName){
-        waitFor{lastNameFilter.displayed}
+        waitFor{middleNameFilter.displayed}
         middleNameFilter=mName
         commonsModule.waitForLoadingMessage()
     }
@@ -91,13 +91,13 @@ class   StaffListPage extends Page {
     }
 
     def filterByUserName(usrName){
-        waitFor{lastNameFilter.displayed}
+        waitFor{userNameFilter.displayed}
         userNameFilter=usrName
         commonsModule.waitForLoadingMessage()
     }
 
     def filterUserByEmail(email){
-        waitFor{lastNameFilter.displayed}
+        waitFor{emailFilter.displayed}
         emailFilter=email
         commonsModule.waitForLoadingMessage()
     }
