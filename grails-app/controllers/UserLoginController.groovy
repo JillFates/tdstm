@@ -36,6 +36,7 @@ class UserLoginController implements ControllerMethods {
 	PersonService personService
 	ProjectService projectService
 	UserPreferenceService userPreferenceService
+	int indefinitelyThreshold = 10
 
 	@HasPermission(Permission.UserView)
 	def list() {
@@ -146,7 +147,6 @@ class UserLoginController implements ControllerMethods {
 
 		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
 		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.
-		int indefinitelyThreshold = 10
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
 			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.hence(it.locked, indefinitelyThreshold), failedLoginAttempts: it.failedAttempts],
@@ -176,7 +176,7 @@ class UserLoginController implements ControllerMethods {
 			id: showUser.id,
 			username: showUser.username,
 			lockedOutUntil: showUser.lockedOutUntil,
-			lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), showUser.lockedOutUntil),
+			lockedOutTime: TimeUtil.hence(showUser.lockedOutUntil, indefinitelyThreshold),
 			failedLoginAttempts: showUser.failedLoginAttempts
 		] as JSON
 
