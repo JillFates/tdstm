@@ -5,9 +5,10 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"  class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
+	 class="modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close" type="button" (click)="onCancelEdit()"><span
+		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
 				aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
@@ -282,10 +283,10 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger pull-left mar-left-50 component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-default pull-right" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </div>
