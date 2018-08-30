@@ -129,7 +129,7 @@ export class AssetCommonEdit implements OnInit {
 	 * On Cancel if there is changes notify user
 	 */
 	protected onCancelEdit(): void {
-		if (!ramdaEquals(this.initialModel, this.model)) {
+		if (this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
 			this.prompSaveChanges();
 			return;
 		}
