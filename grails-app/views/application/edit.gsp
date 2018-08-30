@@ -54,7 +54,7 @@
 	<%-- Used to track dependencies added and deleted --%>
 	<g:render template="../assetEntity/dependentHidden" />
 
-	<table style="border: 0">
+	<table style="border: 0" class="asset-entities-dialog-table-content">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
@@ -314,6 +314,8 @@
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>
 
+							<g:render template="/comment/assetTagsEdit"></g:render>
+
 						</tbody>
 					</table>
 				</div></td>
@@ -347,7 +349,7 @@
                 });
             });
         }
-
+		EntityCrud.loadAssetTags();
     });
 
 	currentMenuId = "#assetMenu";

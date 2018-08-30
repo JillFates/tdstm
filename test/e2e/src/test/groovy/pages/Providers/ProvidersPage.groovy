@@ -2,6 +2,7 @@ package pages.Providers
 
 import geb.Page
 import modules.CommonsModule
+import modules.ProjectsModule
 
 class ProvidersPage extends Page{
     static at = {
@@ -27,6 +28,7 @@ class ProvidersPage extends Page{
         firstProviderEditPencilBtn(wait:true) {$("div", class: "text-center").find("span", class: "glyphicon glyphicon-pencil")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
+        projectsModule { module ProjectsModule}
     }
 
     def filterByName(provName){
