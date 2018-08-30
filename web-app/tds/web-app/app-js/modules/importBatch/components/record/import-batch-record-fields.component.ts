@@ -95,10 +95,11 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		show: false,
 		offset: {},
 		margin: {horizontal: 2, vertical: 2},
-		position: 'fixed'
+		position: 'fixed',
+		type: null
 	};
 	protected popupGridData: DataResult;
-	protected popupGridGroups: Array<GroupDescriptor> = [{field: 'domain'}];
+	protected popupGridGroups: Array<GroupDescriptor> = [{field: 'domainIndex'}];
 
 	// Contains the Current/Previous value column label based on the state of the record
 	protected currentPreviousColumnLabel = '';
@@ -381,7 +382,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 */
 	protected onShowPopup($event: MouseEvent, type: FieldInfoType, field: any): void {
 		let typeString = this.FieldInfoType[type].toLowerCase();
-		this.buildPopupFieldData(field[typeString]);
+		if (type === FieldInfoType.FIND) {
+			this.buildPopupFieldDataForFindObject(field[typeString]);
+		} else {
+			this.buildPopupFieldData(field[typeString]);
+		}
+		this.popup.type = type;
 		this.popup.title = this.getPopupTitle(type);
 		this.popup.offset = { left: $event.pageX, top: $event.pageY};
 		this.popup.show = true;
@@ -393,15 +399,42 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 */
 	private buildPopupFieldData(field: any): void {
 		let popupFields: Array<any> = [];
+		const {fieldLabelMap} = this.importBatch;
 		for (let fieldName in field) {
 			if (field[fieldName]) {
 				popupFields.push({
-					domain: this.importBatch.domainClassName,
-					fieldName: fieldName,
+					domainIndex: 0,
+					domainName: '?',
+					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
 					value: field[fieldName]
 				});
 			}
 		}
+		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
+	}
+
+	/**
+	 * Builds the popup grid field info data.
+	 * @param field
+	 */
+	private buildPopupFieldDataForFindObject(field: any): void {
+		const {matchOn, results} = field;
+		const {fieldLabelMap} = this.importBatch;
+		let popupFields: Array<any> = [];
+		field.query.forEach( (item, index) => {
+			const domain = item.domain;
+			for (let fieldName in item.kv) {
+				if (item.kv[fieldName]) {
+					popupFields.push({
+						domainIndex: index,
+						domainName: domain,
+						fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
+						value: item.kv[fieldName],
+						results: null
+					});
+				}
+			}
+		});
 		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
 	}
 
