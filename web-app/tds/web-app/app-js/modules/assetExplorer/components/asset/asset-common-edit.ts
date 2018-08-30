@@ -8,6 +8,7 @@ import {HostListener, Inject, OnInit} from '@angular/core';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
+import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 
 declare var jQuery: any;
 
@@ -19,6 +20,7 @@ export class AssetCommonEdit implements OnInit {
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
 	protected isDependenciesValidForm = true;
+	private initialModel: any = null;
 
 	constructor(
 		protected model: any,
@@ -40,6 +42,13 @@ export class AssetCommonEdit implements OnInit {
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
+	}
+
+	/**
+	 * Save a reference to the initial model in order to detect changes later on
+	 */
+	onInitDependenciesDone(model): void {
+		this.initialModel = ramdaClone(model);
 	}
 
 	/**
@@ -102,6 +111,9 @@ export class AssetCommonEdit implements OnInit {
 		this.isDependenciesValidForm = validForm;
 	}
 
+	/**
+	 * Notify user there are changes
+	 */
 	protected prompSaveChanges(): void {
 		this.promptService.open(
 			'Confirmation Required',
@@ -111,5 +123,17 @@ export class AssetCommonEdit implements OnInit {
 				this.cancelCloseDialog();
 			}
 		});
+	}
+
+	/**
+	 * On Cancel if there is changes notify user
+	 */
+	protected onCancelEdit(): void {
+		if (!ramdaEquals(this.initialModel, this.model)) {
+			this.prompSaveChanges();
+			return;
+		}
+
+		this.cancelCloseDialog();
 	}
 }
