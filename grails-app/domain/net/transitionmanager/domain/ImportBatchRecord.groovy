@@ -2,8 +2,11 @@ package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import org.codehaus.groovy.grails.web.json.JSONObject
+import net.transitionmanager.dataImport.SearchQueryHelper
+
 /**
  * ImportBatchRecord
  *
@@ -186,9 +189,36 @@ class ImportBatchRecord {
 			// Populate the full errors and fieldsInfo sections instead of the currentValues
 			domainMap.errorList = errorListAsList()
 			domainMap.fieldsInfo = fieldsInfoAsMap()
+
+			// Populate the results of the find/elseFind queries if the record is pending
+			if (status == ImportBatchStatusEnum.PENDING) {
+				Map context = [
+					domainClass:importBatch.domainClassName.getClazz(),
+					project: importBatch.project
+				]
+				Object entity = SearchQueryHelper.findEntityByMetaData('id', domainMap.fieldsInfo, context)
+				if (entity && GormUtil.isDomainClass(entity.getClass())) {
+					domainMap.existingRecord = getMapOfFieldsFromEntity(domainMap.fieldsInfo, entity)
+				}
+			}
 		}
 
 		return domainMap
+	}
+
+	/**
+	 * Used to generate a Map of the a domain entities values for fields that are specified in the fieldsInfo
+	 * @param fieldsInfo - the JsonObject representation of the fieldsInfo JSON property
+	 * @param entity - the domain entity to extract the values out of
+	 * @return map of the field values for the entity
+	 */
+	private Map getMapOfFieldsFromEntity(Map fieldsInfo, Object entity) {
+		Map result = [:]
+		List fieldNames = fieldsInfo.keySet() as List
+		for (String fieldName in fieldNames) {
+			result[fieldName] = entity[fieldName]?.toString()
+		}
+		return result
 	}
 
 	/**

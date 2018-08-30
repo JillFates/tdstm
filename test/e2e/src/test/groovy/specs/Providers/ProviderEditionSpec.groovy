@@ -28,7 +28,7 @@ class ProviderEditionSpec extends GebReportingSpec{
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToProviders()
+        projectsModule.goToProviders()
         at ProvidersPage
         waitFor{createBtn.click()}
         at CreateProviderPage
@@ -53,7 +53,6 @@ class ProviderEditionSpec extends GebReportingSpec{
     }
 
     def "1. The user opens the created Provider"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Providers Page'
             at ProvidersPage
         and: 'The user clicks the Name filter'
@@ -73,7 +72,6 @@ class ProviderEditionSpec extends GebReportingSpec{
     }
 
     def "2. The user closes the Provider by the X button"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Provider Detail pop up'
             at ProvidersDetailPage
         when: 'The user clicks the X icon'
@@ -84,7 +82,6 @@ class ProviderEditionSpec extends GebReportingSpec{
     }
 
     def "3. The user opens again the provider and clicks the Edit button"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Providers Page'
             at ProvidersPage
         and: 'The user clicks the Name filter'
@@ -107,7 +104,6 @@ class ProviderEditionSpec extends GebReportingSpec{
     }
 
     def "4. The user edits the Provider and Saves it"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Provider Edit pop up'
             at ProvidersEditionPage
         when: 'The user modifies the info of the Provider'
@@ -125,7 +121,6 @@ class ProviderEditionSpec extends GebReportingSpec{
     }
 
     def "5. The user searches and opens the edited Provider"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Providers Page'
             at ProvidersPage
             and: 'The user clicks the Name filter'

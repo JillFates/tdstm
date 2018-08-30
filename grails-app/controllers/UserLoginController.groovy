@@ -145,10 +145,11 @@ class UserLoginController implements ControllerMethods {
 			userLogins = []
 
 		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
-
+		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.
+		int indefinitelyThreshold = 10
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
-			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts: it.failedAttempts],
+			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.hence(it.locked, indefinitelyThreshold), failedLoginAttempts: it.failedAttempts],
 			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
 			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}

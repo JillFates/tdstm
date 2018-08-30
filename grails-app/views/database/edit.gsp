@@ -37,7 +37,7 @@
 	<g:render template="../assetEntity/dependentHidden" />
 
 
-<table style="border: 0">
+<table style="border: 0" class="asset-entities-dialog-table-content">
 	<tr>
 		<td colspan="2">
 			<div class="dialog">
@@ -134,6 +134,9 @@
 						<tbody class="customTemplate">
 							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>
 						</tbody>
+
+						<g:render template="/comment/assetTagsEdit"></g:render>
+
 					</tbody>
 				</table>
 			</div>
@@ -158,6 +161,7 @@
 
     $(document).ready(function() {
         $('[data-toggle="popover"]').popover();
+		EntityCrud.loadAssetTags();
     });
 
 	currentMenuId = "#assetMenu";
