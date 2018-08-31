@@ -428,10 +428,12 @@ class ApplicationController implements ControllerMethods {
 		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
 		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+		def partyGroupList = partyRelationshipService.getCompaniesList()
 
 		[	applicationInstance: application,
 			availabaleRoles: partyRelationshipService.getStaffingRoles(),
-			personList: personList
+			personList: personList,
+			partyGroupList: partyGroupList
 		] + assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 

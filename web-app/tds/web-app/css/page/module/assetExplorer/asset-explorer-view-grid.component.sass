@@ -40,3 +40,47 @@
   .k-grid-content-locked, .k-grid-header-locked
     border-right-width: 5px
     border-right-color: #ebebeb
+
+  .k-grid-header .k-header
+    vertical-align: top
+
+  .sortable-column
+    width: 90%
+
+  .text-delimited
+    white-space: normal;
+    word-wrap: break-word;
+  .k-grid-toolbar
+    display: flex
+    justify-content: space-between
+
+    .bulkchange-section,
+    .filters-section
+      display: flex;
+      align-items: center
+
+    .filters-section
+      justify-content: flex-end
+
+    .bulkchange-section
+      .just-planning
+        margin-left: 12px
+        input
+          margin-left: 0
+          position: relative
+          margin-top: -1px
+        label
+          margin-top: -2px
+          position: absolute
+          padding-left: 2px
+          font-weight: normal
+      .selected-assets
+        margin-left: 10px
+        display: flex
+        align-items: baseline
+        label
+          font-weight: normal
+        .badge-light
+          background-color: #fff
+          color: #777
+          margin-right: 5px

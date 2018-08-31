@@ -10,6 +10,7 @@ import {
 } from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIHandleEscapeDirective} from '../../../../shared/directives/handle-escape-directive.ts';
 import {PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
@@ -95,13 +96,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				}
 			}
 		}, error => console.log(error));
-	}
-
-	/**
-	 * On EscKey Pressed close the dialog.
-	 */
-	onEscKeyPressed(): void {
-		this.cancelCloseDialog();
 	}
 
 	/**

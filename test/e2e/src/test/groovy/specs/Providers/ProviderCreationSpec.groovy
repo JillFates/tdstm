@@ -40,18 +40,16 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "1. The user navigates to the Providers Section"() {
-        testKey = "TM-XXXX"
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The user goes to the Providers page'
-            menuModule.goToProviders()
+            projectsModule.goToProviders()
 
         then: 'The Providers Page loads with no problem'
             at ProvidersPage
     }
 
     def "2. Open the Create Providers Page"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Providers landing page'
             at ProvidersPage
         when: 'The user clicks the Create Providers Page'
@@ -62,7 +60,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "3. Create a Provider"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Providers landing page'
             at CreateProviderPage
         when: 'The user fills the necessary data to create a Provider'
@@ -77,7 +74,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "4. Search the Provider by name"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Providers page after a Provider was created'
             at ProvidersPage
         when: 'The user clicks the Name filter'
@@ -94,7 +90,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "5. Filter providers by date and description"(){
-        testKey = "TM-XXXX"
         given: 'The user is still on the Providers page'
             at ProvidersPage
         when: 'The user clears the Name filter'
@@ -115,7 +110,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "6. Refresh the table and verify the element we just created is still present"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Provider Page with the latest created provider filtered'
             at ProvidersPage
         when: 'The user clicks the Refresh Icon'
@@ -126,7 +120,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "7. Verify the opened provider is the one we created"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Provider Page with the latest created provider filtered'
             at ProvidersPage
         when: 'The user clicks the first element'
@@ -140,7 +133,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "8. We close the pop up and verify we land on the Providers Page"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Provider Detail pop up'
             at ProvidersDetailPage
         when: 'The user clicks the X icon'
@@ -151,7 +143,6 @@ class ProviderCreationSpec extends GebReportingSpec{
     }
 
     def "9. We click the Asc/Desc option for any column and verify the provider is still displayed"(){
-        testKey = "TM-XXXX"
         given: 'The user is on the Providers Page'
             at ProvidersPage
         when: 'The user clicks asc/desc option for the name column'
