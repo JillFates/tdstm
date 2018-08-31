@@ -39,17 +39,15 @@ class TagsCreationSpec extends GebReportingSpec {
     }
 
     def "1. The User navigates to Manage Tags Page"() {
-        testKey = "TM-11374"
         given: 'The User is logged in'
             at MenuPage
         when: 'The User clicks on Projects > Tags'
-            menuModule.goToTagsPage()
+            projectsModule.goToTagsPage()
         then: 'Manage Tags Page is displayed'
             at TagsPage
     }
 
     def "2. The user certifies that 2 Cancel and Save buttons are going to appear"() {
-        testKey = "TM-11374"
         given: 'The User is Manage Tags Page'
             at TagsPage
         when: 'The User clicks on Create button'
@@ -66,7 +64,6 @@ class TagsCreationSpec extends GebReportingSpec {
     }
 
     def "3. The User starts creating a custom tag and certifies some are not editable"(){
-        testKey = "TM-11374"
         given: 'The User is Manage Tags Page'
             at TagsPage
         when: 'The User clicks on Create button'
@@ -81,7 +78,6 @@ class TagsCreationSpec extends GebReportingSpec {
     }
 
     def "4. The User creates a custom tag"(){
-        testKey = "TM-11374"
         given: 'The User filled some fields'
             isSaveButtonDisabled() == false
         when: 'The User clicks on Save button'
@@ -91,7 +87,6 @@ class TagsCreationSpec extends GebReportingSpec {
     }
 
     def "5. The User verifies tags info displayed"() {
-        testKey = "TM-11374"
         given: 'The User is in Manage Tags page'
             at TagsPage
         when: 'The User filters by name'

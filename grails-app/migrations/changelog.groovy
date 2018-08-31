@@ -263,7 +263,11 @@ databaseChangeLog = {
 	include file: '20180713-drop-context-type.groovy'
 	include file: '20180730-converting-black-to-grey-tags.groovy'
 	include file: '20180909-all-devices-system-view.groovy'
+	include file: '20180808-all-databases-system-view.groovy'
+
 	include file: '20180809-cleaning-up-orphaned-party-roles.groovy'
 	include file: '20180803-create-tag-event.groovy'
 	include file: '20180807-add-last-updated-to-move-event.groovy'
+	include file: '20180809-all-storage-system-view.groovy'
+	include file: '20180809-all-applications-system-view.groovy'
 }

@@ -15,6 +15,9 @@ class CommonsModule extends Module {
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
         loadingIndicator { $('.loading-indicator')}
+        kendoGridPaginationContainer { $('kendo-pager')}
+        kendoGridPaginationButtons { kendoGridPaginationContainer.find("a.k-link")}
+        kendoSelectPaginationOptions { kendoGridPaginationContainer.find("kendo-pager-page-sizes select option")}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -58,9 +61,9 @@ class CommonsModule extends Module {
     * */
     def setKendoDateFilter(date, calendarIconIndex = null){
         if (calendarIconIndex != null) {
-            browser.driver.executeScript("\$('.k-i-calendar')[$calendarIconIndex].click()")
+            browser.driver.executeScript("\$('kendo-datepicker span.k-select')[$calendarIconIndex].click()")
         } else {
-            browser.driver.executeScript("\$('.k-i-calendar').click()")
+            browser.driver.executeScript("\$('kendo-datepicker span.k-select').click()")
         }
         waitFor{kendoDateFilter.find{it.@title.contains(date)}.click()}
     }
@@ -111,5 +114,40 @@ class CommonsModule extends Module {
 
     def blockCookbookLoadingIndicator(){
         loadingIndicator.jquery.attr("style", "display: none !important")
+    }
+
+    def clickOnKendoPaginationButtonByText(text){
+        goToElement kendoGridPaginationButtons.find{it.@title.contains(text)}
+        waitFor{kendoGridPaginationButtons.find{it.@title.contains(text)}.click()}
+        waitForLoader 2
+    }
+
+    def goToTargetKendoGridPage(target, timesToClick = 1){
+        def count = 0
+        while (count < timesToClick){
+            count = count + 1
+            clickOnKendoPaginationButtonByText target.toLowerCase()
+        }
+    }
+
+    def goToLastKendoGridPage(){
+        clickOnKendoPaginationButtonByText "last"
+    }
+
+    def goToFirstKendoGridPage(){
+        clickOnKendoPaginationButtonByText "first"
+    }
+
+    def selectRandomPaginationNumber(){
+        goToElement kendoSelectPaginationOptions
+        def option = CommonActions.getRandomOption kendoSelectPaginationOptions
+        option.click()
+        waitForLoader 2
+    }
+
+    def goToElement(element){
+        interact{
+            moveToElement element
+        }
     }
 }

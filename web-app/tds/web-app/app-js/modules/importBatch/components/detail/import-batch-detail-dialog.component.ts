@@ -9,8 +9,9 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: 'import-batch-detail-dialog',
@@ -55,8 +56,8 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		private importBatchService: ImportBatchService,
 		private activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
-		private userPreferenceService: PreferenceService
-	) {
+		private userPreferenceService: PreferenceService) {
+			this.batchRecords = [];
 			this.prepareColumnsModel();
 			this.onLoad();
 	}
@@ -66,6 +67,14 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 */
 	private onLoad(): void {
 		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
+		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_RECORDS_FILTER).subscribe( res => {
+			if (res) {
+				const match = this.batchRecordsFilter.options.find( item => item.name === res);
+				if (match) {
+					this.batchRecordsFilter.selected = match;
+				}
+			}
+		}, error => { console.error(error) });
 	}
 
 	/**
@@ -83,14 +92,11 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.batchRecords = result.data;
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
+				this.onStatusFilter(this.batchRecordsFilter.selected, true);
 			} else {
-				this.batchRecords = [];
-				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
+				this.handleError(result.errors[0] ? result.errors[0] : 'error loading Batch Records');
 			}
-		}, error => {
-			this.batchRecords = [];
-			this.handleError(error);
-		});
+		}, error => this.handleError(error));
 	}
 
 	/**
@@ -198,8 +204,9 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	/**
 	 * On Status Select Filter Select handle the multi filter on status + errors.
 	 * @param $event
+	 * @param avoidPreferenceSave used when we want to stop saving the filter in user preferences.
 	 */
-	private onStatusFilter($event) {
+	private onStatusFilter($event, avoidPreferenceSave = false) {
 		for (const columnProperty of ['status.label', 'errorCount']) {
 			let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
 			foundMatch.filter = null;
@@ -213,6 +220,9 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 					this.dataGridOperationsHelper.onFilter(foundMatch, $event.id === 3 ? 'gte' : null);
 				}
 			}
+		}
+		if (!avoidPreferenceSave) {
+			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_RECORDS_FILTER, $event.name).subscribe( r => { /**/});
 		}
 	}
 
@@ -265,5 +275,31 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		if ($event && $event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
+	}
+
+	/**
+	 * Determines which value to print on the batch record dynamic values, can be direct value, init or null.
+	 * @returns {string}
+	 */
+	protected getInitOrValue(dataItem: ImportBatchRecordModel, column: GridColumnModel): string {
+		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
+		if (isEmptyVal && dataItem.init) {
+			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
+			return  !isEmptyInit ? dataItem.init[column.properties[1]] : '(null)';
+		}
+		return isEmptyVal ? '(null)' : dataItem.currentValues[column.properties[1]];
+	}
+
+	/**
+	 * Determines if value of current record value is INIT value.
+	 * @returns {string}
+	 */
+	protected hasInitVal(dataItem: ImportBatchRecordModel, column: GridColumnModel): boolean {
+		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
+		if (isEmptyVal && dataItem.init) {
+			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
+			return  !isEmptyInit;
+		}
+		return false;
 	}
 }

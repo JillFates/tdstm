@@ -11,6 +11,7 @@
 <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}"></script>
 <g:javascript src="shared/validators/tmLinkableUrlDirective.js"/>
+<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 <g:javascript src="cabling.js"/>
 <g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 <g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />

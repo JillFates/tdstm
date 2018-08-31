@@ -26,7 +26,7 @@ class StaffListSpec extends GebReportingSpec {
     static userName = baseName + randStr + "Test"
     static userPass = baseName + randStr + "Pass*"
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
-
+    static originalDetails = [firstName,middleName,lastName,userName,userEmail]
     def setupSpec() {
         testCount = 0
         to LoginPage
@@ -43,7 +43,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "1. The User Navigates in the Staff List Section"() {
-        testKey = "TM-XXXX"
         given: 'The User searches in the Menu Page'
             at MenuPage
         when: 'The User Clicks in the Admin > List Staff Menu Option'
@@ -56,7 +55,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "2. The User gains access to the Create Staff Pop-up"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Clicks the "Create Staff" Button'
@@ -67,7 +65,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "3. A brand new Staff is successfully created"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Create Staff Pop-up'
             at StaffCreationPage
         when: 'The User randomly completes First, Middle and Last Name'
@@ -90,7 +87,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "3. The User Filters out by Staff First Name that was recently created"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Clicks the First Name Filter Column'
@@ -103,7 +99,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "4. The User gains access to the Create UserLogin Section"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Searches by and clicks the "Create User" Button'
@@ -114,7 +109,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "5. A brand New User is successfully created"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Create UserLogin Section'
             at UserCreationPage
         when: 'The User Completes his Username, Email'
@@ -137,5 +131,7 @@ class StaffListSpec extends GebReportingSpec {
             at UserDetailsPage
         and: 'A success message related to the User that was created should be displayed'
             waitFor {pageMessage.text() == "UserLogin "+userName+" created"}
+        and: 'All of the details entered when creating the user are displayed'
+            validateUserDetails(originalDetails)
     }
 }

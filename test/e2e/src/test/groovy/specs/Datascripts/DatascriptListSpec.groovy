@@ -29,7 +29,7 @@ class DatascriptListSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        menuModule.goToDatascripts()
+        projectsModule.goToDatascripts()
         at DatascriptsPage
         createBtn.click()
         at CreateDatascriptPage
@@ -58,7 +58,6 @@ class DatascriptListSpec extends GebReportingSpec{
 
 
     def "1. The User finds a datascript already created filtering by name"() {
-        testKey = "TM-11049"
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Name'
@@ -72,7 +71,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "2. The User finds a datascripts filtering by date created"() {
-        testKey = "TM-11049"
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Date Create'
@@ -82,7 +80,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "3. The User finds a datascript already created filtering by description"() {
-        testKey = "TM-11049"
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Description'
@@ -96,7 +93,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "4. The User play around refreshing the grid"() {
-        testKey = "TM-11049"
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user refreshes datascript grid'
@@ -106,7 +102,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "5. The User certifies datascript information is properly displayed"() {
-        testKey = "TM-11049"
         given: 'The user collects first Datascript information from grid'
             firstDSInformation = collectFirstDSInfoDisplayedInGrid()
         and: 'The user clicks on datascript row'
@@ -121,7 +116,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "6. The user order by Asc/Desc  Name"() {
-        testKey = "TM-11049"
         given: 'The user close the modal'
             clickOnXButton()
         when: 'The User is in datascript list page'
@@ -135,7 +129,6 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "7. The User finds a datascript filtering by different combinations"() {
-        testKey = "TM-11049"
         given: 'The User is in datascript list page'
             at DatascriptsPage
         when: 'The user fill Filter Name + Date Created already selected'

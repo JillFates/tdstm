@@ -102,6 +102,16 @@ class TimeUtilTests extends AbstractUnitSpec {
 		then:
 		'-48s' == TimeUtil.ago(delta)
 	}
+	
+	void testAgoWithYears() {
+		given:
+		TimeDuration start = new TimeDuration(0, 20, 5, 0)
+		TimeDuration end = new TimeDuration(366,0, 20, 5, 0)
+		TimeDuration diff = end - start
+		
+		expect:
+		'1y 1d' == TimeUtil.ago(diff)
+	}
 
 	void testParseDate() {
 		given:
@@ -358,6 +368,81 @@ class TimeUtilTests extends AbstractUnitSpec {
 			resultDate = TimeUtil.adjustDateFromGMTToTZ(originalDate, japanTimezone) // Move from GMT to Japan Timezone
 		then: 'The resultDate has a 9 hours more than the originalDate'
 			resultDate.compareTo(expectedDate) == 0
+	}
+
+	void 'Test agoOrIndefinitely'() {
+		setup: 'Create a few dates in the near feature and also way ahead.'
+			Date now = TimeUtil.nowGMT()
+			Date thirtyYearsAhead = now + 11000
+			Date nextYear = now + 365
+			Date lastYear = now - 365
+			Date thirtyYearsAgo = now - 11000
+		when: 'Using agoOrIndefinitely with the default values'
+			String ago1 = TimeUtil.agoOrIndefinitely(now, nextYear)
+			String ago2 = TimeUtil.agoOrIndefinitely(now, thirtyYearsAhead)
+		then: 'Neither value is Indefinitely'
+			ago1 != 'Indefinitely'
+			ago2 != 'Indefinitely'
+		when: 'Using agoOrIndefinitely with a threshold set to 10 years'
+			ago1 = TimeUtil.agoOrIndefinitely(now, nextYear, 10)
+			ago2 = TimeUtil.agoOrIndefinitely(now, thirtyYearsAhead, 10)
+		then: 'The date to next year returned an actual value while the one 30 years in the future returned Indefinitely'
+			ago1 != 'Indefinitely'
+			ago2 == 'Indefinitely'
+		when: 'Testing agoOrIndefinitely with a custom label'
+			String customLabel = 'XYZ'
+			ago1 = TimeUtil.agoOrIndefinitely(now, nextYear, 10, customLabel)
+			ago2 = TimeUtil.agoOrIndefinitely(now, thirtyYearsAhead, 10, customLabel)
+		then: 'The custom label is returned when appropriately'
+			ago1 != customLabel
+			ago2 == customLabel
+		when: 'Calling with null dates'
+			ago1 = TimeUtil.agoOrIndefinitely(null, null)
+		then: 'The method returned a null'
+			ago1 == null
+		when: 'Sending the dates in the wrong order'
+			ago1 = TimeUtil.agoOrIndefinitely(nextYear, now, 10, customLabel)
+			ago2 = TimeUtil.agoOrIndefinitely(thirtyYearsAhead, now, 10, customLabel)
+		then: 'The correct label is still used (negative differences should not matter)'
+			ago1 != customLabel
+			ago2 == customLabel
+	}
+
+	void 'Test hence'() {
+		setup: 'Create a couple of dates for testing different scenarios'
+			Date now = TimeUtil.nowGMT()
+			Date thirtyYearsAhead = now + 11000
+			Date nextYear = now + 365
+			Date lastYear = now - 365
+			Date thirtyYearsAgo = now - 11000
+		when: 'Testing without threshold parameters'
+			String hence1 = TimeUtil.hence(nextYear)
+		then: 'The value is not the default label'
+			hence1 != 'Indefinitely'
+		when: 'Testing with threshold'
+			hence1 = TimeUtil.hence(nextYear, 10)
+			String hence2 = TimeUtil.hence(thirtyYearsAhead, 10)
+		then: 'The default label is used only in the second case'
+			hence1 != 'Indefinitely'
+			hence2 == 'Indefinitely'
+		when: 'Using a threshold and a custom label'
+			String label = 'Way in the future'
+			hence1 = TimeUtil.hence(nextYear, 10, label)
+			hence2 = TimeUtil.hence(thirtyYearsAhead, 10, label)
+		then: 'The custom label was used only for the second case'
+			hence1 != label
+			hence1 != 'Indefinitely'
+			hence2 == label
+		when: 'Testing with a null date'
+			hence1 = TimeUtil.hence(null)
+		then: 'The result is null'
+			hence1 == null
+		when: 'Testing with a date in the past and a threshold'
+			hence1 = TimeUtil.hence(lastYear, 10, label)
+			hence2 = TimeUtil.hence(thirtyYearsAgo, 10, label)
+		then: 'Only the second case returned the label'
+			hence1 != label
+			hence2 == label
 	}
 
 }
