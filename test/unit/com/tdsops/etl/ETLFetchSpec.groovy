@@ -106,37 +106,30 @@ class ETLFetchSpec extends ETLBaseSpec {
 			processor.currentRow = new Row([], processor)
 			// load 'manufacturer' with 'PM10'
 			processor.load('manufacturer').with('PM10')
-
-		and: 'a find element'
-			ETLFindElement find = new ETLFindElement(processor, ETLDomain.Model, 1)
-			find.by 'manufacturer' with 'PM10' into 'manufacturer'
-			processor.pushIntoStack find
-			processor.currentFindElement = find
+			// find Model by 'manufaturer' with 'PM10' into 'manufacturer'
+			processor.find ETLDomain.Model by 'manufacturer' with 'PM10' into 'manufacturer'
 
 		and:
 			mockFor(SearchQueryHelper)
 			SearchQueryHelper.metaClass.static.findEntityByMetaData = { String fieldName, Map fieldsInfo, Map context, Object entityInstance ->
 				assert context.project.getId() == projectId
-				assert context.domainClass == Model
+				assert context.domainClass == AssetEntity
 				assert fieldName == 'model'
 				assert fieldsInfo['manufacturer'].value == 'PM10'
+				assert fieldsInfo['manufacturer'].find.query[0].domain == 'Model'
+				assert fieldsInfo['manufacturer'].find.query[0].kv['manufacturer'] == 'PM10'
 
 				Model model = new Model(modelName: 'PM10', usize: 1)
 				return new AssetEntity(assetClass: AssetClass.DEVICE, assetName: 'A1 PDU1 A', priority: 2, model: model)
 			}
 
 		when: 'a fetch command that is is configured with fields'
-			Map myVar = new FetchFacade(processor, 'Model').set 'myVar'
+			Map myVar = new FetchFacade(processor, 'Model').fields 'assetName', 'priority' set 'myVar'
 
 		then:
 			with(myVar, Map) {
 				assetName == 'A1 PDU1 A'
 				priority == 2
-
-				with(model) {
-					modelName == 'PM10'
-					usize == 1
-				}
 			}
 	}
 
