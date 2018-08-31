@@ -201,6 +201,11 @@
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
+                            <li class="menu-child-item menu-parent-assets-database-explorer">
+                                <g:link class="mmlink" mapping="assetViewShow" id="2">
+                                    <tds:svgIcon name="database_menu" width="16" height="16" /> All Databases
+                                </g:link>
+                            </li>
                             <li class="menu-child-item menu-parent-assets-application-list">
                                 <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                     <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
