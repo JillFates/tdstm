@@ -59,7 +59,7 @@ class CookbookPage extends Page {
     }
 
     def getRecipeByName(name){
-        gebRecipes.find{it.text().trim().contains(name)}
+        gebRecipes.find{it.text().trim() == name}
     }
 
     def getRecipeNameDisplayedInTaskGenerationTab(){
