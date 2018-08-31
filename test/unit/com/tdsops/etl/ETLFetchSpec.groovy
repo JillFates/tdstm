@@ -167,10 +167,8 @@ class ETLFetchSpec extends ETLBaseSpec {
 		when: 'a fetch command for the id property that it is not configured with fields is set it in a local var'
 			Map myVar = new FetchFacade(processor, 'id').set 'myVar'
 
-		then: 'results contains field values previous defined in Fetch command'
-			with(myVar, Map) {
-				id == deviceId
-			}
+		then: 'results contains, by default the id field'
+			myVar.containsKey('id')
 	}
 
 	@ConfineMetaClassChanges([SearchQueryHelper])
