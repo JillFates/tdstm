@@ -262,6 +262,7 @@ databaseChangeLog = {
 
 	include file: '20180713-drop-context-type.groovy'
 	include file: '20180730-converting-black-to-grey-tags.groovy'
+	include file: '20180909-all-devices-system-view.groovy'
 	include file: '20180808-all-databases-system-view.groovy'
 
 	include file: '20180809-cleaning-up-orphaned-party-roles.groovy'

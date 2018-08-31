@@ -201,24 +201,14 @@
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-applications-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="7">
-                                    <tds:svgIcon name="application_menu" width="16" height="16" /> All Applications
+                            <li class="menu-child-item menu-parent-assets-devices-explorer">
+                                <g:link class="mmlink" mapping="assetViewShow" id="3">
+                                    <tds:svgIcon name="other_menu" width="16" height="16" /> All Devices
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-database-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="2">
-                                    <tds:svgIcon name="database_menu" width="16" height="16" /> All Databases
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-storage-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> All Storage - Physical
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-storage-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="6">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> All Storage - Virtual
+                            <li class="menu-child-item menu-parent-assets-devices-explorer">
+                                <g:link class="mmlink" mapping="assetViewShow" id="4">
+                                    <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> All Servers
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-application-list">
