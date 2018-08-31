@@ -208,6 +208,7 @@
 
 		</tr>
 		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
+		<g:render template="/comment/assetTagsShow"></g:render>
 	</tbody>
 </table>
 
@@ -219,4 +220,10 @@
 		</tr>
 	</table>
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		EntityCrud.loadAssetTags(${applicationInstance?.id});
+	});
+</script>
 

@@ -201,6 +201,16 @@
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
+                            <li class="menu-child-item menu-parent-assets-applications-explorer">
+                                <g:link class="mmlink" mapping="assetViewShow" id="7">
+                                    <tds:svgIcon name="application_menu" width="16" height="16" /> All Applications
+                                </g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-database-explorer">
+                                <g:link class="mmlink" mapping="assetViewShow" id="2">
+                                    <tds:svgIcon name="database_menu" width="16" height="16" /> All Databases
+                                </g:link>
+                            </li>
                             <li class="menu-child-item menu-parent-assets-storage-explorer">
                                 <g:link class="mmlink" mapping="assetViewShow" id="5">
                                     <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> All Storage - Physical

@@ -326,7 +326,7 @@ trait ControllerMethods {
 	private void handleException(Exception e, String viewName, errorStringOrList='', Boolean dumpStacktrace=false) {
 		log.debug "handleException(${e.getClass().getName()}) called"
 		if (dumpStacktrace || (e instanceof java.lang.IllegalArgumentException)) {
-			log.warn ExceptionUtil.stackTraceToString(e.getMessage(), e)
+			log.warn ExceptionUtil.stackTraceToString(e.getMessage(), e, 60)
 		}
 
 		String alternateMsg = ''

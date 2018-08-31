@@ -18,7 +18,6 @@
 		<g:javascript src="progressBar.js" />
 
 		<g:javascript src="asset.comment.js" />
-		<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="svg.js"/>
@@ -482,5 +481,6 @@
 
 		</script>
 		<div style="display: none;" id="graphSVGContainer"></div>
+		<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	</body>
 </html>

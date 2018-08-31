@@ -19,6 +19,9 @@ export class ImportBatchRecordModel {
 	lastUpdated: Date;
 	warn: number;
 	currentValues: any;
+	// A HashMap of the field values from the existing record which is only populated when the record is PENDING
+	existingRecord: { [path: string]: string; };
+	init?: any;
 }
 
 export class ImportBatchRecordDetailColumnsModel {
