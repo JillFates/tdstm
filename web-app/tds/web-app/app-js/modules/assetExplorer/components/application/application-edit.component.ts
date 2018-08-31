@@ -135,9 +135,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
-			personModel.companies = companies;
+			personModel.companies = companies || [];
 			personModel.teams = teams;
-			personModel.staffType = staffTypes;
+			personModel.staffType = staffTypes || [];
 			this.dialogService.extra(AddPersonComponent,
 				[UIDialogService,
 					{
@@ -149,7 +149,8 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				.then((result) => {
 					this.personList.push({personId: result.id, fullName: result.name})
 					this.model.asset[fieldName].id = result.id;
-				});
+				})
+				.catch(err => console.log('Cancelling add person'));
 		}
 		getPersonList(personList: any[]): any[] {
 			if (!this.personList) {
