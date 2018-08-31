@@ -3,7 +3,7 @@
 <head>
 <title>MoveTech Home</title>
 <jq:plugin name="jquery"/>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 <meta name="viewport" content="height=device-height,width=220" />

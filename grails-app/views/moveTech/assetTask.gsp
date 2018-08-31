@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>My Tasks</title>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<tds:favicon />

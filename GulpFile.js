@@ -144,7 +144,7 @@ gulp.task('watch-build', ['validate-js'], function () {
  * from command line: gulp sass-compiler --PROD
  */
 gulp.task('sass-compiler', function () {
-    return gulp.src('web-app/css/style.sass')
+    return gulp.src('web-app/css/tds-style.sass')
         .pipe(sourcemaps.init())
         .pipe(sass({errLogToConsole: true}))
         .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))

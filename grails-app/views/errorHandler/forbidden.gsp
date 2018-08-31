@@ -25,7 +25,7 @@
 		<link rel="stylesheet" href="${resource(dir: 'css', file: 'managerStyle.css')}">
 	</g:if>
 	<g:else>
-		<link rel="stylesheet" href="${resource(dir: 'css', file: 'style.css')}">
+		<link rel="stylesheet" href="${resource(dir: 'css', file: 'tds-style.css')}">
 	</g:else>
 
 	<!-- Blue Skin -->

@@ -16,7 +16,7 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
-	<link rel="stylesheet" href="${resource(dir:'css',file:'style.css')}">
+	<link rel="stylesheet" href="${resource(dir:'css',file:'tds-style.css')}">
 
 	<tds:favicon />
 

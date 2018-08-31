@@ -4,7 +4,7 @@
 
 <tds:favicon />
 
-<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'main.css')}"/>
+<link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'tds-main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'ui.core.css')}" />
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'ui.dialog.css')}" />
@@ -16,8 +16,7 @@
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'combox.css')}" />
 
 <%-- TODO : JPM 10/2014 : Determine why we have jquery ui 1.8.15 css while using 1.9.1-ui --%>
-<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
-	href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
+<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'jquery-ui-1.8.15.custom.css')}"/>
 
 <g:javascript src="prototype/prototype.js" />
 <g:javascript src="jquery-1.9.1.js"/>

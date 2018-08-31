@@ -94,6 +94,7 @@ grails.project.dependency.resolution = {
 		compile ":rest-client-builder:2.1.0"
 
 		compile "org.grails.plugins:cascade-validation:0.1.5"
+		runtime "org.grails.plugins:asset-pipeline:2.14.1.1"
 
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'

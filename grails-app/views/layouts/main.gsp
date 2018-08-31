@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
+    <link rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" type="text/css"/>
     <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
     <tds:favicon />

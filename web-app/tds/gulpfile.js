@@ -13,7 +13,7 @@ let shell = require('gulp-shell');
  * What this task do is to compile the SASS file and generate a map that can be view from modern browser
  */
 gulp.task('sass-compiler', function () {
-	return gulp.src('./web-app/css/style.sass')
+	return gulp.src('./web-app/css/tds-style.sass')
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 		.pipe(gulp.dest('./web-app/css'));
@@ -26,7 +26,7 @@ gulp.task('sass-compiler', function () {
  */
 gulp.task('sass:watch', function () {
 	return gulp.watch('./web-app/css/**/*.sass', function () {
-		gulp.src('./web-app/css/style.sass')
+		gulp.src('./web-app/css/tds-style.sass')
 			.pipe(sourceMaps.init())
 			.pipe(sass({errLogToConsole: true}))
 			.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))

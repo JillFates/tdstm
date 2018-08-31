@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="refresh" content="0; url=/tdstm/">
 <title>Login</title>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
     <tds:favicon />

@@ -13,7 +13,7 @@
 <!-- Theme style -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 <!-- General Template Style -->
-<link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'style.css')}">
+<link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'tds-style.css')}">
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
@@ -26,11 +26,11 @@
 <!-- jQuery -->
 <!-- LEGACY CODE START -->
 
-<link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'main.css')}"/>
+<link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds-main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'codemirror.css')}"/>
 
-<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${resource(dir: 'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness', file: 'jquery-ui-1.8.15.custom.css')}"/>
+<<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'jquery-ui-1.8.15.custom.css')}"/>
 
 <g:javascript src="jquery-1.9.1.js"/>
 <g:javascript src="jquery-1.9.1-ui.js"/>
