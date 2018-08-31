@@ -29,7 +29,7 @@ class DatascriptEditionSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        menuModule.goToDatascripts()
+        projectsModule.goToDatascripts()
         at DatascriptsPage
         createBtn.click()
         at CreateDatascriptPage
@@ -55,7 +55,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "1. The user opens the created Datascripts"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Datascripts Page'
             at DatascriptsPage
         and: 'Filters by the datascript Name'
@@ -67,7 +66,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "2. The user closes the Datascript by the X button"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the Provider Detail pop up'
             at DatascriptDetailsPage
         when: 'The user clicks the X icon'
@@ -77,7 +75,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "3. The user opens again the datascript and clicks the Edit button"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Providers Page'
             at DatascriptsPage
         when: 'The user clicks on datascript name'
@@ -91,7 +88,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "4. The user edits the datascript and Saves it"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the datascript Edit pop up'
             at EditDatascriptPage
         when: 'The user modifies the info of the Provider'
@@ -108,7 +104,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "5. The user searches and opens the edited datascript"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the datascript Page'
             at DatascriptsPage
         when: 'Filters by the datascript Name'
@@ -121,7 +116,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "6. The user opens again the datascript from edit button and clicks the Edit button"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the datascript Page'
             at DatascriptsPage
         when: 'the user clicks on edit button'
@@ -131,7 +125,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "7. The user edits the datascript and Saves it again"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the datascript Edit pop up'
             at EditDatascriptPage
         when: 'The user modifies the info of the Provider'
@@ -148,7 +141,6 @@ class DatascriptEditionSpec extends GebReportingSpec{
     }
 
     def "8. The user searches and opens the edited datascript"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the datascript Page'
             at DatascriptsPage
         when: 'Filters by the datascript Name'

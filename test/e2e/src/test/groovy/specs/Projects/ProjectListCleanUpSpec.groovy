@@ -28,7 +28,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToProjectsActive()
+        projectsModule.goToProjectsActive()
     }
 
     def setup() {
@@ -65,7 +65,6 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     }
 
     def "1. The User deletes Projects starting with QAE2E for clean up purposes"() {
-        testKey = "TM-11678"
         given: 'The User is on the Project List Page'
             at ProjectListPage
         when: 'The user filters by project name starting with QAE2E'
@@ -81,7 +80,6 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     }
 
     def "2. Workaround to switch to a licensed Project"() {
-        testKey = "TM-XXXX"
         when: 'The user selects a licenced project'
             def displayed = false
             try {
@@ -89,16 +87,16 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
                 filterByName licensedProjectName
                 clickOnProjectByName licensedProjectName
                 at MenuPage
-                waitFor {menuModule.projectName}
-                menuModule.assertProjectName licensedProjectName
+                waitFor {projectsModule.projectName}
+                projectsModule.assertProjectName licensedProjectName
                 // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = menuModule.projectLicenseIcon.displayed
+                displayed = projectsModule.projectLicenseIcon.displayed
             } catch (RequiredPageContentNotPresent e) {
                 // Try failed because license icon is not present so a Licensed project is selected now
                 displayed = false
             }
             !displayed
         then: 'A licensed project should be selected if license is requested'
-            menuModule.assertProjectName licensedProjectName
+            projectsModule.assertProjectName licensedProjectName
     }
 }

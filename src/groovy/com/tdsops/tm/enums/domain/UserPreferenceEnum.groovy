@@ -28,6 +28,7 @@ enum UserPreferenceEnum {
 	HIGHLIGHT_TASKS('highlightTasks'),
 	ImportApplication,
 	ImportBatchListSize,
+    ImportBatchRecordsFilter,
 	ImportCabling,
 	ImportComment,
 	ImportDatabase,
