@@ -1,4 +1,12 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	EventEmitter,
+	Input,
+	OnInit,
+	Output,
+	ViewChild
+} from '@angular/core';
 import {ImportBatchService} from '../../service/import-batch.service';
 import {BATCH_RECORD_OPERATION, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
@@ -17,7 +25,7 @@ export enum CurrentValueAction {
 	EditValue = 'EditValue',
 	ShowInit = 'ShowInit',
 	EditInit = 'EditInit'
-};
+}
 
 export enum FieldInfoType {
 	CREATE,
@@ -31,6 +39,7 @@ export enum FieldInfoType {
 })
 export class ImportBatchRecordFieldsComponent implements OnInit {
 
+	@ViewChild('focusElement') popupEscFocusElement: ElementRef;
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	@Output('onClose') closeEvent = new EventEmitter<any>();
@@ -395,6 +404,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.popup.title = this.getPopupTitle(type);
 		this.popup.offset = { left: $event.pageX, top: $event.pageY};
 		this.popup.show = true;
+		// focus input element to help the on escape key exit.
+		setTimeout( () => {
+			if (this.popupEscFocusElement) {
+				this.popupEscFocusElement.nativeElement.focus();
+			}
+		}, 300);
 	}
 
 	/**
