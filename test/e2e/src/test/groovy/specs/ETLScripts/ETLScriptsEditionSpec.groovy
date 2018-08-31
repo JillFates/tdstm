@@ -27,7 +27,7 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
 
         at MenuPage
         projectsModule.goToETLScripts()
-        at ETLScriptssPage
+        at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
         waitFor{providerDropdown.click()}
