@@ -410,11 +410,11 @@ td.buttonR .powerIcon {
 	padding-left: 22px !important;
 }
 .buttons input.delete {
-	background: transparent url(../icons/database_delete.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_delete.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.tabledelete {
-	background: transparent url(../icons/table_delete.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/table_delete.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.cancel {
@@ -423,38 +423,38 @@ td.buttonR .powerIcon {
 	color: #214aa0 !important
 }
 .buttons input.show {
-	background: transparent url(../icons/database_table.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_table.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.edit {
-	background: transparent url(../icons/database_edit.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_edit.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.tableedit {
-	background: transparent url(../icons/table_edit.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/table_edit.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.cableedit {
-	background: transparent url(../icons/disconnect.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/disconnect.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.create {
-	background: transparent url(../icons/database_add.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_add.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.select {
 	background: transparent;
 }
 .buttons input.save {
-	background: transparent url(../icons/database_save.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_save.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.tablesave {
-	background: transparent url(../icons/table_save.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/table_save.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.architectureGraph {
-	background: transparent url(../icons/chart_organisation.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/chart_organisation.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .onhold_button {
@@ -467,7 +467,7 @@ td.buttonR .powerIcon {
 }
 
 .menuButton a.save {
-	background: transparent url(../icons/database_save.png) 5px 50% no-repeat;
+	background: transparent url(../../icons/database_save.png) 5px 50% no-repeat;
 	color: #333;
 	padding-left: 25px;
 }

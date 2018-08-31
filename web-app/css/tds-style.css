@@ -342,7 +342,7 @@ body.skin-blue div.content-wrapper div.k-grid div.k-grid-header th.k-header a.k-
   color: #1c94c4 !important; }
 
 body.skin-blue div.content-wrapper div.k-grid .k-loading-image {
-  background-image: url("../../dist/css/kendo/Default/loading-image.gif"); }
+  background-image: url("../dist/css/kendo/Default/loading-image.gif"); }
 
 body.skin-blue div.content-wrapper div.k-grid .k-filter-row th {
   padding: 5px 5px 5px 5px;

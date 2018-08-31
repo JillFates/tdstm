@@ -346,7 +346,7 @@
 	padding-left: 22px !important;
 }
 .old-legacy-content .buttons input.delete {
-	background: transparent url(../../../../icons/database_delete.png) 5px 50% no-repeat;
+	background: transparent url(../../../../images/database_delete.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .old-legacy-content .buttons input.tabledelete {

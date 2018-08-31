@@ -410,7 +410,7 @@ td.buttonR .powerIcon {
 	padding-left: 22px !important;
 }
 .buttons input.delete {
-	background: transparent url(../icons/database_delete.png) 5px 50% no-repeat;
+	background: transparent url(database_delete.png) 5px 50% no-repeat;
 	padding-left: 28px;
 }
 .buttons input.tabledelete {

@@ -41,20 +41,7 @@
 
 
 <!-- LEGACY CODE START -->
-
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'tds-main.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'tds.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.core.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.dialog.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.theme.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.datetimepicker.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'jquery-ui-smoothness.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'combox.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'select2.css')}"/>
-        <link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'combox.css')}"/>
-
-        <%-- TODO : JPM 10/2014 : Determine why we have jquery ui 1.8.15 css while using 1.9.1-ui --%>
-<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'jquery-ui-1.8.15.custom.css')}"/>
+<asset:stylesheet src="resources" />
 
 
         <g:javascript src="prototype/prototype.js" />
