@@ -104,7 +104,7 @@ class FetchFacade {
 			null
 		)
 
-		return objectResult ? buildMapResults(objectResult) : null
+		return (objectResult != null && objectResult != -1) ? buildMapResults(objectResult) : null
 	}
 
 	/**
@@ -116,16 +116,18 @@ class FetchFacade {
 	 */
 	private Map<String, Object> buildMapResults(Object objectResult) {
 
+		Map mapResult = [
+			id: objectResult.id
+		]
+
 		if (fieldNames) {
-			return fieldNames.collectEntries { String fieldName ->
+			mapResult += fieldNames.collectEntries { String fieldName ->
 				ETLFieldDefinition fieldDefinition = fieldDefinitionMap[fieldName]
 				[(fieldName): objectResult[fieldDefinition.name]]
 			}
-		} else {
-			return [
-			    id: objectResult.id
-			]
 		}
+
+		return mapResult
 	}
 
 }
