@@ -56,7 +56,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
         and: 'Edit radio button is selected'
             getEditRadioButtonStatus() == true
         and: 'Bulk change action message is correct'
-        verifyActionMessageText "This action will effect ${assetNames.size()} Asset(s)"
+            verifyActionMessageText "This action will effect ${assetNames.size()} Asset(s)"
     }
 
     def "2. Certify assets still selected after cancel process"(){
