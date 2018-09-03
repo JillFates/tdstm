@@ -344,6 +344,12 @@ class ViewPage extends Page{
         checkBoxNameMap
     }
 
+    /**
+     * Method verifies input checkbox with given name attribute associated to the asset by a map [assetName: checkboxNameAttr]
+     * is not displayed, this is because can be more than one asset with same name
+     * @param assetMap = map [assetName: checkboxNameAttr]
+     * @author Sebastian Bigatton
+     */
     def verifyDeletedAssetsByCheckboxName(assetsMap){
         assetsMap.each{ assetName, checkboxName ->
             filterByName assetName
