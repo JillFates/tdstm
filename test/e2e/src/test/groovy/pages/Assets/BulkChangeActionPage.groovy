@@ -43,6 +43,10 @@ class BulkChangeActionPage extends Page{
         actionMessage.text().trim()
     }
 
+    def verifyActionMessageText(text){
+        getActionMessageText() == text
+    }
+
     def clickOnCancelButton(){
         waitFor{cancelButton.click()}
     }

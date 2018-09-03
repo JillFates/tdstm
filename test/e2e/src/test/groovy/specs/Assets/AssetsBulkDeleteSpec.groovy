@@ -56,7 +56,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
         and: 'Edit radio button is selected'
             getEditRadioButtonStatus() == true
         and: 'Bulk change action message is correct'
-            getActionMessageText() == "This action will effect ${assetNames.size()} Asset(s)"
+        verifyActionMessageText "This action will effect ${assetNames.size()} Asset(s)"
     }
 
     def "2. Certify assets still selected after cancel process"(){
@@ -79,7 +79,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
         and: 'The User clicks on Next button'
             clickOnNextButton()
         then: 'Delete confirmation modal message is correct'
-            commonsModule.getDeleteAlertMessageText().contains "You are about to delete ${assetNames.size()} Asset(s)"
+            commonsModule.verifyDeletePrompDialogMessage "You are about to delete ${assetNames.size()} Asset(s)"
     }
 
     def "4. Certify assets still selected after cancel delete confirmation process"(){
