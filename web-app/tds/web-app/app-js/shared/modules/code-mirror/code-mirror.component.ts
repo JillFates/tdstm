@@ -15,6 +15,12 @@ export class CodeMirrorComponent implements OnInit {
 	CodeMirror;
 
 	/**
+	 * This stores (cache) the line errores currently present in the component.
+	 * @type {any[]}
+	 */
+	private currentErrorLines: Array<number> = [];
+
+	/**
 	 * Get Code Mirror when initializing the component
 	 */
 	ngOnInit(): void {
@@ -43,17 +49,25 @@ export class CodeMirrorComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Adds Syntax Error class to the given line numbers (lines index starts at 0)
+	 * @param {Array<number>} lineNumbers
+	 */
 	public addSyntaxErrors(lineNumbers: Array<number>) {
-		for (let line of lineNumbers) {
+		this.currentErrorLines = lineNumbers;
+		for (let line of this.currentErrorLines) {
 			this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
 		}
 	}
 
+	/**
+	 * Clears out ALL the Syntax Error class of the given line numbers stored in currentErrorLines.
+	 */
 	public clearSyntaxErrors(): void {
-		const elems = this.instance.display.lineDiv.querySelectorAll('.line-with-syntax-errors');
-		for (let elem of elems) {
-			elem.classList.remove('line-with-syntax-errors');
+		for (let line of this.currentErrorLines) {
+			this.instance.removeLineClass(line, 'background', 'line-with-syntax-errors');
 		}
+		this.currentErrorLines = [];
 	}
 
 	/**
