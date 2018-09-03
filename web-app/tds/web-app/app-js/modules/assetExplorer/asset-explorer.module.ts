@@ -40,7 +40,7 @@ import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
 import { TagService } from '../assetTags/service/tag.service';
 import { BulkChangeService } from './service/bulk-change.service';
-import { DataGridCheckboxService } from './service/data-grid-checkbox.service';
+import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
 
@@ -85,7 +85,7 @@ import { ModelService } from  './service/model.service';
 		DependecyService,
 		TagService,
 		BulkChangeService,
-		DataGridCheckboxService,
+		BulkCheckboxService,
 		ManufacturerService,
 		ModelService
 	],

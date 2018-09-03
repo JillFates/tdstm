@@ -13,6 +13,7 @@ import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 declare var jQuery: any;
 
@@ -33,9 +34,10 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
-			tagService: TagService) {
+			tagService: TagService,
+			promptService: UIPromptService) {
 
-			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata);
+			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		/**

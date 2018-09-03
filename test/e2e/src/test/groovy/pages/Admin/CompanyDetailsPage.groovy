@@ -30,7 +30,7 @@ class CompanyDetailsPage extends Page{
     }
 
     def hasCompanyPartner(){
-        partnerCheck.value()
+        partnerCheck.jquery.prop('checked')
     }
 
     def getTextMessage(){

@@ -3,3 +3,8 @@ export enum CheckboxStates {
 	indeterminate,
 	unchecked
 }
+
+export interface CheckboxState {
+	current: CheckboxStates;
+	affectItems: boolean;
+}
