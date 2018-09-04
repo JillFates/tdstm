@@ -184,8 +184,6 @@ ${person.toString()}""".stripIndent())
 			}
 	}*/
 
-/*
-
 	void 'test can fetch results first by manufacturer and after that results with model'() {
 
 		given:
@@ -216,7 +214,7 @@ ${person.toString()}""".stripIndent())
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 mfg,model
 Dell 11111,PPPPAAAAA
-${model.modelName},${manufacturer.name}
+${manufacturer.name},${model.modelName}
 """.stripIndent())
 
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -258,7 +256,6 @@ ${model.modelName},${manufacturer.name}
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-*/
 
 /*	void 'test can fetch results by find/elseFind'() {
 
