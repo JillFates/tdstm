@@ -43,8 +43,8 @@
 												<kendo-dropdownlist #controlSme
 														class="tm-input-control person-list"
 														name="modelAssetSme"
-														[(ngModel)]="model.asset.sme.id"
-														(selectionChange)="onPersonSelected($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														[(ngModel)]="persons.sme"
+														(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
@@ -72,8 +72,8 @@
 												<kendo-dropdownlist  #controlSme2
 													class="tm-input-control person-list"
 													name="modelAssetSme2"
-													[(ngModel)]="model.asset.sme2.id"
-													(selectionChange)="onPersonSelected($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+													[(ngModel)]="persons.sme2"
+													(selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 													[defaultItem]="defaultItem"
 													[textField]="'fullName'"
 													[valueField]="'personId'"
@@ -100,8 +100,8 @@
 												<kendo-dropdownlist
 														class="tm-input-control"
 														name="modelAssetappOwner"
-														[(ngModel)]="model.asset.appOwner.id"
-														(selectionChange)="onPersonSelected($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														[(ngModel)]="persons.appOwner"
+														(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"

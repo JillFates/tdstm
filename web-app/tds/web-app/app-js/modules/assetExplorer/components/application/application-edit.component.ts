@@ -29,10 +29,15 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		]
 	})
 	class ApplicationShowComponent extends AssetCommonEdit {
-		defaultItem = {fullName: 'Please Select', personId: 0};
+		defaultItem = {fullName: 'Please Select', personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
+		persons = {
+			sme: null,
+			sme2: null,
+			appOwner: null
+		};
 
 		constructor(
 			@Inject('model') model: any,
@@ -66,6 +71,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			if (this.model.asset.startUpBySelectedValue) {
 				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
+			this.updatePersonReferences();
 		}
 
 		/**
@@ -81,6 +87,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				const backSource = sourceId;
 				this.model.asset[source].id = targetId;
 				this.model.asset[target].id = backSource;
+				this.updatePersonReferences();
 			}
 		}
 
@@ -91,18 +98,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 */
 		public onUpdate(): void {
 			const modelRequest   = R.clone(this.model);
-
-			if ((modelRequest.asset.appOwner && modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId) || (modelRequest.asset.appOwner.id && modelRequest.asset.appOwner.id.personId === 0)) {
-				modelRequest.asset.appOwner.id = (modelRequest.asset.appOwner.id.personId !== 0) ? modelRequest.asset.appOwner.id.personId : null;
-			}
-
-			if ((modelRequest.asset.sme && modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId) || (modelRequest.asset.sme.id && modelRequest.asset.sme.id.personId === 0)) {
-				modelRequest.asset.sme.id = (modelRequest.asset.sme.id.personId !== 0) ? modelRequest.asset.sme.id.personId : null;
-			}
-
-			if ((modelRequest.asset.sme2 && modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId) || (modelRequest.asset.sme2.id && modelRequest.asset.sme2.id.personId === 0)) {
-				modelRequest.asset.sme2.id = (modelRequest.asset.sme2.id.personId !== 0) ? modelRequest.asset.sme2.id.personId : null;
-			}
 
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
@@ -127,17 +122,18 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 		}
-		onPersonSelected(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
 			if (person.personId !== this.addPersonItem.personId) {
+				this.model.asset[fieldName].id = person.personId;
 				return;
 			}
 
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
-			personModel.companies = companies;
+			personModel.companies = companies || [];
 			personModel.teams = teams;
-			personModel.staffType = staffTypes;
+			personModel.staffType = staffTypes || [];
 			this.dialogService.extra(AddPersonComponent,
 				[UIDialogService,
 					{
@@ -149,6 +145,11 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				.then((result) => {
 					this.personList.push({personId: result.id, fullName: result.name})
 					this.model.asset[fieldName].id = result.id;
+					this.updatePersonReferences();
+				})
+				.catch((error) => {
+					// get back to previous value
+					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
 		getPersonList(personList: any[]): any[] {
@@ -157,6 +158,11 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				this.personList.unshift(this.addPersonItem)
 			}
 			return this.personList;
+		}
+		updatePersonReferences(): void {
+			this.persons.sme = { personId: this.model.asset.sme.id};
+			this.persons.sme2 = { personId: this.model.asset.sme2.id};
+			this.persons.appOwner = { personId: this.model.asset.appOwner.id};
 		}
 	}
 
