@@ -1,6 +1,7 @@
 package pages.AssetViewManager
 import geb.Page
 import modules.MenuModule
+import modules.AssetsModule
 
 class SaveViewPage extends Page{
 
@@ -9,11 +10,12 @@ class SaveViewPage extends Page{
     }
 
     static content = {
-        saveViewModal                (wait:true) { $("section","class":"content-header")}
-        nameField                    {$("input", id:"name")}
-        saveBtn                      {$("button",text:"Save").not(id:"btnSave")}
-        menuModule                   { module MenuModule }
-        sharedView                   {$("input", name:"shared")}
+        saveViewModal  (wait:true) { $("section","class":"content-header")}
+        nameField {$("input", id:"name")}
+        saveBtn {$("button",text:"Save").not(id:"btnSave")}
+        menuModule { module MenuModule }
+        assetsModule { module AssetsModule }
+        sharedView {$("input", name:"shared")}
     }
 
     def enterName(String value){

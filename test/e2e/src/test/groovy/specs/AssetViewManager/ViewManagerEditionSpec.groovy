@@ -28,7 +28,7 @@ class ViewManagerEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
         at AssetViewsPage
         //Creates a view to use in validations
         waitFor{allViewsModule.clickCreateView()}

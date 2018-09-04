@@ -40,7 +40,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The user goes to the All Assets page'
-            menuModule.goToAllAssets()
+            assetsModule.goToAllAssets()
 
         then: 'The All Assets Page loads with no problem'
             at ViewPage

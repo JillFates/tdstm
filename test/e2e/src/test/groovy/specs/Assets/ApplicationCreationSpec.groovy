@@ -42,18 +42,16 @@ class ApplicationCreationSpec extends GebReportingSpec {
     }
 
     def "1. The User Navigates in the Assets Application List Section"() {
-        testKey = "tm-xxxx"
         given: 'The User searches in the menu page'
             at MenuPage
         when: 'The User clicks in the Assets > Applications Menu option'
-            menuModule.goToApplications()
+            assetsModule.goToApplications()
 
         then: 'Application List should be displayed'
             at ApplicationListPage
     }
 
     def "2. The User gains access to the Application Creation Window"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User Clicks the "Create App" Button'
@@ -64,8 +62,6 @@ class ApplicationCreationSpec extends GebReportingSpec {
     }
 
     def "3. A brand new Application is successfully created"() {
-        testKey = "TM-XXXX"
-
         given: 'The User is in the Application Create Pop-up'
             at ApplicationCreationPage
         when: 'The User completes all the Random Information for Name and Description'
@@ -102,7 +98,6 @@ class ApplicationCreationSpec extends GebReportingSpec {
     }
 
     def "4. The User Filters out by Application Name Name that was recently created"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User Clicks the Application Name Filter Column'
@@ -117,7 +112,6 @@ class ApplicationCreationSpec extends GebReportingSpec {
     }
 
     def "5. Validate Application Details"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Application List Page'
             at ApplicationDetailsPage
 
