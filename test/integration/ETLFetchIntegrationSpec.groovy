@@ -9,7 +9,6 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import test.helper.AssetEntityTestHelper
 
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
@@ -256,8 +255,8 @@ ${manufacturer.name},${model.modelName}
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-
-/*	void 'test can fetch results by find/elseFind'() {
+	/** TODO:dcorrea. Review with John in SearchQueryHelper, this line -> fieldsInfo[propertyName].find.size = recordsFound
+	void 'test can fetch results by find/elseFind'() {
 
 		given:
 			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
@@ -275,7 +274,7 @@ ${manufacturer.name},${model.modelName}
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 model,manufacturer
-Dell 11111,
+Dell 11111,PPAA
 ${model.modelName},${manufacturer.name}""".stripIndent())
 
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -294,19 +293,16 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 
 					extract 'manufacturer' set manufacturerNameVar
 					extract 'model' set modelNameVar
-					find Model by 'manufacturer', 'model' with manufacturerNameVar, modelNameVar into 'model'
+					find Device by 'manufacturer', 'model' with manufacturerNameVar, modelNameVar into 'model'
 					fetch 'Model' set modelVar
 
-					if(ROW == 0){
-					
+					if(ROW == 1){
+						assert modelVar == null
 					} 	
 
-					if(ROW == 1){
-					
+					if(ROW == 2){
+						assert modelVar.id == ${model.id}
 					}
-					assert modelVar != null
-					assert modelVar.id == ${model.id}
-					
 				}
 			""".stripIndent())
 
@@ -319,7 +315,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-	}*/
+	} */
 
 	void 'test can fetch model based on manufacturer and model'() {
 
