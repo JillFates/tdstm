@@ -4,6 +4,7 @@ package specs.Assets
  * @author Sebastian Bigatton
  */
 
+import pages.Assets.BulkChangeEditAssetsPage
 import pages.Assets.BulkChangeActionPage
 import pages.AssetViewManager.ViewPage
 import spock.lang.Stepwise
@@ -14,7 +15,7 @@ import spock.lang.Stepwise
 import spock.lang.Shared
 
 @Stepwise
-class AssetsBulkDeleteSpec extends GebReportingSpec {
+class AssetsBulkEditSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -23,7 +24,10 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
     static assetNames = []
     @Shared
     static assetCheckboxNameMap = []
-    static numberOfAssetsToBeDeleted = 2
+    @Shared
+    static selectedTags = []
+    static numberOfAssetsToBeEdited = 3
+    static noRecordsMessage = "No records available"
 
     def setupSpec() {
         testCount = 0
@@ -47,8 +51,10 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
             at ViewPage
         when: 'The user filters by name QAE2E'
             filterByName baseName
-        and: 'The user selects random assets and collects names'
-            assetNames = selectRandomAssetsAndGetNames numberOfAssetsToBeDeleted
+        then: 'The user verifies if no records displayed'
+            verifyIfNoRecordsDisplayed noRecordsMessage
+        when: 'The user selects random QAE2E or any assets displayed and collects names'
+            assetNames = selectRandomAssetsAndGetNames numberOfAssetsToBeEdited
         and: 'The user clicks on Bulk Change button'
             clickOnBulkChangeButton()
         then: 'Bulk Change Action modal is displayed'
@@ -69,46 +75,46 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
             verifyCheckedInputAssetsByName assetNames
     }
 
-    def "3. Certify delete confirmation modal message"(){
+    def "3. Certify Bulk Change Edit Assets modal step"(){
         given: 'The user clicks on Bulk Change button'
             clickOnBulkChangeButton()
         and: 'Bulk Change Action modal is displayed'
             at BulkChangeActionPage
-        when: 'The User clicks on Delete radio button'
-            clickOnDeleteRadioButton()
+        when: 'The User clicks on Next button'
+            clickOnNextButton()
+        then: 'Bulk Change Edit Assets modal is displayed'
+            at BulkChangeEditAssetsPage
+    }
+
+    def "4. Certify confirmation update process"(){
+        when: 'The User selects field name'
+            selectFieldNameByText "Tags"
+        and: 'The User selects action'
+            selectActionByText "Add to existing"
+        and: 'The User selects random value by given text or any'
+            commonsModule.selectRandomKendoMultiselectTagOptionByText baseName
+            selectedTags = commonsModule.getSelectedTagsFromKendoMultiselect()
         and: 'The User clicks on Next button'
             clickOnNextButton()
         then: 'Delete confirmation modal message is correct'
-            commonsModule.verifyConfirmationPrompDialogMessage "You are about to delete ${assetNames.size()} Asset(s)"
+            commonsModule.verifyConfirmationPrompDialogMessage "You are about to update ${assetNames.size()} Asset(s)"
     }
 
-    def "4. Certify assets still selected after cancel delete confirmation process"(){
-        when: 'The User clicks on Cancel button'
-            commonsModule.clickOnButtonPromptModalByText("Cancel")
+    def "5. Certify bulk change edit asset process is complete"() {
+        when: 'The User clicks on Confirm button'
+            commonsModule.clickOnButtonPromptModalByText("Confirm")
         then: 'Confirmation modal is closed'
             commonsModule.waitForPromptModalHidden()
-        and: 'Bulk Change Action is closed'
-            commonsModule.waitForDialogModalHidden()
         and: 'All Assets view is displayed'
             at ViewPage
-        and: 'Selected assets still checked'
-            verifyCheckedInputAssetsByName assetNames
+        and: 'All checkboxes are unchecked in page'
+            checkedItems false
     }
 
-    def "5. Certify deleted assets"(){
-        given: 'The user clicks on Bulk Change button'
-            clickOnBulkChangeButton()
-        and: 'Bulk Change Action modal is displayed'
-            at BulkChangeActionPage
-        when: 'The User clicks on Delete radio button'
-            clickOnDeleteRadioButton()
-        and: 'The User clicks on Next button'
-            clickOnNextButton()
-        and: 'The User clicks on Confirm button'
-            commonsModule.clickOnButtonPromptModalByText("Confirm")
-        then: 'All Assets view is displayed'
-            at ViewPage
-        and: 'Assets are not displayed'
-            verifyDeletedAssetsByCheckboxName assetCheckboxNameMap
+    def "6. Certify applied changes to assets"(){
+        when: 'The user adds custom column'
+            addColumnByName "Tags"
+        then: 'Tags were added successfully to assets'
+                verifyDisplayedTagsByAsset assetCheckboxNameMap, selectedTags
     }
 }

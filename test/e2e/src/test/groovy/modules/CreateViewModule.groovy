@@ -22,6 +22,7 @@ class CreateViewModule extends Module {
         saveBtn                      {$("button", text:"Save")}
         saveOptions                  {$("button.dropdown-toggle")}
         saveAs                       {$("a",text:"Save As")}
+        closeViewEdition {$("button i.fa-angle-double-down")}
         //>>>>tabs
         assetsClasses                {$("a",text:"Asset Classes")}
         fields                       {$("a",text:"Fields")}
@@ -55,8 +56,12 @@ class CreateViewModule extends Module {
     }
 
     def clickSpecificCheckbox(String name){
-        def nameChk = $("label", text: name)
+        def nameChk = waitFor{$("label", text: name)}
         nameChk.click()
+    }
+
+    def clickOnCloseViewEdition(){
+        waitFor{closeViewEdition.click()}
     }
 
     def filterPreviewByText(String txt){
@@ -84,7 +89,7 @@ class CreateViewModule extends Module {
     }
 
     def clickPreview(){
-        previewBtn.click()
+        waitFor{previewBtn.click()}
     }
 
     def String searchFieldName(){
