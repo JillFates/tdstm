@@ -270,4 +270,5 @@ databaseChangeLog = {
 	include file: '20180807-add-last-updated-to-move-event.groovy'
 	include file: '20180809-all-storage-system-view.groovy'
 	include file: '20180809-all-applications-system-view.groovy'
+	include file: '20180904-project-table-drop-column-custom-fields-shown.groovy'
 }
