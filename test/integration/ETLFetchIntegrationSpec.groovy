@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import test.helper.AssetEntityTestHelper
 
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
@@ -323,7 +324,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			}
 	}*/
 
-	void 'test can fetch model based on'() {
+	void 'test can fetch model based on manufacturer and model'() {
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -367,15 +368,14 @@ ${device.id},${device.assetName},${device.model.modelName},${device.model.manufa
 				domain Device
 				
 				iterate {
-					
 					extract 'manufacturer' load 'manufacturer' set manufacturerNameVar
 					extract 'model' load 'model' set modelNameVar
 					fetch 'Model' set modelVar
 
-					if(ROW == 0){
+					if(ROW == 1){
 						assert modelVar == null
 					}		
-					if(ROW == 1){
+					if(ROW == 2){
 						assert modelVar.id == ${model.id}
 					}
 				}
@@ -446,9 +446,10 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			}
 	}
 
-	void 'test can fetch results by Alternate Key using a non AssetEntity'() {
 
-		given: 'a defined manufacturer assigned to an Device domain'
+	/*void 'test can fetch results by Alternate Key using a non AssetEntity'() {
+
+		given: 'a defined Model and Manufacturer assigned to an Device domain'
 			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
 
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
@@ -456,6 +457,19 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			device.environment = 'Production'
 			device.os = 'Microsoft'
 			device.ipAddress = '192.168.1.10'
+
+			Model model = new Model(
+				modelName: "PowerEdge 1950",
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
 			device.manufacturer = manufacturer
 			device.save(failOnError: true, flush: true)
 
@@ -477,11 +491,15 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 				domain Device
 				iterate {
 					// Load the manufacturer with the alternate key
-					extract 'mfg' load 'Manufacturer' set mfgNameVar
-					fetch 'Manufacturer' set mfgVar
+					extract 'mfg' load 'manufacturer' set mfgNameVar
+					fetch 'Model' set modelVar
 					
-					if(mfgVar){
-						assert mfgVar.id == ${manufacturer.id} 
+					if(ROW == 1){
+						assert modelVar == null
+					}
+
+					if(ROW == 2){
+						assert modelVar.id == ${model.id} 
 					}
 				}
 			""".stripIndent())
@@ -495,5 +513,5 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-	}
+	}*/
 }
