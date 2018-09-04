@@ -622,7 +622,10 @@ class Element implements RangeChecker {
 	 * @return
 	 */
 	Element set(Object variableName) {
-		if ( !(variableName instanceof String) || processor.hasVariable(variableName)) {
+		if ( !(variableName instanceof String) ||
+				  processor.hasVariable(variableName) ||
+				  ! processor.binding.isValidETLVariableName(variableName)
+		) {
 			throw ETLProcessorException.invalidSetParameter()
 
 		}

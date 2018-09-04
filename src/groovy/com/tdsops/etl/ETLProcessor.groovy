@@ -651,10 +651,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param field
 	 * @return
 	 */
-	Map<String, ?> set(final String variableName) {
-		if (!binding.isValidETLVariableName(variableName)) {
-			throw ETLProcessorException.invalidETLVariableName(variableName)
+	Map<String, ?> set(final Object variableName) {
+		if ( !(variableName instanceof String) ||
+				  hasVariable(variableName) ||
+				  ! binding.isValidETLVariableName(variableName)
+		) {
+			throw ETLProcessorException.invalidSetParameter()
+
 		}
+
 		validateStack()
 
 		return [

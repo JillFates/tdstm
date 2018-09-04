@@ -175,15 +175,13 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Invalid variable name: ${variableName}. Variable names must end with 'Var'")
     }
 
-    static final String missingPropertyExceptionMessage = "No such property: variableName"
-	static ETLProcessorException missingPropertyException (String variableName) {
-		return new ETLProcessorException(missingPropertyExceptionMessage.replace('variableName', variableName))
-	}
+    static ETLProcessorException missingPropertyException (String variableName) {
+        return new ETLProcessorException("No such property: ${variableName}")
+    }
 
-	static final String invalidReadCommandMessage = "Incorrect use of 'read labels' command'"
-	static ETLProcessorException invalidReadCommand () {
-		return new ETLProcessorException(invalidReadCommandMessage)
-	}
+    static ETLProcessorException invalidReadCommand () {
+        return new ETLProcessorException("Incorrect use of 'read labels' command'")
+    }
 
     /**
      * Exception being thrown when no domain is specified upon load clause
