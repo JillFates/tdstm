@@ -506,5 +506,6 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-	}*/
+	}
+	*/
 }
