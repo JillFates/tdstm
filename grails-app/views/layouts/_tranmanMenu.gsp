@@ -196,18 +196,38 @@
                                     <g:img uri="/icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-asset-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="1">
+                            <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-devices-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="3">
+                            <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">
+                                    <tds:svgIcon name="database_menu" width="16" height="16" /> All Databases
+                                </g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">
+                                    <tds:svgIcon name="application_menu" width="16" height="16" /> All Applications
+                                </g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
+                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> All Storage - Physical
+                                </g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
+                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> All Storage - Virtual
+                                </g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-all-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="3" elementId="3">
                                     <tds:svgIcon name="other_menu" width="16" height="16" /> All Devices
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-devices-explorer">
-                                <g:link class="mmlink" mapping="assetViewShow" id="4">
+                            <li class="menu-child-item menu-parent-assets-server-list assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="4" elementId="4">
                                     <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> All Servers
                                 </g:link>
                             </li>
