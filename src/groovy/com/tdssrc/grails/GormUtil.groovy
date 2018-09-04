@@ -782,8 +782,8 @@ public class GormUtil {
 	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
 	 * @return the cloned object
 	 */
-	static Object cloneDomain(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal=false) {
-		Object newDomain = domainClone(originalDomain, replaceKeys)
+	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false) {
+		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
 		newDomain.save(flush:true)
 
@@ -804,7 +804,8 @@ public class GormUtil {
 	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
 	 * @return the cloned object
 	 */
-	static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
+	//static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
+	static Object cloneDomain(Object originDomain,  Map replaceKeys = [:]) {
 		logger.debug("** Cloning: {} *****", originDomain.getClass())
 		if (!isDomainClass(originDomain.getClass())) {
 			throw new RuntimeException('A non-Grails Domain object was received')
@@ -902,7 +903,7 @@ public class GormUtil {
 		Object clone
 		if (! findCloneDomainTarget(domain, keyValues)) {
 			// println "cloneDomainIfNotExist() cloning domain ($domain) and replacing ($keyValues)"
-			clone = cloneDomain(domain, keyValues, deleteOriginal)
+			clone = cloneDomainAndSave(domain, keyValues, deleteOriginal)
 			// println "cloneDomainIfNotExist() resulted in $clone"
 		} else {
 			if (deleteOriginal) {

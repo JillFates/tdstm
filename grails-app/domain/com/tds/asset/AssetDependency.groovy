@@ -74,7 +74,7 @@ class AssetDependency {
 	 * @return
 	 */
 	AssetDependency clone(Map replaceKeys = [:]){
-		AssetDependency clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetDependency
+		AssetDependency clonedAsset = GormUtil.cloneDomain(this, replaceKeys) as AssetDependency
 		return clonedAsset
 	}
 

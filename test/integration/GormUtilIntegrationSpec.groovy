@@ -127,12 +127,12 @@ class GormUtilIntegrationSpec extends Specification {
 	def "5. Test cloneDomain"() {
 		when:
 			Person p = new Person(firstName:'Jack', middleName:'B', lastName:'Nimble')
-			Person n = GormUtil.cloneDomain(p, [lastName:'Quick'])
+			Person n = GormUtil.cloneDomainAndSave(p, [lastName:'Quick'])
 		then:
 			n.toString().equals('Jack B Quick')
 
 		when:
-			GormUtil.cloneDomain(new String() )
+			GormUtil.cloneDomainAndSave(new String() )
 		then:
 			RuntimeException e = thrown()
 
