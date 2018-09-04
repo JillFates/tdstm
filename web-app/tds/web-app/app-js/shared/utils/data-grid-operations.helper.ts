@@ -302,7 +302,7 @@ export class DataGridOperationsHelper {
 	 * @param item
 	 */
 	public addDataItem(item: any): void {
-		this.gridData.data.push(item);
+		this.gridData.data.unshift(item);
 	}
 
 	/**
