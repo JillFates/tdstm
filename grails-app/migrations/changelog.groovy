@@ -272,4 +272,5 @@ databaseChangeLog = {
 	include file: '20180809-all-applications-system-view.groovy'
 	include file: '20180904-project-table-drop-column-custom-fields-shown.groovy'
 	include file: '20180829-rename-agent-to-connector.groovy'
+  	include file: '20180904-project-table-drop-column-custom-fields-shown.groovy'
 }
