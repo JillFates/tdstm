@@ -651,10 +651,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param field
 	 * @return
 	 */
-	Map<String, ?> set(final String variableName) {
-		if (!binding.isValidETLVariableName(variableName)) {
-			throw ETLProcessorException.invalidETLVariableName(variableName)
+	Map<String, ?> set(final Object variableName) {
+		if ( !(variableName instanceof String) ||
+				  hasVariable(variableName) ||
+				  ! binding.isValidETLVariableName(variableName)
+		) {
+			throw ETLProcessorException.invalidSetParameter()
+
 		}
+
 		validateStack()
 
 		return [
@@ -1122,6 +1127,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	void addGlobalVariableInBinding(String variableName, Object value) {
 		binding.addGlobalVariable(variableName, value)
 	}
+
+	/**
+	 * Check in the binding if a variable has been declared already
+	 * @param varName
+	 * @return
+	 */
+	boolean hasVariable(String varName) {
+		binding.hasVariable(varName)
+	}
+
 	/**
 	 * Adds a new row in the list of rows
 	 * @param rowIndex
