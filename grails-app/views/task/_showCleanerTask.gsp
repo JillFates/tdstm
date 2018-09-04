@@ -247,40 +247,43 @@
 </div>
 <script type="text/javascript">
 	$(function() {
-	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
-		$('#noteId_'+${assetComment.id}).hide()
-		$('#resolutionId_'+${assetComment.id}).show()
-	}
-	document.onkeyup = keyCheck;
-});
+		if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
+			$('#noteId_'+${assetComment.id}).hide();
+			$('#resolutionId_'+${assetComment.id}).show();
+		}
+		document.onkeyup = keyCheck;
+	});
 
-function showResolve() {
-	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
-		$('#noteId_'+${assetComment.id}).hide()
-		$('#resolutionId_'+${assetComment.id}).show()
-	} else {
-		$('#noteId_'+${assetComment.id}).show()
-		$('#resolutionId_'+${assetComment.id}).hide()
+	function showResolve() {
+		if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
+			$('#noteId_'+${assetComment.id}).hide()
+			$('#resolutionId_'+${assetComment.id}).show()
+		} else {
+			$('#noteId_'+${assetComment.id}).show()
+			$('#resolutionId_'+${assetComment.id}).hide()
+		}
 	}
-}
 
-function keyCheck( e ) {
+	function keyCheck( e ) {
 		var keyStrokesFlag = $('.keyStrokesHandler').attr('status')
 		if(keyStrokesFlag && keyStrokesFlag === 'enable' ) {
 			var currentFocus = document.activeElement.id;
-	var focusId = currentFocus.substring(0,currentFocus.indexOf("_"))
-	if (currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ) {
-		if (!e && window.event) e=window.event;
-		var keyID = e.keyCode;
+			var focusId = currentFocus.substring(0,currentFocus.indexOf("_"));
+			if (currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ) {
+				if (!e && window.event) {
+				    e=window.event;
+                }
+				var keyID = e.keyCode;
 
 				<g:if test="${assetComment.status == "Started" || assetComment.status == "Ready"}">
 					if (keyID == KeyEvent.DOM_VK_RETURN || keyID == KeyEvent.DOM_VK_D || keyID == KeyEvent.DOM_VK_NUMPAD4) {
-			$("#printAndDoneButton").click()
-			return;
+						$("#printAndDoneButton").click()
+						return;
 					} else if (keyID == KeyEvent.DOM_VK_P) {
-			startprintjob();
-		}
+						startprintjob();
+					}
 				</g:if>
+
 				// Input is a numeric value from normal keyboard or extended numeric pad
 				if((keyID >= KeyEvent.DOM_VK_0 && keyID <= KeyEvent.DOM_VK_9) || (keyID >= KeyEvent.DOM_VK_NUMPAD0 && keyID <= KeyEvent.DOM_VK_NUMPAD9)){
 
@@ -293,15 +296,16 @@ function keyCheck( e ) {
 						labelQty = keyID - KeyEvent.DOM_VK_NUMPAD0;
 					}
 
-		if (labelQty > 0 && labelQty < 10) {
+					if (labelQty > 0 && labelQty < 10) {
 						var printTimesSelector = $('#printTimes');
 						printTimesSelector.focus();
-			if ($("input:focus").length < 1) {
+
+						if ($("input:focus").length < 1) {
 							printTimesSelector.val(labelQty);
 							printTimesSelector.change();
-			}
-		}
-	}
+						}
+					}
+				}
 
 				//Increment or decrement pages using '-' or '+' keys
 				if(keyID == KeyEvent.DOM_VK_PLUS || keyID == KeyEvent.DOM_VK_HYPHEN_MINUS){
@@ -315,7 +319,7 @@ function keyCheck( e ) {
 						if(value > 0 && value < 10) {
 							printTimesSelector.val(value);
 							printTimesSelector.change();
-}
+						}
 					}
 				}
 
@@ -329,95 +333,98 @@ function keyCheck( e ) {
 		}
 	}
 
-function printAndMarkDone(id, status, currentStatus) {
+	function printAndMarkDone(id, status, currentStatus) {
 		startprintjob({
 			onSuccess: function(){
-	jQuery.ajax({
-		url: '../task/update',
-		data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
-		type:'POST',
-		success: function(data) {
-			if (typeof data.error !== 'undefined') {
-				alert(data.error);
-			} else {
+				jQuery.ajax({
+					url: '../task/update',
+					data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
+					type:'POST',
+					success: function(data) {
+						if (typeof data.error !== 'undefined') {
+							alert(data.error);
+						} else {
 							$("#myIssueList").replaceWith(data);
 							$("#search").focus();
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while attempting to update task/comment")
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert("An unexpected error occurred while attempting to update task/comment")
 					}
 				});
-		}
-	});
-}
+			}
+		});
+	}
  
-function validateComment(objId){
-	var status = $('#statusEditId_'+${assetComment.id}).val()
+	function validateComment(objId){
+		var status = $('#statusEditId_'+${assetComment.id}).val()
 		var params = {
 			'comment':$('#editComment_'+objId).val(),
-			'resolution':$('#resolutionEditId_'+objId).val(), 
-			'category':$('#categoryEditId_'+objId).val(), 
+			'resolution':$('#resolutionEditId_'+objId).val(),
+			'category':$('#categoryEditId_'+objId).val(),
 			'assignedTo':$('#assignedToEditId_'+objId).val(),
 			'status':$('#statusEditId_'+objId).val(),
-			'currentStatus':$('#currentStatus_'+objId).val(), 
+			'currentStatus':$('#currentStatus_'+objId).val(),
 			'note':$('#noteEditId_'+objId).val(),
 			'id':objId,'view':'myTask',
 			'tab': $('#tabId').val()
-	}
+		};
 
-	jQuery.ajax({
-		url: '../task/update',
-		data: params,
-		type:'POST',
-		success: function(data) {
-			if (typeof data.error !== 'undefined') {
-			} else {
-				$('#myTaskList').html(data)
-				$('#showStatusId_'+objId).show()
-				$('#issueTrId_'+objId).each(function(){
-					$(this).removeAttr('onclick')
-					$(this).unbind("click").bind("click", function(){
-						hideStatus(objId,status)
+		jQuery.ajax({
+			url: '../task/update',
+			data: params,
+			type:'POST',
+			success: function(data) {
+				if (typeof data.error !== 'undefined') {
+				} else {
+					$('#myTaskList').html(data);
+					$('#showStatusId_'+objId).show();
+					$('#issueTrId_'+objId).each(function(){
+						$(this).removeAttr('onclick');
+						$(this).unbind("click").bind("click", function(){
+							hideStatus(objId,status);
+						});
 					});
-				})
-				if (status=='Started') {
-					$('#started_'+objId).hide()
+
+					if (status=='Started') {
+						$('#started_'+objId).hide();
+					}
+
+					timerBar.Restart();
 				}
-				timerBar.Restart();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while attempting to update task/comment")
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while attempting to update task/comment")
-		}
-	});
-}
-
-function truncate( text ){
-	var trunc = text
-	if(text){
-		if(text.length > 50){
-			trunc = trunc.substring(0, 50);
-			trunc += '...'
-		}
+		});
 	}
-	return trunc;
-}
 
-function hideStatus(id,status){
-	$('#showStatusId_'+id).hide()
-	$('#detailTdId_'+id).css('display','none')
-	timerBar.Start();
-}
+	function truncate( text ){
+		var trunc = text;
+		if(text){
+			if(text.length > 50){
+				trunc = trunc.substring(0, 50);
+				trunc += '...';
+			}
+		}
+		return trunc;
+	}
+
+	function hideStatus(id,status){
+		$('#showStatusId_'+id).hide();
+		$('#detailTdId_'+id).css('display','none');
+		timerBar.Start();
+	}
  </script>
 
 <script type="text/javascript" language="javascript">
 //=============================================================================
 // PRINT HERE
 //=============================================================================
+	window.PREFS.PRINTER_COPIES = '${lblQty}';
+	window.PREFS.PRINTER_NAME = '${prefPrinter}';
 
 	function startprintjob(opts) {
-		//debugger; // This code is injected dynamically, let's force the debugger to stop into the VM compilation at runtime
 		var printerName = $('#printers').val();
 		var printerCopies = $("#printTimes").val();
 
@@ -425,16 +432,16 @@ function hideStatus(id,status){
 		window.PREFS.PRINTER_NAME   = printerName;
 		window.PREFS.PRINTER_COPIES = parseInt(printerCopies);
 
-	jQuery.ajax({
-			url: "${createLink(controller:'assetEntity', action: 'setImportPerferences')}",
-			data: JSON.stringify({
-				"PRINTER_NAME":printerName,
-				"PRINTER_COPIES":printerCopies
-			}),
-			type: 'POST',
-			contentType: "application/json; charset=utf-8",
-			dataType: 'json'
-	});
+		jQuery.ajax({
+				url: "${createLink(controller:'task', action: 'setLabelQuantityPref')}",
+				data: JSON.stringify({
+					"PRINTER_NAME":printerName,
+					"PRINT_LABEL_QUANTITY":printerCopies
+				}),
+				type: 'POST',
+				contentType: "application/json; charset=utf-8",
+				dataType: 'json'
+		});
 
 		opts = opts || {};
 		var NOP = function(){};
@@ -442,8 +449,7 @@ function hideStatus(id,status){
 		var onFail = opts.onFail || NOP;
 		var onDone = opts.onDone || NOP;
 	    
-		window.QZObj.print(
-			{
+		window.QZObj.print({
 				printerName: printerName,
 				data:{
 					assetName : $("#assetName").val(),
@@ -472,27 +478,26 @@ function hideStatus(id,status){
 					onFail(error, qz);
 				},
 				onDone : onDone
+		});
 	}
-		);
-}
 
 //=============================================================================
 // Add a new option to select element
 //=============================================================================
 	function AddOption (selElement, text, value){
-  opt = new Option(text, value, false, true);
-//selElement.options[0] = opt;
-}
+	    opt = new Option(text, value, false, true);
+		// selElement.options[0] = opt;
+	}
 
 //=============================================================================
 // Set default data for TFORMer Runtime Properties
 //=============================================================================
 	function InitData(){
-		//Nothing here yet
+		// Nothing here yet
 	}
 
 	function focusOnPrintAndDone(){
-		//To check the Instructions for enable the Clean Button
+		// To check the Instructions for enable the Clean Button
 		if(!$('#printAndDoneButton').is(':disabled')){
 			//push to the bottom of the event queue
 			setTimeout(function() {

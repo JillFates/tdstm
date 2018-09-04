@@ -74,6 +74,10 @@ enum UserPreferenceEnum {
 	TIMELINE_REFRESH('RefreshTimeline'),
 	VIEW_MANAGER_DEFAULT_SORT('viewManagerDefaultSort')
 
+	static final Map<UserPreferenceEnum, ?> DEFAULT_VALUES = [
+			  (PRINT_LABEL_QUANTITY) : 2
+	].asImmutable()
+
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportCabling,
 	                                                              ImportComment, DataScriptSize].asImmutable()
