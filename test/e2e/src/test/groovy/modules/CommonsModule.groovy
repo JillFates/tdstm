@@ -112,6 +112,10 @@ class CommonsModule extends Module {
         deleteAlertMessage.text()
     }
 
+    def verifyDeletePrompDialogMessage(text){
+        getDeleteAlertMessageText().contains text
+    }
+
     def blockCookbookLoadingIndicator(){
         loadingIndicator.jquery.attr("style", "display: none !important")
     }
@@ -149,5 +153,9 @@ class CommonsModule extends Module {
         interact{
             moveToElement element
         }
+    }
+
+    def isListOfElements(selector){
+        selector.size() > 1
     }
 }
