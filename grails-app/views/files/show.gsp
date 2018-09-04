@@ -72,6 +72,7 @@
 					<tds:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 				</tr>
 				<g:render template="../assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
+				<g:render template="/comment/assetTagsShow"></g:render>
 				</tbody>
 			</table>
 			</div>
@@ -110,6 +111,7 @@
 
 	$(document).ready(function() {
 		changeDocTitle('${raw(escapedName)}');
-	})
+		EntityCrud.loadAssetTags(${filesInstance?.id});
+	});
 </script>
 

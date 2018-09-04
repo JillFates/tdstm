@@ -2,6 +2,7 @@ package pages.Projects
 
 import geb.Page
 import modules.CommonsModule
+import modules.ProjectsModule
 
 class ProjectListPage extends Page {
 
@@ -38,6 +39,7 @@ class ProjectListPage extends Page {
         projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
         projectDeletedMessage { $("#messageDivId")}
         showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
+        projectsModule { module ProjectsModule}
     }
 
     def clickOnCreateButton(){

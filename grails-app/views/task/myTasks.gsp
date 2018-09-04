@@ -31,7 +31,7 @@
 	var timerBar;
 
 	$(document).ready(function() {
-		timerBar = new TimerBar(60, 'RefreshMyTasks', null);
+		timerBar = new TimerBar(60, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.MYTASKS_REFRESH}', null);
 	});
 </script>
 </head>

@@ -13,7 +13,7 @@ import spock.lang.Ignore
 
 
 @Stepwise
-class AllAssetsSpec extends GebReportingSpec {
+class AllAssetsListSelectAllSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -56,10 +56,10 @@ class AllAssetsSpec extends GebReportingSpec {
         and: 'We verify all the items are checked'
             checkedItems()== true
         when: 'We uncheck all the items'
-            waitFor{selectAllChecks.click()}
-
+            clickOnSelectAllAssets() // click set indeterminate state
+            clickOnSelectAllAssets() // click again to uncheck
         then: 'All the items are unchecked again'
-            checkedItems()== false
+            checkedItems(false)== true
 
     }
 

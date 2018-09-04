@@ -36,7 +36,7 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        menuModule.goToDatascripts()
+        projectsModule.goToDatascripts()
         at DatascriptsPage
         createBtn.click()
         at CreateDatascriptPage
@@ -61,7 +61,6 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
 
 
     def "1. The user opens Datascript Designer modal"() {
-        testKey = "TM-11071"
         given: 'The User is in datascript details modal'
             at DatascriptDetailsPage
         when: 'The user clicks on datascript designer button'
@@ -73,12 +72,9 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
             getCheckSyntaxButtonVisibility() == "true"
             getViewConsoleButtonVisibility() == "true"
             getSaveButtonVisibility() == "true"
-        and: 'No records available text is being displayed in the Sample Data Preview section'
-            getNoRecordsInSampleDataText().contains("No records available")
     }
 
     def "2. The user opens Sample Data modal"() {
-        testKey = "TM-11071"
         given: 'The user is on the Datascript designer modal'
             at DatascriptDesignerPage
         when: 'The user clicks on Load sample data button'
@@ -88,7 +84,6 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
     }
 
     def "3. Certify that data on the Sample Data Preview section is being displayed"() {
-        testKey = "TM-11071"
         given: 'The user is in Sample Data modal'
             at DatascriptDesignerSampleDataPage
         when: 'The user selects source option type Paste content'
@@ -107,7 +102,6 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
     }
 
     def "4. Certify that Data is being displayed on the Transformed Data Preview Section"() {
-        testKey = "TM-11071"
         given: 'The user is in Sample Data modal'
             at DatascriptDesignerPage
         when: 'The user sets datascript code'

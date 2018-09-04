@@ -1,13 +1,41 @@
-<div class="modal fade in" id="import-batch-record-dialog" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xlg" role="document">
-        <div class="modal-content">
+<style>
+    .modal-content {
+        width: 1065px;
+    }
+    .modal-title {
+        float: left;
+    }
+    .tool-box {
+        float: right;
+    }
+    .modal-body {
+        height: 650px;
+        overflow: auto;
+    }
+</style>
+<div class="modal fade in tds-ui-modal-decorator" id="import-batch-record-dialog" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content resizable"
+             tds-ui-modal-decorator=""
+             [isWindowMaximized]="isWindowMaximized"
+             [options]="modalOptions">
             <div class="modal-header">
-                <button (click)="onCancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
                 <h4 class="modal-title">Record Detail</h4>
+                <div class="tool-box">
+                    <button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
+                        <span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
+                    </button>
+
+                    <button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
+                        <span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
+                    </button>
+
+                    <button id="btnCloseDialog" (click)="onCancelCloseDialog()" type="button" class="close-screen" aria-label="Close" title="Close">
+                        <span class="glyphicon glyphicon-remove" title="Close"></span>
+                    </button>
+                </div>
             </div>
-            <div class="modal-body" style="height: 650px; overflow: auto;">
+            <div class="modal-body" >
                 <div class="modal-body-container">
                     <section>
                         <import-batch-record-summary

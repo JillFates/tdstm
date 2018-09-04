@@ -419,7 +419,7 @@ class ImportBatchService implements ServiceMethods {
 			if (!fieldName) {
 				fieldName = ( field.fieldName in labelsToFieldName ? labelsToFieldName[field.fieldName] : null)
 			}
-println "****** ***** updateBatchRecord() fieldName=$fieldName, validFields=$validFields"
+
 			if (fieldName != null) {
 			// if (field.fieldName in validFields) {
 				// The field for the id has a different structure

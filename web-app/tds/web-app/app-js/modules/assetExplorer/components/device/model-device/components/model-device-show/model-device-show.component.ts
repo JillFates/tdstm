@@ -34,7 +34,9 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	}
 
 	onEditModel(): void {
-		console.log('On edit model');
+		// fix issue preventing submit form from bootstrap modal
+		document.getElementById('editModelForm')['submit']();
+		this.close();
 	}
 
 }

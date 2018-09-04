@@ -31,6 +31,7 @@ tds.admin.controller.MainController = function (scope, modal, utils, adminServic
 	    });
 
 	    $("#unlockUserDialog").dialog("open");
+	    $(".ui-dialog").css("width","330px")
 	    $("#unlockUserDialog").parent().find(".ui-dialog-buttonpane").css('width', 'auto')
 
 		/*
