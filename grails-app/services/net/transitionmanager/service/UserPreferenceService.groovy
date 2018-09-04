@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.common.validation.ConstraintsValidator
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -37,72 +38,85 @@ class UserPreferenceService implements ServiceMethods {
 	// ac:Asset Classes, de: Dependencies, hb: Highlight By
 	private static final Collection<String> legendTwistieStateValid = ['ac', 'de', 'hb']
 
-	// TODO - TM-6569 - Refactor the Map definition with the closures
-	private static final Map<String, Map> prefCodeConstraints = [
-		viewUnpublished:  [type: 'boolean'],
-		assetJustPlanning: [type: 'boolean'],
-		RefreshEventDB:   [type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
-		RefreshTaskMgr:   [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		RefreshMyTasks:   [type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
-		RefreshTaskGraph: [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		RefreshTimeline:  [type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
-		depGraph:         [type: 'string', validator: { String value ->
-			def prefs = JSON.parse(value)
-
-			if (!(prefs.colorBy in depGraphColorBy)) {
-				return false
-			}
-
-			for (label in depGraphCheckboxLabels) {
-				if (prefs[label] && prefs[label] != 'true') {
-					return false
-				}
-			}
-
-			if (!(Integer.parseInt(prefs.maxEdgeCount) in (1..20))) {
-				return false
-			}
-
-			return true
-		}],
-		archGraph: [type: 'string', validator: { String value ->
-			def prefs = JSON.parse(value)
-
-			for (label in archGraphCheckboxLabels) {
-				// transforming to String because sometimes it's a Boolean.
-				if (prefs[label] && prefs[label].toString() != 'true') {
-					return false
-				}
-			}
-
-			if (!(Integer.parseInt(prefs.levelsUp) in (0..10))) {
-				return false
-			}
-
-			if (!(Integer.parseInt(prefs.levelsDown) in (0..10))) {
-				return false
-			}
-
-			return true
-		}],
-		legendTwistieState: [type: 'string', validator: { String value ->
-			def prefs = value.split(',')
-			if (prefs.length == 0) {
-				return true // it means is just empty (nothing open)
-			}
-			if (prefs.length > 4) {
-				return false
-			}
-
-			for (pref in prefs) {
-				if (!(pref in legendTwistieStateValid)) {
-					return false // Value passed doesn't exist
-				}
-			}
-
-			true
-		}]
+	private static final EnumMap<UserPreferenceEnum, Map> prefCodeConstraints = [
+			(UserPreferenceEnum.VIEW_UNPUBLISHED): 		[type: 'boolean'],
+			(UserPreferenceEnum.ASSET_JUST_PLANNING): 	[type: 'boolean'],
+			(UserPreferenceEnum.EVENTDB_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '300', '600']],
+			(UserPreferenceEnum.TASKMGR_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.MYTASKS_REFRESH): 		[type: 'integer', inList: ['0', '30', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.TASKGRAPH_REFRESH): 	[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.TIMELINE_REFRESH): 		[type: 'integer', inList: ['0', '60', '120', '180', '240', '300']],
+			(UserPreferenceEnum.DEP_GRAPH):         	[type: 'string', validator: { String value -> depGraphValidator(value)}],
+			(UserPreferenceEnum.ARCH_GRAPH): 			[type: 'string', validator: { String value -> archGraphValidator(value)}],
+			(UserPreferenceEnum.LEGEND_TWISTIE_STATE): 	[type: 'string', validator: { String value -> legendTwistieStateValidator(value)}]
 	]
+
+	/**
+	 * Validator for Dep Graph.
+	 * @param value  The value to be validated
+	 * @return  true or false depending on the validation result.
+	 */
+	static boolean depGraphValidator(String value) {
+		def prefs = JSON.parse(value)
+
+		if (!(prefs.colorBy in depGraphColorBy)) {
+			return false
+		}
+		for (label in depGraphCheckboxLabels) {
+			if (prefs[label] && prefs[label] != 'true') {
+				return false
+			}
+		}
+		if (!(NumberUtil.toInteger(prefs.maxEdgeCount, 0) in (1..20))) {
+			return false
+		}
+		return true
+	}
+
+	/**
+	 * Validator for Arch Graph.
+	 * @param value  The value to be validated
+	 * @return  true or false depending on the validation result.
+	 */
+	static boolean archGraphValidator(String value) {
+		def prefs = JSON.parse(value)
+
+		for (label in archGraphCheckboxLabels) {
+			// transforming to String because sometimes it's a Boolean.
+			if (prefs[label] && prefs[label].toString() != 'true') {
+				return false
+			}
+		}
+		if (!(NumberUtil.toInteger(prefs.levelsUp, 0) in (0..10))) {
+			return false
+		}
+		if (!(NumberUtil.toInteger(prefs.levelsDown, 0)  in (0..10))) {
+			return false
+		}
+		return true
+	}
+
+	/**
+	 * Validator for Legend Twistie State.
+	 * @param value  The value to be validated
+	 * @return  true or false depending on the validation result.
+	 */
+	static boolean legendTwistieStateValidator(String value) {
+		def prefs = value.split(',')
+
+		if (prefs.length == 0) {
+			return true // it means is just empty (nothing open)
+		}
+		if (prefs.length > 4) {
+			return false
+		}
+		for (pref in prefs) {
+			if (!(pref in legendTwistieStateValid)) {
+				return false // Value passed doesn't exist
+			}
+		}
+		true
+	}
 
 	/**
 	 * Used to retrieve a user preference from the user session or database appropriately.
@@ -237,7 +251,7 @@ class UserPreferenceService implements ServiceMethods {
 			return null
 		}
 
-		if (!ConstraintsValidator.validate(value, prefCodeConstraints[preferenceCode.value()])) {
+		if (!ConstraintsValidator.validate(value, prefCodeConstraints[preferenceCode])) {
 			throw new InvalidParamException()
 		}
 
