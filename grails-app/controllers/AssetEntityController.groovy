@@ -12,6 +12,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -464,6 +465,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		AssetComment assetComment = AssetComment.get(params.id)
 		if (assetComment) {
+			Project project = controllerService.getProjectForPage(this)
+			List eventList = MoveEvent.findAllByProject(project)
+
 			if (assetComment.createdBy) {
 				personCreateObj = assetComment.createdBy.toString()
 				dtCreated = TimeUtil.formatDateTime(assetComment.dateCreated)
@@ -620,7 +624,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				action: assetComment.apiAction?.name,
 				recipe: recipeMap,
 				actualDuration: TimeUtil.formatDuration(actualDuration),
-				durationDelta: TimeUtil.formatDuration(durationDelta)
+				durationDelta: TimeUtil.formatDuration(durationDelta),
+				eventList: eventList,
+				categories: AssetCommentCategory.list
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
