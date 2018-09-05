@@ -99,6 +99,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value")
     }
 
+    static ETLProcessorException incorrectFindCommandStructure() {
+        new ETLProcessorException("find/elseFind statement is missing required [with] keyword")
+    }
+
     static ETLProcessorException invalidDomainPropertyName (ETLDomain domain, String fieldName) {
         new ETLProcessorException("$fieldName is not a domain property for ${domain.name()}")
     }
