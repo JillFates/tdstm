@@ -1,3 +1,4 @@
+import asset.pipeline.grails.AssetResourceLocator
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -42,7 +43,8 @@ class CustomTagLib implements InitializingBean {
 	UserPreferenceService userPreferenceService
 
 	LicenseCommonService licenseCommonService
-	LicenseAdminService licenseAdminService
+	LicenseAdminService  licenseAdminService
+	AssetResourceLocator assetResourceLocator
 
 	/**
 	 * Adjusts a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified.
@@ -600,7 +602,7 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	void afterPropertiesSet() {
-		faviconStr = '<link href="' + grailsLinkGenerator.resource(dir:'/images', file:'favicon.ico') +
+		faviconStr = '<link href="' + assetResourceLocator.findAssetForURI('images/favicon.ico') +
 				'" rel="shortcut icon" type="image/x-icon"/>'
 	}
 

@@ -2,7 +2,7 @@
 -- This is the standard include of CSS and Javascript files necessary throughout the TM application
 --%>
 
-<link rel="shortcut icon" type="image/x-icon" href="${resource(dir: 'images', file: 'favicon.ico')}"/>
+<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 
 <!-- Bootstrap 3.3.5 -->
 <link rel="stylesheet" href="${resource(dir: 'dist/js/vendors/bootstrap/dist/css', file: 'bootstrap.min.css')}">
