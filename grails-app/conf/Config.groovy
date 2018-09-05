@@ -393,6 +393,7 @@ grails {
 					'/tds/web-app/**'     : 'permitAll', // Angular2* - resources
 					'/module/**'          : 'permitAll', // Angular2  - router access
 					'/test/**'            : 'permitAll', // Angular - Test
+					'/dist/**'            : 'permitAll',
 					'/monitoring'         : "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
 					'/greenmail/**'       : 'permitAll',
 					'/components/**'      : 'permitAll',
