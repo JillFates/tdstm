@@ -196,6 +196,12 @@
                                     <g:img uri="/icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
                                 </g:link>
                             </li>
+                            <li class="menu-child-item menu-parent-assets-asset-manager">
+                                <g:link class="mmlink" controller="module" action="asset" id="views">
+                                    <g:img uri="/icons/cat.png" width="16" height="16" alt="Dependencies" /> View Manager
+                                </g:link>
+                            </li>
+                            <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
@@ -231,6 +237,7 @@
                                     <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> All Servers
                                 </g:link>
                             </li>
+                            <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-application-list">
                                 <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                     <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
@@ -323,12 +330,6 @@
                                     <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a>
                                 </li>
                             </tds:hasPermission>
-                            <li class="divider"></li>
-                            <li class="menu-child-item menu-parent-assets-asset-manager">
-                                <g:link class="mmlink" controller="module" action="asset" id="views">
-                                    View Manager
-                                </g:link>
-                            </li>
                         </ul>
                     </li>
                 </tds:hasPermission>
