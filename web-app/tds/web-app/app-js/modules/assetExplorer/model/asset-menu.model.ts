@@ -1,5 +1,5 @@
 /**
- * Some views for the Assets were created by DB Scripts, however they given ID's are
+ * Some views for the Assets were created by DB Scripts, however the given ID's are
  * the same across all environments
  */
 
