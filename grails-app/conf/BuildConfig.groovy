@@ -16,11 +16,6 @@ grails.project.dependency.resolution = {
 		inherits true
 		mavenLocal()
 
-		// mavenRepo 'http://repo.novus.com/releases/'
-		// mavenRepo 'http://repo.grails.org/grails/plugins'
-		// mavenRepo 'https://repo.grails.org/grails/core'
-		// grailsPlugins()
-
 		// TDS Private Repository
 		mavenRepo 'https://tm-nexus.transitionmanager.net/repository/TransitionManager-Application-Libraries'
 
@@ -67,7 +62,6 @@ grails.project.dependency.resolution = {
 			excludes 'org.apache.hadoop:hadoop-common'
 		}
 
-		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
 		test ('com.stehno.ersatz:ersatz:1.7.0') {
 			excludes 'ch.qos.logback:logback-classic'
@@ -77,10 +71,6 @@ grails.project.dependency.resolution = {
 	plugins {
 		build ':tomcat:8.0.33'
 
-//		compile ':filterpane:2.5.0', {
-//			excludes 'asset-pipeline'
-//		}
-
 		compile ':jasper:1.11.0'
 		compile ':quartz:1.0.2'
 		compile ':plugin-config:0.2.0'
@@ -89,11 +79,9 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-core:2.0.0'
 		compile ':spring-security-ldap:2.0.1'
 		compile ':spring-events:1.2'
-		// Added the acl for some testing JPM 12/2016
-		// OLB NOT USED: compile ':spring-security-acl:2.0.0'
 
 		/*
-		 * TODO: OLB, We have a compilation dependency for the Following plugin in the UnitTest,
+		 * TODO: (oluna@tdsi.com) We have a compilation dependency for the Following plugin in the UnitTest,
 		 *       it is safe to build the war file ignoring the test cases???
 		 */
 		compile ':greenmail:1.3.4'
@@ -121,13 +109,6 @@ grails.project.dependency.resolution = {
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
 		runtime ':xss-sanitizer:0.4.0'
-
-		/*
-		 TODO: oluna - the next plugins help to work with the resources and the Browsers Cache
-		 they may be removed after switching to asset-pipeline, I just leave it as a reference
-		*/
-		// runtime ':cached-resources:1.0'
-		// runtime ':cache-headers:1.1.7'
 
 		test ':functional-test:1.2.7'
 
