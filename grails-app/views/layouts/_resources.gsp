@@ -30,7 +30,7 @@
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'codemirror.css')}"/>
 
-<<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'resources/jquery-ui-1.8.15.custom.css')}"/>
+<<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'resources/jquery-ui-1.10.4.custom.min.css')}"/>
 
 <g:javascript src="jquery-1.9.1.js"/>
 <g:javascript src="jquery-1.9.1-ui.js"/>

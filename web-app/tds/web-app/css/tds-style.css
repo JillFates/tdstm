@@ -779,6 +779,11 @@ code-mirror .line-with-syntax-errors {
 .field-setting-component field-settings-grid span.k-icon {
   margin-left: 0px !important; }
 
+.field-setting-component .text-delimited {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+
 .single-comment-component .modal-content {
   display: table; }
 
@@ -1408,8 +1413,7 @@ section.page-asset-explorer-config div.box-body {
   margin-top: 5px; }
 
 button.btnBulkChange {
-  margin-top: 5px;
-  margin-left: 10px; }
+  margin-left: 0; }
 
 .bulk-change-actions-component .modal-content {
   margin: 0 auto;
@@ -1510,6 +1514,61 @@ button.btnBulkChange {
 .asset-explorer-view-grid-component .k-grid-content-locked, .asset-explorer-view-grid-component .k-grid-header-locked {
   border-right-width: 5px;
   border-right-color: #ebebeb; }
+
+.asset-explorer-view-grid-component .k-grid-header .k-header {
+  vertical-align: top; }
+
+.asset-explorer-view-grid-component .sortable-column {
+  width: 90%; }
+
+.asset-explorer-view-grid-component .text-delimited {
+  white-space: normal;
+  word-wrap: break-word; }
+
+.asset-explorer-view-grid-component .k-grid-toolbar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between; }
+  .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section,
+  .asset-explorer-view-grid-component .k-grid-toolbar .filters-section {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center; }
+  .asset-explorer-view-grid-component .k-grid-toolbar .filters-section {
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end; }
+  .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .just-planning {
+    margin-left: 12px; }
+    .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .just-planning input {
+      margin-left: 0;
+      position: relative;
+      margin-top: -1px; }
+    .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .just-planning label {
+      margin-top: -2px;
+      position: absolute;
+      padding-left: 2px;
+      font-weight: normal; }
+  .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .selected-assets {
+    margin-left: 10px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline; }
+    .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .selected-assets label {
+      font-weight: normal; }
+    .asset-explorer-view-grid-component .k-grid-toolbar .bulkchange-section .selected-assets .badge-light {
+      background-color: #fff;
+      color: #777;
+      margin-right: 5px; }
 
 .model-device-show-component .modal-content {
   width: 350px; }
@@ -1657,6 +1716,9 @@ div.data-script-console-component textarea.console {
     .data-script-etl-builder-component .modal-body .modal-body-container {
       margin: 10px 15px 20px;
       height: 100%; }
+  .data-script-etl-builder-component .data-preview th {
+    padding-left: 0px;
+    padding-right: 0px; }
   .data-script-etl-builder-component .data-preview label {
     margin-bottom: 0px;
     width: 100%;
@@ -1789,6 +1851,17 @@ import-batch-detail-dialog .toolbar-dropdown {
 
 import-batch-detail-dialog .has-init {
   font-style: italic; }
+
+import-batch-record-dialog .modal-content {
+  min-width: 945px;
+  min-height: 520px;
+  width: 1065px; }
+  import-batch-record-dialog .modal-content .modal-header .modal-title {
+    float: left; }
+  import-batch-record-dialog .modal-content .modal-header .tool-box {
+    float: right; }
+  import-batch-record-dialog .modal-content .modal-body {
+    overflow: auto; }
 
 import-batch-record-summary {
   margin-top: 15px; }
@@ -1968,7 +2041,7 @@ tag-list kendo-grid kendo-dropdownlist[name="color"] {
       margin-right: 5px !important;
       color: #5f9fcf; }
       .old-legacy-content.ui-dialog div.ui-widget-header button.ui-dialog-titlebar-close span.ui-icon {
-        background-image: url(../../../plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness/images/ui-icons_ffffff_256x240.png);
+        background-image: url(../../../../../images/ui-icons_ffffff_256x240.png);
         font-size: 17px !important;
         margin-right: 2px !important; }
     .old-legacy-content.ui-dialog div.ui-widget-header button.ui-dialog-titlebar-close:hover {
