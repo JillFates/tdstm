@@ -9,8 +9,9 @@ export class UIHandleEscapeDirective {
 			const isEscPressed = event.code === KEYSTROKE.ESCAPE;
 			// handle issue pressing esc key on kendo-upload file dialog
 			const isFileDialog = Boolean(event.target && event.target['type'] === 'file');
+			const isConfirmationDialog = event.target['id'] === 'tdsUiPrompt';
 
-			if (!isFileDialog &&  isEscPressed) {
+			if (!isFileDialog &&  !isConfirmationDialog && isEscPressed) {
 				this.escPressed.emit();
 			}
 		}
