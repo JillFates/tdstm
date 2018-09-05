@@ -428,6 +428,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 * @param field
 	 */
 	private buildPopupFieldDataForFindObject(field: any): void {
+		this.popup.results = [];
 		const {matchOn, results} = field;
 		const {fieldLabelMap} = this.importBatch;
 		let popupFields: Array<any> = [];
