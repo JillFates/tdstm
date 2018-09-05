@@ -20,11 +20,11 @@ class WsApiActionController implements ControllerMethods {
     ApiCatalogService apiCatalogService
 
     /**
-     * Get agent details by agent name
+     * Get connector details by connector name
      * @param id
      * @return
      */
-    def agentDictionary(String id) {
+    def connectorDictionary(String id) {
         renderAsJson(apiCatalogService.getCatalogMethods(id as Long))
     }
 
