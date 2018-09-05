@@ -99,7 +99,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can lookup results and used LOOKUP.found() to check results'() {
+	void 'test can lookup results and used LOOKUP found to check results'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
@@ -240,7 +240,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can lookup results and used LOOKUP.notFound() to check results'() {
+	void 'test can lookup results and used LOOKUP notFound to check results'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)

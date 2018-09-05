@@ -3123,7 +3123,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				iterate {
 					extract 'name' set nameVar
 					extract 'type' transform with substitute(map) set domainClassVar
-					domain domainClassVar.value
+					domain domainClassVar
 				}
 				'''.stripIndent())
 
@@ -3228,8 +3228,8 @@ class ETLFindSpec extends ETLBaseSpec {
 				iterate {
 					extract 'name' set nameVar
 					extract 'type' transform with substitute(map) set domainClassVar
-					domain domainClassVar.value
-					find domainClassVar.value by 'Name' with nameVar into 'id'
+					domain domainClassVar
+					find domainClassVar by 'Name' with nameVar into 'id'
 					load 'Name' with nameVar
 				}
 				'''.stripIndent())
