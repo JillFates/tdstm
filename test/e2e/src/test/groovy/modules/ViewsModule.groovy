@@ -75,8 +75,8 @@ class ViewsModule extends Module {
      */
     def noVoidStarsAreDisplayed(){
         waitFor{!voidStars.displayed}
-
     }
+
     /**
      * Shared views will have a tick on the "Shared" column
      * In This section the number of rows should be the same as number of ticks.
@@ -134,7 +134,7 @@ class ViewsModule extends Module {
         clearFilterX.click()
     }
     /**
-     * Receives a number of ros that had been saved before in the spec and compares it ti the
+     * Receives a number of rows that had been saved before in the spec and compares it ti the
      * curren number of rows
      * @param numberOfRows
      * @return
@@ -165,13 +165,11 @@ class ViewsModule extends Module {
     }
 
     def createdDateNotEmpty(){
-
         waitFor{vwGridRows.findAll { it.find{"td[4]"}.text()!="" }}
     }
 
     def setFirstNonFavViewAsFav(){
         waitFor{voidStars[0].click()}
-
     }
 
     def goToFirstNonFavView(){

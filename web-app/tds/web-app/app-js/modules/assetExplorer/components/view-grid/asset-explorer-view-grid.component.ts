@@ -9,18 +9,17 @@ import { Observable } from 'rxjs/Observable';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
-	SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE,
+	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
 	DIALOG_SIZE
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -34,12 +33,17 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent {
-
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
+	@Input()
+	set viewId(viewId: number) {
+		this._viewId = viewId;
+		// changing the view reset selections
+		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
+	}
 
 	fields = [];
 	justPlanning = false;
@@ -50,8 +54,9 @@ export class AssetExplorerViewGridComponent {
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
-	private maxDefault = MAX_DEFAULT;
-	private maxOptions = MAX_OPTIONS;
+	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
+	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
@@ -61,19 +66,20 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 	selectAll = false;
-	bulkItems = {};
-	bulkSelectedItems: number[] = [];
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
+	public bulkItems: number[] = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
+		private bulkCheckboxService: BulkCheckboxService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+				this.bulkCheckboxService.setPageSize(this.state.take);
 				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
 				this.onReload();
 			});
@@ -139,6 +145,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clearText(column: ViewColumn): void {
+		this.bulkCheckboxService.handleFiltering();
 		if (column.filter) {
 			column.filter = '';
 			this.state.skip = 0;
@@ -178,6 +185,8 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
+		this.bulkCheckboxService.handleFiltering();
+
 		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
@@ -185,10 +194,9 @@ export class AssetExplorerViewGridComponent {
 
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
-		this.bulkItems = {};
-		data.assets.map(c => c.common_id).forEach(id => {
-			this.bulkItems[id] = false;
-		});
+
+		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
@@ -247,7 +255,7 @@ export class AssetExplorerViewGridComponent {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.XLG, true).then(x => {
+			DIALOG_SIZE.XLG, false).then(x => {
 				if (x) {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}
@@ -264,27 +272,17 @@ export class AssetExplorerViewGridComponent {
 		});
 	}
 
-	onSelectAll(): void {
-		Object.keys(this.bulkItems).forEach(key => {
-			this.bulkItems[key] = this.selectAll;
-		});
-		this.setSelectedItems();
+	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
+		this.bulkCheckboxService.changeState(checkboxState);
 	}
 
-	clearSelectAll(): void {
-		this.selectAll = false;
-	}
-
-	setSelectedItems(): void {
-		this.bulkSelectedItems = Object.keys(this.bulkItems)
-			.filter(key => this.bulkItems[key])
-			.map(value => parseInt(value, 10));
-		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
+	checkItem(id: number, checked: boolean): void {
+		this.bulkCheckboxService.checkItem(id, checked, this.gridData.data.length);
 	}
 
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		if (operationResult.success) {
-			this.bulkSelectedItems = [];
+			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
 	}
@@ -329,8 +327,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onChangeJustPlanning(isChecked = false): void {
-		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
-			.subscribe(this.onReload.bind(this));
+		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString()).subscribe(() => {
+			this.onReload();
+		});
 	}
 
 	/**
@@ -343,5 +342,22 @@ export class AssetExplorerViewGridComponent {
 		let selectedTagsFilter = ($event.tags as Array<TagModel>).map( tag => tag.id).join(`${operator}`);
 		column.filter = selectedTagsFilter;
 		this.onFilter();
+	}
+
+	onClickBulkButton(): void {
+		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
+			.then((results: number[]) => {
+				this.bulkItems = [...results];
+			})
+			.catch ((err) => console.log('Error:', err))
+	}
+
+	hasSelectedItems(): boolean {
+		return this.bulkCheckboxService.hasSelectedItems();
+	}
+
+	getSelectedItemsCount(): number {
+		const allCounter = (this.gridData && this.gridData.total) || 0;
+		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
 	}
 }

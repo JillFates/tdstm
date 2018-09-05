@@ -2,8 +2,11 @@ package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import org.codehaus.groovy.grails.web.json.JSONObject
+import net.transitionmanager.dataImport.SearchQueryHelper
+
 /**
  * ImportBatchRecord
  *
@@ -154,19 +157,68 @@ class ImportBatchRecord {
 			// Populate the currentValues map with the current values from the fieldsInfo
 			// for each field specified in the batch
 			//
-			domainMap.currentValues = [:]
+
 			Map info = fieldsInfoAsMap()
+			Map currentValues = [:]
+			Map initValues = [:]
+
 			for ( fieldName in importBatch.fieldNameListAsList() ) {
-				def value = (info.containsKey(fieldName) ? info[fieldName].value : null)
-				domainMap.currentValues[fieldName] = value
+				def value = null
+				def initVal = null
+
+				if (info.containsKey(fieldName)) {
+					def record = ( info[fieldName] ?: [:] )
+
+					value = record.value
+					initVal = record.init
+				}
+
+				currentValues[fieldName] = value
+
+				if ( initVal ) {
+					initValues[fieldName] = initVal
+				}
+			}
+
+			domainMap.currentValues = currentValues
+
+			if ( initValues ) {
+				domainMap.init = initValues
 			}
 		} else {
 			// Populate the full errors and fieldsInfo sections instead of the currentValues
 			domainMap.errorList = errorListAsList()
 			domainMap.fieldsInfo = fieldsInfoAsMap()
+
+			// Populate the results of the find/elseFind queries if the record is pending
+			if (status == ImportBatchStatusEnum.PENDING) {
+				Map context = [
+					domainClass:importBatch.domainClassName.getClazz(),
+					project: importBatch.project
+				]
+				Object entity = SearchQueryHelper.findEntityByMetaData('id', domainMap.fieldsInfo, context)
+				if (entity && GormUtil.isDomainClass(entity.getClass())) {
+					domainMap.existingRecord = getMapOfFieldsFromEntity(domainMap.fieldsInfo, entity)
+				}
+			}
 		}
 
 		return domainMap
+	}
+
+	/**
+	 * Used to generate a Map of the a domain entities values for fields that are specified in the fieldsInfo
+	 * @param fieldsInfo - the JsonObject representation of the fieldsInfo JSON property
+	 * @param entity - the domain entity to extract the values out of
+	 * @return map of the field values for the entity
+	 */
+	private Map getMapOfFieldsFromEntity(Map fieldsInfo, Object entity) {
+		Map result = [:]
+		List fieldNames = fieldsInfo.keySet() as List
+		for (String fieldName in fieldNames) {
+			result[fieldName] = entity[fieldName]?.toString()
+		}
+		return result
 	}
 
 	/**

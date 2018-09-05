@@ -35,7 +35,7 @@ export class DataIngestionService {
 	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
 	private ETLScriptUploadTextURL = '../ws/fileSystem/uploadTextETLDesigner';
 	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
-	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}');
+	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}&rootNode={3}');
 	private readonly GET_ETL_SCRIPT_BY_ID_URL = this.dataIngestionUrl.concat('/datascript/{0}');
 
 	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
@@ -215,13 +215,23 @@ export class DataIngestionService {
 	 * @param {string} originalFileName
 	 * @returns {Observable<SampleDataModel>}
 	 */
-	getSampleData(id: number, fileName: string, originalFileName = ''): Observable<SampleDataModel> {
-		return this.http.get(this.GET_SAMPLE_DATA_URL.replace('{0}', id.toString()).replace('{1}', fileName).replace('{2}', originalFileName))
+	getSampleData(id: number, fileName: string, originalFileName = '', rootNode: string): Observable<SampleDataModel> {
+		return this.http.get(this.GET_SAMPLE_DATA_URL
+			.replace('{0}', id.toString())
+			.replace('{1}', fileName)
+			.replace('{2}', originalFileName)
+			.replace('{3}', rootNode))
 			.map((res: Response) => {
 				let result = res.json();
 				let data: any = (result && result.status === 'success' && result.data);
 				let columns: any = [];
-				let sampleDataModel;
+				let sampleDataModel: SampleDataModel;
+				if (result.status === ApiResponseModel.API_ERROR && result.errors) {
+					sampleDataModel = {
+						errors: result.errors
+					};
+					return sampleDataModel;
+				}
 				if (data.config) {
 					for (let property in data.config) {
 						if (data.config.hasOwnProperty(property)) {
@@ -244,7 +254,7 @@ export class DataIngestionService {
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
-		return this.http.get(`${this.dataApiActionUrl}/agent/${agentId}`)
+		return this.http.get(`${this.dataApiActionUrl}/connector/${agentId}`)
 			.map((res: Response) => {
 				let result = res.json();
 				let agentMethodModel = new Array<AgentMethodModel>();
@@ -345,7 +355,7 @@ export class DataIngestionService {
 			description: model.description,
 			provider: { id: model.provider.id },
 			apiCatalog: { id: model.agentClass.id },
-			agentMethod: model.agentMethod.id,
+			connectorMethod: model.agentMethod.id,
 			httpMethod: model.httpMethod,
 			endpointUrl: model.endpointUrl,
 			docUrl: model.docUrl,

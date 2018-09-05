@@ -5,9 +5,10 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div tds-autocenter tds-autofocus class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
+	 class="modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
+		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
 				aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
@@ -43,10 +44,11 @@
 														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="model.asset.sme.id"
+														(selectionChange)="onPersonSelected($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="${personList as JSON}">
+														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
@@ -71,10 +73,11 @@
 													class="tm-input-control person-list"
 													name="modelAssetSme2"
 													[(ngModel)]="model.asset.sme2.id"
+													(selectionChange)="onPersonSelected($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 													[defaultItem]="defaultItem"
 													[textField]="'fullName'"
 													[valueField]="'personId'"
-													[data]="${personList as JSON}">
+													[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
@@ -98,10 +101,11 @@
 														class="tm-input-control"
 														name="modelAssetappOwner"
 														[(ngModel)]="model.asset.appOwner.id"
+														(selectionChange)="onPersonSelected($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="${personList as JSON}">
+														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
@@ -212,7 +216,7 @@
 													</tdsAngular:tooltipSpan>
 												</label>
 											</td>
-											<td class="tm-input-control-container ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
+											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
 														(modelChange)="model.asset.shutdownBy = $event"
@@ -223,13 +227,16 @@
 												</tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-											<td>
-												<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''} duration" [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>m
+											<td class="tm-input-control">
+												<input type="text" id="shutdownDuration" name="shutdownDuration"
+													   class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
+													   [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>
+												<label>m</label>
 											</td>
 										</tr>
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control-container ${standardFieldSpecs.startupBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
 														(modelChange)="model.asset.startupBy = $event"
@@ -240,7 +247,7 @@
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control-container ${standardFieldSpecs.testingBy.imp?:''}">
+											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
 														(modelChange)="model.asset.testingBy = $event"
@@ -251,8 +258,10 @@
                                                 </tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-											<td>
-												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''} duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>m
+											<td class="tm-input-control">
+												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
+												duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>
+												<label>m</label>
 											</td>
 										</tr>
 
@@ -268,16 +277,16 @@
 					</tr>
 					<!-- Dependencies -->
 					<tr id="deps">
-						<tds-supports-depends [(model)]="model"></tds-supports-depends>
+						<tds-supports-depends (initDone)="onInitDependenciesDone($event)"  [(model)]="model"></tds-supports-depends>
 					</tr>
 				</table>
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger pull-left mar-left-50 component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </div>

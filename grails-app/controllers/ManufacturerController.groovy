@@ -224,6 +224,7 @@ class ManufacturerController implements ControllerMethods {
 	def retrieveManufacturerAsJSON() {
 		def manufacturer = Manufacturer.get(params.id)
 		def jsonMap = [manufacturer: manufacturer,
+					   akaCollection: manufacturer.getAliases(),
 		               aliases: WebUtil.listAsMultiValueString(manufacturer.getAliases()?.name)]
 		render jsonMap as JSON
 	}

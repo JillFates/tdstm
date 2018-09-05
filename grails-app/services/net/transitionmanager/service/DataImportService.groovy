@@ -22,6 +22,7 @@ import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
+import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
@@ -30,6 +31,7 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -66,19 +68,7 @@ class DataImportService implements ServiceMethods {
 	ScriptProcessorService scriptProcessorService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
-	static final String SEARCH_BY_ID_NOT_FOUND_MSG = 'Record not found searching by id'
-	static final String NO_FIND_QUERY_SPECIFIED_MSG = 'No find/findElse specified for property'
-	static final String WHEN_NOT_FOUND_PROPER_USE_MSG = "whenNotFound create only applicable for reference properties"
-	static final String FIND_FOUND_MULTIPLE_REFERENCES_MSG = 'Multiple records found for find/elseFind criteria'
-	static final String ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG = 'Multiple records found with current value'
-
-	// TODO : JPM 4/2018 : Augusto - Get these to work first
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
-	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field {propertyName} was not found in ETL dataset"
-	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field {propertyName} in domain"
-
-	static final Integer NOT_FOUND_BY_ID = -1
-	static final Integer FOUND_MULTIPLE = -2
 
 	static final List<String> PROPERTIES_THAT_CANNOT_BE_MODIFIED = [
 		'version', 'assetClass', 'createdBy', 'updatedBy', 'project', 'dateCreated', 'lastUpdated'
@@ -174,7 +164,7 @@ class DataImportService implements ServiceMethods {
 					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
 					// Create a Transfer Batch for the asset class
-					def batch = createImportBatch(importContext)
+					ImportBatch batch = createImportBatch(importContext)
 
 					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
 					if (batch == null) {
@@ -195,7 +185,7 @@ class DataImportService implements ServiceMethods {
 
 						// Update the reporting
 						importResults.batchesCreated++
-						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: importContext.rowsCreated ]
+						importResults.domains << [ domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated ]
 					}
 				}
 			}
@@ -849,6 +839,25 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * This method should be used after any SearchQueryHelper.findEntityByMetaData calls to record errors
+	 * into the field or import batch record errors appropriately.
+	 * @param fieldName - the field that was being queried
+	 * @param fieldsInfo - the map with all of the fields information
+	 * @param context - the bag with all of the details being passed around - note that SearchQueryHelperErrors list will be added by SearchQueryHelper.findEntityByMetaData method
+	 * @return true if there were any recognized errors otherwise false
+	 */
+	private boolean recordAnySearchQueryHelperErrors(String fieldName, Map fieldsInfo, Map context) {
+		boolean hasErrors=context.searchQueryHelperErrors.size() > 0
+		if (hasErrors) {
+
+			for (String errorMsg in context.searchQueryHelperErrors) {
+				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+			}
+		}
+		return hasErrors
+	}
+
+	/**
 	 * Used to find a single Entity record or create one if not found
 	 *
 	 * The find is performed using the meta data provided in the fieldsInfo.  When more than one entity are found then
@@ -862,10 +871,11 @@ class DataImportService implements ServiceMethods {
 	 */
 	private Object findOrCreateEntity(Map fieldsInfo, Map context ) {
 		Object entity
-
 		log.debug 'findOrCreateEntity() called'
 
-		entity = fetchEntityByFieldMetaData('id', fieldsInfo, context)
+		entity = SearchQueryHelper.findEntityByMetaData('id', fieldsInfo, context)
+		// Any errors from the function call will be stuffed into context
+		recordAnySearchQueryHelperErrors('id', fieldsInfo, context)
 
 		if (entity == -1) {
 			log.debug "findOrCreateEntity() Unable to initially find the entity by ID reference"
@@ -892,7 +902,7 @@ class DataImportService implements ServiceMethods {
 	 * @param context
 	 * @return the newly minted domain entity instance
 	 */
-	private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
+	Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
 		}
@@ -916,16 +926,16 @@ class DataImportService implements ServiceMethods {
 			}
 		}
 
-		// createdBy
-		if ('createdBy' in propsInDomain) {
-			entity.createdBy = context.person
+		// Handle Person references
+		for (String fname in ['createdBy', 'modifiedBy']) {
+			if (fname in propsInDomain && GormUtil.getDomainPropertyType(domainClass, fname) == Person ) {
+				entity[fname] = context.whom
+			}
 		}
 
 		// owner (i.e. project.client)
-		if ('owner' in propsInDomain
-			&& GormUtil.getDomainPropertyType(domainClass, 'owner') == net.transitionmanager.domain.PartyGroup
-		) {
-			entity.owner = project.client
+		if ('owner' in propsInDomain && GormUtil.getDomainPropertyType(domainClass, 'owner') == PartyGroup) {
+			entity.owner = context.project.client
 		}
 
 		return entity
@@ -956,6 +966,7 @@ class DataImportService implements ServiceMethods {
 		//		  JPM 8/2018 : Believe that this may already work. Need to test and remove TODO if so..
 		int c = 0
 		Boolean noErrorsEncountered = true
+		String errMsg
 
 		// Used to add errors and set flag in one line within this function
 		Closure recordErrorHelper = { fieldName, msg ->
@@ -994,7 +1005,7 @@ class DataImportService implements ServiceMethods {
 			}
 
 			def domainValue = domain[fieldName]
-			def (value, initValue) = getValueAndInitialize(fieldName, fieldsInfo)
+			def (value, initValue) = SearchQueryHelper.getValueAndInitialize(fieldName, fieldsInfo)
 			boolean isInitValue = (initValue != null)
 
 			// The field must have a value to set otherwise the logic will skip over it. As such this logic
@@ -1030,7 +1041,9 @@ class DataImportService implements ServiceMethods {
 				// --------------------------------------------------
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
-				valueToSet = fetchEntityByFieldMetaData(fieldName, fieldsInfo, context, domain)
+				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
+				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
+
 				switch (valueToSet) {
 					case -1:
 						noErrorsEncountered = false
@@ -1046,7 +1059,30 @@ class DataImportService implements ServiceMethods {
 						// 	domain[fieldName] = null
 						// }
 
-						recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
+						// Check to see if there is a create block which would ultimately resolve the issue subsequently
+						if (hasWhenNotFoundCreate(fieldName, fieldsInfo)) {
+							valueToSet = createReferenceEntityForWhenNotFoundCreate(fieldName, fieldsInfo, context)
+							if (valueToSet) {
+								_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+								// Update cache for this reference object
+								Class domainClassToCreate
+								(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(fieldName, fieldsInfo, context.domainClass)
+								if (errMsg) {
+									recordErrorHelper(fieldName, errMsg)
+								} else {
+									String refDomainShortName = GormUtil.domainShortName(domainClassToCreate)
+									String md5 = SearchQueryHelper.generateMd5OfFieldsInfoField(refDomainShortName, fieldName, fieldsInfo)
+									log.debug "bindFieldsInfoValuesToEntity() Updating cache value for key {} with {}", md5, valueToSet
+									context.cache.put(md5, valueToSet)
+								}
+							} else {
+								log.debug "bindFieldsInfoValuesToEntity() call to createReferenceEntityForWhenNotFoundCreate failed!"
+								// The createReferenceEntityForWhenNotFoundCreate must of recorded some error in the propertyName of fieldsInfo
+								noErrorsEncountered = false
+							}
+						} else {
+							recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
+						}
 						break
 
 					default:
@@ -1149,6 +1185,16 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to determine if there is a whenNotFoundCreate data structure for a given property in the ETL meta-data
+	 * @param fieldName - the fieldname in question
+	 * @param fieldsInfo - the map of all fields in the ETL meta data
+	 * @return true if the field contains the 'create' map and the map contains key/value pairs otherwise false
+	 */
+	Boolean hasWhenNotFoundCreate(fieldName, fieldsInfo) {
+		return fieldsInfo[fieldName].containsKey('create') && fieldsInfo[fieldName].create.size() > 0
+	}
+
+	/**
 	 * Used to actually assign values to the domain being created or updated. Additionally it will record the original value when
 	 * the record pre-existed back into the fieldsInfo to allow for showing what fields actually changed.
 	 *
@@ -1171,8 +1217,8 @@ class DataImportService implements ServiceMethods {
 	) {
 		Object existingValue = domainInstance[fieldName]
 
-		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}',
-			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity
+		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
+			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity, isInitValue
 
 		if ( !isInitValue || (isInitValue && existingValue == null)) {
 			boolean isMatch
@@ -1183,672 +1229,14 @@ class DataImportService implements ServiceMethods {
 				isMatch = existingValue == newValue
 			}
 			if (! isMatch) {
+				log.debug '_recordChangeOnField() changed field {} to {}', fieldName, newValue
 				domainInstance[fieldName] = newValue
+				log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
 				if (! isNewEntity) {
 					fieldsInfo[fieldName].previousValue = existingValue.toString()
 				}
 			}
 		}
-	}
-
-	/**
-	 * Used in an attempt to lookup a domain record using the metadata that is provided by the
-	 * ETL process. This method will leverage caching of the domain entities to expedite retrieval
-	 * for entities that are frequently cross-referenced (e.g. Clusters to Servers).
-	 *
-	 * @param fieldName - the domain fieldname
-	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
-	 * @param context - the context map that the process uses to cart crap around
-	 * @param entityInstance - optional used when looking up a reference field
-	 * @return will return various results based on searches
-	 * 		entity 	: if found
-	 *		null	: if not found by alternate or query
-	 *		-1 		: an error occurred, which is recorded in the fieldsInfo appropriately
-	 *
-	 * The process logic should flow as documented here:
-	 *
-	 * 		If find.results contains a single id
-	 *		Then get with id
-	 *			If found then done
-	 *			Else error
-	 *		Else if field.value is an ID (number)
-	 *			Then get with id
-	 *				If found then done
-	 *				Else error
-	 *		Else if find.query specified then requery
-	 *			If found one (1) then done
-	 *			Else if found more than one (1) then error
-	 *		Try searching by alternate key value in field.value
-	 *			if found one (1) then done else error
-	 *
-	 * The structure looks like the following:
-	 *	{
-	 * 		fields": {
-	 * 			"asset": {
-	 *				// Search by Alternate Key Example
-	 * 				"value": "xraysrv01",
-	 *				// Search by primary ID Example
-	 * 				"value": 114052,
-	 * 				"originalValue": "114052",   // THIS MAY BE GOING AWAY JPM 7/2018
-	 *              "previousValue": "23432" // This is set during the POSTING process for existing records being updated
-	 * 				"error": false,
-	 *				"errors": [ "Lookup by ID was not found"],
-	 * 				"warn": false,
-	 * 				"find": {
-	 * 					"query": [
-	 *						[ domain: 'Device', kv: [ assetName: 'xraysrv01', assetType: 'Server' ] ]
-	 *						[ domain: 'Device', kv: [ assetName: 'xraysrv01'] ]
-	 *					],
-	 *					"matchOn": 2,
-	 *					"results": [12312,123123,123123123]
-	 * 				}
-	 * 			},
-	 *
-	 * @test Integration
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Object fetchEntityByFieldMetaData(String fieldName, Map fieldsInfo, Map context, Object entityInstance=null) {
-		// This will be populated with the entity object or error message appropriately
-		Object entity
-
-		// This will be used to check/set cache for previously searched items
-		String md5
-
-		log.debug 'fetchEntityByFieldMetaData() called with domain {} on row {}, fieldName {}, value={}',
-			context.domainShortName, context.record.sourceRowId, fieldName, fieldsInfo[fieldName]?.value
-
-		// This is a QA Easter Egg to test the error handling
-		if (fieldsInfo[fieldName]?.value == '!~! Go ahead, Make my day !~!') {
-			throw new InvalidRequestException('Do you feel lucky, punk?')
-		}
-
-		boolean foundInCache=false
-		boolean errorPreviouslyRecorded = false
-		boolean fieldIsId = fieldName == 'id'
-		boolean fieldIsInFieldsInfo = fieldsInfo.containsKey(fieldName)
-
-		// Flags that a search by ID failed which will result in an error so that duplicates are not created
-		boolean searchedById = false
-
-		Class domainClass = classOfDomainProperty(fieldName, fieldsInfo, context)
-		String domainShortName = GormUtil.domainShortName(domainClass)
-
-		while (true) {
-
-			if ( ! fieldIsInFieldsInfo && ! fieldIsId) {
-				// Shouldn't happen but just in case...
-				entity = "Reference property $fieldName is missing from ETL output"
-				break
-			}
-
-			//
-			// Now going to try up to 5+ different ways to find the domain entity
-			//
-
-			if (fieldIsInFieldsInfo) {
-				// 1. See if this property based on ID is in the cache already
-				md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
-				// log.debug 'fetchEntityByFieldMetaData() has cache key {}', md5
-				entity = context.cache.get(md5)
-				if (entity) {
-					log.debug 'fetchEntityByFieldMetaData() resolved by method 1 (cache ID {}, {})', md5, entity
-					foundInCache=true
-					break
-				}
-
-				// 2. Attempt to find the domain by the ID in the property field.value (Number or String)
-				entity = fetchEntityById(domainClass, fieldName, fieldsInfo, context)
-				if (entity) {
-					if (entity == NOT_FOUND_BY_ID) {
-						// Didn't find but we did have an ID
-						searchedById = true
-					} else {
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 2 (ID)'
-						break
-					}
-				}
-
-				// 3. Attempt to find domain with the single result (find.results[0])
-				if ( _hasSingleFindResult(fieldName, fieldsInfo) ) {
-					searchedById = true
-					entity = _fetchEntityByFindResults(fieldName, fieldsInfo, context)
-					if (entity) {
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 3 (find results)'
-						break
-					}
-				}
-
-				// Fail out if the field had a previously set/resolved ID
-				if (searchedById) {
-					// This is when we give up because there were attempts by previously specified or resolved ID but
-					// now attempting to retrieve has failed indicating that the entity was deleted. As such we do NOT
-					// what a create a new record.
-					log.info 'fetchEntityByFieldMetaData() failed to resolve by ELT ID reference - domain {}, field {}',
-						domainClass.getName(), fieldName
-					entity = SEARCH_BY_ID_NOT_FOUND_MSG
-					break
-				}
-
-				// 4. Attept to find domain by re-applying the find/elseFind queries
-				if ( _hasFindQuery(fieldName, fieldsInfo)) {
-					List entities = _performQueryAndUpdateFindElement(fieldName, fieldsInfo, context)
-					int qtyFound = entities?.size() ?: 0
-					if (qtyFound == 1) {
-						entity = entities[0]
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found 1 '
-						break
-					} else if (qtyFound > 1 ) {
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 4 (requery), found {}', qtyFound
-						entity = FIND_FOUND_MULTIPLE_REFERENCES_MSG
-						errorPreviouslyRecorded = true
-						break
-					}
-				}
-
-				// 5. Attempt to find domain by alternate key (which is the least precise)
-				// If the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name)
-				def searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-				Map findResult = _fetchEntityByAlternateKey(domainClass, searchValue, fieldName, fieldsInfo, context)
-				// entities = findDomainByAlternateProperty(fieldName, fieldsInfo, context)
-				if (findResult.error) {
-					addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, findResult.error)
-					entity = findResult.error
-					break
-				} else {
-					int qtyFound = findResult.entities?.size() ?: 0
-					if (qtyFound == 1) {
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found 1 by {}', fieldsInfo[fieldName].value
-						entity = findResult.entities[0]
-						break
-					} else if (qtyFound > 1 ) {
-						log.debug 'fetchEntityByFieldMetaData() resolved by method 5 (alternate key), found {} by []', qtyFound, fieldsInfo[fieldName].value
-						entity = ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
-						break
-					}
-				}
-			} // if (fieldIsInFieldsInfo) {
-
-			// 6. Attempt for certain domain classes (e.g. AssetDependency) that weren't found
-			switch (domainClass) {
-				case AssetDependency:
-					entity = _fetchAssetDependencyByAssets(fieldsInfo, context)
-					break
-
-				case Person:
-					// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
-					Person existingPerson = entityInstance ? entityInstance[fieldName] : null
-					String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-					String errorMsg
-					(entity, errorMsg) = _fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-					if (errorMsg) {
-						// If no entity was found then we want to capture the error message to save in the cache
-						entity = errorMsg
-						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-					}
-					break
-			}
-
-			break
-		}
-
-		// Cache the entity or error message for the lookup (unless it was found in cache above)
-		if (! foundInCache && md5) {
-			log.debug ('fetchEntityByFieldMetaData() added to cache: key {}, class {}, fieldName {}, entity {}', md5, domainShortName, fieldName, entity)
-			context.cache.put(md5, entity)
-		}
-
-		// Deal with setting the error message if the entity wasn't found
-		if ( (entity instanceof CharSequence) ) {
-			if (! errorPreviouslyRecorded) {
-				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, entity)
-			}
-			entity = -1
-		}
-
-		return entity
-	}
-
-	/**
-	 * Used by the fetchEntityByFieldMetaData method to find an AssetDependency by the asset and dependent assets specified
-	 * in the fieldsInfo appropriately. If either assets can not be located then a null is returned.
-	 *
-	 * @return the Dependency if found
-	 * @test None
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private AssetDependency _fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
-		AssetEntity primary
-		AssetEntity supporting
-		AssetDependency dependency
-
-		log.debug '_fetchAssetDependencyByAssets() was called'
-
-		primary = fetchEntityByFieldMetaData('asset', fieldsInfo, context)
-		if (primary in AssetEntity) {
-			log.debug '_fetchAssetDependencyByAssets() primary asset was found'
-			supporting = fetchEntityByFieldMetaData('dependent', fieldsInfo, context)
-			if (supporting in AssetEntity) {
-				log.debug '_fetchAssetDependencyByAssets() supporting asset was found'
-				dependency = AssetDependency.where {
-					asset.id == primary.id
-					dependent.id == supporting.id
-				}.find()
-				if (dependency) {
-					log.debug '_fetchAssetDependencyByAssets() asset dependency was found'
-				}
-			}
-		}
-
-		return dependency
-	}
-
-	/**
-	 * Used by fetchEntityByFieldMetaData to get the entity by the field.value containing an ID as a Number or
-	 * String. If the value is a String containing a number it could actually be the name of the entity so if that
-	 * is so then it will not flag the NOT_FOUND_BY_ID if not found.
-	 *
-	 * @return One of three values:
-	 * 		entity : The entity instance if ID was specified and found
-	 *		null : ID was not specified
-	 *		NOT_FOUND_BY_ID : if ID specified but not found
-	 * @test Integration
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	Object fetchEntityById(Class domainClass, String fieldName, Map fieldsInfo, Map context) {
-		Object entity
-		Boolean searchedById = false
-		Boolean valueIsString = (fieldsInfo[fieldName].value instanceof CharSequence)
-		Long id = NumberUtil.toPositiveLong(fieldsInfo[fieldName].value)
-		// log.debug 'fetchEntityById() isaNumber={}, isaString={}, idValue={}', isaNumber, isaString, idValue
-		if (id) {
-			searchedById = true
-			entity = GormUtil.findInProject(context.project, domainClass, id)
-		}
-		log.debug 'fetchEntityById() domainClass={}, fieldName={}, id={}, entity={}', domainClass.getName(), fieldName, id, entity
-
-		if (searchedById && ! entity) {
-			return valueIsString ? null : NOT_FOUND_BY_ID
-		} else {
-			return entity
-		}
-	}
-
-	/**
-	 * Called by fetchEntityByFieldMetaData.
-	 * Used to determine if the fieldsInfo for a property has a single result.
-	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return true if there is a single result otherwise false
-	 * @test Integration
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	Boolean _hasSingleFindResult(String propertyName, Map fieldsInfo) {
-		Boolean hasSingleResult = fieldsInfo[propertyName].find?.results?.size() == 1
-		log.debug '_hasSingleFindResult() for field {} has single result? {}', propertyName, hasSingleResult
-		return hasSingleResult
-	}
-
-	/**
-	 * Used to determine if the fieldsInfo for a property has a find/elseFind query specified
-	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return true if there is one or more queries defined
-	 * @test Integration
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	Boolean _hasFindQuery(String propertyName, Map fieldsInfo) {
-		Boolean hasFindQuery = fieldsInfo[propertyName].find?.query?.size() > 0
-		log.debug '_hasFindQuery() for field {} has find query? {}', propertyName, hasFindQuery
-		return hasFindQuery
-	}
-
-	/**
-	 * Called by fetchEntityByFieldMetaData.
-	 * Used to fetch a single domain entity based on the results of the find/elseFind commands having
-	 * found a single entity. The _hasSingleFindResult method must be called first to determine if this
-	 * method should be called.
-	 *
-	 * @param propertyName - the property that has find results to lookup the object
-	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return One of two values:
-	 * 		entity : the entity instance referenced in find results if found
-	 *		null : the find result reference was not found, must of been deleted
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Object _fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
-		Object entity=null
-		if (_hasSingleFindResult(propertyName, fieldsInfo)) {
-			Map find = fieldsInfo[propertyName].find ?: null
-			Long entityId = find.results[0]
-			String domainName = find.query[0].domain
-			// Get the class of the domain specified in find of the ETL script
-			Class domainClass = ETLDomain.lookup(domainName)?.getClazz()
-
-			if (domainClass) {
-				// Now get the entity by the id in the results
-				entity = GormUtil.findInProject(context.project, domainClass, entityId, false)
-			} else {
-				// This really should never happen but just in case
-				throw new RuntimeException("ETL find/elseFind references invalid domain '${domainName}'")
-			}
-		}
-		return entity
-	}
-
-	/**
-	 * Called by fetchEntityByFieldMetaData
-	 * Used to query for domain entities using the meta-data generated by the find/elseFind commands in the
-	 * ELT DataScript. After performing the queries it will update the find section of the fieldsInfo with the
-	 * the results. It will return a list of the entities found.
-	 *
-	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return list of entities found
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private List<Object> _performQueryAndUpdateFindElement(String propertyName, Map fieldsInfo, Map context) {
-		List<Object> entities = []
-
-		// If the lookup is for a reference field then it is mandatory in the script to account for this via
-		if ( ! fieldsInfo[propertyName].find?.query || fieldsInfo[propertyName].find.query.size() == 0 ) {
-			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, NO_FIND_QUERY_SPECIFIED_MSG)
-		} else {
-			// log.debug '_performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
-			int recordsFound = 0
-			int foundMatchOn = -1
-
-			// Iterate over the list of Queries until something is found
-			//  and update the find section appropriately.
-			for (query in fieldsInfo[propertyName].find.query) {
-				foundMatchOn++
-
-				// Use the ETL find logic to try searching for the domain entities
-				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv, false)
-
-				recordsFound = entities.size()
-				if (recordsFound > 0) {
-					break
-				}
-			}
-
-			// Update the field section of the fieldsInfo with the results of the this series of queries
-			fieldsInfo[propertyName].find.with() {
-				matchOn = (recordsFound > 0 ? foundMatchOn : 0)
-				fieldsInfo[propertyName].find.size = recordsFound
-				fieldsInfo[propertyName].find.results = entities*.id
-			}
-
-			log.debug '_performQueryAndUpdateFindElement() for property={}, find={}', propertyName, fieldsInfo[propertyName].find
-			// Record error on the field if more than one entity was found
-			if (recordsFound > 1) {
-				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, FIND_FOUND_MULTIPLE_REFERENCES_MSG)
-			}
-		}
-
-		return entities
-	}
-
-	/**
-	 * Called by fetchEntityByFieldMetaData
-	 * Used by the createReferenceDomain to locate other reference domain objects (e.g. manufacturer or model) that will be set
-	 * on the entity being created.
-	 * @param entity - the Entity that is being created
-	 * @param refDomainPropName - the property name of the entity for which the reference is going to be searched
-	 * @param fieldsInfo - the information map of all of the parent record properties
-	 * @param referenceFieldName - the field name in the parent record for which the reference domain is being searched (e.g. roomSource of AssetEntity)
-	 * @param context - the map that contains the holy grail of the Import Batch processing
-	 * @return A map containing
-	 *		entities: List of reference domain entities that were found
-	 * 		error: A String with any error encountered
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	Map _fetchEntityByAlternateKey(Class domainClass, String searchValue, String referenceFieldName, Map fieldsInfo, Map context) {
-		Map result = [entities: [], error: '']
-		log.debug '_fetchEntityByAlternateKey() domainClass {}, searchValue {}', domainClass.getName(), searchValue
-
-		if (searchValue?.size() > 0) {
-			// Class refDomainClass = GormUtil.getDomainPropertyType(domainClass, refDomainPropName)
-			String refDomainName = GormUtil.domainShortName(domainClass)
-
-			// Make sure that the domain has an alternateLookup defined on the class
-			// if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
-			// 	result.error = "Reference ${refDomainPropName} of domain ${refDomainName} does not support alternate key lookups")
-			// 	return result
-			// }
-
-			Map extraCriteria = [:]
-			// TODO : JPM 6/2018 : This requires that we have access to the parent instance so we can snag manufacturer or other related fields
-			/*
-			if (refDomainName == 'Model') {
-				// The first query of Model will be by Name + Mfg & assetType (if they are specified)
-				if (entity.manufacturer) {
-					extraCriteria.put('manufacturer', entity.manufacturer)
-				} else {
-					result.error = 'Manufacturer is required in order to find model by alternate key reference'
-					return result
-				}
-
-				// TODO : JPM 6/2018 : why did I add this as additional criteria? May need to add back
-				// if (entity.assetType) {
-				// 	extraCriteria.put('assetType', entity.assetType)
-				// }
-			}
-			*/
-
-			// TODO : JPM 6/2018 : Searching rooms/racks requires knowing the target field that we're looking up the resource. Therefore
-			// we need to pass the parentPropertyName into this logic...
-			switch (refDomainName) {
-				case 'Room':
-					// Get the Location field
-					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
-					break
-
-				case 'Rack':
-					// Resolve the Room first
-					boolean isSource = referenceFieldName == 'rackSource'
-					String roomFieldName = isSource ? 'roomSource' : 'roomTarget'
-					if (fieldsInfo.containsKey(roomFieldName)) {
-						Room room = fetchEntityByFieldMetaData(roomFieldName, fieldsInfo, context)
-						if (! room) {
-							result.error = 'Unable to resolve room'
-						} else {
-							extraCriteria.put('room.id', room.id)
-						}
-					} else {
-						result.error = 'Room must be included to set rack'
-					}
-
-					extraCriteria.put('source', (isSource ? 1 : 0))
-					break
-
-				case 'Model':
-					// Need to get the Manufacturer ID
-					// TODO : 6/2018 : properly get the mfg id
-					if (fieldsInfo.containsKey('manufacturer')) {
-						Manufacturer mfg = fetchEntityByFieldMetaData('manufacturer', fieldsInfo, context)
-						if (! mfg) {
-							result.error = 'Unable to resolve manufacturer'
-						} else {
-							extraCriteria.put('manufacturer.id', mfg.id)
-						}
-					} else {
-						result.error = 'Manufacturer must be included to set model'
-					}
-					break
-			}
-
-			if (! result.error) {
-				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
-				int numFound = entities ? entities.size() : 0
-				log.debug '_fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
-					domainClass.getName(), searchValue, extraCriteria, numFound
-
-				if (numFound > 0) {
-					result.entities = entities
-				} else {
-					// what to do here?
-				}
-			}
-		}
-
-		return result
-	}
-
-	/**
-	 * Used fetch the person based on a string search value
-	 *
-	 * The logic will first check to see if the name matches that of the person currently assigned to the
-	 * field if pre-existing then if not it will then use the PersonService to lookup the person by their name.
-	 *
-	 * When errors encountered or multiple references found then an error will be recorded into the fieldsInfo appropriately.
-	 *
-	 * Note this this method is dependent on the staffList being populated in the context object for performances reasons.
-	 * It also assumes that the value is not the person ID and that there is a searchValue (not null).
-	 *
-	 * @param existingPerson - the existing person for update operations where field previously set otherwise null
-	 * @param searchValue - the name or email address of the person to fetch
-	 * @param fieldName - the field name of the Person object
-	 * @param fieldsInfo - the Map of the fields
-	 * @param context - the context containing the goodies for the import batch process
-	 * @return a list containing:
-	 *     1) the Person if found/created
-	 *     2) an error message if an error encountered or multiple references were found
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	List _fetchPerson(Person existingPerson, String searchValue, String fieldName, Map fieldsInfo, Map context) {
-		Person person
-		String errorMsg
-		Boolean isEmail = searchValue.contains('@')
-
-		// println "*** _fetchPerson() Existing Person ${existingPerson ? existingPerson.toString() + ' ' + existingPerson.email : 'null'}, searchBy $searchValue"
-		// If the pre-existing person check if searchValue matches the person
-		if (existingPerson) {
-			if ( (isEmail && existingPerson.email.equalsIgnoreCase(searchValue) ) ||
-				 (! isEmail && existingPerson.toString().equalsIgnoreCase(searchValue))
-			) {
-				person = existingPerson
-			}
-		}
-
-		if (!person) {
-			if (isEmail) {
-				person = context.staffList.find { it.email.equalsIgnoreCase(searchValue) }
-				if (!person) {
-					errorMsg = 'Unable to find person by email address'
-				}
-			} else {
-				try {
-					Map resultMap = personService.findOrCreatePerson(searchValue, context.project, context.staffList)
-					if (resultMap) {
-						if (resultMap.isAmbiguous) {
-							errorMsg = 'Multiple references found for value'
-						} else if (resultMap.person) {
-							person = resultMap.person
-						}
-					}
-					if (!resultMap || ! resultMap.person && ! resultMap.isAmbiguous) {
-						errorMsg = 'Unable to locate person'
-					}
-				} catch (e) {
-					errorMsg = e.message
-				}
-			}
-		}
-
-		return [person, errorMsg]
-	}
-
-	/**
-	 * Used to determine what the actual class is of a particular domain property. In the case of AssetEntity the logic
-	 * logic needs to determine which type is actually intended based on the ETLDomain property name (e.g. Device, Asset, etc)
-	 * @param propertyName - the property to get the class type for
-	 * @param fieldsInfo - the ETL info on the fields of the entity
-	 * @param context - the process context map
-	 * @return the class name of the property
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Class classOfDomainProperty(String propertyName, Map fieldsInfo, Map context) {
-		Class domainClassToCreate
-		ETLDomain ed
-		String errorMsg
-
-		if (! GormUtil.isDomainProperty(context.domainClass, propertyName)) {
-			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			log.debug 'classOfDomainProperty() {}', errorMsg
-		} else {
-			while ( true ) {
-				if (propertyName == 'id') {
-					domainClassToCreate = context.domainClass
-					break
-				}
-
-				if (! fieldsInfo.containsKey(propertyName)) {
-					errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
-					log.debug 'classOfDomainProperty() {}', errorMsg
-					break
-				}
-
-				Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(context.domainClass, propertyName)
-				Boolean isReferenceProperty = GormUtil.isReferenceProperty(context.domainClass, propertyName)
-				log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
-
-				// propertyName MUST be a reference or identifier for this function otherwise record an error
-				if (! ( isIdentifierProperty || isReferenceProperty ) ) {
-					errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG
-					log.debug 'classOfDomainProperty() {}', errorMsg
-					break
-				}
-
-				if (isIdentifierProperty) {
-					log.debug 'classOfDomainProperty() is the identifier'
-					domainClassToCreate = context.domainClass
-					break
-				}
-
-				// Get the type for the property of domain class being processed by the batch
-				domainClassToCreate = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
-
-				if (isReferenceProperty) {
-					// We need to try and resolve what class to create. Most times it is just the class type of the property in the
-					// parent domain. In the case of AssetEntity however the class could be AssetEntity, Application, Database, etc.
-					// In order to know which the assumption is that there will be a find.query and that the first search is going to
-					//be precisely what that DataScript developer intended to be created.
-
-					String classShortName = GormUtil.domainShortName(domainClassToCreate)
-					if (classShortName in ['AssetEntity']) {
-						// Try looking for the exact class type in the find.query
-						List query = fieldsInfo[propertyName].find?.query
-						if (query?.size() > 0) {
-							ed = ETLDomain.lookup(query[0].domain)
-							domainClassToCreate = ed.getClazz()
-						} else {
-							// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
-							Map createInfo = fieldsInfo[propertyName].create ?: [:]
-							if (createInfo.containsKey('assetClass')) {
-								ed = ETLDomain.lookup(createInfo['assetClass'])
-								domainClassToCreate = ed.getClazz()
-							}
-						}
-					}
-					break
-				}
-
-				break
-			}
-		}
-
-		if (errorMsg) {
-			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
-		}
-
-		log.debug 'classOfDomainProperty() for property {} for class {} type is {}',
-			propertyName,
-			context.domainClass.getName(),
-			( domainClassToCreate ? domainClassToCreate.getName() : 'Not a Reference' )
-
-		return domainClassToCreate
 	}
 
 	/**
@@ -1873,37 +1261,6 @@ class DataImportService implements ServiceMethods {
 		}
 		*/
 		return list
-	}
-
-	/**
-	 * Used to retrieve the value and initialize values from the fieldsInfo for a fieldName
-	 * @param fieldName
-	 * @param fieldsInfo
-	 * @return List containing [value, initialValue]
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private List getValueAndInitialize(String fieldName, Map fieldsInfo) {
-		def value = fieldsInfo[fieldName]['value']
-		def init = fieldsInfo[fieldName]['init']
-
-		// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
-		// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
-		// extra test.  See ticket TM-10981.
-		value = (value instanceof groovy.json.internal.LazyMap) ? null : value
-		init = (init instanceof groovy.json.internal.LazyMap) ? null : init
-		return [value, init]
-	}
-
-	/**
-	 * Returns the initialize value or value from the fieldsInfo of a field
-	 * @param fieldName
-	 * @param fieldsInfo
-	 * @return the initialize value if set otherwise the value property
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private Object getValueOrInitialize(String fieldName, Map fieldsInfo) {
-		def (value, init) = getValueAndInitialize(fieldName, fieldsInfo)
-		return (init != null ? init : value)
 	}
 
 	/**
@@ -1996,26 +1353,158 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to generate the MD5 value of the Map that is used to query for a domain of a particular
-	 * fieldName. This will toString the Map of fieldName query names/values in order to create an unique key
-	 * that can be used to cache the results afterward.
+	 * Used to create a reference entity and populate it with the name/value pairs from the whenNotFound data structure. If any
+	 * errors occurred while setting up the new entity one or more errors will be recorded against the reference property field.
 	 *
-	 * The MD5 string will be composed like the following:
-	 *		Dependency:asset
-	 *		:value=123:
-	 *		query=[[assetName:"xraysrv01", assetType:"VM"]]
-	 *
-	 * @param fieldName - the name of the field to fetch the Query element from the map
-	 * @param fieldsInfo - the Map of all of the fields for the current row that came from the ETL process
-	 * @return the MD5 32 character String of the query element
+	 * @param propertyName - the property of the reference object
+	 * @param fieldsInfo - the ETL meta data for the current row
+	 * @param context - the context containing all the goodies for the process
+	 * @return the newly minted domain object or null if an error occurred
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	private String generateMd5OfFieldsInfoField(String domainShortName, String fieldName, Map fieldsInfo) {
-		StringUtil.md5Hex(
-			"${domainShortName}:${fieldName}" +
-			":value=${fieldsInfo[fieldName].value}:query=" +
-			( fieldsInfo[fieldName].find.containsKey('query') ? fieldsInfo[fieldName].find.query.toString() : 'NO-QUERY-SPECIFIED')
-		)
+	Object createReferenceEntityForWhenNotFoundCreate(String propertyName, Map fieldsInfo, Map context) {
+		Object entity
+		List<String> errorMsg = []
+		Map createInfo
+		String errMsg
+
+		log.debug 'createReferenceEntityForWhenNotFoundCreate() CREATING reference entity for property {}', propertyName
+
+		while (true) {
+			if (!fieldsInfo.containsKey(propertyName)) {
+				errorMsg << "Property $propertyName was missing from ETL meta-data"
+				break
+			}
+
+			createInfo = fieldsInfo[propertyName].create
+			if (! createInfo) {
+				errorMsg << "Missing necessary 'whenNotFound create' information to create new asset"
+				break
+			}
+
+			Class domainClassToCreate
+			(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(propertyName, fieldsInfo, context.domainClass)
+			if (errMsg) {
+				errorMsg << errMsg
+				break
+			}
+
+			log.debug "createReferenceEntityForWhenNotFoundCreate() creating for class {}", domainClassToCreate.getName()
+			if (domainClassToCreate in AssetEntity) {
+				// For Asset classes due to inheritence we need to determine which class that the user intended by looking
+				// at the initial find statement, which we will assume is the class that they really want. If they specified
+				// Asset then that will be an issue since that is ambiguous and will error
+				if (! fieldsInfo[propertyName].containsKey('find') ||
+					! fieldsInfo[propertyName].find.containsKey('query') ||
+					! (fieldsInfo[propertyName].find.query.size() > 0))
+				{
+					errorMsg << "The whenNotFound '$propertyName' create statement - requires that an associated find command preceeded it"
+				}
+				String intendedDomainName = fieldsInfo[propertyName].find?.query[0].domain
+				log.debug "domainClassToCreate() intendedDomainName is {}", intendedDomainName
+				if (intendedDomainName == 'Asset') {
+					errorMsg << "The whenNotFound '$propertyName' create command - requires that an associated find command has an explicit asset domain name"
+					break
+				}
+				// Get the class of the domain specified in find of the ETL script
+				domainClassToCreate = ETLDomain.lookup(intendedDomainName)?.getClazz()
+			}
+			if (domainClassToCreate == null) {
+				errorMsg << "Unable to determine class for property $propertyName"
+				break
+			}
+
+			// Actually create the domain and set any of the require properties that are required
+			entity = createEntity(domainClassToCreate, fieldsInfo, context)
+			if (!entity) {
+				break
+			}
+
+			List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
+			for (fieldName in fieldNames) {
+				String failureMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
+				if (failureMsg) {
+					errorMsg << failureMsg
+				}
+			}
+
+			break
+		}
+
+		// Attempt to save this sucker
+		if (errorMsg.size() == 0) {
+			if (! entity.save(flush:true, failOnError:false)) {
+				errorMsg << GormUtil.allErrorsString(entity)
+			}
+		}
+
+		// If there were any errors then record them and cleanup
+		if (errorMsg.size() > 0) {
+			for (String msg in errorMsg) {
+				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, msg)
+			}
+
+			if (entity) {
+				// Discard this new entity that errored while attempting to process
+				entity.discard()
+				entity = null
+			}
+		} else {
+		}
+
+		return entity
+	}
+
+	/**
+	 * Used to set a property onto a domain object
+	 * @param domain - the domain entity to be manipulated
+	 * @param propertyName - the property to be set
+	 * @param value - the value to set onto the domain object
+	 * @param parentPropertyName - the property name of the parent property that the domain will be assigned to
+	 * @param context - the grand poopa of objects for the Import Process
+	 * @return null if successful otherwise a string containing the error message that occurred
+	 */
+	@Transactional(noRollbackFor=[Exception])
+	private String setDomainPropertyWithValue(Object domainInstance, String propertyName, Object value, String parentPropertyName, Map fieldsInfo, Map context) {
+		String errorMsg = null
+		while (true) {
+			// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
+			if ( (propertyName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
+				// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
+				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
+				break
+			} else {
+				if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {
+					// TODO : JPM 6/2018 : Error message to specific - not only for whenNotFound
+					errorMsg = "Unknown field ${propertyName} in 'whenNotFound create' statement"
+					break
+				}
+
+				// TODO : JPM 8/2018 : The setDomainPropertyWithValue should use the logic in bindFieldsInfoValuesToEntity by refactoring that method
+
+				// Check if the field is a reference property
+				if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
+					// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
+					Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
+					if (refObject instanceof CharSequence) {
+						errorMsg = refObject
+					} else {
+						// Only set if different so as not to trigger the dirty flag unnecessarily
+						if (domainInstance[propertyName] != refObject) {
+							domainInstance[propertyName] = refObject
+						}
+					}
+				} else {
+					// Just a normal data type (e.g. Date, Integer, String, etc)
+					// TODO : JPM 4/2018 : Need to deal with ENUM and Date being resolved
+					if (domainInstance[propertyName] != value) {
+						domainInstance[propertyName] = value
+					}
+				}
+			}
+			break
+		}
+		return errorMsg
 	}
 
 	/**
@@ -2151,40 +1640,6 @@ class DataImportService implements ServiceMethods {
 	}
 }
 
-		// The following was my initial attempt to get the marshalling of the fieldsInfo JSON into a hierarchical set of Command
-		// Objects.
-
-
-		// ETLDataRecordFieldsCommand record = JsonUtil.mapToObject(importBatchRecord.fieldsInfo, ETLDataRecordFieldsCommand)
-		// ETLDataRecordFieldsCommand record = JsonUtil.mapToObject(importBatchRecord.fieldsInfo, new TypeReference<Map<String, ETLDataRecordFieldsCommand>>(){} )
-		// new TypeReference<Map<String, String>>(){}
-		/*
-		 * Tried https://www.mkyong.com/java/how-to-convert-java-map-to-from-json-jackson/ with no luck
-		 */
-		// Map<String, ETLDataRecordFieldsPropertyCommand> record = new HashMap<String, ETLDataRecordFieldsPropertyCommand>();
-		// try {
-		// 	ObjectMapper mapper = new ObjectMapper();
-		// 	map = mapper.readValue(importBatchRecord.fieldsInfo, new TypeReference<Map<String, ETLDataRecordFieldsPropertyCommand>>(){});
-		// } catch (JsonGenerationException e) {
-		// 	println "${e.getMessage()}"
-		// } catch (JsonMappingException e) {
-		// 	println "${e.getMessage()}"
-		// } catch (IOException e) {
-		// 	println "${e.getMessage()}"
-		// }
-		//  def record = bindData( ETLDataRecordFieldsCommand, importBatchRecord.fieldsInfo, '')
-
-		// @SuppressWarnings("unchecked")
-		// private List convertToListIfString(Object o) {
-		// 	if (o instanceof CharSequence) {
-		// 		List list = new ArrayList();
-		// 		list.add(o instanceof String ? o : o.toString());
-		// 		o = list;
-		// 	}
-		// 	return (List) o;
-		//  }
-
-
 /**
  * DataImportEntityCache is a caching object used for the Data Import that retains the results of
  * searches based on the query specs of a field. The cache will contain the error of the query results
@@ -2237,287 +1692,3 @@ class DataImportEntityCache {
 		return cache.size()
 	}
 }
-
-
-	/**
-	 * Used to set a property onto a domain object
-	 * @param domain - the domain entity to be manipulated
-	 * @param propertyName - the property to be set
-	 * @param value - the value to set onto the domain object
-	 * @param parentPropertyName - the property name of the parent property that the domain will be assigned to
-	 * @param context - the grand poopa of objects for the Import Process
-	 * @return null if successful otherwise a string containing the error message that occurred
-	 */
-	// private String setDomainPropertyWithValue(Object domainInstance, String propertyName, Object value, String parentPropertyName, Map fieldsInfo, Map context) {
-	// 	String errorMsg = null
-	// 	while (true) {
-	// 		// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
-	// 		if ( (propertyName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
-	// 			// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
-	// 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
-	// 			break
-	// 		} else {
-	// 			if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {
-	// 				// TODO : JPM 6/2018 : Error message to specific - not only for whenNotFound
-	// 				errorMsg = "Unknown field ${propertyName} in 'whenNotFound create' statement"
-	// 				break
-	// 			}
-
-	// 			// Check if the field is a reference property
-	// 			if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
-	// 				// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
-	// 				Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 				if (refObject instanceof CharSequence) {
-	// 					errorMsg = refObject
-	// 				} else {
-	// 					// Only set if different so as not to trigger the dirty flag unnecessarily
-	// 					if (domainInstance[propertyName] != refObject) {
-	// 						domainInstance[propertyName] = refObject
-	// 					}
-	// 				}
-	// 				// if (NumberUtil.isaNumber(value)) {
-	// 				// 	// Perform lookup by ID
-	// 				// 	// TODO : JPM 4/2018 : Refactor into Gorm as a single function
-	// 				// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
-	// 				// 	def entity = GormUtil.findInProject(context.project, refDomainClass, value)
-
-	// 				// 	if (entity) {
-	// 				// 		domainInstance[propertyName] = entity
-	// 				// 	} else {
-	// 				// 		errorMsg = "No reference record found for field ${propertyName} (${value}) by ID in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	}
-	// 				// 	// searchForDomainById(refDomainClass, propertyName, value, fieldsInfo, context)
-	// 				// } else if (! StringUtil.isBlank(value)) {
-	// 				// 	// Attempt the find the reference by the alternate key
-	// 				// 	List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 				// 	Integer numFound = references.size()
-	// 				// 	if (numFound == 1) {
-	// 				// 		domainInstance[propertyName] = references[0]
-	// 				// 	} else if (numFound > 1) {
-	// 				// 		errorMsg = "Multiple references found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	} else {
-	// 				// 		errorMsg = "No reference record found for field ${propertyName} by Name ($value) in 'whenNotFound create'"
-	// 				// 		break
-	// 				// 	}
-	// 				// }
-	// 			} else {
-	// 				// Just a normal data type (e.g. Date, Integer, String, etc)
-	// 				// TODO : JPM 4/2018 : Need to deal with ENUM and Date being resolved
-	// 				if (domainInstance[propertyName] != value) {
-	// 					domainInstance[propertyName] = value
-	// 				}
-	// 			}
-	// 		}
-	// 		break
-	// 	}
-	// 	return errorMsg
-	// }
-
-	/**
-	 * Used to create a domain record using the "create" structure in the ETL meta-data for a specified property. If the
-	 * reference domain entity could not be created then the error(s) will be recorded into the property of fieldsInfo map.
-	 *
-	 * @param propertyName - the name of the property in the fields ETL datastructure
-	 * @param context - the context map that the process uses to cart crap around
-	 * @return the reference domain object if successfully created
-	 */
-	// private Object createReferenceDomain(String propertyName, Map fieldsInfo, Map context) {
-	// 	Object entity
-	// 	String errorMsg
-	// 	Map createInfo
-
-
-
-	// 	log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
-	// 	while (true) {
-	// 		if (!fieldsInfo.containsKey(propertyName)) {
-	// 			errorMsg = "Property $propertyName was missing from ETL meta-data"
-	// 			break
-	// 		}
-
-
-
-	// 		createInfo = fieldsInfo[propertyName].create
-
-
-
-	// 		if (! createInfo) {
-	// 			errorMsg = "Missing necessary 'whenNotFound create' information to create new asset"
-	// 			break
-	// 		}
-
-
-
-	// 		Class domainClassToCreate = classOfDomainProperty(propertyName, fieldsInfo, context)
-	// 		if (domainClassToCreate == null) {
-	// 			errorMsg = "Unable to determine class for property $propertyName"
-	// 			break
-	// 		}
-
-
-
-	// 		// Determine what we're trying to create by looking at the property and getting the Domain class
-	// 		entity = domainClassToCreate.newInstance()
-
-
-
-	// 		// load with the values from the create key/value pairs
-	// 		List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
-	// 		for (fieldName in fieldNames) {
-	// 			errorMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
-	// 			// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered (Augusto)
-	// 			if (errorMsg) {
-	// 				break
-	// 			}
-	// 		}
-	// 		if (errorMsg) {
-	// 			break
-	// 		}
-
-
-
-	// 		//
-	// 		// Handle different required properties
-	// 		// TODO : JPM 4/2018 : Refactor to make this method smaller and more testable
-	// 		//
-
-
-
-	// 		// Project
-	// 		if (GormUtil.isDomainProperty(entity, 'project')) {
-	// 			entity.project = context.project
-	// 		}
-
-
-
-	// 		// MoveBundle
-	// 		if (GormUtil.isDomainProperty(entity, 'moveBundle') && ! entity.moveBundle ) {
-	// 			// TODO : JPM 4/2018 : The bundle may have been set with reference logic above
-	// 			entity.moveBundle = context.project.getProjectDefaultBundle()
-	// 		}
-
-
-
-	// 		if (! entity.validate() ) {
-	// 			log.debug "createReferenceDomain() failed : {}", GormUtil.allErrorsString(entity)
-	// 			// TODO : JPM 4/2018 : Change to populate field with list of i18n errors (August - good one to work on)
-	// 			// Populate field with list of errors
-	// 			// clear the error message
-	// 			// entity.discard()
-	// 			errorMsg = "Failed to create record for $propertyName : " + GormUtil.errorsAsUL(entity)
-	// 			break
-	// 		}
-
-
-
-	// 		// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
-	// 		//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
-	// 		entity.save(failOnError:true, flush:true)
-
-
-
-	// 		// Replace the cache reference of the query with that of the new entity
-	// 		String md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
-	// 		log.debug "createReferenceDomain() replaced cache $md5 with {}", entity
-	// 		// TODO : JPM 4/2018 : change to cache the ID of the object instead of the object to conserve memory
-	// 		context.cache.put(md5, entity)
-
-
-
-	// 		break
-	// 	} // while(true)
-
-
-
-	// 	if (errorMsg) {
-	// 		if (entity) {
-	// 			entity.discard()
-	// 		}
-	// 		log.warn 'createReferenceDomain() failed - property={}, error={}, create={}', propertyName, errorMsg, createInfo
-	// 		addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, errorMsg)
-	// 	}
-
-
-
-	// 	return entity
-	// }
-
-	/**
-	 * Used to find the a domain entity or reference domain when the field.value is a String and the domain has an
-	 * alternate key defined. Note that this lookup is generally only useful for domain entities that typical have
-	 * unique names. For domains such as Application this method will more than likely return multiple results.
-	 *
-	 * @param propertyName - the property name that the id value will be used and will be populated with error if not found
-	 * @param fieldsInfo - the fields map that came from the ETL process
-	 * @return the list of domain entities found for the property
-	 */
-	// private List<Object> XXfindDomainByAlternateProperty(String propertyName, Map fieldsInfo, Map context) {
-	// 	String notFoundByID = 'Entity was not found by ID'
-	// 	List<Object> entities=[]
-
-	// 	def value = fieldsInfo[propertyName]?.value
-	// 	if ( value && (value instanceof CharSequence) ) {
-	// 		Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
-	// 		entities = GormUtil.findDomainByAlternateKey(domainClass, value, propertyName, context.project)
-	// 		log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
-	// 	}
-	// 	return entities
-	// }
-
-	/**
-	 * Used to find a single domain object by using various techniques including:
-	 *    1. By ID
-	 *    2. By find/elseFind
-	 *    3. By String value (Alternate Key or special handlers such as Person)
-	 * @param domainInstance
-	 * @param propertyName
-	 * @param value
-	 * @param fieldsInfo
-	 * @param context
-	 * @return A String if there was an error or the Entity object
-	 */
-	// private Object XXfindDomainReferenceProperty(Object domainInstance, String propertyName, Object value, Map fieldsInfo, Map context) {
-	// 	Object entity = null
-	// 	String errorMsg = null
-
-	// 	// TODO : JPM : 6/2018 : Check find results first ?
-
-	// 	Class refDomainClass = GormUtil.getDomainPropertyType(domainInstance, propertyName)
-
-	// 	Long id = NumberUtil.isaNumber(value) ? value : null
-	// 	boolean isaString = (value instanceof CharSequence)
-	// 	if ( id == null && isaString) {
-	// 		id = NumberUtil.toPositiveLong(value)
-	// 	}
-
-	// 	log.debug 'findDomainReferenceProperty() Searching {}, property {}, value {}, isaString {}, id {}',
-	// 		refDomainClass?.getName(), propertyName, value, isaString, id
-
-	// 	if (id) {
-	// 		// Perform lookup by ID
-	// 		// TODO : JPM 4/2018 : Refactor into Gorm as a single function
-	// 		entity = GormUtil.findInProject(context.project, refDomainClass, id)
-	// 	} else if (isaString && ! StringUtil.isBlank(value)) {
-	// 		// Attempt the find the reference by the alternate key
-	// 		// List references = _fetchEntityByAlternateKey(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-	// 		// TODO : JPM 6/2018 : does _fetchEntityByAlternateKey need the propertyName argument?
-	// 		Map result = _fetchEntityByAlternateKey(refDomainClass, value, propertyName, fieldsInfo, context)
-	// 		if (result.error) {
-	// 			errorMsg = result.error
-	// 		} else {
-	// 			int numFound = result.entities.size()
-	// 			if (numFound == 1) {
-	// 				entity = result.entities[0]
-	// 			} else if (numFound > 1) {
-	// 				errorMsg = 'Multiple references found'
-	// 			}
-	// 		}
-	// 	}
-
-	// 	log.debug 'findDomainReferenceProperty() result {}', (errorMsg ?: entity)
-
-	// 	return errorMsg ?: entity
-	// }
-

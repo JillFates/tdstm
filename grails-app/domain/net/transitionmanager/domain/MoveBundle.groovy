@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 
 class MoveBundle extends Party {
 	static final String USE_FOR_PLANNING = 'useForPlanning'
@@ -16,6 +17,7 @@ class MoveBundle extends Party {
 	Room sourceRoom
 	Room targetRoom
 	Boolean tasksCreated = false
+	Collection assets
 
 	static String alternateKey = 'name'
 
@@ -73,8 +75,8 @@ class MoveBundle extends Party {
 		project ? MoveBundle.findAllByProjectAndUseForPlanning(project, true) : []
 	}
 
-	static final List<String> dependecyBundlingAssetTypes = ['server', 'vm', 'blade', 'Application', 'Files',
-	                                                         'Database', 'Appliance', 'Storage'].asImmutable()
+	static final List<String> dependecyBundlingAssetTypes = (AssetType.allServerTypes + ['Application', 'Files',
+	     'Database', 'Storage', 'NAS', 'Array', 'SAN']).asImmutable()
 
 	boolean belongsToClient(client) {
 		project.clientId == client?.id

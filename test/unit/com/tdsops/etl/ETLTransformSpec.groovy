@@ -144,7 +144,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
+		debugConsole = new DebugConsole(buffer: new StringBuilder())
 
 		applicationFieldsValidator = new ETLFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application,
@@ -206,10 +206,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		where:
 			result || value1 | value2 | value3
-			null   || null   | null   | null
-			''     || ''     | null   | 5
-			''     || null   | ''     | 'tadah'
+			null   || null   | ''     | null
+			5      || ''     | null   | 5
+			'tadah'|| null   | ''     | 'tadah'
 			false  || null   | null   | false
+			true   || ''     | true   | 3
+			0      || ''     | 0      | 1
+			now    || ''     | null   | now
 			new Element(value: 5) || null | null | new Element(value: 5)
 	}
 
@@ -864,7 +867,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -898,7 +901,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can throw an ETLProcessorException for an invalid console status'() {
 
 		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+			DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
@@ -917,7 +920,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can translate an extracted value using a dictionary'() {
 
 		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+			DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), environmentDataSet, console, GroovyMock(ETLFieldsValidator))
@@ -969,7 +972,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				dataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 		when: 'Evaluating a DataScript with having substitute with default value'
 			etlProcessor.evaluate(dataScript)
@@ -1041,7 +1044,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can plus strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+			DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
@@ -1081,7 +1084,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1118,7 +1121,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1155,7 +1158,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -1192,7 +1195,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				new DebugConsole(buffer: new StringBuilder()),
 				validator)
 
 		when: 'The ETL script is evaluated'

@@ -1,17 +1,21 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
+import net.transitionmanager.domain.TagEvent
 
 /**
  * A service for managing the relationship of Tags to Assets.
  */
 @Transactional
 class TagAssetService implements ServiceMethods {
+
+	AssetEntityService assetEntityService
 
 	/**
 	 * Gets a list of tagAssets for an asset.
@@ -57,13 +61,19 @@ class TagAssetService implements ServiceMethods {
 	List<TagAsset> applyTags(Project currentProject, List<Long> tagIds, Long assetId) {
 		AssetEntity asset = get(AssetEntity, assetId, currentProject)
 
-		tagIds.collect { Long tagId ->
+		List<TagAsset> tagAssets = tagIds.collect { Long tagId ->
 			Tag tag = get(Tag, tagId, currentProject)
 
 			TagAsset tagAsset = new TagAsset(tag: tag, asset: asset)
 			asset.refresh()
 			return tagAsset.save(failOnError: true)
 		}
+
+		// Bump the last updated date for the given asset.
+		asset.lastUpdated = TimeUtil.nowGMT()
+		asset.save(failOnError: true)
+
+		return tagAssets
 	}
 
 	/**
@@ -72,15 +82,19 @@ class TagAssetService implements ServiceMethods {
 	 * @param tagAssetIds the id of the tagAsset to remove.
 	 */
 	void removeTags(Project currentProject, List<Long> tagAssetIds) {
+		Set<Long> assetIds = []
 		tagAssetIds.each { Long id ->
 			TagAsset tagAsset = get(TagAsset, id, currentProject)
 			if (currentProject.id != tagAsset?.tag?.project?.id) {
 				securityService.reportViolation("attempted to access asset from unrelated project (asset ${tagAsset?.id})")
 				throw new EmptyResultException()
 			}
-
+			assetIds << tagAsset.asset.id
 			tagAsset.delete(flush: true)
 		}
+
+		// Bump the last updated date for all the assets involved.
+		assetEntityService.bulkBumpAssetLastUpdated(currentProject, assetIds)
 	}
 
 	/**
@@ -104,8 +118,16 @@ class TagAssetService implements ServiceMethods {
 			return link.save(flush: true, failOnError: false)
 		}
 
+		List<TagEvent> tagEvents = TagEvent.findAllWhere(tag: secondary)
+
+		//This will ignore nulls resulting from a duplicate key.
+		tagEvents.findResults { TagEvent link ->
+			link.tag = primary
+			return link.save(flush: true, failOnError: false)
+		}
+
 		//removes the secondary tag, and by cascade any links, that would create a duplicate key.
-		secondary.delete(failOnError:true)
+		secondary.delete(failOnError:true, flush: true)
 
 		return updatedLinks
 	}
@@ -162,12 +184,16 @@ class TagAssetService implements ServiceMethods {
 		String queryForAssetIds
 		Map params = [:]
 
+		Map assetQueryParams = [:]
+
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
 			params.assetIds = assetIds
+			assetQueryParams['assetIds'] = assetIds
 		} else {
 			queryForAssetIds = assetIdsFilterQuery.query
 			params << assetIdsFilterQuery.params
+			assetQueryParams = assetIdsFilterQuery.params
 		}
 
 		params.tagIds = tagIds
@@ -185,6 +211,8 @@ class TagAssetService implements ServiceMethods {
 		"""
 
 		TagAsset.executeUpdate(query, params)
+		// Bump the lastUpdated field for those assets for which tags were added.
+		assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 	}
 
 	/**
@@ -196,7 +224,7 @@ class TagAssetService implements ServiceMethods {
 	 */
 	void bulkClear(List<Long> tagIds = null, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if (tagIds) {
-			throw InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
+			throw new InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
 		}
 
 		remove([], assetIds, assetIdsFilterQuery)
@@ -211,7 +239,7 @@ class TagAssetService implements ServiceMethods {
 	 */
 	void bulkRemove(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if(!tagIds){
-			throw InvalidParamException("Tag IDs must be specified for removal")
+			throw new InvalidParamException("Tag IDs must be specified for removal")
 		}
 
 		remove(tagIds, assetIds, assetIdsFilterQuery)
@@ -228,13 +256,16 @@ class TagAssetService implements ServiceMethods {
 		String queryForAssetIds
 		String queryForTagIds = ''
 		Map params = [:]
+		Map assetQueryParams = [:]
 
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
 			params.assetIds = assetIds
+			assetQueryParams['assetIds'] = assetIds
 		} else {
 			queryForAssetIds = assetIdsFilterQuery.query
 			params << assetIdsFilterQuery.params
+			assetQueryParams = assetIdsFilterQuery.params
 		}
 
 		if (tagIds) {
@@ -248,6 +279,9 @@ class TagAssetService implements ServiceMethods {
 		"""
 
 		TagAsset.executeUpdate(query, params)
+
+		// Bump the lastUpdated field on those assets that were affected by the remove operation.
+		assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 	}
 
 	/**

@@ -11,13 +11,11 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
@@ -35,7 +33,6 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.Manufacturer
@@ -47,6 +44,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Recipe
+import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
@@ -76,18 +74,12 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang3.BooleanUtils
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.util.StreamUtils
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -97,6 +89,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
+	static Integer MINUTES_CONSIDERED_TARDY = 300
+	static Integer MINUTES_CONSIDERED_LATE = 600
 
 	// This is a has table that sets what status from/to are available
 	private static final Map statusOptionForRole = [
@@ -1410,6 +1404,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def dueClass
 		def estStartClass
 		def estFinishClass
+		def updatedClass
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
@@ -1421,21 +1416,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
+
 			// clear out the CSS classes for overDue
 			dueClass = ''
-
-			if (it.estFinish) {
-				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
-				elapsedSec = elapsed.toMilliseconds() / 1000
-				if (elapsedSec > 300) {
-					dueClass = 'task_overdue'
-				}
+			if (it.dueDate && it.dueDate < nowGMT) {
+				dueClass = 'task_overdue'
+			}
+			if (it.estFinish < nowGMT) {
+				Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
+				estStartClass = estimatedColumnsCSS['estStartClass']
+				estFinishClass = estimatedColumnsCSS['estFinishClass']
 			}
 
-			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
-
-			estStartClass = estimatedColumnsCSS['estStartClass']
-			estFinishClass = estimatedColumnsCSS['estFinishClass']
 
 			String dueDate = TimeUtil.formatDate(it.dueDate)
 
@@ -1443,6 +1436,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			Date due = it.dueDate?.clearTime()
 
 			// Highlight Due Date column for tardy and late tasks
+
 			if (it.dueDate && it.isActionable()) {
 				if (due > today) {
 					dueClass = ''
@@ -1502,7 +1496,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					instructionsLinkURL, // 18
 					estStartClass,	// 19
 					estFinishClass,	// 20
-					it.isPublished // 21
+					it.isPublished, // 21
+					updatedClass // 22
 			],
 			  id:it.id
 			]
@@ -1543,13 +1538,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def assetOptions() {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
+		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])
+		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: "value", order: "asc"])
 
 		def assetType = assetTypes.collect{ AssetOptions option ->
-			[type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
+			[id: option.id, type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
 		}
 
 		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
@@ -1737,7 +1732,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			depGroups = [-1]
 		}
 
-		def assetDependentlist = []
+		List<Map> assetDependentlist = []
 		String selectionQuery = ''
 		//String mapQuery
 		def nodesQuery = []
@@ -1802,12 +1797,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def asset
 
 		if (params.entity != 'graph') {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null,
+			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
 				params.dependencyBundle != "null" ? params.dependencyBundle : "all")
 			depMap = depMap.gridStats
 		}
 		else {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null,
+			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
 				params.dependencyBundle != "null" ? params.dependencyBundle : "all", true)
 		}
 		def model = [entity: params.entity ?: 'apps', stats: depMap]
@@ -1817,6 +1812,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		model.orderBy = orderBy
 		model.sortBy = sortOn
 		model.haveAssetEditPerm = securityService.hasPermission(Permission.AssetEdit)
+		if (assetDependentlist) {
+            model.tags = TagAsset.where {
+                asset.id in assetDependentlist*.assetId
+            }.projections {
+                property 'tag'
+            }.list()*.toMap() as JSON
+        }
 
 		// Switch on the desired entity type to be shown, and render the page for that type
 		switch(params.entity) {
@@ -2200,7 +2202,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	// removes the user's dependency analyzer map related preferences
 	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference(params.preferenceName ?: 'depGraph')
+		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.value())
 		render true
 	}
 
@@ -2673,7 +2675,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
 		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
-		StringBuffer query = new StringBuffer("""
+		StringBuilder query = new StringBuilder("""
 			SELECT * FROM (
 				SELECT asset_dependency_id AS id,
 					ae.asset_name AS assetName,
@@ -2955,7 +2957,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String queryColumns = 'a.id as id, a.assetName as text'
 			String queryCount = 'COUNT(a)'
 
-			StringBuffer query = new StringBuffer("SELECT @COLS@ FROM ")
+			StringBuilder query = new StringBuilder("SELECT @COLS@ FROM ")
 
 			if (qmap.containsKey(params.assetClassOption)) {
 				def qm = qmap[params.assetClassOption]
@@ -2996,7 +2998,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					qparams.assetType = qm.assetType
 				}
 
-				StringBuffer wquery = new StringBuffer(query) // This one is set aside for later use
+				StringBuilder wquery = new StringBuilder(query) // This one is set aside for later use
 
 				query.append("ORDER BY a.assetName ASC")
 				log.debug "***** Query: $query\nParams: $qparams"
@@ -3562,7 +3564,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 *
 	 * @param task : The task.
 	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
-	 * @param nowGMT : The actual time in GMT.
+	 * @param nowGMT : The actual time in GMT timezone.
 	 * @return : A Map with estStartClass and estFinishClass
 	 * @todo: refactor getEstimatedColumnsCSS into a service and create test cases
 	 */
@@ -3616,6 +3618,36 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
 	}
+
+    /**
+     * Returns a String with the updated column CSS class name, according to
+     * the relation between now and a particular amount of time (elapsedSec = current time - statusUpdate).
+     * If a task estimate value is not late or tardy, it returns an empty string for the class name.
+     * For more information see TM-11565.
+     *
+     * @param  task : The task.
+     * @param  elapsedSec : The elapsed time in milliseconds (elapsedSec = current time - statusUpdate).
+     * @return  A String with updateClass.
+     */
+    private String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
+
+        String updatedClass = ''
+		if (task.status == AssetCommentStatus.READY) {
+			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
+				updatedClass = 'task_late'
+			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
+				updatedClass = 'task_tardy'
+			}
+		} else if (task.status == AssetCommentStatus.STARTED) {
+			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
+			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
+				updatedClass='task_late'
+			} else if (dueInSecs >= MINUTES_CONSIDERED_TARDY) {
+				updatedClass='task_tardy'
+			}
+		}
+        return updatedClass
+    }
 
 
 	/**

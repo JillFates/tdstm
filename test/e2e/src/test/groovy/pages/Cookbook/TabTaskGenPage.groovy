@@ -1,6 +1,7 @@
 package pages.Cookbook
 
 import geb.Page
+import modules.CommonsModule
 
 class TabTaskGenPage extends Page {
 
@@ -19,7 +20,6 @@ class TabTaskGenPage extends Page {
         tskGTabText                         { $("div", "ui-view": "taskBatchStart").find("p").text()}
         tskGTabEventSelectorLabel           { $("label", for: "eventSelect").text()}
         tskGTabEventSelector(wait:true)     { $("select#eventSelect")}
-        tskGTabBundleSelector               { $("select#bundleSelect")}
         tskGTabSetDefaultLink(wait:true)    { $('a#setDefaultContext')}
         tskGTabClearDefaultLink             { $('a#clearDefaultContext')}
         tskGTabAutoPubTaskCboxLabel         { $("label", for: "autoPublishTasks").text()}
@@ -27,5 +27,11 @@ class TabTaskGenPage extends Page {
         tskGTabGenUsingWipCBoxLabel         { $("label", for: "generateUsingWIP").text()}
         tskGTabGenUsingWipCBox              { $('input#generateUsingWIP')}
         tskGTabGenerateTasksBtn(wait:true)  { $("a#generateTask")}
+        commonsModule { module CommonsModule }
+    }
+
+    def waitForProgressBar(){
+        waitFor{js.'$("[ui-view=taskBatchProgress] .progress-bar")'.size() > 0}
+        waitFor{js.'$("[ui-view=taskBatchProgress] .progress-bar")'.size() == 0}
     }
 }

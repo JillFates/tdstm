@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus class="modal-content tds-angular-component-content">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <span aria-hidden="true">×</span>
@@ -37,8 +37,11 @@
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
-                                    <td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">${assetEntity.manufacturer}</td>
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
+									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
+										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
+											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
+										</tdsAngular:tooltipSpan>
+									</td>
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
                                         <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
                                     </td>
@@ -47,14 +50,16 @@
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
-                                    <td class="valueNW ${standardFieldSpecs.model.imp?:''}">
-                                        ${assetEntity.model}
-                                        <g:if test="${! assetEntity.model?.isValid()}">
-                                            <span style="color: red;">
-                                                <b>?</b>
-                                            </span>
-                                        </g:if>
-                                    </td>
+									<td class="valueNW ${standardFieldSpecs.model.imp?:''}">
+										<tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
+											<a (click)="showModel('${assetEntity.model?.id}')">${assetEntity.model}</a>
+											<g:if test="${! assetEntity.model?.isValid()}">
+												<span style="color: red;">
+													<b>?</b>
+												</span>
+											</g:if>
+										</tdsAngular:tooltipSpan>
+									</td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
                                     <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
                                         <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>

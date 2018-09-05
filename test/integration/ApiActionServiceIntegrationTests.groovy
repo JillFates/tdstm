@@ -9,7 +9,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 
-import net.transitionmanager.agent.*
+import net.transitionmanager.connector.*
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.EmptyResultException
@@ -78,9 +78,9 @@ class ApiActionServiceIntegrationTests extends Specification {
 		action = new ApiAction(
 			name:'testAction',
 			description: 'This is a bogus action for testing',
-			//agentClass: AgentClass.HTTP,
+			//connectorClass: ConnectorClass.HTTP,
 			apiCatalog: apiCatalog,
-			agentMethod: 'callEndpoint',
+			connectorMethod: 'callEndpoint',
 			methodParams: paramsJson,
 			asyncQueue: 'test_outbound_queue',
 			callbackMethod: 'updateTaskState',
@@ -110,40 +110,40 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	}
 
-	def '1. Tests for the agentClassForAction method'() {
+	def '1. Tests for the connectorClassForAction method'() {
 		setup: 'requires a Class variable so that'
 			Class clazz
 
-		when: 'calling agentClassForAction to get an implemented ApiAction'
-			clazz = apiActionService.agentInstanceForAction(action).class
+		when: 'calling connectorClassForAction to get an implemented ApiAction'
+			clazz = apiActionService.connectorInstanceForAction(action).class
 		then: 'the specified class should be returned'
-			clazz == net.transitionmanager.agent.GenericHttpAgent
+			clazz == GenericHttpConnector
 
-		when: 'the method is called referencing an unimplemented Agent'
+		when: 'the method is called referencing an unimplemented Connector'
 			// SL 07/2018 : Test kept just to preserve structure
-			this.apiActionService = [agentInstanceForAction: { throw new MissingPropertyException('Test') }] as ApiActionService
+			this.apiActionService = [connectorInstanceForAction: { throw new MissingPropertyException('Test') }] as ApiActionService
 
-			clazz = apiActionService.agentInstanceForAction(action).class
+			clazz = apiActionService.connectorInstanceForAction(action).class
 		then: 'an exception should be thrown'
 			thrown MissingPropertyException
 	}
 
 	@Ignore
-	// TODO : SL 6/2018 : Test being ignored until AWS Agent will be reestablished
-	def '2. Tests for the agentInstanceForAction method'() {
-		setup: 'requires an Object to hold the Agent instance so that'
+	// TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
+	def '2. Tests for the connectorInstanceForAction method'() {
+		setup: 'requires an Object to hold the Connector instance so that'
 			Object aws
 
-		when: 'calling the method to get an implemented Agent'
-			aws = apiActionService.agentInstanceForAction(action)
-		then: 'the requested Agent class instance should be returned'
-			(aws instanceof AwsAgent)
+		when: 'calling the method to get an implemented Connector'
+			aws = apiActionService.connectorInstanceForAction(action)
+		then: 'the requested Connector class instance should be returned'
+			(aws instanceof AwsConnector)
 		and: 'the AwsService was propery injected into the instance'
 			aws.awsService != null
 
-		when: 'the method is called requesting an unimplemented Agent'
-			// action.agentClass = AgentClass.RACIME
-			clazz = apiActionService.agentInstanceForAction(action)
+		when: 'the method is called requesting an unimplemented Connector'
+			// action.connectorClass = ConnectorClass.RACIME
+			clazz = apiActionService.connectorInstanceForAction(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
 	}
@@ -151,16 +151,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def '3. Tests for methodDefinition'() {
 		setup:
 			def methodDef
-		when: 'calling agentClassForAction for a good ApiAction'
+		when: 'calling connectorClassForAction for a good ApiAction'
 			methodDef = apiActionService.methodDefinition(action)
 		then: 'a valid DictionaryItem should be returned'
 			methodDef
 			(methodDef instanceof DictionaryItem)
 		and: 'the method name is the one expected'
-			methodDef.apiMethod == action.agentMethod
+			methodDef.apiMethod == action.connectorMethod
 
-		when: 'the ApiAction has an unimplemented Agent'
-			action.agentMethod = 'DOES-NOT-EXISTS'
+		when: 'the ApiAction has an unimplemented Connector'
+			action.connectorMethod = 'DOES-NOT-EXISTS'
 			clazz = apiActionService.methodDefinition(action)
 		then: 'an exception should be thrown'
 			thrown InvalidRequestException
@@ -169,7 +169,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 	def '4. Tests for buildMethodParamsWithContext'() {
 		setup:
 			Map methodParamsMap
-		when: 'calling the method with the AwsAgent and the above mocked task'
+		when: 'calling the method with the AwsConnector and the above mocked task'
 			methodParamsMap = apiActionService.buildMethodParamsWithContext(action, task)
 		then: 'a map with the method arguments should be returned'
 			methodParamsMap
@@ -182,12 +182,12 @@ class ApiActionServiceIntegrationTests extends Specification {
 	}
 
 	@Ignore
-	// TODO : SL 6/2018 : Test being ignored until AWS Agent will be reestablished
+	// TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
 	def '5. Test the invoke method'() {
-		setup: 'will inject a mock awsService into the AwsAgent class to stub out calls to AWS so that'
+		setup: 'will inject a mock awsService into the AwsConnector class to stub out calls to AWS so that'
 			AwsService awsService = Mock()
-			AwsAgent awsAgent = AwsAgent.instance
-			awsAgent.awsService = awsService
+			AwsConnector awsConnector = AwsConnector.instance
+			awsConnector.awsService = awsService
 
 		when: 'calling the invoke method on the service'
 			apiActionService.invoke(action, task)
@@ -285,7 +285,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				description = "some description"
 				provider = provider1
 				apiCatalog = apiCatalog1
-				agentMethod = "X"
+				connectorMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
 				asyncQueue = "AQ"
@@ -320,7 +320,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: "A ValidationException is thrown"
 			thrown InvalidParamException
 		when: "Trying to create an ApiAction with missing params"
-			cmd.agentMethod = null
+			cmd.connectorMethod = null
 			cmd.name = RSU.randomAlphabetic(10)
 			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, 0, project)
 		then: "The missing field causes the validation step to fail with a ValidationException."
@@ -355,7 +355,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				description = "some description"
 				provider = provider1
 				apiCatalog = apiCatalog1
-				agentMethod = "X"
+				connectorMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
 				asyncQueue = "AQ"
@@ -408,7 +408,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				description = "some description"
 				provider = provider1
 				apiCatalog = apiCatalog1
-				agentMethod = "X"
+				connectorMethod = "X"
 				callbackMode = "NA"
 				callbackMethod = "Y"
 				asyncQueue = "AQ"

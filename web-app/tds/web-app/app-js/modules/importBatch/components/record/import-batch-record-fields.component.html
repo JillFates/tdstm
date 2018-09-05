@@ -1,0 +1,115 @@
+<div class="fields-container row" *ngIf="fieldsInfo">
+
+    <kendo-grid
+            [data]="gridData"
+            [pageSize]="25">
+        <ng-template kendoGridToolbarTemplate [position]="'top'">
+            <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
+            <div class="fieldsFilter col-sm-2">
+                <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
+                    [data]="fieldsFilter.options"
+                    [textField]="'text'"
+                    [valueField]="'value'"
+                    [(ngModel)]="fieldsFilter.selected"
+                    (valueChange)="onFieldsFilter($event)"
+                    placeholder="Filter"
+                    class="form-control input-sm">
+                </kendo-dropdownlist>
+            </div>
+            <div class="fieldsFilterText col-sm-3">
+                <input [(ngModel)]="fieldsFilter.nameFilter.value"
+                       type="text" class="form-control"
+                       name="fieldsFilterText" placeholder="Filter on field name"
+                       (keyup)="onTextFilter()">
+                <span *ngIf="fieldsFilter.nameFilter.value"
+                      class="fa fa-times form-control-feedback"
+                      (click)="clearTextFilter()"></span>
+            </div>
+        </ng-template>
+        <kendo-grid-column title="Name" field="name"></kendo-grid-column>
+
+        <!-- Current / Previous Column Label -->
+        <kendo-grid-column
+            [title]="currentPreviousColumnLabel"
+            field="currentPreviousValue"
+            [class]="batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE ? '' : 'gray-background'"
+        >
+        </kendo-grid-column>
+
+        <!-- Imported Value Column Label -->
+        <kendo-grid-column title="Imported Value" [class]="'import-value'">
+            <ng-template kendoGridCellTemplate let-dataItem>
+                <div class="import-item-container">
+                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowValue"
+                        [style.font-weight]="dataItem.modified === true ? 'bold' : 'normal'">
+                        {{dataItem.importValue}}
+                    </div>
+                    <div *ngIf="dataItem.currentValueAction == CurrentValueAction.ShowInit" class="has-init-value">
+                        {{dataItem.initValue}}
+                    </div>
+                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditValue"
+                        type="text"
+                        class="import-value-input form-control"
+                        [(ngModel)]="dataItem.importValue"
+                        [style.font-weight]="dataItem.currentPreviousValue !== dataItem.importValue &&  batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE? 'bold' : 'normal'"
+                    />
+                    <input *ngIf="dataItem.currentValueAction == CurrentValueAction.EditInit"
+                        type="text"
+                        class="has-init-value import-value-input form-control"
+                        [(ngModel)]="dataItem.initValue"
+                    />
+                    <span *ngIf="(dataItem.currentValueAction == CurrentValueAction.ShowInit || dataItem.currentValueAction == CurrentValueAction.EditInit)">
+                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                    </span>
+                </div>
+            </ng-template>
+        </kendo-grid-column>
+
+        <!-- Errors Column -->
+        <kendo-grid-column title="Error(s)">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <div *ngFor="let error of dataItem.errors" class="error">
+                    * {{error}}
+                </div>
+            </ng-template>
+        </kendo-grid-column>
+    </kendo-grid>
+
+    <div class="row footer">
+        <tds-check-action
+                *ngIf="showActionButtons()"
+                [disabled]="!areOverrideValuesDirty()"
+                [name]="'Save'"
+                (onClick)="onUpdate()"
+                [noneStateIcon]="'glyphicon glyphicon-floppy-disk'"
+                [class]="'btn-sm col-sm-1'"
+                [(model)]="saveStatus">
+        </tds-check-action>
+        <tds-check-action
+                *ngIf="showActionButtons()"
+                [disabled]="areOverrideValuesDirty()"
+                [name]="'Process'"
+                (onClick)="onProcess()"
+                [noneStateIcon]="'glyphicon glyphicon-retweet'"
+                [class]="'btn-sm col-sm-1'"
+                [(model)]="processStatus">
+        </tds-check-action>
+        <button *ngIf="showIncludeButton()"
+                (click)="onInclude()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-plus"></i>
+            Include
+        </button>
+        <button *ngIf="showIgnoreButton()"
+                (click)="onIgnore()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-eye-close"></i>
+            Ignore
+        </button>
+        <button (click)="onCancel()"
+                class="btn btn-default btn-sm col-sm-1 pull-right" type="button">
+            <i class="glyphicon glyphicon-remove-circle"></i>
+            <span>{{showActionButtons() ? 'Cancel' : 'Close'}}</span>
+        </button>
+    </div>
+</div>

@@ -552,7 +552,7 @@ class UserService implements ServiceMethods {
 		projectIds.addAll getSelectedProject(project)*.id
 		def projectIdsAsValue = projectIds.join(",")
 
-		def query = new StringBuffer("SELECT p.person_id, ul.user_login_id, p.first_name, p.last_name, p.middle_name, proj.project_id, pg.name AS project_name, ul.last_page AS lastPage")
+		def query = new StringBuilder("SELECT p.person_id, ul.user_login_id, p.first_name, p.last_name, p.middle_name, proj.project_id, pg.name AS project_name, ul.last_page AS lastPage")
 			.append(" FROM (")
 			.append("     SELECT user_login_id, CAST(value AS UNSIGNED INTEGER) AS project_id")
 			.append("     FROM user_preference")

@@ -36,6 +36,7 @@ class UserLoginController implements ControllerMethods {
 	PersonService personService
 	ProjectService projectService
 	UserPreferenceService userPreferenceService
+	int indefinitelyThreshold = 10
 
 	@HasPermission(Permission.UserView)
 	def list() {
@@ -84,7 +85,7 @@ class UserLoginController implements ControllerMethods {
 		}
 
 
-		def query = new StringBuffer("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
+		def query = new StringBuilder("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
 			FROM person p
@@ -145,10 +146,10 @@ class UserLoginController implements ControllerMethods {
 			userLogins = []
 
 		String acceptImgTag = '<img src="' + resource(dir: 'icons', file: 'accept.png', absolute: false) + '"></img>'
-
+		// If the time difference for the userLogin.lockedOutUntil is greater than 10 years, use 'Indefinitely' instead.
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLogins?.collect {
-			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts: it.failedAttempts],
+			[cell: [[id: it.userLoginId, username: it.username, lockedOutUntil: it.locked, lockedOutTime: TimeUtil.hence(it.locked, indefinitelyThreshold), failedLoginAttempts: it.failedAttempts],
 			'<a href="' + createLink(controller: 'userLogin', action: 'show', id: it.userLoginId) + '">' + it.username + '</a>',
 			'<a href="javascript: Person.showPersonDialog(' + it.personId + ',\'generalInfoShow\')">' + it.fullname + '</a>',
 			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate], id: it.userLoginId]}
@@ -175,7 +176,7 @@ class UserLoginController implements ControllerMethods {
 			id: showUser.id,
 			username: showUser.username,
 			lockedOutUntil: showUser.lockedOutUntil,
-			lockedOutTime: TimeUtil.ago(TimeUtil.nowGMT(), showUser.lockedOutUntil),
+			lockedOutTime: TimeUtil.hence(showUser.lockedOutUntil, indefinitelyThreshold),
 			failedLoginAttempts: showUser.failedLoginAttempts
 		] as JSON
 

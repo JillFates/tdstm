@@ -37,7 +37,7 @@ import { DataIngestionService } from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {ImportAssetsService} from '../importAssets/service/import-assets.service';
+import {ImportAssetsService} from '../importBatch/service/import-assets.service';
 
 @NgModule({
 	imports: [

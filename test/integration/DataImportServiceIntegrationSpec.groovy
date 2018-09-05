@@ -6,6 +6,7 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -13,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import grails.test.spock.IntegrationSpec
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MoveBundle
@@ -21,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.mock.web.MockMultipartFile
@@ -35,6 +38,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
     DataImportService dataImportService
+
+	@Shared
+    SecurityService securityService
 
 	@Shared
 	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
@@ -83,6 +89,10 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
 			moveBundleTestHelper.createBundle(otherProject, null))
+
+		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ADMIN}"])
+        securityService.assumeUserIdentity(adminUser.username, false)
+
 		context = dataImportService.initContextForProcessBatch( project, ETLDomain.Dependency )
 		context.record = new ImportBatchRecord(sourceRowId:1)
 
@@ -114,13 +124,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			initializeFindElement(propertyName, fieldsInfo)
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName: device.assetName], true, device.id)
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
-			[device] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
+			[device] ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
 
 		when: 'the query is by the assetName of an non-existing asset'
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:'A bogus asset name that does not exist for certain!'], false)
 			fieldsInfo.value = ''
 		then: 'calling performQueryAndUpdateFindElement should return an empty list'
-			[] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
+			[] ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
 
 		when: 'there is an asset with the same assetName in a different project'
 			// Done in spec setup
@@ -128,14 +138,14 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetName:device.assetName], true, device.id)
 			fieldsInfo.value = ''
 		then: 'calling performQueryAndUpdateFindElement should return the expected record'
-			[device] ==  dataImportService._performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
+			[device] ==  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, fieldsInfo, context)
 
 		when: 'there is a second asset with the same assetType'
 			// Done in spec setup
 		and: 'the query is by the assetType only'
 			setQueryElement(propertyName, fieldsInfo, 'Device', [assetType: assetType], false)
 		and: 'calling performQueryAndUpdateFindElement that should return multiple records'
-			List entities =  dataImportService._performQueryAndUpdateFindElement(propertyName, new JSONObject(fieldsInfo), context)
+			List entities =  SearchQueryHelper.performQueryAndUpdateFindElement(propertyName, new JSONObject(fieldsInfo), context)
 		then: 'the list of entities should have 2 entities'
 			2 == entities.size()
 		and: 'the returned list should have the ids of the expected records'
@@ -150,19 +160,20 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void '2. beat up on classOfDomainProperty'() {
-		// classOfDomainProperty(String propertyName, Map fieldsInfo, Map context)
+		// classOfDomainProperty(String propertyName, Map fieldsInfo, Map clazz)
 
 		given:
 			Class clazz
-			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
+			//JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
+			Map fieldsInfo = initFieldsInfoForDependency()
+			String errMsg
 
 		when: 'called for the identity of the object'
-			clazz = dataImportService.classOfDomainProperty('id', fieldsInfo, context)
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty('id', fieldsInfo, AssetDependency)
 		then:
 			AssetDependency == clazz
-
 		when: 'called for the asset reference'
-			clazz = dataImportService.classOfDomainProperty('asset', fieldsInfo, context)
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty('asset', fieldsInfo, AssetDependency)
 		then: 'an AssetEntity should be returned'
 			AssetEntity == clazz
 
@@ -172,7 +183,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				assetName: 'foo'
 			] ]
 		and: 'and calling for the asset reference'
-			clazz = dataImportService.classOfDomainProperty('asset', fieldsInfo, context)
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty('asset', fieldsInfo, AssetDependency)
 		then: 'an Application class should be returned'
 			Application == clazz
 
@@ -184,36 +195,34 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'the query section was removed from previous test'
 			fieldsInfo.asset.find.query = []
 		and: ' classOfDomainProperty is calledfor the asset reference'
-			clazz = dataImportService.classOfDomainProperty('asset', fieldsInfo, context)
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty('asset', fieldsInfo, AssetDependency)
 		then: 'a Database class should be returned'
 			Database == clazz
 
 
 		when: 'called for an invalid property name'
 			String propertyName = 'xyzzy'
-			clazz = dataImportService.classOfDomainProperty(propertyName, fieldsInfo, context)
-			String expectedError = StringUtil.replacePlaceholders(dataImportService.PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			List errorsFound = context.record.errorListAsList()
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty(propertyName, fieldsInfo, AssetDependency)
+			String expectedError = StringUtil.replacePlaceholders(SearchQueryHelper.PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
 		then: 'an error should be reported'
-			1 == errorsFound.size()
+			errMsg
 		and: 'the error message should be what is expected'
-			expectedError == errorsFound[0]
+			expectedError == errMsg
 
 		// when: 'called for a non-asset reference property (Person)'
-		// 	clazz = dataImportService.classOfDomainProperty('createdBy', fieldsInfo, context)
+		// 	clazz = SearchQueryHelper.classOfDomainProperty('createdBy', fieldsInfo, AssetDependency)
 		// then: 'a Person domain class should be returned'
 		// 	clazz == Person
 
 		when: 'called for the a non-identity or reference field'
 			fieldsInfo['c1'] = [errors:[]]
-			clazz = dataImportService.classOfDomainProperty('c1', fieldsInfo, context)
-			List errors = dataImportService.getFieldsInfoFieldErrors('c1', fieldsInfo)
+			(clazz,errMsg) = SearchQueryHelper.classOfDomainProperty('c1', fieldsInfo, AssetDependency)
 		then: 'no domain class should be returned'
 			clazz == null
 		and: 'there should be an error on the field'
-			1 == errors.size()
+			errMsg
 		and: 'the error message should be what is expected'
-			dataImportService.WHEN_NOT_FOUND_PROPER_USE_MSG == errors[0]
+			SearchQueryHelper.WHEN_NOT_FOUND_PROPER_USE_MSG == errMsg
 
 	}
 
@@ -225,12 +234,12 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
 
         when: 'called with no id and an empty query section'
-			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def entity = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
         then: 'no entity should be returned'
 			! entity
 		and: 'a particular error message should be recorded in the fieldsInfo'
 			String errMsg = fieldsInfo[property].errors[0]
-			dataImportService.NO_FIND_QUERY_SPECIFIED_MSG == errMsg
+			SearchQueryHelper.NO_FIND_QUERY_SPECIFIED_MSG == errMsg
 	}
 
     void 'Test fetchEntityByFieldMetaData for find by field.value set to asset ID number'() {
@@ -241,7 +250,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field value contains the asset id as a numeric value'
 			fieldsInfo[property].value = device.id
 		and: 'the method is called'
-			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def entity = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the asset should be found'
 			entity
 		and: 'the asset should match the one attempting to be found'
@@ -256,7 +265,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field value contains the alternate key value (assetName)'
 			fieldsInfo[property].value = device.assetName
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the asset should be found'
 			result
 		and: 'the asset should match the one attempting to be found'
@@ -271,7 +280,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field value contains the id of the entity'
 			fieldsInfo[property].value = device.id
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 	}
@@ -284,7 +293,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field query contains one result with the id of the asset'
 			fieldsInfo[property].value = device.id
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 	}
@@ -300,7 +309,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'field.value is empty'
 			fieldsInfo[property].value = ''
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 		and: 'the matchOn should be for the 2nd query'
@@ -315,7 +324,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the field query contains the search by the assetName and assetType'
 			fieldsInfo[property].value = device.assetName
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the expected asset should be returned'
 			device == result
 	}
@@ -342,7 +351,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				]
 			]
 		and: 'the method is called'
-			def result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 			String cacheKey = context.cache.lastKey
 		then: 'no result should be returned'
 			null == result
@@ -358,7 +367,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			device3.assetType = assetType
 			device3.save(flush:true)
 		and: 'the method is called again'
-			result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the asset should be returned'
 			device3 == result
 		and: 'the cache should still have a single entry'
@@ -371,7 +380,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// 	Set keys = context.cache.keySet()
 		// 	keys.each { key -> context.cache[key] = overwritten }
 		// and: 'fetchEntityByFieldMetaData is called again with the same query'
-		// 	result = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+		// 	result = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		// then: 'the object returned should by the override number indicating that the cache is working correctly'
 		// 	overwritten == result
 	}
@@ -394,11 +403,11 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				]
 			]
 		and: 'the fetchEntityByFieldMetaData method is called'
-			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def entity = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'the return negative value indicating an error'
 			NumberUtil.isaNumber(entity)
 		and: 'the property should have an error message abouth there being multiple references'
-			dataImportService.FIND_FOUND_MULTIPLE_REFERENCES_MSG == fieldsInfo[property].errors[0]
+			SearchQueryHelper.FIND_FOUND_MULTIPLE_REFERENCES_MSG == context.searchQueryHelperErrors[0]
 	}
 
     void 'Test fetchEntityByFieldMetaData method with id reference to another project asset'() {
@@ -409,7 +418,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'the ETL field.value contains a numeric id of a domain entity belonging to another project'
 			fieldsInfo[property].value = otherProjectDevice.id
 		and: 'the fetchEntityByFieldMetaData method is called'
-			def entity = dataImportService.fetchEntityByFieldMetaData(property, fieldsInfo, context)
+			def entity = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
 		then: 'a -1 should be returned indicating that an explicit ID lookup failed'
 			-1 == entity
     }
@@ -421,37 +430,37 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			String property = 'asset'
 
 		when: 'calling the method field.value for the id set the property'
-			def entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
+			def entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'then nothing should be returned'
 			!entity
 
 		when: 'the ETL property value contains the id of the asset'
 			fieldsInfo[property].value = device.id
 		and: 'calling the method'
-			entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
+			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'the device should be returned'
 			device == entity
 
 		when: 'the ETL field.value contains the id of device'
 			fieldsInfo[property].value = device2.id
 		and: 'calling the method'
-			entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
+			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'device2 from the find results should be returned'
 			device2 == entity
 
 		when: 'the ETL field.value contains an invalid id for a device'
 			fieldsInfo[property].value = 9999999999999
 		and: 'calling the method'
-			entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
+			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'device2 from the find results should be returned'
-			dataImportService.NOT_FOUND_BY_ID == entity
+			SearchQueryHelper.NOT_FOUND_BY_ID == entity
 
 		when: 'the ETL field.value contains the id of the otherProjectDevice'
 			fieldsInfo[property].value = otherProjectDevice.id
 		and: 'calling the method'
-			entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
+			entity = SearchQueryHelper.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		then: 'no device should be returned'
-			dataImportService.NOT_FOUND_BY_ID == entity
+			SearchQueryHelper.NOT_FOUND_BY_ID == entity
 
 		// when: 'the ETL find.result is empty'
 		// 	fieldsInfo[property].find.results = []
@@ -469,7 +478,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// and: 'calling the method'
 		// 	entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		// then: 'no device should be returned'
-		// 	dataImportService.NOT_FOUND_BY_ID == entity
+		// 	SearchQueryHelper.NOT_FOUND_BY_ID == entity
 
 		// when: 'the ETL find.result is empty'
 		// 	fieldsInfo[property].find.results = []
@@ -478,7 +487,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// and: 'calling the method'
 		// 	entity = dataImportService.fetchEntityById(AssetEntity, property, fieldsInfo, context)
 		// then: 'no device should be returned'
-		// 	dataImportService.NOT_FOUND_BY_ID == entity
+		// 	SearchQueryHelper.NOT_FOUND_BY_ID == entity
 	}
 
 	// This method was removed - check to see if there is an alternative that we are going to use
@@ -650,39 +659,32 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			['record error'] == context.record.errorListAsList()
 	}
 
-	// This method was replaced with createEntity?
-	@Ignore
-	void '11. test findAndUpdateOrCreateDependency method'() {
-		// findAndUpdateOrCreateDependency(AssetEntity primary, AssetEntity supporting, Map fieldsInfo, Map context)
+	void '11. test createEntity method for Assets'() {
+		// private Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
 		setup:
-			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
-			ImportBatchRecord record = new ImportBatchRecord()
-			AssetDependency nullDependency = null
-		and: 'the primary asset has a create element'
-			fieldsInfo['asset'].create = [
-				assetName: device.assetName,
-				description: 'CPU 2, Memory 16,384MB',
-				environment: 'Production',
-				assetType: 'VM',
-				manufacturer: 'VMWare',
-				model: 'VM',
-				os: 'Red Hat Enterprise Linux 6 (64-bit)'
-			]
-		and: 'the supporting asset has a create element'
-			fieldsInfo['dependent'].create = [
-				assetName: device2.assetName,
-				description: 'CPU 2, Memory 16,384MB',
-				environment: 'Production',
-				assetType: 'VM',
-				manufacturer: 'VMWare',
-				model: 'VM',
-				os: 'Red Hat Enterprise Linux 6 (64-bit)'
-			]
+			Map assetFieldsInfo = [:]
 
-		when: 'the method is called'
-			def dependency = dataImportService.findAndUpdateOrCreateDependency(nullDependency, device, device2, fieldsInfo, context)
-		then: 'a new dependency should be created'
-			dependency
+		when: 'calling the createEntity for a device'
+			Object entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+		then: 'we should get an AssetEntity'
+			(entity instanceof AssetEntity)
+		and: 'the moveBundle is set to the TBD'
+			'TBD' == entity.moveBundle.name
+		and: 'the owner is the client of the project'
+			context.project.client.id == entity.owner.id
+		and: 'the project is assigned'
+			context.project.id == entity.project.id
+		and: 'the modifiedBy is the person running the import'
+			context.whom
+			entity.modifiedBy
+			context.whom.id == entity.modifiedBy.id
+
+		when: 'the fieldsInfo has a bundle defined'
+			initializeFieldElement('moveBundle', assetFieldsInfo, moveBundle.name)
+		and: 'calling createEntity'
+			entity = dataImportService.createEntity(AssetEntity, assetFieldsInfo, context)
+		then: 'the default bundle should not be assigned'
+			null == entity.moveBundle
 	}
 
 	void '12. test tallyNumberOfErrors method'() {
@@ -860,22 +862,22 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 		when: 'a field does not have any find results'
 			initializeFindElement(fieldName, fi)
-			dataImportService._hasSingleFindResult(fieldName, fi)
+			SearchQueryHelper.hasSingleFindResult(fieldName, fi)
 		then: 'calling _hasSingleFindResult should return false'
-			! dataImportService._hasSingleFindResult(fieldName, fi)
+			! SearchQueryHelper.hasSingleFindResult(fieldName, fi)
 
 		when: 'the field has one result'
 			fi[fieldName].find.results << 123
 		then:  'calling _hasSingleFindResult should return true'
-			dataImportService._hasSingleFindResult(fieldName, fi)
+			SearchQueryHelper.hasSingleFindResult(fieldName, fi)
 
 		when: 'the field has more than one result'
 			fi[fieldName].find.results << 456
 		then:  'calling _hasSingleFindResult should return false'
-			! dataImportService._hasSingleFindResult(fieldName, fi)
+			! SearchQueryHelper.hasSingleFindResult(fieldName, fi)
 	}
 
-	void '19 Test the _hasFindQuery method'() {
+	void '19 Test the SearchQueryHelper.hasFindQuery method'() {
 		setup:
 			Map fieldsInfo = initFieldsInfoForDependency()
 			String fieldName = 'asset'
@@ -883,17 +885,17 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'a field does not have any query specified'
 			initializeFindElement(fieldName, fieldsInfo)
 		then: 'calling _hasFindQuery should return false'
-			! dataImportService._hasFindQuery(fieldName, fieldsInfo)
+			! SearchQueryHelper.hasFindQuery(fieldName, fieldsInfo)
 
 		when: 'a field has one query specified'
 			addQueryElement(fieldName, fieldsInfo, 'Application', [id:123], true, 123)
 		then: 'calling _hasFindQuery should return true'
-			dataImportService._hasFindQuery(fieldName, fieldsInfo)
+			SearchQueryHelper.hasFindQuery(fieldName, fieldsInfo)
 
 		when: 'a field has more than one query specified'
 			addQueryElement(fieldName, fieldsInfo, 'Application', [assetName: 'abc123'], false)
 		then: 'calling _hasFindQuery should still return true'
-			dataImportService._hasFindQuery(fieldName, fieldsInfo)
+			SearchQueryHelper.hasFindQuery(fieldName, fieldsInfo)
 	}
 
 	void '20 Test the bindFieldsInfoValuesToEntity method for bugs'() {

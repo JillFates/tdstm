@@ -14,8 +14,10 @@ import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
+import { PersonService } from './services/person.service';
 // Shared Directives
-import {UIAutofocusDirective} from './directives/autofocus-directive';
+import { UIAutofocusDirective } from './directives/autofocus-directive';
+import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
@@ -25,6 +27,7 @@ import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive'
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 import {UIAutoCenterDirective} from './directives/autocenter-directive';
 // Shared Pipes
+import { UserDateTime } from './pipes/userDateTime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
@@ -42,6 +45,8 @@ import { SupportsDependsComponent } from './components/supports-depends/supports
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 import { AddPersonComponent } from './components/add-person/add-person.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
+import { AkaComponent } from './components/aka/aka.component';
+import { ConnectorComponent } from './components/connector/connector.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -65,9 +70,11 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	declarations: [
 		UIAutofocusDirective,
+		UIHandleEscapeDirective,
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
+		UserDateTime,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
@@ -91,11 +98,14 @@ import { DictionaryService } from './services/dictionary.service';
 		UIModalDecoratorDirective,
 		AddPersonComponent,
 		AssetTagSelectorComponent,
-		UIAutoCenterDirective
+		UIAutoCenterDirective,
+		AkaComponent,
+		ConnectorComponent
 	],
 	providers: [
 		AuthService,
 		PermissionService,
+		PersonService,
 		PreferenceService,
 		NotifierService,
 		UILoaderService,
@@ -111,9 +121,11 @@ import { DictionaryService } from './services/dictionary.service';
 	],
 	exports: [UILoaderDirective,
 		UIAutofocusDirective,
+		UIHandleEscapeDirective,
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
+		UserDateTime,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
 		TranslatePipe,
@@ -132,11 +144,14 @@ import { DictionaryService } from './services/dictionary.service';
 		UIModalDecoratorDirective,
 		AddPersonComponent,
 		AssetTagSelectorComponent,
-		UIAutoCenterDirective
+		UIAutoCenterDirective,
+		AkaComponent,
+		ConnectorComponent
 	],
 	entryComponents: [
 		DynamicComponent,
-		DependentCommentComponent
+		DependentCommentComponent,
+		AddPersonComponent
 	]
 })
 export class SharedModule {

@@ -968,8 +968,8 @@ class TaskImportExportService implements ServiceMethods {
 		List updatedTasks = []
 
 		log.debug "postChangesToTasks() formOptions=$formOptions - processing ${tasks.size()} tasks"
-		StringBuffer chgSB = new StringBuffer('<h2>Change History</h2>')
-		StringBuffer errorsSB = new StringBuffer('<br><h2>Errors</h2><table><tr><th width=20>Row</th><th>Task #</th><th>Errors</th></tr>')
+		StringBuilder chgSB = new StringBuilder('<h2>Change History</h2>')
+		StringBuilder errorsSB = new StringBuilder('<br><h2>Errors</h2><table><tr><th width=20>Row</th><th>Task #</th><th>Errors</th></tr>')
 		boolean recordedErrors = false
 
 		for (int i=0; i < tasks.size(); i++) {
@@ -1037,7 +1037,7 @@ class TaskImportExportService implements ServiceMethods {
 
 				if (taskChanged) {
 					chgSB.append("\r\n<br>Changes for ${tasks[i].taskNumber}:<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
-					StringBuffer changeMsg = new StringBuffer("***** Change History for $tasks[i].taskNumber changed:")
+					StringBuilder changeMsg = new StringBuilder("***** Change History for $tasks[i].taskNumber changed:")
 					tasks[i].changeHistory.each { prop, origVal ->
 						changeMsg.append("\n\t$prop was '$origVal' now is '${tasks[i][prop]}'")
 						chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${tasks[i][prop]}</td></tr>\r\n")

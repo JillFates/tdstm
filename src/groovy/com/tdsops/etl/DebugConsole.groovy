@@ -18,7 +18,7 @@ class DebugConsole {
 
     ConsoleStatus status
 
-    StringBuffer buffer = new StringBuffer()
+    StringBuilder buffer = new StringBuilder()
 
     void info (def content) {
         append(LevelMessage.INFO, content)

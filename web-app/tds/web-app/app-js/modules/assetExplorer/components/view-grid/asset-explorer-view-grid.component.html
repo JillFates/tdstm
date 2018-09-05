@@ -1,53 +1,53 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
 <kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)" (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
     <!-- Header Toolbar -->
-    <ng-template kendoGridToolbarTemplate [position]="'top'">
-		<div class="col-sm-6">
-			<div class="checkbox pull-left">
-				<label>
-					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+    <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+		<div class="col-sm-6 bulkchange-section">
+			<tds-bulk-change-button [bulkItems]="bulkItems"
+			                        [enabled]="hasSelectedItems()"
+			                        (clickBulk)="onClickBulkButton()"
+			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<div *ngIf="hasSelectedItems()" class="selected-assets">
+				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 			</div>
-			<tds-bulk-change-button [selectedItems]="bulkSelectedItems" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<div class="checkbox just-planning">
+				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning">
+				<label>Just Planning</label>
+			</div>
 		</div>
-	    <div class="col-sm-6">
-		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
+	    <div class="col-sm-6 filters-section">
+		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload component-action-reload">
 			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		    </div>
 		    <div class="kendo-grid-toolbar__refresh-btn btnClear">
-			    <button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
+			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear" [disabled]="!hasFilterApplied()"
+			            (click)="onClearFilters()">
 				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		    </div>
 	    </div>
 	</ng-template>
 
     <!-- Select All column -->
-    <kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
-		<ng-template kendoGridHeaderTemplate>
-			<div class="row">
-				<div class="col-md-12 text-center">
-					<div class="checkbox checkbox-grid">
-						<label>
-							<input type="checkbox" [(ngModel)]="selectAll" (change)="onSelectAll()" name="selectAll">
-						</label>
-					</div>
-				</div>
-			</div>
-		</ng-template>
+    <kendo-grid-column title="" [locked]="true" [width]="55" [filterable]="false">
+	    <ng-template kendoGridHeaderTemplate>
+		    <div class="row">
+			    <div class="col-md-12 text-center">
+				    <tds-checkbox name="assetsSelector"
+				                  [hasThirdState]="true"
+				                  (changeState)="onChangeBulkCheckbox($event)"
+				                  id="assetSelector"
+				                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+			    </div>
+		    </div>
+	    </ng-template>
+
 		<ng-template kendoGridCellTemplate let-dataItem>
             <label class="selectall-checkbox-column text-center">
-                <input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
+	            <input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
             </label>
-			<!--<div class="row">-->
-				<!--<div class="col-md-12 text-center">-->
-					<!--<div class="checkbox checkbox-grid">-->
-
-					<!--</div>-->
-				<!--</div>-->
-			<!--</div>-->
 		</ng-template>
 	</kendo-grid-column>
 
@@ -55,9 +55,9 @@
 	<kendo-grid-column *ngFor="let column of model.columns; let i = index" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>
-			<div class="sortable-column" (click)="onClickTemplate($event)">
+			<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 				<div [ngClass]="{'field-not-found': column?.notFound }">
-					<label for=""> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+					<label class="text-delimited" for=""> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 				</div>
 			</div>
 		</ng-template>
@@ -67,7 +67,7 @@
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
                        [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
-                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
                       aria-hidden="true"></span>
             </div>
         </ng-template>

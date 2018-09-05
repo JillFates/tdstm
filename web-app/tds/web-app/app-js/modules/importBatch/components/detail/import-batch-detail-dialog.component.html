@@ -1,0 +1,161 @@
+<div tds-autofocus class="modal-content">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow: auto;">
+        <div class="modal-body-container">
+            <!-- Batch Records Grid -->
+            <section>
+                <div class="box-body box-with-empty-header tds-kendo-grid">
+                    <kendo-grid *ngIf="dataGridOperationsHelper"
+                                [height]="550"
+                                [data]="dataGridOperationsHelper.gridData"
+                                [filter]="dataGridOperationsHelper.state.filter"
+                                [filterable]="true"
+                                (filterChange)="dataGridOperationsHelper.filterChange($event)"
+                                [sort]="dataGridOperationsHelper.state.sort"
+                                [sortable]="{mode:'single'}"
+                                [pageSize]="dataGridOperationsHelper.state.take"
+                                [skip]="dataGridOperationsHelper.state.skip"
+                                [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+                                (pageChange)="dataGridOperationsHelper.pageChange($event)"
+                                [resizable]="true"
+                                (sortChange)="dataGridOperationsHelper.sortChange($event)"
+                                [selectable]="selectableSettings"
+                                [rowSelected]="dataGridOperationsHelper.isRowSelected"
+                                (cellClick)="openBatchRecordDetail($event)">
+
+                        <!-- Toolbar Template -->
+                        <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                <div class="col-sm-1 toolbar-button button-process">
+                                    <button (click)="onProcess()"
+                                            [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                            class="btn btn-default" type="button"
+                                            title="{{'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate}}">
+                                        <i class="glyphicon glyphicon-retweet"></i>
+                                        Process
+                                    </button>
+                                </div>
+                                <div class="col-sm-1 toolbar-button">
+                                    <button (click)="onIgnore()"
+                                            [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                            class="btn btn-default" type="button"
+                                            title="{{'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate}}">
+                                        <i class="glyphicon glyphicon-eye-close"></i>
+                                        Ignore
+                                    </button>
+                                </div>
+                                <div class="col-sm-2 toolbar-dropdown">
+                                    <kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
+                                        [data]="batchRecordsFilter.options"
+                                        [textField]="'name'"
+                                        [valueField]="'id'"
+                                        [(ngModel)]="batchRecordsFilter.selected"
+                                        (valueChange)="onStatusFilter($event)"
+                                        placeholder="Filter"
+                                        class="form-control">
+                                    </kendo-dropdownlist>
+                                </div>
+                            </ng-template>
+
+                        <!-- Checkbox Template (Select All & Cell Content) -->
+                        <kendo-grid-column [locked]="true" [filterable]="false" [width]="45">
+                                <ng-template kendoGridHeaderTemplate>
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <div class="checkbox checkbox-grid">
+                                                <label>
+                                                    <input type="checkbox" name="selectAll"
+                                                           [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
+                                                           (change)="dataGridOperationsHelper.onSelectAllCheckboxes()" >
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template kendoGridCellTemplate let-dataItem>
+                                        <label *ngIf="dataItem.status.code === BatchStatus.IGNORED || dataItem.status.code === BatchStatus.PENDING"
+                                               class="selectall-checkbox-column text-center k-grid-ignore-click">
+                                        <input type="checkbox"
+                                               [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                               name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                        </label>
+                                </ng-template>
+                            </kendo-grid-column>
+
+                        <!-- Batch Record - Dynamic Columns -->
+                        <kendo-grid-column *ngFor="let column of columnsModel.columns"
+                                               field="{{column.property}}"
+                                               [locked]="column.locked"
+                                               [hidden]="column.hidden"
+                                               format="{{column.format}}"
+                                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                                               [class]="column.cellClass ? column.cellClass : ''"
+                                               [style]="column.cellStyle ? column.cellStyle : ''"
+                                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                            <!-- Header Template -->
+                            <ng-template kendoGridHeaderTemplate>
+                                <label>
+                                    {{column.label}}
+                                </label>
+                            </ng-template>
+
+                            <!-- Filter Template -->
+                            <ng-template kendoGridFilterCellTemplate let-filter>
+                                <div class="has-feedback" *ngIf="column.property && (column.type !== 'action')" style="margin-bottom:0px;">
+                                    <div *ngIf="column.type === 'date'; then dateFilter else numberFilter"></div>
+                                    <ng-template #dateFilter>
+                                        <kendo-datepicker (valueChange)="preProcessFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+                                        <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)"
+                                              style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                    </ng-template>
+                                    <ng-template #numberFilter>
+                                        <div *ngIf="column.type === 'number'; else stringFilter">
+                                            <input [(ngModel)]="column.filter" (ngModelChange)="preProcessFilter(column)" style="padding-right: 25px;"
+                                                   type="number" class="form-control" name="{{column.property}}" placeholder="Filter" value="" min="0">
+                                            <span *ngIf="column.filter || column.filter === 0" (click)="preProcessClear(column)"
+                                                  style="cursor:pointer;color:#656565;pointer-events:all; width: 10px; margin-right: 10px;"
+                                                  class="fa fa-times form-control-feedback"></span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #stringFilter>
+                                        <input [(ngModel)]="column.filter" (keyup)="preProcessFilter(column)"
+                                               type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
+                                        <span *ngIf="column.filter" (click)="preProcessClear(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                    </ng-template>
+                                </div>
+                            </ng-template>
+
+                            <!-- Cell Templates -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'status.label'" let-dataItem>
+                                <span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.status.label}}</span>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'errorCount'" let-dataItem>
+                                <span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.errorCount}}</span>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'dynamicValue'" let-dataItem>
+                                <span [ngClass]="{'has-init': hasInitVal(dataItem, column)}">
+                                    {{ getInitOrValue(dataItem, column) }}
+                                </span>
+                                <i *ngIf="hasInitVal(dataItem, column)" style="padding-left: 5px;" class="fa fa-w fa-info has-init"
+                                   [title]="'DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED' | translate"></i>
+                            </ng-template>
+
+                        </kendo-grid-column>
+
+                    </kendo-grid>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+            <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+    </div>
+</div>

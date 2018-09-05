@@ -88,6 +88,7 @@
 							</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
+						<g:render template="/comment/assetTagsShow"></g:render>
 					</tbody>
 				</table>
 			</div></td>
@@ -124,6 +125,7 @@
 	$("#assetMenuId a").css('background-color','#003366')
 
 	$(document).ready(function() {
+		EntityCrud.loadAssetTags(${databaseInstance?.id});
 		changeDocTitle('${raw(escapedName)}');
 	})
 </script>

@@ -1,6 +1,7 @@
 package pages.Cookbook
 
 import geb.Page
+import modules.CommonsModule
 
 class CreateRecipePage extends Page {
 
@@ -24,9 +25,11 @@ class CreateRecipePage extends Page {
         nameFieldContents       { $("input#inputName")}
         descriptionLabel        { $("label", for:"textareaDescription").text()}
         descriptionContents     { $("textarea#textareaDescription")}
+        commonsModule { module CommonsModule }
     }
 
     def createRecipe(recipeDataMap){
+        waitFor{nameFieldContents.displayed}
         nameFieldContents = recipeDataMap.name
         nameFieldContents == recipeDataMap.name
         descriptionContents = recipeDataMap.description

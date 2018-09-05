@@ -18,6 +18,7 @@ import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.DependencyConsoleCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
@@ -539,13 +540,15 @@ class MoveBundleController implements ControllerMethods {
 		int movedAppCount = 0
 		int confirmedAppCount = 0
 		int assignedAppCount = 0
+		int lockedAppCount = 0
 
 		def basicCountsQuery = """SELECT
 				assetClass,
 				COUNT(ae) AS all1,
 				SUM(CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END)  AS allUnassigned2,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END)     AS allMoveded3,
-				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4
+				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4,
+				SUM(CASE WHEN ae.planStatus=:lockedStatus THEN 1 ELSE 0 END) AS allLocked5
 			FROM AssetEntity ae
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)
 			GROUP BY ae.assetClass"""
@@ -555,7 +558,8 @@ class MoveBundleController implements ControllerMethods {
 			moveBundles: moveBundleList,
 			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 			movedStatus: AssetEntityPlanStatus.MOVED,
-			confirmedStatus: AssetEntityPlanStatus.CONFIRMED]
+			confirmedStatus: AssetEntityPlanStatus.CONFIRMED,
+			lockedStatus: AssetEntityPlanStatus.LOCKED]
 
 		def basicCountsResults = AssetEntity.executeQuery(basicCountsQuery, basicCountsParams)
 		basicCountsResults.each { ua ->
@@ -565,7 +569,8 @@ class MoveBundleController implements ControllerMethods {
 					unassignedAppCount = ua[2]
 					assignedAppCount = applicationCount - unassignedAppCount
 					movedAppCount = ua[3]
-					confirmedAppCount = movedAppCount + ua[4]
+					lockedAppCount = ua[5]
+					confirmedAppCount = movedAppCount + ua[4] + lockedAppCount
 					break
 				case AssetClass.DATABASE:
 					unassignedDbCount = ua[2]; break
@@ -908,49 +913,75 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
-	 * @param bundle  Move bundle id to filter for bundle
-	 * @param assignedGroup  Whether it is assigned
-	 * @param subsection  Tab name to show on the Dependency Analyzer (optional)
-	 * @param groupId  The group Id to show selected on the Dependency Analyzer (optional)
-	 * @param assetName  The asset to show selected on the Dependency Analyzer (optional)
+	 * @param  Console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
-	def dependencyConsole(Long bundle, String assinedGroup, String subsection, Long groupId, String assetName) {
+	def dependencyConsole() {
+		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
+		validateCommandObject(console)
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
 		// Check for correct URL params
-		if ( subsection || groupId) { // is the drill-in URL
-			if (!(subsection && groupId)) { // If any exists, then both should be present in the URL
+		if ( console.subsection || console.groupId) { // is the drill-in URL
+			if (!(console.subsection && console.groupId)) { // If any exists, then both should be present in the URL
 				throw new InvalidParamException("Subsection and Group Id params are both required.")
 			}
-			String subsec = subsection as String // Check for valid tab name
+			String subsec = console.subsection as String // Check for valid tab name
 			if (!(subsec.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
 				throw new InvalidParamException("Invalid Subsection name: ${subsec}")
 			}
 		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
-			assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, bundle, assinedGroup, null, false, subsection, groupId, assetName)
+			console.assignedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+
+		def map = moveBundleService.dependencyConsoleMap(
+			project,
+			console.bundle,
+			console.tagIds,
+			console.tagMatch,
+			console.assignedGroup,
+			null,
+			false,
+			console.subsection,
+			console.groupId,
+			console.assetName
+		)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map
 	}
 
-	/*
-	 * Controller to render the Dependency Bundle Details
+	/**
+	 * Controller to render the Dependency Bundle Details Table.
+	 * This method is called from the Dependency Analyzer in an Ajax call to render the dependency table.
+	 * @param  Console command object that contains bundle, tagIds, tagMatch, assinedGroup, subsection, groupId, assetName
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyBundleDetails() {
+		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
+		validateCommandObject(console)
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		// Now get the model and display results
-		def isAssigned = userPreferenceService.getPreference(PREF.ASSIGNED_GROUP)?: "1"
+		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
+				console.assignedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+		def model = moveBundleService.dependencyConsoleMap(
+				project,
+				console.bundle,
+				console.tagIds,
+				console.tagMatch,
+				console.assignedGroup,
+				null,
+				false,
+				console.subsection,
+				console.groupId,
+				console.assetName
+		)
 		render(template: 'dependencyBundleDetails',
-		       model: moveBundleService.dependencyConsoleMap(project, params.bundle, isAssigned, null))
+		       model: model)
 	}
 
 	@HasPermission(Permission.DepAnalyzerGenerate)

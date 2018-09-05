@@ -1320,7 +1320,7 @@ class TaskService implements ServiceMethods {
 	 * @return
 	 */
 	def genTableHtmlForDependencies(depTasks, task, String dependency){
-		def html = new StringBuffer("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
+		def html = new StringBuilder("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
 		def optionList = AssetComment.constraints.category.inList.toList()
 		def i=1
 		depTasks.each { depTask ->
@@ -1761,12 +1761,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		List<AssetEntity> assets = []
 
 		if (contextObj.tag) {
-			// Get list of tags from the generation context
-			List<Long>tagIds = contextObj.tag.collect{ tag-> tag instanceof Map ? (Long)tag.id: (Long)tag}
-
 			// Query the TagAsset to get list of Assets with ANY of the tags
 			assets = TagAsset.where {
-					tag.id in tagIds
+					tag.id in contextObj.getTagIds()
 					asset.moveBundle.useForPlanning == true }.projections {
 				}.projections {
 					property 'asset'
@@ -1895,9 +1892,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		MoveEvent event = null
+
 		if(contextObj.eventId) {
 			event = get(MoveEvent, contextObj.eventId, settings.project)
 		}
+
 		settings.event = event
 
 		// Determine the start/completion times for the event
@@ -4214,13 +4213,33 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						if (sm) {
 							where = SqlUtil.appendToWhere(where, sm.sql)
 							if (sm.param) {
-								map[code] = sm.param
+								map[propertyName] = sm.param
 							}
 						} else {
 							log.error "SqlUtil.whereExpression unable to resolve '$propertyName' expression [${filter.asset[propertyName]}]"
 						}
 					}
 				}
+			}
+
+			/**
+			 * TM-11900 This is a hack to bypass an underlying issue where this method receives a list of tag ids
+			 * when fetching groups, but a list of maps when running the task generation. This wasn't the behavior until
+			 * a couple of days ago.
+			 */
+			def getTagIdsList = {List tags ->
+				List<Long> tagIds = []
+				tags.each {tag ->
+					def tagId
+					if (NumberUtil.isaNumber(tag)) {
+						tagId = tag
+					} else {
+						tagId = tag.id
+					}
+					tagIds << NumberUtil.toPositiveLong(tagId)
+				}
+				return tagIds
+
 			}
 
             if (filter?.asset && project) {
@@ -4261,7 +4280,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 			if (contextObject.tag) {
 				where = SqlUtil.appendToWhere(where, 't.id in (:tags)')
-				map.tags = contextObject.tag.collect { Map tag -> (Long) tag.id }
+				map.tags = contextObject.getTagIds()
 				join = 'LEFT OUTER JOIN a.tagAssets ta LEFT OUTER JOIN ta.tag t'
 
 				// When using tags, bundles are going to be ignored
@@ -4295,29 +4314,33 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						def sb = new StringBuilder('')
 
-						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
-						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)}) {
-							sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
-							addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
+						Map assetFilter = filter?.asset
+
+						if (assetFilter) {
+							// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
+							if (assetFilter.keySet().find {['sourceLocation', 'sourceRoom'].contains(it)}) {
+								sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
+								addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
+							}
+
+							if (assetFilter.containsKey('sourceRack' )) {
+								sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
+								addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
+							}
+
+							if (assetFilter.keySet().find {['targetLocation', 'targetRoom'].contains(it)}) {
+								sb.append('LEFT OUTER JOIN a.roomTarget as roomTgt ')
+								addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
+							}
+
+							if (assetFilter.containsKey('targetRack')) {
+								sb.append('LEFT OUTER JOIN a.rackTarget as rackTgt ')
+								addJoinWhereConditions('rackTgt', ['targetRack':'tag'])
+							}
 						}
 
-						if (filter?.asset?.find { it == 'sourceRack' }) {
-							sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
-							addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
-						}
 
-						if (filter?.asset?.find {['targetLocation', 'targetRoom'].contains(it)}) {
-							sb.append('LEFT OUTER JOIN a.roomtarget as roomTgt ')
-							addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
-						}
-
-						if (filter?.asset?.find { it == 'targetRack' }) {
-							sb.append('LEFT OUTER JOIN a.racktarget as rackTgt ')
-							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
-						}
-
-						sb.append("${where ?  where : ''}")
-						where = sb.toString()
+						join = "$join ${sb.toString()}"
 						break
 
 					case 'application':

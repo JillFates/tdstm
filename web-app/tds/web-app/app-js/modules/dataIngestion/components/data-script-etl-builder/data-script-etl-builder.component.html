@@ -1,4 +1,4 @@
-<div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
+<div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog()" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div #resizableForm class="modal-content resizable"
              tds-ui-modal-decorator=""
@@ -63,8 +63,7 @@
                     <!-- Textarea code -->
                     <div class="row" *ngIf="!collapsed.code">
                         <div class="col-md-12">
-                            <code-mirror *ngIf="!script || script.length === 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
-                            <code-mirror *ngIf="script.length > 0" #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
+                            <code-mirror #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
                         </div>
                     </div>
                     <!-- Save / Cancel buttons -->
@@ -82,7 +81,7 @@
                         </div>
                     </div>
                     <!-- Errors Panel -->
-                    <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
+                    <div *ngIf="(sampleDataHasErrors() || testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
                             <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
@@ -98,6 +97,11 @@
                                       class="form-control console"
                                       cols="30" rows="3" readonly
                                       style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
+                            <textarea *ngIf="sampleDataHasErrors()"
+                                      [(ngModel)]="sampleDataModel.errors"
+                                      class="form-control console"
+                                      cols="30" rows="3" readonly
+                                      style="cursor: default; resize: vertical;"></textarea>
                         </div>
                     </div>
                     <hr>
@@ -106,15 +110,33 @@
                         <div class="row">
                             <div class="col-md-12 sample-preview" >
                                 <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
+                                <span
+                                    *ngIf="showSampleDataRefresh()"
+                                    class="glyphicon glyphicon-refresh"
+                                    style="margin-left: 5px; margin-top: 3px; cursor: pointer; color: #5e9fcf; font-weight: bold;"
+                                    (click)="reloadSampleData()"
+                                ></span>
                                 <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
                                     <i class="fa" [ngClass]="collapsed.sample ? 'fa-angle-double-right' : 'fa-angle-double-down'"></i>
                                 </button>
                             </div>
-                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="">
-                                <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
+                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data">
+                                <kendo-grid *ngIf="sampleDataGridHelper"
+                                            [data]="sampleDataGridHelper.gridData"
+                                            [height]="sampleDataModel.gridHeight"
+                                            [resizable]="true"
+                                            [pageSize]="sampleDataGridHelper.state.take"
+                                            [skip]="sampleDataGridHelper.state.skip"
+                                            [pageable]="true"
+                                            (pageChange)="sampleDataGridHelper.pageChange($event)">
                                     <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
                                         <ng-template kendoGridHeaderTemplate>
-                                            <label> {{column.label}}</label>
+                                            <label>{{column.label}}</label>
+                                        </ng-template>
+                                        <ng-template kendoGridCellTemplate let-dataItem>
+                                            <div class="sample-data-cell-max-line-height" title="{{dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE}}">
+                                                {{ dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE }}
+                                            </div>
                                         </ng-template>
                                     </kendo-grid-column>
                                 </kendo-grid>
@@ -136,18 +158,25 @@
                                     <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                               <kendo-grid [data]="domain.data" [resizable]="true" class="test-results">
-                                                    <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames;
-                                                               let columnIndex = index;"
-                                                                       title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
-                                                        <ng-template kendoGridCellTemplate let-dataItem>
-	                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
-	                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
-		                                                        {{getInitOrValue(dataItem.fields[column])}}
-		                                                        <i [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
-	                                                        </div>
-                                                        </ng-template>
-                                                    </kendo-grid-column>
+                                               <kendo-grid *ngIf="transformedDataGrids[i]"
+                                                           [data]="transformedDataGrids[i].gridData"
+                                                           [height]="'300'"
+                                                           [resizable]="true"
+                                                           [pageSize]="transformedDataGrids[i].state.take"
+                                                           [skip]="transformedDataGrids[i].state.skip"
+                                                           [pageable]="true"
+                                                           (pageChange)="transformedDataGrids[i].pageChange($event)">
+                                                                <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames"
+                                                                                   title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
+                                                                    <ng-template kendoGridCellTemplate let-dataItem>
+                                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
+                                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
+                                                                            {{getInitOrValue(dataItem.fields[column])}}
+                                                                            <i *ngIf="!dataItem.fields[column].value && dataItem.fields[column].init"
+                                                                               [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                                                                        </div>
+                                                                    </ng-template>
+                                                                </kendo-grid-column>
                                                 </kendo-grid>
                                             </div>
                                         </ng-template>

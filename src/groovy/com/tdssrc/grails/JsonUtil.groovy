@@ -8,8 +8,10 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.io.IOUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -198,8 +200,12 @@ class JsonUtil {
      */
     static Object parseFilePath(String fileName) {
         File file = new File(fileName)
-        // return JSON.parse(file.text)
-        return JsonUtil.parseJsonObject(file.text)
+
+        String content = file.text?.trim()
+        if ( StringUtils.isBlank(content) ) {
+            throw new EmptyResultException("JSON data file contains no data")
+        }
+        return parseJsonObject(content)
     }
 
     /**
@@ -216,9 +222,8 @@ class JsonUtil {
      * @return
      */
     static Object gpathAt(Object obj, String gpath, String separator = '.') {
-        def parts = gpath.tokenize(separator)
+        List<String> parts = gpath.tokenize(separator)
         Object property = obj
-
         for (String key in parts) {
             key = key.trim()
             if (key) {
@@ -234,4 +239,20 @@ class JsonUtil {
         }
         return property
     }
+
+    /**
+     * Populates command object using the JSON, that was stored as a string in a domain class.
+     *
+     * @param commandObjectClass command object class
+     * @param json the json string from a domain class.
+     *
+     * @return a instance of commandObjectClass
+     */
+	static <T> T populateCommandObject(Class<T> commandObjectClass, String json) {
+		def cmd = commandObjectClass.newInstance()
+		JSONObject JsonObject = parseJson(json)
+		GormUtil.bindMapToDomain(cmd, JsonObject)
+
+		return cmd
+	}
 }

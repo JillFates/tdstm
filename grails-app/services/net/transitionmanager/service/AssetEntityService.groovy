@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -66,12 +67,12 @@ class AssetEntityService implements ServiceMethods {
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
-			(AssetClass.APPLICATION): [ 'assetName', 'tagAssets' ],
-			(AssetClass.DATABASE): [ 'assetName', 'tagAssets' ],
+			(AssetClass.APPLICATION): [ 'assetName'],
+			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName', 'tagAssets'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
 			],
-			(AssetClass.STORAGE): [ 'assetName', 'tagAssets' ]
+			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
 
 	// The follow define the various properties that can be used with bindData to assign domain.properties
@@ -1089,7 +1090,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)*.value
+		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1105,7 +1106,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)*.value
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
 	}
 
 	/**
@@ -1214,8 +1215,12 @@ class AssetEntityService implements ServiceMethods {
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
 	 */
-	List<MoveBundle> getMoveBundles(Project project) {
-		project ? MoveBundle.findAllByProject(project, [sort: 'name']) : []
+	List<Map> getMoveBundles(Project project) {
+		List<String> properties = [
+			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+			'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+		]
+		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])
 	}
 
 	/**
@@ -2018,6 +2023,24 @@ class AssetEntityService implements ServiceMethods {
 					case ~/validation|latency|planStatus|moveBundle/:
 						// Handled by the calling routine
 						break
+					case 'tagAssets':
+						query.append("""
+							CONCAT(
+			                    '[',
+			                    if(
+			                        TA.tag_asset_id,
+			                        group_concat(
+			                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+			                        ),
+			                        ''
+			                    ),
+			                    ']'
+			                ) as tagAssets, """)
+						joinQuery.append("""
+								LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+								LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+							""")
+						break
 					case ~/shutdownBy|startupBy|testingBy/:
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
@@ -2551,6 +2574,24 @@ class AssetEntityService implements ServiceMethods {
 
 				case 'validation':
 					break
+				case 'tagAssets':
+					altColumns.append("""
+						, CONCAT(
+		                    '[',
+		                    if(
+		                        TA.tag_asset_id,
+		                        group_concat(
+		                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+		                        ),
+		                        ''
+		                    ),
+		                    ']'
+		                ) as tagAssets""")
+					joinQuery.append("""
+						LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+						LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+						""")
+					break
 				default:
 					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS $value ")
 			}
@@ -2913,7 +2954,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	def assetTypesOf(String manufacturerId, String term) {
 		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
-			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value', order: 'asc'])
 
 			List<Map> results = assetOptions.collect { options ->
 				[id: options.value, text : options.value]
@@ -3072,7 +3113,7 @@ class AssetEntityService implements ServiceMethods {
 							clonedDependency.save()
 						}
 					}
-					// clone asset Tags
+					// copy asset Tags
 					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
 					if (sourceTagIds) {
 						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
@@ -3092,6 +3133,51 @@ class AssetEntityService implements ServiceMethods {
 	AssetEntity saveOrUpdateAsset(AssetCommand command) {
 		AssetSaveUpdateStrategy strategy = AssetSaveUpdateStrategy.getInstanceFor(command)
 		return strategy.saveOrUpdateAsset()
+	}
+
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets accordingly,
+	 * when performing bulk update operations on objects that have a relationship with assets,
+	 * such as TagAsset. this will take in the subquery from a bulk change generated from
+	 * dataviewService.getAssetIdsHql using the field specs.
+	 *
+	 * @param project
+	 * @param assetQuery - query generated from the field specs using dataviewService.getAssetIdsHql.
+	 * @param assetQueryParams - parameters for assetQuery
+	 */
+	void bulkBumpAssetLastUpdated(Project project, String assetQuery, Map assetQueryParams) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN ($assetQuery) AND project = :project
+			"""
+
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT()]
+			params.putAll(assetQueryParams)
+			AssetEntity.executeUpdate(query, params)
+		}
+	}
+
+	/**
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets.
+	 *
+	 * @param project
+	 * @param assetIds - a list of asset ids
+	 */
+	void bulkBumpAssetLastUpdated(Project project, Set<Long> assetIds) {
+		if (project) {
+			String query = """
+				UPDATE AssetEntity SET lastUpdated = :lastUpdated
+				WHERE id IN (:assetIds) AND project = :project
+			"""
+
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), assetIds: assetIds]
+			AssetEntity.executeUpdate(query, params)
+		}
 	}
 
 }

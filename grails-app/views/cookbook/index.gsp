@@ -26,7 +26,6 @@
 
 	<g:javascript src="angular/plugins/angular-ui-router.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
@@ -79,6 +78,13 @@
 
 	<g:render template="../assetEntity/initAssetEntityData"/>
 	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#createEntityView").dialog({autoOpen: false});
+			$("#cloneEntityView").dialog({autoOpen: false});
+			$("#editEntityView").dialog({autoOpen: false});
+			$("#showEntityView").dialog({autoOpen: false});
+		});
+
 		$('#editSyntax').on('shown.bs.modal', function (e) {
 			$('.CodeMirror').each(function(i, el){
 				setTimeout(function(){
@@ -91,6 +97,11 @@
 		$(".menu-parent-tasks-cookbook").addClass('active');
 		$(".menu-parent-tasks").addClass('active');
 	</script>
+
+	<div id="createEntityView" style="display: none;"></div>
+	<div id="cloneEntityView" style="display: none;"></div>
+	<div id="editEntityView" style="display: none;"></div>
+	<div id="showEntityView" style="display: none;"></div>
 
 </body>
 </html>

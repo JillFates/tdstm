@@ -6,11 +6,23 @@ import { HttpInterceptor } from '../providers/http-interceptor.provider';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {DateUtils} from '../utils/date.utils';
+import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';
+
+// add constants as needed
+export const PREFERENCES_LIST = {
+	ASSET_JUST_PLANNING: 'assetJustPlanning',
+	ASSET_LIST_SIZE : 'assetListSize',
+	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
+	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
+	CURR_TZ: 'CURR_TZ',
+	DATA_SCRIPT_SIZE: 'DataScriptSize',
+	VIEW_UNPUBLISHED: 'viewUnpublished',
+	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize',
+	IMPORT_BATCH_RECORDS_FILTER: 'ImportBatchRecordsFilter'
+};
 
 @Injectable()
 export class PreferenceService {
-
-	public static readonly USER_PREFERENCES_DATE_FORMAT = 'CURR_DT_FORMAT';
 
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
@@ -37,6 +49,15 @@ export class PreferenceService {
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
+	getSinglePreference(preferenceCode: string): Observable<any> {
+		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
+			.map((res: Response) => {
+				let response = res.json();
+				return response.data.preferences[preferenceCode];
+			})
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+	}
+
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
 		const headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -46,12 +67,30 @@ export class PreferenceService {
 		return this.http.post(this.preferenceUrlPost, body, requestOptions);
 	}
 
-	getUserTimeZone(): string {
-		const currentUserDateFormat = this.preferences[PreferenceService.USER_PREFERENCES_DATE_FORMAT];
+	/**
+	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
+	 */
+	getUserDateFormat(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		if (currentUserDateFormat) {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}
-		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
+		return DateUtils.DEFAULT_FORMAT_DATE;
+	}
+
+	/**
+	 * Used to retrieve the user's preferred TimeZone that which is used to display date times
+	 * based on user's preference in TM instead of the TimeZone of their computer.
+	 */
+	getUserTimeZone(): string {
+		return this.preferences[PREFERENCES_LIST.CURR_TZ];
+	}
+
+	/**
+	 * Used to retrieve the format to use for Date Time properties (e.g. MM/dd/YYYY hh:mm a)
+	 */
+	getUserDateTimeFormat(): string {
+		return this.getUserDateFormat() + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
 	}
 
 	/**
@@ -60,7 +99,7 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_TIMEZONE_FORMAT )
+			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE )
 			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
 	}
 
@@ -84,14 +123,13 @@ export class PreferenceService {
 			.filter((size: any) =>  size.width !== null && size.height !== null);
 	}
 
-}
+	getImportBatchListSizePreference(): Observable<number> {
+		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE).map( result => {
+			if (!result || isNaN(result)) {
+				return GRID_DEFAULT_PAGE_SIZE;
+			}
+			return parseInt(result, 0);
+		});
+	}
 
-// add constants as needed
-export const PREFERENCES_LIST = {
-	ASSET_JUST_PLANNING: 'assetJustPlanning',
-	ASSET_LIST_SIZE : 'assetListSize',
-	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
-	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT',
-	DATA_SCRIPT_SIZE: 'DataScriptSize',
-	VIEW_UNPUBLISHED: 'viewUnpublished'
-};
+}

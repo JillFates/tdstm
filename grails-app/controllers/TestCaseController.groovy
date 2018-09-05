@@ -1,29 +1,22 @@
-import com.tds.asset.Application
-import com.tds.asset.AssetEntity
-import com.tdsops.common.security.ConnectorActiveDirectory
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.ApiCatalogService
 import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.AccountImportExportService
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-
-//import net.transitionmanager.agent.AgentClass
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
@@ -31,21 +24,9 @@ import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 import static net.transitionmanager.domain.Permissions.Roles.SUPERVISOR
 import static net.transitionmanager.domain.Permissions.Roles.USER
 
-// Exception classes
-import grails.validation.ValidationException
-import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.UnauthorizedException
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
-
 /*
  * This controller just allows us to do some testing of things until we can move them into an integrated testcase
  */
-import grails.plugin.springsecurity.annotation.Secured
-
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TestCaseController implements ControllerMethods {
 
@@ -132,7 +113,7 @@ class TestCaseController implements ControllerMethods {
 
 	@HasPermission('ViewAdminTools')
 	def elapsed() {
-		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
+		StringBuilder sb = new StringBuilder("<h1>Testing the Elapsed Method</h1>")
 		List now = [new Date()]
 
 		sb.append("elapsed now=$now <br>")
@@ -180,7 +161,7 @@ class TestCaseController implements ControllerMethods {
 		List deleteFromPerson = ['E'], deleteFromProject = ['E', 'D']
 
 		Map map = accountImportExportService.determineTeamChanges(allTeams, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
-		StringBuffer out = new StringBuffer("Results were:<br> <pre>")
+		StringBuilder out = new StringBuilder("Results were:<br> <pre>")
 		out.append("\n\t        allTeams: $allTeams")
 		out.append("\n\t currPersonTeams: $currPersonTeams")
 		out.append("\n\t  chgPersonTeams: $chgPersonTeams")

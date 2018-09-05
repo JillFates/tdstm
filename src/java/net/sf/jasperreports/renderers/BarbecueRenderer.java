@@ -38,7 +38,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sf.jasperreports.engine.JRAbstractSvgRenderer;
+import net.sf.jasperreports.engine.JRException;
 import net.sourceforge.barbecue.Barcode;
+import net.sourceforge.barbecue.output.OutputException;
 
 
 /**
@@ -46,11 +48,17 @@ import net.sourceforge.barbecue.Barcode;
  * JCommon classes in your classpath to compile this class. In particular this can be
  * used to allow JFreeChart objects to be included in the output report in vector form.
  *
+ * FILES USING THIS CLASS:
+ *    cartReport.jrxml,
+ *    transportationAssetReport.jrxml,
+ *    workSheetsReport.jrxml
+ *
  * @author Teodor Danciu (teodord@users.sourceforge.net)
  * @version $Id: BarbecueRenderer.java 2692 2009-03-24 17:17:32Z teodord $
  */
-public class BarbecueRenderer extends JRAbstractSvgRenderer
-{
+// Suppress warnings for IDEs since it's used Dynamically
+@SuppressWarnings("unused")
+public class BarbecueRenderer extends JRAbstractSvgRenderer {
 
 	/**
 	 *
@@ -70,11 +78,13 @@ public class BarbecueRenderer extends JRAbstractSvgRenderer
 	/**
 	 *
 	 */
-	public void render(Graphics2D grx, Rectangle2D rectangle)
-	{
-		if (barcode != null)
-		{
-			barcode.draw(grx, (int)rectangle.getX(), (int)rectangle.getY());
+	public void render(Graphics2D grx, Rectangle2D rectangle) throws JRException{
+		if (barcode != null) {
+			try {
+				barcode.draw(grx, (int)rectangle.getX(), (int)rectangle.getY());
+			} catch (OutputException ex) {
+				throw new JRException(ex);
+			}
 		}
 	}
 }

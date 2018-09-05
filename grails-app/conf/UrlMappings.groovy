@@ -255,9 +255,14 @@ class UrlMappings {
 			action = [POST:"groups"]
 		}
 
-		name wsDepAnalyzer:
-		"/ws/depAnalyzer/$action?/$id?" {
+		name wsDepAnalyzer: "/ws/depAnalyzer/peopleAssociatedToDepGroup/$id?" {
 			controller = 'wsDepAnalyzer'
+			action = [GET: ' peopleAssociatedToDepGroup']
+		}
+
+		"/ws/depAnalyzer/filteredAssetList/$id?" {
+			controller = 'wsDepAnalyzer'
+			action = [POST: ' filteredAssetList']
 		}
 
 		"/ws/event/listBundles/$id?" {
@@ -868,10 +873,10 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent/$id" {
+		"/ws/apiAction/connector/$id" {
 			controller = "wsApiAction"
 			action = [
-			        GET: "agentDictionary"
+			        GET: "connectorDictionary"
 			]
 		}
 
@@ -1056,6 +1061,21 @@ class UrlMappings {
 			controller = "wsTagAsset"
 			action = [
 				GET : "list"
+			]
+		}
+
+		"/ws/tag/event" {
+			controller = "wsTagEvent"
+			action = [
+				POST  : "create",
+				DELETE: "delete"
+			]
+		}
+
+		"/ws/tag/event/$id" {
+			controller = "wsTagEvent"
+			action = [
+				GET: "list"
 			]
 		}
 

@@ -1,9 +1,11 @@
 package com.tdsops.etl
 
 import com.google.gson.JsonObject
+import com.tdsops.etl.ETLDomain
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.agent.Environment
+import net.transitionmanager.connector.Environment
 import com.tds.asset.AssetEntity
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -270,7 +272,7 @@ class DataImportHelper {
 
 					// Now check to see that the object exists and belongs to the current project
 					// This is necessary because no find/elseFind was performed by the ETL script
-					String error = validDomainId(id, importContext.project)
+					String error = validDomainId(id, importContext.project, importContext.domainClass)
 					if (error) {
 						importContext.errors << error + " on row ${importContext.rowNumber}"
 						rowData.errors << error
@@ -289,25 +291,24 @@ class DataImportHelper {
 	 * @param project - the Project that the domain object should belong to
 	 * @return a String containing any error message or null if valid or no id was specified
 	 */
-	static String validDomainId(Long id, Project project) {
-
+	static String validDomainId(Long id, Project project, String domainClassName) {
+		String result
 		if (id) {
-			// Check if the ID exists in a different project
-			List<Long> foundProjIds = AssetEntity.where {
-				id == id
-			}.projections {
-				property('project.id')
-			}.list()
-
-			if (! foundProjIds) {
-				return "Record not found for Id ($id)"
-			} else if (foundProjIds[0] != project.id) {
-				// The id belongs to another project but we can't just say that
-				return "Invalid Id ($id) reference"
+			Class domainClass = ETLDomain.lookup(domainClassName).getClazz()
+			String domainName = GormUtil.domainShortName(domainClass)
+			Map params = [id:id]
+			String hql = "select count(*) from $domainName where id = :id"
+			if ( GormUtil.isDomainProperty(domainClass, 'project') ) {
+				hql += ' and project.id = :projectId'
+				params.projectId = project.id
 			}
-		}
 
-		return null
+			List results = domainClass.executeQuery(hql, params)
+			Long count = results.size() == 1 ? results[0] : 0
+
+			result = (count == 1 ? null : 'Unable to find by ID')
+		}
+		return result
 	}
 
 	/**

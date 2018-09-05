@@ -1,0 +1,44 @@
+<div class="modal fade in tds-ui-modal-decorator import-batch-record-dialog" id="import-batch-record-dialog" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content resizable"
+             tds-ui-modal-decorator=""
+             [isWindowMaximized]="isWindowMaximized"
+             [options]="modalOptions">
+            <div class="modal-header">
+                <h4 class="modal-title">Record Detail</h4>
+                <div class="tool-box">
+                    <button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
+                        <span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
+                    </button>
+
+                    <button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
+                        <span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
+                    </button>
+
+                    <button id="btnCloseDialog" (click)="onCancelCloseDialog()" type="button" class="close-screen" aria-label="Close" title="Close">
+                        <span class="glyphicon glyphicon-remove" title="Close"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" >
+                <div class="modal-body-container">
+                    <section>
+                        <import-batch-record-summary
+                                [importBatch]="importBatch"
+                                [batchRecord]="batchRecord">
+                        </import-batch-record-summary>
+                        <import-batch-record-fields
+                                #detailFieldsComponent
+                                *ngIf="batchRecord"
+                                [importBatch]="importBatch"
+                                [batchRecord]="batchRecord"
+                                (onClose)="onCancelCloseDialog()"
+                                (onUpdateSuccess)="onUpdateSuccess()"
+                                (onBatchRecordUpdated)="onBatchRecordUpdated($event)">
+                        </import-batch-record-fields>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

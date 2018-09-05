@@ -228,6 +228,7 @@
 						<td>&nbsp;</td>
 					</tr>
 					<g:render template="customShow" ></g:render>
+					<g:render template="/comment/assetTagsShow"></g:render>
 					</tbody>
 				</table>
 				</div>
@@ -268,7 +269,7 @@
 		var assetType = "${assetEntity.assetType}"
 
 		EntityCrud.toggleAssetTypeFields( assetType );
-
+		EntityCrud.loadAssetTags(${assetEntity?.id});
 		changeDocTitle('${raw(escapedName)}');
 	});
 </script>

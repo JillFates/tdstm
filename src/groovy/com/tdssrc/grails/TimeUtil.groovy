@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.TimeScale
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.util.Assert
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods
  */
@@ -118,6 +120,7 @@ class TimeUtil {
 
 	/**
 	 * Returns a string that represents the time in shorthand that follows these rules:
+	 * >= 1 year - ##y ##d ##h ##s
 	 * > 24 hours - ##d ##h ##s
 	 * > 1 hour - ##h ##m ##s
 	 * <= 90 minutes - ##m ##s
@@ -139,11 +142,12 @@ class TimeUtil {
 		int hours = duration.hours
 		int minutes = duration.minutes
 		int seconds = duration.seconds
-
+		int years = Math.floor(days/365)
+		days = days % 365
 		// local closure to do the borrowing math on the d:h:m:s appropriately
-		def adjustForNegative = { ggrand, grand, parent, value, factor ->
+		def adjustForNegative = { gggrand, ggrand, grand, parent, value, factor ->
 			if (value < 0) {
-				if (ggrand == 0 && grand == 0 && parent == 0) {
+				if (gggrand == 0 && ggrand == 0 && grand == 0 && parent == 0) {
 					// We stop borrowing and just flip the value from negative to positive
 					value *= -1
 				}
@@ -169,16 +173,24 @@ class TimeUtil {
 			return [value, parent]
 		}
 
-		if (days < 0 || hours < 0 || minutes < 0 || seconds < 0) {
-			(seconds, minutes) = adjustForNegative(days, hours, minutes, seconds, 60)
-			(minutes, hours) = adjustForNegative(0, days, hours, minutes, 60)
-			(hours, days) = adjustForNegative(0, 0, days, hours, 60)
+		if (years < 0 || days < 0 || hours < 0 || minutes < 0 || seconds < 0) {
+			int millenia
+			(seconds, minutes) = adjustForNegative(years, days, hours, minutes, seconds, 60)
+			(minutes, hours) = adjustForNegative(0, years, days, hours, minutes, 60)
+			(hours, days) = adjustForNegative(0, 0, years, days, hours, 24)
+			(days, years) = adjustForNegative(0, 0, 0, years, days, 365)
+			// Add an adjustment for years, so it doesn't break when handling values such as -1y, which were being converted to --1y
+			(years, millenia) = adjustForNegative(0, 0, 0, 0, years, 1000)
 
 			ago << '-'
 		}
 
+		if (years != 0) {
+			ago       	<< years   << (format == SHORT ? 'y' : (format == FULL ? '-year' : '-yr') + (years == 1 ? '' : 's'))
+		}
 		if (days != 0) {
-			ago          << days    << (format == SHORT ? 'd' : '-day' + (days == 1 ? '' : 's'))
+			space = ago.length() > 1 ? ' ' : ''
+			ago << space << days    << (format == SHORT ? 'd' : '-day' + (days == 1 ? '' : 's'))
 		}
 		// Hours
 		if (hours != 0) {
@@ -686,21 +698,21 @@ class TimeUtil {
 	 * @param toTZ -  the timezone that the date will be adjusted to
 	 * @return the adjusted date
 	 */
+	@CompileStatic
 	private static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
-		}
-		else {
-			Calendar calendar = Calendar.getInstance();
+		} else {
+			Calendar calendar = Calendar.getInstance()
 			calendar.setTime(date)
-			TimeZone toTimeZone = TimeZone.getTimeZone(toTZ);
+			TimeZone toTimeZone = TimeZone.getTimeZone(toTZ)
 
 			// Apply the offset to move GMT time to Timezone
 			calendar.add(Calendar.MILLISECOND, toTimeZone.getRawOffset())
-
-			if (toTimeZone.inDaylightTime(calendar.getTime())) { // Apply time saving offset, if it exsist
-				calendar.add(Calendar.MILLISECOND, calendar.getTimeZone().getDSTSavings());
+			if (toTimeZone.inDaylightTime(new Date())) { // Apply time saving offset, if it exists
+				calendar.add(Calendar.MILLISECOND, toTimeZone.getDSTSavings())
 			}
+
 			int year = calendar.get(Calendar.YEAR)
 			int month = calendar.get(Calendar.MONTH) + 1 // Calendar indexes months from 0-11 and not 1-12 as DateFormat, so we need to add 1 to construct a Date
 			int day = calendar.get(Calendar.DATE)
@@ -963,5 +975,45 @@ class TimeUtil {
 		}
 
 		return new TimeDuration(days, hours, minutes, 0, 0)
+	}
+
+	/**
+	 * Calculate the time difference between two dates. Should the years be greater than the threshold, a label
+	 * will be returned instead of the actual difference.
+	 *
+	 * If any of the dates is null, null is returned.
+	 *
+	 * @param start
+	 * @param end
+	 * @param indefinitelyYearsThreshold - the default is the max possible value so by default the label is not enforced.
+	 * @param indefinitelyLabel
+	 * @return a string with the time difference or a label if needed.
+	 */
+	static String agoOrIndefinitely(Date start, Date end, int indefinitelyYearsThreshold = Integer.MAX_VALUE, String indefinitelyLabel = "Indefinitely") {
+		String timeDifference = null
+		// Proceed only if both dates are not null.
+		if (start && end) {
+			timeDifference = ago(start, end)
+			int numYears = 0
+			// Check if the difference is in the years range.
+			if (timeDifference && timeDifference.contains("y")) {
+				numYears = Integer.parseInt(timeDifference.substring(0,timeDifference.indexOf('y')))
+			}
+			timeDifference = Math.abs(numYears) >= indefinitelyYearsThreshold ? indefinitelyLabel : timeDifference
+		}
+		return timeDifference
+
+	}
+
+	/**
+	 * Return the time difference between a date in the future and today. If the difference in years is greater
+	 * than a given threshold, a fixed label will be returned instead.
+	 * @param futureDate
+	 * @param indefinitelyYearsThreshold - the default is the max possible value so by default the label is not enforced.
+	 * @param indefinitelyString
+	 * @return
+	 */
+	static String hence(Date futureDate, int  indefinitelyYearsThreshold = Integer.MAX_VALUE, String indefinitelyString = "Indefinitely") {
+		return agoOrIndefinitely(nowGMT(), futureDate, indefinitelyYearsThreshold, indefinitelyString)
 	}
 }

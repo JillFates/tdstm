@@ -16,6 +16,9 @@ import org.apache.commons.io.FilenameUtils
 class FilenameUtil {
 
 	static final String CSV_SUFIX = 'csv'
+
+	static final String JSON_SUFIX = 'json'
+
 	/**
 	 * Main method for creating a file name.
 	 *
@@ -270,6 +273,15 @@ class FilenameUtil {
 	 */
 	static boolean isCsvFile(String fileName){
 		return FilenameUtils.isExtension(fileName?.toLowerCase(), CSV_SUFIX)
+	}
+
+	/**
+	 * It checks if a filename is a json or JSON filename.
+	 * @param fileName
+	 * @return true if fileName belongs to a json file
+	 */
+	static boolean isJsonFile(String fileName){
+		return FilenameUtils.isExtension(fileName?.toLowerCase(), JSON_SUFIX)
 	}
 
 }

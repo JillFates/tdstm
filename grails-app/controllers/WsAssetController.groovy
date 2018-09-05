@@ -341,7 +341,6 @@ class WsAssetController implements ControllerMethods {
 				model.dependencyMap = assetEntityService.dependencyEditMap(asset.project, asset)
 				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 			}
-			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
 			renderAsJson(model)
 		}
 	}

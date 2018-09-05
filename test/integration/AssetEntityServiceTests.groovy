@@ -1,17 +1,21 @@
-import com.tdsops.tm.domain.AssetEntityHelper
-import grails.test.spock.IntegrationSpec
 import com.tds.asset.Application
-import com.tds.asset.Database
+import com.tdsops.tm.enums.domain.Color
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import grails.test.spock.IntegrationSpec
+import net.transitionmanager.domain.Tag
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.TagAssetService
+import spock.lang.See
 
 class AssetEntityServiceTests extends IntegrationSpec {
 
 	AssetEntityService assetEntityService
+	TagAssetService tagAssetService
 
 	private AssetTestHelper assetHelper = new AssetTestHelper()
+	private ProjectTestHelper projectHelper = new ProjectTestHelper()
+	private PersonTestHelper personHelper = new PersonTestHelper()
 
 	void "1. test Entity Info Method"() {
 		setup:
@@ -201,31 +205,36 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			queries["joinQuery"] == ""
 	}
 
+	@See('TM-11480')
 	void '6. Test cloning of assets'() {
-		setup: 'Get access to the project and person'
-			// Project should be dynamically created
-			Project project = Project.read(2445)
-			// Person should be dynamically created
-			Person person = Person.read(100)
+		setup: 'Create a test project and person'
+			Project project = projectHelper.createProject()
+			Person person = personHelper.createPerson()
 			List<String> errors = []
 			boolean cloneDependencies = true
 			String assetName = 'clone asset name'
-
-		and: 'create a test application'
+		when: 'an asset of type application is created'
 			Application app = assetHelper.createApplication(person, project)
 			assert app
-
-		when: 'calling clone method'
+		and: 'some tags are added to the asset'
+			Tag tag1 = new Tag(name: 'first tag', description: 'This is a description', color: Color.Green, project: project).save(flush: true, failOnError: true)
+			Tag tag2 = new Tag(name: 'second tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
+			Tag tag3 = new Tag(name: 'third tag', description: 'Another description', color: Color.Blue, project: project).save(flush: true, failOnError: true)
+			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
+			app.refresh() // needed to refresh because of Grails test transaction caching entities
+		and: 'the clone method is called'
 			Long newAssetId = assetEntityService.clone(app.id, assetName, cloneDependencies, errors)
 		then: 'a new asset id should be returned'
 			newAssetId
 		and: 'there should be no errors reported'
-			! errors
-		and: 'the asset should be able to be retrieved'
+			!errors
+		and: 'the cloned asset should be able to be retrieved'
 			Application clone = Application.read(newAssetId)
-			clone
-		and: 'the clone asset name should be set'
+			clone.refresh()
+		and: 'the cloned asset name should be set'
 			assetName == clone.assetName
+		and: 'the cloned asset should have three tags'
+			clone.tagAssets.size() == 3
 		and: 'other properties should match the original asset'
 			List<String> props = ['appVendor', 'appVersion', 'sme', 'sme2']
 			for (prop in props) {

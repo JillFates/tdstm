@@ -1,7 +1,9 @@
 package pages.AssetViewManager
+
 import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
+import utils.CommonActions
 
 class ViewPage extends Page{
 
@@ -12,6 +14,7 @@ class ViewPage extends Page{
         view (wait:true) { $("section","class":"page-asset-explorer-config")}
         sectionHeaderTitle { $("section.content-header h1")}
         clearBtn {$("button", id:"btnClear")}
+        bulkChangeButton {$('#btnBulkChange')}
         exportViewButton {$("button", id:"btnExport")}
         exportModalContainer {$('#tdsUiDialog')}
         fileNameField {exportModalContainer.find("input", id: "fileName")}
@@ -25,20 +28,72 @@ class ViewPage extends Page{
         gearBtn {$(".fa-cog")}
         justPlanningCheck(required:false)  { $("input", type: "checkbox" , name: "justPlanning") }
         itemsPerPage(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-page-sizes", class:"k-pager-info k-label")}
-        selectAllChecks(required:false) {$("input" , type:"checkbox" , name:"selectAll")}
+        selectAllChecks(required:false) {$("[name=assetsSelector] input")}
         itemNumberDesc(required:false) {$("kendo-pager-info" , class:"k-pager-info k-label")}
         nextPageButton(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-next-buttons").find("a", class:"k-link k-pager-nav" , title:"Go to the next page").find("span", class:"k-icon k-i-arrow-e")}
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
-        allItemsCheckbox(required:false) {$("label",class:"selectall-checkbox-column text-center").find("input",type:"checkbox", class:"ng-untouched ng-pristine ng-valid")}
+        allItemsCheckbox(required:false) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
         nameFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("input",type:"text")}
         nameFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("span")}
         assetClassFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("input",type:"text")}
         assetClassFilterXicon(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"3").find("div").find("span")}
+        descriptionFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("input")}
+        descriptionFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "4").find("span.fa-times")}
+        environmentFilter { $('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("input")}
+        environmentFilterXicon {$('div.k-grid-header-wrap').find("td[kendogridfiltercell]", "aria-colindex": "5").find("span.fa-times")}
+        allFilterXIcons {$('td[kendogridfiltercell] span.fa-times')}
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
         refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
+        assetNames {$(".asset-detail-name-column")}
+        rows {$("[kendogridtablebody]")[1]}
+    }
+
+    def getRandomAssetDataAndClickOnIt(){
+        //waitFor asset details to be displayed
+        commonsModule.waitForLoader(5)
+        def dataList = []
+        def assetIndex =Math.abs(Math.min(new Random().nextInt(10),new Random().nextInt() % assetNames.size()))
+        def assetName =assetNames[assetIndex].text()
+        dataList.add(assetName)
+        def rowData =getRowData(assetIndex)
+        dataList.addAll(rowData)
+        interact {
+            moveToElement(assetNames[assetIndex])
+        }
+        assetNames[assetIndex].click()
+        dataList
+    }
+    /**
+     * Clicks on THE FIRST asset with that name
+     * @param name
+     * @return
+     */
+    def openAssetByName(name){
+        nameFilter = name
+        // verify exact match and no other was found with same name
+        // otherwise we can click in other view than is required
+        def links = assetNames.findAll { it.text() == name }
+        waitFor{ links[0].click() }
+    }
+
+    /**
+     * saves the text of a row in a list so it can be validated later
+     * @param rowIndex
+     */
+    def getRowData(int rowIndex){
+        def assetRowDataDisplayed = rows.find("tr")[rowIndex].find("td")
+        def assetRowData = []
+        assetRowDataDisplayed.each {
+            assetRowData.add(it.text())
+        }
+        assetRowData
+    }
+
+    def getViewName(){
+        voidStars[0].parent().parent().next().text()
     }
 
     def verifyViewTitle(title) {
@@ -49,10 +104,10 @@ class ViewPage extends Page{
         waitFor{exportModalContainer.isDisplayed()}
     }
 
-
     def clickViewManagerBreadCrumb(){
         waitFor{viewMgrBreadCrumb.click()}
     }
+
     def waitForHiddenModalContainer(){
         waitFor{!exportModalContainer.isDisplayed()}
     }
@@ -124,25 +179,182 @@ class ViewPage extends Page{
         return flag
     }
 
-    def checkedItems(){
-        def flag = true
-        for(int i=0;i<allItemsCheckbox.size();i++){
-            if(allItemsCheckbox[i].value()==false){
-                flag=false
-                break
-            }
+    def checkedItems(checked = true){
+        allItemsCheckbox.each{
+            assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }
-        return flag
+        true // return true to avoid failure in spoke verification, if fails it will be in above assert
     }
 
     def checkJustPlanning(){
-        if(justPlanningCheck.value()==false)
-            waitFor{justPlanningCheck.click()}
+        if(justPlanningCheck.value()==false){
+            clickOnJustPlanningCheckbox()
+        }
     }
 
     def checkAllItems(){
-        if(selectAllChecks.value()==false)
-            waitFor{selectAllChecks.click()}
+        if(selectAllChecks.value()==false){
+            clickOnSelectAllAssets()
+        }
+    }
+
+    def clickOnJustPlanningCheckbox(){
+        waitFor{justPlanningCheck.click()}
+        commonsModule.waitForLoader 2
+    }
+
+    def clickOnSelectAllAssets(){
+        waitFor{selectAllChecks.click()}
+    }
+
+    def getSelectIndeterminateState(){
+        selectAllChecks.jquery.prop('indeterminate')
+    }
+
+    def waitForBulkChangeButtonDisplayed(){
+        waitFor{bulkChangeButton.displayed}
+    }
+
+    def waitForBulkChangeButtonDisabled(){
+        waitFor{bulkChangeButton.@disabled == "true"}
+    }
+
+    def filterByAssetClass(text){
+        waitFor{assetClassFilter.displayed}
+        assetClassFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def filterByDescription(text){
+        waitFor{descriptionFilter.displayed}
+        descriptionFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def filterByEnvironment(text){
+        waitFor{environmentFilter.displayed}
+        environmentFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def filterByName(text){
+        waitFor{nameFilter.displayed}
+        nameFilter = text
+        commonsModule.waitForLoader 2
+    }
+
+    def clearAllAppliedFilters(){
+        allFilterXIcons.each{
+            it.click()
+            commonsModule.waitForLoader 2
+        }
+    }
+
+    def getFilterAssetClassText(){
+        assetClassFilter.value()
+    }
+
+    def getFilterDescriptionText(){
+        descriptionFilter.value()
+    }
+
+    def getFilterEnvironmentText(){
+        environmentFilter.value()
+    }
+
+	/**
+	* Method gets random assets from passed param, selects them if there are more than one asset found and returns
+	* a list of names of selected assets displayed in name column (list = one or more asset names)
+	* @param numberOfAssetsToBeSelected = int
+	* @author Sebastian Bigatton
+	*/
+    def selectRandomAssetsAndGetNames(numberOfAssetsToBeSelected){
+        def assetNames = []
+        if (!commonsModule.isListOfElements(allItemsCheckbox)) { // if not list just click on selector
+            clickOnCheckboxByName allItemsCheckbox
+            assetNames.add getAssetNameFromGivenCheckboxSelector(allItemsCheckbox)
+        } else { // else get random number of assets, click on them and add names to the list
+            // validates available checkboxes are more than passed number, otherwise selects displayed
+            def maxNumberToSelect = allItemsCheckbox.size() < numberOfAssetsToBeSelected ? allItemsCheckbox.size() : numberOfAssetsToBeSelected
+            def checkboxes = CommonActions.getRandomOptions allItemsCheckbox, maxNumberToSelect
+            def checkbox
+            checkboxes.each { input ->
+                checkbox = allItemsCheckbox.find{it.attr("name") == input.jquery.prop("name")}
+                clickOnCheckboxByName checkbox
+                assetNames.add getAssetNameFromGivenCheckboxSelector(checkbox)
+            }
+        }
+        assetNames
+    }
+
+    def clickOnCheckboxByName(checkbox){
+        waitFor{checkbox.click()}
+        waitFor{getCheckedInputStatus(checkbox) == true} // verify its checked
+    }
+
+    def getCheckedInputStatus(element){
+        element.jquery.prop('checked') // returns true or false
+    }
+
+    def getAssetNameFromGivenCheckboxSelector(element){
+        element.parent().parent().next().find("span.asset-detail-name-column").text()
+    }
+
+    def clickOnBulkChangeButton(){
+        waitForBulkChangeButtonDisplayed()
+        waitFor{bulkChangeButton.click()}
+    }
+
+    /**
+     * Method gets a list of checked assets in page, iterates in passed names and compares them
+     * with checked assets names
+     * @param names = string array list with asset name(s)
+     * @author Sebastian Bigatton
+     */
+    def verifyCheckedInputAssetsByName(names){
+        def checkedAssetsInput = getAllCheckedInputs()
+        def isChecked = false
+        names.each{ assetName ->
+            // compare and find displayed name with passed name
+            if (checkedAssetsInput.find{getAssetNameFromGivenCheckboxSelector(it) == assetName}){
+                isChecked = true
+            }
+            assert isChecked
+        }
+        true // to avoid spoke step fails
+    }
+
+    def getAllCheckedInputs(){
+        allItemsCheckbox.findAll{getCheckedInputStatus(it) == true} // returns list checked input elements
+    }
+
+    /**
+     * Method gets a checkbox name identifier and returns a map of associated asset name and checkbox name
+     * @param names = string array list with asset name(s)
+     * @author Sebastian Bigatton
+     */
+    def getAllCheckedInputNameMap(names){
+        def checkBoxNameMap = [:]
+        def checkbox
+        names.each{ assetName ->
+            // find displayed name with passed name of checked inputs
+            checkbox = getAllCheckedInputs().find{getAssetNameFromGivenCheckboxSelector(it) == assetName}
+            checkBoxNameMap.put(assetName, checkbox.attr("name"))
+        }
+        checkBoxNameMap
+    }
+
+    /**
+     * Method verifies input checkbox with given name attribute associated to the asset by a map [assetName: checkboxNameAttr]
+     * is not displayed, this is because can be more than one asset with same name
+     * @param assetMap = map [assetName: checkboxNameAttr]
+     * @author Sebastian Bigatton
+     */
+    def verifyDeletedAssetsByCheckboxName(assetsMap){
+        assetsMap.each{ assetName, checkboxName ->
+            filterByName assetName
+            assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            clearAllAppliedFilters()
+        }
     }
 }
-

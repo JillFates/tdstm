@@ -50,7 +50,7 @@ class ScriptProcessorService {
     ETLProcessor execute (Project project, String scriptContent, String filename) {
 
         Dataset dataset = FileSystemService.buildDataset(filename)
-        DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+        DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 	    etlProcessor.execute(scriptContent?.trim())
@@ -83,7 +83,7 @@ class ScriptProcessorService {
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
 			new DataSetFacade(FileSystemService.buildDataset(filename)),
-			new DebugConsole(buffer: new StringBuffer()),
+			new DebugConsole(buffer: new StringBuilder()),
 			createFieldsSpecValidator(project))
 
 		if(dataScriptId){
@@ -148,7 +148,7 @@ class ScriptProcessorService {
 	        Dataset dataset = FileSystemService.buildDataset(filename)
             etlProcessor = new ETLProcessor(project,
                     new DataSetFacade(dataset),
-                    new DebugConsole(buffer: new StringBuffer()),
+                    new DebugConsole(buffer: new StringBuilder()),
                     createFieldsSpecValidator(project))
 
 			etlProcessor.evaluate(scriptContent?.trim())
@@ -227,7 +227,7 @@ class ScriptProcessorService {
 
 	    Dataset dataset = FileSystemService.buildDataset(filename)
 
-        DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+        DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLFieldsValidator())
 

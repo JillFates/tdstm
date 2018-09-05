@@ -10,6 +10,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -235,21 +236,12 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def save() {
-		if (params.estStartTime) {
-			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
-		}
-		MoveEvent moveEvent = new MoveEvent(params)
-
-		// The project is no longer available in the view. We need to retrieve it.
+		CreateEventCommand event = populateCommandObject(CreateEventCommand)
 		Project currentProject = securityService.userCurrentProject
-		moveEvent.project = currentProject
 
-		if (moveEvent.project.runbookOn == 1) {
-			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
-		}
-		if (!moveEvent.hasErrors() && moveEvent.save()) {
-			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues("moveBundle") as List)
-			moveBundleService.createManualMoveEventSnapshot(moveEvent)
+		MoveEvent moveEvent = moveEventService.save(event, currentProject)
+
+		if (!moveEvent.hasErrors()) {
 			flash.message = "MoveEvent $moveEvent.name created"
 			redirect(action: "show", id: moveEvent.id)
 		}
@@ -292,14 +284,14 @@ class MoveEventController implements ControllerMethods {
 
 			def moveEventNews = jdbcTemplate.queryForList(moveEventNewsQuery)
 
-			def news = new StringBuffer()
+			def news = new StringBuilder()
 
 			moveEventNews.each {
 				news.append(String.valueOf(TimeUtil.formatDateTime(it.created) + "&nbsp;:&nbsp;" + it.message + ".&nbsp;&nbsp;"))
 			}
 
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
-			def transitionComment = new StringBuffer()
+			def transitionComment = new StringBuilder()
 			if (moveEvent.newsBarMode == "on") {
 				def today = new Date()
 				def currentPoolTime = new Timestamp(today.getTime())

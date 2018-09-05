@@ -265,11 +265,66 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			result = result || (activePopups[popupType]);
 		}
 		return result;
-	}
+	};
 
+	var getTagsIds = function(tags) {
+		var tagIds = [];
+		tags.each( function(a){
+			tagIds.push(parseInt(a.id));
+		})
+		return tagIds;
+	};
+
+	/**
+	 * The following code is being injected in the current main controller scope, later is being used in the tag selector
+	 * by passing the reference from a re-compiled DOM, this make possible to communicate angular1 with a native JS call...
+	 */
+	scope.internal =  {
+		assetSelector: {}
+	};
+
+	scope.dependencyGroup =  {
+		assetSelector:{}
+	};
+
+
+	scope.onDependencyAnalyzerTagSelectionChange = function () {
+		if (scope.internal.assetSelector.tag.length >= 1) {
+			var currentdependencyBundle = parseInt($('.depGroupSelected .depGroup').html());
+
+			var postData = {
+				tagIds: getTagsIds(scope.internal.assetSelector.tag),
+				tagMatch: scope.internal.assetSelector.operator
+			};
+
+			// Cases where is not: All, Remnants, Grouped
+			if(!isNaN(currentdependencyBundle)) {
+				postData.depGroup = currentdependencyBundle;
+			}
+
+			// Partially Remove Prototype
+			if(window.Prototype) {
+				delete Object.prototype.toJSON;
+				delete Array.prototype.toJSON;
+				delete Hash.prototype.toJSON;
+				delete String.prototype.toJSON;
+			}
+
+			commentService.filteredAssetList(postData).then(
+				function (data) {
+					GraphUtil.performTagSearch(data);
+				}
+			);
+
+		}
+	};
+
+	scope.onDependencyFiltersChange = function () {
+		reloadDependencyGroupsSection();
+	};
 };
 
-tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$modal', '$window', 'utils', 'commentUtils'];
+tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$modal', '$window', 'utils', 'commentUtils', 'commentService'];
 
 
 /**
@@ -365,6 +420,97 @@ tds.comments.controller.ListDialogController = function ($scope, $modalInstance,
 	var showComments = function (data) {
 		$scope.commentsData = data;
 	}
+
+};
+
+/**
+ * Edit Event Form
+ * This page is legacy, so this code introduce a feature just for the tags on the Edit and Create of the Form
+ */
+
+tds.comments.controller.EventEditController = function ($scope, $q, commentService) {
+
+	$scope.validEditEventSubmit = false;
+	// Get the Current Event
+	$scope.moveEventInstanceId = $('.moveEventInstanceId').val();
+
+	$scope.internal =  {
+		// Server Selected Tag
+		assetSelector:{
+			operator: "ANY",
+			tag: []
+		},
+		// Current Selected Tags
+		selectedAssetSelector:{}
+	};
+
+	// Get the List of Current Tags for this Event
+	commentService.getAssetTagsForEvent($scope.moveEventInstanceId).then(
+		function (response) {
+			if (response && response.data && response.data.length >= 1) {
+				response.data.forEach(function(eventTag) {
+					var eventId = eventTag.id;
+					var tagId = eventTag.tagId;
+					eventTag.id = tagId;
+					eventTag.eventId = eventId;
+					eventTag.label = eventTag.name;
+				});
+				$scope.internal.assetSelector.tag = response.data;
+			}
+		}
+	);
+
+	/**
+	 * Event Edit Form
+	 * Perform update and delete of tags before to sent the Form
+	 */
+
+	$scope.onSubmitEventEditForm = function (event) {
+		if (!$scope.validEditEventSubmit) {
+			event.preventDefault();
+			var diffNewSelection = $scope.internal.selectedAssetSelector.tag.filter((r) => !$scope.internal.assetSelector.tag.find((l) => r.id === l.id));
+			let diffDeletedSelection = $scope.internal.assetSelector.tag.filter((r) => !$scope.internal.selectedAssetSelector.tag.find((l) => r.id === l.id));
+
+			var qPromises = [];
+
+			// Partially Remove Prototype
+			if(window.Prototype) {
+				delete Object.prototype.toJSON;
+				delete Array.prototype.toJSON;
+				delete Hash.prototype.toJSON;
+				delete String.prototype.toJSON;
+			}
+
+			// To Delete
+			var deletedTagEventIds = [];
+			diffDeletedSelection.each( function(a){
+				deletedTagEventIds.push(parseInt(a.eventId));
+			});
+			if (deletedTagEventIds.length > 0) {
+				console.log({ ids: deletedTagEventIds });
+				qPromises.push(commentService.deleteAssetTagsForEvent({ ids: deletedTagEventIds }));
+			}
+
+			// To Add
+			var newTagEventIds = [];
+			diffNewSelection.each( function(a){
+				newTagEventIds.push(parseInt(a.id));
+			});
+			if (newTagEventIds.length > 0) {
+				console.log({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId})
+				qPromises.push(commentService.createAssetTagsForEvent({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId}));
+			}
+
+			$scope.validEditEventSubmit = true;
+			if (qPromises.length > 0) {
+				$q.all(qPromises).then(function(){
+					$('#submitEditEventForm').click();
+				});
+			} else {
+				$('#submitEditEventForm').click();
+			}
+		}
+	};
 
 };
 
@@ -1543,6 +1689,73 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var filteredAssetList = function(filterValues) {
+		var deferred = q.defer();
+		http({
+			method: 'POST',
+			url: utils.url.applyRootPath('/ws/depAnalyzer/filteredAssetList'),
+			data: JSON.stringify(filterValues),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
+	var getAssetTagsForEvent = function(tagId) {
+		var deferred = q.defer();
+		http({
+			method: 'GET',
+			url: utils.url.applyRootPath('/ws/tag/event/' + tagId),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
+	var deleteAssetTagsForEvent = function(tagEventIds) {
+		var deferred = q.defer();
+		http({
+			method: 'DELETE',
+			url: utils.url.applyRootPath('/ws/tag/event/'),
+			data: JSON.stringify(tagEventIds),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
+	var createAssetTagsForEvent = function(tagIds) {
+		var deferred = q.defer();
+		http({
+			method: 'POST',
+			url: utils.url.applyRootPath('/ws/tag/event/'),
+			data: JSON.stringify(tagIds),
+			headers: { "Content-Type": "application/json"}
+		}).
+		success(function (data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function (data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -1573,7 +1786,11 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		setViewUnpublishedPreference: setViewUnpublishedPreference,
 		getAssetById: getAssetById,
 		updateDependencies: updateDependencies,
-		deleteDependency: deleteDependency
+		deleteDependency: deleteDependency,
+		filteredAssetList: filteredAssetList,
+		getAssetTagsForEvent: getAssetTagsForEvent,
+		deleteAssetTagsForEvent: deleteAssetTagsForEvent,
+		createAssetTagsForEvent: createAssetTagsForEvent
 	};
 
 };
@@ -2693,18 +2910,18 @@ tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comme
  ***************************/
 
 /**
- * Function used to recompile the dynamic code generated by the jqgrid plugin
+ * Function used to recompile the dynamic code generated
  */
-function recompileDOM(gridElementId, compileScope) {
+function recompileDOM(elementId, compileScope) {
 	var objDom = $('[ng-app]');
 	var injector = angular.element(objDom).injector();
 	if (injector) {
 		injector.invoke(function ($rootScope, $compile) {
-			var gridElement = $('#' + gridElementId);
+			var htmlElement = $('#' + elementId);
 			if (compileScope)
-				$compile(gridElement)(compileScope);
+				$compile(htmlElement)(compileScope);
 			else
-				$compile(gridElement)($rootScope.commentsScope);
+				$compile(htmlElement)($rootScope.commentsScope);
 		});
 	} else {
 		location.reload();
