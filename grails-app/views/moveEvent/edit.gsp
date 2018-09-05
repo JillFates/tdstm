@@ -174,7 +174,6 @@
                                         $("#kendoEstStartTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />' });
 				                    });
 				                  </script>
-                                  <tds:convertDateTime date="${moveEventInstance?.estStartTime}" />
                                   <input type="text" id="kendoEstStartTime" class="dateRange" size="15" style="width: 210px;" />
                                   <input type="hidden" id="estStartTime" name="estStartTime" />
 				                  <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
