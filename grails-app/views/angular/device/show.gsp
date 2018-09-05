@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus class="modal-content tds-angular-component-content">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <span aria-hidden="true">×</span>

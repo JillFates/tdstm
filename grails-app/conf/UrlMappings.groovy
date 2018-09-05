@@ -873,10 +873,10 @@ class UrlMappings {
 		//
 		// ApiAction
 		//
-		"/ws/apiAction/agent/$id" {
+		"/ws/apiAction/connector/$id" {
 			controller = "wsApiAction"
 			action = [
-			        GET: "agentDictionary"
+			        GET: "connectorDictionary"
 			]
 		}
 

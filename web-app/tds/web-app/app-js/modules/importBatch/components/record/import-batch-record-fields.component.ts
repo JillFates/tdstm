@@ -9,10 +9,21 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
+/**
+ * This is the various options that the Current Value column will have for display
+ */
+export enum CurrentValueAction {
+	ShowValue = 'ShowValue',
+	EditValue = 'EditValue',
+	ShowInit = 'ShowInit',
+	EditInit = 'EditInit'
+};
+
 @Component({
 	selector: 'import-batch-record-fields',
 	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/import-batch-record-fields.component.html'
 })
+
 export class ImportBatchRecordFieldsComponent implements OnInit {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
@@ -22,20 +33,33 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	@Output('onBatchRecordUpdated') onBatchRecordUpdated = new EventEmitter<any>();
 
 	private fieldsInfo: Array<{
+		// Name of the field
 		name: string,
+		// Contains the value to post or was posted that the user can modify before posting
 		currentValue: string,
-		importValue: string,
+		// Contains the initValue that if populated is used for posting. The user can modify this before posting
 		initValue: string,
+		// ???
+		importValue: string,
+		// Contains the Current value (from the domain property before posting) or the Previous value (from Record JSON)
+		currentPreviousValue: string,
+		// Indicates what action to take displaying input or value of the Current Value column
+		currentValueAction: CurrentValueAction,
+		// True if the field value was modified from the previous value
+		modified: boolean,
 		errors: Array<string>,
 		errorsAsString: string,
+		// ???
 		overridedValue: string
 	}>;
+
 	private state: State = {
 		filter: {
 			filters: [],
 			logic: 'and'
 		}
 	};
+
 	protected gridData: GridDataResult;
 	protected fieldsFilter: any = {
 		options: [
@@ -56,17 +80,23 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			ignoreCase: true
 		}
 	};
+
 	private originalImportValues: string;
-	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
-	protected BatchStatus = BatchStatus;
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	// Contains the Current/Previous value column label based on the state of the record
+	protected currentPreviousColumnLabel = '';
+
+	// Create vars of Enums to be used in the html
+	protected BATCH_RECORD_OPERATION = BATCH_RECORD_OPERATION;
+	protected CurrentValueAction = CurrentValueAction;
+	protected BatchStatus = BatchStatus;
 
 	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
-			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
-			this.processStatus.state = CHECK_ACTION.NONE;
-			this.saveStatus.state = CHECK_ACTION.NONE;
+		this.state.filter.filters.push(this.fieldsFilter.nameFilter);
+		this.processStatus.state = CHECK_ACTION.NONE;
+		this.saveStatus.state = CHECK_ACTION.NONE;
 	}
 
 	/**
@@ -75,6 +105,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	ngOnInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		this.loadRecordFieldDetails();
+		this.currentPreviousColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
 	}
 
 	/**
@@ -83,21 +114,28 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	private loadRecordFieldDetails(updateProcessStatus = false): void {
 		this.importBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
-			if (result.status === ApiResponseModel.API_SUCCESS) {
-				this.onBatchRecordUpdated.emit({batchRecord: result.data});
-				this.buildGridData(result.data.fieldsInfo);
-				this.processStatus.state = CHECK_ACTION.NONE;
-				if (updateProcessStatus) {
-					let fieldsWithErrors = this.fieldsInfo.filter(item => item.errors.length > 0);
-					this.processStatus.state = fieldsWithErrors.length > 0 ? CHECK_ACTION.INVALID : CHECK_ACTION.NONE;
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+
+					// TODO : Fix the parent batchRecord reassignment and this code should be able to be removed
+					// The parent gets updated with the following emit but the this.batchRecord never gets updated
+					if (result.data['existingRecord']) {
+						this.batchRecord.existingRecord = result.data.existingRecord;
+					}
+
+					this.onBatchRecordUpdated.emit({batchRecord: result.data});
+					this.buildGridData(result.data.fieldsInfo);
+					this.processStatus.state = CHECK_ACTION.NONE;
+					if (updateProcessStatus) {
+						let fieldsWithErrors = this.fieldsInfo.filter(item => item.errors.length > 0);
+						this.processStatus.state = fieldsWithErrors.length > 0 ? CHECK_ACTION.INVALID : CHECK_ACTION.NONE;
+					}
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
 				}
-			} else {
-				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
-			}
-		}, error => {
-			this.fieldsInfo = [];
-			this.handleError(error);
-		});
+			}, error => {
+				this.fieldsInfo = [];
+				this.handleError(error);
+			});
 	}
 
 	/**
@@ -110,16 +148,51 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 
 		this.fieldsInfo = [];
 		for (const fieldName of fieldNameList) {
+
+			// Determine if the fieldName exists in the current record since not all records have all of the fields
+			if (fields[fieldName] === undefined) {
+				continue;
+			}
+
+			// Determine the currentPreviousValue based on update and the batch status
+			let currentPreviousValue = '';
+			let modified = false;
+			if (this.batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE) {
+				// Before POSTING the record
+				if (this.batchRecord.status.code === BatchStatus.PENDING) {
+					// Use current record property
+					currentPreviousValue = this.batchRecord.existingRecord[fieldName];
+				} else {
+					// After the POSTING the record
+					if ('previousValue' in fields[fieldName] && !ValidationUtils.isEmptyObject(fields[fieldName].previousValue)) {
+						// Use previousValue in Record JSON
+						currentPreviousValue = fields[fieldName].previousValue;
+						modified = true;
+					}
+				}
+			}
+
+			// Determine what action should be shown for the Current Value column
+			let currentValueAction: CurrentValueAction;
+			if (this.batchRecord.status.code === BatchStatus.PENDING) {
+				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.EditValue : CurrentValueAction.EditInit
+			} else {
+				currentValueAction = ValidationUtils.isEmptyObject(fields[fieldName].init) ? CurrentValueAction.ShowValue : CurrentValueAction.ShowInit;
+			}
+
 			// Not all rows will have all of the same fields so must check first
 			if ( fields[fieldName] !== undefined ) {
 				this.fieldsInfo.push({
 					name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
 					currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
 						? fields[fieldName].originalValue : '(null)',
+					currentPreviousValue: currentPreviousValue,
+					currentValueAction: currentValueAction,
 					importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
 						? fields[fieldName].value : '',
 					initValue: !ValidationUtils.isEmptyObject(fields[fieldName].init)
 						? fields[fieldName].init : '',
+					modified: modified,
 					errors: fields[fieldName].errors,
 					errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
 					overridedValue: null
@@ -208,6 +281,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadRecordFieldDetails(true);
+					// TODO : This is not updating the datagrid to show the posted information correctly
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on Process batch record.');

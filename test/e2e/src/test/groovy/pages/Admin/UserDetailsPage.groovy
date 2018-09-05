@@ -14,13 +14,14 @@ class UserDetailsPage extends Page {
     static content = {
         udPageTitle             { $("section", class:"content-header").find("h1")}
         pageMessage (required: false, wait:true) { $("div", class:"message")}
-
+        adminModule { module AdminModule}
         udButtonsForm           { $("form", action:"/tdstm/userLogin/list")}
         udEditBtn               { udButtonsForm.find("input", class:"edit")}
         udDeleteBtn             { udButtonsForm.find("input", class:"delete")}
         udPassResetBtn          { udButtonsForm.find("input#resetPassword")}
         fullName                {$("tbody")[0].find("a")}
 
+        userCompany             {$(".value")[0].text()}
         userName                {$(".value")[2].text()}
         email                   {$(".value")[3].text()}
         createdDate             {$(".value")[18].text()}
@@ -38,8 +39,8 @@ class UserDetailsPage extends Page {
      * @author ingrid
      */
     def validateUserDetails(List originalDetails){
-        //originalDetails = [firstName,middleName,lastName,userName,userEmail]
-        List dataDisplayed=[fullName.text().split(" ")[0],fullName.text().split(" ")[1],fullName.text().split(" ")[2],
+        //originalDetails = [userCompany,firstName,middleName,lastName,userName,userEmail]
+        List dataDisplayed=[userCompany,fullName.text().split(" ")[0],fullName.text().split(" ")[1],fullName.text().split(" ")[2],
                        userName,email]
         def success=false
         originalDetails.each { data ->

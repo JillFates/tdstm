@@ -1,5 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -649,7 +650,7 @@ class PersonController implements ControllerMethods {
 				prePreference.each { preference ->
 					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
 						// When clearing preference, the RefreshMyTasks should be the same.
-						if (preferenceInstance.preferenceCode != 'RefreshMyTasks') {
+						if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
 							preferenceInstance.delete()
 						}
 				}
