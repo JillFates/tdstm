@@ -1,6 +1,7 @@
 package pages.Admin
 import geb.Page
 import modules.AdminModule
+import utils.CommonActions
 
 class UserCreationPage extends Page {
 
@@ -39,9 +40,9 @@ class UserCreationPage extends Page {
         //number of roles that will be assigned to the user
         def numRoles =Math.abs(new Random().nextInt() % availableRoles.size())+1
         for(int i = 0;i<numRoles+1;i++) {
-            def num =Math.abs(new Random().nextInt() % availableRoles.size())//random position in the availableRoles list
-            if (availableRoles[num].value()==false){
-                availableRoles[num].click()
+            def option = CommonActions.getRandomOption availableRoles
+            if (option.value()==false){
+                option.click()
             }
         }
     }
