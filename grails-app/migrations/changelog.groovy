@@ -273,4 +273,5 @@ databaseChangeLog = {
 	include file: '20180904-project-table-drop-column-custom-fields-shown.groovy'
 	include file: '20180829-rename-agent-to-connector.groovy'
   	include file: '20180904-project-table-drop-column-custom-fields-shown.groovy'
+	include file: '20180815-date-columns-to-have-date-controls-for-common-fields.groovy'
 }
