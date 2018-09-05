@@ -20,4 +20,8 @@ class TaskGenerationCommand {
 		eventId nullable: true
 		tagMatch inList: ['ANY', 'ALL']
 	}
+
+	List<Long> getTagIds() {
+		return tag
+	}
 }

@@ -4,7 +4,7 @@ import geb.spock.GebReportingSpec
 import pages.Projects.*
 import pages.Providers.*
 import pages.Tags.*
-import pages.Datascripts.*
+import pages.ETLScripts.*
 import pages.Credentials.*
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -113,10 +113,10 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
 
     def "10. Verify the ETL Scripts Landing Page"() {
         when: 'The user goes to the ETL Scripts  page'
-            projectsModule.goToDatascripts()
+            projectsModule.goToETLScripts()
 
         then: 'The ETL Scripts Page is loaded successfully'
-            at DatascriptsPage
+            at ETLScriptsPage
     }
 
     def "11. Verify the Actions Landing Page"() {

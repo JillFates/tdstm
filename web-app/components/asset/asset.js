@@ -21,17 +21,17 @@ tds.assets.controller.MainController = function($rootScope, $scope, assetService
 	 * Load the current set of Asset for the current view
 	 */
 	$scope.loadAssetTags = function(assetId) {
-		if(assetId) {
-			$scope.internalAsset =  {
-				// Server Selected Tag
-				assetSelector:{
-					operator: "ANY",
-					tag: []
-				},
-				// Current Selected Tags
-				selectedAssetSelector:{}
-			};
+		$scope.internalAsset =  {
+			// Server Selected Tag
+			assetSelector:{
+				operator: "ANY",
+				tag: []
+			},
+			// Current Selected Tags
+			selectedAssetSelector:{}
+		};
 
+		if(assetId) {
 			// Get the List of Current Tags for this Asset
 			assetService.getAssetTagsForAsset(assetId).then(
 				function (response) {
@@ -45,12 +45,12 @@ tds.assets.controller.MainController = function($rootScope, $scope, assetService
 						});
 						$scope.internalAsset.assetSelector.tag = response.data;
 					}
-					// Create the component
-					recompileAssetDOM('tmAssetTagSelector');
-					recompileAssetDOM('tmAssetTagViewSelector');
 				}
 			);
 		}
+		// Create the component
+		recompileAssetDOM('tmAssetTagSelector');
+		recompileAssetDOM('tmAssetTagViewSelector');
 	};
 
 

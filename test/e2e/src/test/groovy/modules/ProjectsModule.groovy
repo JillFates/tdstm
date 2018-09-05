@@ -18,7 +18,7 @@ class ProjectsModule extends Module {
         projectsFieldsSetItem { projectsMenu.find("li.menu-projects-field-settings")}
         projectsProviders { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/provider/list")}
         projectsCredentials { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/credential/list")}
-        projectsDatascripts { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
+        projectsETLScripts { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
         projectsActions { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/action/list")}
         projectsTags { projectsMenu.find("li.menu-projects-tags")}
         projectName { menuContainer.find("li a#nav-project-name")}
@@ -79,9 +79,9 @@ class ProjectsModule extends Module {
         selectItem(projectsCredentials)
     }
 
-    def goToDatascripts(){
+    def goToETLScripts(){
         selectMenu(projectsItem)
-        selectItem(projectsDatascripts)
+        selectItem(projectsETLScripts)
     }
 
     def goToActions(){

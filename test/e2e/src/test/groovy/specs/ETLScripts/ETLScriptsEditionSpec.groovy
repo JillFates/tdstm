@@ -1,17 +1,14 @@
-package specs.Datascripts
+package specs.ETLScripts
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Datascripts.CreateDatascriptPage
-import pages.Datascripts.DatascriptDetailsPage
-import pages.Datascripts.EditDatascriptPage
-import pages.Datascripts.DatascriptsPage
+import pages.ETLScripts.*
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 
 @Stepwise
-class DatascriptEditionSpec extends GebReportingSpec{
+class ETLScriptsEditionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
@@ -29,10 +26,10 @@ class DatascriptEditionSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        projectsModule.goToDatascripts()
-        at DatascriptsPage
+        projectsModule.goToETLScripts()
+        at ETLScriptsPage
         createBtn.click()
-        at CreateDatascriptPage
+        at CreateETLScriptsPage
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.click()}
@@ -41,7 +38,7 @@ class DatascriptEditionSpec extends GebReportingSpec{
         datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
-        at DatascriptDetailsPage
+        at ETLScriptsDetailsPage
         waitFor {dsDetailXIcon.click()}
     }
 
@@ -54,42 +51,42 @@ class DatascriptEditionSpec extends GebReportingSpec{
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "1. The user opens the created Datascripts"() {
-        given: 'The User is on the Datascripts Page'
-            at DatascriptsPage
-        and: 'Filters by the datascript Name'
+    def "1. The user opens the created ETLScripts"() {
+        given: 'The User is on the ETLScripts Page'
+            at ETLScriptsPage
+        and: 'Filters by the ETLScripts Name'
             filterByName datascriptName
-        when: 'The user clicks the created Datascript'
+        when: 'The user clicks the created ETLScripts'
             clickOnFirstGridRow()
-        then: 'We verify that the Datascript Details pop up is displayed'
-            at DatascriptDetailsPage
+        then: 'We verify that the ETLScripts Details pop up is displayed'
+            at ETLScriptsDetailsPage
     }
 
-    def "2. The user closes the Datascript by the X button"() {
+    def "2. The user closes the ETLScripts by the X button"() {
         given: 'The user is on the Provider Detail pop up'
-            at DatascriptDetailsPage
+            at ETLScriptsDetailsPage
         when: 'The user clicks the X icon'
             clickOnXButton()
         then:'We are back to the Providers Page'
-            at DatascriptsPage
+            at ETLScriptsPage
     }
 
-    def "3. The user opens again the datascript and clicks the Edit button"() {
+    def "3. The user opens again the ETLScripts and clicks the Edit button"() {
         given: 'The User is on the Providers Page'
-            at DatascriptsPage
-        when: 'The user clicks on datascript name'
+            at ETLScriptsPage
+        when: 'The user clicks on ETLScripts name'
             clickOnFirstGridRow()
-        then: 'Datascript details modal is displayed'
-            at DatascriptDetailsPage
+        then: 'ETLScripts details modal is displayed'
+            at ETLScriptsDetailsPage
         when: 'The User clicks the Edit button'
             clickOnEditButton()
-        then:'Edit datascript modal is displayed'
-            at EditDatascriptPage
+        then:'Edit ETLScripts modal is displayed'
+            at EditETLScriptsPage
     }
 
-    def "4. The user edits the datascript and Saves it"() {
-        given: 'The User is on the datascript Edit pop up'
-            at EditDatascriptPage
+    def "4. The user edits the ETLScripts and Saves it"() {
+        given: 'The User is on the ETLScripts Edit pop up'
+            at EditETLScriptsPage
         when: 'The user modifies the info of the Provider'
             datascriptName = datascriptName + edit
             setDsName datascriptName
@@ -99,14 +96,14 @@ class DatascriptEditionSpec extends GebReportingSpec{
             datascriptProvider = getSelectedProviderText()
         and: 'Clicks the Save button'
             clickOnSaveButton()
-        then:'The page redirects to the datascript page'
-            at DatascriptsPage
+        then:'The page redirects to the ETLScripts page'
+            at ETLScriptsPage
     }
 
-    def "5. The user searches and opens the edited datascript"() {
-        given: 'The User is on the datascript Page'
-            at DatascriptsPage
-        when: 'Filters by the datascript Name'
+    def "5. The user searches and opens the edited ETLScripts"() {
+        given: 'The User is on the ETLScripts Page'
+            at ETLScriptsPage
+        when: 'Filters by the ETLScripts Name'
             filterByName datascriptName
             datascriptInfo = collectFirstDSInfoDisplayedInGrid()
         then: 'Updated data is properly displayed'
@@ -115,18 +112,18 @@ class DatascriptEditionSpec extends GebReportingSpec{
             datascriptInfo.provider == datascriptProvider
     }
 
-    def "6. The user opens again the datascript from edit button and clicks the Edit button"() {
-        given: 'The User is on the datascript Page'
-            at DatascriptsPage
+    def "6. The user opens again the ETLScripts from edit button and clicks the Edit button"() {
+        given: 'The User is on the ETLScripts Page'
+            at ETLScriptsPage
         when: 'the user clicks on edit button'
             clickOnEditButtonForFirstDS()
-        then: 'Datascript details modal is displayed'
-            at EditDatascriptPage
+        then: 'ETLScripts details modal is displayed'
+            at EditETLScriptsPage
     }
 
-    def "7. The user edits the datascript and Saves it again"() {
-        given: 'The User is on the datascript Edit pop up'
-            at EditDatascriptPage
+    def "7. The user edits the ETLScripts and Saves it again"() {
+        given: 'The User is on the ETLScripts Edit pop up'
+            at EditETLScriptsPage
         when: 'The user modifies the info of the Provider'
             datascriptName = datascriptName + edit
             setDsName datascriptName
@@ -136,14 +133,14 @@ class DatascriptEditionSpec extends GebReportingSpec{
             datascriptProvider = getSelectedProviderText()
         and: 'Clicks the Save button'
             clickOnSaveButton()
-        then:'The page redirects to the datascript page'
-            at DatascriptsPage
+        then:'The page redirects to the ETLScripts page'
+            at ETLScriptsPage
     }
 
-    def "8. The user searches and opens the edited datascript"() {
-        given: 'The User is on the datascript Page'
-            at DatascriptsPage
-        when: 'Filters by the datascript Name'
+    def "8. The user searches and opens the edited ETLScripts"() {
+        given: 'The User is on the ETLScripts Page'
+            at ETLScriptsPage
+        when: 'Filters by the ETLScripts Name'
             filterByName datascriptName
             datascriptInfo = collectFirstDSInfoDisplayedInGrid()
         then: 'Updated data is properly displayed'

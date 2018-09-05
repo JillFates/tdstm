@@ -12,7 +12,6 @@
         <g:javascript src="progressBar.js" />
 
         <g:javascript src="asset.comment.js" />
-        <g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
         <g:javascript src="cabling.js"/>
         <g:javascript src="d3/d3.js"/>
         <g:javascript src="svg.js"/>
@@ -208,9 +207,6 @@
 	currentMenuId = "#eventMenu";
     $(".menu-parent-planning-event-list").addClass('active');
     $(".menu-parent-planning").addClass('active');
-	$(document).ready(function () {
-		// recompileDOM('tmHighlightGroupSelector');
-	});
 </script>
     </body>
 </html>

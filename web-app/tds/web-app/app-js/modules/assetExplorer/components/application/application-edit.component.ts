@@ -18,6 +18,7 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -40,10 +41,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
-			tagService: TagService) {
-
-				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata);
-
+			tagService: TagService,
+			promptService: UIPromptService) {
+				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 				this.initModel();
 		}
 

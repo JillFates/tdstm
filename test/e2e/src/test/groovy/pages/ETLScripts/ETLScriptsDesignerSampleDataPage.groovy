@@ -1,9 +1,9 @@
-package pages.Datascripts
+package pages.ETLScripts
 
 import geb.Page
 import modules.CommonsModule
 
-class DatascriptDesignerSampleDataPage extends Page{
+class ETLScriptsDesignerSampleDataPage extends Page{
 
     static at = {
         modalTitle.text().trim().contains("Sample Data")
