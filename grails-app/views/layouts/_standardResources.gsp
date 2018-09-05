@@ -10,10 +10,6 @@
 
 <g:javascript src="prototype/prototype.js" />
 <asset:javascript src="resources" />
-%{--<g:javascript src="jquery-1.9.1.js"/>--}%
-%{--<g:javascript src="jquery-1.9.1-ui.js"/>--}%
-%{--<g:javascript src="datetimepicker.js"/>--}%
-%{--<g:javascript src="jquery-migrate-1.0.0.js"/>--}%
 
 <%
 def moveEvent = tds.currentMoveEvent()
@@ -30,15 +26,6 @@ if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 <g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
 	<g:javascript src="crawler.js" />
 </g:if>
-%{--<g:javascript src="select2.js"/>--}%
-%{--<g:javascript src="jquery.combox.js"/>	--}%
-%{--<g:javascript src="moment.min.js" />--}%
-%{--<g:javascript src="moment-timezone-with-data.min.js" />--}%
-%{--<g:javascript src="daterangepicker.js" />--}%
-%{--<g:javascript src="lodash/lodash.min.js" />--}%
-%{--<g:javascript src="tds-common.js" />--}%
-%{--<g:javascript src="timezone/jquery.maphilight.min.js" />--}%
-%{--<g:javascript src="timezone/jquery.timezone-picker.min.js" />--}%
 
 <script type="text/javascript">
 	var currentURL='';
