@@ -1,4 +1,4 @@
-import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
@@ -23,7 +23,7 @@ class ApiActionTestHelper {
                 provider: provider,
                 description: 'This is a bogus action for testing',
                 apiCatalog: apiCatalog,
-                agentMethod: 'sendSnsNotification',
+                connectorMethod: 'sendSnsNotification',
                 methodParams: null,
                 asyncQueue: 'test_outbound_queue',
                 callbackMethod: 'updateTaskState',

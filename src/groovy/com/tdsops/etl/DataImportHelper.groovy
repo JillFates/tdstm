@@ -5,7 +5,7 @@ import com.tdsops.etl.ETLDomain
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.agent.Environment
+import net.transitionmanager.connector.Environment
 import com.tds.asset.AssetEntity
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject

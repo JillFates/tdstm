@@ -23,7 +23,7 @@ import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 
-//import net.transitionmanager.agent.AgentClass
+//import net.transitionmanager.connector.AgentClass
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN

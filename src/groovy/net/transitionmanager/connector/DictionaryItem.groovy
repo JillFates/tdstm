@@ -1,10 +1,10 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 import groovy.transform.ToString
 import groovy.transform.CompileStatic
 
 /**
- * Represents the properties of a method available in the Dictionary of an agent class
+ * Represents the properties of a method available in the Dictionary of an connector class
  */
 @ToString(includes='name,method,description', includeNames=true, includeFields=true)
 @CompileStatic

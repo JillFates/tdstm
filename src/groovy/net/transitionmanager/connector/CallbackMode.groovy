@@ -1,4 +1,4 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 /*
  * Used to determine the Callback on an action is:
