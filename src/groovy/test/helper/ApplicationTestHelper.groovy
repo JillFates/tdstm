@@ -6,7 +6,9 @@ import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.jdbc.core.JdbcTemplate
 
 class ApplicationTestHelper {
 
@@ -19,6 +21,8 @@ class ApplicationTestHelper {
 		)
 
 		application.customDomainService = new CustomDomainService()
+		application.customDomainService.settingService = new SettingService()
+		application.customDomainService.jdbcTemplate = new JdbcTemplate()
 		application.save(flush: true, failOnError: true)
 
 		return application
