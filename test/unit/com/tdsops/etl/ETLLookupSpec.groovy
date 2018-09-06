@@ -704,18 +704,126 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 	}
 
-	static final String DependencyDataSetContent = """server,model,dependsOn
-xray01,VM,
-deltasrv03,VM,xray01
-alpha,VM,""".stripIndent().trim()
+	void 'test setting a variable at ETLProcessor level'() {
+		setup:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
-	static String RVToolsCSVContent = """VM,Powerstate,Template,Config status,DNS Name,Connection state,Guest state,Heartbeat,Consolidation Needed,PowerOn,Suspend time,Change Version,CPUs,Memory,NICs,Disks,Network #1,Network #2,Network #3,Network #4,Num Monitors,Video Ram KB,Resource pool,Folder,vApp,DAS protection,FT State,FT Latency,FT Bandwidth,FT Sec. Latency,Provisioned MB,In Use MB,Unshared MB,HA Restart Priority,HA Isolation Response,HA VM Monitoring,Cluster rule(s),Cluster rule name(s),Boot Required,Boot delay,Boot retry delay,Boot retry enabled,Boot BIOS setup,Firmware,HW version,HW upgrade status,HW upgrade policy,HW target,Path,Annotation,BridgeWays.VMware.ESX.CustomField.CollectCPUStatistics,BridgeWays.VMware.ESX.CustomField.CollectMemoryStatistics,BridgeWays.VMware.ESX.CustomField.CollectNetStatistics,BridgeWays.VMware.ESX.CustomField.WasteWhitelisted,NB_LAST_BACKUP,Datacenter,Cluster,Host,OS according to the configuration file,OS according to the VMware Tools,VM ID,VM UUID,VI SDK Server type,VI SDK API Version,VI SDK Server,VI SDK UUID
-59,poweredOff,False,green,,connected,notRunning,gray,False,,,2017-11-28T19:32:21.560802Z,2,"16,384",1,2,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,,notConfigured,gray,-1,-1,"206,057","189,440","189,440",medium,none,vmMonitoringOnly,,,False,0,"10,000",True,True,bios,8,none,never,,[AP_VNX5400_ESX06_PROD] 59/59.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Red Hat Enterprise Linux 6 (64-bit),Red Hat Enterprise Linux 6 (64-bit),vm-98720,422e6d92-22c1-c6c1-1de8-eceec50f94bc,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
-59admin,poweredOn,False,green,59admin.moredirect.com,connected,running,gray,False,2017/11/28 16:14:28,,2017-11-28T21:14:28.910375Z,2,"16,384",1,2,PROD_10_3_24,,,,1,"8,192",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"118,892","118,892","118,892",medium,none,vmMonitoringOnly,,,False,0,"10,000",True,False,bios,8,none,never,,[AP_VNX5400_ESX06_PROD] 59admin/59admin.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Red Hat Enterprise Linux 6 (64-bit),Red Hat Enterprise Linux 6 (64-bit),vm-98718,422e2244-f78c-2012-b56a-e435d7519abf,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
-APDC03,poweredOn,False,green,APDC03.pcc.int,connected,running,green,False,,,2017-02-02T22:38:49.341678Z,2,"4,096",1,2,PROD_10_3_24,,,,1,"8,192",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"65,744","65,744","65,744",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,9,none,never,,[AP_VNX5300_ESX13_PROD] APDC03/APDC03.vmx,PCC.INT Domain Controller 6/3/15 - CMG,,,,,"Sat Jan 20 05:26:53 2018
-,apntbkup01,VMWare_ESX_50_FlashBackup",MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Microsoft Windows Server 2012 (64-bit),Microsoft Windows Server 2012 (64-bit),vm-44956,422ea90a-b80a-81de-0d4c-6f111142c4f7,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
-APESRS,poweredOn,False,green,,connected,notRunning,gray,False,,,2017-04-28T16:38:21.437802Z,1,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"69,723","69,723","69,723",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,4,none,never,,[AP_VNX5300_ESX07_PROD] APESRS/APESRS.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_DEV,apesx01.moredirect.com,SUSE Linux Enterprise 11 (64-bit),SUSE Linux Enterprise 11 (64-bit),vm-67122,422e1dd3-acd2-9e60-3720-2d69ba848df2,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
-APESX01-SCVM,poweredOn,False,green,APESX01-SCVM,connected,running,green,False,2018/01/16 16:43:22,,2018-01-16T21:43:23.155196Z,2,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"20,702","20,702","20,702",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,9,none,never,,[AP_VNX5400_ESX06_PROD] APESX01-SCVM/APESX01-SCVM.vmx,"The ""Sophos for Virtual Environments"" Appliance, part of the Sophos Endpoint Security suite of products, provides a unique integrated solution that centralizes threat protection across virtual machines.",,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Other Linux (64-bit),Ubuntu Linux (64-bit),vm-100365,422ed1b6-466d-8155-4483-fb786405a8a3,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0""".stripIndent()
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'we set a variable with wrong Convention name'
+			etlProcessor.set("variable")
+
+		then: 'an exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+		when: 'we set a correct variable name'
+			etlProcessor.set "variableVar" with 123
+
+		then: 'Variable should be set'
+			etlProcessor.binding.getVariable('variableVar') == 123
+
+		when: 'we set a variable with wrong Convention name'
+			etlProcessor.set("variable")
+
+		then: 'an exception should be thrown'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+
+		when: 'we set in a number instead of a variable'
+			etlProcessor.set(123)
+
+		then: 'an exception should be thrown'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+
+		when: 'we try to re-establish an already existing variable'
+			etlProcessor.set "variableVar" with 'other Value'
+
+		then: 'Exception should be trhown due that the variable is already defined'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+	}
+
+	void 'test setting a variable at Element level'() {
+		setup:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator
+			)
+
+			ETLDomain domain = ETLDomain.Device
+			etlProcessor.domain( domain )
+			etlProcessor.read(ETLProcessor.ReservedWord.labels)
+
+			etlProcessor.iterateIndex = new IterateIndex(1)
+			def row = etlProcessor.dataSetFacade.rows()[0]
+			etlProcessor.addCrudRowData(row)
+			Element el = etlProcessor.extract(1)
+
+		when: 'we set a variable with wrong Convention name'
+			el.set 'variable'
+
+		then: 'an exception should be thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+		when: 'we set a correct variable name'
+			el.set 'variableVar' load 'custom1' with 123
+
+		then: 'Variable should be set'
+			etlProcessor.binding.getVariable('variableVar').value == 123
+
+		when: 'we set a variable with wrong Convention name'
+			el.set 'variable'
+
+		then: 'an exception should be thrown'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+		when: 'we set in a number instead of a variable'
+			el.set 123
+
+		then: 'an exception should be thrown'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+
+		when: 'we try to re-establish an already existing variable'
+			el.set 'variableVar' load 'custom1' with 'other Value'
+
+		then: 'Exception should be trhown due that the variable is already defined'
+			e = thrown ETLProcessorException
+			ETLProcessorException.invalidSetParameter().message == e.message
+
+	}
+
+	static final String DependencyDataSetContent = """
+		server,model,dependsOn
+		xray01,VM,
+		deltasrv03,VM,xray01
+		alpha,VM,
+	""".stripIndent().trim()
+
+	static String RVToolsCSVContent = """
+		VM,Powerstate,Template,Config status,DNS Name,Connection state,Guest state,Heartbeat,Consolidation Needed,PowerOn,Suspend time,Change Version,CPUs,Memory,NICs,Disks,Network #1,Network #2,Network #3,Network #4,Num Monitors,Video Ram KB,Resource pool,Folder,vApp,DAS protection,FT State,FT Latency,FT Bandwidth,FT Sec. Latency,Provisioned MB,In Use MB,Unshared MB,HA Restart Priority,HA Isolation Response,HA VM Monitoring,Cluster rule(s),Cluster rule name(s),Boot Required,Boot delay,Boot retry delay,Boot retry enabled,Boot BIOS setup,Firmware,HW version,HW upgrade status,HW upgrade policy,HW target,Path,Annotation,BridgeWays.VMware.ESX.CustomField.CollectCPUStatistics,BridgeWays.VMware.ESX.CustomField.CollectMemoryStatistics,BridgeWays.VMware.ESX.CustomField.CollectNetStatistics,BridgeWays.VMware.ESX.CustomField.WasteWhitelisted,NB_LAST_BACKUP,Datacenter,Cluster,Host,OS according to the configuration file,OS according to the VMware Tools,VM ID,VM UUID,VI SDK Server type,VI SDK API Version,VI SDK Server,VI SDK UUID
+		59,poweredOff,False,green,,connected,notRunning,gray,False,,,2017-11-28T19:32:21.560802Z,2,"16,384",1,2,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,,notConfigured,gray,-1,-1,"206,057","189,440","189,440",medium,none,vmMonitoringOnly,,,False,0,"10,000",True,True,bios,8,none,never,,[AP_VNX5400_ESX06_PROD] 59/59.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Red Hat Enterprise Linux 6 (64-bit),Red Hat Enterprise Linux 6 (64-bit),vm-98720,422e6d92-22c1-c6c1-1de8-eceec50f94bc,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
+		59admin,poweredOn,False,green,59admin.moredirect.com,connected,running,gray,False,2017/11/28 16:14:28,,2017-11-28T21:14:28.910375Z,2,"16,384",1,2,PROD_10_3_24,,,,1,"8,192",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"118,892","118,892","118,892",medium,none,vmMonitoringOnly,,,False,0,"10,000",True,False,bios,8,none,never,,[AP_VNX5400_ESX06_PROD] 59admin/59admin.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Red Hat Enterprise Linux 6 (64-bit),Red Hat Enterprise Linux 6 (64-bit),vm-98718,422e2244-f78c-2012-b56a-e435d7519abf,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
+		APDC03,poweredOn,False,green,APDC03.pcc.int,connected,running,green,False,,,2017-02-02T22:38:49.341678Z,2,"4,096",1,2,PROD_10_3_24,,,,1,"8,192",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"65,744","65,744","65,744",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,9,none,never,,[AP_VNX5300_ESX13_PROD] APDC03/APDC03.vmx,PCC.INT Domain Controller 6/3/15 - CMG,,,,,"Sat Jan 20 05:26:53 2018
+		,apntbkup01,VMWare_ESX_50_FlashBackup",MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Microsoft Windows Server 2012 (64-bit),Microsoft Windows Server 2012 (64-bit),vm-44956,422ea90a-b80a-81de-0d4c-6f111142c4f7,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
+		APESRS,poweredOn,False,green,,connected,notRunning,gray,False,,,2017-04-28T16:38:21.437802Z,1,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"69,723","69,723","69,723",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,4,none,never,,[AP_VNX5300_ESX07_PROD] APESRS/APESRS.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_DEV,apesx01.moredirect.com,SUSE Linux Enterprise 11 (64-bit),SUSE Linux Enterprise 11 (64-bit),vm-67122,422e1dd3-acd2-9e60-3720-2d69ba848df2,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
+		APESX01-SCVM,poweredOn,False,green,APESX01-SCVM,connected,running,green,False,2018/01/16 16:43:22,,2018-01-16T21:43:23.155196Z,2,"4,096",1,1,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,True,notConfigured,gray,-1,-1,"20,702","20,702","20,702",medium,none,vmMonitoringOnly,,,False,0,"10,000",False,False,bios,9,none,never,,[AP_VNX5400_ESX06_PROD] APESX01-SCVM/APESX01-SCVM.vmx,"The ""Sophos for Virtual Environments"" Appliance, part of the Sophos Endpoint Security suite of products, provides a unique integrated solution that centralizes threat protection across virtual machines.",,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Other Linux (64-bit),Ubuntu Linux (64-bit),vm-100365,422ed1b6-466d-8155-4483-fb786405a8a3,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0
+	""".stripIndent().trim()
 
 
 	/**

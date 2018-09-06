@@ -26,7 +26,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
     }
     def "1. Validates user can reach 'my views' "() {
         given: "I am in Asset Views Page"
@@ -113,7 +113,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
             waitFor{enterName(viewName)}
             waitFor{clickSave()}
         when: "User goes to Asset View Manager and filter the views by name"
-            waitFor { menuModule.goToAssetViewManager() }
+            waitFor { assetsModule.goToAssetViewManager() }
             at AssetViewsPage
             allViewsModule.filterViewByName(randStr)
         then: "The newly created view is filtered and displayed"

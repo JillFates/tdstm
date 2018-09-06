@@ -1,10 +1,10 @@
-package pages.Datascripts
+package pages.ETLScripts
 
 import geb.Page
 import utils.CommonActions
 import modules.CommonsModule
 
-class EditDatascriptPage extends Page{
+class EditETLScriptsPage extends Page{
 
     static at = {
         title == "ETL Scripts"

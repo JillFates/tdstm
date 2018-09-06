@@ -1,10 +1,10 @@
-package pages.Datascripts
+package pages.ETLScripts
 
 import geb.Page
 import geb.Browser
 import modules.CommonsModule
 
-class DatascriptDesignerPage extends Page{
+class ETLScriptsDesignerPage extends Page{
 
     static at = {
         modalTitle.text().trim().contains("ETL Script Designer")

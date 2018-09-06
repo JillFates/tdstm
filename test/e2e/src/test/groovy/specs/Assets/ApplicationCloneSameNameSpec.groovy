@@ -33,7 +33,7 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToApplications() }
+        waitFor { assetsModule.goToApplications() }
         at ApplicationListPage
         clickOnCreateButton()
         at ApplicationCreationPage
@@ -51,7 +51,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "1. User Opens Clone Application Modal"() {
-        testKey = "TM-8496"
         given: 'The User is on the Application Details Modal'
             at ApplicationDetailsPage
         when: 'The user clicks on Clone Button'
@@ -67,7 +66,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "2. User verifies Confirmation dialog title and legend"() {
-        testKey = "TM-8496"
         given: 'The User is on the Clone Pop-Up'
             at AssetClonePage
         when: 'The User Clicks the "Clone Button"'
@@ -78,7 +76,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "3. User cancels the Asset Clone process and verifies the Asset is not cloned"() {
-        testKey = "TM-8496"
         given: 'The User is on the Clone Pop-Up'
             at AssetClonePage
         when: 'The User clicks the "Cancel" button'
@@ -100,7 +97,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "4. User clones the App with the Same Name"() {
-        testKey = "TM-8496"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User clicks the asset name'
@@ -121,7 +117,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "5. Validates duplicate application with same name"() {
-        testKey = "TM-8496"
         given: 'The User is in the Application Details modal'
             at ApplicationDetailsPage
         and: 'The user closes details modal'
@@ -138,7 +133,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "6. User opens the Clone Application Modal Window By using the Clone Icon"() {
-        testKey = "TM-8496"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User clicks the "Clone" Button'
@@ -154,7 +148,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "7. User clones the App with the Same Name"() {
-        testKey = "TM-8496"
         given: 'The User is on the Application Clone Modal'
             at AssetClonePage
         when: 'The User Clicks the "Clone Button"'
@@ -166,7 +159,6 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
     }
 
     def "8. Validates triplicate application with same name"() {
-        testKey = "TM-8496"
         given: 'The User is in the Application List Page'
             at ApplicationListPage
         when: 'The user filters by app name'
