@@ -141,14 +141,8 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.importBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-
-					// TODO : Fix the parent batchRecord reassignment and this code should be able to be removed
-					// The parent gets updated with the following emit but the this.batchRecord never gets updated
-					if (result.data['existingRecord']) {
-						this.batchRecord.existingRecord = result.data.existingRecord;
-					}
-
-					this.onBatchRecordUpdated.emit({batchRecord: result.data});
+					this.batchRecord = result.data;
+					this.onBatchRecordUpdated.emit({batchRecord: this.batchRecord});
 					this.buildGridData(result.data.fieldsInfo);
 					this.processStatus.state = CHECK_ACTION.NONE;
 					if (updateProcessStatus) {
@@ -186,8 +180,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			if (this.batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE) {
 				// Before POSTING the record
 				if (this.batchRecord.status.code === BatchStatus.PENDING) {
-					// Use current record property
-					currentPreviousValue = this.batchRecord.existingRecord[fieldName];
+					currentPreviousValue = this.batchRecord[fieldName];
 				} else {
 					// After the POSTING the record
 					if ('previousValue' in fields[fieldName] && !ValidationUtils.isEmptyObject(fields[fieldName].previousValue)) {
@@ -435,6 +428,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 * @param field
 	 */
 	private buildPopupFieldDataForFindObject(field: any): void {
+		this.popup.results = [];
 		const {matchOn, results} = field;
 		const {fieldLabelMap} = this.importBatch;
 		let popupFields: Array<any> = [];

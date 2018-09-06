@@ -49,6 +49,7 @@
                             <div class="col-sm-{{ (uiConfig.inputColSize + uiConfig.buttonColSize) }}" style="padding-right: 0;">
                                 <kendo-upload
                                         #kendoUploadInstance="kendoUpload"
+                                        [restrictions]="file.uploadRestrictions"
                                         [autoUpload]="file.autoUpload"
                                         [saveUrl]="file.uploadSaveUrl"
                                         [removeUrl]="file.uploadDeleteUrl"

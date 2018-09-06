@@ -29,7 +29,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
         at AssetViewsPage
     }
 
@@ -83,7 +83,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
             at LoginPage
             login(user,pass)
             at MenuPage
-            waitFor {menuModule.goToAssetViewManager()}
+            waitFor {assetsModule.goToAssetViewManager()}
             at AssetViewsPage
         then: "The view is visible to the current user"
             waitFor{ allViewsModule.validateRowNames(viewName, true)}
