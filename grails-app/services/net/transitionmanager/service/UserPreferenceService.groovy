@@ -21,12 +21,6 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferenc
 
 @Slf4j
 class UserPreferenceService implements ServiceMethods {
-	// defaults holds global defaults for certain values
-	// TODO - load these from application settings
-	protected static final Map<String, Object> defaults = [
-		CURR_TZ        :'GMT',
-		PRINTER_COPIES : 2
-	]
 
 	private static final List<String> depGraphCheckboxLabels = [
 		'bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
@@ -204,13 +198,16 @@ class UserPreferenceService implements ServiceMethods {
 		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
 
 		if (userPreference) {
+			// we use the 'value' part of the Enum
+			preferenceCode = userPreferenceEnum.value()
+
 			// Note that session does not exist for Quartz jobs so we should check for a session object
 			if (session) {
 				// Set or update the session with the new value 
 				def previousValue = session.getAttribute(preferenceCode)
 				if (previousValue == null || previousValue != userPreference.value) {
 					session.setAttribute(preferenceCode, userPreference.value)
-					session.setAttribute(preferenceCode, userPreference.value)
+
 				}
 			}
 			return true

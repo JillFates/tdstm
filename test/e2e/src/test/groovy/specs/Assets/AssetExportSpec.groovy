@@ -19,7 +19,7 @@ class AssetExportSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        assert menuModule.assertProjectName(projName), "${projName} is required to perform this test"
+        assert projectsModule.assertProjectName(projName), "${projName} is required to perform this test"
     }
 
     def setup() {
@@ -32,17 +32,15 @@ class AssetExportSpec extends GebReportingSpec {
     }
 
     def "1. The User Navigates in the Asset Export Section"() {
-        testKey = "TM-8478"
         given: 'The User searches in the Menu Page'
             at MenuPage
         when: 'The User Clicks in the Assets > Asset Export Menu Option'
-            menuModule.goToAssetExport()
+            assetsModule.goToAssetExport()
         then: 'Export Assets page should be displayed'
             at AssetExportPage
     }
 
     def "2. The User Exports Assets"() {
-        testKey = "TM-8478"
         given: 'The User is on the Export Assets Page'
             at AssetExportPage
         when: 'The User selects a bundle type'

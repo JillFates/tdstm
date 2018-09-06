@@ -19,6 +19,7 @@ class StaffListSpec extends GebReportingSpec {
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"
     static userProject = "TM-Demo"
+    static userCompany = "TM Demo"
     static teamName = "Account Manager"
     static firstName = baseName + randStr + "First"
     static middleName = baseName + randStr + "Middle"
@@ -26,7 +27,7 @@ class StaffListSpec extends GebReportingSpec {
     static userName = baseName + randStr + "Test"
     static userPass = baseName + randStr + "Pass*"
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
-    static originalDetails = [firstName,middleName,lastName,userName,userEmail]
+    static originalDetails = [userCompany,firstName,middleName,lastName,userName,userEmail]
     def setupSpec() {
         testCount = 0
         to LoginPage

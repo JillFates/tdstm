@@ -1,50 +1,55 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
 <kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" (pageChange)="clearSelectAll()" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)" (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
     <!-- Header Toolbar -->
-    <ng-template kendoGridToolbarTemplate [position]="'top'">
-		<div class="col-sm-6">
-			<div class="checkbox pull-left">
-				<label>
-					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+    <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+		<div class="col-sm-6 bulkchange-section">
+			<tds-bulk-change-button [bulkItems]="bulkItems"
+			                        [enabled]="hasSelectedItems()"
+			                        (clickBulk)="onClickBulkButton()"
+			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<div *ngIf="hasSelectedItems()" class="selected-assets">
+				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 			</div>
-			<tds-bulk-change-button [bulkItems]="bulkItems" [enabled]="hasSelectedItems()" (clickBulk)="onClickBulkButton()" (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+			<div class="checkbox just-planning">
+				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
+				       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
+				<label>Just Planning</label>
+			</div>
 		</div>
-	    <div class="col-sm-6">
-		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload component-action-reload">
-			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		    </div>
-		    <div class="kendo-grid-toolbar__refresh-btn btnClear">
-			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear" [disabled]="!hasFilterApplied()"
+	    <div class="col-sm-6 filters-section">
+		    <div>
+			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear"
+			            [disabled]="!hasFilterApplied()"
 			            (click)="onClearFilters()">
 				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+		    </div>
+		    <div (click)="onReload()" class="component-action-reload">
+			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		    </div>
 	    </div>
 	</ng-template>
 
     <!-- Select All column -->
-    <kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
-		<ng-template kendoGridHeaderTemplate>
-			<div class="row">
-				<div class="col-md-12 text-center">
-					<tds-checkbox name="assetsSelector" [hasThirdState]="true" (changeState)="onChangeAssetsSelector($event)" [overrideState]="overrideCheckboxState"></tds-checkbox>
-				</div>
-			</div>
-		</ng-template>
+    <kendo-grid-column title="" [locked]="true" [width]="55" [filterable]="false">
+	    <ng-template kendoGridHeaderTemplate>
+		    <div class="row">
+			    <div class="col-md-12 text-center">
+				    <tds-checkbox name="assetsSelector"
+				                  [hasThirdState]="true"
+				                  (changeState)="onChangeBulkCheckbox($event)"
+				                  id="assetSelector"
+				                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+			    </div>
+		    </div>
+	    </ng-template>
+
 		<ng-template kendoGridCellTemplate let-dataItem>
             <label class="selectall-checkbox-column text-center">
-	            <input type="checkbox" [checked]="dataGridCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="setSelectedItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
+	            <input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
             </label>
-			<!--<div class="row">-->
-				<!--<div class="col-md-12 text-center">-->
-					<!--<div class="checkbox checkbox-grid">-->
-
-					<!--</div>-->
-				<!--</div>-->
-			<!--</div>-->
 		</ng-template>
 	</kendo-grid-column>
 

@@ -633,6 +633,11 @@ var EntityCrud = (function ($) {
 						assetCreateInvoked = false;
 						return false;
 					} else {
+						$angularScope = getCurrentAngularContext();
+						if ($angularScope) {
+							$angularScope.onSubmitAssetTags(resp.data.asset.id);
+						}
+
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
 
 						/*
@@ -643,7 +648,7 @@ var EntityCrud = (function ($) {
 							getRackLayout( $('#selectedRackId').val() );
 						*/
 					}
-					assetCreateInvoked = false
+					assetCreateInvoked = false;
 					$(document).trigger('entityAssetCreated', resp.data);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {

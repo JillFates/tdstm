@@ -146,7 +146,8 @@ import { DictionaryService } from './services/dictionary.service';
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
-		ConnectorComponent
+		ConnectorComponent,
+		PopupModule
 	],
 	entryComponents: [
 		DynamicComponent,

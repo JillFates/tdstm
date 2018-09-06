@@ -57,7 +57,7 @@ export class KendoFileUploadBasicConfig {
 	[x: string]: any; // this enables the model to add any extra property as needed.
 
 	constructor() {
-		this.uploadRestrictions = { allowedExtensions: ['csv', 'txt', 'xml', 'json', 'xlsx', 'xls'] };
+		this.uploadRestrictions = { allowedExtensions: ['csv', 'xml', 'json', 'xlsx', 'xls'] };
 		this.uploadSaveUrl = FILE_UPLOAD_SAVE_URL;
 		this.uploadDeleteUrl = FILE_UPLOAD_REMOVE_URL;
 		this.autoUpload = false;

@@ -50,3 +50,45 @@
   .text-delimited
     white-space: normal;
     word-wrap: break-word;
+  .k-grid-toolbar
+    display: flex
+    justify-content: space-between
+
+    .bulkchange-section,
+    .filters-section
+      display: flex;
+      align-items: center
+
+    .filters-section
+      justify-content: flex-end
+      padding-right: 8px
+      .component-action-reload
+        margin-left: 12px
+        cursor: pointer
+
+    .bulkchange-section
+      padding-left: 8px
+      .just-planning
+        margin-left: 12px
+        display: flex
+        align-items: center
+        input
+          position: relative
+          margin: unset
+          cursor: pointer
+        label
+          min-height: unset
+          padding-left: unset
+          font-weight: normal
+          margin-bottom: unset
+      .selected-assets
+        margin-left: 12px
+        display: flex
+        align-items: baseline
+        label
+          font-weight: normal
+          margin-bottom: unset
+        .badge-light
+          background-color: #fff
+          color: #777
+          margin-right: 5px

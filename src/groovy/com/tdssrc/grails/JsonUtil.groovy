@@ -239,4 +239,20 @@ class JsonUtil {
         }
         return property
     }
+
+    /**
+     * Populates command object using the JSON, that was stored as a string in a domain class.
+     *
+     * @param commandObjectClass command object class
+     * @param json the json string from a domain class.
+     *
+     * @return a instance of commandObjectClass
+     */
+	static <T> T populateCommandObject(Class<T> commandObjectClass, String json) {
+		def cmd = commandObjectClass.newInstance()
+		JSONObject JsonObject = parseJson(json)
+		GormUtil.bindMapToDomain(cmd, JsonObject)
+
+		return cmd
+	}
 }
