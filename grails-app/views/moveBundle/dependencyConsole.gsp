@@ -130,7 +130,7 @@
                         <tr>
                             <td>
                                 <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
-                                <tm-asset-tag-selector ng-init="assetSelector.tag = ${session.SELECTED_TAG_IDS ?: [] as grails.converters.JSON}" hide-operator="true" id="tmAssignmentTagSelector" pre-asset-selector="assetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+                                <tm-asset-tag-selector ng-init="assetSelector.tag = ${session.SELECTED_TAG_IDS ?: [] as grails.converters.JSON}" hide-operator="true" formData='true' id="tmAssignmentTagSelector" pre-asset-selector="assetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
                             </td>
                         </tr>
 						<tr>

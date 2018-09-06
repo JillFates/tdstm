@@ -1925,9 +1925,7 @@ function submitMoveForm() {
 
 	$.ajax({
 		type: "POST",
-		data: JSON.stringify(postData),
-		contentType : 'application/json; charset=utf-8',
-		dataType : "JSON",
+		data: postData,
 		url: $('#changeBundle').attr('action'),
 		complete: function (jqXHR) {
 			$('#moveBundleSelectId').dialog("close")
