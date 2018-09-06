@@ -59,7 +59,7 @@ import {LayoutModule} from '@progress/kendo-angular-layout';
 	],
 	entryComponents: [
 		ImportBatchDetailDialogComponent,
-		ImportBatchRecordDialogComponent,
+		ImportBatchRecordDialogComponent
 	],
 })
 

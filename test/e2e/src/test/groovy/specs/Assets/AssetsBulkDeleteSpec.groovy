@@ -30,7 +30,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToAllAssets()
+        assetsModule.goToAllAssets()
     }
 
     def setup() {

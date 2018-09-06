@@ -36,7 +36,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToApplications() }
+        waitFor { assetsModule.goToApplications() }
         at ApplicationListPage
         clickOnCreateButton()
         at ApplicationCreationPage
@@ -55,7 +55,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "1. To Open the Clone Application Modal Window"() {
-        testKey = "TM-8494"
         given: 'The User is on the Application Details Page'
             at ApplicationDetailsPage
         when: 'The Clone Button is Displayed'
@@ -69,7 +68,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "2. Close Clone modal window and the Application detail modal Window"() {
-        testKey = "TM-8494"
         given: 'The User is on the Clone Pop-Up section'
             at AssetClonePage
         when: 'The User clicks the "Close" button'
@@ -87,7 +85,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "3. Filtering The Application on the List by using the App name"() {
-        testKey = "TM-8494"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User searches by the App Name'
@@ -101,7 +98,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "4. Opens the Clone Application Modal Window By using the Clone Icon"() {
-        testKey = "TM-8494"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User clicks the "Clone" Button'
@@ -114,7 +110,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "5. Verifying the Legend for a Duplicated Cloned Asset name"() {
-        testKey = "TM-8494"
         given: 'The User is on the Clone Pop-Up section'
             at AssetClonePage
         when: 'The User adds the Same App Name'
@@ -125,7 +120,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "6. Clicking The Clone & Edit Button and verifying the Confirm legend"() {
-        testKey = "TM-8494"
         given: 'The User is on the Clone Pop-Up section'
             at AssetClonePage
 
@@ -138,7 +132,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "7. Cancels the Asset Clone and verifies the Asset is not cloned"() {
-        testKey = "TM-8494"
         given: 'The User is on the Clone Pop-Up section'
             at AssetClonePage
         when: 'The User clicks the "Cancel" button'
@@ -159,7 +152,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "8. Opens up Clone Asset again and Clones the App with the Same Name"() {
-        testKey = "TM-8494"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User clicks the "Clone" Button'
@@ -190,7 +182,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "9. Validating Application Details Section"() {
-        testKey = "TM-8494"
         when: 'The User is in the Application Details Page'
             at ApplicationDetailsPage
 
@@ -202,7 +193,6 @@ class ApplicationCloneSpec extends GebReportingSpec {
     }
 
     def "10. Checking in the App List the duplicated item"() {
-        testKey = "TM-8494"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User searches by the App Name'
