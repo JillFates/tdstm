@@ -707,9 +707,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(Object... fieldNames) {
+	LookupElement lookup(Object... fieldNames) {
 		validateStack()
-		return new LookupElement(this, fieldNames)
+		List fieldNamesList = fieldNames as List
+		return new LookupElement(this, fieldNamesList)
 	}
 	/**
 	 * Initialize a fieldName using a default value
