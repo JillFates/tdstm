@@ -1,10 +1,6 @@
-package specs.Datascripts
+package specs.ETLScripts
 
-import pages.Datascripts.CreateDatascriptPage
-import pages.Datascripts.DatascriptDetailsPage
-import pages.Datascripts.DatascriptsPage
-import pages.Datascripts.DatascriptDesignerPage
-import pages.Datascripts.DatascriptDesignerSampleDataPage
+import pages.ETLScripts.*
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -13,7 +9,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
 @Stepwise
-class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
+class ETLScriptsDesignerTransformWithPastedDataSpec extends GebReportingSpec{
 
     def testKey
     static testCount
@@ -26,7 +22,7 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         new File("src/test/resources/SampleCsvDataToPasteForDS.txt").text.toString()
     }
 
-    def getDataScript(){
+    def getETLScript(){
         new File("src/test/resources/DataScriptCode.txt").text.toString()
     }
 
@@ -36,10 +32,10 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        menuModule.goToDatascripts()
-        at DatascriptsPage
+        projectsModule.goToETLScripts()
+        at ETLScriptsPage
         createBtn.click()
-        at CreateDatascriptPage
+        at CreateETLScriptsPage
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.click()}
@@ -60,14 +56,13 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
     }
 
 
-    def "1. The user opens Datascript Designer modal"() {
-        testKey = "TM-11071"
-        given: 'The User is in datascript details modal'
-            at DatascriptDetailsPage
-        when: 'The user clicks on datascript designer button'
+    def "1. The user opens ETLScripts Designer modal"() {
+        given: 'The User is in ETLScripts details modal'
+            at ETLScriptsDetailsPage
+        when: 'The user clicks on ETLScripts designer button'
             clickOnDesignerButton()
-        then: 'The Datascripts Page loads with no problem'
-            at DatascriptDesignerPage
+        then: 'The ETLScripts loads with no problem'
+            at ETLScriptsDesignerPage
         and: 'Test, Check Syntax, View Console and Save buttons are disabled'
             getTestButtonVisibility() == "true"
             getCheckSyntaxButtonVisibility() == "true"
@@ -76,19 +71,17 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
     }
 
     def "2. The user opens Sample Data modal"() {
-        testKey = "TM-11071"
-        given: 'The user is on the Datascript designer modal'
-            at DatascriptDesignerPage
+        given: 'The user is on the ETLScripts designer modal'
+            at ETLScriptsDesignerPage
         when: 'The user clicks on Load sample data button'
             clickLoadSampleDataButton()
         then: 'The Sample Data modal is displayed'
-            at DatascriptDesignerSampleDataPage
+            at ETLScriptsDesignerSampleDataPage
     }
 
     def "3. Certify that data on the Sample Data Preview section is being displayed"() {
-        testKey = "TM-11071"
         given: 'The user is in Sample Data modal'
-            at DatascriptDesignerSampleDataPage
+            at ETLScriptsDesignerSampleDataPage
         when: 'The user selects source option type Paste content'
             clickOnPasteContent()
         and: 'Selects CSV option from dropdown'
@@ -100,16 +93,15 @@ class DatascriptDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         and: 'Clicks on Continue button'
             clickOnContinueButton()
         then: 'The Sample Data rows are displayed'
-            at DatascriptDesignerPage
+            at ETLScriptsDesignerPage
             getSampleDataRowsSize() > 1
     }
 
     def "4. Certify that Data is being displayed on the Transformed Data Preview Section"() {
-        testKey = "TM-11071"
         given: 'The user is in Sample Data modal'
-            at DatascriptDesignerPage
-        when: 'The user sets datascript code'
-            setCode getDataScript()
+            at ETLScriptsDesignerPage
+        when: 'The user sets ETLScript code'
+            setCode getETLScript()
         and: 'Clicks on Save button'
             clickOnSaveButton()
         and: 'Clicks on Check Syntax button'

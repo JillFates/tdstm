@@ -1,8 +1,6 @@
-package specs.Datascripts
+package specs.ETLScripts
 
-import pages.Datascripts.CreateDatascriptPage
-import pages.Datascripts.DatascriptDetailsPage
-import pages.Datascripts.DatascriptsPage
+import pages.ETLScripts.*
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -11,7 +9,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
 @Stepwise
-class DatascriptListSpec extends GebReportingSpec{
+class ETLScriptsListSpec extends GebReportingSpec{
 
     def testKey
     static testCount
@@ -29,10 +27,10 @@ class DatascriptListSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        menuModule.goToDatascripts()
-        at DatascriptsPage
+        projectsModule.goToETLScripts()
+        at ETLScriptsPage
         createBtn.click()
-        at CreateDatascriptPage
+        at CreateETLScriptsPage
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.displayed}
@@ -43,7 +41,7 @@ class DatascriptListSpec extends GebReportingSpec{
         datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
-        at DatascriptDetailsPage
+        at ETLScriptsDetailsPage
         clickOnXButton()
     }
 
@@ -57,63 +55,58 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
 
-    def "1. The User finds a datascript already created filtering by name"() {
-        testKey = "TM-11049"
-        given: 'The User is in datascript list page'
-            at DatascriptsPage
+    def "1. The User finds a ETLScripts already created filtering by name"() {
+        given: 'The User is in ETLScripts list page'
+            at ETLScriptsPage
         when: 'The user fill Filter Name'
             filterByName datascriptName
-        then: 'One datascript row should be displayed'
+        then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans Filter Name'
             removeNameFilter()
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
 
-    def "2. The User finds a datascripts filtering by date created"() {
-        testKey = "TM-11049"
-        given: 'The User is in datascript list page'
-            at DatascriptsPage
+    def "2. The User finds a ETLScript filtering by date created"() {
+        given: 'The User is in ETLScript list page'
+            at ETLScriptsPage
         when: 'The user fill Filter Date Create'
             filterByDateCreated datascriptDateCreated
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
 
-    def "3. The User finds a datascript already created filtering by description"() {
-        testKey = "TM-11049"
-        given: 'The User is in datascript list page'
-            at DatascriptsPage
+    def "3. The User finds a ETLScripts already created filtering by description"() {
+        given: 'The User is in ETLScripts list page'
+            at ETLScriptsPage
         when: 'The user fill Filter Description'
             filterByDescription datascriptDescription
-        then: 'One datascript row should be displayed'
+        then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans Filter Description'
             removeDescriptionFilter()
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
 
     def "4. The User play around refreshing the grid"() {
-        testKey = "TM-11049"
-        given: 'The User is in datascript list page'
-            at DatascriptsPage
-        when: 'The user refreshes datascript grid'
+        given: 'The User is in ETLScript list page'
+            at ETLScriptsPage
+        when: 'The user refreshes ETLScripts grid'
             clickOnRefreshIcon()
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
 
-    def "5. The User certifies datascript information is properly displayed"() {
-        testKey = "TM-11049"
-        given: 'The user collects first Datascript information from grid'
+    def "5. The User certifies ETLScripts information is properly displayed"() {
+        given: 'The user collects first ETLScript information from grid'
             firstDSInformation = collectFirstDSInfoDisplayedInGrid()
-        and: 'The user clicks on datascript row'
+        and: 'The user clicks on ETLScript row'
             clickOnFirstGridRow()
-        when: 'Datascript details modal is opened'
-            at DatascriptDetailsPage
-        then: 'Datascript information is properly displayed'
+        when: 'ETLScripts details modal is opened'
+            at ETLScriptsDetailsPage
+        then: 'ETLScripts information is properly displayed'
             getDSProviderLabelText() == firstDSInformation.provider
             getDSNameLabelText() == firstDSInformation.name
             getDSModeLabelText() == firstDSInformation.mode
@@ -121,11 +114,10 @@ class DatascriptListSpec extends GebReportingSpec{
     }
 
     def "6. The user order by Asc/Desc  Name"() {
-        testKey = "TM-11049"
         given: 'The user close the modal'
             clickOnXButton()
-        when: 'The User is in datascript list page'
-            at DatascriptsPage
+        when: 'The User is in ETLScripts list page'
+            at ETLScriptsPage
         then: 'Grid is ordered by asc name'
             isOrderedByName "asc"
         when: 'The User clicks on Name header'
@@ -134,17 +126,16 @@ class DatascriptListSpec extends GebReportingSpec{
             isOrderedByName "desc"
     }
 
-    def "7. The User finds a datascript filtering by different combinations"() {
-        testKey = "TM-11049"
-        given: 'The User is in datascript list page'
-            at DatascriptsPage
+    def "7. The User finds a ETLScripts filtering by different combinations"() {
+        given: 'The User is in ETLScripts list page'
+            at ETLScriptsPage
         when: 'The user fill Filter Name + Date Created already selected'
             filterByName datascriptName
-        then: 'One datascript row should be displayed'
+        then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans adds Filter Description'
             filterByDescription datascriptDescription
-        then: 'One datascript row should be displayed'
+        then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The user removes some filters'
             removeDescriptionFilter()
@@ -152,15 +143,15 @@ class DatascriptListSpec extends GebReportingSpec{
             removeDateCreateFilter()
         and: 'The User cleans adds Filter Provider'
             filterByProvider datascriptProvider
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
         when: 'The User cleans adds Filter Mode'
             filterByMode "Import"
-        then: 'At least one datascript row should be displayed'
+        then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
         when: 'The user fill Filter Name + Date Created already selected'
             filterByName datascriptName
-        then: 'One datascript row should be displayed'
+        then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
     }
 

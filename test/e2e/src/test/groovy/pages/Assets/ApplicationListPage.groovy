@@ -2,6 +2,7 @@ package pages.Assets
 
 import geb.Page
 import modules.CommonsModule
+import modules.AssetsModule
 
 class ApplicationListPage extends Page {
 
@@ -66,6 +67,7 @@ class ApplicationListPage extends Page {
         alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
         alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}
         commonsModule { module CommonsModule }
+        assetsModule { module AssetsModule}
     }
 
     def clickOnCreateButton(){

@@ -633,6 +633,11 @@ var EntityCrud = (function ($) {
 						assetCreateInvoked = false;
 						return false;
 					} else {
+						$angularScope = getCurrentAngularContext();
+						if ($angularScope) {
+							$angularScope.onSubmitAssetTags(resp.data.asset.id);
+						}
+
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
 
 						/*
@@ -643,7 +648,7 @@ var EntityCrud = (function ($) {
 							getRackLayout( $('#selectedRackId').val() );
 						*/
 					}
-					assetCreateInvoked = false
+					assetCreateInvoked = false;
 					$(document).trigger('entityAssetCreated', resp.data);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
@@ -691,6 +696,21 @@ var EntityCrud = (function ($) {
 		return validateOkay;
 
 	}
+
+	/**
+	 * Invoke the angular scope from a non angular section to load the Asset Tags for the View
+	 */
+	pub.loadAssetTags = function(assetId) {
+		// Getting the Context
+		var $angularScope;
+		if (typeof getCurrentAngularContext !== "undefined") {
+			$angularScope = getCurrentAngularContext();
+			if ($angularScope) {
+				// Asset Main Controller
+				$angularScope.loadAssetTags(assetId  || $('#assetId').val());
+			}
+		}
+	};
 
 	// Private variable used to prevent multiple clicks from invoking multiple updates
 	var assetUpdateInvoked = false;
@@ -747,6 +767,8 @@ var EntityCrud = (function ($) {
 			validateOkay = pub.validateDependencies(formName);
 
 		if (validateOkay) {
+			// Verify the
+
 			var formObj = $('#' + formName);
 			if (formObj.length == 0) {
 				alert("Unable to locate form " + formName);
@@ -770,7 +792,11 @@ var EntityCrud = (function ($) {
 				success: function (resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
 					$(document).trigger('entityAssetUpdated', resp.data);
-					//location.reload();  //to reload the whole List View
+					// If Asset get saved properly, save the Asset Tags
+					$angularScope = getCurrentAngularContext();
+					if ($angularScope) {
+						$angularScope.onSubmitAssetTags(resp.data.asset.id);
+					}
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;

@@ -1,8 +1,6 @@
-package specs.Datascripts
+package specs.ETLScripts
 
-import pages.Datascripts.CreateDatascriptPage
-import pages.Datascripts.DatascriptDetailsPage
-import pages.Datascripts.DatascriptsPage
+import pages.ETLScripts.*
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -11,7 +9,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
 @Stepwise
-class DatascriptCreationSpec extends GebReportingSpec{
+class ETLScriptsCreationSpec extends GebReportingSpec{
 
     def testKey
     static testCount
@@ -38,38 +36,35 @@ class DatascriptCreationSpec extends GebReportingSpec{
     }
 
 
-    def "1. The user navigates to the Datascripts Section"() {
-        testKey = "TM-XXXX"
+    def "1. The user navigates to the ETLScripts Section"() {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
-        when: 'The user goes to the Datascripts page'
-            menuModule.goToDatascripts()
+        when: 'The user goes to the ETLScripts page'
+            projectsModule.goToETLScripts()
 
-        then: 'The Datascripts Page loads with no problem'
-            at DatascriptsPage
+        then: 'The ETLScripts Page loads with no problem'
+            at ETLScriptsPage
     }
 
-    def "2. Open the Create Datascripts pop up and close it"() {
-        testKey = "TM-XXXX"
-        given: 'The user is on the Datascript landing page'
-            at DatascriptsPage
-        when: 'The user clicks the Create Datascripts Button'
+    def "2. Open the Create ETLScripts pop up and close it"() {
+        given: 'The user is on the ETLScripts landing page'
+            at ETLScriptsPage
+        when: 'The user clicks the Create ETLScripts Button'
             createBtn.click()
 
         then: 'The pop up loads with no problem and it is closed again'
-            at CreateDatascriptPage
+            at CreateETLScriptsPage
             waitFor{datascriptXIcon.click()}
             commonsModule.waitForDialogModalHidden()
     }
 
-    def "3. Create a Datascript"() {
-        testKey = "TM-XXXX"
-        given: 'The user is on the Datascripts landing page'
-            at DatascriptsPage
-        and: 'Opens the Create Datascript pop up'
+    def "3. Create a ETLScripts"() {
+        given: 'The user is on the ETLScripts landing page'
+            at ETLScriptsPage
+        and: 'Opens the Create ETLScripts pop up'
             waitFor{createBtn.click()}
-            at CreateDatascriptPage
-        when: 'The user fills the necessary data to create a Datascript'
+            at CreateETLScriptsPage
+        when: 'The user fills the necessary data to create a ETLScripts'
             waitFor{providerDropdown.click()}
             //We select the latest provider that was created
             waitFor{latestProvider.click()}
@@ -79,18 +74,17 @@ class DatascriptCreationSpec extends GebReportingSpec{
             waitFor {datascriptSaveBtn.isDisplayed()}
             waitFor {datascriptSaveBtn.click()}
 
-        then: 'The Datascript Detail page is displayed'
-            at DatascriptDetailsPage
+        then: 'The ETLScripts Detail page is displayed'
+            at ETLScriptsDetailsPage
     }
 
-    def "4. Close the detail pop up and search the Datascript"(){
-        testKey = "TM-XXXX"
-        given: 'The user is on the Datascript Detail pop up page after a Datascript was created'
-            at DatascriptDetailsPage
+    def "4. Close the detail pop up and search the ETLScripts"(){
+        given: 'The user is on the ETLScripts Detail pop up page after a ETLScripts was created'
+            at ETLScriptsDetailsPage
         when: 'The user closes the details pop up'
             waitFor{dsDetailXIcon.click()}
-        and: 'The Datascript Page is displayed'
-            at DatascriptsPage
+        and: 'The ETLScripts Page is displayed'
+            at ETLScriptsPage
         and: 'The user clicks the Name filter'
             waitFor {nameFilter.click()}
         and: 'Filters by the DS Name'

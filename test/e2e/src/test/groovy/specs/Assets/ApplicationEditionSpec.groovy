@@ -55,7 +55,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToApplications() }
+        waitFor { assetsModule.goToApplications() }
         at ApplicationListPage
         clickOnCreateButton()
         at ApplicationCreationPage
@@ -78,7 +78,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         given: 'The User displays the Menu Page'
             at MenuPage
         when: 'The User clicks in the Assets > Applications Menu option'
-            menuModule.goToApplications()
+            assetsModule.goToApplications()
 
         then: 'Application list should be displayed'
             at ApplicationListPage

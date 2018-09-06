@@ -107,6 +107,24 @@ class FilesController implements ControllerMethods {
 		String joinQuery=""
 		filePref.each { key, value ->
 			switch(value) {
+				case 'tagAssets':
+					temp += """
+					CONCAT(
+	                    '[',
+	                    if(
+	                        ta.tag_asset_id,
+	                        group_concat(
+	                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+	                        ),
+	                        ''
+	                    ),
+	                    ']'
+	                ) as tagAssets, """
+					joinQuery += """
+						LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+						LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+					"""
+					break
 			case 'moveBundle':
 				temp +="mb.name AS moveBundle,"
 			break
@@ -175,7 +193,7 @@ class FilesController implements ControllerMethods {
 			}
 		}
 
-		query.append(" GROUP BY files_id) AS files ")
+		query.append(" GROUP BY files_id, ac_task.asset_comment_id, ac_comment.asset_comment_id ) AS files ")
 
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)

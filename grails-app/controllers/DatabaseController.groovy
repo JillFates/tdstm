@@ -108,6 +108,24 @@ class DatabaseController implements ControllerMethods {
 		String joinQuery = ''
 		dbPref.each { key, value ->
 			switch(value){
+			case 'tagAssets':
+				temp = """
+				CONCAT(
+                    '[',
+                    if(
+                        ta.tag_asset_id,
+                        group_concat(
+                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+                        ),
+                        ''
+                    ),
+                    ']'
+                ) as tagAssets, """
+				joinQuery += """
+					LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+					LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+				"""
+				break
 			case 'moveBundle':
 				temp += 'mb.name AS moveBundle,'
 				break
@@ -170,7 +188,7 @@ class DatabaseController implements ControllerMethods {
 				query.append(" AND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id IS NULL)")
 			}
 		}
-		query.append(" GROUP BY db_id) AS dbs ")
+		query.append(" GROUP BY db_id, ac_task.asset_comment_id, ac_comment.asset_comment_id) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN ($unknownQuestioned)

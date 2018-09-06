@@ -1,4 +1,4 @@
-<div class="task-detail-component modal fade in tds-ui-modal-decorator" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="task-detail-component modal fade in tds-ui-modal-decorator" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content resizable tds-angular-component-content"
              tds-ui-modal-decorator=""
@@ -264,9 +264,13 @@
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Cancel</span>
+                </button>
+                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete pull-left">
+                    <span  class="glyphicon glyphicon-trash"></span>
+                    <span>Delete</span>
                 </button>
             </div>
         </div>

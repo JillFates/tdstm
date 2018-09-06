@@ -13,7 +13,7 @@ import spock.lang.Ignore
 
 
 @Stepwise
-class AllAssetsSpec extends GebReportingSpec {
+class AllAssetsListSelectAllSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -40,7 +40,7 @@ class AllAssetsSpec extends GebReportingSpec {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The user goes to the All Assets page'
-            menuModule.goToAllAssets()
+            assetsModule.goToAllAssets()
 
         then: 'The All Assets Page loads with no problem'
             at ViewPage
@@ -59,7 +59,7 @@ class AllAssetsSpec extends GebReportingSpec {
             clickOnSelectAllAssets() // click set indeterminate state
             clickOnSelectAllAssets() // click again to uncheck
         then: 'All the items are unchecked again'
-            checkedItems()== false
+            checkedItems(false)== true
 
     }
 

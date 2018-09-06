@@ -67,12 +67,12 @@ class AssetEntityService implements ServiceMethods {
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
-			(AssetClass.APPLICATION): [ 'assetName', 'tagAssets' ],
-			(AssetClass.DATABASE): [ 'assetName', 'tagAssets' ],
+			(AssetClass.APPLICATION): [ 'assetName'],
+			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName', 'tagAssets'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
 			],
-			(AssetClass.STORAGE): [ 'assetName', 'tagAssets' ]
+			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
 
 	// The follow define the various properties that can be used with bindData to assign domain.properties
@@ -1216,28 +1216,11 @@ class AssetEntityService implements ServiceMethods {
 	 * @return list of MoveBundles
 	 */
 	List<Map> getMoveBundles(Project project) {
-		List<Map> resultBundles = []
-		if (project) {
-			// Minimize the amount of information retrieved by limiting the fields to the following list.
-			List<String> properties = [
-				'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
-				'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
-			]
-			// Query for bundles in this project (sorted by name).
-			resultBundles = MoveBundle.createCriteria().list {
-				and {
-					eq('project', project)
-				}
-				projections {
-					properties.each{ String prop ->
-						property(prop, prop)
-					}
-				}
-				order('name')
-				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-			}
-		}
-		return resultBundles
+		List<String> properties = [
+			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+			'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+		]
+		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])
 	}
 
 	/**
@@ -2040,6 +2023,24 @@ class AssetEntityService implements ServiceMethods {
 					case ~/validation|latency|planStatus|moveBundle/:
 						// Handled by the calling routine
 						break
+					case 'tagAssets':
+						query.append("""
+							CONCAT(
+			                    '[',
+			                    if(
+			                        ta.tag_asset_id,
+			                        group_concat(
+			                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+			                        ),
+			                        ''
+			                    ),
+			                    ']'
+			                ) as tagAssets, """)
+						joinQuery.append("""
+								LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+								LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+							""")
+						break
 					case ~/shutdownBy|startupBy|testingBy/:
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
@@ -2573,6 +2574,24 @@ class AssetEntityService implements ServiceMethods {
 
 				case 'validation':
 					break
+				case 'tagAssets':
+					altColumns.append("""
+						, CONCAT(
+		                    '[',
+		                    if(
+		                        ta.tag_asset_id,
+		                        group_concat(
+		                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+		                        ),
+		                        ''
+		                    ),
+		                    ']'
+		                ) as tagAssets""")
+					joinQuery.append("""
+						LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+						LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+						""")
+					break
 				default:
 					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS $value ")
 			}
@@ -2659,7 +2678,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		query.append("\nGROUP BY assetId \n) AS assets")
+		query.append("\nGROUP BY assetId, at.asset_comment_id, ac.asset_comment_id \n) AS assets")
 
 		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
 		def firstWhere = true

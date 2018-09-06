@@ -190,7 +190,7 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
-		query.append('GROUP BY app_id ) AS apps')
+		query.append('GROUP BY app_id, ac_task.asset_comment_id, ac_comment.asset_comment_id ) AS apps')
 
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
@@ -428,10 +428,12 @@ class ApplicationController implements ControllerMethods {
 		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
 		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+		def partyGroupList = partyRelationshipService.getCompaniesList()
 
 		[	applicationInstance: application,
 			availabaleRoles: partyRelationshipService.getStaffingRoles(),
-			personList: personList
+			personList: personList,
+			partyGroupList: partyGroupList
 		] + assetEntityService.getDefaultModelForEdits('Application', project, application, params)
 	}
 

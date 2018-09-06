@@ -541,13 +541,15 @@ class MoveBundleController implements ControllerMethods {
 		int movedAppCount = 0
 		int confirmedAppCount = 0
 		int assignedAppCount = 0
+		int lockedAppCount = 0
 
 		def basicCountsQuery = """SELECT
 				assetClass,
 				COUNT(ae) AS all1,
 				SUM(CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END)  AS allUnassigned2,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END)     AS allMoveded3,
-				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4
+				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4,
+				SUM(CASE WHEN ae.planStatus=:lockedStatus THEN 1 ELSE 0 END) AS allLocked5
 			FROM AssetEntity ae
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)
 			GROUP BY ae.assetClass"""
@@ -557,7 +559,8 @@ class MoveBundleController implements ControllerMethods {
 			moveBundles: moveBundleList,
 			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 			movedStatus: AssetEntityPlanStatus.MOVED,
-			confirmedStatus: AssetEntityPlanStatus.CONFIRMED]
+			confirmedStatus: AssetEntityPlanStatus.CONFIRMED,
+			lockedStatus: AssetEntityPlanStatus.LOCKED]
 
 		def basicCountsResults = AssetEntity.executeQuery(basicCountsQuery, basicCountsParams)
 		basicCountsResults.each { ua ->
@@ -567,7 +570,8 @@ class MoveBundleController implements ControllerMethods {
 					unassignedAppCount = ua[2]
 					assignedAppCount = applicationCount - unassignedAppCount
 					movedAppCount = ua[3]
-					confirmedAppCount = movedAppCount + ua[4]
+					lockedAppCount = ua[5]
+					confirmedAppCount = movedAppCount + ua[4] + lockedAppCount
 					break
 				case AssetClass.DATABASE:
 					unassignedDbCount = ua[2]; break

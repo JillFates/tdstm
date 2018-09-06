@@ -3,6 +3,7 @@ package modules
 import geb.Module
 import geb.waiting.WaitTimeoutException
 import geb.Browser
+import utils.CommonActions
 
 class CommonsModule extends Module {
 
@@ -10,11 +11,18 @@ class CommonsModule extends Module {
         modalDialog {$('div#tdsUiDialog')}
         prompDialog {$('div#tdsUiPrompt')}
         prompDialogButton {prompDialog.find("button")}
-        deleteAlertMessage {prompDialog.find(".box-body p")}
+        confirmationAlertMessage {prompDialog.find(".box-body p")}
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
         loadingIndicator { $('.loading-indicator')}
+        kendoGridPaginationContainer { $('kendo-pager')}
+        kendoGridPaginationButtons { kendoGridPaginationContainer.find("a.k-link")}
+        kendoSelectPaginationOptions { kendoGridPaginationContainer.find("kendo-pager-page-sizes select option")}
+        kendoDropdownList { $("kendo-popup.k-animation-container  kendo-list")}
+        kendoMultiselectTagsListOptions { kendoDropdownList.find("div.asset-tag-selector-single-item")}
+        kendoMultiselectSelectedList { $("#asset-tag-selector-component kendo-taglist li div")}
+        kendoDropdownListOptions { kendoDropdownList.find("li.k-item")}
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -104,12 +112,115 @@ class CommonsModule extends Module {
         waitForPromptModalHidden()
     }
 
-    def getDeleteAlertMessageText(){
-        waitFor{deleteAlertMessage.displayed}
-        deleteAlertMessage.text()
+    def getConfirmationAlertMessageText(){
+        waitFor{confirmationAlertMessage.displayed}
+        confirmationAlertMessage.text()
+    }
+
+    def verifyConfirmationPrompDialogMessage(text){
+        getConfirmationAlertMessageText().contains text
     }
 
     def blockCookbookLoadingIndicator(){
         loadingIndicator.jquery.attr("style", "display: none !important")
+    }
+
+    def clickOnKendoPaginationButtonByText(text){
+        goToElement kendoGridPaginationButtons.find{it.@title.contains(text)}
+        waitFor{kendoGridPaginationButtons.find{it.@title.contains(text)}.click()}
+        waitForLoader 2
+    }
+
+    def goToTargetKendoGridPage(target, timesToClick = 1){
+        def count = 0
+        while (count < timesToClick){
+            count = count + 1
+            clickOnKendoPaginationButtonByText target.toLowerCase()
+        }
+    }
+
+    def goToLastKendoGridPage(){
+        clickOnKendoPaginationButtonByText "last"
+    }
+
+    def goToFirstKendoGridPage(){
+        clickOnKendoPaginationButtonByText "first"
+    }
+
+    def selectRandomPaginationNumber(){
+        goToElement kendoSelectPaginationOptions
+        def option = CommonActions.getRandomOption kendoSelectPaginationOptions
+        option.click()
+        waitForLoader 2
+    }
+
+    def goToElement(element){
+        interact{
+            moveToElement element
+        }
+    }
+
+    def isListOfElements(selector){
+        selector.size() > 1
+    }
+
+    /**
+    * Verifies element is displayed in page or not
+    * @param: selector. Eg: $('div.something')
+    * @author: Sebastian Bigatton
+    */
+    def verifyElementDisplayed(selector){
+        try {
+            waitFor(0.5){element.displayed}
+        } catch (WaitTimeoutException e){
+            false
+        }
+    }
+
+    def clickToOpenKendoDropdownMultiselect(){
+        js.('$(".component-action-open").click()')
+    }
+
+    /**
+     * Selects random tags from common kendo tags multiselect dropdown component in the application
+     * found by given name and quantity or just one if quantity is not specified
+     * or filter by given text returns only 1 selector. Eg: text = QAE2E can return more than one tag
+     * containing that text
+     * @param: text = some text to search into existing tag list name
+     * @param: numberOfTagsToBeSelected = number of tags to select, default 1 if not set
+     * @author: Sebastian Bigatton
+     */
+    def selectRandomKendoMultiselectTagOptionByText(text, numberOfTagsToBeSelected = 1){
+        clickToOpenKendoDropdownMultiselect()
+        def options = waitFor{kendoMultiselectTagsListOptions.findAll {it.text().contains(text)}}
+        def option
+        if (options && numberOfTagsToBeSelected > 1){ // select random from filtered options by given text and quantity
+            option = CommonActions.getRandomOptions options, numberOfTagsToBeSelected
+        } else { // select any from filtered options by given text
+            option = CommonActions.getRandomOption options
+        }
+        option.click()
+    }
+
+    /**
+     * Returns a list of tag names (1..n tags) from common kendo tags list component displayed
+     * in the application.
+     * @author: Sebastian Bigatton
+     */
+    def getSelectedTagsFromKendoMultiselect(){
+        def selectedTagsList = []
+        if (isListOfElements(kendoMultiselectSelectedList)){ // add every element text displayed
+            kendoMultiselectSelectedList.each {
+                selectedTagsList.add it.text.trim()
+            }
+        } else { // add the only element text displayed
+            selectedTagsList.add kendoMultiselectSelectedList.text().trim()
+        }
+        selectedTagsList
+    }
+
+    def selectKendoDropdownOptionByText(text){
+        def option = waitFor{kendoDropdownListOptions.find {it.text().contains(text)}}
+        option.click()
     }
 }

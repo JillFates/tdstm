@@ -1,32 +1,133 @@
-<div class="modal fade in" id="add-person-component" data-backdrop="static" tabindex="0" role="dialog">
+<div class="modal fade in add-person-component" id="add-person-component" data-backdrop="static" tabindex="0" role="dialog">
     <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content resizable" [style.width.px]="500">
+        <div class="modal-content">
             <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Information</h4>
+                <h4 class="modal-title">Create Person</h4>
             </div>
             <div class="modal-body">
                 <div class="modal-body-container">
                     <form name="addPersonForm" role="form" data-toggle="validator" #addPersonForm='ngForm' class="form-horizontal left-alignment">
                         <div class="box-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <textarea rows="15" class="form-control"></textarea>
-                                    </div>
+	                        <div class="form-group">
+		                        <div class="col-md-12 mandatory">Fields marked ( * ) are mandatory</div>
+	                        </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Company:</div>
+                                <div class="col-md-9">
+	                                <kendo-dropdownlist name="company"
+	                                                    [data]="personModel.companies"
+	                                                    [textField]="'name'"
+	                                                    [valueField]="'id'"
+	                                                    [(ngModel)]="personModel.company"
+	                                                    class="form-control">
+	                                </kendo-dropdownlist>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3 required-field">First Name:</div>
+                                <div class="col-md-9"><input type="text"  [(ngModel)]="personModel.firstName" name="firstName"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Middle Name:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.middleName" name="middleName"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Last Name:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.lastName" name="lastName"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Nick Name:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.nickName" name="nickName"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Title:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.title" name="title"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Staff type:</div>
+                                <div class="col-md-9">
+	                                <kendo-dropdownlist
+			                                name="staffType"
+			                                [(ngModel)]="personModel.staffTypeId"
+			                                [data]="personModel.staffType">
+	                                </kendo-dropdownlist>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Email:</div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('email')" [(ngModel)]="personModel.email" name="email">
+	                                <p *ngIf="errors && errors.email" class="error-msg">{{errors.email}}</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3 required-field">Active:</div>
+                                <div class="col-md-9">
+	                                <kendo-dropdownlist
+			                                name="active"
+			                                [(ngModel)]="personModel.active"
+			                                [data]="yesNoList">
+	                                </kendo-dropdownlist>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Department:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.department" name="department"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Location:</div>
+                                <div class="col-md-9"><input type="text" [(ngModel)]="personModel.location" name="location"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Work Phone:</div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('workPhone')"  [(ngModel)]="personModel.workPhone" name="workPhone">
+	                                <p *ngIf="errors && errors.workPhone" class="error-msg">{{errors.workPhone}}</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Mobile Phone:</div>
+                                <div class="col-md-9">
+	                                <input type="text" (keyup)="resetFieldError('mobilePhone')" [(ngModel)]="personModel.mobilePhone" name="mobilePhone">
+	                                <p *ngIf="errors && errors.mobilePhone" class="error-msg">{{errors.mobilePhone}}</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">Team:</div>
+                                <div class="col-md-9">
+	                                <div *ngFor="let team of teams;let index=index;trackBy:trackByIndex" class="teams">
+		                                <kendo-dropdownlist
+				                                name="active"
+				                                [value]="teams[index].team"
+				                                (valueChange)="onTeamSelected($event, index)"
+				                                [textField]="'description'"
+				                                [valueField]="'id'"
+				                                [data]="teams[index].data">
+		                                </kendo-dropdownlist>
+		                                <span class="glyphicon glyphicon-remove remove-team component-action-remove-team" (click)="removeTeam(index)"></span>
+	                                </div>
+
+                                </div>
+                            </div>
+	                        <div class="form-group">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-9"><button (click)="addTeam()" class="component-action-add-team">Add Team</button></div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <button type="button" class="btn btn-primary pull-left"><span
+                <button type="button"
+                        [disabled]="!canSave()"
+                        class="btn btn-primary pull-left component-action-save" (click)="save()"><span
                         class="fa fa-fw fa-floppy-o"></span> Save
                 </button>
-                <button type="button" class="btn btn-default pull-right">
+                <button type="button"
+                        class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Cancel</span>
                 </button>

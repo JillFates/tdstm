@@ -90,6 +90,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
+	static Integer MINUTES_CONSIDERED_TARDY = 300
+	static Integer MINUTES_CONSIDERED_LATE = 600
 
 	// This is a has table that sets what status from/to are available
 	private static final Map statusOptionForRole = [
@@ -1403,6 +1405,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def dueClass
 		def estStartClass
 		def estFinishClass
+		def updatedClass
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
@@ -1414,21 +1417,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
+
 			// clear out the CSS classes for overDue
 			dueClass = ''
-
-			if (it.estFinish) {
-				elapsed = TimeUtil.elapsed(it.estFinish, nowGMT)
-				elapsedSec = elapsed.toMilliseconds() / 1000
-				if (elapsedSec > 300) {
-					dueClass = 'task_overdue'
-				}
+			if (it.dueDate && it.dueDate < nowGMT) {
+				dueClass = 'task_overdue'
+			}
+			if (it.estFinish < nowGMT) {
+				Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
+				estStartClass = estimatedColumnsCSS['estStartClass']
+				estFinishClass = estimatedColumnsCSS['estFinishClass']
 			}
 
-			Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
-
-			estStartClass = estimatedColumnsCSS['estStartClass']
-			estFinishClass = estimatedColumnsCSS['estFinishClass']
 
 			String dueDate = TimeUtil.formatDate(it.dueDate)
 
@@ -1436,6 +1437,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			Date due = it.dueDate?.clearTime()
 
 			// Highlight Due Date column for tardy and late tasks
+
 			if (it.dueDate && it.isActionable()) {
 				if (due > today) {
 					dueClass = ''
@@ -1495,7 +1497,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					instructionsLinkURL, // 18
 					estStartClass,	// 19
 					estFinishClass,	// 20
-					it.isPublished // 21
+					it.isPublished, // 21
+					updatedClass // 22
 			],
 			  id:it.id
 			]
@@ -2607,17 +2610,30 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	/**
 	 * Sets Import preferences.(ImportApplication,ImportServer,ImportDatabase, ImportStorage,ImportRoom,ImportRack,ImportDependency)
+	 *
 	 * @param preference
 	 * @param value
 	 */
 	@HasPermission(Permission.AssetImport)
-	def setImportPerferences() {
-		def key = params.preference
-		def value = params.value
-		if (value) {
-			userPreferenceService.setPreference(key, value)
-			session.setAttribute(key,value)
+	def setImportPreferences() {
+		Map preferencesMap
+
+		if (request.format == "json") {
+			preferencesMap = request.JSON
+
+		} else {
+			preferencesMap = [:]
+			def key = params.preference
+			def value = params.value
+			if (value) {
+				preferencesMap[key] = value
+			}
 		}
+
+		preferencesMap.each { key, value ->
+			userPreferenceService.setPreference(key, value)
+		}
+
 		render true
 	}
 
@@ -3559,7 +3575,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 *
 	 * @param task : The task.
 	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
-	 * @param nowGMT : The actual time in GMT.
+	 * @param nowGMT : The actual time in GMT timezone.
 	 * @return : A Map with estStartClass and estFinishClass
 	 * @todo: refactor getEstimatedColumnsCSS into a service and create test cases
 	 */
@@ -3613,6 +3629,36 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
 	}
+
+    /**
+     * Returns a String with the updated column CSS class name, according to
+     * the relation between now and a particular amount of time (elapsedSec = current time - statusUpdate).
+     * If a task estimate value is not late or tardy, it returns an empty string for the class name.
+     * For more information see TM-11565.
+     *
+     * @param  task : The task.
+     * @param  elapsedSec : The elapsed time in milliseconds (elapsedSec = current time - statusUpdate).
+     * @return  A String with updateClass.
+     */
+    private String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
+
+        String updatedClass = ''
+		if (task.status == AssetCommentStatus.READY) {
+			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
+				updatedClass = 'task_late'
+			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
+				updatedClass = 'task_tardy'
+			}
+		} else if (task.status == AssetCommentStatus.STARTED) {
+			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
+			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
+				updatedClass='task_late'
+			} else if (dueInSecs >= MINUTES_CONSIDERED_TARDY) {
+				updatedClass='task_tardy'
+			}
+		}
+        return updatedClass
+    }
 
 
 	/**
