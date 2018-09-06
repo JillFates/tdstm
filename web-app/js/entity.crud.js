@@ -1896,25 +1896,44 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
 		$('#assetsTypeId').val(assetType);
+		$('#assetVal').val(assetArr);
 
-		for (var x = 0; x < assetArr.size(); x++) {
-			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
-		}
+		recompileDOM('tmAssignmentTagSelector');
 
-		// TODO Jorge add tagIds...
 		$('#moveBundleSelectId').dialog('open')
 	}
 }
 function submitMoveForm() {
-	jQuery.ajax({
+
+	// Partially Remove Prototype
+	if(window.Prototype) {
+		delete Object.prototype.toJSON;
+		delete Array.prototype.toJSON;
+		delete Hash.prototype.toJSON;
+		delete String.prototype.toJSON;
+	}
+
+	var postData = {
+		assetType: $('#assetTypeId').val(),
+		bundleSession: $('#bundleSession').val(),
+		moveBundle: $('#plannedMoveBundleList').val(),
+		planStatus: $('#plannedStatus').val(),
+		bundles: $('#planningBundle').val(),
+		assets: $('#assetVal').val(),
+		tagsIds: getTagsIds($('#tmAssignmentTagSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
+	};
+
+	$.ajax({
+		type: "POST",
+		data: JSON.stringify(postData),
+		contentType : 'application/json; charset=utf-8',
+		dataType : "JSON",
 		url: $('#changeBundle').attr('action'),
-		data: $('#changeBundle').serialize(),
-		type: 'POST',
-		success: function (data) {
+		complete: function (jqXHR) {
 			$('#moveBundleSelectId').dialog("close")
-			$('#items1').html(data);
-			$('#allBundles').attr('checked', 'false')
-			$('#planningBundle').attr('checked', 'true')
+			$('#items1').html(jqXHR.responseText);
+			$('#allBundles').attr('checked', 'false');
+			$('#planningBundle').attr('checked', 'true');
 			$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 		}
 	});

@@ -120,13 +120,19 @@
 
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
 				<g:form name="changeBundle" action="assetsAssignment" >
-
+                    <input type="hidden" name="assetVal" id="assetVal" />
 					<input type="hidden" name="assetType" id="assetsTypeId"  />
 					<input type="hidden" name="bundleSession" id="bundleSession" />
 					<table style="border: 0px;">
 						<tr>
 							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
 						</tr>
+                        <tr>
+                            <td>
+                                <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
+                                <tm-asset-tag-selector ng-init="assetSelector.tag = ${session.SELECTED_TAG_IDS ?: [] as grails.converters.JSON}" hide-operator="true" id="tmAssignmentTagSelector" pre-asset-selector="assetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+                            </td>
+                        </tr>
 						<tr>
 							<td>
 								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
