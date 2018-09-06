@@ -2678,7 +2678,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		query.append("\nGROUP BY assetId \n) AS assets")
+		query.append("\nGROUP BY assetId, at.asset_comment_id, ac.asset_comment_id \n) AS assets")
 
 		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
 		def firstWhere = true
