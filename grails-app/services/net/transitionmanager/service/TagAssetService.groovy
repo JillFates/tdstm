@@ -165,6 +165,10 @@ class TagAssetService implements ServiceMethods {
 	 * @param tagIds the ids to validate.
 	 */
 	void validateBulkValues(Project currentProject, List<Long> tagIds) {
+		if(!tagIds){
+			return
+		}
+
 		int tagCount = Tag.where {id in tagIds && project == currentProject}.count()
 
 		if(tagCount != tagIds.size()){
@@ -181,6 +185,10 @@ class TagAssetService implements ServiceMethods {
 	 * from the filtering in the frontend.
 	 */
 	void bulkAdd(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		if(!tagIds){
+			return
+		}
+
 		String queryForAssetIds
 		Map params = [:]
 

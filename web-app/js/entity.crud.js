@@ -1898,12 +1898,14 @@ function selectAll() {
 		isFirst = true;
 	}
 }
-function changeMoveBundle(assetType, totalAsset, assignBundle) {
+function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 	if (!assignBundle) {
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
+
 	var assetArr = new Array();
 	var j = 0;
+
 	for (i = 0; i < totalAsset.size(); i++) {
 		if ($('#checkId_' + totalAsset[i]) != null) {
 			var booCheck = $('#checkId_' + totalAsset[i]).is(':checked');
@@ -1912,13 +1914,20 @@ function changeMoveBundle(assetType, totalAsset, assignBundle) {
 				j++;
 			}
 		}
-	} if (j == 0) {
+	}
+
+	if (j == 0) {
 		alert('Please select the Asset');
 	} else {
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
-		$('#assetsTypeId').val(assetType)
-		$('#assetVal').val(assetArr);
+		$('#assetsTypeId').val(assetType);
+
+		for (var x = 0; x < assetArr.size(); x++) {
+			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
+		}
+
+		// TODO Jorge add tagIds...
 		$('#moveBundleSelectId').dialog('open')
 	}
 }

@@ -118,9 +118,8 @@
 			<div style="clear: both;"></div>
 
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
-				<g:form name="changeBundle" action="saveAssetsToBundle" >
+				<g:form name="changeBundle" action="assetsAssignment" >
 
-					<input type="hidden" name="assetVal" id="assetVal" />
 					<input type="hidden" name="assetType" id="assetsTypeId"  />
 					<input type="hidden" name="bundleSession" id="bundleSession" />
 					<table style="border: 0px;">
