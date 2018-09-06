@@ -399,6 +399,98 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void "test exception when [with] keyword is not found"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' load 'id'
+							find Application by 'id' into 'id' // <-- Missing with keyword
+						}
+						""".stripIndent())
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'find/elseFind statement is missing required [with] keyword at line 7'
+				startLine == 7
+				endLine == 7
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void "test exception when [with, into] keywords are not found"(){
 
 		given:
