@@ -1927,20 +1927,27 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
 		}
 
-		// TODO Jorge add tagIds...
+		var objDom = $('[ng-app]');
+		var injector = angular.element(objDom).injector();
+		injector.invoke(function ($rootScope, commentUtils) {
+			$rootScope.$broadcast('sessionAssignmentTagSelector', tagIds);
+			recompileDOM('tmAssignmentTagSelector');
+		});
+
 		$('#moveBundleSelectId').dialog('open')
 	}
 }
 function submitMoveForm() {
-	jQuery.ajax({
-		url: $('#changeBundle').attr('action'),
+
+	$.ajax({
+		type: "POST",
 		data: $('#changeBundle').serialize(),
-		type: 'POST',
-		success: function (data) {
+		url: $('#changeBundle').attr('action'),
+		complete: function (jqXHR) {
 			$('#moveBundleSelectId').dialog("close")
-			$('#items1').html(data);
-			$('#allBundles').attr('checked', 'false')
-			$('#planningBundle').attr('checked', 'true')
+			$('#items1').html(jqXHR.responseText);
+			$('#allBundles').attr('checked', 'false');
+			$('#planningBundle').attr('checked', 'true');
 			$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 		}
 	});
