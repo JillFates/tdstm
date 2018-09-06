@@ -183,6 +183,7 @@ class ViewPage extends Page{
     }
 
     def checkedItems(checked = true){
+        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
         allItemsCheckbox.each{
             assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }

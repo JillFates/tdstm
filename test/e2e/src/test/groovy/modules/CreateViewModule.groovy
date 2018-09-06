@@ -56,8 +56,8 @@ class CreateViewModule extends Module {
     }
 
     def clickSpecificCheckbox(String name){
-        def nameChk = waitFor{$("label", text: name)}
-        nameChk.click()
+        commonsModule.goToElement firstPreviewFilter
+        waitFor{$("label", text: name).click()}
     }
 
     def clickOnCloseViewEdition(){
