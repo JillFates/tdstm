@@ -8,6 +8,9 @@
  */
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.RandomStringUtils
 
 import com.tds.asset.Application
@@ -19,6 +22,7 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.springframework.jdbc.core.JdbcTemplate
 
 class AssetTestHelper {
 	DeviceService deviceService
@@ -84,37 +88,46 @@ class AssetTestHelper {
 	public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
 		 /* Most the values in this map replicate what the front-end sends to the
 		 back-end when creating a device. */
-		 Map defaultValues = [
-		 		assetName: RandomStringUtils.randomAlphabetic(15),
-				currentAssetType: assetType,
-				moveBundle: project.projectDefaultBundle,
-				"moveBundle.id": params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
-				roomSourceId: "-1",
-				locationSource: "TBD",
-				roomSource: "",
-				roomTargetId: "-1",
-				locationTarget: "TBD",
-				roomTarget: "",
-				rackSourceId: "-1",
-				rackSource: "",
-				newRackSourceId: "-1",
-				rackTargetId: "-1",
-				rackTarget: "",
-				newRackTargetId: "-1",
-				sourceChassis: "0",
-				targetChassis: "0",
-				sourceRackPosition: "",
-				targetRackPosition: "",
-				sourceBladePosition: "",
-				targetBladePosition: "",
+		Map defaultValues = [
+			assetName          : RandomStringUtils.randomAlphabetic(15),
+			currentAssetType   : assetType,
+			moveBundle         : project.projectDefaultBundle,
+			"moveBundle.id"    : params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
+			roomSourceId       : "-1",
+			locationSource     : "TBD",
+			roomSource         : "",
+			roomTargetId       : "-1",
+			locationTarget     : "TBD",
+			roomTarget         : "",
+			rackSourceId       : "-1",
+			rackSource         : "",
+			newRackSourceId    : "-1",
+			rackTargetId       : "-1",
+			rackTarget         : "",
+			newRackTargetId    : "-1",
+			sourceChassis      : null,
+			targetChassis      : null,
+			sourceRackPosition : "",
+			targetRackPosition : "",
+			sourceBladePosition: "",
+			targetBladePosition: "",
+			project            : project,
+			owner              : project.client,
+			assetClass         : AssetClass.DEVICE,
 
-		 ]
+		]
+
 		 defaultValues.each{ key, val->
 			 if(!params.containsKey(key)) {
 				 params[key] = val
 			 }
 		 }
-		return deviceService.saveAssetFromForm(project, params)
+		AssetEntity asset = new AssetEntity(params)
+		asset.customDomainService = new CustomDomainService()
+		asset.customDomainService.settingService = new SettingService()
+		asset.customDomainService.jdbcTemplate = new JdbcTemplate()
+
+		return asset.save(flush: true, failOnError: true)
 	 }
 
 }
