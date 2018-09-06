@@ -287,6 +287,15 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		assetSelector:{}
 	};
 
+	scope.assignments = {
+		assetSelector:{}
+	};
+
+	scope.$on('sessionAssignmentTagSelector', function (evt, tagIds) {
+		scope.assignments.preAssetSelector = {
+			tag: tagIds
+		}
+	});
 
 	scope.onDependencyAnalyzerTagSelectionChange = function () {
 		if (scope.internal.assetSelector.tag.length >= 1) {

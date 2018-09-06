@@ -78,7 +78,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         then:'Delete confirmation modal is displayed'
             commonsModule.waitForPromptModalDisplayed()
         and: 'The user verifies delete message displayed'
-            commonsModule.getDeleteAlertMessageText() == deleteMessage
+            commonsModule.getConfirmationAlertMessageText() == deleteMessage
     }
 
     def "3. The user clicks on No button and provider is not deleted"() {
@@ -145,7 +145,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         then:'Delete confirmation modal is displayed'
             commonsModule.waitForPromptModalDisplayed()
         and: 'The user verifies delete message displayed'
-            commonsModule.getDeleteAlertMessageText() == deleteMessage
+            commonsModule.getConfirmationAlertMessageText() == deleteMessage
     }
 
     def "9. The user clicks on No and second provider is not deleted"() {

@@ -188,7 +188,7 @@ class DatabaseController implements ControllerMethods {
 				query.append(" AND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id IS NULL)")
 			}
 		}
-		query.append(" GROUP BY db_id) AS dbs ")
+		query.append(" GROUP BY db_id, ac_task.asset_comment_id, ac_comment.asset_comment_id) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN ($unknownQuestioned)

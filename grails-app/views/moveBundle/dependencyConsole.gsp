@@ -118,15 +118,19 @@
 			<div style="clear: both;"></div>
 
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
-				<g:form name="changeBundle" action="saveAssetsToBundle" >
-
-					<input type="hidden" name="assetVal" id="assetVal" />
+				<g:form name="changeBundle" action="assetsAssignment" >
 					<input type="hidden" name="assetType" id="assetsTypeId"  />
 					<input type="hidden" name="bundleSession" id="bundleSession" />
 					<table style="border: 0px;">
 						<tr>
 							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
 						</tr>
+                        <tr>
+                            <td>
+                                <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
+                                <tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+                            </td>
+                        </tr>
 						<tr>
 							<td>
 								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
