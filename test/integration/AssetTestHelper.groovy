@@ -46,7 +46,7 @@ class AssetTestHelper {
 	 * @param person - the person to be referenced
 	 * @return the newly created Application
 	 */
-	 Application createApplication(Person person, Project project) {
+	Application createApplication(Person person, Project project) {
 		String pRef = person.id.toString()
 		Application app = new Application(
 			assetName: RandomStringUtils.randomAlphabetic(15),
@@ -60,9 +60,13 @@ class AssetTestHelper {
 			testingBy: pRef,
 			moveBundle: project.projectDefaultBundle
 		)
-		app.moveBundle = project.getDefaultBundle()
 
-		if (! app.save(flush:true) ) {
+		app.moveBundle = project.getDefaultBundle()
+		app.customDomainService = new CustomDomainService()
+		app.customDomainService.settingService = new SettingService()
+		app.customDomainService.jdbcTemplate = new JdbcTemplate()
+
+		if (!app.save(flush: true)) {
 			throw new RuntimeException("createApplication() failed because " + GormUtil.allErrorsString(app))
 		}
 
