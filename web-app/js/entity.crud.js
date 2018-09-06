@@ -1927,7 +1927,12 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
 		}
 
-		recompileDOM('tmAssignmentTagSelector');
+		var objDom = $('[ng-app]');
+		var injector = angular.element(objDom).injector();
+		injector.invoke(function ($rootScope, commentUtils) {
+			$rootScope.$broadcast('sessionAssignmentTagSelector', tagIds);
+			recompileDOM('tmAssignmentTagSelector');
+		});
 
 		$('#moveBundleSelectId').dialog('open')
 	}
