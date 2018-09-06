@@ -61,25 +61,33 @@
 
     .filters-section
       justify-content: flex-end
+      padding-right: 8px
+      .component-action-reload
+        margin-left: 12px
+        cursor: pointer
 
     .bulkchange-section
+      padding-left: 8px
       .just-planning
         margin-left: 12px
+        display: flex
+        align-items: center
         input
-          margin-left: 0
           position: relative
-          margin-top: -1px
+          margin: unset
+          cursor: pointer
         label
-          margin-top: -2px
-          position: absolute
-          padding-left: 2px
+          min-height: unset
+          padding-left: unset
           font-weight: normal
+          margin-bottom: unset
       .selected-assets
-        margin-left: 10px
+        margin-left: 12px
         display: flex
         align-items: baseline
         label
           font-weight: normal
+          margin-bottom: unset
         .badge-light
           background-color: #fff
           color: #777

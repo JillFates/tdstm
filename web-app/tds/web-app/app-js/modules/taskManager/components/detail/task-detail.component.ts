@@ -177,4 +177,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected cancelCloseDialog(): void {
 		this.dismiss();
 	}
+	/**
+	 * Prompt confirm delete a task
+	 * delegate operation to host component
+	 */
+	deleteTask(): void {
+		this.promptService.open(
+			'Confirmation Required',
+			'Confirm deletion of this task. There is no undo for this action',
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.close({id: this.taskDetailModel, isDeleted: true})
+			}
+		});
+
+	}
 }

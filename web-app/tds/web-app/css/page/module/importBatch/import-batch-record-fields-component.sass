@@ -51,6 +51,10 @@ import-batch-record-fields
       .k-grid-table
         td
           padding-left: $grid-left-padding
+        i.field-info-icon
+          cursor: pointer
+          font-size: 17px
+          margin-right: 5px
         .import-value
           padding-left: 2px
           .import-value-input
@@ -58,10 +62,7 @@ import-batch-record-fields
             width: 95%
             height: inherit
             // margin-left: 5px
-          i
-            visibility: hidden
           i.has-init-value
-            visibility: visible
             cursor: pointer
           .import-item-container
             display: flex
@@ -75,3 +76,48 @@ import-batch-record-fields
 
       button
         margin-right: 5px
+
+
+$popup-label-font-size: 13px
+$popup-kendo-grid-max-height: 200px
+.fields-info-popup
+  .popup-content
+    border: 1px solid #656565
+    .popup-header
+      padding: 5px 3px 0px 10px
+      background-color: #5f9fcf
+      display: inline-block
+      width: 100%
+      label
+        float: left
+        display: inline
+        padding-right: 0
+        color: #ffffff
+      i
+        float: right
+        cursor: pointer
+        font-size: smaller
+        color: #ffffff
+        display: inline
+        margin-top: 5px
+        margin-right:  5px
+    .popup-body
+      padding: 10px 15px 15px 15px
+      .find-field-info
+        kendo-grid
+          width: 400px
+          max-height: $popup-kendo-grid-max-height
+          .domain-group-header
+            width: 50%
+        .footer-results
+          margin-top: 5px
+          label
+            font-size: $popup-label-font-size
+          .badge
+            margin-right: 2px
+      .create-update-field-info
+        label
+          font-size: $popup-label-font-size
+        kendo-grid
+          width: 300px
+          max-height: $popup-kendo-grid-max-height

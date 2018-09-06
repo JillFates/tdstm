@@ -4,6 +4,7 @@ import geb.Page
 import modules.CommonsModule
 import modules.CreateViewModule
 import utils.CommonActions
+import modules.AssetsModule
 
 class ViewPage extends Page{
 
@@ -21,6 +22,7 @@ class ViewPage extends Page{
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
         commonsModule { module CommonsModule }
+        assetsModule { module AssetsModule }
         createViewModule {module CreateViewModule}
         viewMgrBreadCrumb {$('a.font-weight-bold')}
         //starOn {$("fa text-yellow fa-star")}
