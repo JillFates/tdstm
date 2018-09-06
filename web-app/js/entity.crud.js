@@ -1922,7 +1922,10 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
 		$('#assetsTypeId').val(assetType);
-		$('#assetVal').val(assetArr);
+
+		for (var x = 0; x < assetArr.size(); x++) {
+			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
+		}
 
 		recompileDOM('tmAssignmentTagSelector');
 
@@ -1931,27 +1934,9 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 }
 function submitMoveForm() {
 
-	// Partially Remove Prototype
-	if(window.Prototype) {
-		delete Object.prototype.toJSON;
-		delete Array.prototype.toJSON;
-		delete Hash.prototype.toJSON;
-		delete String.prototype.toJSON;
-	}
-
-	var postData = {
-		assetType: $('#assetTypeId').val(),
-		bundleSession: $('#bundleSession').val(),
-		moveBundle: $('#plannedMoveBundleList').val(),
-		planStatus: $('#plannedStatus').val(),
-		bundles: $('#planningBundle').val(),
-		assets: $('#assetVal').val(),
-		tagsIds: getTagsIds($('#tmAssignmentTagSelector').find("#asset-tag-selector").data("kendoMultiSelect").dataItems()),
-	};
-
 	$.ajax({
 		type: "POST",
-		data: postData,
+		data: $('#changeBundle').serialize(),
 		url: $('#changeBundle').attr('action'),
 		complete: function (jqXHR) {
 			$('#moveBundleSelectId').dialog("close")
