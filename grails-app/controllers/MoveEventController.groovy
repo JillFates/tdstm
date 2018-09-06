@@ -202,6 +202,8 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventEdit)
 	def update() {
+		CreateEventCommand event = populateCommandObject(CreateEventCommand)
+
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
 			flash.message = "MoveEvent not found with id $params.id"
@@ -209,13 +211,7 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		//If we have a Date we need to fetch it using the TimeUtil
-		if (params.estStartTime) {
-			//if is Null we reassign the old value to show the original error
-			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
-		}
-
-		moveEvent.properties = params
+		moveEvent.properties = event
 
 		if (!moveEvent.hasErrors() && moveEvent.save()) {
 			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues('moveBundle') as List)
