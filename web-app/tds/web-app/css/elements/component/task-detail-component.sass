@@ -1,8 +1,12 @@
 .task-detail-component
+  .tds-angular-component-content
+    .successor-predecessor-table
+      max-height: 200px
   .modal-content
-    min-height: 679px
+    min-height: 760px
     min-width: 769px
-    display: inline-block
+    @-moz-document url-prefix()
+      display: inline-block
     .modal-body
       height: 86%
       .task-layout
@@ -20,6 +24,7 @@
           .k-grid
             position: relative
             min-height: 100%
+            max-height: 150px;
       .no-grow-container
         flex: 0
         .task-details
@@ -42,3 +47,6 @@
       padding: 4px 9px
       i
         padding-right: 0px
+
+.task-detail-component.tds-ui-modal-decorator
+  overflow-y: auto!important
