@@ -19,9 +19,6 @@ declare var jQuery: any;
 	template: `
         <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
             style="overflow-y: auto" role="dialog">
-            <!-- Adding overflow-y as style so it has the highest precedence and cannot be removed by multiple modal hide events --> 
-            <!-- otherwise scrollbar is removed closing nested modal windows, -->
-            <!-- this is causing in small screens the view become unmanagable-->
             <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
                 <div class="modal-content">
                     <div #view></div>
