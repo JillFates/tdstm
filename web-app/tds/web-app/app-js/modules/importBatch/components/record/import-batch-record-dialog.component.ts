@@ -58,7 +58,6 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 	 * On Fields Values updated successfully.
 	 */
 	private onBatchRecordUpdated($event): void {
-		// TODO : The import-batch-record-fields.component batchRecord is NOT seeing this change (should merge instead of assignment)
 		this.batchRecord = $event.batchRecord;
 	}
 

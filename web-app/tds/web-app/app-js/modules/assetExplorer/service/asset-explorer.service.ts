@@ -162,7 +162,7 @@ export class AssetExplorerService {
 	 * @param {string[]} ids
 	 * @returns {Observable<any>}
 	 */
-	deleteAssetComment(ids: number[]): Observable<any> {
+	deleteAssetComment(ids: number|string[]): Observable<any> {
 		return this.http.post(`${this.assetEntitySearch}/deleteComment`, JSON.stringify({ids: ids}))
 			.map((res: Response) => {
 				let result = res.json();

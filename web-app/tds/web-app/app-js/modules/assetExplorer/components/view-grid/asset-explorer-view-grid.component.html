@@ -14,18 +14,20 @@
 				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
 			</div>
 			<div class="checkbox just-planning">
-				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning">
+				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
+				       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
 				<label>Just Planning</label>
 			</div>
 		</div>
 	    <div class="col-sm-6 filters-section">
-		    <div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload component-action-reload">
-			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		    </div>
-		    <div class="kendo-grid-toolbar__refresh-btn btnClear">
-			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear" [disabled]="!hasFilterApplied()"
+		    <div>
+			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear"
+			            [disabled]="!hasFilterApplied()"
 			            (click)="onClearFilters()">
 				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+		    </div>
+		    <div (click)="onReload()" class="component-action-reload">
+			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 		    </div>
 	    </div>
 	</ng-template>

@@ -29,7 +29,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
         login()
         at MenuPage
 
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
         at AssetViewsPage
         /**
          * The existence of at least 11 views is a precondition to
@@ -49,7 +49,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
                 at SaveViewPage
                 waitFor { enterName(randStr) }
                 waitFor { clickSave() }
-                waitFor { menuModule.goToAssetViewManager() }
+                waitFor { assetsModule.goToAssetViewManager() }
                 at AssetViewsPage
                 i++
             }

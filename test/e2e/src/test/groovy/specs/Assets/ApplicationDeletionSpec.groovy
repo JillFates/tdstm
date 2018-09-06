@@ -33,7 +33,7 @@ class ApplicationDeletionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToApplications() }
+        waitFor { assetsModule.goToApplications() }
         at ApplicationListPage
         clickOnCreateButton()
         at ApplicationCreationPage
@@ -52,18 +52,16 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "1. The User Navigates in the Assets Application List Section"() {
-        testKey = "TM-XXXX"
         given: 'The User searches in the menu page\''
             at MenuPage
         when: 'The User clicks in the Assets > Applications Menu option'
-            menuModule.goToApplications()
+            assetsModule.goToApplications()
 
         then: 'Application List should be displayed'
             at ApplicationListPage
     }
 
     def "2. Filters out by Applications and gets the First occurrence"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User Click in The Filter Name Column'
@@ -83,7 +81,6 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "3. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application Details Page'
             at ApplicationDetailsPage
         when: 'The User clicks the "Edit" Button'
@@ -99,7 +96,6 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "4. Filter Applications on the List by using the App name"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User searches by the App Name'
@@ -112,7 +108,6 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "5. Opens up The Edit Application Modal Window By using the Edit Icon"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User clicks on the "Edit" Button right on the left'
@@ -125,7 +120,6 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "6. Delete the Application already displayed "() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application Edition Section'
             at ApplicationEditionPage
         when: 'The User Deletes the Application'
@@ -136,7 +130,6 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     }
 
     def "7. Validating the Application is not on the List"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
         when: 'The User searches by the App already deleted'

@@ -30,8 +30,9 @@ class ETLBinding extends Binding {
     @Override
     Object getVariable (String name) {
 
-        if (variables == null)
-            throw new MissingPropertyException(name, this.getClass())
+        if (variables == null) {
+	        throw new MissingPropertyException(name, this.getClass())
+        }
 
         Object result = variables.get(name)
 

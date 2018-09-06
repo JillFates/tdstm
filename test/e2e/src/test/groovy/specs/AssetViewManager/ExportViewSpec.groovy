@@ -24,7 +24,7 @@ class ExportViewSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
     }
 
     def "1. User loads the system 'All Views' view"() {

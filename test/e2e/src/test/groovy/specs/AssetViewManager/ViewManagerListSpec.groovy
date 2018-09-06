@@ -27,7 +27,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
     }
     def "1. Validate section title and presence of 'All Views'"() {
         given: "I am in Asset Views Page"

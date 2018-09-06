@@ -158,11 +158,11 @@ export class TaskCommentComponent implements OnInit {
 
 	/**
 	 * Open the Task Detail
-	 * @param comment
+	 * @param dataItem
 	 */
-	public openTaskDetail(comment: any, modalType: ModalType): void {
+	public openTaskDetail(dataItem: any, modalType: ModalType): void {
 		let taskDetailModel: TaskDetailModel = {
-			id: comment.commentInstance.id,
+			id: dataItem.commentInstance.id,
 			modal: {
 				title: 'Task Detail',
 				type: modalType
@@ -172,9 +172,14 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		], true, false).then(result => {
-			if (result && result.commentInstance) {
-				this.openTaskDetail(result, ModalType.VIEW);
+			if (result) {
+				if (result.isDeleted) {
+					this.deleteTaskComment(dataItem);
+				} else if (result.commentInstance) {
+					this.openTaskDetail(result, ModalType.VIEW);
+				}
 			}
+
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -202,7 +207,7 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the Asset Comment
+	 * Prompt for delete the Asset Comment
 	 */
 	protected onDelete(dataItem: any): void {
 		this.promptService.open(
@@ -211,17 +216,27 @@ export class TaskCommentComponent implements OnInit {
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
-					const commentId = dataItem.commentInstance.id;
-
-					this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
-						// delete the item
-						this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
-						this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
-						// update comments collections
-						this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
-					});
+					this.deleteTaskComment(dataItem);
 				}
 			})
 			.catch((error) => console.log(error));
+	}
+
+	/**
+	 * Delete the Asset Task/Comment
+	 */
+	private deleteTaskComment(dataItem: any): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			const commentId = dataItem.commentInstance.id;
+
+			this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
+				// delete the item
+				this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
+				this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
+				// update comments collections
+				this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
+				return resolve(true);
+			}, err => reject(false));
+		});
 	}
 }
