@@ -34,7 +34,7 @@ import grails.validation.Validateable
 
 
 @Slf4j(value='logger')
-public class GormUtil {
+class GormUtil {
 
 	// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
     // Used to control how some functions will perform comparisons with multiple where criteria
@@ -93,7 +93,7 @@ public class GormUtil {
 	/**
 	 * Convert a list into a comma delimited of type String to use inside sql statement.
 	 */
-	 static String asCommaDelimitedString(list) {
+	static String asCommaDelimitedString(list) {
 		WebUtil.listAsMultiValueString list
 	}
 
@@ -166,7 +166,7 @@ public class GormUtil {
 	 * @return the map of constraints
 	 */
 	@Memoized
-	public static Map getConstrainedProperties(Class domainClass) {
+	static Map getConstrainedProperties(Class domainClass) {
 		if (! isDomainClass(domainClass)) {
 			throw new RuntimeException("A non-domain class parameter was provided")
 		}
@@ -187,7 +187,7 @@ public class GormUtil {
 	 * @return the map of constraints
 	 */
 	@Memoized
-	public static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
+	static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
 		Map props = getConstrainedProperties(domainClass)
 
 		if (! props[propertyName]) {
@@ -204,7 +204,7 @@ public class GormUtil {
 	 * @param constraintName - the individual constraint to access
 	 * @return the constraint value
 	 */
-	public static getConstraint(Object domainInstance, String property, String constraintName) {
+	static getConstraint(Object domainInstance, String property, String constraintName) {
 		getConstraint(domainInstance.getClass(), property, constraintName)
 	}
 
@@ -216,7 +216,7 @@ public class GormUtil {
 	 * @return the constraint value
 	 */
 	@Memoized
-	public static getConstraint(Class domainClass, String property, String constraintName) {
+	static getConstraint(Class domainClass, String property, String constraintName) {
 		ConstrainedProperty constraint =  getConstrainedProperty(domainClass, property)
 		return constraint.getAppliedConstraint(constraintName)
 	}
@@ -230,7 +230,7 @@ public class GormUtil {
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
 	@Deprecated
-	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+	static void optimisticLockCheck(Object domainObj, Object params, String label) {
 		if ( ! params?.containsKey('version')) {
 			throw new InvalidRequestException("The $label version property was missing from request")
 		}
@@ -250,7 +250,7 @@ public class GormUtil {
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
-	public static void optimisticLockCheck(Object domainObj, Long version, String label) {
+	static void optimisticLockCheck(Object domainObj, Long version, String label) {
 		if (domainObj.version > version) {
 			throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 		}
@@ -804,7 +804,6 @@ public class GormUtil {
 	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
 	 * @return the cloned object
 	 */
-	//static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
 	static Object cloneDomain(Object originDomain,  Map replaceKeys = [:]) {
 		logger.debug("** Cloning: {} *****", originDomain.getClass())
 		if (!isDomainClass(originDomain.getClass())) {
