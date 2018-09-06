@@ -181,6 +181,15 @@ class CommonsModule extends Module {
         js.('$(".component-action-open").click()')
     }
 
+    /**
+     * Selects random tags from common kendo tags multiselect dropdown component in the application
+     * found by given name and quantity or just one if quantity is not specified
+     * or filter by given text returns only 1 selector. Eg: text = QAE2E can return more than one tag
+     * containing that text
+     * @param: text = some text to search into existing tag list name
+     * @param: numberOfTagsToBeSelected = number of tags to select, default 1 if not set
+     * @author: Sebastian Bigatton
+     */
     def selectRandomKendoMultiselectTagOptionByText(text, numberOfTagsToBeSelected = 1){
         clickToOpenKendoDropdownMultiselect()
         def options = waitFor{kendoMultiselectTagsListOptions.findAll {it.text().contains(text)}}
@@ -193,6 +202,11 @@ class CommonsModule extends Module {
         option.click()
     }
 
+    /**
+     * Returns a list of tag names (1..n tags) from common kendo tags list component displayed
+     * in the application.
+     * @author: Sebastian Bigatton
+     */
     def getSelectedTagsFromKendoMultiselect(){
         def selectedTagsList = []
         if (isListOfElements(kendoMultiselectSelectedList)){ // add every element text displayed

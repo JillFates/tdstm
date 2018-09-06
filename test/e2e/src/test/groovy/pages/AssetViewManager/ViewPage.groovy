@@ -272,7 +272,7 @@ class ViewPage extends Page{
     def selectRandomAssetsAndGetNames(numberOfAssetsToBeSelected){
         def assetNames = []
         if (!commonsModule.isListOfElements(allItemsCheckbox)) { // if not list just click on selector
-            clickOnCheckboxByName allItemsCheckbox
+            clickOnAssetCheckbox allItemsCheckbox
             assetNames.add getAssetNameFromGivenCheckboxSelector(allItemsCheckbox)
         } else { // else get random number of assets, click on them and add names to the list
             // validates available checkboxes are more than passed number, otherwise selects displayed
@@ -281,18 +281,18 @@ class ViewPage extends Page{
             def checkbox
             checkboxes.each { input ->
                 checkbox = allItemsCheckbox.find{it.attr("name") == input.jquery.prop("name")}
-                clickOnCheckboxByName checkbox
+                clickOnAssetCheckbox checkbox
                 assetNames.add getAssetNameFromGivenCheckboxSelector(checkbox)
             }
         }
         assetNames
     }
 
-    def clickOnCheckboxByName(checkbox){
+    def clickOnAssetCheckbox(checkboxSelector){
         commonsModule.goToElement bulkChangeButton // trick to avoid stale element
-        commonsModule.goToElement checkbox
-        waitFor{checkbox.click()}
-        waitFor{getCheckedInputStatus(checkbox) == true} // verify its checked
+        commonsModule.goToElement checkboxSelector
+        waitFor{checkboxSelector.click()}
+        waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
     }
 
     def getCheckedInputStatus(element){
