@@ -690,21 +690,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(final Object fieldName) {
+	LookupElement lookup(final Object fieldName) {
 		validateStack()
-		ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fieldName)
-
-		return [
-		    with: { value ->
-			    // Object stringValue = ETLValueHelper.valueOf(value)
-
-			    boolean found = result.lookupInReference([ fieldSpec.name ], [ value ])
-			    if (found) {
-				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			    }
-			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
-		    }
-		]
+		return new LookupElement(this, [fieldName])
 	}
 
 	/**
@@ -724,24 +712,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?>  lookup(Object... fieldNames) {
+	LookupElement lookup(Object... fieldNames) {
 		validateStack()
-		List<Element> lookupFieldNames = []
-		for (String fname in fieldNames) {
-			ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fname)
-			lookupFieldNames << fieldSpec.name
-		}
-
-		return [
-		    with: { Object... values ->
-				List valuesAsList = values as List
-			    boolean found = result.lookupInReference(lookupFieldNames, valuesAsList)
-			    if (found) {
-				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			    }
-			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
-		    }
-		]
+		List fieldNamesList = fieldNames as List
+		return new LookupElement(this, fieldNamesList)
 	}
 	/**
 	 * Initialize a fieldName using a default value

@@ -99,7 +99,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can lookup results and used LOOKUP.found() to check results'() {
+	void 'test can lookup results and used LOOKUP found to check results'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
@@ -240,7 +240,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can lookup results and used LOOKUP.notFound() to check results'() {
+	void 'test can lookup results and used LOOKUP notFound to check results'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
@@ -762,6 +762,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 					  validator
 			)
 
+			etlProcessor.result = Mock(ETLProcessorResult)
 			ETLDomain domain = ETLDomain.Device
 			etlProcessor.domain( domain )
 			etlProcessor.read(ETLProcessor.ReservedWord.labels)
@@ -771,6 +772,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.addCrudRowData(row)
 			Element el = etlProcessor.extract(1)
 
+
 		when: 'we set a variable with wrong Convention name'
 			el.set 'variable'
 
@@ -779,10 +781,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 			ETLProcessorException.invalidSetParameter().message == e.message
 
 		when: 'we set a correct variable name'
-			el.set 'variableVar' load 'custom1' with 123
+			etlProcessor.set 'variableVar' with 123
 
 		then: 'Variable should be set'
-			etlProcessor.binding.getVariable('variableVar').value == 123
+			etlProcessor.binding.getVariable('variableVar') == 123
 
 		when: 'we set a variable with wrong Convention name'
 			el.set 'variable'
