@@ -131,6 +131,12 @@ class CommonsModule extends Module {
         waitForLoader 2
     }
 
+    /**
+     * Clicks on kendo grid pagination arrow to go to page based on passed text
+     * @param: target = options: "first", "last", "next" or "previous"
+     * @param: timesToClick = default set to 1
+     * @author: Sebastian Bigatton
+     */
     def goToTargetKendoGridPage(target, timesToClick = 1){
         def count = 0
         while (count < timesToClick){

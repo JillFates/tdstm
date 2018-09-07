@@ -36,8 +36,10 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             at MenuPage
         when: 'The user goes to the All Assets page'
             assetsModule.goToAllAssets()
+
         then: 'The All Assets Page loads with no problem'
             at ViewPage
+
     }
 
     def "2. The user checks and unchecks all the items of the table"(){
@@ -54,6 +56,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             unCheckAllItems()
         then: 'All the items are unchecked again'
             checkedItems(false)== true
+
     }
 
     def "3. The user filters data on different columns"(){
@@ -65,10 +68,12 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             filterByName originalFirstElementName
         and: 'The user also filters by the Asset Class of the first element'
             filterByAssetClass originalFirstElementClass
+
         then: 'We verify that the first elements name matches'
             getFirstElementNameText() == originalFirstElementName
         and:'Also the Asset Class matches'
             getFirstElementClassText() == originalFirstElementClass
+
     }
 
     def "4. The user clears the filters"(){
@@ -80,8 +85,10 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             nameFilter.text()== ""
         and: 'We click the Clear filters button'
             waitFor{clearBtn.click()}
+
         then: 'We verify that the other filter that was used is now emptied'
             assetClassFilter.text()== ""
+
     }
 
     def "5. The user sorts different columns"(){
@@ -96,6 +103,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             waitFor{refreshBtn.click()}
             waitFor{nameColumn.click()}
             waitFor{refreshBtn.click()}
+
         then: 'The table should be displayed as it was originally shown'
         /*
             When the table is first loaded, it's sorted by name.
@@ -105,7 +113,8 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
          */
             waitFor{refreshBtn.click()}
             waitFor {view.displayed}
-            getFirstElementNameText() == originalFirstElementName
+        getFirstElementNameText() == originalFirstElementName
+
     }
 
     def "6. The user sets the pagination, clicks the Just Planning checkbox and no TBD bundles are shown "(){
@@ -118,10 +127,12 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             waitFor {view.displayed}
         and: 'We change the pagination to the value set above'
             itemsPerPage.value(dropdownItems)
+
         then: 'We verify that no Assets have the TBD bundle'
             searchTBD(dropdownItems) == false
         and: 'We uncheck the Just Planning checkbox'
             waitFor{justPlanningCheck.click()}
+
     }
 
     def "7. The user changes the pagination value again"(){
@@ -130,6 +141,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
         when: 'The user changes the pagination value again'
             waitFor {view.displayed}
             itemsPerPage.value(25)
+
         then: 'The table loads and the elements are present'
             leftTableElements.displayed
             waitFor {view.displayed}
