@@ -113,7 +113,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
          */
             waitFor{refreshBtn.click()}
             waitFor {view.displayed}
-        getFirstElementNameText() == originalFirstElementName
+            getFirstElementNameText() == originalFirstElementName
 
     }
 
