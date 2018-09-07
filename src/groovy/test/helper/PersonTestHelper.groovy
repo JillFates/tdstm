@@ -2,6 +2,7 @@ package test.helper
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 
 /**
@@ -72,7 +73,18 @@ class PersonTestHelper {
 				'@example.com'
 		}
 
-		Person person = personService.savePerson(personMap, company.id, project, true)
+		Party companyParty = Party.get(company.id)
+		Person person = new Person(personMap)
+		person.partyRelationshipService = partyRelationshipService
+		person.save(failOnError: true, flush:true)
+
+		if(project) {
+			personService.addToProjectSecured(project, person)
+		}
+
+		partyRelationshipService.addCompanyStaff(companyParty, person)
+
+
 		assert person
 
 		if (roles) {
@@ -118,6 +130,7 @@ class PersonTestHelper {
 	 */
 	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
 		Person staff = createPerson(firstName, middleName, lastName, email)
+		staff.partyRelationshipService = partyRelationshipService
 		partyRelationshipService.addCompanyStaff(company, staff)
 		return staff
 	}
