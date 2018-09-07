@@ -94,9 +94,6 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return
 	 */
 	ETLFindElement into(String property) {
-		if(!this.currentFind.kv){
-			throw ETLProcessorException.incorrectFindCommandStructure()
-		}
 		validateReference(property)
 		currentFind.property = property
 		currentFind.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(property)
