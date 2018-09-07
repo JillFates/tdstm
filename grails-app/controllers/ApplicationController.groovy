@@ -190,7 +190,7 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
-		query.append('GROUP BY app_id, ac_task.asset_comment_id, ac_comment.asset_comment_id ) AS apps')
+		query.append('GROUP BY app_id ) AS apps')
 
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
