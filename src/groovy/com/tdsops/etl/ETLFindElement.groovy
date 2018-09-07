@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import groovy.transform.CompileStatic
+
 /**
  * ETL find command implementation.
  * <code>
@@ -49,7 +52,7 @@ class ETLFindElement implements ETLStackableCommand {
 	/**
 	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
 	 */
-	Map<String, Object> currentFind = [:]
+	CurrentFind currentFind
 	/**
 	 * Total results collected towards a sequence of find/elseFind commands
 	 */
@@ -57,9 +60,7 @@ class ETLFindElement implements ETLStackableCommand {
 	/**
 	 * List of references to each one in a sequence of find/elseFind commands
 	 */
-	List<Map<String, ?>> findings = []
-
-
+	List<CurrentFind> findings = []
 
 	/**
 	 * ETLFindElement instances creation defined by the ETLProcessor instance and a particular value of ETL Domain
@@ -93,12 +94,35 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return
 	 */
 	ETLFindElement into(String property) {
-		if(!this.currentFind.kv){
-			throw ETLProcessorException.incorrectFindCommandStructure()
-		}
 		validateReference(property)
 		currentFind.property = property
 		currentFind.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(property)
+		processor.addFindElement(this)
+		return this
+	}
+
+	/**
+	 * <p>Completes find command using an instance of {@code FindStatementBuilder}</p>
+	 * <p>Once a chain of methods where used by an instance of {@code FindStatementBuilder},
+	 * this method completes the HQL sentence and execute it verifying first if it already exists in cache</p>
+	 * @param property
+	 * @param findStatementBuilder
+	 * @return
+	 */
+	ETLFindElement into(String property, FindStatementBuilder findStatementBuilder) {
+		checkProject()
+		validateReference(property)
+		currentFind.property = property
+		currentFind.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(property)
+
+		if(!findStatementBuilder.currentCondition.isComplete()){
+			throw ETLProcessorException.incorrectFindCommandStructure()
+		}
+
+		if(!results?.objects){
+			findDomainObjectResults(currentFind.domain, findStatementBuilder.conditions)
+		}
+
 		processor.addFindElement(this)
 		return this
 	}
@@ -129,13 +153,17 @@ class ETLFindElement implements ETLStackableCommand {
 		checkProject()
 		currentFind.values = checkValues(values)
 
-		currentFind.kv = [
+		//TODO: dcorrea filter null values in conditions
+		List<FindCondition> conditions = [
 			currentFind.fields,
 			currentFind.values
-		].transpose().collectEntries { it }
+		].transpose().collect { new FindCondition(it[0], it[1]) }
+
+		//TODO dcorrea. Refactor this to use same code from FindStatementBuilder and operations
+		this.currentFind.statement = new FindStatementBuilder(conditions)
 
 		if(!results?.objects){
-			findDomainObjectResults()
+			findDomainObjectResults(currentFind.domain, this.currentFind.statement.conditions)
 		}
 
 		return this
@@ -148,20 +176,14 @@ class ETLFindElement implements ETLStackableCommand {
 	 * <pre>
 	 * currentFind.objects = findResultsInCache()
 	 * </pre>
-	 * And the prepares final structure for results:
-	 * <pre>
-	 * results = [
-	 * 	objects: [],
-	 * 	matchOn: null
-	 * ]
-	 * </pre>
-	 * In case of error it saves error messages using currentFind.errors field.
-	 * @see com.tdsops.etl.ETLFindElement#lookupResultsInCache()
+	 * @see com.tdsops.etl.ETLFindElement#lookupResultsInCache(java.lang.String, java.util.List)
 	 */
-	private void findDomainObjectResults() {
+	private void findDomainObjectResults(String domain, List<FindCondition> conditions) {
 
 		try{
-			currentFind.objects = lookupResultsInCache()
+
+			currentFind.objects = lookupResultsInCache(domain, conditions)
+
 		} catch (all){
 
 			processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
@@ -196,26 +218,30 @@ class ETLFindElement implements ETLStackableCommand {
 	 * <pre>
 	 *     findCache.get('Application', [id: 1555345l])
 	 * </pre>
+	 * @param domain an ETL domain String value
+	 * @param conditions a List of {@code FindCondition} used to calculate HQL sentences
 	 * @return a list of results based on findCache results
 	 *          or after querying database using a DomainClassQueryHelper
+	 * @see DomainClassQueryHelper#where(com.tdsops.etl.ETLDomain, net.transitionmanager.domain.Project, java.util.List, java.lang.Boolean)
 	 */
-	private List lookupResultsInCache() {
-		List cacheResults = processor.findCache?.get(currentFind.domain, currentFind.kv)
+	private List lookupResultsInCache(String domain, List<FindCondition> conditions) {
+
+		List cacheResults = processor.findCache?.get(domain, conditions)
 
 		if (cacheResults == null) {
 			cacheResults = DomainClassQueryHelper.where(
-					ETLDomain.lookup(currentFind.domain),
-					processor.project,
-					currentFind.kv)
+				ETLDomain.lookup(domain),
+				processor.project,
+				conditions
+			)
 
 			if (processor.findCache) {
-				processor.findCache.put(currentFind.domain, currentFind.kv, cacheResults)
+				processor.findCache.put(domain, conditions, cacheResults)
 			}
 		}
 
 		return cacheResults
 	}
-
 	/**
 	 * It checks if the amount of values is equals to the number of fields.
 	 * After that, it converts all the according to their types.
@@ -275,12 +301,12 @@ class ETLFindElement implements ETLStackableCommand {
 	 */
 	private void setCurrentDomain(ETLDomain domain) {
 		currentDomain = domain
-		currentFind = [
+		currentFind = new CurrentFind(
 			domain: domain.name(),
 			fields: [],
-			values: [],
-			queryParams: [:]
-		]
+			values: []
+		)
+
 		if(!mainSelectedDomain){
 			mainSelectedDomain = domain
 		}
@@ -333,26 +359,67 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return string with errors or empty
 	 */
 	String stackableErrorMessage() {
-		String error = ''
 
-		Set<String> missingProperties = []
+		if(currentFind.statement){
+			currentFind.statement.stackableErrorMessage()
+		} else{
+			String error = ''
 
-		if (! currentFind.fields ) {
-			missingProperties << 'by'
+			Set<String> missingProperties = []
+
+			if (! currentFind.fields ) {
+				missingProperties << 'by'
+			}
+
+			if (! currentFind.values ) {
+				missingProperties << 'with'
+			}
+
+			if (! currentFind.property ) {
+				missingProperties << 'into'
+			}
+
+			if (missingProperties) {
+				error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+			}
+
+			return error
 		}
-
-		if (! currentFind.values ) {
-			missingProperties << 'with'
-		}
-
-		if (! currentFind.property ) {
-			missingProperties << 'into'
-		}
-
-		if (missingProperties) {
-			error = "find/elseFind statement is missing required [${missingProperties.join(', ')}] ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
-		}
-
-		return error
 	}
+
+	/**
+	 * <p>Starts a chain of methods to build find command using an instance of {@code FindStatementBuilder}</p>
+	 * <pre>
+	 * 	find Device by 'assetName' ....
+	 * 	find Application by 'appName' ....
+	 * </pre>
+	 * @param propertyName
+	 * @return an instance of FindStatementBuilder
+	 * @see FindStatementBuilder#into(java.lang.String)
+	 */
+	FindStatementBuilder by(String propertyName) {
+		//TODO: dcorrea validate incorrect status for 'by' method
+		currentFind.statement = new FindStatementBuilder(this, propertyName)
+		return currentFind.statement
+	}
+}
+
+/**
+ * Current find command status holder.
+ * It maintence all he necessary properties to build a find results.
+ */
+class CurrentFind {
+
+	String property
+	ETLFieldDefinition fieldDefinition
+	String domain
+	List<String> fields = []
+	List<Object> values = []
+	Map<String, Object> kv = [:]
+
+	List<Object> objects
+	List<String> errors
+	Integer matchOn
+
+	FindStatementBuilder statement
 }

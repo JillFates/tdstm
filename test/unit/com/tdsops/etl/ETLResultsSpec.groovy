@@ -173,7 +173,9 @@ class ETLResultsSpec extends ETLBaseSpec {
 						find.query.size() == 1
 						with(find.query[0]) {
 							domain == 'Application'
-							kv == [id: '152254']
+							criteria == [
+								[propertyName: 'id', value: '152254', operator: 'eq']
+							]
 						}
 					}
 
@@ -189,7 +191,9 @@ class ETLResultsSpec extends ETLBaseSpec {
 						find.query.size() == 1
 						with(find.query[0]) {
 							domain == 'Application'
-							kv == [id: '152255']
+							criteria == [
+								[propertyName: 'id', value:'152255', operator: 'eq']
+							]
 						}
 					}
 				}

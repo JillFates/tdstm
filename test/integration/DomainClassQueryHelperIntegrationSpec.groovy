@@ -1,7 +1,10 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.FindCondition
+import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
@@ -17,6 +20,7 @@ import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
 class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
+
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
 
@@ -87,7 +91,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		otherProjectDevice.save()
 	}
 
-
 	void '1. can find a Device by its id'() {
 
 		given:
@@ -100,7 +103,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.size() == 1
 			results.first() == device.id
 	}
-
 
 	void '2. can find a Device by roomSource'() {
 
@@ -284,7 +286,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then: 'one result should be returned'
 			results.size() == 1
 		and: 'the return value should be an instance of the expected asset domain and id'
-			with(results.first()){
+			with(results.first()) {
 				AssetEntity.isAssignableFrom(it.getClass())
 				id == device.id
 			}
@@ -300,7 +302,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 
 		then:
 			results.size() == 1
-			with(results.first()){
+			with(results.first()) {
 				Room.isAssignableFrom(it.getClass())
 				id == room.id
 			}
@@ -371,4 +373,308 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			Exception e = thrown Exception
 			e.message == 'java.lang.String cannot be cast to java.lang.Long'
 	}
+
+	void '21. can find a Device by its id using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id, 'eq')
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+
+	void '22. can find a Device by roomSource using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomSource = roomTestHelper.createRoom(project)
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('roomSource', device.roomSource.roomName)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '23. can find a Device by roomTarget using a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomTarget = roomTestHelper.createRoom(project)
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('roomTarget', device.roomTarget.roomName)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '24. can find a Device by using ne in a FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id, FindOperator.ne)
+				]
+			)
+
+		then:
+			!results.contains(device.id)
+	}
+
+	void '25. can find a Room by a roomName using a like FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName + '%', FindOperator.like)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	// TODO: dcorrea Review with John
+	void '26. can find a Room by a roomName using a notLike FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName + '%', FindOperator.notLike)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+
+	void '27. can find a Room by a roomName using a contains FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName, FindOperator.contains)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	void '28. can find a Room by a roomName using a notContains FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition('roomName', room.roomName, FindOperator.notContains)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '29. can find a Room by a roomName using a inList FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition(
+						'roomName',
+						[room.roomName, 'anotherValue'],
+						FindOperator.inList
+					)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == room.id
+	}
+
+	void '30. can find a Room by a roomName using a notInList FindCondition'() {
+
+		given:
+			Room room = roomTestHelper.createRoom(project)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Room,
+				project,
+				[
+					new FindCondition(
+						'roomName',
+						[room.roomName, 'anotherValue'],
+						FindOperator.notInList
+					)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '31. can find a Room by a roomName using a between FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.priority = 6
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'priority',
+						(4..6),
+						FindOperator.between
+					)
+				]
+			)
+
+		then:
+			results.size() == 1
+			results.first() == device.id
+	}
+
+	void '32. can find a Room by a roomName using a notBetween FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.priority = 6
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'priority',
+						(4..6),
+						FindOperator.notBetween
+					)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '33. can find a Room by a roomName using a null FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.department = null
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'department',
+						null,
+						FindOperator.isNull
+					)
+				]
+			)
+
+		then:
+			results.size() > 0
+			results.contains(device.id)
+	}
+
+	void '34. can find a Room by a roomName using a is not null FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.department = null
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition(
+						'department',
+						null,
+						FindOperator.isNotNull
+					)
+				]
+			)
+
+		then:
+			results.size() == 0
+	}
+
+	void '35. can throw an Exception in case of using an invalid FindCondition'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('id', device.id, 'equality')
+				]
+			)
+
+		then: 'It throws an Exception because project was not defined'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
+	}
+
 }
