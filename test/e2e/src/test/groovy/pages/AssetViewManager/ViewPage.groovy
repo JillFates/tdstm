@@ -34,7 +34,7 @@ class ViewPage extends Page{
         itemNumberDesc(required:false) {$("kendo-pager-info" , class:"k-pager-info k-label")}
         nextPageButton(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-next-buttons").find("a", class:"k-link k-pager-nav" , title:"Go to the next page").find("span", class:"k-icon k-i-arrow-e")}
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
-        allItemsCheckbox(required:false) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
+        allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
         nameFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("input",type:"text")}
@@ -51,6 +51,7 @@ class ViewPage extends Page{
         refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
+        noRecords {$("div.grid-message label")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -139,7 +140,7 @@ class ViewPage extends Page{
     }
 
     def clickOnGear(){
-        gearBtn.click()
+        waitFor{gearBtn.click()}
     }
 
     def nextPage(){
@@ -182,6 +183,7 @@ class ViewPage extends Page{
     }
 
     def checkedItems(checked = true){
+        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
         allItemsCheckbox.each{
             assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }
@@ -273,7 +275,7 @@ class ViewPage extends Page{
     def selectRandomAssetsAndGetNames(numberOfAssetsToBeSelected){
         def assetNames = []
         if (!commonsModule.isListOfElements(allItemsCheckbox)) { // if not list just click on selector
-            clickOnCheckboxByName allItemsCheckbox
+            clickOnAssetCheckbox allItemsCheckbox
             assetNames.add getAssetNameFromGivenCheckboxSelector(allItemsCheckbox)
         } else { // else get random number of assets, click on them and add names to the list
             // validates available checkboxes are more than passed number, otherwise selects displayed
@@ -282,16 +284,18 @@ class ViewPage extends Page{
             def checkbox
             checkboxes.each { input ->
                 checkbox = allItemsCheckbox.find{it.attr("name") == input.jquery.prop("name")}
-                clickOnCheckboxByName checkbox
+                clickOnAssetCheckbox checkbox
                 assetNames.add getAssetNameFromGivenCheckboxSelector(checkbox)
             }
         }
         assetNames
     }
 
-    def clickOnCheckboxByName(checkbox){
-        waitFor{checkbox.click()}
-        waitFor{getCheckedInputStatus(checkbox) == true} // verify its checked
+    def clickOnAssetCheckbox(checkboxSelector){
+        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
+        commonsModule.goToElement checkboxSelector
+        waitFor{checkboxSelector.click()}
+        waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
     }
 
     def getCheckedInputStatus(element){
@@ -358,5 +362,66 @@ class ViewPage extends Page{
             assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
             clearAllAppliedFilters()
         }
+    }
+
+    def verifyIfNoRecordsDisplayed(text){
+        if (commonsModule.verifyElementDisplayed($("div.grid-message label"))) {
+            verifyNoRecordsText(text)
+            clearAllAppliedFilters()
+        }
+        true
+    }
+
+    def verifyNoRecordsText(text){
+        waitFor{noRecords.text() == text}
+    }
+
+    def addColumnByName(name){
+        clickOnGear()
+        createViewModule.clickSpecificCheckbox name
+        createViewModule.clickPreview()
+        commonsModule.waitForLoader 5
+        createViewModule.clickOnCloseViewEdition()
+        !commonsModule.verifyElementDisplayed($('#tab_2'))
+    }
+
+    /**
+     * Method gets and returns a list of tags displayed in grid associated to the asset.
+     * @param checkboxName = checkbox Name Attr associated to the tag to find in asset row
+     * @author Sebastian Bigatton
+     */
+    def getDisplayedTagsByAssetCheckbox(checkboxName){
+        def displayed = []
+        def checkbox = $("input[name=$checkboxName]")
+        def rowIndex = checkbox.closest("tr[kendogridlogicalrow]").attr("data-kendo-grid-item-index")
+        def tagsRow = checkbox.closest("kendo-grid-list")find("tr", "data-kendo-grid-item-index":rowIndex)
+        def tagsDisplayedInColumn = tagsRow.find("span.tag")
+        if (!commonsModule.isListOfElements(tagsDisplayedInColumn)){
+            displayed.add tagsDisplayedInColumn.text()
+        } else {
+            tagsDisplayedInColumn.each{
+                displayed.add it.text()
+            }
+        }
+        displayed
+    }
+
+    /**
+     * Method iterates thru assets map [name: checkbox name attr identifier] and tag name list
+     * to verify they were successfylly saved and displayed in grid
+     * @param assetsMap = [asset name: checkbox name attr identifier]
+     * @param tagNames = list of tag names to verify
+     * @author Sebastian Bigatton
+     */
+    def verifyDisplayedTagsByAsset(assetsMap, tagNames){
+        assetsMap.each{
+            def displayedTags
+            filterByName it.key // key = assetName
+            displayedTags = getDisplayedTagsByAssetCheckbox(it.value) // value = checkbox name attr identifier
+            tagNames.each{
+                assert displayedTags.find{it} != null
+            }
+        }
+        true
     }
 }

@@ -39,6 +39,10 @@ class BulkChangeActionPage extends Page{
         deleteCheckbox.click()
     }
 
+    def clickOnEditRadioButton(){
+        editCheckbox.click()
+    }
+
     def getActionMessageText(){
         actionMessage.text().trim()
     }

@@ -117,7 +117,9 @@ class ETLFetchSpec extends ETLBaseSpec {
 				assert fieldName == 'model'
 				assert fieldsInfo['manufacturer'].value == 'PM10'
 				assert fieldsInfo['manufacturer'].find.query[0].domain == 'Model'
-				assert fieldsInfo['manufacturer'].find.query[0].kv['manufacturer'] == 'PM10'
+				assert fieldsInfo['manufacturer'].find.query[0].criteria[0].propertyName == 'manufacturer'
+				assert fieldsInfo['manufacturer'].find.query[0].criteria[0].operator == 'eq'
+				assert fieldsInfo['manufacturer'].find.query[0].criteria[0].value == 'PM10'
 
 				Model model = new Model(modelName: 'PM10', usize: 1)
 				return new AssetEntity(assetClass: AssetClass.DEVICE, assetName: 'A1 PDU1 A', priority: 2, model: model)

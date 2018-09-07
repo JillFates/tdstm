@@ -1,6 +1,7 @@
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.QueryResult
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -296,5 +297,21 @@ abstract class ETLBaseIntegrationSpec extends IntegrationSpec {
 		}
 
 		return fieldSpecs
+	}
+
+	/**
+	 * Assertions for a {@code QueryResult} instance
+	 * //TODO dcorrea add an example
+	 * @param queryResult
+	 * @param domain
+	 * @param values
+	 */
+	static void assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+		assert queryResult.domain == domain.name()
+		queryResult.criteria.eachWithIndex { Map map, int i ->
+			assert map['propertyName'] == values[i][0]
+			assert map['operator'] == values[i][1]
+			assert map['value'] == values[i][2]
+		}
 	}
 }

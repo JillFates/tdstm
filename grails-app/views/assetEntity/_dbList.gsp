@@ -13,7 +13,7 @@
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="database" />
 		<tds:hasPermission permission="${Permission.AssetEdit}">
-			<input id="state" type="button"  class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${databaseList?.asset?.id},'${session.ASSIGN_BUNDLE}')"  />
+			<input id="state" type="button"  class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${databaseList?.asset?.id},'${session.ASSIGN_BUNDLE}', ${session.SELECTED_TAG_IDS ?: []  as grails.converters.JSON})"  />
 		</tds:hasPermission>
 	</div>
 	<div class="tabInner">

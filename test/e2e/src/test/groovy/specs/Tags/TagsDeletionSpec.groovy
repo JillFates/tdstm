@@ -50,7 +50,7 @@ class TagsDeletionSpec extends GebReportingSpec {
         and: 'The User clicks on Erase button for first row'
             clickOnDeleteButton()
         then: 'Alert is displayed'
-            commonsModule.getDeleteAlertMessageText() == deleteMessage
+            commonsModule.getConfirmationAlertMessageText() == deleteMessage
         when: 'The User clicks on Cancel button'
             commonsModule.clickOnButtonPromptModalByText("Cancel")
         then: 'Tag still displayed in the grid'
