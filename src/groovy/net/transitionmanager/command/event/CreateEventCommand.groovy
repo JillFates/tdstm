@@ -17,7 +17,7 @@ class CreateEventCommand {
 	List<Long> tagIds = []
 
 	@BindUsing({ obj, source ->
-		return source['tagIds'] ?: []
+		return source['moveBundle'] ?: []
 	})
 	List<Long> moveBundle = []
 

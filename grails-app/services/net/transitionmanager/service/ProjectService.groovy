@@ -79,6 +79,7 @@ class ProjectService implements ServiceMethods {
 	TagService tagService
 	ApiCatalogService apiCatalogService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+	ApiActionService apiActionService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -537,6 +538,9 @@ class ProjectService implements ServiceMethods {
 
 		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
 		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
+
+		// Clone the Default Project Api Actions (if it has any) and add them to the new project
+		apiActionService.cloneProjectApiActions(defProject, project)
 	}
 
 	/**

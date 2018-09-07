@@ -113,7 +113,7 @@ class DatabaseController implements ControllerMethods {
 				CONCAT(
                     '[',
                     if(
-                        TA.tag_asset_id,
+                        ta.tag_asset_id,
                         group_concat(
                             json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
                         ),

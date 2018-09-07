@@ -7,6 +7,7 @@ import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
@@ -18,6 +19,7 @@ import net.transitionmanager.connector.GenericHttpConnector
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
@@ -35,6 +37,8 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
+import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -49,6 +53,8 @@ class ApiActionService implements ServiceMethods {
 	CredentialService credentialService
 	DataScriptService dataScriptService
 	CustomDomainService customDomainService
+	ProviderService providerService
+	ApiCatalogService apiCatalogService
 
 	/**
 	 * Find an ApiAction by id
@@ -669,6 +675,55 @@ class ApiActionService implements ServiceMethods {
 
 		if (count > 0) {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
+		}
+	}
+
+	/**
+	 * Clone any existing api actions associated to sourceProject (if any),
+	 * then associate those newly created tags to targetProject.
+	 *
+	 * @param sourceProject  The project from which the existing tags will be cloned.
+	 * @param targetProject  The project to which the new tags will be associated.
+	 */
+	void cloneProjectApiActions(Project sourceProject, Project targetProject) {
+		List<ApiAction> apiActions = ApiAction.where {
+			project == sourceProject
+		}.list()
+
+		if (apiActions && !apiActions.isEmpty()) {
+
+			apiActions.each { ApiAction sourceApiAction ->
+				Provider targetProvider = providerService.cloneProvider(sourceApiAction.provider, targetProject)
+				ApiCatalog targetApiCatalog = GormUtil.cloneDomainAndSave(sourceApiAction.apiCatalog, [
+				        project: targetProject,
+						provider: targetProvider
+				], false)
+				DataScript targetDataScript = null
+				if (sourceApiAction.defaultDataScript) {
+					targetDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceApiAction.defaultDataScript, [
+							project : targetProject,
+							provider: targetProvider
+					], false)
+				}
+				Credential targetCredential = null
+				if (sourceApiAction.credential) {
+					credential = (Credential)GormUtil.cloneDomainAndSave(sourceApiAction.credential, [
+							project : targetProject,
+							provider: targetProvider,
+							username: 'Must Be Changed',
+							password: RandomStringUtils.randomAlphanumeric(10)
+					], false)
+				}
+				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomainAndSave(sourceApiAction, [
+						project: targetProject,
+						provider: targetProvider,
+						apiCatalog: targetApiCatalog,
+						defaultDataScript: targetDataScript,
+						credential: targetCredential
+
+				], false)
+				log.debug "Cloned api action ${newApiAction.name} for project ${targetProject.toString()}"
+			}
 		}
 	}
 }

@@ -434,7 +434,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Extracting a missing column name 'model'"
+			e.message == ETLProcessorException.extractMissingColumn('model').message
 
 	}
 
@@ -2240,7 +2240,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'No such property: myLocalVariable'
+			e.message == ETLProcessorException.missingPropertyException('myLocalVariable').message
 
 		cleanup:
 			if(fileName){
@@ -2278,7 +2278,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid variable name: Custom Name. Variable names must end with 'Var'"
+			e.message == ETLProcessorException.invalidSetParameter().message
 
 		cleanup:
 			if(fileName){
