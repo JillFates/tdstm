@@ -24,7 +24,7 @@ grails.project.dependency.resolution = {
 	}
 
 	dependencies {
-		compile 'com.google.guava:guava:16.0.1'
+		compile 'com.google.guava:guava:19.0'
 		compile 'net.sf.jasperreports:jasperreports:4.5.1'
 		compile 'org.apache.poi:poi-ooxml:3.14'
 		compile 'org.apache.poi:ooxml-schemas:1.1'

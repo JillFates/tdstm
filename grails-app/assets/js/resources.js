@@ -1,8 +1,8 @@
-
+//=encoding UTF-8
 //= require  resources/jquery-1.9.1
 //= require  resources/jquery-1.9.1-ui
 //= require  resources/datetimepicker
-//= require  resources/jquery-migrate-1.0
+//= require  resources/jquery-migrate-1.0.0
 //= require  resources/select2
 //= require  resources/jquery.combox
 //= require  resources/moment.min
