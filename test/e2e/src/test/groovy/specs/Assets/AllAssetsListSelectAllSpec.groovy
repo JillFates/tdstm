@@ -1,16 +1,11 @@
 package specs.Assets
 
-import jdk.nashorn.internal.ir.annotations.Ignore
 import pages.AssetViewManager.ViewPage
 import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import jodd.util.RandomString
 import geb.spock.GebReportingSpec
-import modules.CommonsModule
 import spock.lang.Stepwise
-import spock.lang.Ignore
-
 
 @Stepwise
 class AllAssetsListSelectAllSpec extends GebReportingSpec {
@@ -18,8 +13,8 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
     def testKey
     static testCount
     static int dropdownItems = 250 //Sets the amount of items that will be displayed in the table
-    static originalFirstElementName = ""
-
+    static originalFirstElementName
+    static assetsCountToBeSelected = 3
 
     def setupSpec() {
         testCount = 0
@@ -41,44 +36,39 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             at MenuPage
         when: 'The user goes to the All Assets page'
             assetsModule.goToAllAssets()
-
         then: 'The All Assets Page loads with no problem'
             at ViewPage
-
     }
 
     def "2. The user checks and unchecks all the items of the table"(){
         given: 'The user is on the All Assets page'
             at ViewPage
+        and: 'The user removes Just Planning if its checked'
+            unCheckJustPlanning()
         and: 'The user checks all the items'
             waitFor {view.displayed}
             checkAllItems()
         and: 'We verify all the items are checked'
             checkedItems()== true
         when: 'We uncheck all the items'
-            clickOnSelectAllAssets() // click set indeterminate state
-            clickOnSelectAllAssets() // click again to uncheck
+            unCheckAllItems()
         then: 'All the items are unchecked again'
             checkedItems(false)== true
-
     }
 
     def "3. The user filters data on different columns"(){
         given: 'The user is on the All Assets page'
             at ViewPage
         when: 'The user filters by the name of the first element'
-            waitFor {view.displayed}
-            waitFor{nameFilter.click()}
-            nameFilter=firstElementName.text()
+            originalFirstElementName = getFirstElementNameText()
+            def originalFirstElementClass = getFirstElementClassText()
+            filterByName originalFirstElementName
         and: 'The user also filters by the Asset Class of the first element'
-            waitFor{assetClassFilter.click()}
-            assetClassFilter=firstElementAssetClass.text()
-
+            filterByAssetClass originalFirstElementClass
         then: 'We verify that the first elements name matches'
-            firstElementName.text()==firstElementName.text()
+            getFirstElementNameText() == originalFirstElementName
         and:'Also the Asset Class matches'
-            firstElementAssetClass.text()==firstElementAssetClass.text()
-
+            getFirstElementClassText() == originalFirstElementClass
     }
 
     def "4. The user clears the filters"(){
@@ -90,10 +80,8 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             nameFilter.text()== ""
         and: 'We click the Clear filters button'
             waitFor{clearBtn.click()}
-
         then: 'We verify that the other filter that was used is now emptied'
             assetClassFilter.text()== ""
-
     }
 
     def "5. The user sorts different columns"(){
@@ -102,13 +90,12 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
         when: 'The user sorts the Description and Name Columns'
             waitFor {view.displayed}
             //We store the original value of the first element for later
-            originalFirstElementName=firstElementName.text()
+            originalFirstElementName = getFirstElementNameText()
             waitFor{descColumn.click()}
             waitFor{nameColumn.displayed}
             waitFor{refreshBtn.click()}
             waitFor{nameColumn.click()}
             waitFor{refreshBtn.click()}
-
         then: 'The table should be displayed as it was originally shown'
         /*
             When the table is first loaded, it's sorted by name.
@@ -118,8 +105,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
          */
             waitFor{refreshBtn.click()}
             waitFor {view.displayed}
-            originalFirstElementName==firstElementName.text()
-
+            getFirstElementNameText() == originalFirstElementName
     }
 
     def "6. The user sets the pagination, clicks the Just Planning checkbox and no TBD bundles are shown "(){
@@ -132,12 +118,10 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
             waitFor {view.displayed}
         and: 'We change the pagination to the value set above'
             itemsPerPage.value(dropdownItems)
-
         then: 'We verify that no Assets have the TBD bundle'
             searchTBD(dropdownItems) == false
         and: 'We uncheck the Just Planning checkbox'
             waitFor{justPlanningCheck.click()}
-
     }
 
     def "7. The user changes the pagination value again"(){
@@ -146,11 +130,57 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
         when: 'The user changes the pagination value again'
             waitFor {view.displayed}
             itemsPerPage.value(25)
-
         then: 'The table loads and the elements are present'
             leftTableElements.displayed
             waitFor {view.displayed}
-
     }
 
+    def "8. Certify selected assets count for all assets state"(){
+        when: "The user clicks on select all assets to get all checked state"
+            checkAllItems()
+            def paginationValue = getPaginationSelectValue()
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText paginationValue
+        when: "The user moves to next page"
+            commonsModule.goToTargetKendoGridPage "next"
+        then: 'All checkboxes are unchecked in page'
+            checkedItems(false) == true
+        and: "Selected assets text is not displayed"
+            !verifySelectedAssetsTextDisplayed()
+    }
+
+    def "9. Certify selected assets count for indeterminate state"(){
+        given: "The user moves to first page"
+            commonsModule.goToFirstKendoGridPage()
+        when: "The user clicks on select all assets to get indeterminate state"
+            checkIndetermitateItems()
+            def totalAssetsValue = getTotalNumberOfAssetsFromBottomPager()
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText totalAssetsValue
+        when: "The user moves to next page"
+            commonsModule.goToTargetKendoGridPage "next"
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText totalAssetsValue
+    }
+
+    def "10. Certify random selected assets count"(){
+        given: "The user moves to first page"
+            commonsModule.goToFirstKendoGridPage()
+        and: "The user clicks on select all assets to get unchecked state"
+            unCheckAllItems()
+        and: "Selected assets text is not displayed"
+            !verifySelectedAssetsTextDisplayed()
+        when: "The user selects random assets"
+            selectRandomAssetsAndGetNames assetsCountToBeSelected
+        then: 'Bulk change button is displayed'
+            waitForBulkChangeButtonDisplayed() // wait and validation
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText assetsCountToBeSelected
+    }
 }
