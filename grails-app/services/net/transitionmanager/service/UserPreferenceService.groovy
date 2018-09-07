@@ -67,7 +67,8 @@ class UserPreferenceService implements ServiceMethods {
 				return false
 			}
 		}
-		if (!(NumberUtil.toInteger(prefs.maxEdgeCount, 0) in (1..20))) {
+		def maxEdgeCount = NumberUtil.toInteger(prefs.maxEdgeCount, 0)
+		if (maxEdgeCount < 1 || maxEdgeCount > 20) {
 			return false
 		}
 		return true
@@ -87,10 +88,12 @@ class UserPreferenceService implements ServiceMethods {
 				return false
 			}
 		}
-		if (!(NumberUtil.toInteger(prefs.levelsUp, 0) in (0..10))) {
+		def levelsUp = NumberUtil.toInteger(prefs.levelsUp, 0)
+		if (levelsUp < 0 || levelsUp > 10) {
 			return false
 		}
-		if (!(NumberUtil.toInteger(prefs.levelsDown, 0)  in (0..10))) {
+		def levelsDown = NumberUtil.toInteger(prefs.levelsDown, 0)
+		if (levelsDown < 0 || levelsDown > 10) {
 			return false
 		}
 		return true
