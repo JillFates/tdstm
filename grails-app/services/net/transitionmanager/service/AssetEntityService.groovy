@@ -2601,8 +2601,8 @@ class AssetEntityService implements ServiceMethods {
 			SELECT * FROM (
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName,
 				ae.asset_type AS assetType, m.name AS model,
-				if (at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
-				if (ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+				(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+				(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
 				me.move_event_id AS event, ae.plan_status AS planStatus,
 				mb.name AS moveBundle, ae.validation AS validation
 			""")
@@ -2615,8 +2615,6 @@ class AssetEntityService implements ServiceMethods {
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '$AssetCommentType.TASK'
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '$AssetCommentType.COMMENT'
 				""")
 
 		if (joinQuery.length())
