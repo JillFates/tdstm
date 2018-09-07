@@ -121,8 +121,8 @@ class ApplicationController implements ControllerMethods {
 		Map queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
-				if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
-				if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+				(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+				(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
 				me.move_event_id AS event, ''')
 
 		if (customizeQuery.query) {
@@ -156,11 +156,6 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
-		query.append('''
-			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
-			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
-		''')
-
 		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
 		}
@@ -190,7 +185,7 @@ class ApplicationController implements ControllerMethods {
 			}
 		}
 
-		query.append('GROUP BY app_id, ac_task.asset_comment_id, ac_comment.asset_comment_id ) AS apps')
+		query.append('GROUP BY app_id ) AS apps')
 
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)

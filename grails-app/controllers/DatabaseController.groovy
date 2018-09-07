@@ -149,9 +149,10 @@ class DatabaseController implements ControllerMethods {
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-		def query = new StringBuilder("""SELECT * FROM (SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-										 me.move_event_id AS event,
-										 if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,""")
+		def query = new StringBuilder("""
+			SELECT * FROM (SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+			(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+			(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,""")
 
 		if (temp){
 			query.append(temp)
@@ -168,8 +169,6 @@ class DatabaseController implements ControllerMethods {
 			query.append(joinQuery)
 
 		query.append(""" \n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
-			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			WHERE ae.project_id = $project.id """)
 
 		if (justPlanning == 'true') {
@@ -188,7 +187,7 @@ class DatabaseController implements ControllerMethods {
 				query.append(" AND (ae.move_bundle_id IN ($unasgnmbId) OR ae.move_bundle_id IS NULL)")
 			}
 		}
-		query.append(" GROUP BY db_id, ac_task.asset_comment_id, ac_comment.asset_comment_id) AS dbs ")
+		query.append(" GROUP BY db_id) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN ($unknownQuestioned)
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN ($unknownQuestioned)
