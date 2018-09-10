@@ -623,6 +623,13 @@ class SearchQueryHelper {
 					extraCriteria.put('source', (isSource ? 1 : 0))
 					break
 
+				case 'Manufacturer':
+					Manufacturer mfg = findEntityByMetaData('manufacturer', fieldsInfo, context)
+					if (mfg) {
+						extraCriteria.put('manufacturer.id', mfg.id)
+					}
+					break
+
 				case 'Model':
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
