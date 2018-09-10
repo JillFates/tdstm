@@ -1485,9 +1485,13 @@ class DataImportService implements ServiceMethods {
 				// Check if the field is a reference property
 				if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
 					// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
-					Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-					if (refObject instanceof CharSequence) {
-						errorMsg = refObject
+					//Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
+					// TODO: dcorrea this logic needs to be changed by TM-11895
+					Object refObject = SearchQueryHelper.findEntityByMetaData(propertyName, fieldsInfo, context, domainInstance)
+					recordAnySearchQueryHelperErrors(propertyName, fieldsInfo, context)
+
+					if (refObject == -1) {
+						errorMsg = context?.searchQueryHelperErrors?.join(',')
 					} else {
 						// Only set if different so as not to trigger the dirty flag unnecessarily
 						if (domainInstance[propertyName] != refObject) {
