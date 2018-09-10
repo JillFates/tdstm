@@ -287,6 +287,15 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		assetSelector:{}
 	};
 
+	scope.assignments = {
+		assetSelector:{}
+	};
+
+	scope.$on('sessionAssignmentTagSelector', function (evt, tagIds) {
+		scope.assignments.preAssetSelector = {
+			tag: tagIds
+		}
+	});
 
 	scope.onDependencyAnalyzerTagSelectionChange = function () {
 		if (scope.internal.assetSelector.tag.length >= 1) {
@@ -500,6 +509,8 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
 				console.log({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId})
 				qPromises.push(commentService.createAssetTagsForEvent({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId}));
 			}
+			// Convert the user date value into the  iso 8601("yyyy-MM-dd'T'HH:mm:ss'Z'") so it's being send to the server like that
+			$('#estStartTime').val(moment($('#kendoEstStartTime').val()).toISOString());
 
 			$scope.validEditEventSubmit = true;
 			if (qPromises.length > 0) {

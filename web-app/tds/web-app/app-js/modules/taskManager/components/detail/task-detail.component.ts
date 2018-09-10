@@ -130,16 +130,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
-	}
-
-	/**
 	 * Get the assigned team name
 	 * @param commentId
 	 * @param assignedToId

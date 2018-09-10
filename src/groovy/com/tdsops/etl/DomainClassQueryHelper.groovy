@@ -42,23 +42,44 @@ class DomainClassQueryHelper {
 	 * @return a list of assets returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
+
+		List<FindCondition> conditions = paramsMap.collect { Entry entry ->
+			new FindCondition(entry.key, entry.value)
+		}
 		if(domain.isAsset()){
-			return assetEntities(domain.clazz, project, paramsMap, returnIdOnly)
+			return assetEntities(domain.clazz, project, conditions, returnIdOnly)
 		} else {
-			return nonAssetEntities(domain.clazz, project, paramsMap, returnIdOnly)
+			return nonAssetEntities(domain.clazz, project, conditions, returnIdOnly)
 		}
 	}
+
 	/**
-	 * Executes an HQL query looking for those all assets referenced by params.
+	 * Executes the HQL query related to the domain defined.
+	 * @param domain an instance of ETLDomain used to defined the correct HQL query to be executed
 	 * @param project a project instance used as a param in the HQL query
-	 * @param paramsMap a map with params to be used in the HQL query
+	 * @param conditions a list of {@code FindCondition} to be used in the HQL query
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
+	static List where(ETLDomain domain, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
+		if(domain.isAsset()){
+			return assetEntities(domain.clazz, project, conditions, returnIdOnly)
+		} else {
+			return nonAssetEntities(domain.clazz, project, conditions, returnIdOnly)
+		}
+	}
 
-		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
-		String hqlJoins = hqlJoins(clazz, paramsMap)
+	/**
+	 * Executes an HQL query looking for those all assets referenced by params.
+	 * @param project a project instance used as a param in the HQL query
+	 * @param conditions a list of {@code FindCondition}
+	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
+	 * @return a list of assets returned by an HQL query
+	 */
+	static List assetEntities(Class<? extends AssetEntity> clazz, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
+
+		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
+		String hqlJoins = hqlJoins(clazz, conditions)
 
 		String hql = """
             select ${DOMAIN_ALIAS}${returnIdOnly ? '.id' : ''}
@@ -77,14 +98,14 @@ class DomainClassQueryHelper {
 	 * Executes an HQL query looking for those all non assets referenced by params.
 	 * @param clazz class used to execute the HQL sentence
 	 * @param project a project instance used as a param in the HQL query
-	 * @param paramsMap  a map with params to be used in the HQL query
+	 * @param conditions a list of {@code FindCondition}
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static <T> List nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
+	static <T> List nonAssetEntities(Class<T> clazz, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
 
-		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, paramsMap)
-		String hqlJoins = hqlJoins(clazz, paramsMap)
+		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
+		String hqlJoins = hqlJoins(clazz, conditions)
 
 		if(GormUtil.isDomainProperty(clazz, 'project')){
 			hqlWhere += " and ${DOMAIN_ALIAS}.project = :project \n".toString()
@@ -226,26 +247,26 @@ class DomainClassQueryHelper {
 	/**
 	 * Prepare el hql where and the hql params for an HQL query.
 	 * @param clazz
-	 * @param mapParams key/value pair use for preparing where and params in the HQL sentence.
+	 * @param  conditions a list of {@code FindCondition} use for preparing where and params in the HQL sentence.
 	 * @return a alist with 2 values: first the where sentence part for an HQL query using Clazz
 	 *          and second the hql params for an HQL query..
 	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 */
-	static List hqlWhereAndHqlParams(Project project, Class clazz, Map<String, ?> mapParams) {
+	static List hqlWhereAndHqlParams(Project project, Class clazz, List<FindCondition> conditions) {
 
 		Map<String, ?> hqlParams = [:]
 
-		String hqlWhere = mapParams.collect { Entry entry ->
+		String hqlWhere = conditions.collect { FindCondition condition ->
 
-			String property = getPropertyForField(clazz, entry.key)
-			String namedParameter = getNamedParameterForField(clazz, entry.key)
+			String property = getPropertyForField(clazz, condition.propertyName)
+			String namedParameter = getNamedParameterForField(clazz, condition.propertyName)
 
-			if (shouldQueryByReferenceId(clazz, entry.key, entry.value) ) {
-				hqlParams[namedParameter] = entry.value
-				String where = " ${property}.id = :${namedParameter}\n"
+			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 
-				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, entry.key)
+				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+
+				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
 					where += " and ${property}.project =:${namedParameter}_project \n"
 					hqlParams[namedParameter + '_project'] = project
@@ -254,15 +275,13 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				if(entry.key == 'id' && NumberUtil.isPositiveLong(entry.value)) {
-					hqlParams[namedParameter] = NumberUtil.toPositiveLong(entry.value)
-				} else {
-					hqlParams[namedParameter] = entry.value
+				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				// If user is trying to use find command by id, automatically we convert that value to a long
+				if(condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
 				}
 
-
-
-				return " ${property} = :${namedParameter}\n"
+				return where
 			}
 
 		}.join(' and ')
@@ -284,14 +303,110 @@ class DomainClassQueryHelper {
 	/**
 	 * Prepares all the necessary joins clause based on paramsMap and clazz parameters.
 	 * @param clazz
-	 * @param mapParams
+	 * @param conditions a list of {@code FindCondition}
 	 * @return a string content with join clause for an HQL query
 	 */
-	static String hqlJoins(Class clazz, Map<String, ?> mapParams) {
-		return mapParams.collect { def item ->
-			getJoinForField(clazz, item.key)
+	static String hqlJoins(Class clazz, List<FindCondition> conditions) {
+		return conditions.collect { FindCondition condition ->
+			getJoinForField(clazz, condition.propertyName)
 		}.join('  ')
 	}
+
+
+	/**
+	 * <p>It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator</p>
+	 * <p>IT also calculate the necessary named parameters to complete the HQL sentnce</p>
+	 * <pre>
+	 *
+	 *
+	 * </pre>
+	 * @param condition a {@code FindCondition} parameter to be used in the HQl sentence
+	 * @param namedParameter a named parameter param for the HQL sentence
+	 * @param hqlParams
+	 * @return a HQL sentence defined by a property operator and named parameter
+	 */
+	static String buildSentenceAndHqlParam(FindCondition condition, String property, String namedParameter, Map<String, ?> hqlParams){
+
+		String sentence
+
+		switch (condition.operator){
+			case FindOperator.eq:
+				sentence = " ${property} = :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.ne:
+				sentence = " ${property} != :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.nseq: //TODO: Review it with John
+				sentence = " ${property} != :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.lt:
+				sentence = " ${property} < :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.le:
+				sentence = " ${property} <= :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.gt:
+				sentence = " ${property} > :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.ge:
+				sentence = " ${property} >= :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.like:
+				sentence = " ${property} like :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.notLike:
+				sentence = " ${property} not like :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.contains:
+				sentence = " ${property} like :${namedParameter}\n"
+				hqlParams[namedParameter] = '%' + condition.value + '%'
+				break
+			case FindOperator.notContains:
+				sentence = " ${property} not like :${namedParameter}\n"
+				hqlParams[namedParameter] = '%' + condition.value + '%'
+				break
+			case FindOperator.inList:
+				sentence = " ${property} in :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.notInList:
+				sentence = " ${property} not in :${namedParameter}\n"
+				hqlParams[namedParameter] = condition.value
+				break
+			case FindOperator.between:
+				sentence = " ${property} between :${namedParameter}_first and :${namedParameter}_last\n"
+				hqlParams[namedParameter + '_first'] = condition.value.first()
+				hqlParams[namedParameter + '_last'] = condition.value.last()
+				break
+			case FindOperator.notBetween:
+				sentence = " ${property} not between :${namedParameter}_first and :${namedParameter}_last\n"
+				hqlParams[namedParameter + '_first'] = condition.value.first()
+				hqlParams[namedParameter + '_last'] = condition.value.last()
+				break
+			case FindOperator.isNull:
+				sentence = " ${property} is null\n"
+				break
+			case FindOperator.isNotNull:
+				sentence = " ${property} is not null\n"
+				break
+
+			default:
+				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")
+
+		}
+
+		return sentence
+	}
+
 
 	static Map otherAlternateKeys = [
 		locationSource: [

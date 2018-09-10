@@ -63,15 +63,15 @@ class FindResultsCache {
 	 * value is replaced.
 	 *
 	 * @param domainClassName class name from a domain class in system
-	 * @param fieldsInfo a map with key and value used in a find command
+	 * @param conditions a list of {@code FindCondition} used in a find command
 	 * @param value a List of objects to be associated with the specified key
 	 * @return the previous value associated with <tt>key</tt>, or
 	 *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
 	 *         (A <tt>null</tt> return can also indicate that the map
 	 *         previously associated <tt>null</tt> with <tt>key</tt>.)
 	 */
-	List<?> put(String domainClassName, Map fieldsInfo, List<?> value) {
-		String key = generateMd5Key(domainClassName, fieldsInfo)
+	List<?> put(String domainClassName, List<FindCondition> conditions, List<?> value) {
+		String key = generateMd5Key(domainClassName, conditions)
 		return cache.put(key, value)
 	}
 
@@ -82,19 +82,17 @@ class FindResultsCache {
 	 * based on {@link StringUtil#md5Hex(java.lang.String)}
 	 *
 	 * @param domainClassName class name from a domain class in system
-	 * @param fieldsInfo a map with key and value used in a find command
+	 * @param conditions a list of {@code FindCondition} used in a find command
 	 * @return <p>if this map contains a mapping from a key {@code k} to a value {@code v}
 	 *          such that {@code ( key = = null ? k = = null : key.equals ( k ) )},
 	 *          then this method returns {@code v}; otherwise
 	 *          it returns {@code null}.  (There can be at most one such mapping.)
 	 */
-	List<?> get(String domainClassName, Map fieldsInfo) {
+	List<?> get(String domainClassName, List<FindCondition> conditions) {
 		accessCount++
-		String key = generateMd5Key(domainClassName, fieldsInfo)
+		String key = generateMd5Key(domainClassName, conditions)
 		List<?> value = cache.get(key)
-
 		updateHitCount(value != null)
-
 		return value
 	}
 
@@ -120,8 +118,8 @@ class FindResultsCache {
 	 * @return an MD5 string based on parameters
 	 * @see StringUtil#md5Hex(java.lang.String)
 	 */
-	private String generateMd5Key(String domainClassName, Map fieldsInfo) {
-		return StringUtil.md5Hex("${domainClassName}:query=${fieldsInfo}")
+	private String generateMd5Key(String domainClassName, List<FindCondition> conditions) {
+		return StringUtil.md5Hex("${domainClassName}:query=${conditions}")
 	}
 
 	/**

@@ -131,7 +131,6 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	ngOnInit(): void {
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
 		this.loadRecordFieldDetails();
-		this.currentPreviousColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
 	}
 
 	/**
@@ -143,8 +142,9 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.batchRecord = result.data;
 					this.onBatchRecordUpdated.emit({batchRecord: this.batchRecord});
-					this.buildGridData(result.data.fieldsInfo);
+					this.buildGridData(this.batchRecord.fieldsInfo);
 					this.processStatus.state = CHECK_ACTION.NONE;
+					this.currentPreviousColumnLabel = (this.batchRecord.status.code === BatchStatus.COMPLETED ? 'Previous Value' : 'Current Value');
 					if (updateProcessStatus) {
 						let fieldsWithErrors = this.fieldsInfo.filter(item => item.errors.length > 0);
 						this.processStatus.state = fieldsWithErrors.length > 0 ? CHECK_ACTION.INVALID : CHECK_ACTION.NONE;

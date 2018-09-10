@@ -34,7 +34,7 @@ class ViewPage extends Page{
         itemNumberDesc(required:false) {$("kendo-pager-info" , class:"k-pager-info k-label")}
         nextPageButton(required:false) {$("kendo-pager" , class:"k-pager-wrap k-grid-pager k-widget").find("kendo-pager-next-buttons").find("a", class:"k-link k-pager-nav" , title:"Go to the next page").find("span", class:"k-icon k-i-arrow-e")}
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
-        allItemsCheckbox(required:false) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
+        allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[2]}
         nameFilter(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"2").find("td","aria-colindex":"2").find("div").find("input",type:"text")}
@@ -48,9 +48,13 @@ class ViewPage extends Page{
         allFilterXIcons {$('td[kendogridfiltercell] span.fa-times')}
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
-        refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
+        refreshBtn {$("div", class:"component-action-reload").find("span", class:"glyphicon-refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
+        noRecords {$("div.grid-message label")}
+        assetsDisplayedInPager {$("kendo-pager-info")}
+        paginationSizes {$("kendo-pager-page-sizes select")}
+        selectedAssets {$('.selected-assets')}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -139,16 +143,7 @@ class ViewPage extends Page{
     }
 
     def clickOnGear(){
-        gearBtn.click()
-    }
-
-    def nextPage(){
-        interact{
-            moveToElement nextPageButton
-        }
-        waitFor{nextPageButton.click()}
-        waitFor {view.displayed}
-        return true
+        waitFor{gearBtn.click()}
     }
 
     /*
@@ -158,46 +153,89 @@ class ViewPage extends Page{
     Parameter: dropdownItems(set on the AllPagesSpec page).
      */
     def searchTBD (dropdownItems) {
-        def splitItemsString = itemNumberDesc.text().split(" ")
-        def stringSize = splitItemsString.size()
-        def numberItems = splitItemsString[stringSize-2]
-        float numberItemsFloat = Math.ceil(numberItems as Float)
+        def numberItemsFloat = Math.ceil(getTotalNumberOfAssetsFromBottomPager() as Float)
         def amountOfIterations = Math.ceil(numberItemsFloat/dropdownItems)
         def flag=false
         for(int j =1 ; j<=amountOfIterations ; j++ ){
             waitFor {view.displayed}
             waitFor{leftTableElements.displayed}
             //We create a list with the elements on the Bundle column every time the table is refreshed
-            def bundleData = $("div" , class:"k-grid-content k-virtual-content").find("table" , class:"k-grid-table" , style:"transform: translateY(0px); width: 1699px;").find("tbody", role:"presentation").find("tr").find("aria-colindex":"8")
+            def bundleData = $("div", class:"k-grid-content").find("td", "aria-colindex":"8")
             for(int i=0; i<bundleData.size();i++){
+                commonsModule.goToElement bundleData[i]
                 if(bundleData[i].text().equals("TBD")){
                     flag=true
                     break
                 }
             }
             if(j!=amountOfIterations)
-                nextPage()
+                commonsModule.goToTargetKendoGridPage "next"
         }
-        return flag
+        flag
     }
 
     def checkedItems(checked = true){
+        goToBulkChangeButton()
         allItemsCheckbox.each{
+            commonsModule.goToElement it
             assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }
         true // return true to avoid failure in spoke verification, if fails it will be in above assert
     }
 
     def checkJustPlanning(){
-        if(justPlanningCheck.value()==false){
+        if(!justPlanningCheck.jquery.prop('checked')){
+            clickOnJustPlanningCheckbox()
+        }
+    }
+
+    def unCheckJustPlanning(){
+        if(justPlanningCheck.jquery.prop('checked')){
             clickOnJustPlanningCheckbox()
         }
     }
 
     def checkAllItems(){
-        if(selectAllChecks.value()==false){
-            clickOnSelectAllAssets()
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(!isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from uncheck to check all
+        } else if (isIndeterminate) {
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+            clickOnAllAssetsAndWait() // from uncheck to check all
         }
+    }
+
+    def unCheckAllItems(){
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+        } else if (isIndeterminate) {
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+        }
+    }
+
+    def checkIndetermitateItems(){
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(!isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from uncheck to check all
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+        } else if (isChecked) {
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+        }
+    }
+
+    def clickOnAllAssetsAndWait(isSelectAllMessageDisplayed = true){
+        clickOnSelectAllAssets()
+        if (!isSelectAllMessageDisplayed) {
+            !verifySelectedAssetsTextDisplayed()
+        } else {
+            verifySelectedAssetsTextDisplayed()
+        }
+
     }
 
     def clickOnJustPlanningCheckbox(){
@@ -213,11 +251,17 @@ class ViewPage extends Page{
         selectAllChecks.jquery.prop('indeterminate')
     }
 
+    def goToBulkChangeButton(){
+        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
+    }
+
     def waitForBulkChangeButtonDisplayed(){
+        goToBulkChangeButton()
         waitFor{bulkChangeButton.displayed}
     }
 
     def waitForBulkChangeButtonDisabled(){
+        goToBulkChangeButton()
         waitFor{bulkChangeButton.@disabled == "true"}
     }
 
@@ -273,7 +317,7 @@ class ViewPage extends Page{
     def selectRandomAssetsAndGetNames(numberOfAssetsToBeSelected){
         def assetNames = []
         if (!commonsModule.isListOfElements(allItemsCheckbox)) { // if not list just click on selector
-            clickOnCheckboxByName allItemsCheckbox
+            clickOnAssetCheckbox allItemsCheckbox
             assetNames.add getAssetNameFromGivenCheckboxSelector(allItemsCheckbox)
         } else { // else get random number of assets, click on them and add names to the list
             // validates available checkboxes are more than passed number, otherwise selects displayed
@@ -282,16 +326,18 @@ class ViewPage extends Page{
             def checkbox
             checkboxes.each { input ->
                 checkbox = allItemsCheckbox.find{it.attr("name") == input.jquery.prop("name")}
-                clickOnCheckboxByName checkbox
+                clickOnAssetCheckbox checkbox
                 assetNames.add getAssetNameFromGivenCheckboxSelector(checkbox)
             }
         }
         assetNames
     }
 
-    def clickOnCheckboxByName(checkbox){
-        waitFor{checkbox.click()}
-        waitFor{getCheckedInputStatus(checkbox) == true} // verify its checked
+    def clickOnAssetCheckbox(checkboxSelector){
+        goToBulkChangeButton()
+        commonsModule.goToElement checkboxSelector
+        waitFor{checkboxSelector.click()}
+        waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
     }
 
     def getCheckedInputStatus(element){
@@ -358,5 +404,105 @@ class ViewPage extends Page{
             assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
             clearAllAppliedFilters()
         }
+    }
+
+    def verifyIfNoRecordsDisplayed(text){
+        if (commonsModule.verifyElementDisplayed($("div.grid-message label"))) {
+            verifyNoRecordsText(text)
+            clearAllAppliedFilters()
+        }
+        true
+    }
+
+    def verifyNoRecordsText(text){
+        waitFor{noRecords.text() == text}
+    }
+
+    def addColumnByName(name){
+        clickOnGear()
+        createViewModule.clickSpecificCheckbox name
+        createViewModule.clickPreview()
+        commonsModule.waitForLoader 5
+        createViewModule.clickOnCloseViewEdition()
+        !commonsModule.verifyElementDisplayed($('#tab_2'))
+    }
+
+    /**
+     * Method gets and returns a list of tags displayed in grid associated to the asset.
+     * @param checkboxName = checkbox Name Attr associated to the tag to find in asset row
+     * @author Sebastian Bigatton
+     */
+    def getDisplayedTagsByAssetCheckbox(checkboxName){
+        def displayed = []
+        def checkbox = $("input[name=$checkboxName]")
+        def rowIndex = checkbox.closest("tr[kendogridlogicalrow]").attr("data-kendo-grid-item-index")
+        def tagsRow = checkbox.closest("kendo-grid-list")find("tr", "data-kendo-grid-item-index":rowIndex)
+        def tagsDisplayedInColumn = tagsRow.find("span.tag")
+        if (!commonsModule.isListOfElements(tagsDisplayedInColumn)){
+            displayed.add tagsDisplayedInColumn.text()
+        } else {
+            tagsDisplayedInColumn.each{
+                displayed.add it.text()
+            }
+        }
+        displayed
+    }
+
+    /**
+     * Method iterates thru assets map [name: checkbox name attr identifier] and tag name list
+     * to verify they were successfylly saved and displayed in grid
+     * @param assetsMap = [asset name: checkbox name attr identifier]
+     * @param tagNames = list of tag names to verify
+     * @author Sebastian Bigatton
+     */
+    def verifyDisplayedTagsByAsset(assetsMap, tagNames){
+        assetsMap.each{
+            def displayedTags
+            filterByName it.key // key = assetName
+            displayedTags = getDisplayedTagsByAssetCheckbox(it.value) // value = checkbox name attr identifier
+            tagNames.each{
+                assert displayedTags.find{it} != null
+            }
+        }
+        true
+    }
+
+    def getTotalNumberOfAssetsFromBottomPager(){
+        commonsModule.goToElement itemNumberDesc
+        def pagerText = itemNumberDesc.text()
+        def filteredTotal = pagerText.substring(pagerText.indexOf("of ") + 3, pagerText.indexOf(" items"))
+        filteredTotal.toInteger()
+    }
+
+    def getPaginationSelectValue(){
+        commonsModule.goToElement paginationSizes
+        paginationSizes.value().toInteger()
+    }
+
+    def getSelectedAssetsText(){
+        goToBulkChangeButton()
+        selectedAssets.find("span").text() + " " + selectedAssets.find("label").text()
+    }
+
+    def verifySelectedAssetsText(selectedCount){
+        goToBulkChangeButton()
+        getSelectedAssetsText() == selectedCount + " Asset(s) selected"
+    }
+
+    def verifySelectedAssetsTextDisplayed(){
+        goToBulkChangeButton()
+        commonsModule.verifyElementDisplayed($('.selected-assets'))
+    }
+
+    def getFirstElementNameText(){
+        goToBulkChangeButton()
+        waitFor{firstElementName.displayed}
+        firstElementName.text()
+    }
+
+    def getFirstElementClassText(){
+        goToBulkChangeButton()
+        waitFor{firstElementAssetClass.displayed}
+        firstElementAssetClass.text()
     }
 }

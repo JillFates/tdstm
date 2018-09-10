@@ -385,7 +385,9 @@ class DataScriptService implements ServiceMethods{
 
 		// If there are no fields it means that none was found in the rootNode location
 		if (dataSetFacade.fields().isEmpty()) {
-			throw new ExceptionGETL("No data found at specified rootNode '${rootNode}'")
+			throw new ExceptionGETL(
+					  'No data found, please check the uploaded data and the documentation for JSON data sources'
+			)
 		}
 
 		return [

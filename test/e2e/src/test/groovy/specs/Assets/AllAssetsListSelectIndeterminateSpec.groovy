@@ -7,7 +7,6 @@ import pages.Login.MenuPage
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
-
 @Stepwise
 class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
 
@@ -16,6 +15,7 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
     static assetClass = "Application"
     static description = "QAE2E"
     static environment = "Production"
+    static assetsCountToBeSelected = 3
 
     def setupSpec() {
         testCount = 0
@@ -37,14 +37,10 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
     def "1. Certify indeterminate state is checked"(){
         given: 'The user is on the All Assets page'
             at ViewPage
-        when: 'The user clicks in select all assets'
-            clickOnSelectAllAssets() // click to select all state
-        then: 'Bulk change button is displayed'
-            waitForBulkChangeButtonDisplayed() // wait and validation
-        when: 'The user clicks in select all assets again'
-            clickOnSelectAllAssets() // click to select all in indeterminate state
-        then: 'Bulk change button still displayed'
-            waitForBulkChangeButtonDisplayed() // wait and validation
+        and: 'The user removes Just Planning if its checked'
+            unCheckJustPlanning()
+        when: 'The user clicks in select all assets to get indeterminate state'
+            checkIndetermitateItems()
         then: 'We verify indeterminate state is checked'
             getSelectIndeterminateState() == true
     }
@@ -60,7 +56,7 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
             checkedItems() == true
     }
 
-    def "2. Certify indeterminate state is checked filtering by asset class"(){
+    def "3. Certify indeterminate state is checked filtering by asset class"(){
         when: 'The user filters by asset class Application'
             filterByAssetClass assetClass
         then: 'We verify indeterminate state is checked'
@@ -69,21 +65,21 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
             checkedItems() == true
     }
 
-    def "3. Certify indeterminate state is checked filtering by description"(){
+    def "4. Certify indeterminate state is checked filtering by description"(){
         when: 'The user filters by asset class Application'
             filterByDescription description
         then: 'We verify indeterminate state is checked'
             getSelectIndeterminateState() == true
     }
 
-    def "4. Certify indeterminate state is checked filtering by environment"(){
+    def "5. Certify indeterminate state is checked filtering by environment"(){
         when: 'The user filters by asset class Application'
             filterByEnvironment environment
         then: 'We verify indeterminate state is checked'
             getSelectIndeterminateState() == true
     }
 
-    def "5. Certify indeterminate state is checked clearing all applied filters"(){
+    def "6. Certify indeterminate state is checked clearing all applied filters"(){
         when: 'The user clears all filters'
             clearAllAppliedFilters()
         then: 'Applied filters are clean'
@@ -94,19 +90,66 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
             getSelectIndeterminateState() == true
     }
 
-    def "6. Certify indeterminate state is checked filtering Just planning"(){
+    def "7. Certify indeterminate state is checked filtering Just planning"(){
         when: 'The user clicks in Just Planning checkbox'
-            clickOnJustPlanningCheckbox()
+            checkJustPlanning()
         then: 'We verify indeterminate state is checked'
             getSelectIndeterminateState() == true
     }
 
-    def "7. Certify unchecked assets"(){
-        when: 'The user clicks in select all assets'
-            clickOnSelectAllAssets() // click to select all state
-        then: 'Bulk change button is disabled'
-            waitForBulkChangeButtonDisabled() // wait and validation
-        and: 'All checkboxes are unchecked in page'
+    def "8. Certify unchecked assets"(){
+        when: 'The user clicks in select all assets to get unchecked state'
+            unCheckAllItems()
+        then: 'All checkboxes are unchecked in page'
             checkedItems(false) == true
+    }
+
+    def "9. Certify selected assets count for all assets state"(){
+        when: "The user clicks on select all assets to get all checked state"
+            checkAllItems()
+            def paginationValue = getPaginationSelectValue()
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText paginationValue
+        when: "The user moves to next page"
+            commonsModule.goToTargetKendoGridPage "next"
+        then: 'All checkboxes are unchecked in page'
+            checkedItems(false) == true
+        and: "Selected assets text is not displayed"
+            !verifySelectedAssetsTextDisplayed()
+    }
+
+    def "10. Certify selected assets count for indeterminate state"(){
+        given: "The user moves to first page"
+            commonsModule.goToFirstKendoGridPage()
+        when: "The user clicks on select all assets to get indeterminate state"
+            checkIndetermitateItems()
+            def totalAssetsValue = getTotalNumberOfAssetsFromBottomPager()
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText totalAssetsValue
+        when: "The user moves to next page"
+            commonsModule.goToTargetKendoGridPage "next"
+        then: 'All checkboxes are checked in page'
+            checkedItems() == true
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText totalAssetsValue
+    }
+
+    def "11. Certify random selected assets count"(){
+        given: "The user moves to first page"
+            commonsModule.goToFirstKendoGridPage()
+        and: "The user clicks on select all assets to get unchecked state"
+            unCheckAllItems()
+        and: "Selected assets text is not displayed"
+            !verifySelectedAssetsTextDisplayed()
+        when: "The user selects random assets"
+            selectRandomAssetsAndGetNames assetsCountToBeSelected
+        then: 'Bulk change button is displayed'
+            waitForBulkChangeButtonDisplayed() // wait and validation
+        and: "Selected assets value is correct"
+            verifySelectedAssetsText assetsCountToBeSelected
     }
 }

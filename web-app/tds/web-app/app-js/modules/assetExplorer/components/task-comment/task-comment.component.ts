@@ -171,7 +171,7 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			if (result) {
 				if (result.isDeleted) {
 					this.deleteTaskComment(dataItem);

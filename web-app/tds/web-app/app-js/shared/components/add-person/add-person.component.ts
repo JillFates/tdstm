@@ -49,7 +49,12 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	}
 
 	addTeam(): void {
-		const team = {team: null, data: [...this.personModel.teams]};
+		let defaultTeam = null;
+		if (this.personModel.teams && this.personModel.teams.length) {
+			defaultTeam = this.personModel.teams[0];
+		}
+
+		const team = {team: defaultTeam, data: [...this.personModel.teams]};
 		this.teams.push(team);
 	}
 
