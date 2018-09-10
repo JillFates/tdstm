@@ -1,5 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
@@ -13,6 +13,7 @@ import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {TaskEditComponent} from '../edit/task-edit.component';
 
 @Component({
 	selector: `task-detail`,
@@ -180,6 +181,23 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.close({id: this.taskDetailModel, isDeleted: true})
 			}
 		});
-
+	}
+	/**
+	 * Open view to edit task details
+	 */
+	public editTaskDetail(): void {
+		this.dialogService.extra(TaskEditComponent,
+			[
+				{provide: UIDialogService, useValue: this.dialogService},
+				{provide: TaskService, useValue:  this.taskManagerService},
+				{provide: UIPromptService, useValue: this.promptService},
+				{provide: PreferenceService, useValue: this.userPreferenceService} ,
+				{provide: PermissionService, useValue: this.permissionService},
+			{provide: TaskDetailModel, useValue: this.taskDetailModel}
+		], false, false).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
 	}
 }

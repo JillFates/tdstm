@@ -41,7 +41,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		public userPreferenceService: PreferenceService,
 		private permissionService: PermissionService) {
 
-		super('#task-detail-component');
+		super('#task-edit-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
 	}
 
