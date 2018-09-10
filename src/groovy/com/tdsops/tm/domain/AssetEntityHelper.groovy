@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.SecurityService
 
 /**
@@ -64,6 +65,9 @@ class AssetEntityHelper {
 				}
 			}
 		}
+
+		asset.customDomainService = new CustomDomainService()
+
 		return asset
 	}
 

@@ -630,7 +630,7 @@ class Element implements RangeChecker {
 
 		}
 
-		processor.addLocalVariableInBinding(variableName, this)
+		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
 

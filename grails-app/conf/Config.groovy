@@ -444,6 +444,6 @@ xssSanitizer.enabled = true
 
 // JPM 5/2018 : TM-10317 - Tried using both formats but the 2nd would not work correctly
 // grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
-grails.databinding.dateFormats = ['yyyy-MM-dd', 'dd/MM/yyyy hh:mm a']
+grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
 
 org.codehaus.groovy.grails.validation.ConstrainedProperty.registerNewConstraint(net.transitionmanager.domain.constraint.OfSameProjectConstraint.NAME, net.transitionmanager.domain.constraint.OfSameProjectConstraint.class)

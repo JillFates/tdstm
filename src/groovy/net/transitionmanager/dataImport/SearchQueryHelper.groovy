@@ -4,6 +4,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.FindCondition
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -492,7 +493,12 @@ class SearchQueryHelper {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv, false)
+				if(query.containsKey('criteria')){
+					List<FindCondition> conditions = FindCondition.buildCriteria(query.criteria)
+					entities = DomainClassQueryHelper.where(whereDomain, context.project, conditions, false)
+				} else {
+					entities = DomainClassQueryHelper.where(whereDomain, context.project, query.kv, false)
+				}
 
 				recordsFound = entities.size()
 				if (recordsFound > 0) {

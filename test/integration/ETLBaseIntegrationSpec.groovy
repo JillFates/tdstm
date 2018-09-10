@@ -1,23 +1,17 @@
-package com.tdsops.etl
-
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.QueryResult
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.WorkbookUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
-import getl.excel.ExcelConnection
-import getl.excel.ExcelDataset
-import getl.json.JSONConnection
-import getl.json.JSONDataset
 import getl.utils.FileUtils
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFRow
-import spock.lang.Specification
 
-abstract class ETLBaseSpec extends Specification {
+abstract class ETLBaseIntegrationSpec extends IntegrationSpec {
 
 	/**
 	 * Builds a list of Mock Room using this fields order
@@ -25,146 +19,91 @@ abstract class ETLBaseSpec extends Specification {
 	 * @param valuesList
 	 * @return a list of Mock(Room)
 	 */
-	List<Room> buildRooms(List<List<?>> valuesList) {
+	List<Room> buildRooms(List<List<?>> valuesList){
 		return valuesList.collect { List<?> values ->
-			Room room = Mock()
-			room.getId() >> values[0]
-			room.getProject() >> values[1]
-			room.getRoomName() >> values[2]
-			room.getLocation() >> values[3]
-			room.getRoomDepth() >> values[4]
-			room.getRoomWidth() >> values[5]
-			room.getAddress() >> values[6]
-			room.getCity() >> values[7]
-			room.getStateProv() >> values[8]
-			room.getPostalCode() >> values[9]
+			Room room = new Room()
+			room.project = values[0]
+			room.roomName = values[1]
+			room.location = values[2]
+			room.roomDepth = values[3]
+			room.roomWidth = values[4]
+			room.address = values[5]
+			room.city = values[6]
+			room.stateProv = values[7]
+			room.postalCode = values[8]
+			room.save()
 			room
 		}
 	}
 
 	/**
 	 * Builds a list of Mock Room using this fields order
-	 * ['id', 'project', 'room', 'manufacturer', 'model', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
+	 * ['project', 'room', 'manufacturer', 'model', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
 	 * @param valuesList
 	 * @return a list of Mock(Rack)
 	 */
-	List<Rack> buildRacks(List<List<?>> valuesList) {
+	List<Rack> buildRacks(List<List<?>> valuesList){
 		return valuesList.collect { List<?> values ->
-			Rack rack = Mock()
-			rack.getId() >> values[0]
-			rack.getProject() >> values[1]
-			rack.getRoom() >> values[2]
-			rack.getManufacturer() >> values[3]
-			rack.getModel() >> values[4]
-			rack.getLocation() >> values[5]
-			rack.getFront() >> values[6]
-			rack.getSource() >> values[7]
-			rack.getRoomX() >> values[8]
-			rack.getRoomY() >> values[9]
-			rack.getPowerA() >> values[10]
-			rack.getPowerB() >> values[11]
-			rack.getPowerC() >> values[12]
-			rack.getRackType() >> values[13]
+			Rack rack = new Rack()
+			rack.project = values[0]
+			rack.room = values[1]
+			rack.manufacturer = values[2]
+			rack.model = values[3]
+			rack.location = values[4]
+			rack.front = values[5]
+			rack.source = values[6]
+			rack.roomX = values[7]
+			rack.roomY = values[8]
+			rack.powerA = values[9]
+			rack.powerB = values[10]
+			rack.powerC = values[11]
+			rack.rackType = values[12]
+			rack.save()
 			rack
 		}
 	}
 
 	/**
-	 * Builds a spec structure used to validate asset fields
+	 * Builds a spec structure used to validate 'asset' fields
 	 * @param field
 	 * @param label
 	 * @param type
 	 * @param required
 	 * @return a map with the correct fieldSpec format
 	 */
-	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
+	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0){
 		return [
 			constraints: [
 				required: required
 			],
-			control: type,
-			default: '',
-			field: field,
-			imp: 'U',
-			label: label,
-			order: 0,
-			shared: 0,
-			show: 0,
-			tip: "",
-			udf: 0
+			control    : type,
+			default    : '',
+			field      : field,
+			imp        : 'U',
+			label      : label,
+			order      : 0,
+			shared     : 0,
+			show       : 0,
+			tip        : "",
+			udf        : 0
 		]
 	}
 
-
 	/**
-	 * Builds a SpreadSheet dataSet for an Excel content
-	 * @param sheetName
-	 * @param sheetContent
+	 * Builds a CSV dataSet from a csv content
+	 * @param csvContent
 	 * @return
 	 */
-	protected List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+	private List buildCSVDataSet(CharSequence csvContent){
 
-		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
-		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
+		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
+		sixRowsDataSetOS << csvContent
+		sixRowsDataSetOS.close()
 
+		String fullName = fileSystemService.getTemporaryFullFilename(fileName)
 
-		addSheetInWorkBook(workbook, sheetName, sheetContent)
-
-		WorkbookUtil.saveToOutputStream(workbook, outputStream)
-
-		ExcelConnection con = new ExcelConnection(
-			path: service.temporaryDirectory,
-			fileName: fileName,
-			driver: TDSExcelDriver)
-		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
-
-		return [fileName, new DataSetFacade(dataSet)]
-	}
-
-	/**
-	 * Adds a Sheet in a Workbook instance using the sheet name and the sheet contents
-	 * @param workbook
-	 * @param sheetName
-	 * @param sheetContent
-	 */
-	protected void addSheetInWorkBook(Workbook workbook, String sheetName, String sheetContent) {
-		Sheet sheet = workbook.createSheet(sheetName)
-		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
-			XSSFRow currentRow = sheet.createRow(rowNumber)
-			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
-			}
-		}
-	}
-
-	/**
-	 * Builds a SpreadSheet dataSet for an Excel content with multiple sheets
-	 * @param sheetsContent
-	 * @return
-	 */
-	protected List buildSpreadSheetDataSetWithMultipleSheets(Map<String, String> sheetsContent) {
-
-		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
-		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
-
-		// Getting the Sheet at index zero
-		sheetsContent.each { String sheetName, String sheetContent ->
-			Sheet sheet = workbook.createSheet(sheetName)
-			sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
-				XSSFRow currentRow = sheet.createRow(rowNumber)
-				line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
-					currentRow.createCell(columnNumber).setCellValue(cellContent)
-				}
-			}
-		}
-
-		WorkbookUtil.saveToOutputStream(workbook, outputStream)
-
-		ExcelConnection con = new ExcelConnection(
-			path: service.temporaryDirectory,
-			fileName: fileName,
-			driver: TDSExcelDriver)
-		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
+		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
+		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
 
 		return [fileName, new DataSetFacade(dataSet)]
 	}
@@ -182,58 +121,15 @@ abstract class ETLBaseSpec extends Specification {
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE) + commonFieldsSpec)
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE) + commonFieldsSpec)
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency) + commonFieldsSpec)
 
 		return validator
 	}
 
-	/**
-	 * Builds a CSV dataSet from a csv content
-	 * @param csvContent
-	 * @return
-	 */
-	private List buildCSVDataSet(String csvContent) {
-
-		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
-		dataSetOS << csvContent
-		dataSetOS.close()
-
-		String fullName = service.getTemporaryFullFilename(fileName)
-
-		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
-		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
-
-		return [fileName, new DataSetFacade(dataSet)]
-	}
-
-	/**
-	 * Builds a JSON dataSet for json content
-	 * @param sheetName
-	 * @param sheetContent
-	 * @return
-	 */
-	protected List buildJSONDataSet(String jsonContent) {
-
-		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'json')
-		dataSetOS << jsonContent
-		dataSetOS.close()
-
-		String fullName = service.getTemporaryFullFilename(fileName)
-
-		JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver:TDSJSONDriver)
-		JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
-
-		return [fileName, new DataSetFacade(dataSet)]
-	}
-
-	/**
-	 * Helper method to create Fields Specs based on Asset definition
-	 * @param asset
-	 * @return
-	 */
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
+	private List<Map<String, ?>> buildFieldSpecsFor(def asset){
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch(asset){
+		switch(asset) {
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
 					buildFieldSpec('appFunction', 'Function', 'String'),
@@ -356,7 +252,6 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('assetName', 'AssetName'),
 					buildFieldSpec('assetType', 'AssetType'),
 					buildFieldSpec('asset', 'Asset'),
-					buildFieldSpec('dependent', 'Dependent'),
 					buildFieldSpec('comment', 'Comment'),
 					buildFieldSpec('status', 'Status'),
 					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
@@ -405,28 +300,6 @@ abstract class ETLBaseSpec extends Specification {
 	}
 
 	/**
-	 * Assertions for a {@code FieldResult} instance
-	 * @param fieldResult
-	 * @param originalValue
-	 * @param value
-	 * @param initValue
-	 * @param errors
-	 * @param warn
-	 */
-	static void assertFieldResult(FieldResult fieldResult,
-								  Object originalValue = null,
-								  Object value = null,
-								  Object initValue = null,
-								  List errors = [],
-								  Boolean warn = false) {
-		assert fieldResult.originalValue == originalValue
-		assert fieldResult.value == value
-		assert fieldResult.init == initValue
-		assert fieldResult.errors == errors
-		assert fieldResult.warn == warn
-	}
-
-	/**
 	 * Assertions for a {@code QueryResult} instance
 	 * //TODO dcorrea add an example
 	 * @param queryResult
@@ -440,25 +313,5 @@ abstract class ETLBaseSpec extends Specification {
 			assert map['operator'] == values[i][1]
 			assert map['value'] == values[i][2]
 		}
-	}
-
-	/**
-	 * Assert if a {@code FindCondition} is complete and the rest of the fields are correct
-	 * @param condition
-	 * @param propertyName
-	 * @param operator
-	 * @param value
-	 */
-	static void assertFindConditionComplete(
-		FindCondition condition,
-		String propertyName,
-		FindOperator operator,
-		Object value,
-		Boolean isComplete = true
-	){
-		assert propertyName == condition.propertyName
-		assert operator == condition.operator
-		assert value == condition.value
-		assert condition.isComplete() == isComplete
 	}
 }

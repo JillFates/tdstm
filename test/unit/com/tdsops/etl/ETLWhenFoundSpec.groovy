@@ -173,26 +173,19 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 					with(data[0].fields.asset) {
 
 						find.query.size() == 4
-						with(find.query[0]) {
-							domain == ETLDomain.Device.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							domain == ETLDomain.Device.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							domain == ETLDomain.Device.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
-
-						with(find.query[3]) {
-							domain == ETLDomain.Asset.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Device, [
+							['id', FindOperator.eq.name(), '151954']
+						])
+						assertQueryResult(find.query[1], ETLDomain.Device, [
+							['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],
+							['assetClass', FindOperator.eq.name(), 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Device, [
+							['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+						])
+						assertQueryResult(find.query[3], ETLDomain.Asset, [
+							['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+						])
 
 						// whenNotFound create command assertions
 						create.assetName == 'ACMEVMPROD01'
@@ -454,30 +447,19 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 					with(data[0].fields.asset) {
 
 						find.query.size() == 4
-						with(find.query[0]) {
-							errors == []
-							domain == ETLDomain.Device.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							errors == []
-							domain == ETLDomain.Device.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							errors == []
-							domain == ETLDomain.Device.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
-
-						with(find.query[3]) {
-							errors == []
-							domain == ETLDomain.Asset.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Device, [
+							['id', FindOperator.eq.name(), '151954']
+						])
+						assertQueryResult(find.query[1], ETLDomain.Device, [
+							['assetName', FindOperator.eq.name(), 'ACMEVMPROD01'],
+							['assetClass', FindOperator.eq.name(), 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Device, [
+							['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+						])
+						assertQueryResult(find.query[3], ETLDomain.Asset, [
+							['assetName', FindOperator.eq.name(), 'VMWare Vcenter']
+						])
 
 						// whenFound update command assertions
 						!!update.lastUpdated

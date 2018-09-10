@@ -52,6 +52,8 @@ class AdminControllerTests extends IntegrationSpec {
      * The command is 'touch' and is an OS dependent command, as it is intended to be run on UNIX systems.
      * If you want to run this test on Windows, there is a workaround that consists of installing a touch command
      * for Windows. This can be done with http://www.binarez.com/touch_dot_exe/
+     *
+     * TODO: (oluna@tdsi.com) I think that this should not be tested since we are getting the command from a configuration file
      */
     @See('TM-7670')
     def 'Test the correct creation of the restart file in restartAppServiceAction()'() {

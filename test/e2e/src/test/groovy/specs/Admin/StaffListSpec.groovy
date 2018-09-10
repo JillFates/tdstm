@@ -80,7 +80,6 @@ class StaffListSpec extends GebReportingSpec {
             scModalTeamSelector = teamName
         and: 'The User Clicks the "Save" Button'
             waitFor { scModalSaveBtn.click() }
-
         then: 'The Pop-up should be closed and the User should be redirected to the Staff List Page'
             at StaffListPage
         and: 'A Success massage stating the User that was currently created should be displayed'
@@ -95,7 +94,7 @@ class StaffListSpec extends GebReportingSpec {
         and: 'The User enters the First Name'
             firstNameFilter = firstName
 
-        then: 'The User should be found out'
+        then: 'The User should be found'
             waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_firstname").find("a").text() == firstName}
     }
 
@@ -123,11 +122,10 @@ class StaffListSpec extends GebReportingSpec {
             ucConfirmPassword = userPass
         and: 'The User Selects The Project'
             ucProjectSelector = userProject
-        and: 'The Admin Role is being checked'
-            ucAdminRoleCB.value(true)
+        and: 'A random number of roles are assigned to the user'
+            selectRandomRoles()
         and: 'The User clicks the "Save" Button'
             waitFor { ucSaveBtn.click() }
-
         then: 'The User should be redirected to the User List Section'
             at UserDetailsPage
         and: 'A success message related to the User that was created should be displayed'

@@ -84,6 +84,8 @@ class ProjectTestHelper {
 		}
 		project.save(failOnError:true)
 
+		project.projectService = projectService
+
 		// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
 		project.owner = company
 		project.save(failOnError:true)
