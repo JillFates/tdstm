@@ -48,10 +48,13 @@ class ViewPage extends Page{
         allFilterXIcons {$('td[kendogridfiltercell] span.fa-times')}
         nameColumn(required:false) {$("div", class:"k-grid-header-locked").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"2")}
         descColumn(required:false) {$("div", class:"k-grid-header-wrap").find("thead").find("tr","aria-rowindex":"1").find("th","aria-colindex":"4")}
-        refreshBtn {$("div", class:"kendo-grid-toolbar__refresh-btn btnReload").find("span", class:"glyphicon glyphicon-refresh")}
+        refreshBtn {$("div", class:"component-action-reload").find("span", class:"glyphicon-refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
         noRecords {$("div.grid-message label")}
+        assetsDisplayedInPager {$("kendo-pager-info")}
+        paginationSizes {$("kendo-pager-page-sizes select")}
+        selectedAssets {$('.selected-assets')}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -143,15 +146,6 @@ class ViewPage extends Page{
         waitFor{gearBtn.click()}
     }
 
-    def nextPage(){
-        interact{
-            moveToElement nextPageButton
-        }
-        waitFor{nextPageButton.click()}
-        waitFor {view.displayed}
-        return true
-    }
-
     /*
     Verifies if any element from a given list contains the "TBD" text.
     If you check the "Just Planning" checkbox, then no elements with TBD bundles should be displayed.
@@ -159,47 +153,89 @@ class ViewPage extends Page{
     Parameter: dropdownItems(set on the AllPagesSpec page).
      */
     def searchTBD (dropdownItems) {
-        def splitItemsString = itemNumberDesc.text().split(" ")
-        def stringSize = splitItemsString.size()
-        def numberItems = splitItemsString[stringSize-2]
-        float numberItemsFloat = Math.ceil(numberItems as Float)
+        def numberItemsFloat = Math.ceil(getTotalNumberOfAssetsFromBottomPager() as Float)
         def amountOfIterations = Math.ceil(numberItemsFloat/dropdownItems)
         def flag=false
         for(int j =1 ; j<=amountOfIterations ; j++ ){
             waitFor {view.displayed}
             waitFor{leftTableElements.displayed}
             //We create a list with the elements on the Bundle column every time the table is refreshed
-            def bundleData = $("div" , class:"k-grid-content k-virtual-content").find("table" , class:"k-grid-table" , style:"transform: translateY(0px); width: 1699px;").find("tbody", role:"presentation").find("tr").find("aria-colindex":"8")
+            def bundleData = $("div", class:"k-grid-content").find("td", "aria-colindex":"8")
             for(int i=0; i<bundleData.size();i++){
+                commonsModule.goToElement bundleData[i]
                 if(bundleData[i].text().equals("TBD")){
                     flag=true
                     break
                 }
             }
             if(j!=amountOfIterations)
-                nextPage()
+                commonsModule.goToTargetKendoGridPage "next"
         }
-        return flag
+        flag
     }
 
     def checkedItems(checked = true){
-        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
+        goToBulkChangeButton()
         allItemsCheckbox.each{
+            commonsModule.goToElement it
             assert checked ? it.value() : !it.value() // if checked true assert value true so are checked else unchecked
         }
         true // return true to avoid failure in spoke verification, if fails it will be in above assert
     }
 
     def checkJustPlanning(){
-        if(justPlanningCheck.value()==false){
+        if(!justPlanningCheck.jquery.prop('checked')){
+            clickOnJustPlanningCheckbox()
+        }
+    }
+
+    def unCheckJustPlanning(){
+        if(justPlanningCheck.jquery.prop('checked')){
             clickOnJustPlanningCheckbox()
         }
     }
 
     def checkAllItems(){
-        if(selectAllChecks.value()==false){
-            clickOnSelectAllAssets()
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(!isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from uncheck to check all
+        } else if (isIndeterminate) {
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+            clickOnAllAssetsAndWait() // from uncheck to check all
         }
+    }
+
+    def unCheckAllItems(){
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+        } else if (isIndeterminate) {
+            clickOnAllAssetsAndWait(false) // from indeterminate to uncheck
+        }
+    }
+
+    def checkIndetermitateItems(){
+        def isChecked = getCheckedInputStatus(selectAllChecks)
+        def isIndeterminate = getSelectIndeterminateState()
+        if(!isChecked && !isIndeterminate){
+            clickOnAllAssetsAndWait() // from uncheck to check all
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+        } else if (isChecked) {
+            clickOnAllAssetsAndWait() // from check all to indeterminate
+        }
+    }
+
+    def clickOnAllAssetsAndWait(isSelectAllMessageDisplayed = true){
+        clickOnSelectAllAssets()
+        if (!isSelectAllMessageDisplayed) {
+            !verifySelectedAssetsTextDisplayed()
+        } else {
+            verifySelectedAssetsTextDisplayed()
+        }
+
     }
 
     def clickOnJustPlanningCheckbox(){
@@ -215,11 +251,17 @@ class ViewPage extends Page{
         selectAllChecks.jquery.prop('indeterminate')
     }
 
+    def goToBulkChangeButton(){
+        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
+    }
+
     def waitForBulkChangeButtonDisplayed(){
+        goToBulkChangeButton()
         waitFor{bulkChangeButton.displayed}
     }
 
     def waitForBulkChangeButtonDisabled(){
+        goToBulkChangeButton()
         waitFor{bulkChangeButton.@disabled == "true"}
     }
 
@@ -292,7 +334,7 @@ class ViewPage extends Page{
     }
 
     def clickOnAssetCheckbox(checkboxSelector){
-        commonsModule.goToElement bulkChangeButton // trick to avoid stale element
+        goToBulkChangeButton()
         commonsModule.goToElement checkboxSelector
         waitFor{checkboxSelector.click()}
         waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
@@ -423,5 +465,44 @@ class ViewPage extends Page{
             }
         }
         true
+    }
+
+    def getTotalNumberOfAssetsFromBottomPager(){
+        commonsModule.goToElement itemNumberDesc
+        def pagerText = itemNumberDesc.text()
+        def filteredTotal = pagerText.substring(pagerText.indexOf("of ") + 3, pagerText.indexOf(" items"))
+        filteredTotal.toInteger()
+    }
+
+    def getPaginationSelectValue(){
+        commonsModule.goToElement paginationSizes
+        paginationSizes.value().toInteger()
+    }
+
+    def getSelectedAssetsText(){
+        goToBulkChangeButton()
+        selectedAssets.find("span").text() + " " + selectedAssets.find("label").text()
+    }
+
+    def verifySelectedAssetsText(selectedCount){
+        goToBulkChangeButton()
+        getSelectedAssetsText() == selectedCount + " Asset(s) selected"
+    }
+
+    def verifySelectedAssetsTextDisplayed(){
+        goToBulkChangeButton()
+        commonsModule.verifyElementDisplayed($('.selected-assets'))
+    }
+
+    def getFirstElementNameText(){
+        goToBulkChangeButton()
+        waitFor{firstElementName.displayed}
+        firstElementName.text()
+    }
+
+    def getFirstElementClassText(){
+        goToBulkChangeButton()
+        waitFor{firstElementAssetClass.displayed}
+        firstElementAssetClass.text()
     }
 }
