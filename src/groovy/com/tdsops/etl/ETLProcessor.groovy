@@ -69,6 +69,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String SOURCE_VARNAME = 'SOURCE'
 	/**
+	 * Static variable name definition for current ROW number
+	 */
+	static final String ROW_VARNAME = 'ROW'
+	/**
 	 * Static variable name definition for SOURCE script variable
 	 */
 	static final String FINDINGS_VARNAME = 'FINDINGS'
@@ -411,6 +415,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		rows.each { def row ->
 			topOfIterate()
 			currentColumnIndex = 0
+			bindVariable(ROW_VARNAME, currentRowIndex)
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
@@ -882,6 +887,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 		throw ETLProcessorException.invalidDomain(domainName)
 	}
+
+	/**
+	 * Fetch ETL results
+	 * <pre>
+	 * 	 find Device by 'assetName' eq SOURCE.assetName into 'id'
+	 * 	 fetch 'id' fields 'Name', 'U Size', 'upos' set deviceVar
+	 * </pre>
+	 * @param fieldName a
+	 * @return
+	 */
+	FetchFacade fetch(String fieldName){
+		validateStack()
+		return new FetchFacade(this, fieldName)
+	}
+
 
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results

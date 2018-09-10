@@ -217,9 +217,13 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('ignore command only when processing new rows')
     }
 
-    static ETLProcessorException domainOnlyAllowOnNewRows() {
-        new ETLProcessorException('DOMAIN variable only available after load commands')
-    }
+	static ETLProcessorException domainOnlyAllowOnNewRows() {
+		new ETLProcessorException('DOMAIN variable only available after load commands')
+	}
+
+	static ETLProcessorException incorrectFetchCommandUse() {
+		new ETLProcessorException('Incorrect use of "fetch" command')
+	}
 
     static ETLProcessorException incorrectFindCommandStructure() {
         new ETLProcessorException('Incorrect structure for find command')
