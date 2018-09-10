@@ -317,7 +317,7 @@ class ApiCatalogUtil {
 	static String transformDictionary(String dictionary) {
 		try {
 			JSONObject jsonDictionaryParsed = JsonUtil.parseJson(dictionary)
-			validateDictionaryHasPrimaryKeys(jsonDictionaryParsed)
+			validateDictionary(dictionary)
 
 			JSONObject jsonDictionaryTransformed = transformJsonDictionary(jsonDictionaryParsed)
 			return JsonUtil.toPrettyJson(jsonDictionaryTransformed)
@@ -339,14 +339,15 @@ class ApiCatalogUtil {
 	}
 
 	/**
-	 * Validate that json dictionary contains expected primary keys
+	 * Validate that json dictionary contains expected keys
 	 * @param dictionary an api catalog json dictionary as String
 	 * @throws InvalidParamException
 	 */
-	static void validateDictionaryHasPrimaryKeys(String dictionary) {
+	static void validateDictionary(String dictionary) {
 		JSONObject jsonDictionary = JsonUtil.parseJson(dictionary)
 
 		validateDictionaryHasPrimaryKeys(jsonDictionary)
+		validateDictionaryDoNotIncludeUnexpectedKeys(jsonDictionary)
 	}
 
 	/**
@@ -362,6 +363,18 @@ class ApiCatalogUtil {
 		jsonDictionary = jsonDictionary.get(ACDK.DICTIONARY_ROOT_ELEMENT)
 		ACDK.DICTIONARY_PRIMARY_KEYS.each { key ->
 			containsKey(jsonDictionary, key)
+		}
+	}
+
+	/**
+	 * Validate that json dictionary does not contain unexpected keys
+	 * @param jsonDictionary
+	 */
+	static void validateDictionaryDoNotIncludeUnexpectedKeys(JSONObject jsonDictionary) {
+		// validate json dictionary does not contain "dictionary.info.agent" key
+		Object key = jsonDictionary.get(ACDK.DICTIONARY_ROOT_ELEMENT).get(ACDK.INFO).get(ACDK.AGENT)
+		if (key) {
+			throw new InvalidParamException('Attribute "dictionary.info.agent" has been renamed to "dictionary.info.connector"')
 		}
 	}
 
