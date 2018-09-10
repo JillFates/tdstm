@@ -117,4 +117,15 @@ grails.project.dependency.resolution = {
 			compile ":console:1.5.12"
 		}
 	}
+
+
+}
+
+grails.war.resources = { stagingDir ->
+	echo message: "StagingDir: $stagingDir"
+	delete(verbose: true) {
+		fileset(dir: stagingDir) {
+			include name: '**/node_modules/**'
+		}
+	}
 }
