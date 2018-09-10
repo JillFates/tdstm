@@ -28,7 +28,7 @@ class ApiCatalogController implements ControllerMethods {
 		ApiCatalogCommand command = populateCommandObject(ApiCatalogCommand.class)
 		validateCommandObject(command)
 
-		ApiCatalogUtil.validateDictionaryHasPrimaryKeys(command.dictionary)
+		ApiCatalogUtil.validateDictionary(command.dictionary)
 		String transformedJson = ApiCatalogUtil.transformDictionary(command)
 		renderAsJson([model: [dictionaryTransformed: transformedJson]])
 	}

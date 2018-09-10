@@ -167,19 +167,38 @@ class ApiCatalogUtilSpec extends Specification {
 	@See('TM-11589')
 	def 'test invalid httpMethod entry'() {
 		when: 'try to transform a dictionary with wrong httpMethod key'
-		def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
-				'"credential": {}, "paramGroup": {}, ' +
-				'"method": [' +
-				'	{' +
-				'		"name": "Test Method",' +
-				'		"apiMethod": "testMethod",' +
-				'       "httpMethod": "HTTP"' +
-				'	}' +
-				']}}'
-			ApiCatalogUtil.transformDictionary(dictionary)
+			def dictionary =  '{"dictionary": {"info": {},  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod",' +
+					'       "httpMethod": "HTTP"' +
+					'	}' +
+					']}}'
+				ApiCatalogUtil.transformDictionary(dictionary)
 		then:
 			def e = thrown InvalidParamException
 			e.message == "Error transforming ApiCatalog dictionary. Api method testMethod has an invalid httpMethod value: HTTP"
+
+	}
+
+	@See('TM-11893')
+	def 'test unexpected dictionary key'() {
+		when: 'try to transform a dictionary with unexpected key'
+			def dictionary =  '{"dictionary": {"info": { "agent": "tm-agent" },  "paramDef": {}, "variable": {}, ' +
+					'"credential": {}, "paramGroup": {}, ' +
+					'"method": [' +
+					'	{' +
+					'		"name": "Test Method",' +
+					'		"apiMethod": "testMethod",' +
+					'       "httpMethod": "GET"' +
+					'	}' +
+					']}}'
+			ApiCatalogUtil.transformDictionary(dictionary)
+		then:
+			def e = thrown InvalidParamException
+			e.message == 'Error transforming ApiCatalog dictionary. Attribute "dictionary.info.agent" has been renamed to "dictionary.info.connector"'
 
 	}
 }
