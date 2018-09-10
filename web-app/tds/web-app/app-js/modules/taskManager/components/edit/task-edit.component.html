@@ -1,0 +1,278 @@
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="task-detail-component modal fade in tds-ui-modal-decorator" id="task-detail-component" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content resizable tds-angular-component-content"
+             tds-ui-modal-decorator=""
+             (resizeEvent)="resizeWindow($event)"
+             [options]="modalOptions"
+             [style.width.px]="860"
+             [style.height.px]="706">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="full-height">
+                    <table style="border: 0;" class="full-height">
+                        <tbody class="full-height task-layout">
+                            <tr class="no-grow-container">
+                                <td class="task-details" colspan="2">
+                                    <div class="btn-collapsed-fixed-right">
+                                        <button class="btn btn-default" (click)="onCollapseTaskDetail()">
+                                            <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
+                                        </button>
+                                    </div>
+                                    <div class="dialog">
+                                        <table>
+                                            <tbody>
+                                                <tr class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label style="min-width: 104px;"><span>Task # {{taskDetailModel.detail?.assetComment?.id}}</span></label>
+                                                    </td>
+                                                    <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
+                                                        <span>{{taskDetailModel.detail?.assetComment?.comment}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Status</span></label>
+                                                    </td>
+                                                    <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}"><span>{{taskDetailModel.detail?.assetComment?.status}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Asset</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetName}}</span></td>
+                                                    <td class="label url U" nowrap="nowrap">
+                                                        <label><span>Instruction Link</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Team</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Priority</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Action</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Person</span></label>
+                                                    </td>
+                                                    <td class="valueNW" colspan="4"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Send Notification</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etStart}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.atStart}}</span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Event</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.eventName}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Finish</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etFinish}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Finish</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.dtResolved}}</span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Category</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationText}}</span>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.actualDuration}}</span></td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Workflow</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Due Date</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.dueDate | date:dateFormat}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Duration Delta</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationDelta}}</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="no-grow-container"  *ngIf="!collapsedTaskDetail">
+                                <td class="dates-info-container" colspan="2">
+                                    <table class="dates-info">
+                                        <tbody>
+                                            <tr>
+                                                <td class="date-created">Created by {{taskDetailModel.detail?.personCreateObj}} at {{taskDetailModel.detail?.assetComment?.dateCreated | date:dateFormatTime}}
+                                                    {{(taskDetailModel.detail?.taskSpecId)? ' with spec id ' + taskDetailModel.detail?.taskSpecId: ''}}
+                                                    <span *ngIf="taskDetailModel.detail?.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{taskDetailModel.detail?.recipe?.id}}/gentasks/start"> {{taskDetailModel.detail?.recipe?.name}}</a></span>
+                                                <td class="last-updated">Last updated: {{taskDetailModel.detail?.assetComment?.lastUpdated | date:dateFormatTime}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="deps no-grow-container">
+                                <table>
+                                    <tr>
+                                        <td valign="top">
+                                            <kendo-grid
+                                                    *ngIf="dataGridTaskPredecessorsHelper"
+                                                    class="successor-predecessor-table"
+                                                    [data]="dataGridTaskPredecessorsHelper.gridData"
+                                                    [sort]="dataGridTaskPredecessorsHelper.state.sort"
+                                                    [sortable]="{mode:'single'}"
+                                                    [resizable]="false"
+                                                    (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)"
+                                                    [rowClass]="rowStatusColor">
+                                                    <!-- Toolbar Template -->
+                                                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                                        <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
+                                                    </ng-template>
+                                                    <!-- Columns -->
+                                                    <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
+                                                                       field="{{column.property}}"
+                                                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                                        <!-- Header Template -->
+                                                        <ng-template kendoGridHeaderTemplate>
+                                                            <label>{{column.label}}</label>
+                                                        </ng-template>
+
+                                                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
+                                                            <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</label>
+                                                        </ng-template>
+
+                                                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
+                                                            <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>
+                                                        </ng-template>
+
+                                                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                                                            <label class="pad-left-7">{{dataItem[column.property]}}</label>
+                                                        </ng-template>
+
+                                                    </kendo-grid-column>
+                                                <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                            </kendo-grid>
+                                        </td>
+                                        <td valign="top">
+                                            <kendo-grid
+                                                    *ngIf="dataGridTaskSuccessorsHelper"
+                                                    class="successor-predecessor-table"
+                                                    [data]="dataGridTaskSuccessorsHelper.gridData"
+                                                    [sort]="dataGridTaskSuccessorsHelper.state.sort"
+                                                    [sortable]="{mode:'single'}"
+                                                    [resizable]="false"
+                                                    (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)"
+                                                    [rowClass]="rowStatusColor">
+                                                <!-- Toolbar Template -->
+                                                <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                                    <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
+                                                </ng-template>
+                                                <!-- Columns -->
+                                                <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
+                                                                   field="{{column.property}}"
+                                                                   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                                    <!-- Header Template -->
+                                                    <ng-template kendoGridHeaderTemplate>
+                                                        <label>{{column.label}}</label>
+                                                    </ng-template>
+
+                                                    <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
+                                                        <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</label>
+                                                    </ng-template>
+
+                                                    <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
+                                                        <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>
+                                                    </ng-template>
+
+                                                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" >
+                                                        <label class="pad-left-7">{{dataItem[column.property]}}</label>
+                                                    </ng-template>
+
+                                                </kendo-grid-column>
+                                                <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                            </kendo-grid>
+                                         </td>
+                                    </tr>
+                                </table>
+                            </tr>
+                            <tr class="deps grow-container">
+                                <td colspan="5">
+                                    <kendo-grid
+                                        *ngIf="dataGridTaskNotesHelper"
+                                        class="successor-predecessor-table"
+                                        [data]="dataGridTaskNotesHelper.gridData"
+                                        [sort]="dataGridTaskNotesHelper.state.sort"
+                                        [sortable]="{mode:'single'}"
+                                        [resizable]="false"
+                                        (sortChange)="dataGridTaskNotesHelper.sortChange($event)">
+                                    <!-- Toolbar Template -->
+                                    <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                        <label class="pad-top-2 pad-left-10 mar-bottom-0">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
+                                    </ng-template>
+                                    <!-- Columns -->
+                                    <kendo-grid-column *ngFor="let column of taskNotesColumnsModel.columns"
+                                                       field="{{column.property}}"
+                                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                                        <!-- Header Template -->
+                                        <ng-template kendoGridHeaderTemplate>
+                                            <label>{{column.label}}</label>
+                                        </ng-template>
+
+                                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" >
+                                            <div class="pad-left-7 pad-bot-6">{{dataItem[column.property]}}</div>
+                                        </ng-template>
+
+                                    </kendo-grid-column>
+                                    <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+                                </kendo-grid>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer form-group-center">
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <span>Cancel</span>
+                </button>
+                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete pull-left">
+                    <span  class="glyphicon glyphicon-trash"></span>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

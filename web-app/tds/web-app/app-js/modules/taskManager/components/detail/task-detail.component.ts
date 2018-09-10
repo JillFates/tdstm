@@ -1,14 +1,14 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from './model/task-detail.model';
+import {TaskDetailModel} from './../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskSuccessorPredecessorColumnsModel} from './model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
+import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
+import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
 import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
