@@ -140,8 +140,8 @@ export const en_DICTIONARY: Object = {
 				'VIEW_CONSOLE': 'View Console',
 				'FILE_TYPE': 'File Type:',
 				'CONTENT': 'Content:',
-				'PASTE_CONTENT': 'Paste content (CSV, JSON, XML)',
-				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON, XML)',
+				'PASTE_CONTENT': 'Paste content (CSV, JSON)',
+				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON)',
 				'FETCH_DATA_FROM_WEBSERVICE': 'Fetch data from web service',
 				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.',
 				'FIELD_WILL_BE_INITIALIZED': 'Field will be initialized with the value shown for new records or existing records where the field has no value.'
