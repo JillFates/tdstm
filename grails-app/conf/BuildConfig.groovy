@@ -73,8 +73,6 @@ grails.project.dependency.resolution = {
 
 		compile ':jasper:1.11.0'
 		compile ':quartz:1.0.2'
-		compile ':plugin-config:0.2.0'
-		compile ':ref-code:0.3.0'
 		compile ':scaffolding:2.1.2'
 		compile ':spring-security-core:2.0.0'
 		compile ':spring-security-ldap:2.0.1'
