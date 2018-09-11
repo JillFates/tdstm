@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" type="text/css"/>
     <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
-    <tds:favicon />
+    <link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />

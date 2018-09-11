@@ -2,7 +2,7 @@
   -- This is the standard include of CSS and Javascript files necessary throughout the TM application
 --%>
 
-<tds:favicon />
+<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 
 <!-- LEGACY CODE START -->
 <asset:stylesheet src="resources" />

@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="topNav" />
 	<title>My Tasks</title>
-    <tds:favicon />
+    <link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<g:javascript src="keyevent_constants.js" />
 	<g:javascript src="asset.comment.js" />

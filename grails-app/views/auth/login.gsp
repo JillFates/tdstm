@@ -18,7 +18,7 @@
 	<!-- General Template Style -->
 	<link rel="stylesheet" href="${resource(dir:'css',file:'tds-style.css')}">
 
-	<tds:favicon />
+	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 

@@ -5,7 +5,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-	<tds:favicon />
+	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 <meta name="viewport" content="height=device-height,width=220" />
 	
 	<%--

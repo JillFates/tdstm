@@ -45,7 +45,6 @@ class CustomTagLib implements InitializingBean {
 
 	LicenseCommonService licenseCommonService
 	LicenseAdminService  licenseAdminService
-	AssetResourceLocator assetResourceLocator
 
 	/**
 	 * Adjusts a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified.
@@ -414,14 +413,6 @@ class CustomTagLib implements InitializingBean {
 		out << urlGenerated
 	}
 
-	/**
-	 * Used to generate the link for including the favicon.ico file into a page
-	 * @usage: <tds:favicon />
-	 */
-	def favicon = { attrs ->
-		out << faviconStr
-	}
-
 	def preferenceValue = { attrs ->
 		userPreferenceService.getPreference(attrs.preference)
 	}
@@ -603,12 +594,7 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	void afterPropertiesSet() {
-		if(!assetResourceLocator){
-			assetResourceLocator = Holders.applicationContext.getBean('assetResourceLocator')
-		}
 
-		faviconStr = '<link href="' + assetResourceLocator.findAssetForURI('images/favicon.ico') +
-				'" rel="shortcut icon" type="image/x-icon"/>'
 	}
 
 	/**
