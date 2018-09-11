@@ -138,7 +138,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	columnSel = {index: 0},
 	actionsTemplate = '<div class="gridIcon">'+
-			'<a href="" class="actions edit" title="Edit Recipe" ng-click="gridActions(row, 0)">'+
+			'<a href="" class="actions edit" title="Edit Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 0)">'+
 				'<img src="'+ utils.url.applyRootPath('/icons/script_edit.png') + '" alt="Edit">' +
 			'</a>'+
 			'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
@@ -153,7 +153,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 				'ng-hide="archived == \'n\'">'+
 				'<img src="'+ utils.url.applyRootPath('/icons/folder_go.png') + '" alt="Archive">' +
 			'</a>'+
-			'<a href="" class="actions remove" title="Delete Recipe" ng-click="gridActions(row, 3)">'+
+			'<a href="" class="actions remove" title="Delete Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 3)">'+
 			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
 			'</a>'+
 		'</div>';
