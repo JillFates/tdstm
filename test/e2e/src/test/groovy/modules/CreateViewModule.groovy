@@ -43,7 +43,7 @@ class CreateViewModule extends Module {
         previewRows {$("tbody")[1]}
         firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
         tableHeaderNames {$('th label')}
-        gridToolbar {$("kendo-grid-toolbar")}
+        gridToolbar (wait:true){$("kendo-grid-toolbar")}
     }
 
     def clickSaveOptions(){
