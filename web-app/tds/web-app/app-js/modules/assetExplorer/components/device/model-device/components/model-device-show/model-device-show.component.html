@@ -12,41 +12,57 @@
 				<div class="modal-body">
 					<div class="modal-body-container">
 						<div class="box-body">
-							<div class="form-group">
-								<div class="col-md-6">Manufacturer:</div>
-								<div class="col-md-6">{{deviceModel.manufacturer}}</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-6">Model Name:</div>
-								<div class="col-md-6">{{deviceModel.modelName}}</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-6">AKA:</div>
-								<div class="col-md-6">{{deviceModel.aka}}</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-6">Asset Type:</div>
-								<div class="col-md-6">{{deviceModel.assetType}}</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-6">Usize:</div>
-								<div class="col-md-6">{{deviceModel.usize}}</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-6">Power(max/design/avg):</div>
-								<div class="col-md-6">
-									{{deviceModel.powerNameplate}}/{{deviceModel.powerUse}}/{{deviceModel.powerDesign}}
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Manufacturer:</div>
+									<div class="col-md-4">{{deviceModel.manufacturer}}</div>
 								</div>
 							</div>
-							<div class="form-group">
-								<div class="col-md-6">Source TDS:</div>
-								<div class="col-md-6">
-									<input type="checkbox" name="sourceTDS" disabled="disabled"/>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Model Name:</div>
+									<div class="col-md-4">{{deviceModel.modelName}}</div>
 								</div>
 							</div>
-							<div class="form-group">
-								<div class="col-md-6">Notes:</div>
-								<div class="col-md-6"></div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">AKA:</div>
+									<div class="col-md-4">{{deviceModel.aka}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Asset Type:</div>
+									<div class="col-md-4">{{deviceModel.assetType}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Usize:</div>
+									<div class="col-md-4">{{deviceModel.usize}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Power(max/design/avg):</div>
+									<div class="col-md-4">
+										{{deviceModel.powerNameplate}}/{{deviceModel.powerUse}}/{{deviceModel.powerDesign}}
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Source TDS:</div>
+									<div class="col-md-4">
+										<input type="checkbox" name="sourceTDS" disabled="disabled"/>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-8">Notes:</div>
+									<div class="col-md-4"></div>
+								</div>
 							</div>
 						</div>
 					</div>

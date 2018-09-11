@@ -1,39 +1,45 @@
-<div class="modal fade in manufacturer-show-component" id="device-manufacturer-component" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title">Show Manufacturer</h4>
-            </div>
-            <div class="modal-body">
-                <div class="modal-body-container">
-                    <form name="deviceManufacturerForm" role="form" data-toggle="validator"
-                          #deviceManufacturerForm='ngForm' class="form-horizontal left-alignment">
-                        <div class="box-body">
-                            <div class="form-group">
-                                <div class="col-md-3">Name:</div>
-	                            <div class="col-md-9">{{deviceManufacturer.name}}</div>
-                            </div>
-	                        <div class="form-group">
-		                        <div class="col-md-3">AKA:</div>
-		                        <div class="col-md-9">{{deviceManufacturer.aka}}</div>
-	                        </div>
-	                        <div class="form-group">
-		                        <div class="col-md-3">Description</div>
-		                        <div class="col-md-9">{{deviceManufacturer.description}}</div>
-	                        </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer form-group-center">
-	            <button type="button" class="btn btn-primary pull-left" (click)="onEditManufacturer()" >
-		            <span class="glyphicon glyphicon-pencil"></span> Edit </button>
-                <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
-                    <span class="glyphicon glyphicon-ban-circle"></span> Cancel </button>
-            </div>
-        </div>
-    </div>
+<div class="modal fade in manufacturer-show-component" id="device-manufacturer-component" data-backdrop="static"
+     tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">Show Manufacturer</h4>
+			</div>
+			<div class="modal-body">
+				<div class="modal-body-container">
+					<div class="box-body">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">Name:</div>
+								<div class="col-md-9">{{deviceManufacturer.name}}</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">AKA:</div>
+								<div class="col-md-9">{{deviceManufacturer.aka}}</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">Description</div>
+								<div class="col-md-9">{{deviceManufacturer.description}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+				<button type="button" class="btn btn-primary pull-left" (click)="onEditManufacturer()">
+					<span class="glyphicon glyphicon-pencil"></span> Edit
+				</button>
+				<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
+					<span class="glyphicon glyphicon-ban-circle"></span> Cancel
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
