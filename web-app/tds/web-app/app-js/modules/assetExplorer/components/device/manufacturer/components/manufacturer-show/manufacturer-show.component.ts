@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import {UIDialogService, UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
 import { DeviceManufacturer} from '../../model/device-manufacturer.model';
 import { ManufacturerEditComponent } from '../manufacturer-edit/manufacturer-edit.component';
+import { PermissionService } from '../../../../../../../shared/services/permission.service';
+import { Permission } from '../../../../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'device-manufacturer',
@@ -11,7 +13,8 @@ export class ManufacturerShowComponent extends UIExtraDialog {
 	aka: string;
 	constructor(
 		private dialogService: UIDialogService,
-		public deviceManufacturer: DeviceManufacturer) {
+		public deviceManufacturer: DeviceManufacturer,
+		private permissionService: PermissionService) {
 		super('#device-manufacturer-component');
 	}
 
@@ -29,7 +32,18 @@ export class ManufacturerShowComponent extends UIExtraDialog {
 		this.cancelCloseDialog();
 	}
 
+	/**
+	 * Determine user has permissions to edit manufacturer
+	 */
+	canEditManufacturer(): boolean {
+		return this.permissionService.hasPermission(Permission.ManufacturerEdit)
+	}
+
 	onEditManufacturer(): void {
+		if (!this.canEditManufacturer()) {
+			return ;
+		}
+
 		this.dialogService.extra(ManufacturerEditComponent,
 			[
 				{

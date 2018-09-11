@@ -33,7 +33,7 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left" (click)="onEditManufacturer()">
+				<button type="button" [disabled]="!canEditManufacturer()" class="btn btn-primary pull-left" (click)="onEditManufacturer()">
 					<span class="glyphicon glyphicon-pencil"></span> Edit
 				</button>
 				<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
