@@ -50,7 +50,7 @@ export class ManufacturerShowComponent extends UIExtraDialog {
 					provide: DeviceManufacturer,
 					useValue: this.deviceManufacturer
 				}
-			])
+			], false, false)
 			.then((result) => {
 				this.close(result);
 			}).catch((error) => console.log(error));
