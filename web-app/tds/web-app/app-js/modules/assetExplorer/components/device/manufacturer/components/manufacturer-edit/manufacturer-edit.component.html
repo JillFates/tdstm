@@ -9,64 +9,66 @@
             </div>
             <div class="modal-body">
                 <div class="modal-body-container">
-                    <form name="deviceManufacturerEditForm" role="form" data-toggle="validator"
-                          #deviceManufacturerEditForm='ngForm' class="form-horizontal left-alignment">
-                        <div class="box-body">
-	                        <div class="form-group">
-		                        <div class="col-md-offset-4 col-md-8"><span class="error pull-right">Fields marked ( * ) are mandatory</span></div>
-	                        </div>
-                            <div class="form-group">
-                                <div class="col-md-4">Name:<span class="error">*</span></div>
-	                            <div class="col-md-8">
-		                            <input type="text" [(ngModel)]="deviceManufacturer.name" name="name" (change)="onChange($event)">
-	                            </div>
-                            </div>
-
-	                        <div class="form-group">
-		                        <div class="col-md-4">AKA:</div>
-		                        <div class="col-md-6"> <tds-aka [aka]="deviceManufacturer.akaCollection || []"
-		                                                        [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.name}"
-		                                                        (validationErrors)="onValidationErrors($event)"
-		                                                        (modelChange)="onAkaChange($event)"></tds-aka></div>
-	                        </div>
-
-                            <div class="form-group">
-                                <div class="col-md-4">Description:</div>
-                                <div class="col-md-8">
-	                                <input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.description" name="description" (change)="onChange($event)">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-4">Corporate Name:</div>
-                                <div class="col-md-8">
-	                                <input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.corporateName" name="corporateName" (change)="onChange($event)">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-4">Corporate Location:</div>
-                                <div class="col-md-8">
-	                                <input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.corporateLocation" name="corporateLocation" (change)="onChange($event)">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-4">Website:</div>
-                                <div class="col-md-8">
-	                                <input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.website" name="website" (change)="onChange($event)">
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+					<div class="box-body">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 description">Name:<span class="error">*</span></div>
+								<div class="col-md-4 content-input">
+									<input type="text" [(ngModel)]="deviceManufacturer.name" name="name" (change)="onChange($event)">
+								</div>
+								<div class="col-md-5"><span class="error pull-right">Fields marked (*) are mandatory</span></div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 description">AKA:</div>
+								<div class="col-md-9 content-input"> <tds-aka [aka]="deviceManufacturer.akaCollection || []"
+								                                [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.name}"
+								                                (validationErrors)="onValidationErrors($event)"
+								                                (modelChange)="onAkaChange($event)"></tds-aka></div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 description">Description:</div>
+								<div class="col-md-9 content-input">
+									<input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.description" name="description" (change)="onChange($event)">
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 description">Corporate Name:</div>
+								<div class="col-md-9 content-input">
+									<input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.corporateName" name="corporateName" (change)="onChange($event)">
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 corporate-location description">Corporate Location:</div>
+								<div class="col-md-9 content-input">
+									<input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.corporateLocation" name="corporateLocation" (change)="onChange($event)">
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3 description">Website:</div>
+								<div class="col-md-9 content-input">
+									<input class="corporate-info" type="text" [(ngModel)]="deviceManufacturer.website" name="website" (change)="onChange($event)">
+								</div>
+							</div>
+						</div>
+					</div>
+			</div>
             </div>
-            <div class="modal-footer form-group-center">
+            <div class="modal-footer">
                 <button [disabled]="!isEditing || !deviceManufacturer.name || hasAkaValidationErrors"
                         type="button" class="btn btn-primary pull-left" (click)="onUpdateManufacturer()"><span
                         class="fa fa-fw fa-floppy-o"></span> Save
                 </button>
-	            <button type="button" class="btn btn-danger pull-left" (click)="onDeleteManufacturer()"><span
+	            <button type="button" class="btn btn-danger" (click)="onDeleteManufacturer()"><span
 			            class="fa fa-fw fa-trash"></span> Delete
 	            </button>
                 <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">

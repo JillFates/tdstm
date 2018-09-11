@@ -1,3 +1,29 @@
 .manufacturer-edit-component
-  input.corporate-info
-    width: 100%
+  $initial-width: 490px
+  .modal-dialog
+    width: $initial-width
+    .modal-content
+      width: $initial-width
+    .modal-body
+      width: $initial-width
+      padding: 15px 20px
+      .box-body
+        padding: unset
+      .row
+        margin-bottom: 8px
+        .corporate-location
+          padding-right: 0
+        .description
+          font-weight: bold
+        .content-input
+          padding-left: 10px
+        input
+          height: 27px
+          border: 1px solid #ccc
+          margin: 2px 0
+          padding: 2px 4px
+    .modal-footer
+      padding: 15px 20px
+      text-align: center
+    input.corporate-info
+      width: 100%
