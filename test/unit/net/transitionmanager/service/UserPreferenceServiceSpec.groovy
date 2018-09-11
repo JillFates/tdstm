@@ -98,4 +98,22 @@ class UserPreferenceServiceSpec extends Specification {
             'levelsDown'        | '10'      | true // upper-end
             'levelsDown'        | '12'      | false
     }
+
+    void '03. Test legendTwistieState validator'() {
+
+        when: 'legendTwistieStateValidator is called with different values'
+        def evaluation = service.legendTwistieStateValidator(value)
+        then: 'the evaluation is validated for the different values'
+        evaluation  == validationResult
+        where:
+        value   | validationResult
+        ''                  | true // empty should be ok
+        'ac'                | true // Asset Classes
+        'de'                | true // Dependencies
+        'hb'                | true // Groups
+        'other'             | false // Non-existent, should fail
+        'ac,de'             | true // combinations should be ok
+        'ac,de,hb'          | true
+        'ac,de,hb,ac'       | false // more than 3 values should fail
+    }
 }

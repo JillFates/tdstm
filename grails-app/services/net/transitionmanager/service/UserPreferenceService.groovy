@@ -105,12 +105,12 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return  true or false depending on the validation result.
 	 */
 	static boolean legendTwistieStateValidator(String value) {
-		def prefs = value.split(',')
-
-		if (prefs.length == 0) {
+		if (!value) {
 			return true // it means is just empty (nothing open)
 		}
-		if (prefs.length > 4) {
+		def prefs = value.split(',')
+
+		if (prefs.length >= 4) {
 			return false
 		}
 		for (pref in prefs) {
