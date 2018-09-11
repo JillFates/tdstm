@@ -5,6 +5,7 @@ import modules.CommonsModule
 import modules.CreateViewModule
 import utils.CommonActions
 import modules.AssetsModule
+import geb.waiting.WaitTimeoutException
 
 class ViewPage extends Page{
 
@@ -401,7 +402,14 @@ class ViewPage extends Page{
     def verifyDeletedAssetsByCheckboxName(assetsMap){
         assetsMap.each{ assetName, checkboxName ->
             filterByName assetName
-            assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            try {
+                // wait until half seconds to get no records text displayed avoiding to wait default secs because
+                // if no records its possible that another asset with same name is displayed
+                // by clone asset same name spec, in that case catch failure and check by checkbox id
+                assert waitFor(0.5){noRecords.displayed}
+            } catch (WaitTimeoutException e) {
+                assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            }
             clearAllAppliedFilters()
         }
     }
