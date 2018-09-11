@@ -164,14 +164,6 @@ class CustomTagLibTests extends AbstractUnitSpec {
 		applyTemplate('<tds:appURL controller="${controller}" fragment="list" />', [controller: "task", fragment: "list"]).contains('/tdstm/app#task/list')
 	}
 
-	void testFaviconTag() {
-		setup:
-		String faviconStr = '<link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>'
-
-		expect:
-		applyTemplate('<tds:favicon />') == faviconStr
-	}
-
 	private void setUserDateFormat(String userDateFormat) {
 		session.setAttribute('CURR_DT_FORMAT', userDateFormat)
 	}
