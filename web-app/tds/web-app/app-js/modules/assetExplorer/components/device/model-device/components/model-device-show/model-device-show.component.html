@@ -69,7 +69,7 @@
 				</div>
 				<div class="modal-footer form-group-center">
 					<input name="id" type="hidden" id="show_modelId" value="{{deviceModel.id}}">
-					<button type="submit" class="btn btn-primary pull-left" (click)="onEditModel()">
+					<button type="submit" [disabled]="!canEditModel()" class="btn btn-primary pull-left" (click)="onEditModel()">
 						<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 					<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
 						<span class="glyphicon glyphicon-ban-circle"></span> Close</button>

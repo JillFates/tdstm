@@ -1,7 +1,9 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
 import {UIDialogService, UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
-import {DeviceModel, DeviceModelDetails} from '../../model/device-model.model';
+import {DeviceModel} from '../../model/device-model.model';
 import {AssetExplorerService} from '../../../../../service/asset-explorer.service';
+import {Permission} from "../../../../../../../shared/model/permission.model";
+import {PermissionService} from "../../../../../../../shared/services/permission.service";
 
 @Component({
 	selector: 'model-device-show',
@@ -11,7 +13,8 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	constructor(
 		private dialogService: UIDialogService,
 		public deviceModel: DeviceModel,
-		private assetExplorerService: AssetExplorerService) {
+		private assetExplorerService: AssetExplorerService,
+		private permissionService: PermissionService) {
 		super('#model-device-show-component');
 	}
 
@@ -33,7 +36,18 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		console.log('Updating component');
 	}
 
+	/**
+	 * Determine user has permissions to edit model
+	 */
+	canEditModel(): boolean {
+		return this.permissionService.hasPermission(Permission.ModelEdit)
+	}
+
 	onEditModel(): void {
+		if (!this.canEditModel()) {
+			return;
+		}
+
 		// fix issue preventing submit form from bootstrap modal
 		document.getElementById('editModelForm')['submit']();
 		this.close();
