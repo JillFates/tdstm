@@ -4,6 +4,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.util.Holders
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -602,6 +603,10 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	void afterPropertiesSet() {
+		if(!assetResourceLocator){
+			assetResourceLocator = Holders.applicationContext.getBean('assetResourceLocator')
+		}
+
 		faviconStr = '<link href="' + assetResourceLocator.findAssetForURI('images/favicon.ico') +
 				'" rel="shortcut icon" type="image/x-icon"/>'
 	}
