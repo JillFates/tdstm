@@ -1,0 +1,480 @@
+{
+	"info": {
+		"_postman_id": "f628bf6f-e825-4ca4-8b5a-3ef1029baab8",
+		"name": "dependency analyzer graph Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign In",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set current project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{projectId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9225c624-4d57-46e8-a2fe-ef5222212ff3",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"A new Tag with the expected values is created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"   ",
+							"    pm.expect(data.name).to.include(pm.variables.get(\"tagName\"));",
+							"    pm.expect(data.description).to.eql('This tag is created to test tm12152');",
+							"    pm.expect(data.color).to.eql('Red');",
+							"    pm.expect(data.css).to.eql('tag-red');",
+							"    postman.setGlobalVariable(\"tag_id\", data.id);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"{{tagName}} {{$randomInt}}\",\n  \"description\":\"This tag is created to test tm12152\",\n  \"color\":\"Red\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Filter assets by Dependency Group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "47254e45-116d-4858-ac45-c60c5b7b51e8",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var assetID01 = jsonObject[0]; ",
+							"    postman.setGlobalVariable(\"assetID01\", assetID01);",
+							"    var assetID02 = jsonObject[1]; ",
+							"    postman.setGlobalVariable(\"assetID02\", assetID02);",
+							"    ",
+							"});",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n \"depGroup\": 4\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/depAnalyzer/filteredAssetList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"depAnalyzer",
+						"filteredAssetList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add tag to asset",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a705c2f8-8c38-4136-a230-5507e98731b4",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tagIds\":[{{tag_id}}],\"assetId\":{{assetID01}}}\n\n"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/asset",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"asset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add tag to second asset",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a705c2f8-8c38-4136-a230-5507e98731b4",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tagIds\":[{{tag_id}}],\"assetId\":{{assetID02}}}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/asset",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"asset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Filter assets by Dep Group and Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c155b28d-4cce-480e-a0ed-53faf40984ad",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Correct number of assets is returned\"), function(){",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    responseBody.size==2;",
+							"};",
+							"",
+							"pm.test(\"Assets returned are the ones expected\"), function(){",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    pm.expect(jsonObject[0]).to.equal(assetID01);",
+							"    pm.expect(jsonObject[1]).to.equal(assetID02);",
+							"};",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n \"depGroup\": 4,\n \"tagIds\":[{{tag_id}}]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/depAnalyzer/filteredAssetList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"depAnalyzer",
+						"filteredAssetList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5349121b-3913-4ff6-955c-b73a5881cea4",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data;",
+							"    pm.expect(data).to.eql({});",
+							"});",
+							"",
+							"//This code cleans up the global variables created through code that should live only in this collection ",
+							"pm.globals.unset(\"tag_id\");",
+							"pm.globals.unset(\"assetID01\");",
+							"pm.globals.unset(\"assetID02\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b61fd614-517f-464b-a3ee-7767da1d0534",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "742e28fe-6347-4652-a967-b5361cca0259",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "87fa3827-78af-4d30-ad85-3f8338bf3565",
+			"key": "projectId",
+			"value": "2445",
+			"type": "string"
+		},
+		{
+			"id": "78f44393-06f9-47f1-847e-799a0d4bf657",
+			"key": "tagName",
+			"value": "tag highlight",
+			"type": "string"
+		}
+	]
+}
