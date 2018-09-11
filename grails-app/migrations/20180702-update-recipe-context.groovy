@@ -6,7 +6,7 @@ databaseChangeLog = {
 	}
 
 
-	changeSet(author: 'tpelletier', id: 'TM-11077-2') {
+	changeSet(author: 'tpelletier', id: 'TM-11077-2-bug-fix-TM-12234') {
 		comment('Change recipe context to a json structure')
 
 		preConditions(onFail: 'MARK_RAN') {
@@ -22,8 +22,14 @@ databaseChangeLog = {
 					switch (recipe.context.trim()) {
 						case 'Bundle':
 							if (recipe.default_asset_id) {
-								Long eventId = sql.firstRow("SELECT move_event_id from move_bundle where move_bundle_id = $recipe.default_asset_id")[0]
-								sqlStatement = """UPDATE recipe set context = '{"eventId": $eventId, "tag":[], "tagMatch":"ANY"}' where recipe_id = $recipe.recipe_id;"""
+								def result = sql.firstRow("SELECT move_event_id from move_bundle where move_bundle_id = $recipe.default_asset_id")
+
+								if(result) {
+									Long eventId = result[0]
+									sqlStatement = """UPDATE recipe set context = '{"eventId": $eventId, "tag":[], "tagMatch":"ANY"}' where recipe_id = $recipe.recipe_id;"""
+								} else{
+									sqlStatement = """UPDATE recipe set context = '{"tag":[], "tagMatch":"ANY"}' where recipe_id = $recipe.recipe_id;"""
+								}
 							} else{
 								sqlStatement = """UPDATE recipe set context = '{"tag":[], "tagMatch":"ANY"}' where recipe_id = $recipe.recipe_id;"""
 							}
