@@ -35,6 +35,9 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 		this.close(null);
 	}
 
+	/**
+	 * Save edited changes.
+	 */
 	public onUpdateManufacturer(): void {
 		this.isEditing = false;
 		this.manufacturerService.updateManufacturer(this.deviceManufacturer, false)
@@ -46,6 +49,9 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 			})
 	}
 
+	/**
+	 * Save edit changes.
+	 */
 	public onAkaChange(akaChanges: AkaChanges): void {
 		if (this.deviceManufacturer.akaChanges) {
 			this.isEditing = true;
@@ -53,10 +59,16 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 		this.deviceManufacturer.akaChanges = akaChanges;
 	}
 
+	/**
+	 * on edit change set the edit flag to true
+	 */
 	public onChange(event: any): void {
 		this.isEditing = true;
 	}
 
+	/**
+	 * Delete manufacturer
+	 */
 	public onDeleteManufacturer() {
 		this.prompt.open(
 			'Confirmation Required',
@@ -76,6 +88,10 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 			}
 		});
 	}
+
+	/**
+	 * validate input errors
+	 */
 	onValidationErrors(hasAkaValidationErrors: boolean): void {
 		this.hasAkaValidationErrors = hasAkaValidationErrors;
 	}

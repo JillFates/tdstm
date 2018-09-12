@@ -37,12 +37,15 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Determine user has permissions to edit model
+	 * Determine if user has permissions to edit model
 	 */
 	canEditModel(): boolean {
 		return this.permissionService.hasPermission(Permission.ModelEdit)
 	}
 
+	/**
+	 * On click Edit button
+	 */
 	onEditModel(): void {
 		if (!this.canEditModel()) {
 			return;

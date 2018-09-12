@@ -33,12 +33,15 @@ export class ManufacturerShowComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Determine user has permissions to edit manufacturer
+	 * Determine if user has permissions to edit manufacturer
 	 */
 	canEditManufacturer(): boolean {
 		return this.permissionService.hasPermission(Permission.ManufacturerEdit)
 	}
 
+	/**
+	 * On click Edit button
+	 */
 	onEditManufacturer(): void {
 		if (!this.canEditManufacturer()) {
 			return ;
