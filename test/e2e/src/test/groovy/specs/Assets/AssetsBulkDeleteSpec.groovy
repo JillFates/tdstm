@@ -79,7 +79,7 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
         and: 'The User clicks on Next button'
             clickOnNextButton()
         then: 'Delete confirmation modal message is correct'
-            commonsModule.verifyDeletePrompDialogMessage "You are about to delete ${assetNames.size()} Asset(s)"
+            commonsModule.verifyConfirmationPrompDialogMessage "You are about to delete ${assetNames.size()} Asset(s)"
     }
 
     def "4. Certify assets still selected after cancel delete confirmation process"(){

@@ -31,10 +31,10 @@ export class ManufacturerService {
 	getManufacturerPayload(manufacturer: DeviceManufacturer, isDelete: boolean): string {
 		let body = `id=${manufacturer.id}`;
 		body += `&name=${manufacturer.name}`;
-		body += `&description=${manufacturer.description}`;
-		body += `&corporateName=${manufacturer.corporateName}`;
-		body += `&corporateLocation=${manufacturer.corporateLocation}`;
-		body += `&website=${manufacturer.website}`;
+		body += `&description=${manufacturer.description || ''}`;
+		body += `&corporateName=${manufacturer.corporateName  || ''}`;
+		body += `&corporateLocation=${manufacturer.corporateLocation  || ''}`;
+		body += `&website=${manufacturer.website || ''}`;
 		const {edited, deleted, added} = manufacturer.akaChanges;
 
 		if (edited.length) {

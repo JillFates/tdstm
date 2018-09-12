@@ -16,12 +16,16 @@ import groovy.transform.CompileStatic
 @ConfigureMarshalling
 class ETLProcessorResult {
 
+	static final Integer CURRENT_VERSION = 2
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
 	@DoNotMarshall
 	ETLProcessor processor
-
+	/**
+	 * Defines JSON version for the import the process.
+	 */
+	Integer version = CURRENT_VERSION
 	/**
 	 * ETL info map details
 	 */
@@ -165,9 +169,9 @@ class ETLProcessorResult {
 	 */
 	void endRow(){
 		// Check first if the scenario with an iterate without defining a domain and read labels
-		if (reference && processor.iterateIndex) {
+		if(reference && processor.iterateIndex){
 			RowResult currentRow = findOrCreateCurrentRow()
-			if (currentRow.ignore) {
+			if(currentRow.ignore){
 				ignoreCurrentRow()
 			}
 		}
@@ -208,7 +212,7 @@ class ETLProcessorResult {
 	 * @see RowResult
 	 * @see ETLProcessorResult#resultIndex
 	 */
-	RowResult currentRow() {
+	RowResult currentRow(){
 		return reference.data[resultIndex]
 	}
 
@@ -270,6 +274,7 @@ class ETLProcessorResult {
 			}
 		}
 	}
+
 
 	/**
 	 * Look up a field name that contain a value equals to the value and if found then the current
@@ -373,9 +378,7 @@ class ETLProcessorResult {
 	static void registerObjectMarshaller() {
 		JSON.registerObjectMarshaller(new AnnotationDrivenObjectMarshaller<JSON>())
 	}
-
 }
-
 
 /**
  * <pre>
@@ -678,7 +681,18 @@ class FindResult {
 	 * @param findElement
 	 */
 	private void addQuery(ETLFindElement findElement) {
-		query.add(new QueryResult(domain: findElement.currentDomain.name(), kv: (Map<String, Object>)findElement.currentFind.kv))
+		query.add(
+			new QueryResult(
+				domain: findElement.currentDomain.name(),
+				criteria: (List<Map<String, Object>>)findElement.currentFind.statement.conditions.collect { FindCondition condition ->
+					return [
+						propertyName: condition.propertyName,
+						operator    : condition.operator.name(),
+						value       : condition.value
+					]
+				}
+			)
+		)
 	}
 
 	/**
@@ -696,7 +710,10 @@ class FindResult {
  *	"query": [
  *		{
  *			"domain": "Application",
- *			"kv": {"id": null},
+ *			"criteria": [
+ *				{"propertyName": "assetName", "operator": "eq","value": "zulu01"},
+ *				{"propertyName": "priority", "operator": "gt","value": 2},
+ *			],
  *	    	"error" : "Named parameter [id] value may not be null"
  *		},
  *	]
@@ -708,8 +725,7 @@ class FindResult {
 @ConfigureMarshalling
 class QueryResult {
 	String domain
-	Map<String, Object> kv = [:]
-
+	List<Map<String, Object>> criteria = []
 
 	@Override
 	String toString() {
@@ -717,7 +733,7 @@ class QueryResult {
 			.concat( "domain=")
 			.concat(domain)
 			.concat(", kv=")
-			.concat(kv.toString())
+			.concat(criteria.toString())
 			.concat('}')
 
 	}

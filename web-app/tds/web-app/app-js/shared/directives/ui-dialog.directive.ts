@@ -18,7 +18,7 @@ declare var jQuery: any;
 	selector: 'tds-ui-dialog',
 	template: `
         <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
-             role="dialog">
+            style="overflow-y: auto" role="dialog">
             <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
                 <div class="modal-content">
                     <div #view></div>

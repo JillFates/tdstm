@@ -32,6 +32,11 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unrecognized command $method with args $args")
     }
 
+    static ETLProcessorException unrecognizedFindCriteria (String method) {
+        //TODO: dcorrea Unrecognized find criteria operator [xxx] specified. Options are eq, ne, ...
+        new ETLProcessorException("Unrecognized find criteria operator [$method] specified. Options are ${FindOperator.values()*.name()}")
+    }
+
     static ETLProcessorException methodMissingInFindCommand (String method, args) {
         new ETLProcessorException("Unrecognized command $method with args $args for the find / elseFind command")
     }
@@ -79,6 +84,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException lookupFoundMultipleResults() {
         new ETLProcessorException('The lookup command found multiple results with the criteria')
     }
+
     static ETLProcessorException UnknownVariable (Object value) {
         new ETLProcessorException("Unknown variable: ${value}")
     }
@@ -211,8 +217,16 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('ignore command only when processing new rows')
     }
 
-    static ETLProcessorException domainOnlyAllowOnNewRows() {
-        new ETLProcessorException('DOMAIN variable only available after load commands')
+	static ETLProcessorException domainOnlyAllowOnNewRows() {
+		new ETLProcessorException('DOMAIN variable only available after load commands')
+	}
+
+	static ETLProcessorException incorrectFetchCommandUse() {
+		new ETLProcessorException('Incorrect use of "fetch" command')
+	}
+
+    static ETLProcessorException incorrectFindCommandStructure() {
+        new ETLProcessorException('Incorrect structure for find command')
     }
 
     static ETLProcessorException invalidSetParameter() {
