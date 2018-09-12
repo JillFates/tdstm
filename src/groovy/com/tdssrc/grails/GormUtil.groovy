@@ -1352,14 +1352,27 @@ public class GormUtil {
 	 * @return A list of the domain instances found or empty list if not found. If the domain does
 	 * 		have an alternate property name defined then the method will return NULL.
 	 */
-	static List findDomainByAlternateKey(Class domainClass, String searchValue, Project project=null, Map extraCriteria=null) {
+	static List findDomainByAlternateKey(
+			  Class domainClass, String searchValue, Project project=null,
+			  Map extraCriteria=null, List extraAlternate
+	) {
 		List entities = null
 		String altKeyName = getAlternateKeyPropertyName(domainClass)
 		if (altKeyName) {
 			String domainName = domainShortName(domainClass)
 			Map params = [searchValue:searchValue]
-			StringBuilder hql = new StringBuilder("from ${domainName} as x where x.${altKeyName} = :searchValue")
+			StringBuilder hql = new StringBuilder("from ${domainName} as x where ")
 
+			List<String> orSearch = [altKeyName]
+			orSearch.addAll(extraAlternate ?: [])
+
+			orSearch = orSearch.collect { alt ->
+				"x.${alt} = :searchValue"
+			}
+
+			hql.append( orSearch.join(' or ') )
+
+			// or
 			// Include project in the query if the domain references it
 			if (isDomainProperty(domainClass, 'project')) {
 				hql.append(' and x.project.id = :projectId')

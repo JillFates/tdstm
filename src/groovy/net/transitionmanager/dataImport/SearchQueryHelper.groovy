@@ -597,6 +597,9 @@ class SearchQueryHelper {
 			}
 			*/
 
+			List extraAlternate = []
+			Manufacturer mfg
+
 			// TODO : JPM 6/2018 : Searching rooms/racks requires knowing the target field that we're looking up the resource. Therefore
 			// we need to pass the parentPropertyName into this logic...
 			switch (refDomainName) {
@@ -624,17 +627,14 @@ class SearchQueryHelper {
 					break
 
 				case 'Manufacturer':
-					Manufacturer mfg = findEntityByMetaData('manufacturer', fieldsInfo, context)
-					if (mfg) {
-						extraCriteria.put('manufacturer.id', mfg.id)
-					}
+					extraAlternate << 'description'
 					break
 
 				case 'Model':
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
 					if (fieldsInfo.containsKey('manufacturer')) {
-						Manufacturer mfg = findEntityByMetaData('manufacturer', fieldsInfo, context)
+						mfg = findEntityByMetaData('manufacturer', fieldsInfo, context)
 						if (! mfg) {
 							result.error = 'Unable to resolve manufacturer'
 						} else {
@@ -647,7 +647,15 @@ class SearchQueryHelper {
 			}
 
 			if (! result.error) {
-				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
+				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria, extraAlternate)
+
+				if (!entities && refDomainName == 'Model') {
+					Model model = ModelAlias.where { name == searchValue && manufacturer == mfg }.find()?.model
+					if (model) {
+						entities = [model]
+					}
+				}
+
 				int numFound = entities ? entities.size() : 0
 				log.debug 'fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
 					domainClass.getName(), searchValue, extraCriteria, numFound
