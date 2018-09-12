@@ -19,11 +19,12 @@ class ListCompaniesPage extends Page{
         pageHeaderName { $("section", class:"content-header").find("h1")}
         createCompanyButton { $("input", value: "Create Company")}
         nameFilter { $("input#gs_companyName")}
-        companyRowContainer { $("tr.ui-row-ltr")}
-        nameField { companyRowContainer.find("td[aria-describedby=companyIdGrid_companyName] a")}
-        partnerField { companyRowContainer.find("td[aria-describedby=companyIdGrid_partner]")}
-        dateCreatedField { companyRowContainer.find("td[aria-describedby=companyIdGrid_dateCreated]")}
-        dateUpdatedField { companyRowContainer.find("td[aria-describedby=companyIdGrid_lastUpdated]")}
+        companyRowContainer (required: false, wait:true){ $("tr.ui-row-ltr")}
+        nameField (required: false, wait:true){ companyRowContainer.find("td[aria-describedby=companyIdGrid_companyName] a")}
+        partnerField (required: false, wait:true){ companyRowContainer.find("td[aria-describedby=companyIdGrid_partner]")}
+        dateCreatedField (required: false, wait:true){ companyRowContainer.find("td[aria-describedby=companyIdGrid_dateCreated]")}
+        dateUpdatedField(required: false, wait:true) { companyRowContainer.find("td[aria-describedby=companyIdGrid_lastUpdated]")}
+        message (required: false, wait:true){$(class:"message")}
     }
 
     def clickOnCreateButton(){
@@ -52,7 +53,10 @@ class ListCompaniesPage extends Page{
     }
 
     def clickOnFirstElement(){
-        //waitFor{$('td[aria-describedby=companyIdGrid_companyName] a')[0].click()}
         nameField[0].click()
+    }
+
+    def validateMessage(text){
+        message.text()==text
     }
 }

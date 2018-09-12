@@ -7,25 +7,17 @@ import pages.Admin.ListCompaniesPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
-import modules.CommonsModule
+
+/**
+ * @author ingrid
+ */
 
 @Stepwise
 class CompanyDeletionSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
-    static nowDate = new Date().format("MM/dd/yyyy")
-    static companyName = baseName +" "+ randStr
-    static companyInfo = [
-        name: companyName,
-        comment: "Comment for company "+ companyName +" created by QA E2E Scripts",
-        isPartner: false,
-        dateCreated: nowDate,
-        lastUpdated: nowDate
-    ]
-    static successCreationMessage = "PartyGroup "+companyInfo.name+" created"
-
+    static companyName =""
     def setupSpec() {
         testCount = 0
         to LoginPage
@@ -43,32 +35,34 @@ class CompanyDeletionSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "1. Confirmation message is displayed"() {
+    def "1. User Cancels Company Deletion"() {
         given: 'The user has selected a Company'
             at ListCompaniesPage
-            filterByName "QAE2E"
+            filterByName baseName
             clickOnFirstElement()
             at CompanyDetailsPage
-        when: 'The user clicks on delete'
-            clickDelete()
-        then: 'A confirmation message is displayed'
-        //withConfirm(false){waitFor {tdModalDeleteBtn.click() }}
+            companyName=getCompanyNameText()
+        when: 'The user clicks on delete and cancels'
+            withConfirm(false){waitFor {clickDelete()}}
+        then: 'The company is not deleted'
+            getCompanyName()==companyName
+        and:'User is still at company details page'
+            at CompanyDetailsPage
     }
 
-    def "2. User Cancels Deletion"() {
-        when: 'The user cancels the deletion'
-
-        then: 'Company List Page should be displayed'
+    def "2. User Deletes the Company"() {
+        when: 'The user deletes the company'
+            withConfirm(true){waitFor {clickDelete()}}
+        then: 'The user is led to Company List page'
             at ListCompaniesPage
+        and: 'A message stating the company was deleted is displayed'
+            validateMessage("PartyGroup "+companyName+" deleted")
     }
 
-    def "4. Certify company information"() {
-        when: 'The user filters by name'
-            filterByName companyInfo.name
-        then: 'Company info displayed in grid is correct'
-            getCompanyNameText() == companyInfo.name
-            hasCompanyPartner() == " " // is not partner then blank displayed
-            getDateCreatedText().contains companyInfo.dateCreated
-            getLastUpdatedText().contains companyInfo.lastUpdated
+    def "3 The Company is no longer listed"(){
+        when: 'The user filters by the company name'
+            filterByName companyName
+        then:  'The company is no longer listed'
+            companyRowContainer.size()==0
     }
 }

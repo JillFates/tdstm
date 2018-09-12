@@ -21,6 +21,7 @@ class CompanyDetailsPage extends Page{
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
         commonsModule { module CommonsModule }
+        name {$('td.value')[0]}
     }
 
     def getCompanyNameText(){
@@ -50,4 +51,5 @@ class CompanyDetailsPage extends Page{
     def clickDelete(){
         deleteButton.click()
     }
+
 }
