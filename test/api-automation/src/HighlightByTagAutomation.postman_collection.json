@@ -465,15 +465,21 @@
 	],
 	"variable": [
 		{
-			"id": "87fa3827-78af-4d30-ad85-3f8338bf3565",
+			"id": "d8445564-f15f-4409-8b00-c4c594c4c05b",
 			"key": "projectId",
 			"value": "2445",
 			"type": "string"
 		},
 		{
-			"id": "78f44393-06f9-47f1-847e-799a0d4bf657",
+			"id": "4f8d9f4b-a2d3-4275-a8d8-615fc6a9a518",
 			"key": "tagName",
 			"value": "tag highlight",
+			"type": "string"
+		},
+		{
+			"id": "6e2420e8-0b6a-4f80-90b5-e295d52e4b27",
+			"key": "depGroup",
+			"value": "4",
 			"type": "string"
 		}
 	]
