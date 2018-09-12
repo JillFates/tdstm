@@ -37,7 +37,7 @@ class AssetEntity {
 		'description',
 		'environment',
 		'externalRefId',
-	    'id',
+		'id',
 		'lastUpdated',
 		'moveBundle',
 		'priority',
@@ -65,13 +65,13 @@ class AssetEntity {
 	String assetType = 'Server'
 	Integer priority
 	String planStatus = UNASSIGNED
-	Date purchaseDate
+	Date   purchaseDate
 	Double purchasePrice
 	String department
 	String costCenter
 	String maintContract
-	Date maintExpDate
-	Date retireDate
+	Date   maintExpDate
+	Date   retireDate
 	String description
 	String supportType
 	String environment
