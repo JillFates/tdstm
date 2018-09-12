@@ -21,12 +21,28 @@
 						Options for highlighting in the graph
 					</td>
 				</tr>
+				<tr>
+					<td colspan="3">
+						App Owner or SME:
+					</td>
+				</tr>
 				<tr title="Highlights assets by SME or app owner" class="optionRow">
 					<td colspan="3">
 						<span id="highlightPersonId" class="noPadding">
 							<select kendo-drop-down-list id="personHighlightSelectId"></select>
 							<span id="clearPersonFilterId" class="clearFilterIcon pointer disabled" onclick="GraphUtil.clearFilter('person')" title="Clears the current person filter"></span>
 						</span>
+					</td>
+				</tr>
+				<!-- -->
+				<tr>
+					<td colspan="3">
+						Asset Tag:
+					</td>
+				</tr>
+				<tr title="Highlights assets by Tag" class="optionRow">
+					<td colspan="3">
+						<tm-asset-tag-selector id="tmHighlighttAssetSelector" asset-selector="internal.assetSelector" pre-selected-operator="'ANY'" on-change="onDependencyAnalyzerTagSelectionChange()"></tm-asset-tag-selector>
 					</td>
 				</tr>
 			</table>
@@ -206,13 +222,13 @@
 			<!-- Save preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('depGraph')">
+					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}')">
 				</td>
 			</tr>
 			<!-- Reset preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('depGraph')">
+					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}')">
 				</td>
 			</tr>
 		</table>

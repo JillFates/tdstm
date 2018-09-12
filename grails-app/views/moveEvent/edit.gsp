@@ -2,6 +2,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
+        <g:javascript src="asset.tranman.js" />
+        <g:javascript src="entity.crud.js" />
+        <g:render template="../layouts/responsiveAngularResources" />
+        <g:javascript src="asset.comment.js" />
+        <g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
+
         <title>Edit Event</title>
     <script type="text/javascript">
       function initialize(){
@@ -34,7 +40,7 @@
     <body>
     <tds:subHeader title="Edit Event" crumbs="['Planning','Event', 'Edit']"/> <br />
 
-    <div class="body move-event-edit">
+    <div class="body move-event-edit" ng-app="tdsComments" ng-controller="tds.comments.controller.EventEditController as eventEdit">
             <!-- <h1>Edit Event</h1> -->
             <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
@@ -49,7 +55,7 @@
             </div>
             </g:hasErrors>
             <g:form method="post" >
-                <input type="hidden" name="id" value="${moveEventInstance?.id}" />
+                <input type="hidden" name="id" class="moveEventInstanceId" value="${moveEventInstance?.id}" />
                 <div class="dialog">
                     <table>
                         <tbody>
@@ -74,6 +80,14 @@
                                 </td>
                             </tr>
 
+                            <tr class="prop">
+                                <td class="name">
+                                    <label class="tag-title">Tag:</label>
+                                </td>
+                                <td  style="text-align:left;" class="valueNW">
+                                    <tm-asset-tag-selector id="tmHighlightGroupSelector" pre-asset-selector="internal.assetSelector" asset-selector="internal.selectedAssetSelector" hide-operator="'true'" on-change="onDependencyAnalyzerGroupTagSelectionChange()"></tm-asset-tag-selector>
+                                </td>
+                            </tr>
 
                             <tr class="prop">
                                 <td class="name">
@@ -157,11 +171,12 @@
 				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estStartTime','errors')}">
 				                  <script type="text/javascript">
 				                    $(document).ready(function(){
-                                        $("#estStartTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
+                                        $("#kendoEstStartTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />' });
 				                    });
-				                  </script> <input type="text" class="dateRange" size="15" style="width: 210px;" id="estStartTime" name="estStartTime"
-				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />" />
-				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
+				                  </script>
+                                  <input type="text" id="kendoEstStartTime" class="dateRange" size="15" style="width: 210px;" />
+                                  <input type="hidden" id="estStartTime" name="estStartTime" />
+				                  <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="estStartTime"/>
 				                    </div>
@@ -182,7 +197,7 @@
                 </div>
 			<div class="buttons">
 				<span class="button">
-					<g:actionSubmit class="save" value="Update" />
+                    <input type="submit" name="_action_Update" value="Update" id="submitEditEventForm" class="save" ng-click="onSubmitEventEditForm($event)">
 				</span>
 				<span class="button">
 					<g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" />

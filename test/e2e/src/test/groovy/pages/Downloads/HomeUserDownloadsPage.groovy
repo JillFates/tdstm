@@ -23,6 +23,9 @@ class HomeUserDownloadsPage extends Page {
     }
 
     def waitForExportedFile(fullFileName){
-        waitFor {fileRow.find {it.text().contains(fullFileName)}}
+        waitFor {
+            driver.navigate().refresh()
+            fileRow.find {it.text().contains(fullFileName)}
+        }
     }
 }

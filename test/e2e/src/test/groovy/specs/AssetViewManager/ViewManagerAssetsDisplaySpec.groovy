@@ -22,7 +22,7 @@ class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { menuModule.goToAssetViewManager() }
+        waitFor { assetsModule.goToAssetViewManager() }
         at AssetViewsPage
     }
 

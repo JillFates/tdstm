@@ -67,12 +67,12 @@ class AssetEntityService implements ServiceMethods {
 
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
-			(AssetClass.APPLICATION): [ 'assetName', 'tagAssets' ],
-			(AssetClass.DATABASE): [ 'assetName', 'tagAssets' ],
+			(AssetClass.APPLICATION): [ 'assetName'],
+			(AssetClass.DATABASE): [ 'assetName'],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName', 'tagAssets'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocationName'
 			],
-			(AssetClass.STORAGE): [ 'assetName', 'tagAssets' ]
+			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()
 
 	// The follow define the various properties that can be used with bindData to assign domain.properties
@@ -1216,28 +1216,11 @@ class AssetEntityService implements ServiceMethods {
 	 * @return list of MoveBundles
 	 */
 	List<Map> getMoveBundles(Project project) {
-		List<Map> resultBundles = []
-		if (project) {
-			// Minimize the amount of information retrieved by limiting the fields to the following list.
-			List<String> properties = [
-				'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
-				'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
-			]
-			// Query for bundles in this project (sorted by name).
-			resultBundles = MoveBundle.createCriteria().list {
-				and {
-					eq('project', project)
-				}
-				projections {
-					properties.each{ String prop ->
-						property(prop, prop)
-					}
-				}
-				order('name')
-				resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
-			}
-		}
-		return resultBundles
+		List<String> properties = [
+			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+			'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+		]
+		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])
 	}
 
 	/**
@@ -2040,6 +2023,24 @@ class AssetEntityService implements ServiceMethods {
 					case ~/validation|latency|planStatus|moveBundle/:
 						// Handled by the calling routine
 						break
+					case 'tagAssets':
+						query.append("""
+							CONCAT(
+			                    '[',
+			                    if(
+			                        ta.tag_asset_id,
+			                        group_concat(
+			                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+			                        ),
+			                        ''
+			                    ),
+			                    ']'
+			                ) as tagAssets, """)
+						joinQuery.append("""
+								LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+								LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+							""")
+						break
 					case ~/shutdownBy|startupBy|testingBy/:
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
@@ -2573,6 +2574,24 @@ class AssetEntityService implements ServiceMethods {
 
 				case 'validation':
 					break
+				case 'tagAssets':
+					altColumns.append("""
+						, CONCAT(
+		                    '[',
+		                    if(
+		                        ta.tag_asset_id,
+		                        group_concat(
+		                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+		                        ),
+		                        ''
+		                    ),
+		                    ']'
+		                ) as tagAssets""")
+					joinQuery.append("""
+						LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+						LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+						""")
+					break
 				default:
 					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS $value ")
 			}
@@ -2582,8 +2601,8 @@ class AssetEntityService implements ServiceMethods {
 			SELECT * FROM (
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName,
 				ae.asset_type AS assetType, m.name AS model,
-				if (at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
-				if (ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus,
+				(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+				(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
 				me.move_event_id AS event, ae.plan_status AS planStatus,
 				mb.name AS moveBundle, ae.validation AS validation
 			""")
@@ -2596,8 +2615,6 @@ class AssetEntityService implements ServiceMethods {
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '$AssetCommentType.TASK'
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '$AssetCommentType.COMMENT'
 				""")
 
 		if (joinQuery.length())

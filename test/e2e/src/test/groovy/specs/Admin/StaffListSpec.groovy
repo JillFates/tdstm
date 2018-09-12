@@ -19,6 +19,7 @@ class StaffListSpec extends GebReportingSpec {
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"
     static userProject = "TM-Demo"
+    static userCompany = "TM Demo"
     static teamName = "Account Manager"
     static firstName = baseName + randStr + "First"
     static middleName = baseName + randStr + "Middle"
@@ -26,7 +27,7 @@ class StaffListSpec extends GebReportingSpec {
     static userName = baseName + randStr + "Test"
     static userPass = baseName + randStr + "Pass*"
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
-
+    static originalDetails = [userCompany,firstName,middleName,lastName,userName,userEmail]
     def setupSpec() {
         testCount = 0
         to LoginPage
@@ -43,7 +44,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "1. The User Navigates in the Staff List Section"() {
-        testKey = "TM-XXXX"
         given: 'The User searches in the Menu Page'
             at MenuPage
         when: 'The User Clicks in the Admin > List Staff Menu Option'
@@ -56,7 +56,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "2. The User gains access to the Create Staff Pop-up"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Clicks the "Create Staff" Button'
@@ -67,7 +66,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "3. A brand new Staff is successfully created"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Create Staff Pop-up'
             at StaffCreationPage
         when: 'The User randomly completes First, Middle and Last Name'
@@ -82,7 +80,6 @@ class StaffListSpec extends GebReportingSpec {
             scModalTeamSelector = teamName
         and: 'The User Clicks the "Save" Button'
             waitFor { scModalSaveBtn.click() }
-
         then: 'The Pop-up should be closed and the User should be redirected to the Staff List Page'
             at StaffListPage
         and: 'A Success massage stating the User that was currently created should be displayed'
@@ -90,7 +87,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "3. The User Filters out by Staff First Name that was recently created"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Clicks the First Name Filter Column'
@@ -98,12 +94,11 @@ class StaffListSpec extends GebReportingSpec {
         and: 'The User enters the First Name'
             firstNameFilter = firstName
 
-        then: 'The User should be found out'
+        then: 'The User should be found'
             waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_firstname").find("a").text() == firstName}
     }
 
     def "4. The User gains access to the Create UserLogin Section"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Staff List Page'
             at StaffListPage
         when: 'The User Searches by and clicks the "Create User" Button'
@@ -114,7 +109,6 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     def "5. A brand New User is successfully created"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Create UserLogin Section'
             at UserCreationPage
         when: 'The User Completes his Username, Email'
@@ -128,14 +122,15 @@ class StaffListSpec extends GebReportingSpec {
             ucConfirmPassword = userPass
         and: 'The User Selects The Project'
             ucProjectSelector = userProject
-        and: 'The Admin Role is being checked'
-            ucAdminRoleCB.value(true)
+        and: 'A random number of roles are assigned to the user'
+            selectRandomRoles()
         and: 'The User clicks the "Save" Button'
             waitFor { ucSaveBtn.click() }
-
         then: 'The User should be redirected to the User List Section'
             at UserDetailsPage
         and: 'A success message related to the User that was created should be displayed'
             waitFor {pageMessage.text() == "UserLogin "+userName+" created"}
+        and: 'All of the details entered when creating the user are displayed'
+            validateUserDetails(originalDetails)
     }
 }

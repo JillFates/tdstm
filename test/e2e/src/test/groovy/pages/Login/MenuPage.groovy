@@ -3,6 +3,8 @@ package pages.Login
 import geb.Page
 import modules.AdminModule
 import modules.MenuModule
+import modules.ProjectsModule
+import modules.AssetsModule
 
 class MenuPage extends Page {
 
@@ -14,5 +16,8 @@ class MenuPage extends Page {
         contextPath { $("input",id:"contextPath")}
         menuModule { module MenuModule}
         adminModule { module AdminModule}
+        projectsModule { module ProjectsModule}
+        assetsModule { module AssetsModule}
+
     }
 }

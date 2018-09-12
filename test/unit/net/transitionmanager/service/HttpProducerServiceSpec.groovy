@@ -8,8 +8,8 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import net.transitionmanager.agent.CallbackMode
-import net.transitionmanager.agent.ContextType
+import net.transitionmanager.connector.CallbackMode
+import net.transitionmanager.connector.ContextType
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
@@ -122,7 +122,7 @@ class HttpProducerServiceSpec extends Specification {
 				name: 'testAction',
 				description: 'This is an action for testing',
 				apiCatalog: apiCatalog,
-				agentMethod: 'invokeHttpRequest',
+				connectorMethod: 'invokeHttpRequest',
 				methodParams: paramsJson,
 				producesData: 0,
 				callbackMode: CallbackMode.DIRECT,

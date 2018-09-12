@@ -28,6 +28,7 @@ enum UserPreferenceEnum {
 	HIGHLIGHT_TASKS('highlightTasks'),
 	ImportApplication,
 	ImportBatchListSize,
+    ImportBatchRecordsFilter,
 	ImportCabling,
 	ImportComment,
 	ImportDatabase,
@@ -45,7 +46,7 @@ enum UserPreferenceEnum {
 	MOVE_BUNDLE,
 	MOVE_EVENT,
 	MYTASKS_MOVE_EVENT_ID,
-	MYTASKS_REFRESH,
+	MYTASKS_REFRESH('RefreshMyTasks'),
 	PARTY_GROUP('PARTYGROUP'),
 	Physical_Columns,
 	PRINT_LABEL_QUANTITY('printLabelQuantity'),
@@ -72,6 +73,10 @@ enum UserPreferenceEnum {
 	TASKGRAPH_REFRESH('RefreshTaskGraph'),
 	TIMELINE_REFRESH('RefreshTimeline'),
 	VIEW_MANAGER_DEFAULT_SORT('viewManagerDefaultSort')
+
+	static final Map<UserPreferenceEnum, ?> DEFAULT_VALUES = [
+			  (PRINT_LABEL_QUANTITY) : 2
+	].asImmutable()
 
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportCabling,

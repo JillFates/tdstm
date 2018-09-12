@@ -141,7 +141,7 @@
 
 					</table>
 				</form>
-
+				
 				<!-- Preference controls -->
 				<table class="labelTree" cellpadding="0" cellspacing="0">
 
@@ -158,12 +158,12 @@
 					</tr>
 					<tr>
 						<td colspan="3" class="noPadding">
-							<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="GraphUtil.updateUserPrefs('archGraph')">
+							<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.value()}')">
 						</td>
 					</tr>
 					<tr>
 						<td colspan="3" class="noPadding">
-							<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="GraphUtil.resetToDefaults('archGraph')">
+							<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.value()}')">
 						</td>
 					</tr>
 				</table>

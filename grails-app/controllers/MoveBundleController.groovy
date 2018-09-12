@@ -19,6 +19,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DependencyConsoleCommand
+import net.transitionmanager.command.bundle.AssetsAssignmentCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
@@ -540,13 +541,15 @@ class MoveBundleController implements ControllerMethods {
 		int movedAppCount = 0
 		int confirmedAppCount = 0
 		int assignedAppCount = 0
+		int lockedAppCount = 0
 
 		def basicCountsQuery = """SELECT
 				assetClass,
 				COUNT(ae) AS all1,
 				SUM(CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END)  AS allUnassigned2,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END)     AS allMoveded3,
-				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4
+				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4,
+				SUM(CASE WHEN ae.planStatus=:lockedStatus THEN 1 ELSE 0 END) AS allLocked5
 			FROM AssetEntity ae
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)
 			GROUP BY ae.assetClass"""
@@ -556,7 +559,8 @@ class MoveBundleController implements ControllerMethods {
 			moveBundles: moveBundleList,
 			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 			movedStatus: AssetEntityPlanStatus.MOVED,
-			confirmedStatus: AssetEntityPlanStatus.CONFIRMED]
+			confirmedStatus: AssetEntityPlanStatus.CONFIRMED,
+			lockedStatus: AssetEntityPlanStatus.LOCKED]
 
 		def basicCountsResults = AssetEntity.executeQuery(basicCountsQuery, basicCountsParams)
 		basicCountsResults.each { ua ->
@@ -566,7 +570,8 @@ class MoveBundleController implements ControllerMethods {
 					unassignedAppCount = ua[2]
 					assignedAppCount = applicationCount - unassignedAppCount
 					movedAppCount = ua[3]
-					confirmedAppCount = movedAppCount + ua[4]
+					lockedAppCount = ua[5]
+					confirmedAppCount = movedAppCount + ua[4] + lockedAppCount
 					break
 				case AssetClass.DATABASE:
 					unassignedDbCount = ua[2]; break
@@ -1023,23 +1028,17 @@ class MoveBundleController implements ControllerMethods {
 	}
 
 	/**
-	 * Assigns one or more assets to a specified bundle
+	 * Assigns one or more assets to a specified bundle, and add tags
 	 */
 	@HasPermission(Permission.AssetEdit)
-	def saveAssetsToBundle() {
+	def assetsAssignment() {
+		AssetsAssignmentCommand assetsAssignment = populateCommandObject(AssetsAssignmentCommand)
+		validateCommandObject(assetsAssignment)
+
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def assetArray = params.assetVal
-		def moveBundleInstance = MoveBundle.get(params.moveBundle)
-		session.ASSIGN_BUNDLE = params.moveBundle
-		def assetList = assetArray.split(",")
-		assetList.each {assetId ->
-			def assetInstance = AssetEntity.get(assetId)
-			assetInstance.moveBundle = moveBundleInstance
-			assetInstance.planStatus = params.planStatus
-			saveWithWarnings assetInstance
-		}
+		moveBundleService.assignAssets(assetsAssignment.assets, assetsAssignment.tagIds,assetsAssignment.moveBundle, assetsAssignment.planStatus, project)
 
 		forward(controller: "assetEntity", action: "retrieveLists",
 			     params: [entity: params.assetType, dependencyBundle: session.getAttribute('dependencyBundle')])

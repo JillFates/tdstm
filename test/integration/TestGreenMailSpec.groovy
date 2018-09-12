@@ -5,6 +5,9 @@ import grails.test.spock.IntegrationSpec
 
 /**
  * Created by octavio on 7/26/17.
+ * This is a placehoder to Test sending mail using the GreenMail Plugin
+ * TODO: oluna this currently gives no value to the app is just an example of how to use the greenmail
+ * to test the result of mails being sent, should we remove it?
  */
 class TestGreenMailSpec extends IntegrationSpec {
 	GreenMail greenMail

@@ -14,6 +14,9 @@ class ApiCatalogDictionaryKey {
 	public static final String SCRIPT 			= 'script'
 	public static final String METHOD 			= 'method'
 
+	// invalid keys
+	public static final String AGENT			= 'agent'
+
 	public static final String DICTIONARY_ROOT_ELEMENT = DICTIONARY
 	public static final String[] METHOD_KEY = [METHOD]
 	public static final String[] COMMON_DICTIONARY_KEYS = [

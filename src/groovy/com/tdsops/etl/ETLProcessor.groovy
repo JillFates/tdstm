@@ -69,6 +69,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	static final String SOURCE_VARNAME = 'SOURCE'
 	/**
+	 * Static variable name definition for current ROW number
+	 */
+	static final String ROW_VARNAME = 'ROW'
+	/**
 	 * Static variable name definition for SOURCE script variable
 	 */
 	static final String FINDINGS_VARNAME = 'FINDINGS'
@@ -411,6 +415,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		rows.each { def row ->
 			topOfIterate()
 			currentColumnIndex = 0
+			bindVariable(ROW_VARNAME, currentRowIndex)
 			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
@@ -651,10 +656,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * @param field
 	 * @return
 	 */
-	Map<String, ?> set(final String variableName) {
-		if (!binding.isValidETLVariableName(variableName)) {
-			throw ETLProcessorException.invalidETLVariableName(variableName)
+	Map<String, ?> set(final Object variableName) {
+		if ( !(variableName instanceof String) ||
+				  hasVariable(variableName) ||
+				  ! binding.isValidETLVariableName(variableName)
+		) {
+			throw ETLProcessorException.invalidSetParameter()
+
 		}
+
 		validateStack()
 
 		return [
@@ -685,21 +695,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?> lookup(final Object fieldName) {
+	LookupElement lookup(final Object fieldName) {
 		validateStack()
-		ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fieldName)
-
-		return [
-		    with: { value ->
-			    // Object stringValue = ETLValueHelper.valueOf(value)
-
-			    boolean found = result.lookupInReference([ fieldSpec.name ], [ value ])
-			    if (found) {
-				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			    }
-			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
-		    }
-		]
+		return new LookupElement(this, [fieldName])
 	}
 
 	/**
@@ -719,24 +717,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	Map<String, ?>  lookup(Object... fieldNames) {
+	LookupElement lookup(Object... fieldNames) {
 		validateStack()
-		List<Element> lookupFieldNames = []
-		for (String fname in fieldNames) {
-			ETLFieldDefinition fieldSpec = lookUpFieldDefinition(selectedDomain.domain, fname)
-			lookupFieldNames << fieldSpec.name
-		}
-
-		return [
-		    with: { Object... values ->
-				List valuesAsList = values as List
-			    boolean found = result.lookupInReference(lookupFieldNames, valuesAsList)
-			    if (found) {
-				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			    }
-			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
-		    }
-		]
+		List fieldNamesList = fieldNames as List
+		return new LookupElement(this, fieldNamesList)
 	}
 	/**
 	 * Initialize a fieldName using a default value
@@ -903,6 +887,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		}
 		throw ETLProcessorException.invalidDomain(domainName)
 	}
+
+	/**
+	 * Fetch ETL results
+	 * <pre>
+	 * 	 find Device by 'assetName' eq SOURCE.assetName into 'id'
+	 * 	 fetch 'id' fields 'Name', 'U Size', 'upos' set deviceVar
+	 * </pre>
+	 * @param fieldName a
+	 * @return
+	 */
+	FetchFacade fetch(String fieldName){
+		validateStack()
+		return new FetchFacade(this, fieldName)
+	}
+
 
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results
@@ -1122,6 +1121,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	void addGlobalVariableInBinding(String variableName, Object value) {
 		binding.addGlobalVariable(variableName, value)
 	}
+
+	/**
+	 * Check in the binding if a variable has been declared already
+	 * @param varName
+	 * @return
+	 */
+	boolean hasVariable(String varName) {
+		binding.hasVariable(varName)
+	}
+
 	/**
 	 * Adds a new row in the list of rows
 	 * @param rowIndex

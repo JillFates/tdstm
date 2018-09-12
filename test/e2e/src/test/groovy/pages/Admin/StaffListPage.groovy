@@ -13,7 +13,7 @@ class   StaffListPage extends Page {
         pageBreadcrumbs[1].text() == "Client"
         pageBreadcrumbs[2].text() == "Staff"
 
-    // TODO following item have the elements inside the label and cannot be reached
+        // TODO following item have the elements inside the label and cannot be reached
         createStaffBtn.value() == "Create Staff"
         compareMergeBtn.value() == "Compare/Merge"
         bulkDeleteBtn.value()== "Bulk Delete"
@@ -41,10 +41,21 @@ class   StaffListPage extends Page {
         staffGridRows               { staffView.find("table#personIdGrid").find("tr.ui-widget-content","role":"row")}
         gridSize                    { staffGridRows.size()}
         rowSize                     { staffGridHeaderCols.size()}
+        //Grid Columns
+        emailColumn                 {$("#jqgh_email")}
 
         selectAllStaffCBox          { columnsHeader.find("input#cb_personIdGrid")}
 
-        firstNameFilter             { $("input#gs_firstname")}
+        rowsDisplayed       {$("#personIdGrid").find("role":"row")}
+        //GRID FILTERS
+        firstNameFilter             {$("input#gs_firstname")}
+        middleNameFilter            {$("#gs_middlename   ")}
+        lastNameFilter              {$("#gs_lastname")}
+        userNameFilter              {$("#gs_userLogin")}
+        emailFilter                 {$("#gs_email")}
+        companyFilter               {$("#gs_company")}
+        dateCreatedFilter           {$("#gs_dateCreated")}
+        lastUpdatedFilter           {$("#gs_lastUpdated")}
 
         staffGridPager              { $("div#pg_personIdGridPager")}
 
@@ -56,14 +67,38 @@ class   StaffListPage extends Page {
         deleteAssociatedAppOwnerOrSMEsInput { $('input#deleteIfAssocWithAssets')}
         deleteConfirmationModalButton { $('button#bulkModalDeleteBtn')}
         closeConfirmationModalButton { $('button#bulkModalCloseBtn')}
-        lastNameFilter { $("input#gs_lastname")}
         rowInputsCheckbox {staffGridRows.find("td input")}
         commonsModule { module CommonsModule }
     }
 
-    def filterByLastname(name){
+
+    def filterByFirstName(fName){
+        waitFor{firstNameFilter.displayed}
+        firstNameFilter=fName
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def filterByMiddleName(mName){
+        waitFor{middleNameFilter.displayed}
+        middleNameFilter=mName
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def filterByLastname(lName){
         waitFor{lastNameFilter.displayed}
-        lastNameFilter = name
+        lastNameFilter = lName
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def filterByUserName(usrName){
+        waitFor{userNameFilter.displayed}
+        userNameFilter=usrName
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def filterUserByEmail(email){
+        waitFor{emailFilter.displayed}
+        emailFilter=email
         commonsModule.waitForLoadingMessage()
     }
 
@@ -91,4 +126,54 @@ class   StaffListPage extends Page {
     def clickOnCloseConfirmationModalButton(){
         waitFor{closeConfirmationModalButton.click()}
     }
+
+    def rowsDisplayed(){
+        rowsDisplayed.displayed
+    }
+
+    def clearAllFilters(){
+        clearfistName()
+        clearMidName()
+        clearLastName()
+        clearUsrNme()
+        clearEmail()
+        clearCompany()
+        clearDateCreated()
+        clearLastUpdtd()
+    }
+
+    def clearfistName(){
+        firstNameFilter=""
+    }
+    def clearMidName(){
+        middleNameFilter=""
+    }
+    def clearLastName(){
+        lastNameFilter=""
+    }
+    def clearUsrNme(){
+        userNameFilter=""
+    }
+
+    def clearEmail(){
+        emailFilter=""
+    }
+    def clearCompany(){
+        companyFilter=""
+    }
+    def clearDateCreated(){
+        dateCreatedFilter=""
+    }
+    def clearLastUpdtd(){
+        lastUpdatedFilter=""
+    }
+
+    def isExpectedUser(firstName,midName,lstName,email,company){
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_firstname").find("a").text() == firstName}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_middlename").find("a").text()==(midName)}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_lastname").find("a").text()==(lstName)}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_email").text()==(email)}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_company").text()==(company)}
+    }
 }
+

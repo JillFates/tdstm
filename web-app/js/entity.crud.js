@@ -633,6 +633,11 @@ var EntityCrud = (function ($) {
 						assetCreateInvoked = false;
 						return false;
 					} else {
+						$angularScope = getCurrentAngularContext();
+						if ($angularScope) {
+							$angularScope.onSubmitAssetTags(resp.data.asset.id);
+						}
+
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
 
 						/*
@@ -643,7 +648,7 @@ var EntityCrud = (function ($) {
 							getRackLayout( $('#selectedRackId').val() );
 						*/
 					}
-					assetCreateInvoked = false
+					assetCreateInvoked = false;
 					$(document).trigger('entityAssetCreated', resp.data);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
@@ -691,6 +696,21 @@ var EntityCrud = (function ($) {
 		return validateOkay;
 
 	}
+
+	/**
+	 * Invoke the angular scope from a non angular section to load the Asset Tags for the View
+	 */
+	pub.loadAssetTags = function(assetId) {
+		// Getting the Context
+		var $angularScope;
+		if (typeof getCurrentAngularContext !== "undefined") {
+			$angularScope = getCurrentAngularContext();
+			if ($angularScope) {
+				// Asset Main Controller
+				$angularScope.loadAssetTags(assetId  || $('#assetId').val());
+			}
+		}
+	};
 
 	// Private variable used to prevent multiple clicks from invoking multiple updates
 	var assetUpdateInvoked = false;
@@ -747,6 +767,8 @@ var EntityCrud = (function ($) {
 			validateOkay = pub.validateDependencies(formName);
 
 		if (validateOkay) {
+			// Verify the
+
 			var formObj = $('#' + formName);
 			if (formObj.length == 0) {
 				alert("Unable to locate form " + formName);
@@ -770,7 +792,11 @@ var EntityCrud = (function ($) {
 				success: function (resp, dataType) {
 					pub.showAssetDetailView(assetClass, resp.data.asset.id);
 					$(document).trigger('entityAssetUpdated', resp.data);
-					//location.reload();  //to reload the whole List View
+					// If Asset get saved properly, save the Asset Tags
+					$angularScope = getCurrentAngularContext();
+					if ($angularScope) {
+						$angularScope.onSubmitAssetTags(resp.data.asset.id);
+					}
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
@@ -1872,12 +1898,14 @@ function selectAll() {
 		isFirst = true;
 	}
 }
-function changeMoveBundle(assetType, totalAsset, assignBundle) {
+function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 	if (!assignBundle) {
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
+
 	var assetArr = new Array();
 	var j = 0;
+
 	for (i = 0; i < totalAsset.size(); i++) {
 		if ($('#checkId_' + totalAsset[i]) != null) {
 			var booCheck = $('#checkId_' + totalAsset[i]).is(':checked');
@@ -1886,26 +1914,40 @@ function changeMoveBundle(assetType, totalAsset, assignBundle) {
 				j++;
 			}
 		}
-	} if (j == 0) {
+	}
+
+	if (j == 0) {
 		alert('Please select the Asset');
 	} else {
 		$('#plannedMoveBundleList').val(assignBundle);
 		$('#bundleSession').val(assignBundle);
-		$('#assetsTypeId').val(assetType)
-		$('#assetVal').val(assetArr);
+		$('#assetsTypeId').val(assetType);
+
+		for (var x = 0; x < assetArr.size(); x++) {
+			$('#changeBundle').append('<input type="hidden" class="tag-hidden-val" name="assets" value="' + assetArr[x] + '" />');
+		}
+
+		var objDom = $('[ng-app]');
+		var injector = angular.element(objDom).injector();
+		injector.invoke(function ($rootScope, commentUtils) {
+			$rootScope.$broadcast('sessionAssignmentTagSelector', tagIds);
+			recompileDOM('tmAssignmentTagSelector');
+		});
+
 		$('#moveBundleSelectId').dialog('open')
 	}
 }
 function submitMoveForm() {
-	jQuery.ajax({
-		url: $('#changeBundle').attr('action'),
+
+	$.ajax({
+		type: "POST",
 		data: $('#changeBundle').serialize(),
-		type: 'POST',
-		success: function (data) {
+		url: $('#changeBundle').attr('action'),
+		complete: function (jqXHR) {
 			$('#moveBundleSelectId').dialog("close")
-			$('#items1').html(data);
-			$('#allBundles').attr('checked', 'false')
-			$('#planningBundle').attr('checked', 'true')
+			$('#items1').html(jqXHR.responseText);
+			$('#allBundles').attr('checked', 'false');
+			$('#planningBundle').attr('checked', 'true');
 			$("#plannedMoveBundleList").html($("#moveBundleList_planning").html())
 		}
 	});

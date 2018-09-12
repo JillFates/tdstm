@@ -17,13 +17,12 @@ export const PREFERENCES_LIST = {
 	CURR_TZ: 'CURR_TZ',
 	DATA_SCRIPT_SIZE: 'DataScriptSize',
 	VIEW_UNPUBLISHED: 'viewUnpublished',
-	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize'
+	IMPORT_BATCH_LIST_SIZE: 'ImportBatchListSize',
+	IMPORT_BATCH_RECORDS_FILTER: 'ImportBatchRecordsFilter'
 };
 
 @Injectable()
 export class PreferenceService {
-
-	public static readonly USER_PREFERENCES_DATE_FORMAT = 'CURR_DT_FORMAT';
 
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
@@ -72,7 +71,7 @@ export class PreferenceService {
 	 * Used to retrieve the format to use for Date properies based on user's preference (e.g. MM/dd/YYYY)
 	 */
 	getUserDateFormat(): string {
-		const currentUserDateFormat = this.preferences[PreferenceService.USER_PREFERENCES_DATE_FORMAT];
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		if (currentUserDateFormat) {
 			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
 		}

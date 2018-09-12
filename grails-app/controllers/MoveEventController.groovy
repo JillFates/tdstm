@@ -10,6 +10,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -201,6 +202,8 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventEdit)
 	def update() {
+		CreateEventCommand event = populateCommandObject(CreateEventCommand)
+
 		MoveEvent moveEvent = MoveEvent.get(params.id)
 		if (!moveEvent) {
 			flash.message = "MoveEvent not found with id $params.id"
@@ -208,13 +211,7 @@ class MoveEventController implements ControllerMethods {
 			return
 		}
 
-		//If we have a Date we need to fetch it using the TimeUtil
-		if (params.estStartTime) {
-			//if is Null we reassign the old value to show the original error
-			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
-		}
-
-		moveEvent.properties = params
+		moveEvent.properties = event
 
 		if (!moveEvent.hasErrors() && moveEvent.save()) {
 			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues('moveBundle') as List)
@@ -235,21 +232,12 @@ class MoveEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def save() {
-		if (params.estStartTime) {
-			params.estStartTime = TimeUtil.parseDateTime(params.estStartTime) ?: params.estStartTime
-		}
-		MoveEvent moveEvent = new MoveEvent(params)
-
-		// The project is no longer available in the view. We need to retrieve it.
+		CreateEventCommand event = populateCommandObject(CreateEventCommand)
 		Project currentProject = securityService.userCurrentProject
-		moveEvent.project = currentProject
 
-		if (moveEvent.project.runbookOn == 1) {
-			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
-		}
-		if (!moveEvent.hasErrors() && moveEvent.save()) {
-			moveBundleService.assignMoveEvent(moveEvent, request.getParameterValues("moveBundle") as List)
-			moveBundleService.createManualMoveEventSnapshot(moveEvent)
+		MoveEvent moveEvent = moveEventService.save(event, currentProject)
+
+		if (!moveEvent.hasErrors()) {
 			flash.message = "MoveEvent $moveEvent.name created"
 			redirect(action: "show", id: moveEvent.id)
 		}

@@ -1,19 +1,23 @@
 package pages.AssetViewManager
 import geb.Page
 import modules.MenuModule
+import modules.AssetsModule
 
 class SaveViewPage extends Page{
 
     static at = {
-        waitFor {saveViewModal.displayed}
+        saveViewModal.displayed
+        headerTitle.text() == "Save List View"
     }
 
     static content = {
-        saveViewModal                (wait:true) { $("section","class":"content-header")}
-        nameField                    {$("input", id:"name")}
-        saveBtn                      {$("button",text:"Save").not(id:"btnSave")}
-        menuModule                   { module MenuModule }
-        sharedView                   {$("input", name:"shared")}
+        saveViewModal  (wait:true) { $(".asset-explorer-view-save-component")}
+        headerTitle { saveViewModal.find("h4.modal-title")}
+        nameField {$("input", id:"name")}
+        saveBtn {$("button",text:"Save").not(id:"btnSave")}
+        menuModule { module MenuModule }
+        assetsModule { module AssetsModule }
+        sharedView {$("input", name:"shared")}
     }
 
     def enterName(String value){

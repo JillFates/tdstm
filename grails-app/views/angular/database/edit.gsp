@@ -5,9 +5,10 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter tds-autofocus class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
+	 class="modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
+		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Edit</h4>
 	</div>
 	<div class="modal-body">
@@ -141,7 +142,7 @@
 					<!-- Dependencies -->
 					<tr id="deps">
 						<td valign="top" colspan="2">
-							<tds-supports-depends [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
+							<tds-supports-depends (initDone)="onInitDependenciesDone($event)" [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 						</td>
 					</tr>
 				</table>
@@ -149,10 +150,10 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger pull-left mar-left-50 component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </div>

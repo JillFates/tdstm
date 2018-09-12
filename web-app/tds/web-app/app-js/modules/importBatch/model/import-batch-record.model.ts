@@ -19,6 +19,8 @@ export class ImportBatchRecordModel {
 	lastUpdated: Date;
 	warn: number;
 	currentValues: any;
+	fieldsInfo?: any;
+	init?: any;
 }
 
 export class ImportBatchRecordDetailColumnsModel {

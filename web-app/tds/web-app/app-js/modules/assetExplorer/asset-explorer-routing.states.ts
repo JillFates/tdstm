@@ -85,7 +85,7 @@ export const assetExplorerReportSelectorState: Ng2StateDeclaration = <Ng2StateDe
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
-			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-manager'}
+			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-manager', subMenu: true }
 		},
 		requiresAuth: true,
 		// requiresPermission: 'AssetExplorerSelection'
@@ -182,7 +182,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
 			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW'],
-			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer'}
+			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
 		},
 		requiresAuth: true
 	},

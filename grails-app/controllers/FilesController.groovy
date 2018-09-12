@@ -107,6 +107,24 @@ class FilesController implements ControllerMethods {
 		String joinQuery=""
 		filePref.each { key, value ->
 			switch(value) {
+				case 'tagAssets':
+					temp += """
+					CONCAT(
+	                    '[',
+	                    if(
+	                        ta.tag_asset_id,
+	                        group_concat(
+	                            json_object('id', ta.tag_asset_id, 'tagId', t.tag_id, 'name', t.name, 'description', t.description, 'color', t.color)
+	                        ),
+	                        ''
+	                    ),
+	                    ']'
+	                ) as tagAssets, """
+					joinQuery += """
+						LEFT OUTER JOIN tag_asset ta on ae.asset_entity_id = ta.asset_id
+						LEFT OUTER JOIN tag t on t.tag_id = ta.tag_id
+					"""
+					break
 			case 'moveBundle':
 				temp +="mb.name AS moveBundle,"
 			break
@@ -133,10 +151,12 @@ class FilesController implements ControllerMethods {
 				temp +="ae.${WebUtil.splitCamelCase(value)} AS $value,"
 			}
 		}
-		def query = new StringBuilder("""SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-										 me.move_event_id AS event,
-										 if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, if (ac_comment.comment_type IS NULL, 'noComments','comments') AS
-		commentsStatus, """)
+		def query = new StringBuilder("""
+			SELECT * FROM (SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
+			me.move_event_id AS event,
+			(SELECT if (count(ac_task.comment_type) = 0, 'tasks','noTasks') FROM asset_comment ac_task WHERE ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue') AS tasksStatus,
+			(SELECT if (count(ac_comment.comment_type = 0), 'comments','noComments') FROM asset_comment ac_comment WHERE ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment') AS commentsStatus,
+			""")
 
 		if (temp) {
 			query.append(temp)
@@ -146,8 +166,6 @@ class FilesController implements ControllerMethods {
 		query.append(""" ae.validation AS validation,ae.plan_status AS planStatus
 				FROM files f
 				LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
-				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
-				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
 		if (joinQuery)
 			query.append(joinQuery)

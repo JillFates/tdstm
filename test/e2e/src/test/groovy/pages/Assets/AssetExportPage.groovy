@@ -5,6 +5,7 @@ import geb.error.RequiredPageContentNotPresent
 import geb.Browser
 import utils.CommonActions
 import modules.CommonsModule
+import modules.AssetsModule
 
 class AssetExportPage extends Page{
 
@@ -15,6 +16,7 @@ class AssetExportPage extends Page{
 
     static content = {
         commonsModule { module CommonsModule }
+        assetsModule { module AssetsModule}
         sectionTitle (wait:true){$("section.content-header h1")}
         exportButton {$("button", id:"exportButton")}
         bundleOptions {$("select#bundleId option")}

@@ -28,6 +28,7 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.StepSnapshot
+import net.transitionmanager.domain.Tag
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -47,6 +48,7 @@ class MoveBundleService implements ServiceMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	TagService tagService
+	TagAssetService tagAssetService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
 	private static final Map<String, Number> defaultsMedium = [force: -500, linkSize: 100, friction: 0.7, theta: 1, maxCutAttempts: 150]
@@ -283,6 +285,7 @@ class MoveBundleService implements ServiceMethods {
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
 		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
+		String tagJoins = tagService.getTagsJoin(tagIds, tagMatch)
 
 		def depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
@@ -304,8 +307,7 @@ class MoveBundleService implements ServiceMethods {
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
 			LEFT OUTER JOIN model m ON a.model_id=m.model_id
-			LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-			LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+			$tagJoins
 			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
 				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
 				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id
@@ -864,5 +866,31 @@ class MoveBundleService implements ServiceMethods {
 			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
 		}
 		return moveBundle
+	}
+
+	/**
+	 * Bulk assigns moveBundle, planStatus and tags to assets from the dependency analyzer.
+	 *
+	 * @param assets The assets to updated.
+	 * @param tagIds The tagIds to replace the current tags, is there are any.
+	 * @param moveBundle The move bundle to assign to the asset.
+	 * @param planStatus the plan status to assign to the asset.
+	 * @param currentProject the project of the signed in user.
+	 */
+	void assignAssets(List<Long> assets, List<Long> tagIds, Long moveBundle, String planStatus, Project currentProject) {
+		MoveBundle moveBundleInstance = MoveBundle.get(moveBundle)
+
+		assets.each { Long assetId ->
+			AssetEntity asset = get(AssetEntity, assetId, currentProject)
+			asset.moveBundle = moveBundleInstance
+			asset.planStatus = planStatus
+			asset.save(failOnError: true)
+		}
+
+		tagAssetService.validateBulkValues(currentProject, tagIds)
+		tagAssetService.bulkReplace(tagIds, assets)
+
+		session.ASSIGN_BUNDLE = moveBundle
+		session.SELECTED_TAG_IDS = tagIds ?: []
 	}
 }

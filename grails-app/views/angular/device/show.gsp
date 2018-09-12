@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autofocus class="modal-content tds-angular-component-content">
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <span aria-hidden="true">×</span>
@@ -39,7 +39,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
 									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
 										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
-											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">${assetEntity.manufacturer}</a>
+											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
 										</tdsAngular:tooltipSpan>
 									</td>
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">

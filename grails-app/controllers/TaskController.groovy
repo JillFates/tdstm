@@ -4,6 +4,7 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -13,8 +14,8 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import net.transitionmanager.agent.AbstractAgent
-import net.transitionmanager.agent.DictionaryItem
+import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
@@ -875,18 +876,31 @@ digraph runbook {
 	}
 
 	/**
-	 * Used in MyTask to set user preference for printername and quantity .
-	 * @param prefFor - Key
-	 * @param selected : value
+	 * Used in MyTask to set user preference for printername and quantity, we can get a key-vaulue or
+	 * a json with a list of permissions to Change
+	 * @param preference - Key
+	 * @param value
 	 */
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
-		def key = params.prefFor
-		def selected = params.list('selected[]')[0] ?:params.selected
-		if (selected) {
-			userPreferenceService.setPreference(key, selected)
-			session.setAttribute(key,selected)
+		Map preferencesMap
+
+		if (request.format == "json") {
+			preferencesMap = request.JSON
+
+		} else {
+			preferencesMap = [:]
+			def key = params.preference
+			def value = params.value
+			if (value) {
+				preferencesMap[key] = value
+			}
 		}
+
+		preferencesMap.each { key, value ->
+			userPreferenceService.setPreference(key, value)
+		}
+
 		render true
 	}
 
@@ -1120,14 +1134,14 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
-			AbstractAgent agent = apiActionService.agentInstanceForAction(assetComment.apiAction)
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
-				agent       : agent.name,
+				connector       : connector.name,
 				method      : methodInfo.name,
 				description : methodInfo.description,
 				methodParams: methodParamsList,
@@ -1577,7 +1591,7 @@ function goBack() { window.history.back() }
 		             dueDate: dueDate, assignToSelect: assignToSelect, assetEntity: assetComment.assetEntity,
 		             cartQty: cartQty, project: project, customs: customs]
 		if (isCleaner) {
-			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY)
+			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY) ?: UserPreferenceEnum.DEFAULT_VALUES[PREF.PRINT_LABEL_QUANTITY]
 			model.prefPrinter = userPreferenceService.getPreference(PREF.PRINTER_NAME)
 		}
 

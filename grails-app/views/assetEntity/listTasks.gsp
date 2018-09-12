@@ -71,6 +71,7 @@
 		var EST_START_CLASS=19;
 		var EST_FINISH_CLASS=20;
 		var IS_PUBLISHED=21;
+        var UPDATED_CLASS=22;
 
 		$(document).ready(function() {
 
@@ -216,8 +217,8 @@
 		 }
 
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId +
-			 	'" class="cellWithoutBackground" action-bar-cell config-table="config.table" comment-id="'+options.rowId +
+			 return '<span id="span_'+options.rowId +'" class="cellWithoutBackground ' +
+                 rowObject[UPDATED_CLASS] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId +
 				 '" asset-id="'+rowObject[ASSET_ID]+'" status="'+rowObject[STATUS] + '" instructions-link="'+rowObject[INST_LINK] +
 				 '">' + cellVal + '</span>';
 		}

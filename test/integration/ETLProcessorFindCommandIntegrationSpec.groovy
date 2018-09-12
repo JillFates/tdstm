@@ -7,6 +7,8 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.FindCondition
+import com.tdsops.etl.QueryResult
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -18,7 +20,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 
-class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
+class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -102,7 +104,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					domain Application
 					load 'environment' with 'Production'
 					extract 'application id' load 'id'
-					find Application by 'id' with SOURCE.'application id' into 'id'
+					find Application by 'id' eq SOURCE.'application id' into 'id'
 				}
 			""".stripIndent())
 
@@ -121,10 +123,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						value == '152254'
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152254']
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152254']])
 					}
 
 					with(data[1].fields.environment) {
@@ -137,10 +136,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 						value == '152255'
 
 						find.query.size() == 1
-						with(find.query[0]) {
-							domain == 'Application'
-							kv == [id: '152255']
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152255']])
 					}
 				}
 			}
@@ -148,8 +144,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: 152254l]) == [152254l]
-				get('Application', [id: 152255l]) == [152255l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', 152254l)]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', 152255l)]) == [152255l]
 			}
 
 		cleanup:
@@ -248,8 +244,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetType' set primaryTypeVar
 
 					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 				}
 			""".stripIndent())
 
@@ -271,48 +267,21 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					(1..14).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							with(query[0]) {
-								domain == ETLDomain.Dependency.name()
-								kv.id == value.toString()
-							}
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
 						}
 					}
 
 					// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
 					with(data[0].fields.asset.find) {
 						query.size() == 3
-						with(query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetType == 'VM'
-						}
-
-						with(query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 					}
 				}
-			}
-
-			with(etlProcessor.findCache) {
-				size() == 48
-				hitCountRate() == 14.29
-				get('Dependency', [id: '1']) == []
-				get('Application', [id: 151954l]) == []
-				get('Application', [assetName: 'ACMEVMPROD01', assetType: 'VM']) == []
-				get('Application', [assetName: 'VMWare Vcenter']) == []
-				get('Dependency', [id: '2']) == []
-				get('Application', [id: 151971l]) == []
-				get('Application', [assetName: 'ACMEVMPROD18', assetType: 'VM']) == []
-				get('Dependency', [id: '3']) == []
-				get('Application', [id: 151974l]) == []
-				get('Application', [assetName: 'ACMEVMPROD21', assetType: 'VM']) == []
 			}
 
 		cleanup:
@@ -370,7 +339,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				iterate {
 
 					extract 'AssetDependencyId' load 'id'
-					find Dependency by 'id' with DOMAIN.id into 'id'
+					find Dependency by 'id' eq DOMAIN.id into 'id'
 
 					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
@@ -396,10 +365,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					(1..13).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							with(query[0]) {
-								domain == ETLDomain.Dependency.name()
-								kv.id == value.toString()
-							}
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
 						}
 					}
 					// Validates command: set comment with 'Asset results found'
@@ -411,7 +377,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				size() == 14
 				hitCountRate() == 0
 				[1..14].each {
-					get('Dependency', [id: it.toString()]) == []
+					get(ETLDomain.Dependency.name(), [new FindCondition('id', it.toString())]) == []
 				}
 			}
 
@@ -461,7 +427,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 				iterate {
 					extract 'application id' load 'asset'
-					find Application by 'id' with DOMAIN.asset into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
 				}
 			""".stripIndent())
 
@@ -486,8 +452,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 2
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == [152255l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == [152255l]
 			}
 
 		cleanup:
@@ -602,8 +568,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					load 'environment' with 'Production'
 					extract 'vendor name' load 'Vendor'
 					extract 'application id' load 'id'
-					find Application by 'id' with SOURCE.'application id' into 'id'
-					elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
+					find Application by 'id' eq SOURCE.'application id' into 'id'
+					elseFind Application by 'appVendor' eq DOMAIN.appVendor into 'id' warn 'found without asset id field'
 				}
 			""".stripIndent())
 
@@ -625,11 +591,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							query[0].domain == ETLDomain.Application.name()
-							query[0].kv == [id: '152254']
-
-							query[1].domain == ETLDomain.Application.name()
-							query[1].kv == [appVendor: 'Microsoft']
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 						}
 					}
 
@@ -645,12 +608,8 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							query[0].domain == ETLDomain.Application.name()
-							query[0].kv == [id: '152255']
-
-							query[1].domain == ETLDomain.Application.name()
-							query[1].kv == [appVendor: 'Mozilla']
-
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 						}
 
 						fields.id.warn
@@ -661,9 +620,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 3
 				hitCountRate() == 0
-				get('Application', [id: '152254']) == [152254l]
-				get('Application', [id: '152255']) == []
-				get('Application', [appVendor: 'Mozilla']) == [152253l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152254')]) == [152254l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '152255')]) == []
+				get(ETLDomain.Application.name(), [new FindCondition('appVendor', 'Mozilla')]) == [152253l]
 			}
 
 		cleanup:
@@ -754,7 +713,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetDependencyId' load 'id'
 					extract 'AssetId' load 'asset'
 
-					find Asset by 'assetName' with SOURCE.AssetName into 'asset'
+					find Asset by 'assetName' eq SOURCE.AssetName into 'asset'
 					// Grab the reference to the FINDINGS to be used later.
 					def primaryFindings = FINDINGS
 
@@ -835,9 +794,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenNotFound 'asset' create {
                         assetName primaryNameVar
@@ -864,21 +823,12 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					with(data[0].fields.asset) {
 
 						find.query.size() == 3
-						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 
 						// whenNotFound create command assertions
 						create.assetName == 'ACMEVMPROD01'
@@ -891,10 +841,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 			with(etlProcessor.findCache) {
 				size() == 12
 				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == [151954l]
-				get('Application', [id: '151971']) == [151971l]
-				get('Application', [id: '151974']) == [151974l]
-				get('Application', [id: '151975']) == [151975l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151954')]) == [151954l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151971')]) == [151971l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151974')]) == [151974l]
+				get(ETLDomain.Application.name(), [new FindCondition('id', '151975')]) == [151975l]
 			}
 
 		cleanup:
@@ -961,9 +911,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenNotFound 'asset' update {
                         assetClass Application
@@ -1042,9 +992,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenFound 'asset' create {
                         "TN Last Seen" NOW
@@ -1120,9 +1070,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
 					whenNotFound 'asset' create {
 						assetClass Unknown
@@ -1203,9 +1153,9 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'AssetName' set primaryNameVar
 					extract 'AssetType' set primaryTypeVar
 
-					find Application by 'id' with DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
-                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+					find Application by 'id' eq DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenFound 'asset' update {
                         assetName primaryNameVar
@@ -1228,39 +1178,20 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					]
 
 					with(data[0].fields.asset) {
-
 						find.query.size() == 3
-						with(find.query[0]) {
-							domain == ETLDomain.Application.name()
-							kv.id == '151954'
-						}
-
-						with(find.query[1]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'ACMEVMPROD01'
-							kv.assetClass == 'VM'
-						}
-
-						with(find.query[2]) {
-							domain == ETLDomain.Application.name()
-							kv.assetName == 'VMWare Vcenter'
-						}
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[1], ETLDomain.Application, [
+							['assetName', 'eq', 'ACMEVMPROD01'],
+							['assetClass', 'eq', 'VM']
+						])
+						assertQueryResult(find.query[2], ETLDomain.Application, [['assetName', 'eq', 'VMWare Vcenter']])
 					}
 				}
 			}
 
 			with(etlProcessor.findCache) {
-				size() == 22
+				size() == 12
 				hitCountRate() == 14.29
-				get('Application', [id: '151954']) == []
-				get('Application', [assetName: 'VMWare Vcenter']) == []
-				get('Application', [id: '151971']) == []
-				get('Application', [id: '151974']) == []
-				get('Application', [id: '151975']) == []
-				get('Application', [id: '151978']) == []
-				get('Application', [assetName: 'V Cluster Prod']) == []
-				get('Application', [id: '151990']) == []
-				get('Application', [assetName: 'VMWare Vcenter Test']) == []
 			}
 
 		cleanup:
@@ -1311,7 +1242,7 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 					extract 'Location' load 'location'
 					extract 'Room' load 'room'
 
-			        find Room by 'id' with SOURCE.RoomId into 'id'
+			        find Room by 'id' eq SOURCE.RoomId into 'id'
 				}
 			""".stripIndent())
 
@@ -1345,305 +1276,10 @@ class ETLProcessorFindCommandIntegrationSpec extends IntegrationSpec {
 				}
 			}
 
-			with(etlProcessor.findCache) {
-				size() == 4
-				hitCountRate() == 0
-				get('Room', [id: '100']) == []
-				get('Room', [id: '102']) == []
-//				get('Room', [id: '741']) == [741l]
-//				get('Room', [id: '742']) == [742l]
-			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-	}
-
-	/**
-	 * Builds a list of Mock Room using this fields order
-	 * ['id', 'project', 'roomName', 'location', 'roomDepth', 'roomWidth', 'address', 'city', 'stateProv', 'postalCode']
-	 * @param valuesList
-	 * @return a list of Mock(Room)
-	 */
-	List<Room> buildRooms(List<List<?>> valuesList){
-		return valuesList.collect { List<?> values ->
-			Room room = new Room()
-			room.project = values[0]
-			room.roomName = values[1]
-			room.location = values[2]
-			room.roomDepth = values[3]
-			room.roomWidth = values[4]
-			room.address = values[5]
-			room.city = values[6]
-			room.stateProv = values[7]
-			room.postalCode = values[8]
-			room.save()
-			room
-		}
-	}
-
-	/**
-	 * Builds a list of Mock Room using this fields order
-	 * ['project', 'room', 'manufacturer', 'model', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
-	 * @param valuesList
-	 * @return a list of Mock(Rack)
-	 */
-	List<Rack> buildRacks(List<List<?>> valuesList){
-		return valuesList.collect { List<?> values ->
-			Rack rack = new Rack()
-			rack.project = values[0]
-			rack.room = values[1]
-			rack.manufacturer = values[2]
-			rack.model = values[3]
-			rack.location = values[4]
-			rack.front = values[5]
-			rack.source = values[6]
-			rack.roomX = values[7]
-			rack.roomY = values[8]
-			rack.powerA = values[9]
-			rack.powerB = values[10]
-			rack.powerC = values[11]
-			rack.rackType = values[12]
-			rack.save()
-			rack
-		}
-	}
-
-	/**
-	 * Builds a spec structure used to validate 'asset' fields
-	 * @param field
-	 * @param label
-	 * @param type
-	 * @param required
-	 * @return a map with the correct fieldSpec format
-	 */
-	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0){
-		return [
-				constraints: [
-						required: required
-				],
-				control    : type,
-				default    : '',
-				field      : field,
-				imp        : 'U',
-				label      : label,
-				order      : 0,
-				shared     : 0,
-				show       : 0,
-				tip        : "",
-				udf        : 0
-		]
-	}
-
-	/**
-	 * Builds a CSV dataSet from a csv content
-	 * @param csvContent
-	 * @return
-	 */
-	private List buildCSVDataSet(String csvContent){
-
-		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
-		sixRowsDataSetOS << csvContent
-		sixRowsDataSetOS.close()
-
-		String fullName = fileSystemService.getTemporaryFullFilename(fileName)
-
-		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
-		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
-
-		return [fileName, new DataSetFacade(dataSet)]
-	}
-
-	/**
-	 * Creates an instance of DomainClassFieldsValidator with all the fields spec correctly set.
-	 * @return an intance of DomainClassFieldsValidator
-	 */
-	protected ETLFieldsValidator createDomainClassFieldsValidator(){
-		ETLFieldsValidator validator = new ETLFieldsValidator()
-		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
-
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION) + commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE) + commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE) + commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE) + commonFieldsSpec)
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency) + commonFieldsSpec)
-
-		return validator
-	}
-
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset){
-
-		List<Map<String, ?>> fieldSpecs = []
-		switch(asset) {
-			case AssetClass.APPLICATION:
-				fieldSpecs = [
-						buildFieldSpec('appFunction', 'Function', 'String'),
-						buildFieldSpec('appOwner', 'App Owner', 'Person'),
-						buildFieldSpec('appSource', 'Source', 'String'),
-						buildFieldSpec('appTech', 'Technology', 'String'),
-						buildFieldSpec('appVendor', 'Vendor', 'String'),
-						buildFieldSpec('appVersion', 'Version', 'String'),
-						buildFieldSpec('businessUnit', 'Business Unit', 'String'),
-						buildFieldSpec('criticality', 'Criticality', 'InList'),
-						buildFieldSpec('drRpoDesc', 'DR RPO', 'String'),
-						buildFieldSpec('drRtoDesc', 'DR RTO', 'String'),
-						buildFieldSpec('latency', 'Latency OK', 'YesNo'),
-						buildFieldSpec('license', 'License', 'String'),
-						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-						buildFieldSpec('shutdownBy', 'Shutdown By', 'String'),
-						buildFieldSpec('shutdownDuration', 'Shutdown Duration', 'Number'),
-						buildFieldSpec('shutdownFixed', 'Shutdown Fixed', 'Number'),
-						buildFieldSpec('sme', 'SME1', 'Person'),
-						buildFieldSpec('sme2', 'SME2', 'Person'),
-						buildFieldSpec('startupBy', 'Startup By', 'String'),
-						buildFieldSpec('startupDuration', 'Startup Duration', 'Number'),
-						buildFieldSpec('startupFixed', 'Startup Fixed', 'Number'),
-						buildFieldSpec('startupProc', 'Startup Proc OK', 'YesNo'),
-						buildFieldSpec('testingBy', 'Testing By', 'String'),
-						buildFieldSpec('testingDuration', 'Testing Duration', 'Number'),
-						buildFieldSpec('testingFixed', 'Testing Fixed', 'Number'),
-						buildFieldSpec('testProc', 'Test Proc OK', 'YesNo'),
-						buildFieldSpec('url', 'URL', 'String'),
-						buildFieldSpec('useFrequency', 'Use Frequency', 'String'),
-						buildFieldSpec('userCount', 'User Count', 'String'),
-						buildFieldSpec('userLocations', 'User Locations', 'String'),
-						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-						buildFieldSpec('custom2', 'SLA Name', 'String'),
-						buildFieldSpec('custom3', 'Cost Basis', 'String'),
-						buildFieldSpec('custom4', 'OPS Manual', 'String'),
-						buildFieldSpec('custom5', 'DR Plan', 'String'),
-						buildFieldSpec('custom6', 'App Code', 'String'),
-						buildFieldSpec('custom7', 'Latency Timing', 'String'),
-						buildFieldSpec('custom8', 'App ID', 'String'),
-						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-						buildFieldSpec('custom10', 'Custom10', 'String'),
-						buildFieldSpec('custom11', 'Custom11', 'String'),
-						buildFieldSpec('custom12', 'Custom12', 'String'),
-				]
-				break
-			case AssetClass.DATABASE:
-				fieldSpecs = [
-						buildFieldSpec('dbFormat', 'Format', 'String'),
-						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-						buildFieldSpec('size', 'Size', 'String'),
-						buildFieldSpec('scale', 'Scale', 'String'),
-						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-						buildFieldSpec('custom2', 'SLA Name', 'String'),
-						buildFieldSpec('custom3', 'Cost Basis', 'String'),
-						buildFieldSpec('custom4', 'OPS Manual', 'String'),
-						buildFieldSpec('custom5', 'DR Plan', 'String'),
-						buildFieldSpec('custom6', 'App Code', 'String'),
-						buildFieldSpec('custom7', 'Latency Timing', 'String'),
-						buildFieldSpec('custom8', 'App ID', 'String'),
-						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-						buildFieldSpec('custom10', 'Custom10', 'String'),
-						buildFieldSpec('custom11', 'Custom11', 'String'),
-						buildFieldSpec('custom12', 'Custom12', 'String'),
-				]
-				break
-				break
-			case AssetClass.DEVICE:
-				fieldSpecs = [
-						buildFieldSpec('assetTag', 'Asset Tag', 'String'),
-						buildFieldSpec('assetType', 'Device Type', 'AssetType'),
-						buildFieldSpec('cart', 'Cart', 'String'),
-						buildFieldSpec('ipAddress', 'IP Address', 'String'),
-						buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
-						buildFieldSpec('manufacturer', 'Manufacturer', 'String'),
-						buildFieldSpec('model', 'Model', 'String'),
-						buildFieldSpec('os', 'OS', 'String'),
-						buildFieldSpec('priority', 'Priority', 'Options.Priority'),
-						buildFieldSpec('railType', 'Rail Type', 'InList'),
-						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-						buildFieldSpec('retireDate', 'Retire Date', 'Date'),
-						buildFieldSpec('scale', 'Scale', 'String'),
-						buildFieldSpec('serialNumber', 'Serial #', 'String'),
-						buildFieldSpec('shelf', 'Shelf', 'String'),
-						buildFieldSpec('shortName', 'Alternate Name', 'String'),
-						buildFieldSpec('size', 'Size', 'Number'),
-						buildFieldSpec('sourceBladePosition', 'Source Blade Position', 'Number'),
-						buildFieldSpec('sourceChassis', 'Source Chassis', 'Chassis.S'),
-						buildFieldSpec('locationSource', 'Source Location', 'Location.S'),
-						buildFieldSpec('rackSource', 'Source Rack', 'Rack.S'),
-						buildFieldSpec('sourceRackPosition', 'Source Position', 'Number'),
-						buildFieldSpec('roomSource', 'Source Room', 'Room.S'),
-						buildFieldSpec('targetBladePosition', 'Target Blade Position', 'Number'),
-						buildFieldSpec('targetChassis', 'Target Chassis', 'Chassis.T'),
-						buildFieldSpec('locationTarget', 'Target Location', 'Location.T'),
-						buildFieldSpec('rackTarget', 'Target Rack', 'Rack.T'),
-						buildFieldSpec('targetRackPosition', 'Target Position', 'Number'),
-						buildFieldSpec('roomTarget', 'Target Room', 'Room.T'),
-						buildFieldSpec('truck', 'Truck', 'String'),
-						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-						buildFieldSpec('custom2', 'SLA Name', 'String'),
-						buildFieldSpec('custom3', 'Cost Basis', 'String'),
-						buildFieldSpec('custom4', 'OPS Manual', 'String'),
-						buildFieldSpec('custom5', 'DR Plan', 'String'),
-						buildFieldSpec('custom6', 'App Code', 'String'),
-						buildFieldSpec('custom7', 'Latency Timing', 'String'),
-						buildFieldSpec('custom8', 'App ID', 'String'),
-						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-						buildFieldSpec('custom10', 'Custom10', 'String'),
-						buildFieldSpec('custom11', 'Custom11', 'String'),
-						buildFieldSpec('custom12', 'Custom12', 'String'),
-				]
-				break
-			case ETLDomain.Dependency:
-				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('assetName', 'AssetName'),
-						buildFieldSpec('assetType', 'AssetType'),
-						buildFieldSpec('asset', 'Asset'),
-						buildFieldSpec('comment', 'Comment'),
-						buildFieldSpec('status', 'Status'),
-						buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-						buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
-				]
-				break
-			case CustomDomainService.COMMON:
-				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('assetName', 'Name', 'String'),
-						buildFieldSpec('description', 'Description', 'String'),
-						buildFieldSpec('environment', 'Environment', 'Options.Environment'),
-						buildFieldSpec('externalRefId', 'External Ref Id', 'String'),
-						buildFieldSpec('lastUpdated', 'Modified Date', 'String'),
-						buildFieldSpec('moveBundle', 'Bundle', 'String'),
-						buildFieldSpec('planStatus', 'Plan Status', 'Options.PlanStatus'),
-						buildFieldSpec('supportType', 'Support', 'String'),
-						buildFieldSpec('validation', 'Validation', 'InList'),
-						buildFieldSpec('assetClass', 'Asset Class', 'String'),
-				]
-				break
-			case AssetClass.STORAGE:
-				fieldSpecs = [
-						buildFieldSpec('LUN', 'LUN', 'String'),
-						buildFieldSpec('fileFormat', 'Format', 'String'),
-						buildFieldSpec('size', 'Size', 'String'),
-						buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
-						buildFieldSpec('scale', 'Scale', 'String'),
-						buildFieldSpec('custom1', 'Network Interfaces', 'String'),
-						buildFieldSpec('custom2', 'SLA Name', 'String'),
-						buildFieldSpec('custom3', 'Cost Basis', 'String'),
-						buildFieldSpec('custom4', 'OPS Manual', 'String'),
-						buildFieldSpec('custom5', 'DR Plan', 'String'),
-						buildFieldSpec('custom6', 'App Code', 'String'),
-						buildFieldSpec('custom7', 'Latency Timing', 'String'),
-						buildFieldSpec('custom8', 'App ID', 'String'),
-						buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
-						buildFieldSpec('custom10', 'Custom10', 'String'),
-						buildFieldSpec('custom11', 'Custom11', 'String'),
-						buildFieldSpec('custom12', 'Custom12', 'String'),
-				]
-				break
-		}
-
-		return fieldSpecs
 	}
 
 }

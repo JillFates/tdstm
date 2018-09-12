@@ -398,8 +398,6 @@ class DataviewService implements ServiceMethods {
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
 	    def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
 
-		postProcessAssetData(assets, dataviewSpec)
-
 	    Map queryResults = previewQueryResults(assets, totalAssets[0], dataviewSpec)
 
 	    postProcessAssetQuery(queryResults, whereInfo.mixedFields)
@@ -407,40 +405,6 @@ class DataviewService implements ServiceMethods {
 	    return queryResults
 
     }
-
-	/**
-	 * After the query for assets is invoked, this method needs to be called
-	 * to perform some final operations on the assets, if needed.
-	 *
-	 * @param assets
-	 * @param mixedFieldsInfo
-	 */
-	// @CompileStatic
-	private void postProcessAssetData(List assets, DataviewSpec dataviewSpec) {
-		// TODO : JPM 8/2018 : See TM-11726 for details
-		// 		Need to improve performance by changing looping logic and dynamically determine columns to adjust
-		// 		Should be Asset agnostic since this logic is going to be used for Dependencies and ultimately for Tasks some day too
-		// 		Should be able to make this CompileStatic
-		//		Is asset a List<List<Map>>?
-		//def m1 = System.currentTimeMillis()
-
-		// Convert Date type columns to user-selected timezone from GMT because it is to slow on front-end to do this
-		List dateColumns = ['lastUpdated']
-		String userTzId = userPreferenceService.timeZone
-		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
-
-		dataviewSpec.columns.each { Map column ->
-			if (column.property in dateColumns) {
-				int idx = dataviewSpec.columns.indexOf(column)
-				assets.each {
-					String originalDate = it[idx]
-					it[idx] = TimeUtil.formatDateTimeWithTZ(userTzId, Date.parse(TimeUtil.FORMAT_DATE_TIME_15, originalDate), formatter)
-				}
-			}
-		}
-		// def m2 = System.currentTimeMillis()
-		// println "postProcessAssetData() took ${m2 - m1} msec for ${assets.size()} rows"
-	}
 
 	/**
 	 * After the query for assets is invoked, this method needs to be called

@@ -4,6 +4,7 @@ import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ASSET_MENU_CSS_TREE } from '../../../modules/assetExplorer/model/asset-menu.model';
 
 declare var jQuery: any;
 @Component({
@@ -20,7 +21,7 @@ export class HeaderComponent implements AfterViewInit {
 		title: string,
 		instruction: string,
 		menu: Array<string>,
-		topMenu: any,
+		topMenu: any
 	};
 	taskCount: Number;
 
@@ -94,6 +95,22 @@ export class HeaderComponent implements AfterViewInit {
 			let element = document.getElementsByClassName(this.pageMetaData.topMenu.child)[0];
 			if (element) {
 				this.renderer.addClass(element, 'active');
+			}
+		}
+
+		if (this.pageMetaData.topMenu && this.pageMetaData.topMenu.subMenu) {
+			const selectedMenu = this.state.params;
+			if (ASSET_MENU_CSS_TREE.PARENT_MENU === this.pageMetaData.topMenu.parent
+				&& ASSET_MENU_CSS_TREE.CHILD_MENU === this.pageMetaData.topMenu.child) {
+				jQuery('li.menu-child-item').removeClass('active');
+				let elements: any = document.getElementsByClassName(ASSET_MENU_CSS_TREE.CHILD_CLASS);
+				if (elements && elements.length > 0) {
+					for (let i = 0; i < elements.length; i++) {
+						if (elements[i].firstElementChild.id == selectedMenu.id) {
+							this.renderer.addClass(elements[i], 'active');
+						}
+					}
+				}
 			}
 		}
 	}

@@ -98,13 +98,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	/**
-	 * On EscKey Pressed close the dialog.
-	 */
-	onEscKeyPressed(): void {
-		this.cancelCloseDialog();
-	}
-
-	/**
 	 * Used to determine if the Refresh Sample Data button appears on the page
 	 * @return true if a JSON file has been uploaded and available
 	 */

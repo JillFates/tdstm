@@ -7,6 +7,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -20,6 +21,7 @@ import org.codehaus.groovy.grails.validation.Constraint
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.hibernate.transform.Transformers
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
@@ -34,7 +36,7 @@ import grails.validation.Validateable
 
 
 @Slf4j(value='logger')
-public class GormUtil {
+class GormUtil {
 
 	// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
     // Used to control how some functions will perform comparisons with multiple where criteria
@@ -93,7 +95,7 @@ public class GormUtil {
 	/**
 	 * Convert a list into a comma delimited of type String to use inside sql statement.
 	 */
-	 static String asCommaDelimitedString(list) {
+	static String asCommaDelimitedString(list) {
 		WebUtil.listAsMultiValueString list
 	}
 
@@ -166,7 +168,7 @@ public class GormUtil {
 	 * @return the map of constraints
 	 */
 	@Memoized
-	public static Map getConstrainedProperties(Class domainClass) {
+	static Map getConstrainedProperties(Class domainClass) {
 		if (! isDomainClass(domainClass)) {
 			throw new RuntimeException("A non-domain class parameter was provided")
 		}
@@ -187,7 +189,7 @@ public class GormUtil {
 	 * @return the map of constraints
 	 */
 	@Memoized
-	public static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
+	static ConstrainedProperty getConstrainedProperty(Class domainClass, String propertyName) {
 		Map props = getConstrainedProperties(domainClass)
 
 		if (! props[propertyName]) {
@@ -204,7 +206,7 @@ public class GormUtil {
 	 * @param constraintName - the individual constraint to access
 	 * @return the constraint value
 	 */
-	public static getConstraint(Object domainInstance, String property, String constraintName) {
+	static getConstraint(Object domainInstance, String property, String constraintName) {
 		getConstraint(domainInstance.getClass(), property, constraintName)
 	}
 
@@ -216,7 +218,7 @@ public class GormUtil {
 	 * @return the constraint value
 	 */
 	@Memoized
-	public static getConstraint(Class domainClass, String property, String constraintName) {
+	static getConstraint(Class domainClass, String property, String constraintName) {
 		ConstrainedProperty constraint =  getConstrainedProperty(domainClass, property)
 		return constraint.getAppliedConstraint(constraintName)
 	}
@@ -230,7 +232,7 @@ public class GormUtil {
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
 	@Deprecated
-	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+	static void optimisticLockCheck(Object domainObj, Object params, String label) {
 		if ( ! params?.containsKey('version')) {
 			throw new InvalidRequestException("The $label version property was missing from request")
 		}
@@ -250,7 +252,7 @@ public class GormUtil {
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
-	public static void optimisticLockCheck(Object domainObj, Long version, String label) {
+	static void optimisticLockCheck(Object domainObj, Long version, String label) {
 		if (domainObj.version > version) {
 			throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 		}
@@ -782,8 +784,8 @@ public class GormUtil {
 	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
 	 * @return the cloned object
 	 */
-	static Object cloneDomain(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal=false) {
-		Object newDomain = domainClone(originalDomain, replaceKeys)
+	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false) {
+		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
 		newDomain.save(flush:true)
 
@@ -804,7 +806,7 @@ public class GormUtil {
 	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
 	 * @return the cloned object
 	 */
-	static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
+	static Object cloneDomain(Object originDomain,  Map replaceKeys = [:]) {
 		logger.debug("** Cloning: {} *****", originDomain.getClass())
 		if (!isDomainClass(originDomain.getClass())) {
 			throw new RuntimeException('A non-Grails Domain object was received')
@@ -902,7 +904,7 @@ public class GormUtil {
 		Object clone
 		if (! findCloneDomainTarget(domain, keyValues)) {
 			// println "cloneDomainIfNotExist() cloning domain ($domain) and replacing ($keyValues)"
-			clone = cloneDomain(domain, keyValues, deleteOriginal)
+			clone = cloneDomainAndSave(domain, keyValues, deleteOriginal)
 			// println "cloneDomainIfNotExist() resulted in $clone"
 		} else {
 			if (deleteOriginal) {
@@ -1385,5 +1387,91 @@ public class GormUtil {
 	 */
 	static boolean hasUnsavedChanges(Object domainInstance) {
 		return domainInstance.dirtyPropertyNames.size() > 0
+	}
+
+	/**
+	 *
+	 * Used to return a set of property values for a given domain
+	 * @param domainClass - the domain class to query
+	 * @param propertyNames - a list of the propertyNames to select
+	 * @param sort - an array of sort parameters (e.g. [ ['name', 'asc'], ['age', 'desc'] ] )
+	 * @param maxRows - the number of rows to return, default to ALL rows
+	 * @param rowOffset - the offset into the results to return for pagination, default to first row
+	 * @return aof the rows as a map by property name
+	 */
+	static List<Map> listDomainForProperties(Project project, Class domainClass, List<String> propertyNames, List<List> sort=[], Integer maxRows=null, Integer rowOffset=null) {
+		// Fail if the class is not a domain.
+		if (!isDomainClass(domainClass)) {
+			throw new InvalidParamException("Invalid domain class ${domainClass} given.")
+		}
+		// Check that the propertyNames is neither null nor empty.
+		if (!propertyNames) {
+			throw new InvalidParamException("No subset of properties was given to GormUtil.listDomainForProperties.")
+		}
+		// Check the properties to be projected are actually properties on the domain.
+		validatePropertiesExistForDomain(domainClass, propertyNames, true)
+
+		// Check the properties used for sorting are also actual properties on the domain.
+		validatePropertiesExistForDomain(domainClass, sort*.get(0), true)
+
+		// Check if 'project' is a domain property for the given class.
+		boolean hasProjectProperty = isDomainProperty(domainClass, 'project')
+		// Fail if the domain has project but the parameter is null.
+		if (hasProjectProperty && !project) {
+			throw new InvalidParamException("Null project given to listDomainForProperties with a domain that has a project property.")
+		}
+
+		return domainClass.createCriteria().list {
+			// If the domain has a 'project' property, use it to filter the results.
+			if (hasProjectProperty) {
+				and {
+					eq('project', project)
+				}
+			}
+			// Restrict the properties being projected to the list of properties given.
+			projections {
+				propertyNames.each{ String prop ->
+					property(prop, prop)
+				}
+			}
+
+			// Sort the results by the fields given for sorting.
+			sort.each {List<String> sortPropList ->
+				String descAsc = 'asc'
+				if (sortPropList.size() > 1 && sortPropList[1].toUpperCase() == 'DESC') {
+					descAsc = 'desc'
+				}
+				order(sortPropList[0], descAsc)
+			}
+			// Limit the number of results if needed.
+			if (maxRows) {
+				maxResults(maxRows)
+			}
+			// Set an offset if specified.
+			if (rowOffset) {
+				firstResult(rowOffset)
+			}
+			resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+		}
+	}
+
+	/**
+	 * Determine whether or not all members of a list are properties of the given domain class.
+	 * @param domainClass
+	 * @param properties
+	 * @param throwException - true: RuntimeException is thrown when a member of the list is not a property on the domain.
+	 * @return true: all elements in the list are valid domain properties. false otherwise.
+	 */
+	static boolean validatePropertiesExistForDomain(Class domainClass, List<String> properties, boolean throwException = false) {
+		for (property in properties) {
+			if (!isDomainProperty(domainClass, property)) {
+				if (throwException) {
+					throw new InvalidParamException("Invalid property $property for domain ${domainClass.simpleName}")
+				} else {
+					return false
+				}
+			}
+		}
+		return true
 	}
 }

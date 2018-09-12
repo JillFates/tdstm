@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.StringUtils
 
 import java.text.DecimalFormat
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat
  *  //
  * </pre>
  */
+@Slf4j(value='logger')
 class Element implements RangeChecker {
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
@@ -181,7 +183,10 @@ class Element implements RangeChecker {
 
 				return this
 
-			} catch (MissingMethodException e) {}
+			} catch (MissingMethodException e) {
+				logger.warn("Method Missing", e)
+				
+			}
 		}
 
 		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
@@ -616,8 +621,16 @@ class Element implements RangeChecker {
 	 * * @param variableName
 	 * @return
 	 */
-	Element set(String variableName) {
-		processor.addLocalVariableInBinding(variableName, this)
+	Element set(Object variableName) {
+		if ( !(variableName instanceof String) ||
+				  processor.hasVariable(variableName) ||
+				  ! processor.binding.isValidETLVariableName(variableName)
+		) {
+			throw ETLProcessorException.invalidSetParameter()
+
+		}
+
+		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
 
