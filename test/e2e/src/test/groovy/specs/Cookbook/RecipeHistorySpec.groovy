@@ -42,7 +42,7 @@ class RecipeHistorySpec extends GebReportingSpec {
                     '    filter : [',
                     '      class: \'application\',',
                     '      asset: [',
-                    '        assetName: \'QAE2E%\'',
+                    '        planStatus: \'Confirmed\'',
                     '      ]',
                     '    ]',
                     '  ]',
@@ -94,7 +94,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         at CookbookPage
         waitFor {taskGenerationTab.click()}
         at TabTaskGenPage
-        def buildOutOp = tskGTabEventSelector.find("option").find{it.text() == "Buildout"}
+        def buildOutOp = tskGTabEventSelector.find("option").find{it.text() == "M1-Physical"}
         waitFor { buildOutOp.click()}
         waitFor { tskGTabGenUsingWipCBox.click()}
         waitFor { tskGTabGenerateTasksBtn.click()}
