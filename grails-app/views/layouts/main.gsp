@@ -15,7 +15,6 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
     <g:javascript src="prototype/prototype.js" />
-    <jq:plugin name="jquery.combined" />
     <g:layoutHead />
 
     <script type="text/javascript">
