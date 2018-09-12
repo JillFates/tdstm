@@ -62,17 +62,27 @@ class CookbookPage extends Page {
         gebRecipes.find{it.text().trim() == name}
     }
 
+    def getAllRecipesContainingName(name){
+        gebRecipes.findAll{it.text().trim().contains(name)}
+    }
+
+    def getRecipeById(id){
+        deleteRecipeButtons.findAll("[recipe-id]").find{it == id}
+    }
+
     def getRecipeNameDisplayedInTaskGenerationTab(){
         taskGenerationTabRecipeName.text()
     }
 
     def deleteRecipeByGivenSelector(recipeNameSelector){
         def recipeName = recipeNameSelector.text().trim()
+        def recipeDeleteButton = recipeNameSelector.parents("div.ngCell").nextAll().find("a.actions.remove")
+        def recipeId = recipeDeleteButton.attr("recipe-id")
         withConfirm(wait: true) {
-            recipeNameSelector.parent().parent().parent().parent().parent().find("a.actions.remove").click()
+            recipeDeleteButton.click()
         }
         waitForSuccessMessage()
-        assert getRecipeByName(recipeName) == null, "${recipeName} recipe still displayed"
+        assert getRecipeById(recipeId) == null, "${recipeName} recipe with id ${recipeId} still displayed"
     }
 
     def waitForSuccessMessage(){
@@ -87,10 +97,14 @@ class CookbookPage extends Page {
         }
     }
 
-    def getRecipesByName(recipeNames){
+    def getRecipeContainingNameFromGivenList(recipeNames){
         def found
-        recipeNames.each{
-            found = getRecipeByName it
+        for (name in recipeNames){
+            def recipes = getAllRecipesContainingName name
+            if (recipes) {
+                found = recipes[0]
+                break
+            }
         }
         found
     }
@@ -107,7 +121,7 @@ class CookbookPage extends Page {
      */
     def bulkDelete(maxNumberOfBulkRecipesToBeDeleted, recipeNames) {
         def count = 0
-        while (getRecipesByName(recipeNames)) {
+        while (getRecipeContainingNameFromGivenList(recipeNames) != null) {
             count = count + 1
             if (count > maxNumberOfBulkRecipesToBeDeleted) {
                 break
