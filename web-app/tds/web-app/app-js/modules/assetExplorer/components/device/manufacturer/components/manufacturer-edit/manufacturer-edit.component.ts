@@ -50,7 +50,7 @@ export class ManufacturerEditComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Save edit changes.
+	 * On changes on aka collection
 	 */
 	public onAkaChange(akaChanges: AkaChanges): void {
 		if (this.deviceManufacturer.akaChanges) {

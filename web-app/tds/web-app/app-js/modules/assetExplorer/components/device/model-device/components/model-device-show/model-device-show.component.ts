@@ -32,6 +32,9 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		this.cancelCloseDialog();
 	}
 
+	/**
+	 * On update comment
+	 */
 	protected onUpdateComment(): void {
 		console.log('Updating component');
 	}
