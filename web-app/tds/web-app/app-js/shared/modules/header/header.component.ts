@@ -106,7 +106,7 @@ export class HeaderComponent implements AfterViewInit {
 				let elements: any = document.getElementsByClassName(ASSET_MENU_CSS_TREE.CHILD_CLASS);
 				if (elements && elements.length > 0) {
 					for (let i = 0; i < elements.length; i++) {
-						if (elements[i].firstElementChild.id == selectedMenu.id) {
+						if (elements[i].firstElementChild.id === selectedMenu.id) {
 							this.renderer.addClass(elements[i], 'active');
 						}
 					}
