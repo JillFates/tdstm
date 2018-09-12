@@ -1079,6 +1079,16 @@ class UrlMappings {
 			]
 		}
 
+		//
+		// Credentials
+		//
+		"/ws/dataview/$id/data" {
+			controller = "wsDataview"
+			action = [
+				GET: "fetch"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

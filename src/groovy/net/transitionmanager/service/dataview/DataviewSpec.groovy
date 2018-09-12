@@ -1,6 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -59,29 +60,56 @@ class DataviewSpec {
     private Map<String, String> order
     private Boolean justPlanning
 
-    // Constructor
-    DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
-        spec = command.filters
-        justPlanning = command.justPlanning
-        args = [offset: command.offset]
-        if(command.limit != 0){
-            args.max = command.limit
-        }
-        order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
+	DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview) {
 
-        if(dataview) {
-            JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
-            spec.domains = ((jsonDataview.domains.collect {it.toLowerCase()} as Set) + (spec.domains as Set)) as List
+		spec = [
+			domains: [],
+			columns: [:],
+		]
+		justPlanning = false
+		args = [
+			offset: apiParamsCommand.offset,
+			max: apiParamsCommand.limit
+		]
 
-            jsonDataview.columns.each { Map dataviewColumn ->
-                dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
-                Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
-                if(!specColumn){
-                    addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
-                }
-            }
-        }
-    }
+		JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
+		order = [property: jsonDataview.sort.property, sort: jsonDataview.sort.sortOrder == ASCENDING ? 'asc' : 'desc']
+		spec.domains = ((jsonDataview.domains.collect { it.toLowerCase() } as Set) + (spec.domains as Set)) as List
+
+		jsonDataview.columns.each { Map dataviewColumn ->
+			dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
+			Map specColumn = spec.columns.find {
+				it.domain == dataviewColumn.domain && it.property == dataviewColumn.property
+			}
+			if (!specColumn) {
+				addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter)
+			}
+		}
+	}
+
+	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
+		spec = command.filters
+		justPlanning = command.justPlanning
+		args = [offset: command.offset]
+		if(command.limit != 0){
+			args.max = command.limit
+		}
+		order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
+
+		if(dataview) {
+			JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
+			spec.domains = ((jsonDataview.domains.collect {it.toLowerCase()} as Set) + (spec.domains as Set)) as List
+
+			jsonDataview.columns.each { Map dataviewColumn ->
+				dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
+				Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
+				if(!specColumn){
+					addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
+				}
+			}
+		}
+	}
+
 
     void addColumn(domain, property, filter = null){
         spec.columns += [
