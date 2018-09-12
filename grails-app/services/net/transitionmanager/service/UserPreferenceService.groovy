@@ -67,7 +67,7 @@ class UserPreferenceService implements ServiceMethods {
 				return false
 			}
 		}
-		def maxEdgeCount = NumberUtil.toInteger(prefs.maxEdgeCount, 0)
+		Integer maxEdgeCount = NumberUtil.toInteger(prefs.maxEdgeCount, 0)
 		if (maxEdgeCount < 1 || maxEdgeCount > 20) {
 			return false
 		}
@@ -88,11 +88,11 @@ class UserPreferenceService implements ServiceMethods {
 				return false
 			}
 		}
-		def levelsUp = NumberUtil.toInteger(prefs.levelsUp, 0)
+		Integer levelsUp = NumberUtil.toInteger(prefs.levelsUp, 0)
 		if (levelsUp < 0 || levelsUp > 10) {
 			return false
 		}
-		def levelsDown = NumberUtil.toInteger(prefs.levelsDown, 0)
+		Integer levelsDown = NumberUtil.toInteger(prefs.levelsDown, 0)
 		if (levelsDown < 0 || levelsDown > 10) {
 			return false
 		}
@@ -108,9 +108,9 @@ class UserPreferenceService implements ServiceMethods {
 		if (!value) {
 			return true // it means is just empty (nothing open)
 		}
-		def prefs = value.split(',')
+		List<String> prefs = value.split(',')
 
-		if (prefs.length >= 4) {
+		if (prefs.size() >= 4) {
 			return false
 		}
 		for (pref in prefs) {
