@@ -50,4 +50,9 @@ class ListCompaniesPage extends Page{
     def getLastUpdatedText(){
         dateUpdatedField.text()
     }
+
+    def clickOnFirstElement(){
+        //waitFor{$('td[aria-describedby=companyIdGrid_companyName] a')[0].click()}
+        nameField[0].click()
+    }
 }

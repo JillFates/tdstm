@@ -1,6 +1,7 @@
 package pages.Admin
 
 import geb.Page
+import modules.CommonsModule
 
 class CompanyDetailsPage extends Page{
 
@@ -19,6 +20,7 @@ class CompanyDetailsPage extends Page{
         labelColumn { $("td.name")}
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
+        commonsModule { module CommonsModule }
     }
 
     def getCompanyNameText(){
@@ -43,5 +45,9 @@ class CompanyDetailsPage extends Page{
 
     def getLastUpdatedText(){
         labelColumn.find{it.text().contains("Last Updated")}.next().text()
+    }
+
+    def clickDelete(){
+        deleteButton.click()
     }
 }
