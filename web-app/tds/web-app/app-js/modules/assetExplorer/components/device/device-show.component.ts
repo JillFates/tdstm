@@ -92,7 +92,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 								provide: DeviceModel,
 								useValue: deviceModel
 							}
-						], true, false)
+						], false, false)
 						.then((result) => {
 							console.log(result);
 						}).catch((error) => console.log(error));
@@ -109,7 +109,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 								provide: DeviceManufacturer,
 								useValue: deviceManufacturer
 							}
-						], true, false)
+						], false, false)
 						.then((result) => {
 							if (result) {
 								this.manufacturerName = result.name;
