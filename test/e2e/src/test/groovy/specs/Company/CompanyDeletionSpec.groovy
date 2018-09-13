@@ -1,7 +1,6 @@
 package specs.Company
 
 import geb.spock.GebReportingSpec
-import utils.CommonActions
 import pages.Admin.CompanyDetailsPage
 import pages.Admin.ListCompaniesPage
 import pages.Login.LoginPage
@@ -43,7 +42,6 @@ class CompanyDeletionSpec extends GebReportingSpec {
             at CompanyDetailsPage
             companyName=getCompanyNameText()
         when: 'The user clicks on delete and cancels'
-            //withConfirm(false){waitFor {clickDelete()}}
             deleteCompany(false)
         then: 'The company is not deleted'
             validateCompanyName companyName
@@ -53,7 +51,6 @@ class CompanyDeletionSpec extends GebReportingSpec {
 
     def "2. User Deletes the Company"() {
         when: 'The user deletes the company'
-            //withConfirm(true){waitFor {clickDelete()}}
             deleteCompany(true)
         then: 'The user is led to Company List page'
             at ListCompaniesPage

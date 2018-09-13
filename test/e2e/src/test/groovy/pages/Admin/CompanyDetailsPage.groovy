@@ -2,7 +2,6 @@ package pages.Admin
 
 import geb.Page
 
-
 class CompanyDetailsPage extends Page{
 
     static at = {
