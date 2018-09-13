@@ -57,7 +57,7 @@ if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 	})(jQuery);
 
 	// TODO : JPM 10/2014 : Need to refactor this javascript functions to not be global
-	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/
 	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
 	var currentMenuId = "";
 	var taskManagerTimePref = "60"

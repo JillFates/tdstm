@@ -295,7 +295,7 @@ var tdsCommon = {
 	 * @return boolean true if valid else false
 	 */
 	isValidEmail: function (email) {
-		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/;
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/;
 		return emailExp.test(email);
 	},
 
