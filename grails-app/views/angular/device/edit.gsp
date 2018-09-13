@@ -258,21 +258,11 @@
 										<kendo-numerictextbox
 											name="deviceSize"
 											[format]="'n'"
-                                            [style.width.px]="70"
 											[min]="0"
 											[autoCorrect]=true
 											tabindex="410"
 											[(ngModel)]="model.asset.size">
 										</kendo-numerictextbox>
-                                        <kendo-dropdownlist
-                                                class="tm-input-control"
-                                                name="modelAssetScaleName"
-                                                [data]="${SizeScale.getAsJsonList() as JSON}"
-                                                [(ngModel)]="model.asset.scale.name"
-                                                [defaultItem]="''"
-                                                [textField]="'text'"
-                                                [valueField]="'value'">
-                                        </kendo-dropdownlist>
                                     </td>
                                 </tr>
                                 <tr>
@@ -295,7 +285,18 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="420" ngmodel="model.asset.rateOfChange"/>
+									<td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
+									<td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
+                                        <kendo-dropdownlist
+                                                class="tm-input-control"
+                                                name="modelAssetScaleName"
+                                                [data]="${SizeScale.getAsJsonList() as JSON}"
+                                                [(ngModel)]="model.asset.scale.name"
+                                                [defaultItem]="''"
+                                                [textField]="'text'"
+                                                [valueField]="'value'">
+                                        </kendo-dropdownlist>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.railType}" value="${asset.railType}"/>
@@ -317,7 +318,7 @@
                                         </kendo-datepicker>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
-                                    <td colspan="2" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
+                                    <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
                                                 class="tm-input-control"
                                                 name="modelAssetValidation"
@@ -325,6 +326,7 @@
                                                 [(ngModel)]="model.asset.validation">
                                         </kendo-dropdownlist>
                                     </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="420" ngmodel="model.asset.rateOfChange"/>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"
