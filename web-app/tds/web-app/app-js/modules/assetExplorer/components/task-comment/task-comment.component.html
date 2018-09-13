@@ -1,4 +1,5 @@
 <div class="task-comment-component dialog-container">
+    <h1>Tasks:</h1>
     <kendo-grid
         *ngIf="dataGridTaskHelper"
         class="task-comment-grid"
@@ -74,7 +75,7 @@
         </kendo-grid-column>
         <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
     </kendo-grid>
-    <br />
+    <h1>Comments:</h1>
     <kendo-grid
         *ngIf="dataGridCommentHelper"
         class="task-comment-grid"

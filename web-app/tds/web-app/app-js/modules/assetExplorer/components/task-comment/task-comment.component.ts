@@ -238,8 +238,11 @@ export class TaskCommentComponent implements OnInit {
 			this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
 				// delete the item
 				this.dataGridTaskHelper.removeDataItem(dataItem);
+				this.dataGridCommentHelper.removeDataItem(dataItem);
+				// Reload Grids
 				this.dataGridTaskHelper.reloadData(this.dataGridTaskHelper.gridData.data);
-				// update comments collections
+				this.dataGridCommentHelper.reloadData(this.dataGridCommentHelper.gridData.data);
+				// update task and comment collections
 				this.taskCommentsList = this.taskCommentsList.filter((comment) => comment.commentInstance.id !== commentId);
 				return resolve(true);
 			}, err => reject(false));
