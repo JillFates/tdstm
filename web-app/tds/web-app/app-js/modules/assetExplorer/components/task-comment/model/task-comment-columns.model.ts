@@ -12,7 +12,7 @@ export class TaskColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 70,
+				width: 82,
 				locked: true
 			},
 			{
@@ -58,7 +58,7 @@ export class CommentColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 50,
+				width: 60,
 				locked: true
 			},
 			{
