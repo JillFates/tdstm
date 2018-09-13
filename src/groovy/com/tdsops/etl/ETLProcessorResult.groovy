@@ -649,8 +649,6 @@ class FieldResult {
 class FindResult {
 	List<QueryResult> query = []
 	List<Long> results = []
-	//TODO: review it with John. We could remove from this class.
-	// TM-11903 - recordsFound
 	Integer size = 0
 	Integer matchOn
 
