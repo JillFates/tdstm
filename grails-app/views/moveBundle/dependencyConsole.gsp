@@ -335,7 +335,9 @@
 							topPosition = svgElement.offset().top;
 
 						if (fullscreen) {
-							spinnerDiv.css('background-color', '#ffffff');
+							spinnerDiv
+								.css('border', 'none')
+								.css('background-color', '#ffffff');
 							leftPosition = $('#toolsContainerId').offset().left;
 							topPosition = $('#toolsContainerId').offset().top;
 						}
