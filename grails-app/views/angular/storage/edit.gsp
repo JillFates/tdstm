@@ -19,7 +19,7 @@
                     <tr>
                         <td colspan="2" class="dialog-container">
                             <div class="dialog">
-                                <table>
+                                <table class="asset-edit-view">
                                     <tbody>
                                     <tr>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>

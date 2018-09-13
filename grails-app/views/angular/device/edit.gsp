@@ -19,7 +19,7 @@
             <tr>
                 <td colspan="2" class="dialog-container">
                     <div class="dialog">
-                        <table>
+                        <table class="asset-edit-view">
                             <tbody>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}"/>
@@ -330,7 +330,7 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"
                                                                    tabindex="109" ngmodel="model.asset.externalRefId"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.truck}" value="${asset.truck}"/>
-                                    <td>
+                                    <td class="truck-input-group">
                                         <tdsAngular:inputControl field="${standardFieldSpecs.truck}" size="3" tabindex="240" value="${asset.truck}" ngmodel="model.asset.truck"/>
                                         <tdsAngular:inputControl field="${standardFieldSpecs.cart}" size="3" tabindex="241" value="${asset.cart}" ngmodel="model.asset.cart"/>
                                         <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" size="2" tabindex="242" value="${asset.shelf}" ngmodel="model.asset.shelf"/>
