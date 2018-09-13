@@ -43,16 +43,18 @@ class CompanyDeletionSpec extends GebReportingSpec {
             at CompanyDetailsPage
             companyName=getCompanyNameText()
         when: 'The user clicks on delete and cancels'
-            withConfirm(false){waitFor {clickDelete()}}
+            //withConfirm(false){waitFor {clickDelete()}}
+            deleteCompany(false)
         then: 'The company is not deleted'
-            getCompanyName()==companyName
+            validateCompanyName companyName
         and:'User is still at company details page'
             at CompanyDetailsPage
     }
 
     def "2. User Deletes the Company"() {
         when: 'The user deletes the company'
-            withConfirm(true){waitFor {clickDelete()}}
+            //withConfirm(true){waitFor {clickDelete()}}
+            deleteCompany(true)
         then: 'The user is led to Company List page'
             at ListCompaniesPage
         and: 'A message stating the company was deleted is displayed'
@@ -63,6 +65,6 @@ class CompanyDeletionSpec extends GebReportingSpec {
         when: 'The user filters by the company name'
             filterByName companyName
         then:  'The company is no longer listed'
-            companyRowContainer.size()==0
+            validateNoResultsAreReturned()
     }
 }

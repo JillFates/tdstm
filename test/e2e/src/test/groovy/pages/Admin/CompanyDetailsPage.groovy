@@ -1,7 +1,7 @@
 package pages.Admin
 
 import geb.Page
-import modules.CommonsModule
+
 
 class CompanyDetailsPage extends Page{
 
@@ -20,7 +20,6 @@ class CompanyDetailsPage extends Page{
         labelColumn { $("td.name")}
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
-        commonsModule { module CommonsModule }
         name {$('td.value')[0]}
     }
 
@@ -50,6 +49,14 @@ class CompanyDetailsPage extends Page{
 
     def clickDelete(){
         deleteButton.click()
+    }
+
+    def deleteCompany(option){
+        withConfirm(option){waitFor {clickDelete()}}
+    }
+
+    def validateCompanyName(name){
+        name==getCompanyNameText()
     }
 
 }

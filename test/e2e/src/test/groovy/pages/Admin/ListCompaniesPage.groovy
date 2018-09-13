@@ -59,4 +59,8 @@ class ListCompaniesPage extends Page{
     def validateMessage(text){
         message.text()==text
     }
+
+    def validateNoResultsAreReturned(){
+        companyRowContainer.size()==0
+    }
 }
