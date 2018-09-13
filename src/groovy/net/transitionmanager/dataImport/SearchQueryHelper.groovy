@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.FindCondition
+import com.tdsops.etl.QueryResult
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -493,7 +494,9 @@ class SearchQueryHelper {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				if(query.containsKey('criteria')){
+
+				// Support the new find query language using criterias
+					if(query.class.isAssignableFrom(QueryResult) || query.containsKey('criteria')){
 					List<FindCondition> conditions = FindCondition.buildCriteria(query.criteria)
 					entities = DomainClassQueryHelper.where(whereDomain, context.project, conditions, false)
 				} else {
@@ -540,7 +543,7 @@ class SearchQueryHelper {
 	private static Object fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
 		Object entity=null
 		if (hasSingleFindResult(propertyName, fieldsInfo)) {
-			Map find = fieldsInfo[propertyName].find ?: null
+			def find = fieldsInfo[propertyName].find ?: null
 			Long entityId = find.results[0]
 			String domainName = find.query[0].domain
 			// Get the class of the domain specified in find of the ETL script
