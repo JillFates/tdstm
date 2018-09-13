@@ -4,7 +4,6 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.TimeScale
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -96,6 +95,11 @@ class TaskController implements ControllerMethods {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
+
+		if (params.printers) {
+			userPreferenceService.setPreference(PREF.PRINTER_NAME, params.printers)
+			userPreferenceService.setPreference(PREF.PRINT_LABEL_QUANTITY, params.printTimes)
+		}
 
 		if (params.view == 'myTask') {
 			if (map.error) {
@@ -1591,7 +1595,7 @@ function goBack() { window.history.back() }
 		             dueDate: dueDate, assignToSelect: assignToSelect, assetEntity: assetComment.assetEntity,
 		             cartQty: cartQty, project: project, customs: customs]
 		if (isCleaner) {
-			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY) ?: UserPreferenceEnum.DEFAULT_VALUES[PREF.PRINT_LABEL_QUANTITY]
+			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY) ?: PREF.DEFAULT_VALUES[PREF.PRINT_LABEL_QUANTITY]
 			model.prefPrinter = userPreferenceService.getPreference(PREF.PRINTER_NAME)
 		}
 
