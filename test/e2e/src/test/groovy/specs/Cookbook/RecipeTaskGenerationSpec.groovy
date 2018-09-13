@@ -33,7 +33,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    filter : [',
             '      class: \'application\',',
             '      asset: [',
-            '        assetName: \'QAE2E%\'',
+            '        planStatus: \'Confirmed\'',
             '      ]',
             '    ]',
             '  ]',
@@ -153,11 +153,11 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         testKey = "TM-XXXX"
         given: 'The User is in the Generation Task Section'
             at TabTaskGenPage
-        when: 'The Event Selector is Buildout'
-            tskGTabEventSelector = "Buildout"
+        when: 'The Event Selector is M1-Physical'
+            tskGTabEventSelector = "M1-Physical"
 
         then: 'The User should Select that Option'
-            tskGTabEventSelector.find('option', value:tskGTabEventSelector.value()).text().trim() == "Buildout"
+            tskGTabEventSelector.find('option', value:tskGTabEventSelector.value()).text().trim() == "M1-Physical"
     }
 
     def "8. Setting as Default option should enabled"() {
