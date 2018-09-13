@@ -1,9 +1,14 @@
 .model-device-show-component
-  .modal-content
-    width: 350px
-  .modal-body
-    padding: 5px 15px
-    .form-group
-      margin-bottom: 5px
-  .modal-footer
-    padding: 5px 15px 15px
+  $initial-width: 320px
+  .modal-dialog
+    width: $initial-width
+    .modal-content
+      width: $initial-width
+    .modal-body
+      padding: 15px 20px
+      .box-body
+        padding: unset
+      .row
+        margin-bottom: 5px
+    .modal-footer
+      padding: 15px 20px

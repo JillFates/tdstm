@@ -1,9 +1,11 @@
 package com.tdsops.validators
 
 import com.tds.asset.AssetOptions
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
@@ -62,7 +64,8 @@ class CustomValidators {
 	 */
 	static Closure validateCustomFields(){
 		return { val, object, Errors errors ->
-			List<Map> customFieldSpecs = object.customDomainService.customFieldsList(object.project, object.assetClass.toString())
+			CustomDomainService customDomainService = ApplicationContextHolder.getBean('customDomainService', CustomDomainService)
+			List<Map> customFieldSpecs = customDomainService.customFieldsList(object.project, object.assetClass.toString())
 
 			// Initializing Validators list
 			Map<String, Closure> validatorHandlers = [:]

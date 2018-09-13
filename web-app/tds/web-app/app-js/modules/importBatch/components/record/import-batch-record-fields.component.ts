@@ -439,16 +439,17 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				recordsFound = results.length;
 				this.popup.results = results;
 			}
-			for (let fieldName in item.kv) {
-				if (item.kv[fieldName]) {
+			// safe null check for the new json object structure vs the old one.
+			if (item.criteria) {
+				item.criteria.forEach( field => {
 					popupFields.push({
 						domainIndex: index,
 						domainName: domain,
-						fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
-						value: item.kv[fieldName],
+						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
+						value: field.value,
 						recordsFound: recordsFound
 					});
-				}
+				});
 			}
 		});
 		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
