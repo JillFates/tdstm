@@ -23,7 +23,7 @@ module.exports = function (env) {
 			path: path.resolve(__dirname, './web-app/dist/'),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: '../'
+			publicPath: '../tds/web-app/dist/'
 		},
 		module: {
 			rules: [

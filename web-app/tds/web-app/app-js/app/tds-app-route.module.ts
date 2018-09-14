@@ -143,7 +143,6 @@ export const TdsAppRoute = [
 
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {LazyTestComponent} from '../modules/lazyTestModule/lazy-test.component';
 
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'dashboard'},
@@ -152,9 +151,6 @@ export const TDSAppRoute: Routes = [
 
 @NgModule({
 	exports: [RouterModule],
-	declarations: [
-		LazyTestComponent,
-	],
 	imports: [RouterModule.forRoot(TDSAppRoute)]
 })
 
