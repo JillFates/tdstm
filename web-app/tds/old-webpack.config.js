@@ -1,10 +1,9 @@
 /**
- * Created by Jorge Morayta on 13/09/2018.
+ * Created by Jorge Morayta on 6/30/2017.
  */
 
+const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
-const webpack = require('webpack');
-
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
 module.exports = function (env) {
@@ -29,9 +28,6 @@ module.exports = function (env) {
 			rules: [
 				{test: /\.tsx?$/, loader: 'ts-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
-				// Required for Lazy Load
-				{test: /\.ts$/, loaders: ['awesome-typescript-loader']},
-				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
@@ -62,12 +58,23 @@ module.exports = function (env) {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
 						chunks: 'all',
-						/* test(module, chunks) {
+						test(module, chunks) {
 							const name = module.nameForCondition && module.nameForCondition();
 							return chunks.some(chunk => {
 								return (chunk.name === 'app' || chunk.name === 'polyfills') && /[\\/]node_modules[\\/]/.test(name);
 							});
-						} */
+						}
+					},
+					codemirror: {
+						name: 'codemirror',
+						chunks: chunk => chunk.name == 'codemirror',
+						priority: 1,
+						enforce: true,
+						test(module, chunks) {
+							return chunks.some((chunk) =>  {
+								return chunk.name === 'codemirror'
+							});
+						}
 					}
 				}
 			}
