@@ -19,9 +19,6 @@ class AssetEntityTestHelper {
                 assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10)
 
         )
-		assetEntity.customDomainService= new CustomDomainService()
-		assetEntity.customDomainService.settingService = new SettingService()
-		assetEntity.customDomainService.jdbcTemplate = new JdbcTemplate()
 
 		assetEntity.save(flush: true, failOnError: true)
 
