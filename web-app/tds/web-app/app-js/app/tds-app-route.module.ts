@@ -143,6 +143,7 @@ export const TdsAppRoute = [
 
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'dashboard'},
@@ -151,6 +152,7 @@ export const TDSAppRoute: Routes = [
 
 @NgModule({
 	exports: [RouterModule],
+	providers: [{provide: LocationStrategy, useClass: PathLocationStrategy} ],
 	imports: [RouterModule.forRoot(TDSAppRoute)]
 })
 
