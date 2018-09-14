@@ -53,6 +53,36 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types into a Long value. If value param is a number with Decimal,
+	 * it also returns the Long-part of the decimal value
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Long value if valid else null
+	 */
+	static Long toLongNumber(value, Long defVal = null) {
+		if (value instanceof Long) {
+			value
+		}
+		else if (value in [Double, BigDecimal, BigInteger]) {
+			value.longValue()
+		}
+		else if (value instanceof CharSequence) {
+
+			if(value.isDouble() ){
+				value.toDouble()?.toLong()
+			} else if(value.isBigDecimal()) {
+				value.toBigDecimal()?.toLong()
+			} else {
+				value.isLong() ? value.toLong() : defVal
+			}
+
+		}
+		else {
+			defVal
+		}
+	}
+
+	/**
 	 * Constrain a number to be between a minimum and maximum value.
 	 * @param value  the value
 	 * @param min  the minimum allowed
