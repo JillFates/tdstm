@@ -65,8 +65,11 @@ class AssetEntityHelper {
 				}
 			}
 		}
-
-		asset.customDomainService = new CustomDomainService()
+		
+		if (asset) {
+			CustomDomainService customDomainService = ApplicationContextHolder.getBean('customDomainService', CustomDomainService)
+			asset.customDomainService = customDomainService
+		}
 
 		return asset
 	}
