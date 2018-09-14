@@ -2569,17 +2569,17 @@ function applyScaleDefinition(msConversion, scale, differScaleTime) {
 	if (msConversion === _MS_PER_HOUR) {
 		scale.time = d3.time.hour;
 		scale.tick = 5;
-		scale.format = d3.time.format('%b %d, %I %p');
+		scale.format = !tdsCommon.isFormatMMDDYYYY() ? d3.time.format('%d %b, %I %p') : d3.time.format('%b %d, %I %p');
 	}
 	if (msConversion === _MS_PER_DAY) {
 		scale.time = d3.time.day;
 		scale.tick = 1;
-		scale.format = d3.time.format('%b %d');
+		scale.format = !tdsCommon.isFormatMMDDYYYY() ? d3.time.format('%d %b') : d3.time.format('%b %d');
 	}
 	if (msConversion === _MS_PER_WEEK) {
 		scale.time = d3.time.week;
 		scale.tick = 2;
-		scale.format = d3.time.format('%b %d');
+		scale.format = !tdsCommon.isFormatMMDDYYYY() ? d3.time.format('%d %b') : d3.time.format('%b %d');
 	}
 	if (msConversion === _MS_PER_MONTH) {
 		scale.time = d3.time.month;
@@ -2646,13 +2646,13 @@ function getTimeFormatToDraw(startDate, endDate, increasePer) {
 
 				if (!isNaN(hours) && hours >= 20) {
 					scale.tick = 5;
-					scale.format = d3.time.format('%b %d, %I %p');
+					scale.format = !tdsCommon.isFormatMMDDYYYY() ? d3.time.format('%d %b, %I %p') : d3.time.format('%b %d, %I %p');
 				}
 
 			}
 
 			if (increasePer && msConversion[i] === _MS_PER_WEEK) {
-				scale.format = d3.time.format('%b %d (week %W)');
+				scale.format = !tdsCommon.isFormatMMDDYYYY() ? d3.time.format('%d %b (week %W)') : d3.time.format('%b %d (week %W)');
 			}
 
 			if (increasePer && msConversion[i] === _MS_PER_DAY) {

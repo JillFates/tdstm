@@ -5,7 +5,7 @@
 			[has-publish-permission]="${hasPublishPermission}"
 	 		[can-edit-comments]="${canEdit}"
 			[can-edit-tasks]="${canEditTasks}"
-			[asset-name]="'${asset.assetName}'"
+			[asset-name]="'${raw(asset.assetName).replace("'","\\'")}'"
 			[asset-type]="'${asset.assetType}'">
 	</task-comment>
 </td>

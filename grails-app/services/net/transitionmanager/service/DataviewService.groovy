@@ -514,6 +514,11 @@ class DataviewService implements ServiceMethods {
 					if(dataviewSpec.columns[index].property == 'tagAssets'){
 						cell = handleTags(cell)
 					}
+					if(dataviewSpec.columns[index].property == 'scale'){
+						if (cell) {
+							cell = cell.value
+						}
+					}
 
 					if (dataviewSpec.columns[index]) {
 						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell

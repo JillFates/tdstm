@@ -161,9 +161,7 @@ class CommonsModule extends Module {
     }
 
     def goToElement(element){
-        interact{
-            moveToElement element
-        }
+        browser.driver.executeScript("arguments[0].scrollIntoView(true);", element.singleElement())
     }
 
     def isListOfElements(selector){

@@ -535,6 +535,15 @@ var tdsCommon = {
 		return tz;
 	},
 
+	getISOString: function(dateToConvert) {
+		// remove timezone just getting the datetime
+		var noTZ = moment(dateToConvert).format('YYYY-MM-DDTHH:mm:ss');
+		// convert to local user timezone
+		var dateTZ = moment.tz(noTZ, tdsCommon.timeZone());
+		// GET ISO
+		return dateTZ.toISOString();
+	},
+
 	addNextDayKendoGridFilter: function (grid, field, value) {
 		var nextDay = moment(value).add(1, 'd').toDate();
 		grid.dataSource._filter.filters.push({
