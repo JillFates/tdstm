@@ -11,8 +11,10 @@ import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import net.transitionmanager.command.DataScriptNameValidationCommand
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
+import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -220,10 +222,23 @@ class DataScriptService implements ServiceMethods{
      */
     void deleteDataScript(Long dataScriptId) {
         // Fetch the DataScript, validating it belogns to the user's project.
-        DataScript dataScript = getDataScript(dataScriptId)
+        DataScript foundDataScript = getDataScript(dataScriptId)
         // Delete the DataScript if found.
-        if (dataScript) {
-            dataScript.delete()
+        if (foundDataScript) {
+			// check api action references
+			int countApiActions = ApiAction.where { defaultDataScript == foundDataScript }.count()
+			if (countApiActions > 0) {
+				throw new InvalidParamException("The DataScript is being references for one or more Api Actions.")
+			}
+
+			// check import batch references
+			int countImportBatches = ImportBatch.where { dataScript == foundDataScript }.count()
+			if (countImportBatches > 0) {
+				throw new InvalidParamException("The DataScript is being references for one or more Import Batches.")
+			}
+
+			// if no references to foundDataScript then delete
+			foundDataScript.delete()
         }
     }
 
