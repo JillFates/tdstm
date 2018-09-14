@@ -60,26 +60,30 @@ class NumberUtil {
 	 * @return the Long value if valid else null
 	 */
 	static Long toLongNumber(value, Long defVal = null) {
-		if (value instanceof Long) {
-			value
-		}
-		else if (value in [Double, BigDecimal, BigInteger]) {
-			value.longValue()
-		}
-		else if (value instanceof CharSequence) {
 
-			if(value.isDouble() ){
-				value.toDouble()?.toLong()
-			} else if(value.isBigDecimal()) {
-				value.toBigDecimal()?.toLong()
-			} else {
-				value.isLong() ? value.toLong() : defVal
+		if(value == null) {
+			value = defVal
+		} else {
+
+			if (value instanceof CharSequence) {
+				if( value.isDouble() ){
+					value = value.toDouble()
+				} else if( value.isBigDecimal() ) {
+					value = value.toBigDecimal()
+				} else if( value.isLong() ) {
+					value = value.toLong()
+				}
 			}
 
+			if (value.class in [Double, BigDecimal, BigInteger, Integer]) {
+				value = value.longValue()
+			}
+
+			if (!(value instanceof Long))
+				value = defVal
 		}
-		else {
-			defVal
-		}
+
+		return value
 	}
 
 	/**
