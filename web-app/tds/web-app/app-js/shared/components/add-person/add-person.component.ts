@@ -4,6 +4,7 @@ import { UIExtraDialog} from '../../../shared/services/ui-dialog.service';
 import { PersonModel } from './model/person.model';
 import { PersonService } from '../../services/person.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
+import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'add-person',
@@ -14,12 +15,14 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	teams: any[] = [];
 	errors: any;
 	dataSignature: string;
+	public modalOptions: DecoratorOptions;
 	constructor(
 		public personModel: PersonModel,
 		private personService: PersonService,
 		private promptService: UIPromptService) {
 		super('#add-person-component');
 		this.errors = {};
+		this.modalOptions = { isDraggable: true, isResizable: false, isCentered: false };
 	}
 
 	ngOnInit() {
