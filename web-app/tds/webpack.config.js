@@ -27,17 +27,15 @@ module.exports = function (env) {
 		},
 		module: {
 			rules: [
-				{test: /\.tsx?$/, loader: 'ts-loader'},
-				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
-				// Required for Lazy Load
-				{test: /\.ts$/, loaders: ['awesome-typescript-loader']},
+				{test: /\.tsx?$/, loaders: ['awesome-typescript-loader']},
 				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
+				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
 		resolve: {
-			extensions: ['.ts', '.tsx', '.js'],
+			extensions: ['.ts', '.tsx', '.js', '.jsx'],
 			unsafeCache: true
 		},
 		plugins: [
@@ -61,13 +59,7 @@ module.exports = function (env) {
 					commons: {
 						test: /[\\/]node_modules[\\/]/,
 						name: "vendor",
-						chunks: 'all',
-						/* test(module, chunks) {
-							const name = module.nameForCondition && module.nameForCondition();
-							return chunks.some(chunk => {
-								return (chunk.name === 'app' || chunk.name === 'polyfills') && /[\\/]node_modules[\\/]/.test(name);
-							});
-						} */
+						chunks: 'all'
 					}
 				}
 			}

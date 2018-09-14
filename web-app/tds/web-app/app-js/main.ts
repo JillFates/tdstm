@@ -5,7 +5,7 @@
 
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {TDSAppModule} from './config/tds-app.module';
+import {TDSAppModule} from './app/tds-app.module';
 
 enableProdMode();
 

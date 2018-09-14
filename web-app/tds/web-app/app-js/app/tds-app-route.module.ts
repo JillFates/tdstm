@@ -2,6 +2,7 @@
  * Jorge Morayta 09/13/2018
  * Refactored to use Native Angular routing
  */
+
 /*
 import { TDSAppComponent } from './tds-app.component';
 import { AuthService } from '../shared/services/auth.service';
@@ -140,18 +141,22 @@ export const TdsAppRoute = [
 ];
 */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {LazyTestComponent} from '../modules/lazyTestModule/lazy-test.component';
 
-// routes
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'dashboard'},
-	{path: 'dashboard', loadChildren: '../tds/web-app/app-js/modules/lazyTestModule/lazy-test.module#LazyTestModule'},
+	{path: 'dashboard', loadChildren: '../modules/lazyTestModule/lazy-test.module#LazyTestModule'},
 ];
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(TDSAppRoute)]
+	declarations: [
+		LazyTestComponent,
+	],
+	imports: [RouterModule.forRoot(TDSAppRoute)]
 })
 
-export class TDSAppRouteModule {}
+export class TDSAppRouteModule {
+}
