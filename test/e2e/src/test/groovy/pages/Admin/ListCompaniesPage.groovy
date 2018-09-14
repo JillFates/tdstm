@@ -63,4 +63,21 @@ class ListCompaniesPage extends Page{
     def validateNoResultsAreReturned(){
         companyRowContainer.size()==0
     }
+
+    def validateCompanyIsListed(compName){
+        nameField[0].text()==compName
+    }
+    /**
+     * receives a boolean parameter. If the parameter is false, the expected text is "Yes"
+     * since the value was changed.
+     * @param value
+     * @return
+     */
+    def validatePartnerField(value){
+        if (value==true){
+            partnerField.text()==" "
+        }else{
+            partnerField.text() =="Yes"
+        }
+    }
 }
