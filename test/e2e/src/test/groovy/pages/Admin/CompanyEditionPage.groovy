@@ -24,15 +24,6 @@ class CompanyEditionPage extends Page{
         partnerCheck { $("input[name=partner]")}
     }
 
-    def createCompany(companyData){
-        nameField = companyData.name
-        commentField = companyData.comment
-        if (companyData.isPartner){
-            partnerCheck.click()
-        }
-        saveButton.click()
-    }
-
     /**
      * Edits the company's name,comment and partner values.
      * @param partner
