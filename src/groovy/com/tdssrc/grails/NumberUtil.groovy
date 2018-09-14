@@ -79,8 +79,10 @@ class NumberUtil {
 				value = value.longValue()
 			}
 
-			if (!(value instanceof Long))
+			if (!(value instanceof Long)){
 				value = defVal
+			}
+
 		}
 
 		return value
