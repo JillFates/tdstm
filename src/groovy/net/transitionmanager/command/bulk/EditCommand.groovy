@@ -21,8 +21,5 @@ class EditCommand {
 	static constraints = {
 		value nullable: true, blank:true
 		fieldName inList: BulkAssetChangeService.fields
-		action validator : { String action, EditCommand command ->
-			action in BulkAssetChangeService.actions[command.fieldName]?.keySet()
-		}
 	}
 }
