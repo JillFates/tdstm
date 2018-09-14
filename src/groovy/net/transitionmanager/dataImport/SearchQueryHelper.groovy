@@ -2,24 +2,21 @@ package net.transitionmanager.dataImport
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.FindCondition
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PersonService
-import com.tdsops.common.grails.ApplicationContextHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-import groovy.util.logging.Slf4j
 
 @Slf4j
 class SearchQueryHelper {
@@ -632,10 +629,6 @@ class SearchQueryHelper {
 					extraCriteria.put('source', (isSource ? 1 : 0))
 					break
 
-				case 'Manufacturer':
-					extraAlternate << 'description'
-					break
-
 				case 'Model':
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
@@ -653,16 +646,27 @@ class SearchQueryHelper {
 			}
 
 			if (! result.error) {
-				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria, extraAlternate)
+				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
 
-				if (!entities && refDomainName == 'Model') {
-					Model model = ModelAlias.where { name == searchValue && manufacturer == mfg }.find()?.model
-					if (model) {
-						entities = [model]
+				if ( !entities ) {
+					Object entity
+					if ( refDomainName == 'Model' ) {
+						entity = Model.lookupFirstAlias(searchValue, mfg)
+
+					} else if ( refDomainName == 'Manufacturer' ) {
+						entity = Manufacturer.lookupFirstAlias(searchValue)
+
+					}
+
+					if (entity) {
+						entities = [entity]
+					} else {
+						entities = []
 					}
 				}
 
-				int numFound = entities ? entities.size() : 0
+				int numFound = entities.size()
+
 				log.debug 'fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
 					domainClass.getName(), searchValue, extraCriteria, numFound
 
