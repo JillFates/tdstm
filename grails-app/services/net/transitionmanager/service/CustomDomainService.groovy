@@ -354,9 +354,9 @@ class CustomDomainService implements ServiceMethods {
      * @param project - project instance
      * @param domain - asset domain
      * @param option - which fields are needed.
-     *             @see ALL_FIELDS
-     *             @see STANDARD_FIELD
-     *             @see CUSTOM_USER_FIELD
+     *             ALL_FIELDS
+     *             STANDARD_FIELD
+     *             CUSTOM_USER_FIELD
      * @param values - a list of string with the name of the fields to be included in the result.
      *
      * @return a list with the specs.
@@ -450,4 +450,22 @@ class CustomDomainService implements ServiceMethods {
         return fieldSpecs
     }
 
+    /**
+     * Provides a mapping of field names to their control type.
+     *
+     * @param currentProject the current project to use to get fieldToControlMapping.
+     *
+     * @return a map of field names to their control types
+     */
+    Map<String, String> fieldToControlMapping(Project currentProject) {
+        Map fields = [:]
+
+        fieldSpecsWithCommon(currentProject).each { key, value ->
+            value.fields.each { Map<String, String> field ->
+                fields[field.field] = field.control
+            }
+        }
+
+        return fields
+    }
 }
