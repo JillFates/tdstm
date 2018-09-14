@@ -14,7 +14,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.service.CustomDomainService
 
 import static com.tds.asset.AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
 import static com.tds.asset.AssetOptions.AssetOptionsType.PRIORITY_OPTION
@@ -30,7 +29,6 @@ import static com.tdsops.validators.CustomValidators.optionsClosure
 import static com.tdsops.validators.CustomValidators.validateCustomFields
 
 class AssetEntity {
-	CustomDomainService customDomainService
 	static final List<String> COMMON_FIELD_LIST = [
 		'assetClass',
 		'assetName',
@@ -316,7 +314,7 @@ class AssetEntity {
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
-	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict', 'customDomainService']
+	static transients = ['modelName', 'moveBundleName', 'depUp', 'depDown', 'depToResolve', 'depToConflict']
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()
