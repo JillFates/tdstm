@@ -626,7 +626,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				actualDuration: TimeUtil.formatDuration(actualDuration),
 				durationDelta: TimeUtil.formatDuration(durationDelta),
 				eventList: eventList,
-				categories: AssetCommentCategory.list
+				categories: AssetCommentCategory.list,
+				assetClasses: assetEntityService.getAssetClasses()
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
