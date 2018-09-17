@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
     <g:javascript src="prototype/prototype.js" />
     <jq:plugin name="jquery.combined" />
-    <g:javascript src="tds-common.js" />
     <g:layoutHead />
 
     <script type="text/javascript">
