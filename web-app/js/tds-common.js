@@ -115,27 +115,29 @@ var tdsCommon = {
 	 *
 	 * To disable this behavior add the class 'static-dialog' to the DIV (class="static-dialog" or modal.addClass('static-dialog'))
 	 */
-	autoClearDialogOnClose: function () {
-		$.widget("ui.dialog", $.ui.dialog, {
-			close: function (event) {
-				var result = this._super();
-				if (this.element.length > 0) {
-					var dialog = $("#" + this.element[0].id)
-					if (dialog.length > 0) {
-						// Need to close any Select2 controls that might still be open
-						var select2 = dialog.find('.select2-container');
-						if (select2 && select2.length > 0) {
-							dialog.find('.select2-container').select2('close');
-						}
+	autoClearDialogOnClose: function (){
+		if($.ui) {
+            $.widget("ui.dialog", $.ui.dialog, {
+                close: function (event) {
+                    var result = this._super();
+                    if (this.element.length > 0) {
+                        var dialog = $("#" + this.element[0].id)
+                        if (dialog.length > 0) {
+                            // Need to close any Select2 controls that might still be open
+                            var select2 = dialog.find('.select2-container');
+                            if (select2 && select2.length > 0) {
+                                dialog.find('.select2-container').select2('close');
+                            }
 
-						if (!dialog.hasClass('static-dialog')) {
-							dialog.html('');
-						}
-					}
-				}
-				return result;
-			}
-		});
+                            if (!dialog.hasClass('static-dialog')) {
+                                dialog.html('');
+                            }
+                        }
+                    }
+                    return result;
+                }
+            });
+        }
 	},
 
 	/**

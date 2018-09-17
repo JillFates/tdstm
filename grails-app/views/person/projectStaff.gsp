@@ -10,7 +10,7 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
-
+    <g:javascript src="tds-common.js" />
 
     <script type="text/javascript">
 	    $(document).ready(function(){
@@ -116,7 +116,6 @@
 				}
 		 	}
 		 	// function to validate CreateForm
-		 	 var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/
 		 	function validateEditForm(){
 				var returnVal = true
 		 		var firstName = document.editForm.firstName.value;
@@ -129,7 +128,7 @@
 		 		} else if( !firstName ){
 		 			alert("First Name can not be Blank");
 					returnVal =  false;
-				} else if( email && !emailExp.test(email) ){
+				} else if( email && !tdsCommon.isValidEmail(email) ){
 					alert(email +" is not a valid e-mail address ")
 					returnVal =  false;
 				} else if( !roleType ){

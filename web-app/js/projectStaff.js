@@ -496,7 +496,6 @@ function createDialog() {
  * Validate person form
  */
 function validatePersonForm(form) {
-	var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/
 	var mobileExp=/^([0-9 +-])+$/
 	var returnVal = true
 	var allFields = $("form[name = "+form+"] input[type = 'text']");
@@ -521,7 +520,7 @@ function validatePersonForm(form) {
 		alert("First Name should not be blank ")
 		returnVal = false
 	}
-	if (email && !emailExp.test(email)) {
+	if (email && !tdsCommon.isValidEmail(email)) {
 		alert(email + " is not a valid e-mail address ")
 		returnVal = false
 	}
