@@ -1,25 +1,68 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 // Components
-import {LazyTestComponent} from './lazy-test.component';
+import {ErrorPageComponent} from './errorPage/error-page.component';
+import {UnauthorizedPageComponent} from './unauthorizedPage/unauthorized-page.component';
+import {NotFoundPageComponent} from './notFoundPage/not-found-page.component';
+
+/**
+ * Task States
+ * @class
+ * @classdesc Represent the possible states and access on Task Routing
+ */
+export class SecurityRouteStates {
+	public static readonly ERROR = {
+		name: 'tds.error',
+		url: '/pages/error'
+	};
+	public static readonly UNAUTHORIZED = {
+		name: 'tds.unauthorized',
+		url: '/pages/unauthorized'
+	};
+	public static readonly NOT_FOUND = {
+		name: 'tds.notfound',
+		url: '/pages/notfound'
+	};
+}
 
 // routes
-export const LazyTestRoute: Routes = [
+export const SecurityRoute: Routes = [
 	{
-		path: '',
+		path: SecurityRouteStates.ERROR.url,
 		data: {
-			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
-			topMenu: { parent: 'menu-parent-assets', child: 'menu-parent-assets-asset-manager', subMenu: true }
+			page: {
+				title: '', instruction: '', menu: []
+			},
+			requiresAuth: true
 		},
-		component: LazyTestComponent
+		component: ErrorPageComponent
+	},
+	{
+		path: SecurityRouteStates.UNAUTHORIZED.url,
+		data: {
+			page: {
+				title: '', instruction: '', menu: []
+			},
+			requiresAuth: true
+		},
+		component: UnauthorizedPageComponent
+	},
+	{
+		path: SecurityRouteStates.NOT_FOUND.url,
+		data: {
+			page: {
+				title: '', instruction: '', menu: []
+			},
+			requiresAuth: true
+		},
+		component: NotFoundPageComponent
 	}
 ];
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(LazyTestRoute)]
+	imports: [RouterModule.forChild(SecurityRoute)]
 })
 
-export class SecurityRouteModule {}
+export class SecurityRouteModule {
+}

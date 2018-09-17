@@ -63,13 +63,13 @@ export class HeaderComponent implements AfterViewInit {
 				console.log(err);
 			});
 
-		if (this.route && this.route.snapshot && route.snapshot.data) {
+		if (this.route && this.route.snapshot && route.snapshot.data && route.snapshot.data.page) {
 			this.pageMetaData = {
-				id: route.snapshot.data['title'],
-				title: route.snapshot.data['title'],
-				instruction: route.snapshot.data['instruction'],
-				menu: route.snapshot.data['menu'],
-				topMenu: route.snapshot.data['topMenu']
+				id: route.snapshot.data.page.id,
+				title: route.snapshot.data.page.title,
+				instruction: route.snapshot.data.page.instruction,
+				menu: route.snapshot.data.page.menu,
+				topMenu: route.snapshot.data.pagetopMenu
 			};
 
 			document.title = translatePipe.transform(this.pageMetaData.title, []);

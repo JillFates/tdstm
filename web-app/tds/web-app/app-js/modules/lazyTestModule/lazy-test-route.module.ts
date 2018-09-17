@@ -8,10 +8,12 @@ export const LazyTestRoute: Routes = [
 	{
 		path: '',
 		data: {
-			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
-			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
-			topMenu: { parent: 'menu-parent-assets', child: 'menu-parent-assets-asset-manager', subMenu: true }
+			page: {
+				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
+				topMenu: { parent: 'menu-parent-assets', child: 'menu-parent-assets-asset-manager', subMenu: true }
+			}
 		},
 		component: LazyTestComponent
 	}

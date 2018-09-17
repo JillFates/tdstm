@@ -54,8 +54,6 @@ import { ErrorPageComponent } from '../modules/security/errorPage/error-page.com
 import { UnauthorizedPageComponent } from '../modules/security/unauthorizedPage/unauthorized-page.component';
 import { NotFoundPageComponent } from '../modules/security/notFoundPage/not-found-page.component';
 // Routing Logic
-import { UIRouterModule } from '@uirouter/angular';
-import { SHARED_STATES } from './shared-routing.states';
 import { DictionaryService } from './services/dictionary.service';
 
 @NgModule({
@@ -65,8 +63,7 @@ import { DictionaryService } from './services/dictionary.service';
 		PopupModule,
 		DropDownsModule,
 		GridModule,
-		InputsModule,
-		UIRouterModule.forChild({ states: SHARED_STATES })
+		InputsModule
 	],
 	declarations: [
 		UIAutofocusDirective,
