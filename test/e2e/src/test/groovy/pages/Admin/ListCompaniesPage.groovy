@@ -74,7 +74,7 @@ class ListCompaniesPage extends Page{
      * @return
      */
     def validatePartnerField(value){
-        if (value==true){
+        if (value){
             partnerField.text()==" "
         }else{
             partnerField.text() =="Yes"

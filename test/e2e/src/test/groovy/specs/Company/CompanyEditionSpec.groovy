@@ -64,6 +64,7 @@ class CompanyEditionSpec extends GebReportingSpec {
 
     def "2. Changes are reflected in Companies' list"(){
         given: "User is in List Companies Page"
+            at MenuPage
             adminModule.goToListCompanies()
             at ListCompaniesPage
         when: "The user filters by the edited company"

@@ -1,7 +1,6 @@
 package pages.Admin
 
 import geb.Page
-import modules.AdminModule
 
 class CompanyDetailsPage extends Page{
 
@@ -21,7 +20,6 @@ class CompanyDetailsPage extends Page{
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
         name {$('td.value')[0]}
-        adminModule { module AdminModule}
     }
 
     def getCompanyNameText(){
