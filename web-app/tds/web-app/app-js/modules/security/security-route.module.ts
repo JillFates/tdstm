@@ -22,4 +22,4 @@ export const LazyTestRoute: Routes = [
 	imports: [RouterModule.forChild(LazyTestRoute)]
 })
 
-export class LazyTestRouteModule {}
+export class SecurityRouteModule {}

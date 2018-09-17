@@ -50,9 +50,9 @@ import { ConnectorComponent } from './components/connector/connector.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
-import { ErrorPageComponent } from './modules/pages/error-page.component';
-import { UnauthorizedPageComponent } from './modules/pages/unauthorized-page.component';
-import { NotFoundPageComponent } from './modules/pages/not-found-page.component';
+import { ErrorPageComponent } from '../modules/security/errorPage/error-page.component';
+import { UnauthorizedPageComponent } from '../modules/security/unauthorizedPage/unauthorized-page.component';
+import { NotFoundPageComponent } from '../modules/security/notFoundPage/not-found-page.component';
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';

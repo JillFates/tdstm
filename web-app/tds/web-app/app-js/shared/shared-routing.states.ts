@@ -1,8 +1,8 @@
 import { Ng2StateDeclaration } from '@uirouter/angular';
 
-import { ErrorPageComponent } from './modules/pages/error-page.component';
-import { UnauthorizedPageComponent } from './modules/pages/unauthorized-page.component';
-import { NotFoundPageComponent } from './modules/pages/not-found-page.component';
+import { ErrorPageComponent } from '../modules/security/errorPage/error-page.component';
+import { UnauthorizedPageComponent } from '../modules/security/unauthorizedPage/unauthorized-page.component';
+import { NotFoundPageComponent } from '../modules/security/notFoundPage/not-found-page.component';
 import { HeaderComponent } from './modules/header/header.component';
 
 /**
