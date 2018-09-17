@@ -48,6 +48,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	ngOnInit() {
 		this.model = this.extractModel();
+		this.taskManagerService.getStatusList(this.model.id)
+			.subscribe((data: string[]) => this.model.statusList = data);
+
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -59,14 +62,20 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		const asset = detail['assetComment'] || {};
 
 		return  {
+			id: asset.id,
 			comment:  asset.comment || '',
 			sendNotification: asset.sendNotification,
 			assetClass: {id: detail.assetClass, text: ''},
-			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) )
+			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
+			status: asset.status,
+			statusList: []
 		}
 	}
 
 	onAssetClassChange(asset): void {
+	}
+
+	onStatusChange(asset): void {
 	}
 
 	/**

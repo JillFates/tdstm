@@ -28,7 +28,7 @@
                                             <tbody>
                                                 <tr class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label style="min-width: 104px;"><span>Task # {{taskDetailModel.detail?.assetComment?.id}}</span></label>
+                                                        <label style="min-width: 104px;"><span>Task # {{model.id}}</span></label>
                                                     </td>
                                                     <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
                                                         <input type="text" name="comment" [(ngModel)]="model.comment" required>
@@ -38,7 +38,15 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Status</span></label>
                                                     </td>
-                                                    <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}"><span>{{taskDetailModel.detail?.assetComment?.status}}</span></td>
+                                                    <td class="valueNW task-{{model.status |  lowercase}}">
+                                                        <kendo-dropdownlist
+                                                                name="statusList"
+                                                                class="form-control" style="width: 100%;"
+                                                                [data]="model.statusList"
+                                                                [(ngModel)]="model.status"
+                                                                (valueChange)="onStatusChange($event)">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label url U" nowrap="nowrap">
                                                         <label><span>Asset class</span></label>
                                                     </td>
@@ -50,8 +58,7 @@
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
                                                                 [(ngModel)]="model.assetClass"
-                                                                (valueChange)="onAssetClassChange($event)"
-                                                                required>
+                                                                (valueChange)="onAssetClassChange($event)">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">

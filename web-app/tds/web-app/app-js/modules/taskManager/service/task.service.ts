@@ -85,6 +85,19 @@ export class TaskService {
 	}
 
 	/**
+	 * Get the status list for the asset id provided
+	 * @returns {Observable<any>}
+	 */
+	getStatusList(commentId: any): Observable<any> {
+		return this.http.post(`${this.assetGeneric}/updateStatusSelect?format=json&id=${commentId}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Get Laste Created Task Params from Session
 	 */
 	getLastCreatedTaskSessionParams(): Observable<any> {
