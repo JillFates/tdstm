@@ -1,0 +1,38 @@
+version: "3"
+services:
+
+  # TransitionManager Application Container
+  tm-application:
+    container_name: tm-application
+    image: tm-registry.transitionmanager.net/tds-dev/tm-application:latest
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_HOME=/usr/java/latest
+    volumes:
+      - .:/home/tmuser/tdstm
+      - ~/.m2:/home/tmuser/.m2
+      - ~/.npm:/home/tmuser/.npm
+    depends_on:
+      - tm-database
+
+  # TransitionManager Database Container
+  tm-database:
+    container_name: tm-database
+    image: tm-registry.transitionmanager.net/tds-dev/tm-database:latest
+    environment:
+      - TM_MYSQL_USER=tdstmapp
+      - TM_MYSQL_PASSWD=tdstmpswd
+    volumes:
+      - ~/.tdstm-data:/data/tranman/
+    ports:
+      - "3306:3306"
+
+  # TransitionManager HTTP Test server (aka: JSON Server)
+  tm-http-test-server:
+    container_name: tm-http-test-server
+    image: tm-registry.transitionmanager.net/tds-dev/tm-http-test-server:latest
+    ports:
+      - "3000:3000"
