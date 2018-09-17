@@ -97,9 +97,6 @@
 						<input type="button" class="save" value="Update" id="saveManufacturerId" onclick="updateManufacturer('Manufacturer')"/>
 					</span>
 					<span class="button">
-						<g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" />
-					</span>
-					<span class="button">
 						<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="showOrEditModelManuDetails('manufacturer',${manufacturerInstance?.id},'Manufacturer','show','Show')" />
 					</span>
 				</div>
