@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Response, RequestOptions, Headers } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import {catchError, map} from "rxjs/operators";
+
 import {DateUtils} from '../utils/date.utils';
 import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';
 
@@ -39,23 +39,23 @@ export class PreferenceService {
 
 	getPreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.map((res: Response) => {
+			.pipe(map((res: Response) => {
 				let response = res.json();
 				Object.keys(response.data.preferences).forEach((key) => {
 					this.preferences[key] = response.data.preferences[key];
 				});
 				return this.preferences;
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			}))
+			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
 	getSinglePreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
-			.map((res: Response) => {
+			.pipe(map((res: Response) => {
 				let response = res.json();
 				return response.data.preferences[preferenceCode];
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			}))
+			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
 	setPreference(preferenceCode: string, value: string): Observable<any>  {
@@ -99,8 +99,8 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE )
-			.map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat))
+			.pipe(map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE ))
+			.pipe(map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat)));
 	}
 
 	/**
@@ -113,23 +113,24 @@ export class PreferenceService {
 		const defaultHeight = 680;
 
 		return this.getPreference(PREFERENCES_LIST.DATA_SCRIPT_SIZE)
-			.map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || '')
-			.map((size: string) => {
+			.pipe(map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || ''))
+			.pipe(map((size: string) => {
 				let measure: string[] = (size || '').split(unitSizeSeparator);
 				let	width = Number(measure.length &&  measure.shift()) || defaultWidth;
 				let height = Number(measure.length &&  measure.shift()) || defaultHeight;
 				return { width, height };
-			})
+			}))
 			.filter((size: any) =>  size.width !== null && size.height !== null);
 	}
 
 	getImportBatchListSizePreference(): Observable<number> {
-		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE).map( result => {
-			if (!result || isNaN(result)) {
-				return GRID_DEFAULT_PAGE_SIZE;
-			}
-			return parseInt(result, 0);
-		});
+		return this.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_LIST_SIZE)
+			.pipe(map(result => {
+				if (!result || isNaN(result)) {
+					return GRID_DEFAULT_PAGE_SIZE;
+				}
+				return parseInt(result, 0);
+			}));
 	}
 
 }

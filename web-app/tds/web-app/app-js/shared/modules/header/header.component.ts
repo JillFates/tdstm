@@ -1,14 +1,13 @@
 import {Component, Inject, AfterViewInit, Renderer2} from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { ASSET_MENU_CSS_TREE } from '../../../modules/assetExplorer/model/asset-menu.model';
+import { ASSET_MENU_CSS_TREE } from './model/asset-menu.model';
 
 declare var jQuery: any;
 @Component({
-	selector: 'header',
+	selector: 'tds-header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 	providers: [TranslatePipe],
 	styles: [`.font-weight-bold { font-weight:bold; }`]

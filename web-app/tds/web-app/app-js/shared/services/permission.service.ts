@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import {catchError, map} from "rxjs/operators";
 
 @Injectable()
 export class PermissionService {
@@ -18,12 +17,12 @@ export class PermissionService {
 
 	getPermissions(): Observable<any> {
 		return this.http.get(this.permissionUrl)
-			.map((res) => {
+			.pipe(map((res) => {
 				let result = res.json();
 				this.permissions = result.data;
 				return this.permissions;
-			})
-			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
+			}))
+			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
 	}
 
 	hasPermission(value: string): boolean {

@@ -44,7 +44,7 @@
     "moment-timezone": "0.5.21",
     "ramda": "0.25.0",
     "rxjs": "6.3.2",
-    "rxjs-compat": "^6.3.2",
+    "rxjs-compat": "6.3.2",
     "zone.js": "0.8.26"
   },
   "devDependencies": {

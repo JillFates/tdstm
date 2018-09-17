@@ -1,6 +1,6 @@
 import {Component, Injectable} from '@angular/core';
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpProgressEvent, HttpRequest, HttpResponse} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
 import {DataIngestionService} from '../../modules/dataIngestion/service/data-ingestion.service';
