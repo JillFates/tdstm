@@ -386,11 +386,11 @@ class MoveEventController implements ControllerMethods {
 			List bundlesList = bundles as List
 			applcationAssigned = Application.countByMoveBundleInListAndProject(bundlesList, project)
 			assetCount = AssetEntity.countByMoveBundleInListAndAssetTypeNotInList(bundlesList,
-					['Application', 'Database', 'Files'], params)
-			databaseCount = AssetEntity.countByAssetTypeAndMoveBundleInList('Database', bundlesList)
-			fileCount = AssetEntity.countByAssetTypeAndMoveBundleInList('Files', bundlesList)
+					['Application', 'Database', 'Logical Storage'], params)
+			databaseCount = Database.countByMoveBundleInListAndProject(bundlesList, project)
+			fileCount = Files.countByMoveBundleInListAndProject(bundlesList, project)
 			otherAssetCount = AssetEntity.countByAssetTypeNotInListAndMoveBundleInList(
-					['Server','VM','Blade','Application','Files','Database'], bundlesList)
+					['Server','VM','Blade','Application','Logical Storage','Database'], bundlesList)
 		}
 
 		if (params.containsKey('viewUnpublished')) {
@@ -453,11 +453,11 @@ class MoveEventController implements ControllerMethods {
 			List bundlesList = bundles as List
 			applications = Application.findAllByMoveBundleInListAndProject(bundlesList, project)
 			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(
-					bundlesList, ['Application','Database','Files'])
+					bundlesList, ['Application','Database','Logical Storage'])
 			databases = Database.findAllByMoveBundleInListAndProject(bundlesList, project)
 			files = Files.findAllByMoveBundleInListAndProject(bundlesList, project)
 			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(
-					['Server','VM','Blade','Application','Files','Database'], bundlesList)
+					['Server','VM','Blade','Application','Logical Storage','Database'], bundlesList)
 			List<Long> allAssetIds = AssetEntity.findAllByMoveBundleInListAndProject(bundlesList, project).id
 
 			unresolvedIssues = AssetComment.executeQuery("""
