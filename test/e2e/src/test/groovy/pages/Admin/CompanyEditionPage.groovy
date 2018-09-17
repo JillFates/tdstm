@@ -29,7 +29,7 @@ class CompanyEditionPage extends Page{
      * @param partner
      * @return
      */
-    def editCompany(partner){
+    def editCompany(){
         nameField=nameField.value()+" Edited"
         commentField=commentField.value()+" Edited"
         partnerCheck.click()

@@ -49,7 +49,7 @@ class CompanyEditionSpec extends GebReportingSpec {
         when:"The user edits the company"
             clickEdit()
             at CompanyEditionPage
-            editCompany(true)
+            editCompany()
         then: "The user is led to Company Details page"
             at CompanyDetailsPage
         and: "A message stating the company was updated is displayed"
