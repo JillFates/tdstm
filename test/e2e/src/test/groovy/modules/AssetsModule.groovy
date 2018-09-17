@@ -14,12 +14,12 @@ class AssetsModule extends Module {
         assetsSections { assetsMenu.find("li",class:"menu-parent-item")}
         assetsSummaryItem { assetsMenu.find("li.menu-parent-assets-summary-table")}
         assetsAllAssetsItem { assetsMenu.find("li.menu-parent-assets-asset-explorer")}
-        assetsApplicationsItem { assetsMenu.find("li.menu-parent-assets-application-list")}
-        assetsDevicesItem { assetsMenu.find("li.menu-parent-assets-all-list")}
-        assetsServersItem { assetsMenu.find("li.menu-parent-assets-server-list")}
-        assetsDatabasesItem { assetsMenu.find("li.menu-parent-assets-database-list")}
-        assetsStorageItem { assetsMenu.find("li.menu-parent-assets-storage-list")}
-        assetsLogicalItem { assetsMenu.find("li.menu-parent-assets-storage-logical-list")}
+        assetsApplicationsItem { assetsMenu.find("li.menu-parent-assets-application-list a[onclick*=hideMegaMenu]")}
+        assetsDevicesItem { assetsMenu.find("li.menu-parent-assets-all-list a[onclick*=hideMegaMenu]")}
+        assetsServersItem { assetsMenu.find("li.menu-parent-assets-server-list a[onclick*=hideMegaMenu]")}
+        assetsDatabasesItem { assetsMenu.find("li.menu-parent-assets-database-list a[onclick*=hideMegaMenu]")}
+        assetsStorageItem { assetsMenu.find("li.menu-parent-assets-storage-list a[onclick*=hideMegaMenu]")}
+        assetsLogicalItem { assetsMenu.find("li.menu-parent-assets-storage-logical-list a[onclick*=hideMegaMenu]")}
         assetsDependItem { assetsMenu.find("li.menu-parent-assets-dependencies-list")}
         assetsCommentsItem { assetsMenu.find("li.menu-parent-assets-comments-list")}
         assetsDepAnalyzerItem { assetsMenu.find("li.menu-parent-assets-dependency-analyzer")}
