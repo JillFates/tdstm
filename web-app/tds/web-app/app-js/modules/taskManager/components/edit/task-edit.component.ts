@@ -56,6 +56,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
 
+		this.taskManagerService.getAssignedTeam(this.model.id)
+			.subscribe((data: any[]) => {
+				this.model.personList = data.map((item) => ({id: item.id, text: item.nameRole}))
+			});
+
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -75,7 +80,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
 			status: asset.status,
 			statusList: [],
-			asset: {id: detail.assetId, text: detail.assetName}
+			personList: [],
+			asset: {id: detail.assetId, text: detail.assetName},
+			assignedTo: {id : asset.assignedTo.id, text: detail.assignedTo}
 		}
 	}
 
@@ -95,6 +102,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onAssetNameChange(asset): void {
+	}
+
+	onPersonChange(asset): void {
 	}
 
 	/**

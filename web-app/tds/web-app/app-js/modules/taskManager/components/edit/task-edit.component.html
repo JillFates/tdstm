@@ -91,7 +91,17 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Person</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="assignedTo"
+                                                                class="form-control" style="width: 100%;"
+                                                                [data]="model.personList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.assignedTo"
+                                                                (valueChange)="onPersonChange($event)">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label url U" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
