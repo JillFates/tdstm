@@ -18,6 +18,7 @@ import spock.lang.Stepwise
 class AssetsLandingPageSpec extends GebReportingSpec {
     def testKey
     static testCount
+    static assetPagesLinks = 24
 
     def setupSpec() {
         testCount = 0
@@ -41,7 +42,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToAssetsMenu()
 
         then: 'The valid clickable pages are displayed'
-            assetsModule.assetsPages.size() == 18
+            assetsModule.assetsPages.size() == assetPagesLinks
             at MenuPage
     }
 
