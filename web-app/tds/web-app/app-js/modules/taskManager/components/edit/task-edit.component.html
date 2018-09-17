@@ -13,7 +13,7 @@
                 <h4 class="modal-title">Edit: {{taskDetailModel.modal.title}}</h4>
             </div>
             <div class="modal-body">
-                <div class="full-height">
+                <form #taskEditForm="ngForm" class="full-height">
                     <table style="border: 0;" class="full-height">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
@@ -31,7 +31,7 @@
                                                         <label style="min-width: 104px;"><span>Task # {{taskDetailModel.detail?.assetComment?.id}}</span></label>
                                                     </td>
                                                     <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
-                                                        <span>{{taskDetailModel.detail?.assetComment?.comment}}</span>
+                                                        <input type="text" name="comment" [(ngModel)]="model.comment" required>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
@@ -39,14 +39,16 @@
                                                         <label><span>Status</span></label>
                                                     </td>
                                                     <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}"><span>{{taskDetailModel.detail?.assetComment?.status}}</span></td>
+                                                    <td class="label url U" nowrap="nowrap">
+                                                        <label><span>Asset class</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <span>{{taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]}}</span>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{taskDetailModel.detail?.assetName}}</span></td>
-                                                    <td class="label url U" nowrap="nowrap">
-                                                        <label><span>Instruction Link</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span></td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
@@ -66,13 +68,22 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Person</span></label>
                                                     </td>
-                                                    <td class="valueNW" colspan="4"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="label url U" nowrap="nowrap">
+                                                        <label><span>Instruction Link</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span>
+                                                    </td>
+                                                    <td colspan="2"></td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Send Notification</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span></td>
+                                                    <td class="valueNW">
+                                                        <input type="checkbox" [(ngModel)]="model.sendNotification" [checked]="model.sendNotification">
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>
                                                     </td>
@@ -261,7 +272,7 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </form>
             </div>
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
