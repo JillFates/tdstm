@@ -1,6 +1,8 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
@@ -452,20 +454,20 @@ class MoveEventController implements ControllerMethods {
 			applications = Application.findAllByMoveBundleInListAndProject(bundlesList, project)
 			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(
 					bundlesList, ['Application','Database','Files'])
-			databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database', bundlesList)
-			files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files', bundlesList)
+			databases = Database.findAllByMoveBundleInListAndProject(bundlesList, project)
+			files = Files.findAllByMoveBundleInListAndProject(bundlesList, project)
 			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(
 					['Server','VM','Blade','Application','Files','Database'], bundlesList)
 			List<Long> allAssetIds = AssetEntity.findAllByMoveBundleInListAndProject(bundlesList, project).id
 
-			unresolvedIssues = AssetComment.executeQuery('''
+			unresolvedIssues = AssetComment.executeQuery("""
 				from AssetComment
 				where assetEntity.id in (:assetIds)
-				  and dateResolved=:dateResolved
+				  and dateResolved = null
 				  and commentType=:commentType
 				  and category in ('general', 'discovery', 'planning', 'walkthru')
 				  AND isPublished IN (:publishedValues)
-			''', [assetIds: allAssetIds, dateResolved: null, commentType: AssetCommentType.ISSUE,
+			""", [assetIds: allAssetIds, commentType: AssetCommentType.ISSUE,
 			      publishedValues: publishedValues])
 		}
 
