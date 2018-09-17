@@ -43,7 +43,7 @@
                                                         <label><span>Asset class</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <span>{{taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]}}</span>
+                                                        <span>{{(taskDetailModel.detail && taskDetailModel.detail.assetClasses && taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]) || ''}}</span>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>

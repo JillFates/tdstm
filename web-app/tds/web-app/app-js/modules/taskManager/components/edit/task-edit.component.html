@@ -43,7 +43,16 @@
                                                         <label><span>Asset class</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <span>{{taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]}}</span>
+                                                        <kendo-dropdownlist
+                                                                name="assetClass"
+                                                                class="form-control" style="width: 100%;"
+                                                                [data]="model.assetClasses"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.assetClass"
+                                                                (valueChange)="onAssetClassChange($event)"
+                                                                required>
+                                                        </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
@@ -82,7 +91,7 @@
                                                         <label><span>Send Notification</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <input type="checkbox" [(ngModel)]="model.sendNotification" [checked]="model.sendNotification">
+                                                        <input type="checkbox" name="sendNotification" [(ngModel)]="model.sendNotification" [checked]="model.sendNotification">
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>

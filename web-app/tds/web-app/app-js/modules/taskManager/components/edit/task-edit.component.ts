@@ -32,6 +32,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public collapsedTaskDetail = false;
 	public hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
+	public model: any = null;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -46,32 +47,26 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.loadTaskDetail();
+		this.model = this.extractModel();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
 	/**
-	 * Load All Asset Class and Retrieve
+	 * Extract only the model fields used by the view
 	 */
-	private loadTaskDetail(): void {
-		this.taskManagerService.getTaskDetails(this.taskDetailModel.id).subscribe((res) => {
-			this.dateFormat = this.userPreferenceService.getUserDateFormat();
-			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-			this.taskDetailModel.detail = res;
-			this.taskDetailModel.detail.instructionLink = this.taskDetailModel.detail.instructionsLinkLabel + '|' + this.taskDetailModel.detail.instructionsLinkURL;
+	extractModel(): any {
+		const detail = this.taskDetailModel.detail;
+		const asset = detail['assetComment'] || {};
 
-			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.predecessorList, null, null);
-			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
-			// Notes are coming into an Array of Arrays...
-			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
-			// Convert the Duration into a Human Readable form
-			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
+		return  {
+			comment:  asset.comment || '',
+			sendNotification: asset.sendNotification,
+			assetClass: {id: detail.assetClass, text: ''},
+			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) )
+		}
+	}
 
-			// Get Assigned Team
-			if (this.taskDetailModel.detail.assetComment.assignedTo) {
-				this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
-			}
-		});
+	onAssetClassChange(asset): void {
 	}
 
 	/**
