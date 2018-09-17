@@ -1,4 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
+import {Observable} from 'rxjs';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
@@ -13,6 +14,7 @@ import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 
 @Component({
 	selector: `task-edit`,
@@ -33,6 +35,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
 	public model: any = null;
+	public getAssetList: Function;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -48,6 +51,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	ngOnInit() {
 		this.model = this.extractModel();
+		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
+
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
 
@@ -63,19 +68,33 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		return  {
 			id: asset.id,
+			assetName: detail.assetName,
 			comment:  asset.comment || '',
 			sendNotification: asset.sendNotification,
 			assetClass: {id: detail.assetClass, text: ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
 			status: asset.status,
-			statusList: []
+			statusList: [],
+			asset: {id: detail.assetId, text: detail.assetName}
 		}
+	}
+
+	/**
+	 * Pass Service as Reference
+	 * @param {ComboBoxSearchModel} searchParam
+	 * @returns {Observable<any>}
+	 */
+	public getAssetListForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
+		return this.taskManagerService.getAssetListForComboBox(searchParam);
 	}
 
 	onAssetClassChange(asset): void {
 	}
 
 	onStatusChange(asset): void {
+	}
+
+	onAssetNameChange(asset): void {
 	}
 
 	/**

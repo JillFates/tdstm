@@ -6,6 +6,8 @@ import {SingleCommentModel} from '../../assetExplorer/components/single-comment/
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
+import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 
 /**
  * @name TaskService
@@ -139,5 +141,23 @@ export class TaskService {
 				})
 				.catch((error: any) => error.json());
 		}
+	}
+	/**
+	 *
+	 * @param searchParams
+	 * @returns {Observable<any>}
+	 */
+	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`${this.assetGeneric}/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value || ''}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.results,
+					total: response.total,
+					page: response.page
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
 	}
 }

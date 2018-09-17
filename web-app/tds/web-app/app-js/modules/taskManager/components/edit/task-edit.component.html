@@ -64,7 +64,14 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetName}}</span></td>
+                                                    <td class="valueNW">
+                                                        <tds-combobox
+                                                                [(model)]="model.asset"
+                                                                [(metaParam)]="model.assetClass.id"
+                                                                [serviceRequest]="getAssetList"
+                                                                (valueChange)="onAssetNameChange($event)">
+                                                        </tds-combobox>
+                                                    </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
