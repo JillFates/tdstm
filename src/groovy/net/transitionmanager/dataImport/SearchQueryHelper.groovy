@@ -493,7 +493,7 @@ class SearchQueryHelper {
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
 
 				// Support the new find query language using criterias
-					if(query.class.isAssignableFrom(QueryResult) || query.containsKey('criteria')){
+				if(query.getClass().isAssignableFrom(QueryResult) || query.containsKey('criteria')){
 					List<FindCondition> conditions = FindCondition.buildCriteria(query.criteria)
 					entities = DomainClassQueryHelper.where(whereDomain, context.project, conditions, false)
 				} else {
