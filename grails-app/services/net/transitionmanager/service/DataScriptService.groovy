@@ -228,13 +228,13 @@ class DataScriptService implements ServiceMethods{
 			// check api action references
 			int countApiActions = ApiAction.where { defaultDataScript == foundDataScript }.count()
 			if (countApiActions > 0) {
-				throw new InvalidParamException("The DataScript is being references for one or more Api Actions.")
+				throw new InvalidParamException("The DataScript is being referenced by one or more Api Actions.")
 			}
 
 			// check import batch references
 			int countImportBatches = ImportBatch.where { dataScript == foundDataScript }.count()
 			if (countImportBatches > 0) {
-				throw new InvalidParamException("The DataScript is being references for one or more Import Batches.")
+				throw new InvalidParamException("The DataScript is being referenced by one or more Import Batches.")
 			}
 
 			// if no references to foundDataScript then delete
