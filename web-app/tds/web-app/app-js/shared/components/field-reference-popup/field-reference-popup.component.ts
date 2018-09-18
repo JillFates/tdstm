@@ -1,9 +1,9 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FieldInfoType} from './import-batch-record-fields.component';
+import {FieldInfoType} from '../../../modules/importBatch/components/record/import-batch-record-fields.component';
 
 @Component({
 	selector: 'field-reference-popup',
-	templateUrl: '../tds/web-app/app-js/modules/importBatch/components/record/field-reference-popup.component.html'
+	templateUrl: '../tds/web-app/app-js/shared/components/field-reference-popup/field-reference-popup.component.html'
 })
 export class FieldReferencePopupComponent implements OnInit {
 

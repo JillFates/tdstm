@@ -57,7 +57,7 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
 import { DictionaryService } from './services/dictionary.service';
-import {FieldReferencePopupComponent} from '../modules/importBatch/components/record/field-reference-popup.component';
+import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
 
 @NgModule({
 	imports: [
