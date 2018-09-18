@@ -1018,9 +1018,9 @@ class DataImportService implements ServiceMethods {
 			Object existingValue = domain[fieldName]
 
 			// --------------------------------------------------
-			// Deal with setting field to NULL
+			// Deal with setting the field to NULL when it's not a reference. References are handled separately.
 			// --------------------------------------------------
-			if (valueToSet == null) {
+			if (!isReference && valueToSet == null) {
 				if (existingValue) {
 					// Check to see if the field is nullable
 					if (GormUtil.getConstraintValue(domain, fieldName, 'nullable')) {
