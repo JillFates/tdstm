@@ -123,7 +123,9 @@
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span>
+                                                        <input type="text" name="instructionLink"
+                                                               placeholder="Enter URL or Label|URL"
+                                                               [(ngModel)]="model.instructionLink" />
                                                     </td>
                                                     <td colspan="2"></td>
                                                 </tr>
