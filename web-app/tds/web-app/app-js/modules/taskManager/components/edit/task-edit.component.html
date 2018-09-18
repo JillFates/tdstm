@@ -196,7 +196,14 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Category</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="category"
+                                                                [data]="model.categoriesList"
+                                                                [(ngModel)]="model.category">
+
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
                                                     </td>
