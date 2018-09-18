@@ -8,6 +8,7 @@ import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -171,11 +172,32 @@ class ManufacturerService implements ServiceMethods {
 		return isValidName(manufacturer.name, manufacturer.id) && !manufacturer.hasErrors() && manufacturer.save()
 	}
 
+	/**
+	 * Deletes a Manufacturer and all associated entities.
+	 * This method will delete the given manufacturer, plus:
+	 * - The associated manufacturer aliases (if any)
+	 * - The associated models and model aliases (if any)
+	 * Finally it will update the manufacturer and model references in all asset entities to be null.
+	 *
+	 * @param manufacturer  The manufacturer to be deleted
+	 */
 	void delete(Manufacturer manufacturer) {
+		// delete existing aliases
 		ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.manufacturer.id = :maId", [maId: manufacturer.id])
 		ModelAlias.executeUpdate("delete from ModelAlias ma where ma.manufacturer.id = :maId", [maId: manufacturer.id])
+		// update Manufacturer references in all assets to null
 		AssetEntity.executeUpdate("update AssetEntity ae set ae.manufacturer=null where ae.manufacturer.id = :maId", [maId: manufacturer.id])
-		manufacturer.delete(flush:true)
+		//Find the associated Models to this manufacturer
+		List<Long> modelIds =
+				Model.where {
+					manufacturer == manufacturer
+				}
+				.projections { property 'id' }
+						.list()
+		// update Model references in all assets to null
+		AssetEntity.executeUpdate("update AssetEntity ae set ae.model=null where ae.model.id in (:moId)", [moId: modelIds])
+		// finally, delete the Manufacturer
+		manufacturer.delete(flush:true) // Note that here associated models will also be deleted by cascade
 	}
 
 	/**

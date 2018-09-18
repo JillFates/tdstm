@@ -367,8 +367,14 @@
 			'currentStatus':$('#currentStatus_'+objId).val(),
 			'note':$('#noteEditId_'+objId).val(),
 			'id':objId,'view':'myTask',
-			'tab': $('#tabId').val()
+			'tab': $('#tabId').val(),
 		};
+
+		var printers = $('#printers').val();
+		if (printers) {
+            params['printers'] = printers;
+			params['printTimes'] = $('#printTimes').val();
+		}
 
 		jQuery.ajax({
 			url: '../task/update',
@@ -432,6 +438,10 @@
 		window.PREFS.PRINTER_NAME   = printerName;
 		window.PREFS.PRINTER_COPIES = parseInt(printerCopies);
 
+		/*
+		// oluna@tdsi.com) Next code sets the Printers preferences if changed when printing
+		// is commented since the current spec states to set the property only when the task
+		// is updated. 
 		jQuery.ajax({
 				url: "${createLink(controller:'task', action: 'setLabelQuantityPref')}",
 				data: JSON.stringify({
@@ -442,6 +452,7 @@
 				contentType: "application/json; charset=utf-8",
 				dataType: 'json'
 		});
+		*/
 
 		opts = opts || {};
 		var NOP = function(){};

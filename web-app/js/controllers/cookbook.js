@@ -138,7 +138,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	columnSel = {index: 0},
 	actionsTemplate = '<div class="gridIcon">'+
-			'<a href="" class="actions edit" title="Edit Recipe" ng-click="gridActions(row, 0)">'+
+			'<a href="" class="actions edit" title="Edit Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 0)">'+
 				'<img src="'+ utils.url.applyRootPath('/icons/script_edit.png') + '" alt="Edit">' +
 			'</a>'+
 			'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
@@ -153,7 +153,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 				'ng-hide="archived == \'n\'">'+
 				'<img src="'+ utils.url.applyRootPath('/icons/folder_go.png') + '" alt="Archive">' +
 			'</a>'+
-			'<a href="" class="actions remove" title="Delete Recipe" ng-click="gridActions(row, 3)">'+
+			'<a href="" class="actions remove" title="Delete Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 3)">'+
 			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
 			'</a>'+
 		'</div>';
@@ -528,7 +528,6 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.contexts.validateCurrentSelection = function(){
 		var recipe = scope.editor.selectedRVersion;
 		if (recipe && recipe.context) {
-			var context = recipe.context;
 			if(scope.contexts.selectedEvent || scope.contexts.assetSelector && scope.contexts.assetSelector.tag.length > 0){
 				log.log('matches event or tag');
 				return true;
@@ -603,6 +602,22 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	// Events for select elements.
 	scope.contexts.eventSelected = function(){
 		scope.contexts.checkValidSelection();
+		if (scope.contexts.selectedEvent && scope.contexts.selectedEvent.id) {
+			$http.get(utils.url.applyRootPath('/ws/tag/event/' + scope.contexts.selectedEvent.id), {headers: {'Content-Type': 'application/json'}}).then(function successCallback(response) {
+				var result = response.data;
+				if (result && result.data && result.data.length >= 1) {
+					result.data.forEach(function(eventTag) {
+						var eventId = eventTag.id;
+						var tagId = eventTag.tagId;
+						eventTag.id = tagId;
+						eventTag.eventId = eventId;
+						eventTag.label = eventTag.name;
+					});
+					scope.editor.selectedRVersion.context.tag = result.data;
+					scope.contexts.checkValidSelection();
+				}
+			});
+		}
 	};
 
 	// Reset selects
@@ -725,6 +740,9 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 	scope.getRecipeData = function(defaultView) {
 		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			scope.editor.selectedRVersion = (data.data) ? data.data : null;
+			if (scope.editor.selectedRVersion.context && scope.editor.selectedRVersion.context.tag) {
+				scope.contexts.assetSelector.tag = scope.editor.selectedRVersion.context.tag;
+			}
 			if ((defaultView == 'release') && (scope.editor.selectedRVersion.versionNumber <= 0)) {
 				defaultView = 'wip';
 			}

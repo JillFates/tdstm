@@ -17,3 +17,5 @@ web-app/dist/Vendors.js
 web-app/tds/web-app/dist/**
 web-app/tds/web-app/css/tds-style.css
 test/e2e/build
+# ignore local config file!
+tdstm-config.groovy

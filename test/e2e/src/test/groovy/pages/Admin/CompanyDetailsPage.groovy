@@ -19,6 +19,7 @@ class CompanyDetailsPage extends Page{
         labelColumn { $("td.name")}
         commentField { $("textarea[name=comment]")}
         partnerCheck { $("input[name=partner]")}
+        name {$('td.value')[0]}
     }
 
     def getCompanyNameText(){
@@ -44,4 +45,17 @@ class CompanyDetailsPage extends Page{
     def getLastUpdatedText(){
         labelColumn.find{it.text().contains("Last Updated")}.next().text()
     }
+
+    def clickDelete(){
+        deleteButton.click()
+    }
+
+    def deleteCompany(option){
+        withConfirm(option){waitFor {clickDelete()}}
+    }
+
+    def validateCompanyName(name){
+        name==getCompanyNameText()
+    }
+
 }
