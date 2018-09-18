@@ -8,6 +8,7 @@ import {FieldInfoType} from './import-batch-record-fields.component';
 export class FieldReferencePopupComponent implements OnInit {
 
 	@Input ('mouseEvent') private mouseEvent;
+	@Input ('offset') private offset;
 	@Input ('type') private type;
 	@Input ('domain') private domain;
 	@Input ('results') private results;
@@ -18,7 +19,6 @@ export class FieldReferencePopupComponent implements OnInit {
 
 	protected margin = {horizontal: 2, vertical: 2};
 	protected position = 'fixed';
-	protected offset;
 
 	protected FieldInfoType = FieldInfoType;
 

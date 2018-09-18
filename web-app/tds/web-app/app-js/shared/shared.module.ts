@@ -57,6 +57,7 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
 import { DictionaryService } from './services/dictionary.service';
+import {FieldReferencePopupComponent} from '../modules/importBatch/components/record/field-reference-popup.component';
 
 @NgModule({
 	imports: [
@@ -100,7 +101,8 @@ import { DictionaryService } from './services/dictionary.service';
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
-		ConnectorComponent
+		ConnectorComponent,
+		FieldReferencePopupComponent
 	],
 	providers: [
 		AuthService,
@@ -147,7 +149,8 @@ import { DictionaryService } from './services/dictionary.service';
 		UIAutoCenterDirective,
 		AkaComponent,
 		ConnectorComponent,
-		PopupModule
+		PopupModule,
+		FieldReferencePopupComponent
 	],
 	entryComponents: [
 		DynamicComponent,

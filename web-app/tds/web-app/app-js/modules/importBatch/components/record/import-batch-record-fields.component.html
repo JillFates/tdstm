@@ -8,60 +8,9 @@
                            [results]="popup.results"
                            [gridData]="popup.gridData"
                            [gridGroups]="popup.gridGroups"
+                           [offset]="popup.offset"
                            (onClose)="popup.show = false">
     </field-reference-popup>
-
-    <!--<kendo-popup #infoPopup *ngIf="popup.show" class="fields-info-popup"
-                 [margin]="popup.margin"
-                 [popupClass]="'content popup'"
-                 [offset]="popup.offset"
-                 [positionMode]="popup.position">
-        <div class="popup-content" tds-handle-escape (escPressed)="popup.show=false">
-            <div class="popup-header">
-                <button #focusElement autofocus class="invisible-button"></button>
-                <label>
-                    {{popup.title}}
-                </label>
-                <i class="glyphicon glyphicon-remove" (click)="popup.show=false"></i>
-            </div>
-            <div class="popup-body">
-
-                &lt;!&ndash; Find Type&ndash;&gt;
-                <div class="find-field-info" *ngIf="popup.type === FieldInfoType.FIND">
-                    <kendo-grid [data]="popupGridData"
-                                [groupable]="false" [group]="popupGridGroups">
-                        <kendo-grid-column [title]="'Domain'" field="domainIndex" [width]="1">
-                            <ng-template kendoGridGroupHeaderTemplate let-field="field" let-value="value" let-group="group">
-                                <span class="domain-group-header">Domain: {{group.items[0].domainName}}</span>
-                                <span *ngIf="group.items[0].recordsFound">Records Found: {{group.items[0].recordsFound}}</span>
-                            </ng-template>
-                        </kendo-grid-column>
-                        <kendo-grid-column [title]="'Field Name'" field="fieldName"></kendo-grid-column>
-                        <kendo-grid-column [title]="'Value'" field="value"></kendo-grid-column>
-                    </kendo-grid>
-                    <div class="footer-results">
-                        <label>Results:</label>
-                        <span *ngIf="popup.results">
-                            <span *ngFor="let id of popup.results" class="badge">{{id}}</span>
-                        </span>
-                        <span *ngIf="!popup.results"><i>No results found</i></span>
-                    </div>
-                </div>
-
-                &lt;!&ndash; Create/Update Type&ndash;&gt;
-                <div class="create-update-field-info" *ngIf="popup.type === FieldInfoType.CREATE || popup.type === FieldInfoType.UPDATE">
-                    <div>
-                        <label>Domain: {{popup.domain}}</label>
-                    </div>
-                    <kendo-grid [data]="popupGridData">
-                        <kendo-grid-column [title]="'Field Name'" field="fieldName"></kendo-grid-column>
-                        <kendo-grid-column [title]="'Value'" field="value"></kendo-grid-column>
-                    </kendo-grid>
-                </div>
-
-            </div>
-        </div>
-    </kendo-popup>-->
 
     <kendo-grid
             [data]="gridData"

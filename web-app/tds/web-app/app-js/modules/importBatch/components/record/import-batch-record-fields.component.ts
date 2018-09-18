@@ -99,6 +99,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected popup: any = {
+		offset: null,
 		show: false,
 		type: null,
 		gridData: null,
@@ -390,6 +391,9 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		}
 		this.popup.type = type;
 		this.popup.mouseEvent = $event;
+		if (this.popup.show) {
+			this.popup.offset = { left: $event.pageX, top: $event.pageY};
+		}
 		this.popup.show = true;
 	}
 
@@ -442,18 +446,4 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		});
 		this.popup.gridData = process(popupFields, { group: this.popup.gridGroups});
 	}
-
-	/**
-	 * Returns the proper popup field info title.
-	 * @param {FieldInfoType} type
-	 * @returns {string}
-	private getPopupTitle(type: FieldInfoType): string {
-		switch (type) {
-			case FieldInfoType.CREATE: return 'Create Reference';
-			case FieldInfoType.UPDATE: return 'Update Reference';
-			case FieldInfoType.FIND: return 'Find Results';
-			default: return '';
-		}
-	}
-	 */
 }
