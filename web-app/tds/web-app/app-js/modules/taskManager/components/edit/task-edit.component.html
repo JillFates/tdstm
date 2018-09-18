@@ -143,7 +143,13 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.atStart}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-datepicker
+                                                                name="actualStart"
+                                                                [format]="dateFormat"
+                                                                [(value)]="model.actualStart">
+                                                        </kendo-datepicker>
+                                                    </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">

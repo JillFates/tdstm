@@ -104,6 +104,14 @@ export class PreferenceService {
 	}
 
 	/**
+	 * Get the default date format in the the corresponding Kendo date format
+	 * @returns {string}
+	 */
+	public getDefaultDateFormatAsKendoFormat(): string {
+		return DateUtils.translateDateFormatToKendoFormat(DateUtils.DEFAULT_FORMAT_DATE);
+	}
+
+	/**
 	 * Get the user preference datascript designer size (width/height)
 	 * @returns {Observable<{number, number}>}
 	 */

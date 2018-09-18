@@ -50,6 +50,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
+		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 
@@ -66,6 +67,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				this.model.teamList = data.map((item) => ({id: item.id, text: item.description }));
 			});
 
+		this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				this.dateFormat = dateFormat;
+			});
+
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -78,6 +84,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		return  {
 			id: assetComment.id,
+			actualStart: new Date(assetComment.actStart) || '',
 			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
 			priority: assetComment.priority,
 			assetName: detail.assetName,
@@ -90,7 +97,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			personList: [],
 			teamList: [],
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
-			priorityList: [1,2,3,4,5],
+			priorityList: [1, 2, 3, 4, 5],
 			asset: {id: detail.assetId, text: detail.assetName},
 			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
