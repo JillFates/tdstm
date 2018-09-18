@@ -19,7 +19,7 @@ import { TDSAppComponent } from './tds-app.component';
 // import { UIRouterModule, UIView } from '@uirouter/angular';
 // import { TdsAppRoute, AuthConfig, PermissionConfig, MiscConfig } from './tds-app.route';
 import {TDSAppRouteModule} from './tds-app-route.module';
-import {SecurityRouteModule} from '../modules/security/security-route.module';
+import {SecurityModule} from '../modules/security/security.module';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -29,7 +29,7 @@ import {SecurityRouteModule} from '../modules/security/security-route.module';
 		HttpModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
-		SecurityRouteModule
+		SecurityModule,
 		// Feature Modules
 		// SharedModule,
 		// TaskManagerModule,
