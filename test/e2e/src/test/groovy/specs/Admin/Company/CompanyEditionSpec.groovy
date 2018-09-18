@@ -1,9 +1,9 @@
-package specs.Company
+package specs.Admin.Company
 
 import geb.spock.GebReportingSpec
-import pages.Admin.CompanyDetailsPage
-import pages.Admin.CompanyEditionPage
-import pages.Admin.ListCompaniesPage
+import pages.Admin.Company.CompanyDetailsPage
+import pages.Admin.Company.CompanyEditionPage
+import pages.Admin.Company.ListCompaniesPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise

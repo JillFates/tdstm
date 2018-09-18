@@ -1,11 +1,11 @@
-package specs.Admin
+package specs.Admin.Staff
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Admin.StaffListPage
-import pages.Admin.StaffCreationPage
-import pages.Admin.UserCreationPage
-import pages.Admin.UserDetailsPage
+import pages.Admin.Staff.StaffListPage
+import pages.Admin.Staff.StaffCreationPage
+import pages.Admin.User.UserCreationPage
+import pages.Admin.User.UserDetailsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise

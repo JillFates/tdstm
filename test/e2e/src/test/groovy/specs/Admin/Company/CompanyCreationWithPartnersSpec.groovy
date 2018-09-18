@@ -1,4 +1,4 @@
-package specs.Company
+package specs.Admin.Company
 
 /**
  * @author Sebastian Bigatton
@@ -6,9 +6,9 @@ package specs.Company
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Admin.CompanyCreationPage
-import pages.Admin.CompanyDetailsPage
-import pages.Admin.ListCompaniesPage
+import pages.Admin.Company.CompanyCreationPage
+import pages.Admin.Company.CompanyDetailsPage
+import pages.Admin.Company.ListCompaniesPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise

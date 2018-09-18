@@ -1,4 +1,5 @@
-package pages.Admin
+package pages.Admin.Staff
+
 import geb.Page
 import modules.AdminModule
 

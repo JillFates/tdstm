@@ -1,7 +1,7 @@
-package specs.Admin
+package specs.Admin.ImportAccounts
 
 import geb.spock.GebReportingSpec
-import pages.Admin.ImportAccountsPage
+import pages.Admin.ImportAccounts.ImportAccountsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Ignore

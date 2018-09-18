@@ -1,6 +1,6 @@
-package pages.Admin
+package pages.Admin.Staff
+
 import geb.Page
-import modules.AdminModule
 
 class StaffManagerPage extends Page {
 
