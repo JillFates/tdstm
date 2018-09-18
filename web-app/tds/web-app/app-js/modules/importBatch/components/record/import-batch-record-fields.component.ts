@@ -39,7 +39,6 @@ export enum FieldInfoType {
 })
 export class ImportBatchRecordFieldsComponent implements OnInit {
 
-	@ViewChild('focusElement') popupEscFocusElement: ElementRef;
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	@Output('onClose') closeEvent = new EventEmitter<any>();
@@ -100,15 +99,11 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected popup: any = {
-		title: '',
 		show: false,
-		offset: {},
-		margin: {horizontal: 2, vertical: 2},
-		position: 'fixed',
-		type: null
+		type: null,
+		gridData: null,
+		gridGroups: [{field: 'domainIndex'}]
 	};
-	protected popupGridData: DataResult;
-	protected popupGridGroups: Array<GroupDescriptor> = [{field: 'domainIndex'}];
 
 	// Contains the Current/Previous value column label based on the state of the record
 	protected currentPreviousColumnLabel = '';
@@ -394,15 +389,8 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			}
 		}
 		this.popup.type = type;
-		this.popup.title = this.getPopupTitle(type);
-		this.popup.offset = { left: $event.pageX, top: $event.pageY};
+		this.popup.mouseEvent = $event;
 		this.popup.show = true;
-		// focus input element to help the on escape key exit.
-		setTimeout( () => {
-			if (this.popupEscFocusElement) {
-				this.popupEscFocusElement.nativeElement.focus();
-			}
-		}, 300);
 	}
 
 	/**
@@ -420,7 +408,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				});
 			}
 		}
-		this.popupGridData = process(popupFields, {});
+		this.popup.gridData = process(popupFields, {});
 	}
 
 	/**
@@ -452,14 +440,13 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				});
 			}
 		});
-		this.popupGridData = process(popupFields, { group: this.popupGridGroups});
+		this.popup.gridData = process(popupFields, { group: this.popup.gridGroups});
 	}
 
 	/**
 	 * Returns the proper popup field info title.
 	 * @param {FieldInfoType} type
 	 * @returns {string}
-	 */
 	private getPopupTitle(type: FieldInfoType): string {
 		switch (type) {
 			case FieldInfoType.CREATE: return 'Create Reference';
@@ -468,4 +455,5 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			default: return '';
 		}
 	}
+	 */
 }

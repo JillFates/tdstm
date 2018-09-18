@@ -21,6 +21,7 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 import {ImportAssetsComponent} from './components/import-assets/import-assets.component';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {LayoutModule} from '@progress/kendo-angular-layout';
+import {FieldReferencePopupComponent} from './components/record/field-reference-popup.component';
 
 @NgModule({
 	imports: [
@@ -42,7 +43,8 @@ import {LayoutModule} from '@progress/kendo-angular-layout';
 		ImportBatchRecordDialogComponent,
 		ImportBatchRecordSummaryComponent,
 		ImportBatchRecordFieldsComponent,
-		ImportAssetsComponent
+		ImportAssetsComponent,
+		FieldReferencePopupComponent
 	],
 	providers: [
 		ImportBatchService,
