@@ -74,17 +74,18 @@ class DataviewSpec {
 
 		JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
 		order = [property: jsonDataview.sort.property, sort: jsonDataview.sort.sortOrder == ASCENDING ? 'asc' : 'desc']
-		spec.domains = ((jsonDataview.domains.collect { it.toLowerCase() } as Set) + (spec.domains as Set)) as List
+		spec.domains = jsonDataview.domains.collect { it.toLowerCase() }
+		spec.columns = jsonDataview.columns
 
-		jsonDataview.columns.each { Map dataviewColumn ->
-			dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
-			Map specColumn = spec.columns.find {
-				it.domain == dataviewColumn.domain && it.property == dataviewColumn.property
-			}
-			if (!specColumn) {
-				addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter)
-			}
-		}
+//		jsonDataview.columns.each { Map dataviewColumn ->
+//			dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
+//			Map specColumn = spec.columns.find {
+//				it.domain == dataviewColumn.domain && it.property == dataviewColumn.property
+//			}
+//			if (!specColumn) {
+//				addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter)
+//			}
+//		}
 	}
 
 	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
