@@ -88,10 +88,12 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			statusList: [],
 			personList: [],
 			teamList: [],
+			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: [1,2,3,4,5],
 			asset: {id: detail.assetId, text: detail.assetName},
 			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
-			assignedTeam: {id: assetComment.role, text: detail.roles}
+			assignedTeam: {id: assetComment.role, text: detail.roles},
+			event: {id: (assetComment.moveEvent && assetComment.moveEvent.id) || null, text: detail.eventName}
 		}
 	}
 

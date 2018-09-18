@@ -147,7 +147,16 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Event</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.eventName}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="event"
+                                                                class="form-control"
+                                                                [data]="model.eventList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.event" readonly="true">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
