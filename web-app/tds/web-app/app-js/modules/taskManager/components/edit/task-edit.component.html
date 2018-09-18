@@ -41,7 +41,7 @@
                                                     <td class="valueNW task-{{model.status |  lowercase}}">
                                                         <kendo-dropdownlist
                                                                 name="statusList"
-                                                                class="form-control" style="width: 100%;"
+                                                                class="form-control"
                                                                 [data]="model.statusList"
                                                                 [(ngModel)]="model.status"
                                                                 (valueChange)="onStatusChange($event)">
@@ -53,7 +53,7 @@
                                                     <td class="valueNW">
                                                         <kendo-dropdownlist
                                                                 name="assetClass"
-                                                                class="form-control" style="width: 100%;"
+                                                                class="form-control"
                                                                 [data]="model.assetClasses"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
@@ -77,11 +77,28 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Team</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="team"
+                                                                class="form-control"
+                                                                [data]="model.teamList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.assignedTeam"
+                                                                (valueChange)="onTeamChange($event)">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Priority</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="priority"
+                                                                class="form-control"
+                                                                [data]="model.priorityList"
+                                                                [(ngModel)]="model.priority">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Action</span></label>
                                                     </td>
@@ -94,7 +111,7 @@
                                                     <td class="valueNW">
                                                         <kendo-dropdownlist
                                                                 name="assignedTo"
-                                                                class="form-control" style="width: 100%;"
+                                                                class="form-control"
                                                                 [data]="model.personList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"

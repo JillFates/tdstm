@@ -61,6 +61,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				this.model.personList = data.map((item) => ({id: item.id, text: item.nameRole}))
 			});
 
+		this.taskManagerService.getStaffRoles()
+			.subscribe((data: any[]) => {
+				this.model.teamList = data.map((item) => ({id: item.id, text: item.description }));
+			});
+
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -69,20 +74,24 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 */
 	extractModel(): any {
 		const detail = this.taskDetailModel.detail;
-		const asset = detail['assetComment'] || {};
+		const assetComment = detail['assetComment'] || {};
 
 		return  {
-			id: asset.id,
+			id: assetComment.id,
+			priority: assetComment.priority,
 			assetName: detail.assetName,
-			comment:  asset.comment || '',
-			sendNotification: asset.sendNotification,
+			comment:  assetComment.comment || '',
+			sendNotification: assetComment.sendNotification,
 			assetClass: {id: detail.assetClass, text: ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
-			status: asset.status,
+			status: assetComment.status,
 			statusList: [],
 			personList: [],
+			teamList: [],
+			priorityList: [1,2,3,4,5],
 			asset: {id: detail.assetId, text: detail.assetName},
-			assignedTo: {id : asset.assignedTo.id, text: detail.assignedTo}
+			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
+			assignedTeam: {id: assetComment.role, text: detail.roles}
 		}
 	}
 
@@ -105,6 +114,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onPersonChange(asset): void {
+	}
+
+	onTeamChange(asset): void {
 	}
 
 	/**
