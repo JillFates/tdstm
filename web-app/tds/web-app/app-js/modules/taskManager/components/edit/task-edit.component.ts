@@ -84,6 +84,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		return  {
 			id: assetComment.id,
+			durationLocked: assetComment.durationLocked,
 			actualStart: assetComment.actStart ? new Date(assetComment.actStart) : '',
 			actualFinish: assetComment.dateResolved ? new Date(assetComment.dateResolved) : '',
 			dueDate: assetComment.dueDate ? new Date(assetComment.dueDate) : '',
