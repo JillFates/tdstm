@@ -487,12 +487,27 @@ var tdsCommon = {
 					result = "";
 				}
 				break;
-
+			case "tagAssets":
+				return tdsCommon.createAssetTagForLegacyList(cellvalue);
+				break;
 			default:
 				result = _.escape(result);
 
 		}
 		return result;
+	},
+
+	createAssetTagForLegacyList: function(cellvalue) {
+		var html = '<div class="asset-tag-selector-component-content">';
+		try {
+			var assetList = JSON.parse(cellvalue);
+			for (var i = 0; i < assetList.length; i++) {
+				html += '<span class="label tag ' + ('tag-' + assetList[i].color.toLowerCase()) + '"> ' + assetList[i].name + '</span>';
+			}
+		} catch(e){
+			console.error(e);
+		}
+		return html + '</div>';
 	},
 
 	// Used to escape the text cells to prevent XSS 
@@ -518,6 +533,15 @@ var tdsCommon = {
 	timeZone: function () {
 		var tz = $("#tzId").val();
 		return tz;
+	},
+
+	getISOString: function(dateToConvert) {
+		// remove timezone just getting the datetime
+		var noTZ = moment(dateToConvert).format('YYYY-MM-DDTHH:mm:ss');
+		// convert to local user timezone
+		var dateTZ = moment.tz(noTZ, tdsCommon.timeZone());
+		// GET ISO
+		return dateTZ.toISOString();
 	},
 
 	addNextDayKendoGridFilter: function (grid, field, value) {
