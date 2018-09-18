@@ -175,5 +175,9 @@ class   StaffListPage extends Page {
         waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_email").text()==(email)}
         waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_company").text()==(company)}
     }
+
+    def verifyNoRecordsDisplayed(){
+        commonsModule.verifyElementDisplayed $(".ui-paging-info")
+    }
 }
 
