@@ -1,6 +1,7 @@
-package specs.TaskManager
+package specs.Tasks.TaskManager
+
 import geb.spock.GebReportingSpec
-import pages.TaskManager.TaskManagerPage
+import pages.Tasks.TaskManager.TaskManagerPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise

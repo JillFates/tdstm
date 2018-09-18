@@ -1,4 +1,4 @@
-package pages.TaskManager
+package pages.Tasks.TaskManager
 
 import geb.Page
 
