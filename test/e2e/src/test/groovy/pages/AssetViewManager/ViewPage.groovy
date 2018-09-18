@@ -56,6 +56,7 @@ class ViewPage extends Page{
         assetsDisplayedInPager {$("kendo-pager-info")}
         paginationSizes {$("kendo-pager-page-sizes select")}
         selectedAssets {$('.selected-assets')}
+        gridHeader {$(".k-grid-header")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -337,6 +338,7 @@ class ViewPage extends Page{
     def clickOnAssetCheckbox(checkboxSelector){
         goToBulkChangeButton()
         commonsModule.goToElement checkboxSelector
+        gridHeader.jquery.removeClass("k-grid-dynamic-header") // set to top avoid getting inside the checkbox
         waitFor{checkboxSelector.click()}
         waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
     }
