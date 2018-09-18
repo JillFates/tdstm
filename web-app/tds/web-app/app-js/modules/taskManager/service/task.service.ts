@@ -16,9 +16,7 @@ import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/mo
 export class TaskService {
 
 	// private instance variable to hold base url
-	private defaultUrl = '../ws';
-	private assetGeneric = '../assetEntity';
-	private taskURL = this.defaultUrl + '/task';
+	private baseURL = '/tdstm';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpInterceptor) {
@@ -29,7 +27,7 @@ export class TaskService {
 	 * @returns {Observable<R>}
 	 */
 	retrieveUserToDoCount(): Observable<any> {
-		return this.http.get('../task/retrieveUserToDoCount')
+		return this.http.get(`${this.baseURL}/task/retrieveUserToDoCount`)
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
@@ -39,7 +37,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.taskURL}/assetCommentCategories`)
+		return this.http.get(`${this.baseURL}/task/assetCommentCategories`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -52,7 +50,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getTaskDetails(taskId: string): Observable<any> {
-		return this.http.get(`${this.assetGeneric}/showComment?id=${taskId}`)
+		return this.http.get(`${this.baseURL}/assetEntity/showComment?id=${taskId}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result[0];
@@ -65,7 +63,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	deleteTaskComment(commentId: any): Observable<any> {
-		return this.http.delete(`${this.taskURL}/comment/${commentId}`)
+		return this.http.delete(`${this.baseURL}/task/comment/${commentId}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -78,7 +76,20 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
-		return this.http.post(`${this.assetGeneric}/updateAssignedToSelect?format=json&forView=&id=${commentId}`, null)
+		return this.http.post(`${this.baseURL}/assetEntity/updateAssignedToSelect?format=json&forView=&id=${commentId}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the staff roles
+	 * @returns {Observable<any>}
+	 */
+	getStaffRoles(): Observable<any> {
+		return this.http.get(`${this.baseURL}/task/retrieveStaffRoles`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -91,7 +102,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getStatusList(commentId: any): Observable<any> {
-		return this.http.post(`${this.assetGeneric}/updateStatusSelect?format=json&id=${commentId}`, null)
+		return this.http.post(`${this.baseURL}/assetEntity/updateStatusSelect?format=json&id=${commentId}`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -103,7 +114,7 @@ export class TaskService {
 	 * Get Laste Created Task Params from Session
 	 */
 	getLastCreatedTaskSessionParams(): Observable<any> {
-		return this.http.get(`${this.defaultUrl}/task/taskCreateDefaults`)
+		return this.http.get(`${this.baseURL}/task/taskCreateDefaults`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -126,7 +137,7 @@ export class TaskService {
 		};
 
 		if (!model.id) {
-			return this.http.post(`${this.taskURL}/comment`, JSON.stringify(request))
+			return this.http.post(`${this.baseURL}/task/comment`, JSON.stringify(request))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -134,7 +145,7 @@ export class TaskService {
 				.catch((error: any) => error.json());
 		} else {
 			request['id'] = model.id;
-			return this.http.put(`${this.taskURL}/comment/${model.id}`, JSON.stringify(request))
+			return this.http.put(`${this.baseURL}/task/comment/${model.id}`, JSON.stringify(request))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -148,7 +159,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
-		return this.http.get(`${this.assetGeneric}/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value || ''}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+		return this.http.get(`${this.baseURL}/assetEntity/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value || ''}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
