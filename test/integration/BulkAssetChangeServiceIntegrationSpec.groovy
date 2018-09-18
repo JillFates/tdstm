@@ -15,6 +15,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TagAssetService
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -104,9 +105,24 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	BulkChangeCommand bulkChangeCommand
 
 	void setup() {
-		bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToControlMapping: {Project currentProject -> [tagAssets:'asset-tag-selector']} ]as CustomDomainService
+		bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+			Project p ->
+				[
+					'tagAssets': [
+						bulkChangeService: 'tagAssetService',
+						bulkChangeActions: [
+							add    : 'bulkAdd',
+							clear  : 'bulkClear',
+							replace: 'bulkReplace',
+							remove : 'bulkRemove'
+						]
+					]
+				]
+		}] as CustomDomainService
+
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
 		bulkAssetChangeService.dataviewService = Mock(DataviewService)
+
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -262,18 +278,32 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [], null)
 	}
 
+	void 'Test bulkChange invalid field'() {
+		setup: 'given an edit command for removing tags, where allAssets it true, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'tgAssets', action: 'inaction', value: "[${tag1.id}, ${tag2.id}]")
+			bulkChangeCommand.edits = [editCommand]
+			bulkChangeCommand.assetIds = []
+			bulkChangeCommand.allAssets = true
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'an InvalidParameter Exception is thrown'
+			thrown InvalidParamException
+	}
+
 	void 'Test bulkChange invalid action'() {
-			setup: 'given an edit command for removing tags, where allAssets it true, and a bulk change command holding the edit'
-				EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'inaction', value: "[${tag1.id}, ${tag2.id}]")
-				bulkChangeCommand.edits = [editCommand]
-				bulkChangeCommand.assetIds = []
-				bulkChangeCommand.allAssets = true
+		setup: 'given an edit command for removing tags, where allAssets it true, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'inaction', value: "[${tag1.id}, ${tag2.id}]")
+			bulkChangeCommand.edits = [editCommand]
+			bulkChangeCommand.assetIds = []
+			bulkChangeCommand.allAssets = true
 
-			when: 'bulk change is called with the bulk change command'
-				bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
-			then: 'an InvalidParameter Exception is thrown'
-				thrown InvalidParamException
-		}
+		then: 'an InvalidParameter Exception is thrown'
+			thrown InvalidParamException
+	}
 
 }

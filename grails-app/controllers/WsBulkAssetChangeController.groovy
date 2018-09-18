@@ -9,7 +9,11 @@ import net.transitionmanager.service.BulkAssetChangeService
 class WsBulkAssetChangeController implements ControllerMethods {
 	BulkAssetChangeService bulkAssetChangeService
 
-	//TODO might want a bulk change permission?
+	/**
+	 * This action handles bulk changes delegating to the bulkAssetChangeService
+	 *
+	 * @return a success JSON
+	 */
 	@HasPermission(Permission.AssetEdit)
 	@HasPermission(Permission.TagDelete)
 	def change() {
@@ -20,10 +24,14 @@ class WsBulkAssetChangeController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+	//TODO Should be removed, once changes are made to the ui
+	@Deprecated
 	def fields() {
 		renderSuccessJson(BulkAssetChangeService.fields)
 	}
 
+	//TODO Should be removed, once changes are made to the ui
+	@Deprecated
 	def actions() {
 		renderSuccessJson(BulkAssetChangeService.actions)
 	}

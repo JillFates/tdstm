@@ -451,18 +451,18 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * Provides a mapping of field names to their control type.
+     * Provides a mapping of field names to their service/actions.
      *
-     * @param currentProject the current project to use to get fieldToControlMapping.
+     * @param currentProject the current project to use to get fieldToBulkChangeMapping.
      *
-     * @return a map of field names to their control types
+     * @return a map of field names to their service/actions.
      */
-    Map<String, String> fieldToControlMapping(Project currentProject) {
-        Map fields = [:]
+    Map<String, Map> fieldToBulkChangeMapping(Project currentProject) {
+        Map<String, Map> fields = [:]
 
         fieldSpecsWithCommon(currentProject).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = field.control
+                fields[field.field] = [bulkChangeService: field.bulkChangeService, bulkChangeActions: field.bulkChangeActions]
             }
         }
 
