@@ -1,0 +1,75 @@
+package pages.Admin.User
+
+import geb.Page
+import modules.AdminModule
+import modules.CommonsModule
+import utils.CommonActions
+
+class UserListPage extends Page{
+
+    static at = {
+        title == "User List - Active Users"
+        pageHeaderName.text() == "UserLogin List - Active Users"
+    }
+
+    static content = {
+        adminModule { module AdminModule}
+        pageHeaderName { $("section", class:"content-header").find("h1")}
+        usernameFilter { $("#gs_username")}
+        personFilter {$("#gs_fullname")}
+        usernames { $("[aria-describedby=userLoginIdGrid_username] a")}
+        fullnames { $("[aria-describedby=userLoginIdGrid_fullname] a")}
+        userDeletedMessage { $(".message")}
+        commonsModule { module CommonsModule }
+        adminModule { module AdminModule}
+
+        gridRows {$("#userLoginIdGrid").find("role":"row")}
+        gridSize {gridRows.size()}
+    }
+
+    def rowsDisplayed(){
+        gridRows.displayed
+    }
+
+    def filterByUsername(username){
+        waitFor{usernameFilter.displayed}
+        usernameFilter = username
+        commonsModule.waitForLoadingMessage()
+    }
+
+    def getRandomBaseUserNameByBaseName(baseName){
+        def fullname = CommonActions.getRandomOption(fullnames).text()
+        fullname.substring(0, baseName.length() + CommonActions.randomCharNumbers)
+    }
+
+    def clickOnFirstUserName(){
+        waitFor{usernames.first().click()}
+    }
+
+    def verifyDeletedMessage(){
+        waitFor{userDeletedMessage.displayed}
+        userDeletedMessage.text().contains("deleted")
+    }
+
+    def getGridRowsSize(){
+        usernames.size()
+    }
+    /**
+     * The filed is used to filter by First and/or Last name
+     */
+    def filterByPerson(person){
+        personFilter = person
+    }
+    /**
+     * validates the user displayed is the one expected
+     */
+    def isExpectedUser(userName, firstName, lastName){
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
+        waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+    }
+
+    def isUserDeleted(){
+        waitFor{message.text().contains "UserLogin not found"}
+    }
+}
