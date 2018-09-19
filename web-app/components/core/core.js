@@ -1008,7 +1008,7 @@ tds.core.directive.ActionButton = function(utils, window) {
 				if (path == '') {
 					return '#';
 				} else {
-					return utils.url.applyRootPath(path);
+					return path;
 				}
 			}
 			scope.doAction = function(event) {
