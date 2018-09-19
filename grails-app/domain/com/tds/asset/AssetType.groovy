@@ -110,9 +110,9 @@ enum AssetType {
 	static final List<String> nonNetworkTypes = ['Server', 'Application', 'VM', 'Files', 'Database', 'Blade'].asImmutable()
 
 	/**
-	 *
+	 * Given an asset entity return the default assetType based on its class.
 	 * @param assetEntity
-	 * @return
+	 * @return the AssetType for this domain based on its class alone.
 	 */
 	static AssetType getDefaultAssetTypeForDomain(AssetEntity assetEntity) {
 		AssetType assetType
