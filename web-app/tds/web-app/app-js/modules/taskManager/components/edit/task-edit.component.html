@@ -120,21 +120,34 @@
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label url U" nowrap="nowrap">
+                                                        <label><span>Fixed Assignment</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="hardAssignment"
+                                                                [(ngModel)]="model.hardAssigned"
+                                                                [data]="yesNoList">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                    <td class="label url U" nowrap="nowrap">
+                                                        <label><span>Send Notification</span></label>
+                                                    </td>
+                                                    <td  class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="sendNotification"
+                                                                [(ngModel)]="model.sendNotification"
+                                                                [data]="yesNoList">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <input type="text" name="instructionLink"
                                                                placeholder="Enter URL or Label|URL"
                                                                [(ngModel)]="model.instructionLink" />
-                                                    </td>
-                                                    <td colspan="2"></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Send Notification</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <input type="checkbox" name="sendNotification" [(ngModel)]="model.sendNotification" [checked]="model.sendNotification">
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>

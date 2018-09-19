@@ -38,6 +38,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public modalOptions: DecoratorOptions;
 	public model: any = null;
 	public getAssetList: Function;
+	public yesNoList = ['Yes', 'No'];
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -90,6 +91,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		return  {
 			id: assetComment.id,
 			duration: assetComment.duration,
+			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? 'Yes' : 'No',
+			sendNotification: Boolean(assetComment.sendNotification) ? 'Yes' : 'No',
 			durationScale,
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			durationLocked: assetComment.durationLocked,
@@ -102,7 +105,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			priority: assetComment.priority,
 			assetName: detail.assetName,
 			comment:  assetComment.comment || '',
-			sendNotification: assetComment.sendNotification,
 			assetClass: {id: detail.assetClass, text: ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
 			status: assetComment.status,
