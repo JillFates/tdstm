@@ -250,9 +250,11 @@
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Workflow</span></label>
+                                                        <label><span>TaskSpec ID</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
+                                                    <td class="valueNW">
+                                                        <span>{{model.taskSpec}}</span>
+                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
