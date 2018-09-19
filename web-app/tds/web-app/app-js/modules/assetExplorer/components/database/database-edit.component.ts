@@ -78,6 +78,10 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 				}
 			});
 		}
+
+		onDeleteAsset() {
+			this.deleteAsset(this.model.asset.id);
+		}
 	}
 
 	return DatabaseShowComponent;
