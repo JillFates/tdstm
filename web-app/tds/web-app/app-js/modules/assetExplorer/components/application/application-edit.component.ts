@@ -172,23 +172,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		*/
 		onDeleteAsset() {
 
-			console.log(this.model.asset.id);
-			this.prompt.open('Confirmation Required',
-				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'Yes', 'No')
-				.then( success => {
-					if (success) {
-						this.assetExplorerService.deleteAssets([this.model.asset.id]).subscribe( res => {
-							if (res) {
-								this.notifierService.broadcast({
-									name: 'reloadCurrentAssetList'
-								});
-								this.activeDialog.dismiss();
-							}
-						}, (error) => console.log(error));
-					}
-				})
-				.catch((error) => console.log(error));
+			this.deleteAsset(this.model.asset.id);
 		}
 	}
 
