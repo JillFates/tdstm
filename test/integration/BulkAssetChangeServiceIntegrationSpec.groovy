@@ -11,6 +11,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.BulkAssetChangeService
+import net.transitionmanager.service.BulkChangeDateService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
@@ -104,9 +105,15 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	BulkChangeCommand bulkChangeCommand
 
 	void setup() {
-		bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToControlMapping: {Project currentProject -> [tagAssets:'asset-tag-selector']} ]as CustomDomainService
+		bulkAssetChangeService.dataviewService.projectService.customDomainService = [
+				fieldToControlMapping: {Project currentProject -> [
+						tagAssets: 'asset-tag-selector',
+						retireDate: 'retireDate'
+				]}
+		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
 		bulkAssetChangeService.dataviewService = Mock(DataviewService)
+		bulkAssetChangeService.bulkChangeDateService = Mock(BulkChangeDateService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -276,4 +283,31 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 				thrown InvalidParamException
 		}
 
+	void 'Test date/time bulkChange replace'() {
+		setup: 'given an edit command for replacing date/time, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'replace', value: '2018-09-19')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeDateService.bulkReplace(null, 'retireDate', [device.id, device2.id], [:])
+	}
+
+	void 'Test date/time bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkRemove function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeDateService.bulkClear('retireDate', [device.id, device2.id], [:])
+	}
 }

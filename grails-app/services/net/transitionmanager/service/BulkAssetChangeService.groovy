@@ -13,11 +13,12 @@ import net.transitionmanager.domain.Project
 class BulkAssetChangeService implements ServiceMethods {
 	TagAssetService tagAssetService
 	DataviewService dataviewService
+	BulkChangeDateService bulkChangeDateService
 
 	/**
 	 * A list of valid field names
 	 */
-	static final List<String> fields = ['tagAssets']
+	static final List<String> fields = ['tagAssets', 'purchaseDate', 'maintExpDate', 'retireDate']
 
 	/**
 	 * A map of field control types to actions, and to the methods that support them.
@@ -28,6 +29,18 @@ class BulkAssetChangeService implements ServiceMethods {
 			clear  : 'bulkClear',
 			replace: 'bulkReplace',
 			remove : 'bulkRemove'
+		],
+		'purchaseDate': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'maintExpDate': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'retireDate': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
 		]
 	]
 
@@ -50,7 +63,10 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Maps field control types to services.
 		Map fieldToService = [
-			'asset-tag-selector': tagAssetService
+			'asset-tag-selector': tagAssetService,
+			'purchaseDate': bulkChangeDateService,
+			'maintExpDate': bulkChangeDateService,
+			'retireDate': bulkChangeDateService
 		]
 
 		if (bulkChange.allAssets) {
@@ -73,7 +89,15 @@ class BulkAssetChangeService implements ServiceMethods {
 			action = actions[controlType][edit.action]
 			value = service.coerceBulkValue(currentProject, edit.value)
 
-			service."$action"(value, assetIds, assetQueryFilter)
+			if ('asset-tag-selector' == controlType) {
+				service."$action"(value, assetIds, assetQueryFilter)
+			} else {
+				if ('clear' == edit.action) {
+					service."$action"(edit.fieldName, assetIds, assetQueryFilter)
+				} else {
+					service."$action"(value, edit.fieldName, assetIds, assetQueryFilter)
+				}
+			}
 		}
 	}
 
