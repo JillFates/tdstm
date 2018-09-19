@@ -1,4 +1,4 @@
-package pages.Cookbook
+package pages.Tasks.Cookbook
 
 import geb.Page
 import modules.CommonsModule

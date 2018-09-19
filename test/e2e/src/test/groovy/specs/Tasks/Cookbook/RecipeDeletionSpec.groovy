@@ -1,8 +1,7 @@
-package specs.Cookbook
+package specs.Tasks.Cookbook
 
 import geb.spock.GebReportingSpec
-import pages.Cookbook.CookbookPage
-import pages.Cookbook.CreateRecipePage
+import pages.Tasks.Cookbook.CookbookPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise

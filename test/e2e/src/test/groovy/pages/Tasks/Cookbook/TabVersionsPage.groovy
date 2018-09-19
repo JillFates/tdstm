@@ -1,8 +1,8 @@
-package pages.Cookbook
+package pages.Tasks.Cookbook
 
 import geb.Page
 
-class TabEditorTabGroupsPage extends Page {
+class TabVersionsPage extends Page {
 
     static at = {
 

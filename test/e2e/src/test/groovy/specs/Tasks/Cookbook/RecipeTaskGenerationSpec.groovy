@@ -1,13 +1,13 @@
-package specs.Cookbook
+package specs.Tasks.Cookbook
 
 import geb.spock.GebReportingSpec
-import pages.Cookbook.CookbookPage
-import pages.Cookbook.CreateRecipePage
-import pages.Cookbook.EditRecipePage
-import pages.Cookbook.ErrorMessagePage
-import pages.Cookbook.TabEditorPage
-import pages.Cookbook.TabTaskGenPage
-import pages.Cookbook.TabTaskGenTabSummaryPage
+import pages.Tasks.Cookbook.CookbookPage
+import pages.Tasks.Cookbook.CreateRecipePage
+import pages.Tasks.Cookbook.EditRecipePage
+import pages.Tasks.Cookbook.ErrorMessagePage
+import pages.Tasks.Cookbook.TabEditorPage
+import pages.Tasks.Cookbook.TabTaskGenPage
+import pages.Tasks.Cookbook.TabTaskGenTabSummaryPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
