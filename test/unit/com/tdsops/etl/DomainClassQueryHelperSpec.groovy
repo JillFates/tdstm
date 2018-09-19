@@ -6,15 +6,21 @@ import com.tds.asset.AssetEntity
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
+import groovy.json.internal.LazyMap
 
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
-
 @TestFor(AssetEntity)
 @TestMixin([DomainClassUnitTestMixin])
 class DomainClassQueryHelperSpec extends Specification {
+	@Shared
+	LazyMap lazy = new LazyMap()
+
+	@Shared
+	Project project = new Project()
 
 	@Unroll
 	void 'test can get parameter for field for clazz #clazz and field #field'() {
@@ -70,30 +76,28 @@ class DomainClassQueryHelperSpec extends Specification {
 			ETLDomain.Dependency.getClazz() | 'asset'          || 'left outer join D.asset'
 	}
 
+	@Unroll
 	@ConfineMetaClassChanges([AssetEntity])
 	void 'test where method returns nothing when value is not set'() {
 		given: 'necessary objects are created'
-			Project project = new Project()
-			FindCondition conditions = new FindCondition('assetName', null, 'eq')
-		and: 'AssetEntity has been mocked to return a list'
 			mockDomain(AssetEntity)
 			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				[1,2,3]
 			}
 
-		when: 'calling where with a null value'
-			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true)
-		then: 'nothing should be returned and no errors'
-			0 == results.size()
+		expect:
+			size == DomainClassQueryHelper.where(ETLDomain.Device, project, [ new FindCondition('assetName', value, operator) ], true).size()
+		where:
+			operator 	| value | size
+			'eq'		| null	| 0
+			'eq'		| lazy	| 0
+			'eq'		| 'xyz'	| 3
+			'isNotNull'	| null	| 3
+			'isNotNull'	| lazy	| 3
+			'isNotNull'	| '123'	| 3
+			'isNull'	| null	| 3
+			'isNull'	| lazy	| 3
+			'isNull'	| '123'	| 3
 
-		when: 'the value is a LazyMap'
-			conditions = new FindCondition('assetName', new groovy.json.internal.LazyMap(), 'eq')
-		then: 'calling where should return nothing and no errors should occur'
-			0 == DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true).size()
-
-		when: 'the value is a String'
-			conditions = new FindCondition('assetName', 'find this sucker', 'eq')
-		then: 'calling where should return a list of objects'
-			3 == DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true).size()
 	}
 }
