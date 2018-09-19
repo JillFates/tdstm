@@ -1,4 +1,4 @@
-package pages.Providers
+package pages.Projects.Providers
 
 import geb.Page
 import modules.CommonsModule
