@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -9,8 +8,12 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.UserPreferenceService
 
-@Secured('isAuthenticated()')
-class WsDataviewController implements ControllerMethods, PaginationMethods {
+class DataviewController implements ControllerMethods, PaginationMethods {
+
+	/**
+	 * Defines filter param name used in this api request
+	 */
+	static final String FILTER_PARAM_NAME = 'filter'
 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
@@ -26,9 +29,11 @@ class WsDataviewController implements ControllerMethods, PaginationMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.AssetView)
-	def fetch(Long id, DataviewApiParamsCommand apiParamsCommand) {
+	def data(Long id, DataviewApiParamsCommand apiParamsCommand) {
 
-		Project project = securityService.userCurrentProject
+		Project project = getProjectForWs()
+
+		apiParamsCommand.filters = params.list(FILTER_PARAM_NAME)
 
 		if (apiParamsCommand.hasErrors()) {
 			renderErrorJson('API filtering was invalid')

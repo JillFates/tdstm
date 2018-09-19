@@ -13,8 +13,8 @@ import net.transitionmanager.service.UserPreferenceService
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestFor(WsDataviewController)
-class WsDataviewControllerIntegrationSpec extends Specification {
+@TestFor(DataviewController)
+class DataviewControllerIntegrationSpec extends Specification {
 
 	@Shared
 	PersonService personService

@@ -11,9 +11,9 @@ import net.transitionmanager.service.ErrorHandlerService
 import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
 
-@TestFor(WsDataviewController)
+@TestFor(DataviewController)
 @TestMixin(GrailsUnitTestMixin)
-class WsDataviewControllerSpec extends Specification {
+class DataviewControllerSpec extends Specification {
 
 	static doWithSpring = {
 		springSecurityService(SpringSecurityService)
