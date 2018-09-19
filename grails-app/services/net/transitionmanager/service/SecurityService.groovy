@@ -532,13 +532,18 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				break
 			}
 
+			if (!grailsApplication.config.grails.mail.default.from) {
+				auditService.logWarning("grails.mail.default.from not defined in tdstm-config.groovy")
+				break
+			}
+
 			auditService.logMessage("Forgot My Password was requested for email $email from $ipAddress")
 			def token = nextAuthToken()
 			emailParams["token"] = token
 
 			def dispatchOrigin = EmailDispatchOrigin.PASSWORD_RESET
 			String bodyTemplate = "passwordReset"
-			String personFromEmail = person.email
+			String personFromEmail = grailsApplication.config.grails.mail.default.from
 			def createdBy = person
 			String subject = "Reset your password"
 
