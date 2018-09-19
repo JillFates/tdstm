@@ -1,4 +1,4 @@
-package pages.Project.Credentials
+package pages.Projects.Credentials
 
 import geb.Page
 import modules.ProjectsModule
