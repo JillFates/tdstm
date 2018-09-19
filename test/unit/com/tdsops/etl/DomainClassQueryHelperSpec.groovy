@@ -1,9 +1,19 @@
 package com.tdsops.etl
 
+import net.transitionmanager.domain.Project
+import com.tds.asset.AssetEntity
+
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.domain.DomainClassUnitTestMixin
+
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
 
+@TestFor(AssetEntity)
+@TestMixin([DomainClassUnitTestMixin])
 class DomainClassQueryHelperSpec extends Specification {
 
 	@Unroll
@@ -26,7 +36,6 @@ class DomainClassQueryHelperSpec extends Specification {
 
 	@Unroll
 	void 'test can get property for field for clazz #clazz and field #field'() {
-
 		expect:
 			DomainClassQueryHelper.getPropertyForField(clazz, field) == result
 
@@ -59,5 +68,32 @@ class DomainClassQueryHelperSpec extends Specification {
 			ETLDomain.Room.getClazz()       | 'roomName'       || ''
 			ETLDomain.Rack.getClazz()       | 'room'           || 'left outer join D.room'
 			ETLDomain.Dependency.getClazz() | 'asset'          || 'left outer join D.asset'
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test where method returns nothing when value is not set'() {
+		given: 'necessary objects are created'
+			Project project = new Project()
+			FindCondition conditions = new FindCondition('assetName', null, 'eq')
+		and: 'AssetEntity has been mocked to return a list'
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[1,2,3]
+			}
+
+		when: 'calling where with a null value'
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true)
+		then: 'nothing should be returned and no errors'
+			0 == results.size()
+
+		when: 'the value is a LazyMap'
+			conditions = new FindCondition('assetName', new groovy.json.internal.LazyMap(), 'eq')
+		then: 'calling where should return nothing and no errors should occur'
+			0 == DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true).size()
+
+		when: 'the value is a String'
+			conditions = new FindCondition('assetName', 'find this sucker', 'eq')
+		then: 'calling where should return a list of objects'
+			3 == DomainClassQueryHelper.where(ETLDomain.Device, project, [conditions], true).size()
 	}
 }
