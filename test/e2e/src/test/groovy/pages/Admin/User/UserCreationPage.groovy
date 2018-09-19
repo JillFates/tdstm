@@ -1,6 +1,6 @@
-package pages.Admin
+package pages.Admin.User
+
 import geb.Page
-import modules.AdminModule
 import utils.CommonActions
 
 class UserCreationPage extends Page {
