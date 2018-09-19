@@ -43,6 +43,7 @@ class CreateViewModule extends Module {
         previewRows {$("tbody")[1]}
         firstPreviewFilter {$("td[kendogridfiltercell] div input")[0]}
         tableHeaderNames {$('th label')}
+        gridToolbar (wait:true){$("kendo-grid-toolbar")}
     }
 
     def clickSaveOptions(){
@@ -56,7 +57,7 @@ class CreateViewModule extends Module {
     }
 
     def clickSpecificCheckbox(String name){
-        commonsModule.goToElement firstPreviewFilter
+        commonsModule.goToElement gridToolbar
         waitFor{$("label", text: name).click()}
     }
 

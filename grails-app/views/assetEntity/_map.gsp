@@ -220,13 +220,13 @@
 			<!-- Save preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('depGraph')">
+					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}')">
 				</td>
 			</tr>
 			<!-- Reset preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('depGraph')">
+					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}')">
 				</td>
 			</tr>
 		</table>

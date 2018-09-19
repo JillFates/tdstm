@@ -5,6 +5,7 @@ import modules.CommonsModule
 import modules.CreateViewModule
 import utils.CommonActions
 import modules.AssetsModule
+import geb.waiting.WaitTimeoutException
 
 class ViewPage extends Page{
 
@@ -55,6 +56,7 @@ class ViewPage extends Page{
         assetsDisplayedInPager {$("kendo-pager-info")}
         paginationSizes {$("kendo-pager-page-sizes select")}
         selectedAssets {$('.selected-assets')}
+        gridHeader {$(".k-grid-header")}
     }
 
     def getRandomAssetDataAndClickOnIt(){
@@ -336,6 +338,7 @@ class ViewPage extends Page{
     def clickOnAssetCheckbox(checkboxSelector){
         goToBulkChangeButton()
         commonsModule.goToElement checkboxSelector
+        gridHeader.jquery.removeClass("k-grid-dynamic-header") // set to top avoid getting inside the checkbox
         waitFor{checkboxSelector.click()}
         waitFor{getCheckedInputStatus(checkboxSelector) == true} // verify its checked
     }
@@ -401,7 +404,14 @@ class ViewPage extends Page{
     def verifyDeletedAssetsByCheckboxName(assetsMap){
         assetsMap.each{ assetName, checkboxName ->
             filterByName assetName
-            assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            try {
+                // wait until half seconds to get no records text displayed avoiding to wait default secs because
+                // if no records its possible that another asset with same name is displayed
+                // by clone asset same name spec, in that case catch failure and check by checkbox id
+                assert waitFor(0.5){noRecords.displayed}
+            } catch (WaitTimeoutException e) {
+                assert !allItemsCheckbox.find{it.attr("name") == checkboxName}
+            }
             clearAllAppliedFilters()
         }
     }

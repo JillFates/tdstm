@@ -24,7 +24,7 @@ class UsernamePasswordAuthorityAuthenticationToken extends UsernamePasswordAuthe
 	 * @param rememberMe  optional boolean param to support remember-me cookies
 	 * @param savedUrlForwardURI  optional, likely not used; the value stored in the HTTP session to redirect to
 	 * @param targetUri  optional uri to redirect to after successful login
-	 * @param userAgent  the browser user-agent header to determine how to redirect
+	 * @param userAgent  the browser user-connector header to determine how to redirect
 	 */
 	UsernamePasswordAuthorityAuthenticationToken(String username, String password, String authority, boolean rememberMe,
 	                                             String savedUrlForwardURI, String targetUri, String userAgent) {

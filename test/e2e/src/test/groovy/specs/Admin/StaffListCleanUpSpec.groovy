@@ -7,6 +7,7 @@ import pages.Admin.UserDetailsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import geb.waiting.WaitTimeoutException
 
 @Stepwise
 class StaffListCleanUpSpec extends GebReportingSpec {
@@ -35,23 +36,31 @@ class StaffListCleanUpSpec extends GebReportingSpec {
     }
 
     def deleteUserLoginAccount(){
-        usersToBeDeleted.add getFirstUserLastNameDisplayed()
+        def username = getRandomBaseUserNameByBaseName baseName
+        filterByUsername username
         clickOnFirstUserName()
-        at UserDetailsPage
-        clickOnDeleteButtonAndConfirm()
-        at UserListPage
-        verifyDeletedMessage()
+        try {
+            at UserDetailsPage
+            clickOnDeleteButtonAndConfirm()
+            at UserListPage
+            verifyDeletedMessage()
+            usersToBeDeleted.add username
+        } catch (WaitTimeoutException e) {
+            assert isUserDeleted() // userLogin could be deleted by other test running in parallel
+        }
     }
 
     def deleteStaff(){
         usersToBeDeleted.each {
             filterByLastname it
-            selectRow()
-            clickOnBulkDeleteButton()
-            clickOnDeleteAssociatedAppOwnerOrSMEsInput()
-            clickOnDeleteConfirmationModalButton()
-            clickOnCloseConfirmationModalButton()
-            at StaffListPage // need to wait because page is refreshed after deleting a staff member
+            if (!verifyNoRecordsDisplayed()){ // staff could be deleted by other test running in parallel
+                selectRow()
+                clickOnBulkDeleteButton()
+                clickOnDeleteAssociatedAppOwnerOrSMEsInput()
+                clickOnDeleteConfirmationModalButton()
+                clickOnCloseConfirmationModalButton()
+                at StaffListPage // need to wait because page is refreshed after deleting a staff member
+            }
         }
     }
 
@@ -85,6 +94,7 @@ class StaffListCleanUpSpec extends GebReportingSpec {
             } else {
                 at MenuPage
                 adminModule.goToAdminListStaff()
+                at StaffListPage
                 filterByLastname baseName
                 getGridRowsSize() >= maxNumberOfUsers
                 println "We are still good, no staff needs to be deleted."

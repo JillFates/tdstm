@@ -71,6 +71,8 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 				this.model.asset.scale = {
 					name: ''
 				};
+			} else {
+				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
 			}
 			this.model.asset.assetTypeSelectValue = {id: null};
 			if (this.model.asset.assetType) {

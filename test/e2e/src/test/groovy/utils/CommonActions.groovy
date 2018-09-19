@@ -79,7 +79,9 @@ class CommonActions {
         builder.toString()
     }
 
-    static getRandomString(Integer charNumbers = 5){
+    static getRandomString(Integer charNumbers = randomCharNumbers){
         RandomStringUtils.randomAlphanumeric(charNumbers)
     }
+
+    static randomCharNumbers = 5
 }

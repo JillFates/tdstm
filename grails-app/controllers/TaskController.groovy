@@ -13,8 +13,8 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import net.transitionmanager.agent.AbstractAgent
-import net.transitionmanager.agent.DictionaryItem
+import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
@@ -1138,14 +1138,14 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
-			AbstractAgent agent = apiActionService.agentInstanceForAction(assetComment.apiAction)
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
-				agent       : agent.name,
+				connector       : connector.name,
 				method      : methodInfo.name,
 				description : methodInfo.description,
 				methodParams: methodParamsList,

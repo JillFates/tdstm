@@ -1,4 +1,4 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.transform.CompileStatic
@@ -8,24 +8,24 @@ import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.HttpProducerService
 
 /**
- * This class represents a generic Http Agent for Api Actions that perform actions
+ * This class represents a generic Http Connector for Api Actions that perform actions
  * using the HttpProducerService.
  *
- * Keep this agent in order to re-use all abstract agent methods wired along with ApiAction invocation.
+ * Keep this connector in order to re-use all abstract connector methods wired along with ApiAction invocation.
  */
 @Slf4j
 @CompileStatic
-class GenericHttpAgent extends AbstractAgent {
+class GenericHttpConnector extends AbstractConnector {
 	HttpProducerService httpProducerService
 
-	GenericHttpAgent() {
-		setInfo('Generic Http Agent')
+	GenericHttpConnector() {
+		setInfo('Generic Http Connector')
 		httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
 	}
 
 	/**
-	 * Call the service supporting this agent execute method. This method name <code>invokeHttpRequest</code> is referenced
-	 * by HttpAgent and VMwarevCenterAgent dictionary in the "method" property of every dictionary item.
+	 * Call the service supporting this connector execute method. This method name <code>invokeHttpRequest</code> is referenced
+	 * by HttpConnector and VMwarevCenterConnector dictionary in the "method" property of every dictionary item.
 	 *
 	 * @param actionRequest - the api action request
 	 * @return an api action response

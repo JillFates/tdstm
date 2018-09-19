@@ -512,7 +512,7 @@ class AssetEntity {
 	 * @return
 	 */
 	AssetEntity clone(Map replaceKeys = [:]){
-		AssetEntity clonedAsset = GormUtil.domainClone(this, replaceKeys) as AssetEntity
+		AssetEntity clonedAsset = GormUtil.cloneDomain(this, replaceKeys) as AssetEntity
 		return clonedAsset
 	}
 }

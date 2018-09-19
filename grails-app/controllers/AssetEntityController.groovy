@@ -11,7 +11,6 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -2203,7 +2202,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	// removes the user's dependency analyzer map related preferences
 	@HasPermission(Permission.UserGeneralAccess)
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference(params.preferenceName ?: 'depGraph')
+		userPreferenceService.removePreference(params.preferenceName ?: PREF.DEP_GRAPH.value())
 		render true
 	}
 
@@ -3274,7 +3273,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def opacity = 1
 		def statusColor = 'grey'
 		dependencyList.each {
-			boolean notApplicable = !(it.status in [AssetDependencyStatus.ARCHIVED, AssetDependencyStatus.NA, AssetDependencyStatus.TESTING])
+			boolean notApplicable = (it.status == AssetDependencyStatus.NA)
+			boolean validated = (it.status == AssetDependencyStatus.VALIDATED)
+			boolean questioned = (it.status == AssetDependencyStatus.QUESTIONED)
 			def future = it.isFuture
 			def unresolved = !it.isStatusResolved
 			def sourceIndex = nodeIds.indexOf(it.asset.id)
@@ -3282,7 +3283,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (sourceIndex != -1 && targetIndex != -1) {
 				graphLinks << [id: i, parentId: it.asset.id, childId: it.dependent.id, child: targetIndex,
 								parent: sourceIndex, value: 2, opacity: opacity, redundant: false, mutual: null,
-								notApplicable: notApplicable, future: future, unresolved: unresolved]
+								notApplicable: notApplicable, future: future, validated:validated, questioned:questioned,
+								unresolved: unresolved]
 				++i
 			}
 		}

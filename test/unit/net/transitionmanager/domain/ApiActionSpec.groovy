@@ -6,8 +6,8 @@ import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.agent.CallbackMode
-import net.transitionmanager.agent.ContextType
+import net.transitionmanager.connector.CallbackMode
+import net.transitionmanager.connector.ContextType
 import spock.lang.Specification
 import spock.lang.Title
 
@@ -47,9 +47,9 @@ class ApiActionSpec extends Specification {
 		action = new ApiAction(
 				name:'testAction',
 				description: 'This is a bogus action for testing',
-				// agentClass: AgentClass.HTTP,
+				// connectorClass: ConnectorClass.HTTP,
 				apiCatalog: apiCatalog,
-				agentMethod: 'sendSnsNotification',
+				connectorMethod: 'sendSnsNotification',
 				methodParams: paramsJson,
 				asyncQueue: 'test_outbound_queue',
 				callbackMethod: 'updateTaskState',

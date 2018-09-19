@@ -1,4 +1,4 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
@@ -11,21 +11,21 @@ import groovy.transform.CompileStatic
 @Slf4j(value='logger')
 @Singleton(strict=false)
 @CompileStatic
-class AwsAgent extends AbstractAgent {
+class AwsConnector extends AbstractConnector {
 
 	public AwsService awsService
 
 	/*
 	 * Constructor
 	 */
-	AwsAgent() {
+	AwsConnector() {
 
 		// TODO : JPM 3/2018 : Need to reenable this line once AWS is implemented TM-9903
-		// setInfo(AgentClass.AWS, 'Amazon AWS API')
+		// setInfo(ConnectorClass.AWS, 'Amazon AWS API')
 
 //		setDictionary( [
 //			PublishSNS: new DictionaryItem( [
-//				agentMethod: 'PublishSNS',
+//				connectorMethod: 'PublishSNS',
 //				name: 'Publish SNS Notification',
 //				description: 'Used to publish Simple Notification Service (SNS) messages',
 //				endpointUrl: 'https://sns.{region}.amazonaws.com/',
@@ -48,7 +48,7 @@ class AwsAgent extends AbstractAgent {
 //				] + queueParams()
 //			] ),
 //			SendSQS: new DictionaryItem([
-//				agentMethod: 'SendSQS',
+//				connectorMethod: 'SendSQS',
 //				name: 'Send SQS Message',
 //				description: 'Used to send Simple Queue Service (SQS) messages',
 //				endpointUrl: 'https://sqs.{region}.amazonaws.com/',

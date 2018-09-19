@@ -54,7 +54,7 @@ class ApiCatalog {
 			dictionaryJson = JsonUtil.validateJson(dictionaryJsonString)
 
 			// Add additional validations on dictionaryJson
-			ApiCatalogUtil.validateDictionaryHasPrimaryKeys(dictionaryJson)
+			ApiCatalogUtil.validateDictionary(dictionaryJson)
 		} catch(InvalidParamException e) {
 			return Message.InvalidFieldForDomain
 		}

@@ -3,6 +3,7 @@ package pages.Admin
 import geb.Page
 import modules.AdminModule
 import modules.CommonsModule
+import utils.CommonActions
 
 class UserListPage extends Page{
 
@@ -36,9 +37,9 @@ class UserListPage extends Page{
         commonsModule.waitForLoadingMessage()
     }
 
-    def getFirstUserLastNameDisplayed(){
-        def fullname = fullnames.first().text()
-        fullname.substring(fullname.lastIndexOf(" ") + 1)
+    def getRandomBaseUserNameByBaseName(baseName){
+        def fullname = CommonActions.getRandomOption(fullnames).text()
+        fullname.substring(0, baseName.length() + CommonActions.randomCharNumbers)
     }
 
     def clickOnFirstUserName(){
@@ -66,5 +67,9 @@ class UserListPage extends Page{
         waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_username").find("a").text() == userName}
         waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(firstName)}
         waitFor{$("td", "role": "gridcell", "aria-describedby": "userLoginIdGrid_fullname").find("a").text().contains(lastName)}
+    }
+
+    def isUserDeleted(){
+        waitFor{message.text().contains "UserLogin not found"}
     }
 }

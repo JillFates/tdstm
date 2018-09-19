@@ -1,4 +1,4 @@
-package net.transitionmanager.agent
+package net.transitionmanager.connector
 
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.integration.ActionRequest
@@ -13,32 +13,32 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 
 /**
- * AbstractAgent Class
+ * AbstractConnector Class
  *
- * The AbstractAgent provides the base class that all API Action Agents will be derived from. The
- * agent will represent a collection of API Action endpoints with the necessary attributes and parameters
+ * The AbstractConnector provides the base class that all API Action Connectors will be derived from. The
+ * connector will represent a collection of API Action endpoints with the necessary attributes and parameters
  * definitions to allow the corresponding service the ability to contact the endpoints appropriately.
  *
  */
 @Slf4j()
 @CompileStatic
-class AbstractAgent {
+class AbstractConnector {
 
 	private Map<String, DictionaryItem> dict = [:]
 
 	String name
 
 	/*
-	 * Used to set the AgentClass and the Name of the agent for introspection
-	 * @param clazz - the AgentClass
-	 * @param agentName - a descriptive name for the class
+	 * Used to set the ConnectorClass and the Name of the connector for introspection
+	 * @param clazz - the ConnectorClass
+	 * @param connectorName - a descriptive name for the class
 	 */
-	void setInfo(String agentName) {
-		name = agentName
+	void setInfo(String connectorName) {
+		name = connectorName
 	}
 
 	/*
-	 * Used to define the map of the method parameters for the Agent class
+	 * Used to define the map of the method parameters for the Connector class
 	 * @param dict - the Map of the DictionaryItem
 	 */
 	protected void setDictionary(Map dict) {
@@ -48,7 +48,7 @@ class AbstractAgent {
 	/**
 	 * Used to get a catalog of the methods that can be invoked along with the parameters and
 	 * results map that the methods have
-	 * @return List that describes the callable methods for an Agent class
+	 * @return List that describes the callable methods for an Connector class
 	 */
 	Map dictionary() {
 		return dict
@@ -63,11 +63,11 @@ class AbstractAgent {
 		if (dict.containsKey(methodName)) {
 			return dict[methodName]
 		}
-		throw new InvalidParamException("Action Method $methodName does not exist for agent $name")
+		throw new InvalidParamException("Action Method $methodName does not exist for connector $name")
 	}
 
 	/**
-	 * Used to trigger the invocation of the particular method on the agent
+	 * Used to trigger the invocation of the particular method on the connector
 	 *
 	 * @param dictionaryItem - api catalog dictionary item
 	 * @param actionRequest - the container class that contains all we need to know about the call
@@ -81,12 +81,12 @@ class AbstractAgent {
 				log.debug 'invoke({}) about to invoke method {}', dictionaryItem.apiMethod, dictionaryItem.method
 				return "${dictionaryItem.method}"(actionRequest)
 			} else {
-				String msg = "The Action Agent $name is missing method name to invoke"
+				String msg = "The Action Connector $name is missing method name to invoke"
 				log.error msg
 				throw new InvalidRequestException(msg)
 			}
 		} else {
-			String msg = "The agent $name does not have a dictionary defined"
+			String msg = "The connector $name does not have a dictionary defined"
 			log.error msg
 			throw new InvalidRequestException(msg)
 		}
@@ -197,7 +197,7 @@ class AbstractAgent {
 		encoded: 0
 	] }
 
-	// Build of some of the standard interfaces for agent methods
+	// Build of some of the standard interfaces for connector methods
 	protected List<LinkedHashMap> queueParams() {
 		[
 			queueNameParam(),

@@ -12,15 +12,15 @@ class ETLScriptsDetailsPage extends Page{
     }
 
     static content = {
-        modaltitle(required:false) { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
-        datascriptDetail { $('div.modal-header h4[_ngcontent-c7]')}
-        dsDetailXIcon {$('div.modal.fade.in button.close')}
-        datascriptEditBtn  { $("button", text: contains("Edit"))}
-        dsProvider {$('.label-detail')[0]}
-        dsName {$('.label-detail')[1]}
-        dsMode {$('.label-detail')[2]}
-        dsDescription {$('.label-detail')[3]}
-        dsDesignerButton {$("data-script-view-edit").find("button", text: contains("ETL Script Designer"))}
+        detailsModal { $("div.data-script-view-edit-component")}
+        datascriptDetail { detailsModal.find('div.modal-header h4[_ngcontent-c7]')}
+        dsDetailXIcon { detailsModal.find('button.close')}
+        datascriptEditBtn  { detailsModal.find("button", text: contains("Edit"))}
+        dsProvider { detailsModal.find('.label-detail')[0]}
+        dsName { detailsModal.find('.label-detail')[1]}
+        dsMode { detailsModal.find('.label-detail')[2]}
+        dsDescription { detailsModal.find('.label-detail')[3]}
+        dsDesignerButton { detailsModal.find("button", text: contains("ETL Script Designer"))}
         commonsModule { module CommonsModule }
     }
 
