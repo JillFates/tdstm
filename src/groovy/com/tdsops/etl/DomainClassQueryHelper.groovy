@@ -61,7 +61,10 @@ class DomainClassQueryHelper {
 		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
 		boolean skipQuery=false
 		for (condition in conditions) {
-			if (condition.value == null || (condition.value instanceof groovy.json.internal.LazyMap)) {
+			if (
+				(! [ FindOperator.isNull, FindOperator.isNotNull].contains(condition.operator))
+			    && (condition.value == null || (condition.value instanceof groovy.json.internal.LazyMap))
+			) {
 				skipQuery = true
 				break
 			}
