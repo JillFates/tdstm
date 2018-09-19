@@ -14,11 +14,16 @@ class BulkAssetChangeService implements ServiceMethods {
 	TagAssetService tagAssetService
 	DataviewService dataviewService
 	BulkChangeDateService bulkChangeDateService
+	BulkChangeStringService bulkChangeStringService
 
 	/**
 	 * A list of valid field names
 	 */
-	static final List<String> fields = ['tagAssets', 'purchaseDate', 'maintExpDate', 'retireDate']
+	static final List<String> fields = [
+			'tagAssets',
+			'purchaseDate', 'maintExpDate', 'retireDate',
+			'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'validation', 'externalRefId'
+	]
 
 	/**
 	 * A map of field control types to actions, and to the methods that support them.
@@ -30,15 +35,11 @@ class BulkAssetChangeService implements ServiceMethods {
 			replace: 'bulkReplace',
 			remove : 'bulkRemove'
 		],
-		'purchaseDate': [
+		'date-time-selector': [
 			clear  : 'bulkClear',
 			replace: 'bulkReplace'
 		],
-		'maintExpDate': [
-			clear  : 'bulkClear',
-			replace: 'bulkReplace'
-		],
-		'retireDate': [
+		'string-selector': [
 			clear  : 'bulkClear',
 			replace: 'bulkReplace'
 		]
@@ -64,9 +65,8 @@ class BulkAssetChangeService implements ServiceMethods {
 		//Maps field control types to services.
 		Map fieldToService = [
 			'asset-tag-selector': tagAssetService,
-			'purchaseDate': bulkChangeDateService,
-			'maintExpDate': bulkChangeDateService,
-			'retireDate': bulkChangeDateService
+			'date-time-selector': bulkChangeDateService,
+			'string-selector': bulkChangeStringService
 		]
 
 		if (bulkChange.allAssets) {

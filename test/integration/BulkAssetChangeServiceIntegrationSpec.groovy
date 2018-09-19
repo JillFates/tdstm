@@ -12,6 +12,7 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.BulkAssetChangeService
 import net.transitionmanager.service.BulkChangeDateService
+import net.transitionmanager.service.BulkChangeStringService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
@@ -108,12 +109,14 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		bulkAssetChangeService.dataviewService.projectService.customDomainService = [
 				fieldToControlMapping: {Project currentProject -> [
 						tagAssets: 'asset-tag-selector',
-						retireDate: 'retireDate'
+						retireDate: 'date-time-selector',
+						externalRefId: 'string-selector'
 				]}
 		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
 		bulkAssetChangeService.dataviewService = Mock(DataviewService)
 		bulkAssetChangeService.bulkChangeDateService = Mock(BulkChangeDateService)
+		bulkAssetChangeService.bulkChangeStringService = Mock(BulkChangeStringService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -283,7 +286,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 				thrown InvalidParamException
 		}
 
-	void 'Test date/time bulkChange replace'() {
+	void 'Test date/time field bulkChange replace'() {
 		setup: 'given an edit command for replacing date/time, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'replace', value: '2018-09-19')
 			bulkChangeCommand.edits = [editCommand]
@@ -297,7 +300,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeDateService.bulkReplace(null, 'retireDate', [device.id, device2.id], [:])
 	}
 
-	void 'Test date/time bulkChange clear'() {
+	void 'Test date/time field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'clear', value: '')
 			bulkChangeCommand.edits = [editCommand]
@@ -309,5 +312,33 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkChangeDateService.bulkClear('retireDate', [device.id, device2.id], [:])
+	}
+
+	void 'Test string field bulkChange replace'() {
+		setup: 'given an edit command for replacing string field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'replace', value: '1abcd')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeStringService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeStringService.bulkReplace(null, 'externalRefId', [device.id, device2.id], [:])
+	}
+
+	void 'Test string field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkRemove function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeStringService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeStringService.bulkClear('externalRefId', [device.id, device2.id], [:])
 	}
 }
