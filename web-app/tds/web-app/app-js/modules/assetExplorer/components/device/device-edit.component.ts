@@ -303,6 +303,10 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			}
 		}
 
+		private onDeleteAsset() {
+			this.deleteAsset(this.model.asset.id);
+		}
+
 		/**
 		 * Function that handles the request of the Asset Types tds-combobox
 		 * @param {ComboBoxSearchModel} searchModel
