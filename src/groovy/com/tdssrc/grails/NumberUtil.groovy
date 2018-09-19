@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import org.apache.commons.lang3.math.NumberUtils
+
 /**
  * The NumberUtil class contains a collection of useful number manipulation methods
  */
@@ -213,4 +215,14 @@ class NumberUtil {
 	static Boolean isaNumber(Object object) {
 		return (object instanceof Integer) || (object instanceof Long)
 	}
+
+	/**
+	 * Checks whether the String a valid Java number
+	 * @param number - a string number to inspect
+	 * @return true if the string is a number
+	 */
+	static Boolean isNumber(String number) {
+		return NumberUtils.isNumber(number)
+	}
+	
 }

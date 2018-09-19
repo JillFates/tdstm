@@ -12,6 +12,7 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.BulkAssetChangeService
 import net.transitionmanager.service.BulkChangeDateService
+import net.transitionmanager.service.BulkChangeNumberService
 import net.transitionmanager.service.BulkChangeStringService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
@@ -110,13 +111,15 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 				fieldToControlMapping: {Project currentProject -> [
 						tagAssets: 'asset-tag-selector',
 						retireDate: 'date-time-selector',
-						externalRefId: 'string-selector'
+						externalRefId: 'string-selector',
+						size: 'number-selector'
 				]}
 		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
 		bulkAssetChangeService.dataviewService = Mock(DataviewService)
 		bulkAssetChangeService.bulkChangeDateService = Mock(BulkChangeDateService)
 		bulkAssetChangeService.bulkChangeStringService = Mock(BulkChangeStringService)
+		bulkAssetChangeService.bulkChangeNumberService = Mock(BulkChangeNumberService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -308,7 +311,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		when: 'bulk change is called with the bulk change command'
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
-		then: 'the bulkRemove function is invoked, with no tags specified'
+		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkChangeDateService.bulkClear('retireDate', [device.id, device2.id], [:])
@@ -336,9 +339,37 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		when: 'bulk change is called with the bulk change command'
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
-		then: 'the bulkRemove function is invoked, with no tags specified'
+		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeStringService.coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkChangeStringService.bulkClear('externalRefId', [device.id, device2.id], [:])
+	}
+
+	void 'Test numeric field bulkChange replace'() {
+		setup: 'given an edit command for replacing numeric field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'replace', value: '1')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeNumberService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeNumberService.bulkReplace(null, 'size', [device.id, device2.id], [:])
+	}
+
+	void 'Test numeric field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeNumberService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeNumberService.bulkClear('size', [device.id, device2.id], [:])
 	}
 }
