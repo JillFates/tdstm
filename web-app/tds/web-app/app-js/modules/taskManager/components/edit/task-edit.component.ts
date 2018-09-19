@@ -16,6 +16,8 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 
+declare var jQuery: any;
+
 @Component({
 	selector: `task-edit`,
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/edit/task-edit.component.html',
@@ -59,6 +61,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		this.taskManagerService.getAssignedTeam(this.model.id)
 			.subscribe((data: any[]) => {
+				jQuery('[data-toggle="popover"]').popover();
 				this.model.personList = data.map((item) => ({id: item.id, text: item.nameRole}))
 			});
 
@@ -82,8 +85,13 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		const detail = this.taskDetailModel.detail;
 		const assetComment = detail['assetComment'] || {};
 
+		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
+
 		return  {
 			id: assetComment.id,
+			duration: assetComment.duration,
+			durationScale,
+			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			durationLocked: assetComment.durationLocked,
 			actualStart: assetComment.actStart ? new Date(assetComment.actStart) : '',
 			actualFinish: assetComment.dateResolved ? new Date(assetComment.dateResolved) : '',
@@ -134,6 +142,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onTeamChange(asset): void {
+	}
+
+	onLockChange(): void {
+		this.model.locked = !this.model.locked;
 	}
 
 	/**

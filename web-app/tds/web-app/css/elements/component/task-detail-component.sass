@@ -12,14 +12,19 @@
       form
         .duration-controls
           display: flex
-          max-width: 200px
           align-items: center
           justify-content: space-between
-          input
-            width: 26px
-          label
-            font-weight: normal
-            margin-bottom: 0
+          .duration-value
+            flex: 32%
+            display: flex
+            flex-direction: column
+            input
+              width: 80%
+            label
+              font-weight: normal
+              margin-bottom: 0
+          .lock-state
+            cursor: pointer;
 
       .task-layout
         display: flex

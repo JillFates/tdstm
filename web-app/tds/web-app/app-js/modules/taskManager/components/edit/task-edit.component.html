@@ -209,18 +209,26 @@
                                                     </td>
                                                     <td class="valueNW">
 	                                                    <div class="duration-controls">
-                                                            <div>
-	                                                            <input type="text" name="durationDays" id="durationDays">
+                                                            <div class="duration-value">
+	                                                            <input type="text" [(ngModel)]="model.durationParts.days" name="durationDays" id="durationDays">
 	                                                            <label for="durationDays">Days</label>
                                                             </div>
-                                                            <div>
-	                                                            <input type="text" name="durationHours" id="durationHours">
-	                                                            <label for="durationHours">Hrs</label>
+                                                            <div  class="duration-value">
+	                                                            <input type="text" [(ngModel)]="model.durationParts.hours" name="durationHours" id="durationHours">
+	                                                            <label for="durationHours">Hours</label>
                                                             </div>
-		                                                    <div>
-			                                                    <input type="text" name="durationMinutes" id="durationMinutes">
-			                                                    <label for="durationMinutes">Min</label>
+		                                                    <div  class="duration-value">
+			                                                    <input type="text" [(ngModel)]="model.durationParts.minutes" name="durationMinutes" id="durationMinutes">
+			                                                    <label for="durationMinutes">Minutes</label>
 		                                                    </div>
+                                                            <label data-toggle="popover"
+                                                                   data-trigger="hover"
+                                                                   data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+                                                                <i class="fa fa-fw  lock-state"
+                                                                   [ngClass]="model.locked ? 'fa-unlock' : 'fa-lock'"
+                                                                   (click)="onLockChange()">
+                                                                </i>
+                                                            </label>
                                                         </div>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Duration</span></label>

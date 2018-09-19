@@ -2,6 +2,12 @@ import {INTERVAL} from '../model/constants';
 
 import * as moment from 'moment-timezone';
 
+export interface DurationParts {
+	days: number;
+	hours: number;
+	minutes: number;
+}
+
 export class DateUtils {
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
@@ -206,4 +212,28 @@ export class DateUtils {
 
 		return durationResult;
 	}
+
+	/**
+	 * Having a duration returns the parts which that duration is made
+	 * @param duration (number)
+	 * @param scale (string val)
+	 * @returns {DurationParts}
+	 */
+	public static getDurationParts(duration: number, scale = 'M' ): DurationParts  {
+		const result = {days: null, hours: null, minutes: null};
+
+		if (duration || duration === 0) {
+			const startDate = moment().startOf('day');
+			const endDate = moment().startOf('day');
+			endDate.add(scale.toLowerCase(), duration);
+
+			const parts = moment.duration(endDate.diff(startDate));
+			result.days = parseInt(parts.asDays(), 10);
+			result.hours =  parseInt(parts.hours(), 10);
+			result.minutes = parseInt(parts.minutes(), 10)
+		}
+
+		return result;
+	}
+
 }
