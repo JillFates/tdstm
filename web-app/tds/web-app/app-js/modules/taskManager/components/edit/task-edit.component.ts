@@ -113,6 +113,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			statusList: [],
 			personList: [],
 			teamList: [],
+			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: detail.categories || [],
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: [1, 2, 3, 4, 5],
@@ -120,7 +121,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent && assetComment.moveEvent.id) || null, text: detail.eventName},
-			category: assetComment.category
+			category: assetComment.category,
+			apiAction: {id: detail.apiAction && detail.apiAction.id || '', text: detail.apiAction && detail.apiAction.name || ''}
 		}
 	}
 

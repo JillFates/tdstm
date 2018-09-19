@@ -49,6 +49,7 @@ import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -120,6 +121,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	AssetEntityService assetEntityService
 	CommentService commentService
 	ControllerService controllerService
+	ApiActionService apiActionService
 	DeviceService deviceService
 	def filterService
 	JdbcTemplate jdbcTemplate
@@ -467,6 +469,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		if (assetComment) {
 			Project project = controllerService.getProjectForPage(this)
 			List eventList = MoveEvent.findAllByProject(project)
+			def apiActionList = apiActionService.list(project, true,[producesData:0] )
 
 			if (assetComment.createdBy) {
 				personCreateObj = assetComment.createdBy.toString()
@@ -585,6 +588,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 			commentList << [
 				assetComment:assetComment,
+				apiActionList:apiActionList,
 				durationScale:assetComment.durationScale.value(),
 				personCreateObj:personCreateObj,
 				personResolvedObj:personResolvedObj,

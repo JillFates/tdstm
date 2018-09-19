@@ -102,7 +102,15 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Action</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="apiActionList"
+                                                                [data]="model.apiActionList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.apiAction">
+                                                        </kendo-dropdownlist>
+                                                    </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
@@ -419,7 +427,7 @@
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Cancel</span>
                 </button>
-                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete pull-left">
+                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete">
                     <span  class="glyphicon glyphicon-trash"></span>
                     <span>Delete</span>
                 </button>
