@@ -2,9 +2,9 @@ package specs.Projects.Project
 
 import geb.spock.GebReportingSpec
 import utils.CommonActions
-import pages.Projects.Project.Project.ProjectCreationPage
-import pages.Projects.Project.Project.ProjectDetailsPage
-import pages.Projects.Project.Project.ProjectListPage
+import pages.Projects.Project.ProjectCreationPage
+import pages.Projects.Project.ProjectDetailsPage
+import pages.Projects.Project.ProjectListPage
 import pages.Projects.Tags.TagsPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
