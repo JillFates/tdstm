@@ -24,30 +24,22 @@
 <![endif]-->
 
 <!-- jQuery -->
-<!-- LEGACY CODE START -->
+<!-- LEGACY AND SUPPORT LEGACY CODE START -->
 
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds-main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'codemirror.css')}"/>
 
-<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" href="${assetPath(src: 'resources/jquery-ui-1.10.4.custom.min.css')}"/>
+<asset:stylesheet src="angular-support" />
+<asset:javascript src="angular-support" />
 
-<g:javascript src="jquery-1.9.1.js"/>
-<g:javascript src="jquery-1.9.1-ui.js"/>
 <%
     def moveEvent = tds.currentMoveEvent() ?: null
 %>
-
 <g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
     <g:javascript src="crawler.js" />
 </g:if>
-<g:javascript src="moment.min.js" />
-<g:javascript src="moment-timezone-with-data.min.js" />
-<g:javascript src="daterangepicker.js" />
-<g:javascript src="tds-common.js" />
-<g:javascript src="timezone/jquery.maphilight.min.js" />
-<g:javascript src="timezone/jquery.timezone-picker.min.js" />
-<g:javascript src="person.js"/>
+
 <script src="${resource(dir: 'dist/js/vendors/jquery.browser/dist', file: 'jquery.browser.min.js')}"></script>
 
 <script type="text/javascript">
