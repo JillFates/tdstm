@@ -118,6 +118,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected CurrentValueAction = CurrentValueAction;
 	protected FieldInfoType = FieldInfoType;
 	protected BatchStatus = BatchStatus;
+	private readonly NULL_OBJECT_LABEL = '(null)';
 
 	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
 		this.state.filter.filters.push(this.fieldsFilter.nameFilter);
@@ -207,7 +208,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				this.fieldsInfo.push({
 					name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
 					currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
-						? fields[fieldName].originalValue : '(null)',
+						? fields[fieldName].originalValue : this.NULL_OBJECT_LABEL,
 					currentPreviousValue: currentPreviousValue,
 					currentValueAction: currentValueAction,
 					importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
@@ -419,7 +420,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			if (field[fieldName]) {
 				popupFields.push({
 					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
-					value: field[fieldName]
+					value: !ValidationUtils.isEmptyObject(field[fieldName]) ? field[fieldName] : this.NULL_OBJECT_LABEL
 				});
 			}
 		}
@@ -449,7 +450,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 						domainIndex: index,
 						domainName: domain,
 						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
-						value: field.value,
+						value: !ValidationUtils.isEmptyObject(field.value) ? field.value : this.NULL_OBJECT_LABEL,
 						operator: field.operator,
 						recordsFound: recordsFound
 					});
