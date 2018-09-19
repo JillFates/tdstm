@@ -3,6 +3,11 @@ package specs.LandingPages
 import geb.spock.GebReportingSpec
 // Useful for importing the Menu as part of the Landing Pages Inspection
 import pages.Admin.*
+import pages.Admin.Company.*
+import pages.Admin.Staff.*
+import pages.Admin.User.*
+import pages.Admin.ImportAccounts.*
+import pages.Admin.ExportAccounts.*
 // Adding a new MenuItem
 import pages.Login.LoginPage
 import pages.Login.MenuPage

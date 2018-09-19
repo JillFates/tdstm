@@ -1354,7 +1354,7 @@ class GormUtil {
 	 */
 	static List findDomainByAlternateKey(
 			  Class domainClass, String searchValue, Project project=null,
-			  Map extraCriteria=null, List extraAlternate
+			  Map extraCriteria=null, List extraAlternate = null
 	) {
 		List entities = null
 		String altKeyName = getAlternateKeyPropertyName(domainClass)
