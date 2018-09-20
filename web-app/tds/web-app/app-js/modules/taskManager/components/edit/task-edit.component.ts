@@ -15,6 +15,8 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
+import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
+import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 
 declare var jQuery: any;
 
@@ -152,6 +154,25 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	onLockChange(): void {
 		this.model.locked = !this.model.locked;
+	}
+
+	openRangeDatesSelector(): void {
+		const dateModel: DateRangeSelectorModel = {
+			dateStart: null,
+			dateEnd: null,
+			timeStart: null,
+			timeEnd: null
+		};
+
+		this.dialogService.extra(DateRangeSelectorComponent,
+			[
+				{provide: UIPromptService, useValue: this.promptService},
+				{provide: DateRangeSelectorModel, useValue: dateModel}
+			], false, false).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	/**

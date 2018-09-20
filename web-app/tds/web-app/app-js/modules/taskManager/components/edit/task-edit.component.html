@@ -251,10 +251,8 @@
                                                                 </i>
                                                             </label>
                                                         </div>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Duration</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.actualDuration}}</span></td>
+                                                    <td></td>
+                                                    <td></td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
@@ -273,10 +271,8 @@
                                                                 [(value)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Duration Delta</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationDelta}}</span></td>
+                                                    <td></td>
+                                                    <td><button (click)="openRangeDatesSelector()">Edit</button></td>
                                                 </tr>
                                             </tbody>
                                         </table>
