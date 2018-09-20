@@ -3,7 +3,7 @@ import { Response, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
-import {catchError, map} from "rxjs/operators";
+import {catchError, map} from 'rxjs/operators';
 
 import {DateUtils} from '../utils/date.utils';
 import {GRID_DEFAULT_PAGE_SIZE} from '../model/constants';

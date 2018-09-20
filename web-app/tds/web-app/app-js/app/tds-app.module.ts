@@ -8,7 +8,6 @@ import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angula
 import { HttpModule, Http } from '@angular/http';
 import { TDSAppComponent } from './tds-app.component';
 // Feature modules
-// import { SharedModule } from '../shared/shared.module';
 // import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 // import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 // import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
@@ -19,6 +18,7 @@ import { TDSAppComponent } from './tds-app.component';
 // import { UIRouterModule, UIView } from '@uirouter/angular';
 // import { TdsAppRoute, AuthConfig, PermissionConfig, MiscConfig } from './tds-app.route';
 import {TDSAppRouteModule} from './tds-app-route.module';
+import {SharedModule} from '../shared/shared.module';
 import {SecurityModule} from '../modules/security/security.module';
 
 // Decorator that tells to Angular is a module.
@@ -29,6 +29,7 @@ import {SecurityModule} from '../modules/security/security.module';
 		HttpModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
+		// SharedModule,
 		SecurityModule,
 		// Feature Modules
 		// SharedModule,

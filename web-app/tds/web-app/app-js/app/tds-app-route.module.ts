@@ -147,7 +147,7 @@ import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'dashboard'},
-	{path: 'dashboard', loadChildren: '../modules/lazyTestModule/lazy-test.module#LazyTestModule'},
+	{path: 'dashboard', loadChildren: '../modules/lazy-test/lazy-test.module#LazyTestModule'},
 ];
 
 @NgModule({

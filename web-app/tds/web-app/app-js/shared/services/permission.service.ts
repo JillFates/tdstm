@@ -3,7 +3,7 @@ import { Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
-import {catchError, map} from "rxjs/operators";
+import {catchError, map} from 'rxjs/operators';
 
 @Injectable()
 export class PermissionService {
@@ -17,12 +17,12 @@ export class PermissionService {
 
 	getPermissions(): Observable<any> {
 		return this.http.get(this.permissionUrl)
-			.pipe(map((res) => {
+			.map((res) => {
 				let result = res.json();
 				this.permissions = result.data;
 				return this.permissions;
-			}))
-			.pipe(catchError((error: any) => Observable.throw(error.json() || 'Server error')));
+			})
+			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
 
 	hasPermission(value: string): boolean {

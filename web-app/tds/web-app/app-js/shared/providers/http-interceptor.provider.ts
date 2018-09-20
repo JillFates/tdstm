@@ -15,7 +15,7 @@ import {
 } from '@angular/http';
 
 import {Observable} from 'rxjs';
-import {catchError, finalize} from "rxjs/operators";
+import {catchError, finalize} from 'rxjs/operators';
 import {NotifierService} from '../services/notifier.service';
 import {AlertType} from '../model/alert.model';
 // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #2

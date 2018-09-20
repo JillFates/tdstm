@@ -13,15 +13,15 @@ import {NotFoundPageComponent} from './notFoundPage/not-found-page.component';
 export class SecurityRouteStates {
 	public static readonly ERROR = {
 		name: 'tds.error',
-		url: '/pages/error'
+		url: 'pages/error'
 	};
 	public static readonly UNAUTHORIZED = {
 		name: 'tds.unauthorized',
-		url: '/pages/unauthorized'
+		url: 'pages/unauthorized'
 	};
 	public static readonly NOT_FOUND = {
 		name: 'tds.notfound',
-		url: '/pages/notfound'
+		url: 'pages/notfound'
 	};
 }
 
