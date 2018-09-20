@@ -121,8 +121,9 @@ var GraphUtil = (function ($) {
 			else
 				public.enableFullscreen();
 		}
-
-		public.correctActionButtons();
+		if($('#dependenciesPanelId').size()) {
+            public.correctActionButtons();
+        }
 	}
 
 	// changes the graph to fullscreen mode
@@ -187,8 +188,10 @@ var GraphUtil = (function ($) {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
 		}
-
-		public.correctActionButtons();
+		
+        if($('#dependenciesPanelId').size()) {
+            public.correctActionButtons();
+        }
 	}
 
 	public.correctActionButtons = function() {
