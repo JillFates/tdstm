@@ -17,6 +17,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	BulkChangeStringService bulkChangeStringService
 	BulkChangeNumberService bulkChangeNumberService
 	BulkChangePersonService bulkChangePersonService
+	BulkChangeYesNoService bulkChangeYesNoService
 
 	/**
 	 * A list of valid field names
@@ -24,9 +25,10 @@ class BulkAssetChangeService implements ServiceMethods {
 	static final List<String> fields = [
 			'tagAssets',
 			'purchaseDate', 'maintExpDate', 'retireDate',
-			'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'validation', 'externalRefId',
+			'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'externalRefId',
 			'priority', 'purchasePrice', 'usize', 'sourceRackPosition', 'sourceBladePosition', 'targetRackPosition', 'targetBladePosition', 'dependencyBundle', 'size', 'rateOfChange',
-			'appOwner', 'modifiedBy'
+			'appOwner', 'modifiedBy',
+			'validation'
 	]
 
 	/**
@@ -52,6 +54,10 @@ class BulkAssetChangeService implements ServiceMethods {
 			replace: 'bulkReplace'
 		],
 		'person-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'yes-no-selector': [
 			clear  : 'bulkClear',
 			replace: 'bulkReplace'
 		]
@@ -80,7 +86,8 @@ class BulkAssetChangeService implements ServiceMethods {
 			'date-time-selector': bulkChangeDateService,
 			'string-selector': bulkChangeStringService,
 			'number-selector': bulkChangeNumberService,
-			'person-selector': bulkChangePersonService
+			'person-selector': bulkChangePersonService,
+			'yes-no-selector': bulkChangeYesNoService
 		]
 
 		if (bulkChange.allAssets) {

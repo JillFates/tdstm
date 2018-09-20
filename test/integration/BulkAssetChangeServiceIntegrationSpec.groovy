@@ -15,6 +15,7 @@ import net.transitionmanager.service.BulkChangeDateService
 import net.transitionmanager.service.BulkChangeNumberService
 import net.transitionmanager.service.BulkChangePersonService
 import net.transitionmanager.service.BulkChangeStringService
+import net.transitionmanager.service.BulkChangeYesNoService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
@@ -114,7 +115,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 						retireDate: 'date-time-selector',
 						externalRefId: 'string-selector',
 						size: 'number-selector',
-						modifiedBy: 'person-selector'
+						modifiedBy: 'person-selector',
+						validation: 'yes-no-selector'
 				]}
 		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
@@ -123,6 +125,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		bulkAssetChangeService.bulkChangeStringService = Mock(BulkChangeStringService)
 		bulkAssetChangeService.bulkChangeNumberService = Mock(BulkChangeNumberService)
 		bulkAssetChangeService.bulkChangePersonService = Mock(BulkChangePersonService)
+		bulkAssetChangeService.bulkChangeYesNoService = Mock(BulkChangeYesNoService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -402,5 +405,33 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangePersonService.coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id], [:])
+	}
+
+	void 'Test yes/no field bulkChange replace'() {
+		setup: 'given an edit command for replacing yes/no field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: 'yes')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkReplace(null, 'validation', [device.id, device2.id], [:])
+	}
+
+	void 'Test yes/no field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkClear('validation', [device.id, device2.id], [:])
 	}
 }
