@@ -1,6 +1,7 @@
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.SecurityRole
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
@@ -14,11 +15,11 @@ import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(DataviewController)
-@TestMixin(IntegrationTestMixin)
 class DataviewControllerIntegrationSpec extends Specification {
 
 	@Shared
@@ -28,9 +29,6 @@ class DataviewControllerIntegrationSpec extends Specification {
 	SecurityService securityService2
 	@Shared
 	UserPreferenceService userPreferenceService
-//	@Shared
-//	DataviewController controller
-
 
 	static Person person
 	static Project project
@@ -39,17 +37,20 @@ class DataviewControllerIntegrationSpec extends Specification {
 
 	static PersonTestHelper personHelper = new PersonTestHelper()
 	static ProjectTestHelper projectHelper = new ProjectTestHelper()
-	static AssetTestHelper assetHelper = new AssetTestHelper()
 
-
-	static doWithSpring = {
-		springSecurityService(SpringSecurityService)
-
-		securityService(SecurityService) {
-			grailsApplication = ref('grailsApplication')
-			springSecurityService = ref('springSecurityService')
-		}
-	}
+//	static doWithSpring = {
+//
+//		authenticationTrustResolver(AuthenticationTrustResolverImpl)
+//
+//		springSecurityService(SpringSecurityService){
+//			authenticationTrustResolver = ref('authenticationTrustResolver')
+//		}
+//
+//		securityService(SecurityService) {
+//			grailsApplication = ref('grailsApplication')
+//			springSecurityService = ref('springSecurityService')
+//		}
+//	}
 
 	/**
 	 * Used to create a test project and user that is logged in
@@ -93,11 +94,12 @@ class DataviewControllerIntegrationSpec extends Specification {
 		when:
 			controller.request.method = 'GET'
 			params.id = '1'
-			controller.data()
+//			SpringSecurityUtils.doWithAuth(adminPerson.userLogin.username){
+				controller.data()
+//			}
 
 		then:
-			response.json == [:]
-
+			response.text == ''
 
 	}
 }

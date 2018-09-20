@@ -31,6 +31,11 @@ class DataviewControllerSpec extends Specification {
 			SpringSecurityUtils.metaClass.static.ifAllGranted = { String role ->
 				return true
 			}
+
+			SpringSecurityUtils.metaClass.static.doWithAuth = { String role, Closure closure ->
+				closure.call()
+			}
+
 			controller.dataviewService = Mock(DataviewService) {
 				query(_, _, _) >> { Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand ->
 					return [
@@ -47,7 +52,7 @@ class DataviewControllerSpec extends Specification {
 			params.id = '1'
 
 			SpringSecurityUtils.doWithAuth('superuser'){
-				controller.fetch()
+				controller.data()
 			}
 
 
