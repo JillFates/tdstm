@@ -26,7 +26,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     def setupSpec() {
         testCount = 0
         to LoginPage
-        login()
+        login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
         projectsModule.goToProjectsActive()
     }
@@ -77,26 +77,5 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
             filterByName baseName
         then: 'The user deletes completed projects if there are'
             deleteProjects(true)
-    }
-
-    def "2. Workaround to switch to a licensed Project"() {
-        when: 'The user selects a licenced project'
-            def displayed = false
-            try {
-                clickOnActiveProjectsButton()
-                filterByName licensedProjectName
-                clickOnProjectByName licensedProjectName
-                at MenuPage
-                waitFor {projectsModule.projectName}
-                projectsModule.assertProjectName licensedProjectName
-                // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = projectsModule.projectLicenseIcon.displayed
-            } catch (RequiredPageContentNotPresent e) {
-                // Try failed because license icon is not present so a Licensed project is selected now
-                displayed = false
-            }
-            !displayed
-        then: 'A licensed project should be selected if license is requested'
-            projectsModule.assertProjectName licensedProjectName
     }
 }
