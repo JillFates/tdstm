@@ -37,9 +37,15 @@ class UserListPage extends Page{
         commonsModule.waitForLoadingMessage()
     }
 
+    /* Get common words to form full name to match with user name [baseName + random characters], but just because
+    * both params could change, so take full name string from
+    * base name + random char + common used for first name [firstNameAddition] - [firstNameAddition]
+    * Result should be for example "QAE2Ea3S4"
+    */
     def getRandomBaseUserNameByBaseName(baseName){
         def fullname = CommonActions.getRandomOption(fullnames).text()
-        fullname.substring(0, baseName.length() + CommonActions.randomCharNumbers)
+        def firstNameAddition = "First"
+        fullname.substring(0, baseName.length() + fullname.indexOf(firstNameAddition) - firstNameAddition.length())
     }
 
     def clickOnFirstUserName(){
