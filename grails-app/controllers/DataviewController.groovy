@@ -12,10 +12,7 @@ import net.transitionmanager.service.UserPreferenceService
 @Secured('isAuthenticated()')
 class DataviewController implements ControllerMethods, PaginationMethods {
 
-	/**
-	 * Defines filter param name used in this api request
-	 */
-	static final String FILTER_PARAM_NAME = 'filter'
+	static namespace = 'v1'
 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
@@ -32,11 +29,11 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.AssetView)
-	def data(Long id, DataviewApiParamsCommand apiParamsCommand) {
+	def data(Long id) {
 
 		Project project = getProjectForWs()
-
-		apiParamsCommand.filter = params.list(FILTER_PARAM_NAME)
+		DataviewApiParamsCommand apiParamsCommand = populateCommandObject(DataviewApiParamsCommand)
+		// 09/21/2018 dcorrea: It's necessary to convert command.filter in to command.filterParams
 		apiParamsCommand.validate()
 
 		if (apiParamsCommand.hasErrors()) {

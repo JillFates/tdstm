@@ -67,7 +67,7 @@ class DataviewSpec {
 			domains: [],
 			columns: [:],
 		]
-		justPlanning = false
+		justPlanning = null
 		args = [
 			offset: apiParamsCommand.offset,
 			max: apiParamsCommand.limit
