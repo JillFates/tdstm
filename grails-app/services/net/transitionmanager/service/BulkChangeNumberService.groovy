@@ -18,7 +18,7 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	void bulkReplace(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	void bulkReplace(Integer value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		bulkUpdate(value, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
@@ -30,7 +30,7 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
 	void bulkClear(String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate('', fieldName, assetIds, assetIdsFilterQuery)
+		bulkUpdate(null, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
@@ -40,12 +40,12 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param currentProject - current project, not used but passed by hierarchical service
 	 * @return - same number if it is a number
 	 */
-	String coerceBulkValue(Project currentProject, String value) {
+	Integer coerceBulkValue(Project currentProject, String value) {
 		if (NumberUtil.isNumber(value)) {
-			return null
+			return NumberUtil.toPositiveInteger(value)
 		}
 
-		return value
+		return null
 	}
 
 	/**
@@ -56,10 +56,11 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	private void bulkUpdate(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	private void bulkUpdate(Integer value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
 		Map params = [:]
 		Map assetQueryParams = [:]
+		params.value = value
 
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
@@ -72,8 +73,8 @@ class BulkChangeNumberService implements ServiceMethods {
 		}
 
 		String query = """
-			UPDATE AssetEntity SET ${fieldName} = ${value} 
-			WHERE project.id = ${securityService.getUserCurrentProjectId()} AND id IN ($queryForAssetIds)
+			UPDATE AssetEntity SET ${fieldName} = :value  
+			WHERE id IN ($queryForAssetIds)
 		"""
 
 		AssetEntity.executeUpdate(query, params)

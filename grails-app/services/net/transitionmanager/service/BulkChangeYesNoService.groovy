@@ -68,6 +68,7 @@ class BulkChangeYesNoService implements ServiceMethods {
 		String queryForAssetIds
 		Map params = [:]
 		Map assetQueryParams = [:]
+		params.value = value
 
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
@@ -80,8 +81,8 @@ class BulkChangeYesNoService implements ServiceMethods {
 		}
 
 		String query = """
-			UPDATE AssetEntity SET ${fieldName} = '${value}' 
-			WHERE project.id = ${securityService.getUserCurrentProjectId()} AND id IN ($queryForAssetIds)
+			UPDATE AssetEntity SET ${fieldName} = :value 
+			WHERE id IN ($queryForAssetIds)
 		"""
 
 		AssetEntity.executeUpdate(query, params)

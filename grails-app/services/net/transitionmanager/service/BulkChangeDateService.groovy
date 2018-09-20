@@ -18,7 +18,11 @@ class BulkChangeDateService implements ServiceMethods {
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	void bulkReplace(String date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	void bulkReplace(Date date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		if (!date) {
+			throw new InvalidParamException('New date value cannot be null')
+		}
+
 		bulkUpdate(date, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
@@ -30,7 +34,7 @@ class BulkChangeDateService implements ServiceMethods {
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
 	void bulkClear(String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate('', fieldName, assetIds, assetIdsFilterQuery)
+		bulkUpdate(null, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
@@ -57,10 +61,11 @@ class BulkChangeDateService implements ServiceMethods {
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	private void bulkUpdate(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	private void bulkUpdate(Date value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
 		Map params = [:]
 		Map assetQueryParams = [:]
+		params.value = value
 
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
@@ -73,8 +78,8 @@ class BulkChangeDateService implements ServiceMethods {
 		}
 
 		String query = """
-			UPDATE AssetEntity SET ${fieldName} = '${value}' 
-			WHERE project.id = ${securityService.getUserCurrentProjectId()} AND id IN ($queryForAssetIds)
+			UPDATE AssetEntity SET ${fieldName} = :value  
+			WHERE id IN ($queryForAssetIds)
 		"""
 
 		AssetEntity.executeUpdate(query, params)
