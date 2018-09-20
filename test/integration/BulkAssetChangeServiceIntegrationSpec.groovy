@@ -165,7 +165,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkAdd function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkAdd(null, [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.tagAssetService.bulkAdd(null, 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange add all assets in filter'() {
@@ -182,7 +182,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.dataviewService.getAssetIdsHql(project, 1, dataviewUserParamsCommand)
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkAdd(null, [], null)
+			1 * bulkAssetChangeService.tagAssetService.bulkAdd(null, 'tagAssets', [], null)
 	}
 
 	void 'Test bulkChange clear'() {
@@ -196,7 +196,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkRemove function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange clear, all assets in filter'() {
@@ -213,7 +213,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.dataviewService.getAssetIdsHql(project, 1, dataviewUserParamsCommand)
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, [], null)
+			1 * bulkAssetChangeService.tagAssetService.bulkClear(null, 'tagAssets', [], null)
 	}
 
 	void 'Test bulkChange replace'() {
@@ -227,7 +227,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkReplace(null, [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.tagAssetService.bulkReplace(null, 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace, all assets in filter'() {
@@ -244,7 +244,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.dataviewService.getAssetIdsHql(project, 1, dataviewUserParamsCommand)
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkReplace(null, [], null)
+			1 * bulkAssetChangeService.tagAssetService.bulkReplace(null, 'tagAssets', [], null)
 	}
 
 	void 'Test bulkChange remove'() {
@@ -258,7 +258,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkRemove function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, 'tagAssets', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange remove, all assets in filter'() {
@@ -274,8 +274,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'The sql for getting the assets is looked up, and bulkRemove is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.dataviewService.getAssetIdsHql(project, 1, dataviewUserParamsCommand)
-			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [], null)
+			1 * bulkAssetChangeService.tagAssetService.coerceBulkValue(project,editCommand.value)
+			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, 'tagAssets', [], null)
 	}
 
 	void 'Test bulkChange invalid field'() {

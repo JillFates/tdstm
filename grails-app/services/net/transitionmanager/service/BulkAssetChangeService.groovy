@@ -74,7 +74,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			action = getAction(edit.fieldName, edit.action, filedMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
 
-			service."$action"(value, assetIds, assetQueryFilter)
+			service."$action"(value, edit.fieldName, assetIds, assetQueryFilter)
 		}
 	}
 

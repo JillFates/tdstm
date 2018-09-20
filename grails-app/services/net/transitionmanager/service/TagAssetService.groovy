@@ -184,7 +184,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIdsFilterQuery If assetIds are not specified  this query and params are added to the query to apply to all assets,
 	 * from the filtering in the frontend.
 	 */
-	void bulkAdd(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	void bulkAdd(List<Long> tagIds, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		if(!tagIds){
 			return
 		}
@@ -230,7 +230,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIds The ids of the assets to remove tags from
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present
 	 */
-	void bulkClear(List<Long> tagIds = null, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
+	void bulkClear(List<Long> tagIds = null, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if (tagIds) {
 			throw new InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
 		}
@@ -245,7 +245,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIds The ids of the assets to remove tags from.
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
 	 */
-	void bulkRemove(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
+	void bulkRemove(List<Long> tagIds, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null){
 		if(!tagIds){
 			throw new InvalidParamException("Tag IDs must be specified for removal")
 		}
@@ -260,7 +260,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIds The ids of the assets to remove tags from.
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
 	 */
-	private void remove(List<Long> tagIds, List<Long> assetIds, Map assetIdsFilterQuery = null) {
+	private void remove(List<Long> tagIds, String field, List<Long> assetIds, Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
 		String queryForTagIds = ''
 		Map params = [:]
@@ -299,7 +299,7 @@ class TagAssetService implements ServiceMethods {
 	 * @param assetIds The ids of the assets to replace tags for.
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
 	 */
-	void bulkReplace(List<Long> tagIds, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	void bulkReplace(List<Long> tagIds, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		bulkClear([], assetIds, assetIdsFilterQuery)
 		bulkAdd(tagIds, assetIds, assetIdsFilterQuery)
 	}
