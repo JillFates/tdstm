@@ -94,6 +94,13 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 				.catch((error) => console.log(error));
 		}
 
+		/**
+		 * Allows to clone an database asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
+		}
+
 	}
 	return DatabaseShowComponent;
 }

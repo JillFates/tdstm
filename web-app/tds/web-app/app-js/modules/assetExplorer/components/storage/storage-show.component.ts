@@ -96,6 +96,13 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 				.catch((error) => console.log(error));
 		}
 
+		/**
+		 * Allows to clone an storage asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
+		}
+
 	}
 	return StorageShowComponent;
 }
