@@ -196,6 +196,12 @@
                                     <g:img uri="${resource(dir:'icons',file:'application_view_columns.png')}" width="16" height="16" alt="Summary Table" /> Summary Table
                                 </g:link>
                             </li>
+                            <li class="menu-child-item menu-parent-assets-asset-manager">
+                                <g:link class="mmlink" controller="module" action="asset" id="views">
+                                    <g:img uri="${resource(dir:'icons',file:'cat.png')}" width="16" height="16" alt="Dependencies" /> View Manager
+                                </g:link>
+                            </li>
+                            <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer">
                                 <g:link class="mmlink" mapping="assetViewShow" id="1">
 	                                <g:img uri="${resource(dir:'icons',file:'magnifier.png')}" width="16" height="16" /> All Assets
