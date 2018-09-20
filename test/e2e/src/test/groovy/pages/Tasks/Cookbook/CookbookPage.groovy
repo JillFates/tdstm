@@ -67,7 +67,7 @@ class CookbookPage extends Page {
     }
 
     def getRecipeById(id){
-        deleteRecipeButtons.findAll("[recipe-id]").find{it == id}
+        deleteRecipeButtons.find{it.attr("recipe-id") == id}
     }
 
     def getRecipeNameDisplayedInTaskGenerationTab(){
