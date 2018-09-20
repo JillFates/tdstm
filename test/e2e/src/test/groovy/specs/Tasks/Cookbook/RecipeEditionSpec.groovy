@@ -29,7 +29,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToTasksCookbook()
+        tasksModule.goToTasksCookbook()
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         clickOnCreateButton()
@@ -47,7 +47,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "1. Selecting the Recipe to edit"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User searches by the Recipe'
@@ -58,7 +57,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "2. Selecting 'Editor' tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the "Editor" Tab'
@@ -71,7 +69,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "3. Checking active buttons on 'Editor' tab"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Editor Section'
             at TabEditorPage
 
@@ -82,7 +79,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "4. Opening the editor modal window"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Editor Section'
             at TabEditorPage
         when: 'The User clicks the Editor Button'
@@ -93,7 +89,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "5. Adding a recipe from the text Editor"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Editor Section'
             at EditRecipePage
         def recipe = [
@@ -121,7 +116,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "6. Closing the Modal and returning  to the 'Editor' Tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Section'
             at EditRecipePage
         when: 'The User clicks the "Close" Button'
@@ -132,7 +126,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "7. Checking 'Save WIP' Button"() {
-        testKey = "TM-XXXX"
         when:  'The User is on the Edit Recipe Tab Section'
             at TabEditorPage
 
@@ -141,7 +134,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "8. Save WIP Button status after Saving the WIP"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Tab Section'
             at TabEditorPage
         when: 'The User clicks the "Save WIP" Option'
@@ -153,7 +145,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "9. Checking Syntax button"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Tab Section'
             at TabEditorPage
         when: 'The User clicks the "Check Syntax" Button'
@@ -164,7 +155,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "10. Checking Syntax result should display errors"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Syntax Error Section'
             at TabEditorTabSyntaxErrorsPage
 
@@ -175,7 +165,6 @@ class RecipeEditionSpec extends GebReportingSpec {
 
     // Fix Recipe and check syntax
     def "11. Editing a Recipe to fixing Errors"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Tab Section'
             at TabEditorPage
         when: 'The User clicks the "Edit" Button'
@@ -187,7 +176,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "12. Adding text to editor"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Tab Section'
             at EditRecipePage
         def recipe = [
@@ -216,7 +204,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "13. Closing button should close Edit Recipe modal window and show recipe on editor tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Section'
             at EditRecipePage
         when: 'The User clicks the "Close" Button'
@@ -228,7 +215,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "14. Checking Save WIP Button is enabled again"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Edit Recipe Section'
             at TabEditorPage
 
@@ -237,7 +223,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "15. Save WIP Button should save WIP and disable the button again"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Section'
             at TabEditorPage
         when: 'The User clicks the "Save" WIP Button'
@@ -249,7 +234,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     def "16. Check Syntax result should have the message 'No errors found' displayed"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Edit Recipe Section'
             at TabEditorPage
         when: 'The User clicks the Check Syntax Button'
