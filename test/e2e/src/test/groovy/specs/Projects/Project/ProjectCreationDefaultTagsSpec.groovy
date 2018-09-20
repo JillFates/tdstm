@@ -34,7 +34,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     def setupSpec() {
         testCount = 0
         to LoginPage
-        login()
+        login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
         projectsModule.goToProjectsActive()
         at ProjectListPage
@@ -111,32 +111,5 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             getTagNameText() == SOX_Tag.name
             getTagDescriptionText() == SOX_Tag.description
             getTagColorHexText() == SOX_Tag.color
-    }
-
-    def "5. Workaround to switch to a licensed Project"() {
-        given: 'The user is in Menu'
-            at MenuPage
-        when: 'The user searches for the selected project'
-            projectsModule.assertProjectName projName
-        then: 'A licensed project should be selected if license is requested'
-            def displayed = false
-            try {
-                // Check if license icon is displayed
-                projectsModule.projectLicenseIcon.displayed
-                // Select a licensed project
-                projectsModule.goToProjectsActive()
-                at ProjectListPage
-                filterByName licensedProjectName
-                clickOnProjectByName licensedProjectName
-                at MenuPage
-                waitFor {projectsModule.projectName}
-                projectsModule.assertProjectName licensedProjectName
-                // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = projectsModule.projectLicenseIcon.displayed
-            } catch (RequiredPageContentNotPresent e) {
-                // Try failed because license icon is not present so a Licensed project is selected now
-                displayed = false
-            }
-            !displayed
     }
 }

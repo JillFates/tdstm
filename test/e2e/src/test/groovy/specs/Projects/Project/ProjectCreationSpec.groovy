@@ -27,7 +27,7 @@ class ProjectCreationSpec extends GebReportingSpec {
     def setupSpec() {
         testCount = 0
         to LoginPage
-        login()
+        login(4,5) // test needs to be done by e2e_projects_user
     }
 
     def setup() {
@@ -94,32 +94,5 @@ class ProjectCreationSpec extends GebReportingSpec {
             projectNameFilter = projName
         then: 'Project created should be displayed in the grid'
             waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
-    }
-
-    def "6. Workaround to switch to a licensed Project"() {
-        given: 'The user is in Menu'
-            at MenuPage
-        when: 'The user searches for the selected project'
-            projectsModule.assertProjectName(projName)
-        then: 'A licensed project should be selected if license is requested'
-            def displayed = false
-            try {
-                // Check if license icon is displayed
-                projectsModule.projectLicenseIcon.isDisplayed()
-                // Select a licensed project
-                at ProjectListPage
-                waitFor {projectNameFilter.click()}
-                projectNameFilter = licensedProjectName
-                waitFor {projectNameGridField.find("a", text: licensedProjectName).first().click()}
-                at MenuPage
-                waitFor {projectsModule.projectName}
-                projectsModule.assertProjectName(licensedProjectName)
-                // Recheck, if its present assertion will fail, otherwise we are OK
-                displayed = projectsModule.projectLicenseIcon.isDisplayed()
-            } catch (RequiredPageContentNotPresent e) {
-                // Try failed because license icon is not present so a Licensed project is selected now
-                displayed = false
-            }
-            assert !displayed
     }
 }
