@@ -48,7 +48,7 @@
 					]
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/auth/signIn?username={{username}}&password={{password}}",
+					"raw": "{{host}}/tdstm/auth/signIn",
 					"host": [
 						"{{host}}"
 					],
@@ -56,16 +56,6 @@
 						"tdstm",
 						"auth",
 						"signIn"
-					],
-					"query": [
-						{
-							"key": "username",
-							"value": "{{username}}"
-						},
-						{
-							"key": "password",
-							"value": "{{password}}"
-						}
 					]
 				}
 			},
@@ -1236,7 +1226,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0c84aad7-683c-40e8-af1e-2e75df002cf6",
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -1250,6 +1240,7 @@
 							"});",
 							"",
 							"//cleanup code",
+							"pm.globals.unset(\"tag_id\");",
 							"pm.globals.unset(\"tag_id2\");",
 							"pm.globals.unset(\"tag_event_id\");",
 							"pm.globals.unset(\"tag_event_id2\");",
@@ -1315,31 +1306,31 @@
 	],
 	"variable": [
 		{
-			"id": "156b8a39-c922-4f2b-bd89-e0ebf6560de4",
+			"id": "707e2276-cbe6-4788-ad2d-e1634a1f5a0a",
 			"key": "projectId",
 			"value": "2445",
 			"type": "string"
 		},
 		{
-			"id": "4c2242bc-d29b-48c7-a978-f5d2296b33e3",
+			"id": "21cf931d-d09b-47fc-9916-118a4e5439b8",
 			"key": "event1",
 			"value": "348",
 			"type": "string"
 		},
 		{
-			"id": "21926da0-5ad9-4dfe-9e12-9537aca95159",
+			"id": "5ce293bc-2847-433a-891f-232be787c177",
 			"key": "event2",
 			"value": "349",
 			"type": "string"
 		},
 		{
-			"id": "37c253dd-e696-4e36-a369-7fdbe84448e5",
+			"id": "28c388f0-ffa4-4714-8b8e-04430e9f3e31",
 			"key": "event3",
 			"value": "350",
 			"type": "string"
 		},
 		{
-			"id": "686f12f0-db1b-461d-bd8f-25178e02dc99",
+			"id": "fda2ecba-6d93-49e9-941d-cb4e4b2dd4f4",
 			"key": "event4",
 			"value": "364",
 			"type": "string"
