@@ -1,5 +1,7 @@
 package net.transitionmanager.command
 
+import grails.util.Pair
+
 /**
  * The DataviewApiParamsCommand is used to filter API dataviews requests
  */
@@ -12,19 +14,21 @@ class DataviewApiParamsCommand implements CommandObject {
     int limit = 25
 	/**
 	 * Defined by the following structure:
-	 * common.environment=Production,common.assetName=PDV*
+	 * environment=Production&filter=assetName=PDV*
 	 */
-    List<String> filters
-	List<Map<String, Object>> filterParams = []
+    List<String> filter
+
+	List<Pair<String, String>> filterParams = []
 
     static constraints = {
         offset min: 0
         limit min: 0, max: 100
-		filters nullable: true, blank: true, validator: { val, obj ->
+		filter nullable: true, blank: true, validator: { val, obj ->
 			if(val){
+				obj.filterParams = []
 				val.each { String param ->
 					def (String key, String value) = param.split(FILTER_PARAMETER_SEPARATOR_CHARACTER)
-					obj.filterParams.add([(key): value])
+					obj.filterParams.add(new Pair<String, String>(key, value))
 				}
 				return true
 			}

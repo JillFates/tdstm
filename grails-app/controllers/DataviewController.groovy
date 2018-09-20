@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -8,6 +9,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.UserPreferenceService
 
+@Secured('isAuthenticated()')
 class DataviewController implements ControllerMethods, PaginationMethods {
 
 	/**
@@ -22,7 +24,8 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	 *
 	 *
 	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2
-	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2&filter=common.environment=Production|Development
+	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=Production|Development
+	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=!Production&filter=Name=PDV*
 	 *
 	 * @param id
 	 * @param apiParamsCommand
@@ -33,7 +36,8 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 
 		Project project = getProjectForWs()
 
-		apiParamsCommand.filters = params.list(FILTER_PARAM_NAME)
+		apiParamsCommand.filter = params.list(FILTER_PARAM_NAME)
+		apiParamsCommand.validate()
 
 		if (apiParamsCommand.hasErrors()) {
 			renderErrorJson('API filtering was invalid')

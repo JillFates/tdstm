@@ -45,20 +45,20 @@ class DataViewApiParamsCommandSpec extends Specification {
 			command.validate()
 
 		when: 'filters contains 1 column with a simple value'
-			command.filters = 'common.environment=Production'
+			command.filter = ['environment=Production']
 
 		then: 'validation succeeds'
 			command.validate()
-			command.filterParams[0]['common.environment'] == 'Production'
+			command.filterParams[0]['environment'] == 'Production'
 
 		when: 'filters contains multiple columns with simple values'
 			command = new DataviewApiParamsCommand()
-			command.filters = 'common.environment=Production,common.assetName=PDV*'
+			command.filter = ['environment=Production', 'assetName=PDV*']
 
 		then: 'validation succeeds'
 			command.validate()
-			command.filterParams[0]['common.environment'] == 'Production'
-			command.filterParams[1]['common.assetName'] == 'PDV*'
+			command.filterParams[0]['environment'] == 'Production'
+			command.filterParams[1]['assetName'] == 'PDV*'
 
 
 	}

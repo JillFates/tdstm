@@ -1,6 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
+import grails.util.Pair
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -77,15 +78,14 @@ class DataviewSpec {
 		spec.domains = jsonDataview.domains.collect { it.toLowerCase() }
 		spec.columns = jsonDataview.columns
 
-//		jsonDataview.columns.each { Map dataviewColumn ->
-//			dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
-//			Map specColumn = spec.columns.find {
-//				it.domain == dataviewColumn.domain && it.property == dataviewColumn.property
-//			}
-//			if (!specColumn) {
-//				addColumn(dataviewColumn.domain, dataviewColumn.property, dataviewColumn.filter)
-//			}
-//		}
+		apiParamsCommand?.filterParams.each { Pair<String, String> pair ->
+			List matchingColumns = spec.columns.findAll{it.property == pair.aValue || it.label == pair.aValue }
+			if(matchingColumns.size() == 1){
+				matchingColumns[0].filter = pair.bValue
+			} else {
+				throw new RuntimeException('Multiple results for column name')
+			}
+		}
 	}
 
 	DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {

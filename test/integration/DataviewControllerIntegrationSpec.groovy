@@ -1,6 +1,10 @@
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.IntegrationTestMixin
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
@@ -14,15 +18,19 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(DataviewController)
+@TestMixin(IntegrationTestMixin)
 class DataviewControllerIntegrationSpec extends Specification {
 
 	@Shared
 	PersonService personService
 	//ProjectService projectService
 	@Shared
-	SecurityService securityService
+	SecurityService securityService2
 	@Shared
 	UserPreferenceService userPreferenceService
+//	@Shared
+//	DataviewController controller
+
 
 	static Person person
 	static Project project
@@ -33,12 +41,22 @@ class DataviewControllerIntegrationSpec extends Specification {
 	static ProjectTestHelper projectHelper = new ProjectTestHelper()
 	static AssetTestHelper assetHelper = new AssetTestHelper()
 
+
+	static doWithSpring = {
+		springSecurityService(SpringSecurityService)
+
+		securityService(SecurityService) {
+			grailsApplication = ref('grailsApplication')
+			springSecurityService = ref('springSecurityService')
+		}
+	}
+
 	/**
 	 * Used to create a test project and user that is logged in
 	 */
 	def setupSpec() {
 		personService = ApplicationContextHolder.getBean('personService')
-		securityService = ApplicationContextHolder.getBean('securityService')
+		securityService2 = ApplicationContextHolder.getBean('securityService')
 		userPreferenceService = ApplicationContextHolder.getBean('userPreferenceService')
 
 		project = projectHelper.createProject()
@@ -52,14 +70,14 @@ class DataviewControllerIntegrationSpec extends Specification {
 		assert adminUser.username
 
 		// logs the admin user into the system
-		securityService.assumeUserIdentity(adminUser.username, false)
+		securityService2.assumeUserIdentity(adminUser.username, false)
 		// println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
-		assert securityService.isLoggedIn()
+		assert securityService2.isLoggedIn()
 
 		personService.addToProjectSecured(project, adminPerson)
 	}
 
-	void 'test can request an Dataview only by its ID'() {
+	def 'test can request an Dataview only by its ID'() {
 
 		setup:
 			controller.dataviewService = Mock(DataviewService) {
@@ -70,10 +88,12 @@ class DataviewControllerIntegrationSpec extends Specification {
 				}
 			}
 
+
+
 		when:
 			controller.request.method = 'GET'
 			params.id = '1'
-			controller.fetch(null, null)
+			controller.data()
 
 		then:
 			response.json == [:]
