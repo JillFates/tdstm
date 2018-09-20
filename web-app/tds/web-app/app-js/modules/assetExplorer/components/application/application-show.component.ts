@@ -91,6 +91,13 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 				.catch((error) => console.log(error));
 		}
 
+		/**
+		 * Allows to clone an application asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
+		}
+
 	}
 	return ApplicationShowComponent;
 }

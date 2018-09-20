@@ -147,6 +147,13 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				.catch((error) => console.log(error));
 		}
 
+		/**
+		 * Allows to clone an device asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
+		}
+
 	}
 	return DeviceShowComponent;
 }
