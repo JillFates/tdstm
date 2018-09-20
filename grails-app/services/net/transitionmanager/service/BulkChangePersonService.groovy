@@ -3,23 +3,23 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
 @Transactional
-class BulkChangeNumberService implements ServiceMethods {
-
+class BulkChangePersonService implements ServiceMethods {
 	AssetEntityService assetEntityService
 
 	/**
 	 * Bulk replace asset entity specified field with given numeric value
 	 *
-	 * @param value - new field value
+	 * @param person - new person field value
 	 * @param fieldName - field name
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	void bulkReplace(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate(value, fieldName, assetIds, assetIdsFilterQuery)
+	void bulkReplace(Person person, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		bulkUpdate(person, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
@@ -30,22 +30,38 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
 	void bulkClear(String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate('', fieldName, assetIds, assetIdsFilterQuery)
+		bulkUpdate(null, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
-	 * Parse the given value to determine if it is valid or not
+	 * Parse the given person id to determine if it belongs to current project or it has access to it
 	 *
-	 * @param value - numeric value
-	 * @param currentProject - current project, not used but passed by hierarchical service
-	 * @return - same number if it is a number
+	 * @param personId - a person id
+	 * @param currentProject - current project
+	 * @return - person if found
 	 */
-	String coerceBulkValue(Project currentProject, String value) {
+	String coerceBulkValue(Project currentProject, String personId) {
 		if (NumberUtil.isNumber(value)) {
 			return null
 		}
 
-		return value
+		// get person from database by id
+		Long pId = NumberUtil.toPositiveLong(personId, 0)
+		Person person = Person.where { id ==  pid }
+
+		// person was found, see if it has a user login
+		if (person && person?.userLogin) {
+			// obtain found person current project
+			Project foundPersonProject = person.getUserLogin().getCurrentProject()
+			if (foundPersonProject) {
+				// if found person current project is the same
+				// as the current project passed by param, them return found person
+				if (currentProject.id == foundPersonProject.getId()) {
+					return person
+				}
+			}
+		}
+		return null
 	}
 
 	/**
@@ -56,7 +72,7 @@ class BulkChangeNumberService implements ServiceMethods {
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	private void bulkUpdate(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	private void bulkUpdate(Person person, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
 		Map params = [:]
 		Map assetQueryParams = [:]
@@ -72,7 +88,7 @@ class BulkChangeNumberService implements ServiceMethods {
 		}
 
 		String query = """
-			UPDATE AssetEntity SET ${fieldName} = ${value} 
+			UPDATE AssetEntity SET ${fieldName} = ${person} 
 			WHERE project.id = ${securityService.getUserCurrentProjectId()} AND id IN ($queryForAssetIds)
 		"""
 

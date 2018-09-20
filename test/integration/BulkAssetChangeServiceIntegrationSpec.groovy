@@ -13,6 +13,7 @@ import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.BulkAssetChangeService
 import net.transitionmanager.service.BulkChangeDateService
 import net.transitionmanager.service.BulkChangeNumberService
+import net.transitionmanager.service.BulkChangePersonService
 import net.transitionmanager.service.BulkChangeStringService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
@@ -112,7 +113,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 						tagAssets: 'asset-tag-selector',
 						retireDate: 'date-time-selector',
 						externalRefId: 'string-selector',
-						size: 'number-selector'
+						size: 'number-selector',
+						modifiedBy: 'person-selector'
 				]}
 		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
@@ -120,6 +122,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		bulkAssetChangeService.bulkChangeDateService = Mock(BulkChangeDateService)
 		bulkAssetChangeService.bulkChangeStringService = Mock(BulkChangeStringService)
 		bulkAssetChangeService.bulkChangeNumberService = Mock(BulkChangeNumberService)
+		bulkAssetChangeService.bulkChangePersonService = Mock(BulkChangePersonService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -371,5 +374,33 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeNumberService.coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkChangeNumberService.bulkClear('size', [device.id, device2.id], [:])
+	}
+
+	void 'Test person field bulkChange replace'() {
+		setup: 'given an edit command for replacing person field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'replace', value: '1')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangePersonService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangePersonService.bulkReplace(null, 'modifiedBy', [device.id, device2.id], [:])
+	}
+
+	void 'Test person field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangePersonService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id], [:])
 	}
 }
