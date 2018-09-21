@@ -5,6 +5,9 @@ import com.tdssrc.grails.TimeUtil
 
 class Files extends AssetEntity {
 
+	// Override default value set by parent class
+	String assetType = 'Files'
+
 	AssetClass assetClass = AssetClass.STORAGE
 	String fileFormat
 	String LUN
