@@ -2816,14 +2816,17 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					data.size() == 1
+					data.size() == 2
 
 					with(data[0], RowResult) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						with(fields.description, FieldResult) {
-							originalValue == 'Tony Baker'
-							value == 'Tony Baker'
+						with(fields){
+
+							with(it.assetName, FieldResult) {
+								originalValue == 'xraysrv01'
+								value == 'xraysrv01'
+							}
 						}
 					}
 				}

@@ -200,7 +200,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <b> ... transform with ...</b>
 	 */
 	static enum ReservedWord {
-		labels, with, on, off, record, ControlCharacters
+		labels, with, on, off, record, ControlCharacters, populated
 	}
 
 	/**
