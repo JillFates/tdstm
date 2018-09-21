@@ -1,14 +1,14 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Components
-import {ErrorPageComponent} from './errorPage/error-page.component';
-import {UnauthorizedPageComponent} from './unauthorizedPage/unauthorized-page.component';
-import {NotFoundPageComponent} from './notFoundPage/not-found-page.component';
+import {ErrorPageComponent} from './error-page/error-page.component';
+import {UnauthorizedPageComponent} from './unauthorized-page/unauthorized-page.component';
+import {NotFoundPageComponent} from './not-found-page/not-found-page.component';
 
 /**
- * Task States
+ * Security Route States
  * @class
- * @classdesc Represent the possible states and access on Task Routing
+ * @classdesc To use externally to reference possible state of the Security Model
  */
 export class SecurityRouteStates {
 	public static readonly ERROR = {

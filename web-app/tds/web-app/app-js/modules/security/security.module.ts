@@ -1,11 +1,12 @@
+// Angular
 import {NgModule} from '@angular/core';
 // Route Module
-import {SecurityRouteModule} from './security-route.module';
 import {SharedModule} from '../../shared/shared.module';
+import {SecurityRouteModule} from './security-route.module';
 // Components
-import {ErrorPageComponent} from './errorPage/error-page.component';
-import {UnauthorizedPageComponent} from './unauthorizedPage/unauthorized-page.component';
-import {NotFoundPageComponent} from './notFoundPage/not-found-page.component';
+import {ErrorPageComponent} from './error-page/error-page.component';
+import {UnauthorizedPageComponent} from './unauthorized-page/unauthorized-page.component';
+import {NotFoundPageComponent} from './not-found-page/not-found-page.component';
 
 @NgModule({
 	imports: [

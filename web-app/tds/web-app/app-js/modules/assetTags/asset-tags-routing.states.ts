@@ -1,36 +1,46 @@
 import {HeaderComponent} from '../../shared/modules/header/header.component';
-import {Ng2StateDeclaration} from '@uirouter/angular';
 import {TagListComponent} from './components/tag-list/tag-list.component';
 import {Permission} from '../../shared/model/permission.model';
+import {SecurityRoute, SecurityRouteStates} from '../security/security-route.module';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 
-export class AssetTagsRoutingStatesStates {
+/**
+ * Asset Tag Route States
+ * @class
+ * @classdesc To use externally to reference possible state of the Security Model
+ */
+export class AssetTagsRouteStates {
 	public static readonly TAG_LIST = {
 		name: 'tds.tag_list',
-		url: '/tag/list'
+		url: 'tag/list'
 	};
 }
 
-export const TagList: Ng2StateDeclaration = <Ng2StateDeclaration>{
-	name: AssetTagsRoutingStatesStates.TAG_LIST.name,
-	url: AssetTagsRoutingStatesStates.TAG_LIST.url,
-	data: {
-		page: {
-			title: 'ASSET_TAGS.MANAGE_TAGS',
-			instruction: '',
-			menu: ['GLOBAL.PROJECTS', 'ASSET_TAGS.MANAGE_TAGS'],
-			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
+export const AssetTagsRoute: Routes = [
+	{ path: '', pathMatch: 'full', redirectTo: AssetTagsRouteStates.TAG_LIST.url },
+	{
+		path: AssetTagsRouteStates.TAG_LIST.url,
+		data: {
+			page: {
+				title: 'ASSET_TAGS.MANAGE_TAGS',
+				instruction: '',
+				menu: ['GLOBAL.PROJECTS', 'ASSET_TAGS.MANAGE_TAGS'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
+			},
+			requiresAuth: true,
+			requiresPermission: Permission.TagView,
 		},
-		requiresAuth: true,
-		requiresPermission: Permission.TagView,
-	},
-	views: {
-		'headerView@tds': {component: HeaderComponent},
-		'containerView@tds': {component: TagListComponent}
+		component: TagListComponent
 	}
-};
-
-export const ASSET_TAGS_STATES = [
-	TagList,
 ];
+
+@NgModule({
+	exports: [RouterModule],
+	imports: [RouterModule.forChild(AssetTagsRoute)]
+})
+
+export class AssetTagsRouteModule {
+}
