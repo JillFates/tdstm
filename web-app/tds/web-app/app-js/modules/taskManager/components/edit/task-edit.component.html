@@ -236,7 +236,7 @@
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
 
-                                                    <td class="valueNW">
+                                                    <td class="valueNW estimated-finish">
                                                         <kendo-dateinput
                                                                 name="estimatedFinish"
                                                                 class="clickable"
@@ -244,6 +244,7 @@
                                                                 (click)="openRangeDatesSelector()"
                                                                 [(ngModel)]="model.estimatedFinish">
                                                         </kendo-dateinput>
+                                                        <span class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
