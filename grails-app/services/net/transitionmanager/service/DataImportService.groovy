@@ -756,13 +756,14 @@ class DataImportService implements ServiceMethods {
 			case ETLDomain.Device:
 			case ETLDomain.Files:
 			case ETLDomain.Storage:
+			case ETLDomain.Task:
 				processEntityRecord(batch, record, context, recordCount)
 				break
 
 			default:
 				String domain = batch.domainClassName.name()
 				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
-				throw new InvalidRequestException("Batch process not supported for domain ${domain}")
+				throw new InvalidRequestException("processEntityRecord ${domain}")
 		}
 	}
 
@@ -1164,23 +1165,31 @@ class DataImportService implements ServiceMethods {
 					}
 					break
 
+				case Boolean:
+					Boolean boolVal = StringUtil.toBoolean(valueToSet)
+					_recordChangeOnField(domain, fieldName, boolVal, isInitValue, fieldsInfo)
+					break
+
 				case Date:
 					// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
 					if (valueToSet instanceof CharSequence) {
 						// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
 						if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
 							valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-						} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+						} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
 							valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+							valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
 						}
-						// Attempt to parse a Date / Date Time based on the underlying database table column type
-						def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-						def propConfig = mapping.getPropertyConfig(fieldName)
+
+						// Attempt to parse a Date / DateTime based on the underlying database table column type
+						// def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+						// def propConfig = mapping.getPropertyConfig(fieldName)
 					}
 
 					if (! (valueToSet instanceof Date)) {
 						String columnType
-						errorMsg = 'Value must be transformed to a Date or in ISO-8601 format'
+						errorMsg = 'Value must be a Date or in ISO-8601 format (yyyy-MM-dd | yyyy-MM-ddTHH:mm:ssZ)'
 					} else {
 						valueToSet.clearTime()
 						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
@@ -1260,7 +1269,7 @@ class DataImportService implements ServiceMethods {
 	@Transactional(noRollbackFor=[Exception])
 	void _recordChangeOnField( Object domainInstance, String fieldName, Object newValue, Boolean isInitValue=false, Map fieldsInfo = null) {
 		Object existingValue = domainInstance[fieldName]
-		Boolean isNewEntity = (domainInstance.id)
+		Boolean isNewEntity = (! domainInstance.id)
 
 		log.debug '_recordChangeOnField() for {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity, isInitValue
@@ -1516,12 +1525,14 @@ class DataImportService implements ServiceMethods {
 
 					// Attempt to find the reference object
 					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context)
-					if (! errorMsg && entities == null) {
-						errorMsg = "Reference field $fieldName does not support alternate key lookup"
-					} else if (entities.size() > 1) {
-						errorMsg = "Multiple results were found for reference field $fieldName"
-					} else if (entities.size() == 0) {
-						errorMsg = "Unable to find reference for field $fieldName"
+					if (! errorMsg) {
+						if (entities == null) {
+							errorMsg = "Reference field $fieldName does not support alternate key lookup"
+						} else if (entities.size() > 1) {
+							errorMsg = "Multiple results were found for reference field $fieldName"
+						} else if (entities.size() == 0) {
+							errorMsg = "Unable to find reference for field $fieldName"
+						}
 					}
 					if (errorMsg) {
 						break

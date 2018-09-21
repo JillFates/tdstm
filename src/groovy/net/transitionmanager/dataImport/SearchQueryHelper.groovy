@@ -710,12 +710,6 @@ class SearchQueryHelper {
 			Class refDomainClass = GormUtil.getDomainPropertyType(entity, fieldName)
 			String refDomainName = GormUtil.domainShortName(refDomainClass)
 
-			// Make sure that the domain has an alternateLookup defined on the class
-			if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
-				errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
-				return [entities, errorMsg]
-			}
-
 			// This map will get populated with extra criteria that will be used for the alternate key lookup appropriately
 			Map extraCriteria = [:]
 
@@ -814,11 +808,25 @@ class SearchQueryHelper {
 					break
 
 				case 'Person':
-					errorMsg = "Person references have not yet been implemented"
+					// Person is a special case which we will create the person if not found unless the name is ambiguous.
+					Map resultMap = personService.findOrCreatePerson(searchValue, context.project, context.staffList)
+					if (resultMap) {
+						if (resultMap.isAmbiguous) {
+							errorMsg = 'Multiple references found for value'
+						} else if (resultMap.person) {
+							return [ [resultMap.person], null]
+						}
+					}
 					break
 			}
 
 			if (! errorMsg) {
+				// Make sure that the domain has an alternateLookup defined on the class
+				if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
+					errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
+					return [entities, errorMsg]
+				}
+
 				entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
 
 				// If not found and the domain has an alias (mfg/model) then try looking up that way
