@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
@@ -71,6 +72,7 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 	}
 
+	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
 		bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id, device3.id], null)
@@ -82,6 +84,7 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 		}
 	}
 
+	@See('TM-12334')
 	void 'Test replace'() {
 		setup:
 			def modifiedBy = personTestHelper.createPerson()

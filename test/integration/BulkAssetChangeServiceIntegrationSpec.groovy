@@ -21,6 +21,7 @@ import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.TagAssetService
+import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 
@@ -295,6 +296,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 				thrown InvalidParamException
 		}
 
+	@See('TM-12334')
 	void 'Test date/time field bulkChange replace'() {
 		setup: 'given an edit command for replacing date/time, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'replace', value: '2018-09-19')
@@ -309,6 +311,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeDateService.bulkReplace(null, 'retireDate', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test date/time field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'clear', value: '')
@@ -323,6 +326,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeDateService.bulkClear('retireDate', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test string field bulkChange replace'() {
 		setup: 'given an edit command for replacing string field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'replace', value: '1abcd')
@@ -337,6 +341,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeStringService.bulkReplace(null, 'externalRefId', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test string field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'clear', value: '')
@@ -351,6 +356,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeStringService.bulkClear('externalRefId', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test numeric field bulkChange replace'() {
 		setup: 'given an edit command for replacing numeric field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'replace', value: '1')
@@ -365,6 +371,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeNumberService.bulkReplace(null, 'size', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test numeric field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'clear', value: '')
@@ -379,6 +386,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeNumberService.bulkClear('size', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test person field bulkChange replace'() {
 		setup: 'given an edit command for replacing person field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'replace', value: '1')
@@ -393,6 +401,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangePersonService.bulkReplace(null, 'modifiedBy', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test person field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'clear', value: '')
@@ -407,6 +416,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test yes/no field bulkChange replace'() {
 		setup: 'given an edit command for replacing yes/no field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: 'yes')
@@ -421,6 +431,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkReplace(null, 'validation', [device.id, device2.id], [:])
 	}
 
+	@See('TM-12334')
 	void 'Test yes/no field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: '')

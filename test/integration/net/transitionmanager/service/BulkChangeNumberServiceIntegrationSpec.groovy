@@ -7,6 +7,7 @@ import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
@@ -69,6 +70,7 @@ class BulkChangeNumberServiceIntegrationSpec extends IntegrationSpec {
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 	}
 
+	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
 			bulkChangeNumberService.bulkClear('size', [device.id, device2.id, device3.id], null)
@@ -80,6 +82,7 @@ class BulkChangeNumberServiceIntegrationSpec extends IntegrationSpec {
 			}
 	}
 
+	@See('TM-12334')
 	void 'Test replace'() {
 		setup:
 			def size = NumberUtil.toPositiveInteger(RandomStringUtils.randomNumeric(5))
