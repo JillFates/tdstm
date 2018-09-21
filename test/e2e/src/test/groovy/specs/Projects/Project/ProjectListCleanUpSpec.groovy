@@ -21,7 +21,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     static baseName = "QAE2E"
     static maxNumberOfProjects = 1
     static maxNumberOfProjectsToBeDeleted = 2 // Example: will delete 2 actives and 2 completed
-    static licensedProjectName = "TM-Demo"
+    static projectName = "TM-Demo"
 
     def setupSpec() {
         testCount = 0
@@ -50,7 +50,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
 
     def deleteProjects(isCompleted = false){
         def count = 0
-        while (getListedProjectsSize() > maxNumberOfProjects){
+        while (verifyRowsDisplayed() && getListedProjectsSize() > maxNumberOfProjects){
             count = count + 1
             if (count > maxNumberOfProjectsToBeDeleted) {
                 break
@@ -77,5 +77,16 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
             filterByName baseName
         then: 'The user deletes completed projects if there are'
             deleteProjects(true)
+    }
+
+    def "2. Workaround to select a Project for next build"() {
+        when: 'The user clicks on Active Projects button'
+            clickOnActiveProjectsButton()
+        and: 'The user selects a project'
+            filterByName projectName
+        and: 'The user clicks on project'
+            clickOnProjectByName projectName
+        then: 'The project should be selected'
+            projectsModule.assertProjectName projectName
     }
 }

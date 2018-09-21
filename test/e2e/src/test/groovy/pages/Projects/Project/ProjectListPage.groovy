@@ -3,6 +3,7 @@ package pages.Projects.Project
 import geb.Page
 import modules.CommonsModule
 import modules.ProjectsModule
+import geb.waiting.WaitTimeoutException
 
 class ProjectListPage extends Page {
 
@@ -40,6 +41,7 @@ class ProjectListPage extends Page {
         projectDeletedMessage { $("#messageDivId")}
         showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
         projectsModule { module ProjectsModule}
+        commonsModule { module CommonsModule}
     }
 
     def clickOnCreateButton(){
@@ -49,6 +51,7 @@ class ProjectListPage extends Page {
     def filterByName(name){
         waitFor {projectNameFilter.displayed}
         projectNameFilter = name
+        commonsModule.waitForLoadingMessage()
     }
 
     def clickOnProjectByName(name){
@@ -58,6 +61,14 @@ class ProjectListPage extends Page {
     def getListedProjectsSize(){
         waitFor{projectGridRows[0].displayed}
         projectGridRows.size()
+    }
+
+    def verifyRowsDisplayed(){
+        try {
+            waitFor(0.5){projectGridRows[0].displayed}
+        } catch (WaitTimeoutException e){
+            false
+        }
     }
 
     def verifyDeletedMessage(){
