@@ -22,7 +22,7 @@ import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
-import {process} from '@progress/kendo-data-query';
+import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -61,20 +61,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 	protected FieldInfoType = FieldInfoType;
-	protected popup: any = {
-		offset: null,
-		show: false,
-		type: null,
-		gridData: null,
-		gridGroups: [{field: 'domainIndex'}]
-	};
-
-	ngAfterViewInit(): void {
-		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
-		setTimeout(() => {
-			this.collapsed.code = false;
-		}, 300);
-	}
+	protected fieldReferencePopupHelper: FieldReferencePopupHelper;
 
 	constructor(
 		private translatePipe: TranslatePipe,
@@ -84,10 +71,18 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
-			super('#etlBuilder');
-			this.script = '';
-			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
-			this.loadETLScript();
+		super('#etlBuilder');
+		this.script = '';
+		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+		this.loadETLScript();
+		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
+	}
+
+	ngAfterViewInit(): void {
+		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
+		setTimeout(() => {
+			this.collapsed.code = false;
+		}, 300);
 	}
 
 	/**
@@ -399,75 +394,5 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		} else {
 			return (dataItem.init || '');
 		}
-	}
-
-	/**
-	 * Opens and positions the popup based on the click event.
-	 * @param {MouseEvent} $event
-	 */
-	protected onShowPopup($event: MouseEvent, type: FieldInfoType, field: any, fieldLabelMap: Array<any>): void {
-		let typeString = this.FieldInfoType[type].toLowerCase();
-		if (type === FieldInfoType.FIND) {
-			this.buildPopupFieldDataForFindObject(field[typeString], fieldLabelMap);
-		} else {
-			this.buildPopupFieldData(field[typeString], fieldLabelMap);
-			if (field.find && field.find.query && field.find.query.length > 0) {
-				this.popup.domain = field.find.query[0].domain;
-			}
-		}
-		this.popup.type = type;
-		this.popup.mouseEvent = $event;
-		if (this.popup.show) {
-			this.popup.offset = { left: $event.pageX, top: $event.pageY};
-		}
-		this.popup.show = true;
-	}
-
-	/**
-	 * Builds the popup grid field info data.
-	 * @param field
-	 */
-	private buildPopupFieldData(field: any, fieldLabelMap: Array<any>): void {
-		let popupFields: Array<any> = [];
-		for (let fieldName in field) {
-			if (field[fieldName]) {
-				popupFields.push({
-					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
-					value: field[fieldName]
-				});
-			}
-		}
-		this.popup.gridData = process(popupFields, {});
-	}
-
-	/**
-	 * Builds the popup grid field info data.
-	 * @param field
-	 */
-	private buildPopupFieldDataForFindObject(field: any, fieldLabelMap: Array<any>): void {
-		this.popup.results = [];
-		const {matchOn, results} = field;
-		let popupFields: Array<any> = [];
-		field.query.forEach( (item, index) => {
-			const domain = item.domain;
-			let recordsFound = null;
-			if (matchOn && results && matchOn === index && results.length > 0) {
-				recordsFound = results.length;
-				this.popup.results = results;
-			}
-			// safe null check for the new json object structure vs the old one.
-			if (item.criteria) {
-				item.criteria.forEach( field => {
-					popupFields.push({
-						domainIndex: index,
-						domainName: domain,
-						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
-						value: field.value,
-						recordsFound: recordsFound
-					});
-				});
-			}
-		});
-		this.popup.gridData = process(popupFields, { group: this.popup.gridGroups});
 	}
 }

@@ -167,15 +167,15 @@
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
                                                 <!-- Fields Info Popup -->
-                                                <field-reference-popup *ngIf="popup.show"
-                                                                       [mouseEvent]="popup.mouseEvent"
-                                                                       [type]="popup.type"
-                                                                       [domain]="popup.domain"
-                                                                       [results]="popup.results"
-                                                                       [gridData]="popup.gridData"
-                                                                       [gridGroups]="popup.gridGroups"
-                                                                       [offset]="popup.offset"
-                                                                       (onClose)="popup.show = false">
+                                                <field-reference-popup *ngIf="fieldReferencePopupHelper.popup.show"
+                                                                       [mouseEvent]="fieldReferencePopupHelper.popup.mouseEvent"
+                                                                       [type]="fieldReferencePopupHelper.popup.type"
+                                                                       [domain]="fieldReferencePopupHelper.popup.domain"
+                                                                       [results]="fieldReferencePopupHelper.popup.results"
+                                                                       [gridData]="fieldReferencePopupHelper.popup.gridData"
+                                                                       [gridGroups]="fieldReferencePopupHelper.popup.gridGroups"
+                                                                       [offset]="fieldReferencePopupHelper.popup.offset"
+                                                                       (onClose)="fieldReferencePopupHelper.popup.show = false">
                                                 </field-reference-popup>
                                                <kendo-grid *ngIf="transformedDataGrids[i]"
                                                            [data]="transformedDataGrids[i].gridData"
@@ -200,12 +200,12 @@
 
                                                                <!-- Popup Reference Icons -->
                                                                <div class="" style="width: 100%;">
-                                                                   <i *ngIf="dataItem.fields[column].create" (click)="onShowPopup($event, FieldInfoType.CREATE, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                   <i *ngIf="dataItem.fields[column].create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem.fields[column], domain.fieldLabelMap)"
                                                                       title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
-                                                                   <i *ngIf="dataItem.fields[column].update" (click)="onShowPopup($event, FieldInfoType.UPDATE, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                   <i *ngIf="dataItem.fields[column].update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem.fields[column], domain.fieldLabelMap)"
                                                                       title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
                                                                    <i *ngIf="dataItem.fields[column].find && dataItem.fields[column].find.query.length > 0"
-                                                                      (click)="onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                      (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column], domain.fieldLabelMap)"
                                                                       title="View Find Results" class="field-info-icon fa fa-search"></i>
                                                                </div>
 
