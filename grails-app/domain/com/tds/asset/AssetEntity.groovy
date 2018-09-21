@@ -60,7 +60,7 @@ class AssetEntity {
 	String application = ''
 	String assetName
 	String shortName
-	String assetType = AssetType.getDefaultAssetTypeForDomain(this).name
+	String assetType = 'Server'
 	Integer priority
 	String planStatus = UNASSIGNED
 	Date   purchaseDate
