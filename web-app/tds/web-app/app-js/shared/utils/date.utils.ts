@@ -262,12 +262,19 @@ export class DateUtils {
 		return result;
 	}
 
-	public static add(date: any, value: number, unit: string): any {
+	/**
+	 * Increment/decrement a date
+	 * @param date (date)
+	 * @param value (number)
+	 * @param unit (string)
+	 * @returns {Date}
+	 */
+	public static increment(date: any, value: number, unit: 'months' | 'days' | 'minutes'): any {
 		if (value === 0) {
 			return date;
 		}
 
-		return moment(date).add(value, unit).value;
+		return new Date(moment(date).add(value, unit));
 	}
 
 }
