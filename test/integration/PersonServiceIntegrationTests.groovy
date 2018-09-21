@@ -703,8 +703,40 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 	}
 
+	def "18. Merge Person using ProcessMergePersonRequest"() {
+		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
+		when: 'Setup the initial data for the test cases'
+		Map results = [:]
 
+		// Setup the From Person with a UserLogin
+		Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
+		UserLogin fromUser = personHelper.createUserLogin(fromPerson)
+		Long fromUID = fromUser.id
 
+		// Setup the To Person
+		Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
+		UserLogin toUser = personHelper.createUserLogin(fromPerson)
+
+		// Closure used a few times for testing
+		def findTestPersons = { return GormUtil.findAllByProperties(Person, personMap) }
+		List persons = findTestPersons()
+
+		then: 'we should find two people'
+		// We should have two people
+		persons.size() == 2
+		and: 'fromPerson has a userLogin'
+		fromPerson.userLogin
+		and: 'the toPerson has a userLogin'
+		toPerson.userLogin
+
+		when: 'the persons are merged together'
+		// Perform the merge of the accounts
+		securityService.processMergePersonRequest(toPerson.userLogin, null, null)
+		toPerson = Person.get(toPerson.id)
+		UserLogin toUserLogin = toPerson.userLogin
+		then: 'the From user should be switched to the To person'
+		toUserLogin.id == fromUID
+	}
 
 	// Used to convert a person object into a map used by the PersonService
 	private Map personToNameMap(Person p) {
