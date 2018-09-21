@@ -7,54 +7,49 @@ import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
-// import { AuthService } from '../shared/services/auth.service';
-// import { PermissionService } from '../shared/services/permission.service';
-// import { PreferenceService } from '../shared/services/preference.service';
+import { AuthService } from '../shared/services/auth.service';
+import { PermissionService } from '../shared/services/permission.service';
+import { PreferenceService } from '../shared/services/preference.service';
 import { NotifierService } from '../shared/services/notifier.service';
-// import { ComponentCreatorService } from '../shared/services/component-creator.service';
-// import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
-// import { UILoaderService } from '../shared/services/ui-loader.service';
-// import { PersonService } from './services/person.service';
+import { ComponentCreatorService } from '../shared/services/component-creator.service';
+import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
+import { UILoaderService } from '../shared/services/ui-loader.service';
+import { PersonService } from './services/person.service';
 // Shared Directives
-// import { UIAutofocusDirective } from './directives/autofocus-directive';
-// import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
-// import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
-// import { UIToastDirective } from '../shared/directives/ui-toast.directive';
-// import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
-// import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
-// import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
-// import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
-// import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
-// import {UIAutoCenterDirective} from './directives/autocenter-directive';
+import { UIAutofocusDirective } from './directives/autofocus-directive';
+import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
+import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
+import { UIToastDirective } from '../shared/directives/ui-toast.directive';
+import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
+import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
+import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
+import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
+import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
+import {UIAutoCenterDirective} from './directives/autocenter-directive';
 // Shared Pipes
-// import { UserDateTime } from './pipes/userDateTime.pipe';
-// import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
+import { UserDateTime } from './pipes/userDateTime.pipe';
+import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
-// import { FilterPipe } from './pipes/filter.pipe';
-// import { UtilsPipe } from './pipes/utils.pipe';
+import { FilterPipe } from './pipes/filter.pipe';
+import { UtilsPipe } from './pipes/utils.pipe';
 // Shared Components
-// import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
-// import { HeaderComponent } from './modules/header/header.component';
-// import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
-// import { DynamicComponent } from './components/dynamic.component';
-// import { CheckActionComponent } from './components/check-action/check-action.component';
-// import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
-// import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
-// import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
-// import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
-// import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
-// import { AddPersonComponent } from './components/add-person/add-person.component';
-// import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
-// import { AkaComponent } from './components/aka/aka.component';
-// import { ConnectorComponent } from './components/connector/connector.component';
-// Dictionaries
-import { en_DICTIONARY } from './i18n/en.dictionary';
-// Pages
-// import { ErrorPageComponent } from '../modules/security/errorPage/error-page.component';
-// import { UnauthorizedPageComponent } from '../modules/security/unauthorizedPage/unauthorized-page.component';
-// import { NotFoundPageComponent } from '../modules/security/notFoundPage/not-found-page.component';
-// Routing Logic
+import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
+import { HeaderComponent } from './modules/header/header.component';
+import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
+import { DynamicComponent } from './components/dynamic.component';
+import { CheckActionComponent } from './components/check-action/check-action.component';
+import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
+import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
+import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
+import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
+import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
+import { AddPersonComponent } from './components/add-person/add-person.component';
+import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
+import { AkaComponent } from './components/aka/aka.component';
+import { ConnectorComponent } from './components/connector/connector.component';
+// Dictionary
 import { DictionaryService } from './services/dictionary.service';
+import { en_DICTIONARY } from './i18n/en.dictionary';
 
 @NgModule({
 	imports: [
@@ -66,38 +61,35 @@ import { DictionaryService } from './services/dictionary.service';
 		InputsModule
 	],
 	declarations: [
-		// UIAutofocusDirective,
-		// UIHandleEscapeDirective,
-		// UILoaderDirective,
-		// UIToastDirective,
-		// UIBooleanPipe,
-		// UserDateTime,
+		UIAutofocusDirective,
+		UIHandleEscapeDirective,
+		UILoaderDirective,
+		UIToastDirective,
+		UIBooleanPipe,
+		UserDateTime,
 		TranslatePipe,
-		// FilterPipe,
-		// UtilsPipe,
-		// UIDialogDirective,
-		// HeaderComponent,
-		// PopupLegendsComponent,
-		// UIPromptDirective,
-		// UISVGIconDirectiveDirective,
-		// UIFloatingHeaderKGridDirective,
-		// ErrorPageComponent,
-		// NotFoundPageComponent,
-		// UnauthorizedPageComponent,
-		// DynamicComponent,
-		// CodeMirrorComponent,
-		// CheckActionComponent,
-		// URLViewerComponent,
-		// TDSComboBoxComponent,
-		// TDSComboBoxGroupComponent,
-		// SupportsDependsComponent,
-		// DependentCommentComponent,
-		// UIModalDecoratorDirective,
-		// AddPersonComponent,
-		// AssetTagSelectorComponent,
-		// UIAutoCenterDirective,
-		// AkaComponent,
-		// ConnectorComponent
+		FilterPipe,
+		UtilsPipe,
+		UIDialogDirective,
+		HeaderComponent,
+		PopupLegendsComponent,
+		UIPromptDirective,
+		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
+		DynamicComponent,
+		CodeMirrorComponent,
+		CheckActionComponent,
+		URLViewerComponent,
+		TDSComboBoxComponent,
+		TDSComboBoxGroupComponent,
+		SupportsDependsComponent,
+		DependentCommentComponent,
+		UIModalDecoratorDirective,
+		AddPersonComponent,
+		AssetTagSelectorComponent,
+		UIAutoCenterDirective,
+		AkaComponent,
+		ConnectorComponent
 	],
 	providers: [
 		// AuthService,
