@@ -1,6 +1,6 @@
 import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
