@@ -1,10 +1,26 @@
 package com.tdsops.etl
 
+import net.transitionmanager.domain.Project
+import com.tds.asset.AssetEntity
+
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.domain.DomainClassUnitTestMixin
+import groovy.json.internal.LazyMap
+
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
-
+@TestFor(AssetEntity)
+@TestMixin([DomainClassUnitTestMixin])
 class DomainClassQueryHelperSpec extends Specification {
+	@Shared
+	LazyMap lazy = new LazyMap()
+
+	@Shared
+	Project project = new Project()
 
 	@Unroll
 	void 'test can get parameter for field for clazz #clazz and field #field'() {
@@ -26,7 +42,6 @@ class DomainClassQueryHelperSpec extends Specification {
 
 	@Unroll
 	void 'test can get property for field for clazz #clazz and field #field'() {
-
 		expect:
 			DomainClassQueryHelper.getPropertyForField(clazz, field) == result
 
@@ -59,5 +74,30 @@ class DomainClassQueryHelperSpec extends Specification {
 			ETLDomain.Room.getClazz()       | 'roomName'       || ''
 			ETLDomain.Rack.getClazz()       | 'room'           || 'left outer join D.room'
 			ETLDomain.Dependency.getClazz() | 'asset'          || 'left outer join D.asset'
+	}
+
+	@Unroll
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test where method returns nothing when value is not set'() {
+		given: 'necessary objects are created'
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[1,2,3]
+			}
+
+		expect:
+			size == DomainClassQueryHelper.where(ETLDomain.Device, project, [ new FindCondition('assetName', value, operator) ], true).size()
+		where:
+			operator 	| value | size
+			'eq'		| null	| 0
+			'eq'		| lazy	| 0
+			'eq'		| 'xyz'	| 3
+			'isNotNull'	| null	| 3
+			'isNotNull'	| lazy	| 3
+			'isNotNull'	| '123'	| 3
+			'isNull'	| null	| 3
+			'isNull'	| lazy	| 3
+			'isNull'	| '123'	| 3
+
 	}
 }

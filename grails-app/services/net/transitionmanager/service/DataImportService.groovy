@@ -783,7 +783,7 @@ class DataImportService implements ServiceMethods {
 
 			Object entity = findOrCreateEntity(fieldsInfo, context)
 
-			if (entity) {
+			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
 
 				// Now add/update the remaining properties on the domain entity appropriately

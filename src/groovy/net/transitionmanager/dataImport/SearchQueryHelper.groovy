@@ -291,7 +291,7 @@ class SearchQueryHelper {
 
 		if (! GormUtil.isDomainProperty(domainClass, propertyName)) {
 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			log.debug 'classOfDomainProperty() {} {}', errorMsg, domainClass.getName()
+			log.debug 'classOfDomainProperty() {} for domain {}', errorMsg, domainClass.getName()
 		} else {
 			while ( true ) {
 				if (propertyName == 'id') {
