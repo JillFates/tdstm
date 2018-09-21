@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.StringUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
@@ -61,7 +60,6 @@ class BulkChangeStringServiceIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		bulkChangeStringService.assetEntityService = Mock(AssetEntityService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 

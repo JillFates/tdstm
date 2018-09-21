@@ -1,15 +1,12 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
-import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.BooleanUtils
 
 @Transactional
 class BulkChangeYesNoService implements ServiceMethods {
-
-	AssetEntityService assetEntityService
 
 	/**
 	 * Bulk replace asset entity specified field with given yes/no value
@@ -98,8 +95,5 @@ class BulkChangeYesNoService implements ServiceMethods {
 		"""
 
 		AssetEntity.executeUpdate(query, params)
-
-		// Bump the lastUpdated field on those assets that were affected by the remove operation.
-		assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 	}
 }

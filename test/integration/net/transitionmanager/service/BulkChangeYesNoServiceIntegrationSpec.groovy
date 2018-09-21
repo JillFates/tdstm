@@ -5,7 +5,6 @@ import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
-import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
@@ -60,7 +59,6 @@ class BulkChangeYesNoServiceIntegrationSpec  extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		bulkChangeYesNoService.assetEntityService = Mock(AssetEntityService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 

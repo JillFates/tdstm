@@ -8,8 +8,6 @@ import net.transitionmanager.domain.Project
 @Transactional
 class BulkChangeDateService implements ServiceMethods {
 
-	AssetEntityService assetEntityService
-
 	/**
 	 * Bulk replace asset entity specified field with given date
 	 *
@@ -90,9 +88,6 @@ class BulkChangeDateService implements ServiceMethods {
 		"""
 
 		AssetEntity.executeUpdate(query, params)
-
-		// Bump the lastUpdated field on those assets that were affected by the remove operation.
-		assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 	}
 
 	/**

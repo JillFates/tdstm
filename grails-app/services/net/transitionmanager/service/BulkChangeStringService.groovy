@@ -8,8 +8,6 @@ import net.transitionmanager.domain.Project
 @Transactional
 class BulkChangeStringService implements ServiceMethods {
 
-	AssetEntityService assetEntityService
-
 	/**
 	 * Bulk replace asset entity specified field with given string value
 	 *
@@ -90,9 +88,6 @@ class BulkChangeStringService implements ServiceMethods {
 		"""
 
 		AssetEntity.executeUpdate(query, params)
-
-		// Bump the lastUpdated field on those assets that were affected by the remove operation.
-		assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 	}
 
 }

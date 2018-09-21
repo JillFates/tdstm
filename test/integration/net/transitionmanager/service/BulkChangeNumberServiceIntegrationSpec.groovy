@@ -61,7 +61,6 @@ class BulkChangeNumberServiceIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		bulkChangeNumberService.assetEntityService = Mock(AssetEntityService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
