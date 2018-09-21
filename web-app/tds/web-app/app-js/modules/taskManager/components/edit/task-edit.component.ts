@@ -297,6 +297,24 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				this.close({id: this.taskDetailModel, isDeleted: true})
 			}
 		});
+	}
 
+	updateEstimatedFinish(unit: string): void {
+		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.estimatedStart, this.model.estimatedFinish);
+		const diff = this.model.durationParts[unit] - originalParts[unit];
+
+		if (unit === "days") {
+			this.model.estimatedFinish.setDate(this.model.estimatedFinish.getDate() + diff);
+			this.model.estimatedFinish = new Date(this.model.estimatedFinish);
+		}
+
+		if (unit === 'hours') {
+			this.model.estimatedFinish.setHours(this.model.estimatedFinish.getHours() + diff);
+			this.model.estimatedFinish = new Date(this.model.estimatedFinish);
+		}
+
+		if (unit === "minutes") {
+			this.model.estimatedFinish =  new Date(this.model.estimatedFinish.getTime() + (diff * 60000))
+		}
 	}
 }

@@ -262,4 +262,12 @@ export class DateUtils {
 		return result;
 	}
 
+	public static add(date: any, value: number, unit: string): any {
+		if (value === 0) {
+			return date;
+		}
+
+		return moment(date).add(value, unit).value;
+	}
+
 }
