@@ -150,37 +150,6 @@
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Instruction Link</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <input type="text" name="instructionLink"
-                                                               placeholder="Enter URL or Label|URL"
-                                                               [(ngModel)]="model.instructionLink" />
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dateinput
-                                                                name="estimatedStart"
-                                                                (click)="openRangeDatesSelector()"
-                                                                [format]="getDateTimeFormat()"
-                                                                [(value)]="model.estimatedStart" readonly="true">
-                                                        </kendo-dateinput>
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Start</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-datepicker
-                                                                name="actualStart"
-                                                                [format]="dateFormat"
-                                                                [(value)]="model.actualStart">
-                                                        </kendo-datepicker>
-                                                    </td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
                                                         <label><span>Event</span></label>
                                                     </td>
                                                     <td class="valueNW">
@@ -194,19 +163,53 @@
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
+                                                        <label><span>Category</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <kendo-dateinput
-                                                                name="estimatedFinish"
-                                                                (click)="openRangeDatesSelector()"
-                                                                [format]="getDateTimeFormat()"
-                                                                [(value)]="model.estimatedFinish" readonly="true">
-                                                        </kendo-dateinput>
+                                                        <kendo-dropdownlist
+                                                                name="category"
+                                                                [data]="model.categoriesList"
+                                                                [(ngModel)]="model.category">
+                                                        </kendo-dropdownlist>
                                                     </td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Instruction Link</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <input type="text" name="instructionLink"
+                                                               placeholder="Enter URL or Label|URL"
+                                                               [(ngModel)]="model.instructionLink" />
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Due Date</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <kendo-datepicker
+                                                                name="dueDate"
+                                                                [format]="dateFormat"
+                                                                [(value)]="model.dueDate">
+                                                        </kendo-datepicker>
+                                                    </td>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual start</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <kendo-datepicker
+                                                                name="actualStart"
+                                                                [format]="dateFormat"
+                                                                [(value)]="model.actualStart">
+                                                        </kendo-datepicker>
+                                                    </td>
+
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Finish</span></label>
                                                     </td>
+
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="actualFinish"
@@ -217,33 +220,50 @@
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Category</span></label>
+                                                        <label><span>Estimated Start</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="category"
-                                                                [data]="model.categoriesList"
-                                                                [(ngModel)]="model.category">
+                                                        <kendo-dateinput
+                                                                name="estimatedStart"
+                                                                class="clickable"
+                                                                (click)="openRangeDatesSelector()"
+                                                                [format]="getDateTimeFormat()"
+                                                                [(value)]="model.estimatedStart" readonly="true">
+                                                        </kendo-dateinput>
+                                                    </td>
 
-                                                        </kendo-dropdownlist>
-                                                    </td>
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Duration</span></label>
+                                                        <label><span>Estimated Finish</span></label>
                                                     </td>
+
                                                     <td class="valueNW">
-	                                                    <div class="duration-controls">
+                                                        <kendo-dateinput
+                                                                name="estimatedFinish"
+                                                                class="clickable"
+                                                                (click)="openRangeDatesSelector()"
+                                                                [format]="getDateTimeFormat()"
+                                                                [(value)]="model.estimatedFinish" readonly="true">
+                                                        </kendo-dateinput>
+                                                    </td>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        Estimated Duration
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <div class="duration-controls">
                                                             <div class="duration-value">
-	                                                            <input type="text" [(ngModel)]="model.durationParts.days" name="durationDays" id="durationDays">
-	                                                            <label for="durationDays">Days</label>
+                                                                <input type="text" [(ngModel)]="model.durationParts.days" name="durationDays" id="durationDays">
+                                                                <label for="durationDays">Days</label>
                                                             </div>
                                                             <div  class="duration-value">
-	                                                            <input type="text" [(ngModel)]="model.durationParts.hours" name="durationHours" id="durationHours">
-	                                                            <label for="durationHours">Hours</label>
+                                                                <input type="text" [(ngModel)]="model.durationParts.hours" name="durationHours" id="durationHours">
+                                                                <label for="durationHours">Hours</label>
                                                             </div>
-		                                                    <div  class="duration-value">
-			                                                    <input type="text" [(ngModel)]="model.durationParts.minutes" name="durationMinutes" id="durationMinutes">
-			                                                    <label for="durationMinutes">Minutes</label>
-		                                                    </div>
+                                                            <div  class="duration-value">
+                                                                <input type="text" [(ngModel)]="model.durationParts.minutes" name="durationMinutes" id="durationMinutes">
+                                                                <label for="durationMinutes">Minutes</label>
+                                                            </div>
                                                             <label data-toggle="popover"
                                                                    data-trigger="hover"
                                                                    data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
@@ -253,8 +273,7 @@
                                                                 </i>
                                                             </label>
                                                         </div>
-                                                    <td></td>
-                                                    <td></td>
+                                                    </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
@@ -263,18 +282,7 @@
                                                     <td class="valueNW">
                                                         <span>{{model.taskSpec}}</span>
                                                     </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Due Date</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-datepicker
-                                                                name="dueDate"
-                                                                [format]="dateFormat"
-                                                                [(value)]="model.dueDate">
-                                                        </kendo-datepicker>
-                                                    </td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td colspan="4"></td>
                                                 </tr>
                                             </tbody>
                                         </table>
