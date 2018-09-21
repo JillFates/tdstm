@@ -19,6 +19,11 @@ class BulkChangeStringService implements ServiceMethods {
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
 	void bulkReplace(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+
+		if (!value) {
+			throw new InvalidParamException('New value cannot be null')
+		}
+
 		bulkUpdate(value, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
@@ -58,9 +63,9 @@ class BulkChangeStringService implements ServiceMethods {
 	 */
 	private void bulkUpdate(String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		String queryForAssetIds
+		String setFieldQueryPart
 		Map params = [:]
 		Map assetQueryParams = [:]
-		params.value = value
 
 		if (assetIds && !assetIdsFilterQuery) {
 			queryForAssetIds = ':assetIds'
@@ -72,8 +77,15 @@ class BulkChangeStringService implements ServiceMethods {
 			assetQueryParams = assetIdsFilterQuery.params
 		}
 
+		if (value) {
+			params.value = value
+			setFieldQueryPart = "SET ${fieldName} = :value"
+		} else {
+			setFieldQueryPart = "SET ${fieldName} = NULL"
+		}
+
 		String query = """
-			UPDATE AssetEntity SET ${fieldName} = :value  
+			UPDATE AssetEntity ${setFieldQueryPart}  
 			WHERE id IN ($queryForAssetIds)
 		"""
 
