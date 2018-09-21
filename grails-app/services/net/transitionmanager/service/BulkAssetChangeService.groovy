@@ -13,13 +13,25 @@ import net.transitionmanager.domain.Project
 class BulkAssetChangeService implements ServiceMethods {
 	TagAssetService tagAssetService
 	DataviewService dataviewService
+	BulkChangeDateService bulkChangeDateService
+	BulkChangeStringService bulkChangeStringService
+	BulkChangeNumberService bulkChangeNumberService
+	BulkChangePersonService bulkChangePersonService
+	BulkChangeYesNoService bulkChangeYesNoService
 
 	/**
 	 * A list of valid field names
 	 */
 	//TODO Should be removed, once changes are made to the ui
 	@Deprecated
-	static final List<String> fields = ['tagAssets']
+	static final List<String> fields = [
+			'tagAssets',
+			'purchaseDate', 'maintExpDate', 'retireDate',
+			'application', 'assetName', 'shortName', 'department', 'costCenter', 'maintContract', 'description', 'supportType', 'environment', 'serialNumber', 'assetTag', 'ipAddress', 'os', 'truck', 'cart', 'shelf', 'railType', 'appSme', 'externalRefId',
+			'priority', 'purchasePrice', 'usize', 'sourceRackPosition', 'sourceBladePosition', 'targetRackPosition', 'targetBladePosition', 'dependencyBundle', 'size', 'rateOfChange',
+			'appOwner', 'modifiedBy',
+			'validation'
+	]
 
 	/**
 	 * A map of field control types to actions, and to the methods that support them.
@@ -32,6 +44,26 @@ class BulkAssetChangeService implements ServiceMethods {
 			clear  : 'bulkClear',
 			replace: 'bulkReplace',
 			remove : 'bulkRemove'
+		],
+		'date-time-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'string-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'number-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'person-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
+		],
+		'yes-no-selector': [
+			clear  : 'bulkClear',
+			replace: 'bulkReplace'
 		]
 	]
 
@@ -53,7 +85,12 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Maps field control types to services.
 		Map bulkServiceMapping = [
-			'tagAssetService': tagAssetService
+			'tagAssetService'        : tagAssetService,
+			'bulkChangeDateService'  : bulkChangeDateService,
+			'bulkChangeStringService': bulkChangeStringService,
+			'bulkChangeNumberService': bulkChangeNumberService,
+			'bulkChangePersonService': bulkChangePersonService,
+			'bulkChangeYesNoService' : bulkChangeYesNoService
 		]
 
 		if (bulkChange.allAssets) {

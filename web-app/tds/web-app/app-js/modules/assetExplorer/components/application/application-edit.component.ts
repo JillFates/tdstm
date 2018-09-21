@@ -141,7 +141,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 						useValue: personModel
 					},
 					PersonService
-				], false, false)
+				], false, true)
 				.then((result) => {
 					this.personList.push({personId: result.id, fullName: result.name})
 					this.model.asset[fieldName].id = result.id;

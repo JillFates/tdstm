@@ -19,7 +19,7 @@
             <tr>
                 <td colspan="2" class="dialog-container">
                     <div class="dialog">
-                        <table>
+                        <table class="asset-edit-view">
                             <tbody>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}"/>
@@ -258,21 +258,11 @@
 										<kendo-numerictextbox
 											name="deviceSize"
 											[format]="'n'"
-                                            [style.width.px]="70"
 											[min]="0"
 											[autoCorrect]=true
 											tabindex="410"
 											[(ngModel)]="model.asset.size">
 										</kendo-numerictextbox>
-                                        <kendo-dropdownlist
-                                                class="tm-input-control"
-                                                name="modelAssetScaleName"
-                                                [data]="${SizeScale.getAsJsonList() as JSON}"
-                                                [(ngModel)]="model.asset.scale.name"
-                                                [defaultItem]="''"
-                                                [textField]="'text'"
-                                                [valueField]="'value'">
-                                        </kendo-dropdownlist>
                                     </td>
                                 </tr>
                                 <tr>
@@ -295,7 +285,18 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="420" ngmodel="model.asset.rateOfChange"/>
+									<td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
+									<td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
+                                        <kendo-dropdownlist
+                                                class="tm-input-control"
+                                                name="modelAssetScaleName"
+                                                [data]="${SizeScale.getAsJsonList() as JSON}"
+                                                [(ngModel)]="model.asset.scale.name"
+                                                [defaultItem]="''"
+                                                [textField]="'text'"
+                                                [valueField]="'value'">
+                                        </kendo-dropdownlist>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.railType}" value="${asset.railType}"/>
@@ -317,7 +318,7 @@
                                         </kendo-datepicker>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
-                                    <td colspan="2" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
+                                    <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
                                                 class="tm-input-control"
                                                 name="modelAssetValidation"
@@ -325,12 +326,13 @@
                                                 [(ngModel)]="model.asset.validation">
                                         </kendo-dropdownlist>
                                     </td>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="420" ngmodel="model.asset.rateOfChange"/>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"
                                                                    tabindex="109" ngmodel="model.asset.externalRefId"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.truck}" value="${asset.truck}"/>
-                                    <td>
+                                    <td class="truck-input-group">
                                         <tdsAngular:inputControl field="${standardFieldSpecs.truck}" size="3" tabindex="240" value="${asset.truck}" ngmodel="model.asset.truck"/>
                                         <tdsAngular:inputControl field="${standardFieldSpecs.cart}" size="3" tabindex="241" value="${asset.cart}" ngmodel="model.asset.cart"/>
                                         <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" size="2" tabindex="242" value="${asset.shelf}" ngmodel="model.asset.shelf"/>
@@ -355,7 +357,7 @@
     <div class="modal-footer form-group-center">
         <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger pull-left mar-left-50 component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button class="btn btn-danger component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
         <button class="btn btn-default pull-right component-action-delete" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
