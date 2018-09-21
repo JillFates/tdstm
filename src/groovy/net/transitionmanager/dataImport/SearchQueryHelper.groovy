@@ -2,24 +2,22 @@ package net.transitionmanager.dataImport
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.FindCondition
+import com.tdsops.etl.QueryResult
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PersonService
-import com.tdsops.common.grails.ApplicationContextHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-import groovy.util.logging.Slf4j
 
 @Slf4j
 class SearchQueryHelper {
@@ -301,7 +299,7 @@ class SearchQueryHelper {
 
 		if (! GormUtil.isDomainProperty(domainClass, propertyName)) {
 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			log.debug 'classOfDomainProperty() {}', errorMsg
+			log.debug 'classOfDomainProperty() {} for domain {}', errorMsg, domainClass.getName()
 		} else {
 			while ( true ) {
 				if (propertyName == 'id') {
@@ -493,7 +491,9 @@ class SearchQueryHelper {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				if(query.containsKey('criteria')){
+
+				// Support the new find query language using criterias
+				if(query.getClass().isAssignableFrom(QueryResult) || query.containsKey('criteria')){
 					List<FindCondition> conditions = FindCondition.buildCriteria(query.criteria)
 					entities = DomainClassQueryHelper.where(whereDomain, context.project, conditions, false)
 				} else {
@@ -540,7 +540,7 @@ class SearchQueryHelper {
 	private static Object fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
 		Object entity=null
 		if (hasSingleFindResult(propertyName, fieldsInfo)) {
-			Map find = fieldsInfo[propertyName].find ?: null
+			def find = fieldsInfo[propertyName].find ?: null
 			Long entityId = find.results[0]
 			String domainName = find.query[0].domain
 			// Get the class of the domain specified in find of the ETL script
@@ -632,10 +632,6 @@ class SearchQueryHelper {
 					extraCriteria.put('source', (isSource ? 1 : 0))
 					break
 
-				case 'Manufacturer':
-					extraAlternate << 'description'
-					break
-
 				case 'Model':
 					// Need to get the Manufacturer ID
 					// TODO : 6/2018 : properly get the mfg id
@@ -653,16 +649,27 @@ class SearchQueryHelper {
 			}
 
 			if (! result.error) {
-				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria, extraAlternate)
+				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
 
-				if (!entities && refDomainName == 'Model') {
-					Model model = ModelAlias.where { name == searchValue && manufacturer == mfg }.find()?.model
-					if (model) {
-						entities = [model]
+				if ( !entities ) {
+					Object entity
+					if ( refDomainName == 'Model' ) {
+						entity = Model.lookupFirstAlias(searchValue, mfg)
+
+					} else if ( refDomainName == 'Manufacturer' ) {
+						entity = Manufacturer.lookupFirstAlias(searchValue)
+
+					}
+
+					if (entity) {
+						entities = [entity]
+					} else {
+						entities = []
 					}
 				}
 
-				int numFound = entities ? entities.size() : 0
+				int numFound = entities.size()
+
 				log.debug 'fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
 					domainClass.getName(), searchValue, extraCriteria, numFound
 

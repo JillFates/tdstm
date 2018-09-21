@@ -39,18 +39,14 @@ class DomainClassQueryHelper {
 	 * @param project a project instance used as a param in the HQL query
 	 * @param paramsMap a map with params to be used in the HQL query
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
-	 * @return a list of assets returned by an HQL query
+	 * @return a list of Entities returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap, Boolean returnIdOnly=true) {
-
 		List<FindCondition> conditions = paramsMap.collect { Entry entry ->
 			new FindCondition(entry.key, entry.value)
 		}
-		if(domain.isAsset()){
-			return assetEntities(domain.clazz, project, conditions, returnIdOnly)
-		} else {
-			return nonAssetEntities(domain.clazz, project, conditions, returnIdOnly)
-		}
+
+		return where(domain, project, conditions, returnIdOnly)
 	}
 
 	/**
@@ -62,11 +58,28 @@ class DomainClassQueryHelper {
 	 * @return a list of assets returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
-		if(domain.isAsset()){
-			return assetEntities(domain.clazz, project, conditions, returnIdOnly)
-		} else {
-			return nonAssetEntities(domain.clazz, project, conditions, returnIdOnly)
+		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
+		boolean skipQuery=false
+		for (condition in conditions) {
+			if (
+				(! [ FindOperator.isNull, FindOperator.isNotNull].contains(condition.operator))
+			    && (condition.value == null || (condition.value instanceof groovy.json.internal.LazyMap))
+			) {
+				skipQuery = true
+				break
+			}
 		}
+
+		List<Object> results = []
+		if (!skipQuery) {
+			if (domain.isAsset()) {
+				results = assetEntities(domain.clazz, project, conditions, returnIdOnly)
+			} else {
+				results = nonAssetEntities(domain.clazz, project, conditions, returnIdOnly)
+			}
+		}
+
+		return results
 	}
 
 	/**

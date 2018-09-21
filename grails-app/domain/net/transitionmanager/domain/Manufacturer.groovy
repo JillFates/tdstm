@@ -71,6 +71,17 @@ class Manufacturer {
 	}
 
 	/**
+	 * Look for the first Manufacturer by alias name
+	 * @param aliasName
+	 * @return
+	 */
+	static Manufacturer lookupFirstAlias(String aliasName) {
+		ManufacturerAlias.where {
+			name == aliasName
+		}.find()?.manufacturer
+	}
+
+	/**
 	 * Get a ManufacturerAlias object by name and create one (optionally) if it doesn't exist
 	 * @param name - name of the manufacturer alias
 	 * @param createIfNotFound - optional flag to indicating if record should be created (default false)
