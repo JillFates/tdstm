@@ -45,6 +45,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		return this.isDirty();
 	}
 
+	save(): void {
+		this.close(this.model);
+	}
+
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */

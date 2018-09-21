@@ -158,22 +158,15 @@
                                                                [(ngModel)]="model.instructionLink" />
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Start/Finish</span></label>
+                                                        <label><span>Estimated Start</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <kendo-dateinput
-                                                                [format]="getDateTimeFormat()"
-                                                                [(value)]="model.estimatedStart">
-                                                        </kendo-dateinput>
-
-                                                        <!--<span>{{model.estimatedStartUTC}}-{{model.estimatedFinishUTC}}</span>-->
-                                                       <!--
-                                                        <kendo-datepicker
                                                                 name="estimatedStart"
-                                                                [format]="dateFormat"
-                                                                [(value)]="model.estimatedStart">
-                                                        </kendo-datepicker>
-                                                        -->
+                                                                (click)="openRangeDatesSelector()"
+                                                                [format]="getDateTimeFormat()"
+                                                                [(value)]="model.estimatedStart" readonly="true">
+                                                        </kendo-dateinput>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
@@ -204,13 +197,12 @@
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <!--
-                                                        <kendo-datepicker
+                                                        <kendo-dateinput
                                                                 name="estimatedFinish"
-                                                                [format]="dateFormat"
-                                                                [(value)]="model.estimatedFinish">
-                                                        </kendo-datepicker>
-                                                        -->
+                                                                (click)="openRangeDatesSelector()"
+                                                                [format]="getDateTimeFormat()"
+                                                                [(value)]="model.estimatedFinish" readonly="true">
+                                                        </kendo-dateinput>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Finish</span></label>
@@ -282,7 +274,7 @@
                                                         </kendo-datepicker>
                                                     </td>
                                                     <td></td>
-                                                    <td><button (click)="openRangeDatesSelector()">Edit</button></td>
+                                                    <td></td>
                                                 </tr>
                                             </tbody>
                                         </table>
