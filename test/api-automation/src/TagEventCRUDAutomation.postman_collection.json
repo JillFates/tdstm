@@ -114,7 +114,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9c02fb30-6c26-45f0-b2ee-37ceef574054",
+						"id": "68d015c5-3903-4a68-beaa-4e6f58ae5300",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -126,7 +126,7 @@
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
 							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.eql('Brand new Tag');",
+							"    pm.expect(data.name).to.contain('Brand new Tag');",
 							"    pm.expect(data.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(data.color).to.eql('Red');",
 							"    pm.expect(data.css).to.eql('tag-red');",
@@ -151,7 +151,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"Brand new Tag\",\n  \"description\":\"Tag to test new tags events.\",\n  \"color\":\"Red\"\n}"
+					"raw": "{ \n  \"name\":\"Brand new Tag {{$randomInt}}\",\n  \"description\":\"Tag to test new tags events.\",\n  \"color\":\"Red\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -173,7 +173,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "de1cbe65-0640-40e2-b9a6-63c87c883b35",
+						"id": "fbee500e-d785-4a85-a757-1418bba9df45",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -185,7 +185,7 @@
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"    ",
 							"    var data = jsonData.data",
-							"    pm.expect(data.name).to.eql('Return of the Tag');",
+							"    pm.expect(data.name).to.contain('Return of the Tag');",
 							"    pm.expect(data.description).to.eql('The tag returns');",
 							"    pm.expect(data.color).to.eql('Red');",
 							"    pm.expect(data.css).to.eql('tag-red');",
@@ -210,7 +210,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"name\":\"Return of the Tag\",\n  \"description\":\"The tag returns\",\n  \"color\":\"Red\"\n}"
+					"raw": "{ \n  \"name\":\"Return of the Tag {{$randomInt}}\",\n  \"description\":\"The tag returns\",\n  \"color\":\"Red\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
@@ -232,7 +232,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4744fefe-90c1-4684-ba9c-43cabf70c496",
+						"id": "b228c835-9f50-4371-bdd4-720b9c2ffef2",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -246,12 +246,12 @@
 							"    var record = jsonData.data[0];",
 							"    var record2 = jsonData.data[1];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"    ",
-							"    pm.expect(record2.name).to.eql('Return of the Tag');",
+							"    pm.expect(record2.name).to.contain('Return of the Tag');",
 							"    pm.expect(record2.description).to.eql('The tag returns');",
 							"    pm.expect(record2.color).to.eql('Red');",
 							"    pm.expect(record2.css).to.eql('tag-red');",
@@ -300,7 +300,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "310b92de-69af-424f-955a-c7329ee1000f",
+						"id": "47b94463-9faf-4ae2-afcd-e7d25071f4b1",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -313,12 +313,12 @@
 							"    var record = json.data[0];",
 							"    var record2 = json.data[1];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
 							"    ",
-							"    pm.expect(record2.name).to.eql('Return of the Tag');",
+							"    pm.expect(record2.name).to.contain('Return of the Tag');",
 							"    pm.expect(record2.description).to.eql('The tag returns');",
 							"    pm.expect(record2.color).to.eql('Red');",
 							"    pm.expect(record2.css).to.eql('tag-red');",
@@ -365,7 +365,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2e307849-14bd-48dc-87a7-ca32ed7d214e",
+						"id": "efdab324-f67f-429c-ad74-44f1b410f25d",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -378,7 +378,7 @@
 							"    ",
 							"    var data1 = jsonData.data[0];",
 							"    ",
-							"    pm.expect(data1.name).to.eql('Brand new Tag');",
+							"    pm.expect(data1.name).to.contain('Brand new Tag');",
 							"    pm.expect(data1.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(data1.color).to.eql('Red');",
 							"    pm.expect(data1.css).to.eql('tag-red');",
@@ -426,7 +426,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a2afe7f4-81bb-4918-a15e-78975987678f",
+						"id": "f321b0ef-76db-4600-bc83-52e341dbdbd6",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -439,7 +439,7 @@
 							"    ",
 							"    var data1 = json.data[0];",
 							"    ",
-							"    pm.expect(data1.name).to.eql('Return of the Tag');",
+							"    pm.expect(data1.name).to.contain('Return of the Tag');",
 							"    pm.expect(data1.description).to.eql('The tag returns');",
 							"    pm.expect(data1.color).to.eql('Red');",
 							"    pm.expect(data1.css).to.eql('tag-red');",
@@ -488,7 +488,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "991cc7c2-a38c-4760-bb63-20bbf5b82a1f",
+						"id": "8fb47a0d-e6f2-4219-8633-174876fea8f9",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -501,7 +501,7 @@
 							"    ",
 							"    var data1 = jsonData.data[0];",
 							"    ",
-							"    pm.expect(data1.name).to.eql('Return of the Tag');",
+							"    pm.expect(data1.name).to.contain('Return of the Tag');",
 							"    pm.expect(data1.description).to.eql('The tag returns');",
 							"    pm.expect(data1.color).to.eql('Red');",
 							"    pm.expect(data1.css).to.eql('tag-red');",
@@ -550,7 +550,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "da37ef15-0ce9-4c04-bace-1a2cffdd2cfa",
+						"id": "253cba24-9d59-4b47-a428-eb87a3fc38e0",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -562,7 +562,7 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Return of the Tag');",
+							"    pm.expect(record.name).to.contain('Return of the Tag');",
 							"    pm.expect(record.description).to.eql('The tag returns');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
@@ -663,7 +663,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0475c136-f5ec-4b3d-9cc6-aeb205d549e5",
+						"id": "a7ffbe31-26d4-44f5-8c91-f549f2cebf33",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -677,7 +677,7 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
@@ -724,7 +724,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a33d39d3-51ac-4b7c-a348-302eff8cd52b",
+						"id": "d4f67500-a84b-4803-ba7e-b47ad00b97b3",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -736,7 +736,7 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
@@ -783,7 +783,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7fbde744-3761-4f32-9d6f-85936b2261b1",
+						"id": "055b1b50-6017-4889-90fd-74c1e7792913",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -795,7 +795,7 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
@@ -842,7 +842,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2cff0c79-a66d-4476-bc44-981a6c512fe7",
+						"id": "4a1a6db4-5c61-411a-95a2-f0ba3c300b23",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -854,7 +854,7 @@
 							"    ",
 							"    var record = json.data[0];",
 							"    ",
-							"    pm.expect(record.name).to.eql('Brand new Tag');",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
 							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
 							"    pm.expect(record.color).to.eql('Red');",
 							"    pm.expect(record.css).to.eql('tag-red');",
@@ -1306,31 +1306,31 @@
 	],
 	"variable": [
 		{
-			"id": "707e2276-cbe6-4788-ad2d-e1634a1f5a0a",
+			"id": "16d4f8f7-5bbe-4f67-9fde-38e05581a2e4",
 			"key": "projectId",
 			"value": "2445",
 			"type": "string"
 		},
 		{
-			"id": "21cf931d-d09b-47fc-9916-118a4e5439b8",
+			"id": "67229d7e-a237-42a4-bc8e-0318a337981f",
 			"key": "event1",
 			"value": "348",
 			"type": "string"
 		},
 		{
-			"id": "5ce293bc-2847-433a-891f-232be787c177",
+			"id": "cc1a640a-7b3c-46f3-8220-3d39260df001",
 			"key": "event2",
 			"value": "349",
 			"type": "string"
 		},
 		{
-			"id": "28c388f0-ffa4-4714-8b8e-04430e9f3e31",
+			"id": "67158b87-8e54-44bb-9554-51cae4c7c8a3",
 			"key": "event3",
 			"value": "350",
 			"type": "string"
 		},
 		{
-			"id": "fda2ecba-6d93-49e9-941d-cb4e4b2dd4f4",
+			"id": "fb61bf3d-fb80-42e8-b2c9-3e8e9cac4b98",
 			"key": "event4",
 			"value": "364",
 			"type": "string"
