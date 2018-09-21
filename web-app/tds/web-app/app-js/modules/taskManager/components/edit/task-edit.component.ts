@@ -29,7 +29,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	public modalType = ModalType;
 	public dateFormat: string;
-	public dateFormatTime: string;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
@@ -103,6 +102,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			actualStart: assetComment.actStart ? new Date(assetComment.actStart) : '',
 			actualFinish: assetComment.dateResolved ? new Date(assetComment.dateResolved) : '',
 			dueDate: assetComment.dueDate ? new Date(assetComment.dueDate) : '',
+			estimatedStartUTC: assetComment.estStart,
+			estimatedFinishUTC: assetComment.estFinish,
 			estimatedStart: assetComment.estStart ? new Date(assetComment.estStart) : '',
 			estimatedFinish: assetComment.estFinish ? new Date(assetComment.estFinish) : '',
 			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
@@ -156,12 +157,20 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.model.locked = !this.model.locked;
 	}
 
+	getFormattedDate(date): string {
+		return DateUtils.formatUserDateTime(this.dateFormat, date);
+	}
+
+	getDateTimeFormat(): string {
+		return this.dateFormat + ' HH:mm:ss';
+	}
+
 	openRangeDatesSelector(): void {
 		const dateModel: DateRangeSelectorModel = {
-			dateStart: null,
-			dateEnd: null,
-			timeStart: null,
-			timeEnd: null
+			start: this.model.estimatedStart,
+			end: this.model.estimatedFinish,
+			locked: true,
+			format: this.dateFormat
 		};
 
 		this.dialogService.extra(DateRangeSelectorComponent,

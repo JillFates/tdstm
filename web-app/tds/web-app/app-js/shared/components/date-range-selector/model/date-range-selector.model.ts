@@ -1,6 +1,6 @@
 export class DateRangeSelectorModel {
-	dateStart: any;
-	timeStart: any;
-	dateEnd: any;
-	timeEnd: any;
+	start: any;
+	end: any;
+	locked?: boolean;
+	format?: string;
 }

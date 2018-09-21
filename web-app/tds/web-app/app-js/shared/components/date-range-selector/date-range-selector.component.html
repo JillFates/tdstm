@@ -1,16 +1,3 @@
-<style>
-	.date-range-selector-component {
-	}
-
-		.date-range-selector-component .modal-dialog {
-			width: 680px;
-		}
-
-		.date-range-selector-component .modal-dialog .modal-content {
-			width: 680px;
-		}
-
-</style>
 <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in date-range-selector-component" id="date-range-selector-component" data-backdrop="static" tabindex="0" role="dialog">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content" tds-ui-modal-decorator=""
@@ -19,20 +6,59 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Date range selector</h4>
+                <h4 class="modal-title">Select an interval</h4>
             </div>
             <div class="modal-body">
                 <div class="modal-body-container">
                     <form name="dateRangeSelectorForm" role="form" data-toggle="validator" #dateRangeSelectorForm='ngForm' class="form-horizontal left-alignment">
                         <div>
-	                        <div>
-		                        header
+	                        <div class="times-container">
+                                <div class="times-section">
+                                    <kendo-dateinput
+                                            [format]="'dd-MMM-yyyy HH:mm:ss'"
+                                            (valueChange)="onValueChange($event)"
+                                            [(value)]="model.start"></kendo-dateinput>
+                                </div>
+                                <div class="times-section">
+                                    <kendo-dateinput
+                                            [format]="'dd-MMM-yyyy HH:mm:ss'"
+                                            (valueChange)="onValueChange($event)"
+                                            [(value)]="model.end"></kendo-dateinput>
+                                </div>
 	                        </div>
 		                    <div>
-                                <kendo-multiviewcalendar kendoDateRangeSelection [(selectionRange)]="range" ></kendo-multiviewcalendar>
+                                <kendo-multiviewcalendar
+		                                (valueChange)="onValueChange($event)"
+		                                kendoDateRangeSelection [(selectionRange)]="model"></kendo-multiviewcalendar>
 	                        </div>
                         </div>
-	                    <div>Duration</div>
+	                    <div>
+		                    <div class="duration-controls">
+			                    <div class="duration-value"><label>Estimated duration</label></div>
+			                    <div class="duration-value">
+				                    <input type="text" [(ngModel)]="durationParts.days" name="durationDays" id="durationDays" readonly>
+				                    <label class="label-part" for="durationDays">Days</label>
+			                    </div>
+			                    <div  class="duration-value">
+				                    <input type="text" [(ngModel)]="durationParts.hours" name="durationHours" id="durationHours" readonly>
+				                    <label class="label-part" for="durationHours">Hours</label>
+			                    </div>
+			                    <div  class="duration-value">
+				                    <input type="text" [(ngModel)]="durationParts.minutes" name="durationMinutes" id="durationMinutes" readonly>
+				                    <label class="label-part" for="durationMinutes">Minutes</label>
+			                    </div>
+
+			                    <label data-toggle="popover"
+			                           data-trigger="hover"
+			                           class="duration-value label-part"
+			                           data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+				                    <i class="fa fa-fw  lock-state"
+				                       [ngClass]="model.locked ? 'fa-unlock' : 'fa-lock'"
+				                       (click)="model.locked = !model.locked">
+				                    </i>
+			                    </label>
+		                    </div>
+	                    </div>
                     </form>
                 </div>
             </div>

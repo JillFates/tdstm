@@ -236,4 +236,30 @@ export class DateUtils {
 		return result;
 	}
 
+	/**
+	 * Calculate duration parts among two dates
+	 * @param start (date)
+	 * @param end (date)
+	 * @returns {DurationParts}
+	 */
+	public static getDurationPartsAmongDates(start: any, end: any): DurationParts  {
+		const result = {days: null, hours: null, minutes: null};
+
+		if (!start || !end) {
+			return result;
+		}
+		const begin = moment(start);
+		const finish = moment(end);
+
+		const duration = moment.duration(finish.diff(begin));
+
+		if (duration) {
+			result.days = parseInt(duration.asDays(), 10);
+			result.hours =  parseInt(duration.hours(), 10);
+			result.minutes = parseInt(duration.minutes(), 10)
+		}
+
+		return result;
+	}
+
 }

@@ -1,0 +1,29 @@
+.date-range-selector-component
+  .modal-dialog
+    width: 630px
+    .modal-content
+      kendo-multiviewcalendar
+        width: 100%
+      width: 630px
+      .times-container
+        display: flex
+      .times-section
+        flex: 50%
+        kendo-dateinput
+          width: 100%
+          input
+            text-align: center
+      .duration-controls
+        display: flex
+        align-items: center
+        justify-content: center
+        .duration-value
+          margin-right: 15px
+          margin-top: 10px
+          input
+            width: 40px
+            text-align: center
+          .label-part
+            font-weight: normal
+  .k-calendar.k-calendar-range table > tbody + tbody
+    margin-left: 1px !important
