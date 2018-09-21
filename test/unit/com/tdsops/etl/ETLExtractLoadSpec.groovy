@@ -2779,4 +2779,59 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
+	@See('TM-11590')
+	void 'test can use use when populated qualifier in an ETL load command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description,nothingThere
+				xraysrv01,2,,
+				zuludb01,,Some description,
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName'
+				   extract 'cpu' load 'custom1' when populated
+				   extract 'description' set descVar
+				   load 'description' with descVar when populated
+				   extract 'nothingThere' load 'custom2' when populated
+				}
+				""".stripIndent())
+
+		then: 'Results should contain correctly set full name'
+			with (etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 1
+
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						with(fields.description, FieldResult) {
+							originalValue == 'Tony Baker'
+							value == 'Tony Baker'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
 }
