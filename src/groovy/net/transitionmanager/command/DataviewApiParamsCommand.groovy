@@ -14,7 +14,7 @@ class DataviewApiParamsCommand implements CommandObject {
     int limit = 25
 	/**
 	 * Defined by the following structure:
-	 * environment=Production&filter=assetName=PDV*
+	 * filter=environment=Production&filter=assetName=PDV*
 	 */
     List<String> filter
 

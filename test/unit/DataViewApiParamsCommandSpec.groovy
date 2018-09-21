@@ -7,7 +7,6 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 class DataViewApiParamsCommandSpec extends Specification {
 
-
 	void 'test can define offset and limit'(){
 
 		when: 'default values are used'
@@ -49,7 +48,8 @@ class DataViewApiParamsCommandSpec extends Specification {
 
 		then: 'validation succeeds'
 			command.validate()
-			command.filterParams[0]['environment'] == 'Production'
+			command.filterParams[0].aValue == 'environment'
+			command.filterParams[0].bValue == 'Production'
 
 		when: 'filters contains multiple columns with simple values'
 			command = new DataviewApiParamsCommand()
@@ -57,8 +57,10 @@ class DataViewApiParamsCommandSpec extends Specification {
 
 		then: 'validation succeeds'
 			command.validate()
-			command.filterParams[0]['environment'] == 'Production'
-			command.filterParams[1]['assetName'] == 'PDV*'
+			command.filterParams[0].aValue == 'environment'
+			command.filterParams[0].bValue == 'Production'
+			command.filterParams[1].aValue == 'assetName'
+			command.filterParams[1].bValue == 'PDV*'
 
 
 	}

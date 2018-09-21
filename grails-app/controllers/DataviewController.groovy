@@ -18,15 +18,48 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	UserPreferenceService userPreferenceService
 
 	/**
+	 * <p>This endpoint is used by the DataView framework to retrieve the data.</p>
+	 * <p>It receives basically the entire definition of the dataview specification.</p>
+	 * <code>
+	 *    /tdstm/ws/dataview/1/data
+	 * </code>
 	 *
+	 * <p>It can define pagination</p>
+	 * <code>
+	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2
+	 * </code>
 	 *
-	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2
-	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=Production|Development
-	 * .../tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=!Production&filter=Name=PDV*
+	 * <p>It can apply filters over the some columns</p>
+	 * <code>
+	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=Production|Development
+	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=!Production&filter=Name=PDV*
+	 * </code>
+	 * <p>Response contains a JSON structure with records and pagination details</p>
 	 *
-	 * @param id
-	 * @param apiParamsCommand
-	 * @return
+	 * <code>
+	 *	{
+	 *     "status": "success",
+	 *     "data": {
+	 *         "pagination": {
+	 *             "offset": 1,
+	 *             "max": 2,
+	 *             "total": 222
+	 *         },
+	 *         "asset [
+	 *             {
+	 *                 "common_assetName": "VMwareVirtualCenter",
+	 *                 ....
+	 *             },
+	 *             {
+	 *                 "common_assetName": "VMWareUpdateManager",
+	 *                 ....
+	 *             }
+	 *         ]
+	 *     }
+	 * }
+	 * </code>
+	 * @param id ID for a {@code Dataview} instance already created in database
+	 * @param apiParamsCommand API params validated by a typicall
 	 */
 	@HasPermission(Permission.AssetView)
 	def data(Long id) {
@@ -51,57 +84,3 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 		renderSuccessJson(queryResult)
 	}
 }
-/*
-{
-   "offset":0,
-   "limit":1000,
-   "sortDomain":"common",
-   "sortProperty":"id",
-   "sortOrder":"a",
-   "filters":{
-      "domains":[
-         "common",
-         "application",
-         "device"
-      ],
-      "columns":[
-         {
-            "domain":"common",
-            "property":"id",
-            "width":200,
-            "locked":false,
-            "edit":false,
-            "label":"Id",
-            "filter":""
-         },
-         {
-            "domain":"common",
-            "property":"environment",
-            "width":200,
-            "locked":false,
-            "edit":false,
-            "label":"Environment",
-            "filter":"Production|Development"
-         },
-         {
-            "domain":"common",
-            "property":"assetName",
-            "width":200,
-            "locked":false,
-            "edit":false,
-            "label":"Name",
-            "filter":""
-         },
-         {
-            "domain":"application",
-            "property":"sme",
-            "width":200,
-            "locked":false,
-            "edit":false,
-            "label":"SME1",
-            "filter":""
-         }
-      ]
-   }
-}
- */
