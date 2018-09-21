@@ -55,6 +55,10 @@ export const en_DICTIONARY: Object = {
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'SHOW': 'Show View',
+		'CREATE_APPLICATION': 'Create Application',
+		'CREATE_DATABASE': 'Create Database',
+		'CREATE_DEVICE': 'Create Device',
+		'CREATE_STORAGE': 'Create Storage',
 		'GRID': {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
