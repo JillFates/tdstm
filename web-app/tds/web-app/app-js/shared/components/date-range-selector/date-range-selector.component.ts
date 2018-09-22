@@ -28,6 +28,9 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
+		const {start, end, format, locked} = this.model;
+
+		this.model = {start: start ? start : new Date(), end: end ? end : new Date(), format, locked: locked || false};
 		this.durationParts =  DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 	}
 	/**
@@ -134,6 +137,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		const end =  DateUtils.increment(this.model.end, [{value: diff, unit}]);
 
 		this.model = {start, end, format, locked};
+	}
+
+	getTitle(): string {
+		return this.activeRangeEnd === 'start' ? 'Select a Start date' : 'Select a Finish date';
 	}
 
 }
