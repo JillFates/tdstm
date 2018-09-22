@@ -21,6 +21,8 @@ import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.mo
 import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../model/asset-menu.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -77,7 +79,8 @@ export class AssetExplorerViewGridComponent {
 		private bulkCheckboxService: BulkCheckboxService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
-		private dialog: UIDialogService) {
+		private dialog: UIDialogService,
+		private permissionService: PermissionService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
@@ -287,6 +290,10 @@ export class AssetExplorerViewGridComponent {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
+	}
+
+	canCreateAssets(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	/**
