@@ -27,9 +27,11 @@
                                 </div>
 	                        </div>
 		                    <div>
+			                    <!--(valueChange)="onValueChange($event)"-->
                                 <kendo-multiviewcalendar
-		                                (valueChange)="onValueChange($event)"
-		                                kendoDateRangeSelection [(selectionRange)]="model"></kendo-multiviewcalendar>
+		                                [(activeRangeEnd)]="activeRangeEnd"
+		                                (selectionRangeChange)="handleSelectionRange($event)"
+		                                kendoDateRangeSelection [selectionRange]="model"></kendo-multiviewcalendar>
 	                        </div>
                         </div>
 	                    <div>

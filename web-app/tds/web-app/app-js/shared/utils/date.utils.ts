@@ -269,7 +269,7 @@ export class DateUtils {
 	 * @param unit (string)
 	 * @returns {Date}
 	 */
-	public static increment(date: any, value: number, unit: 'months' | 'days' | 'minutes'): any {
+	public static increment(date: any, value: number, unit: 'days' | 'hours' | 'minutes'): any {
 		if (value === 0) {
 			return date;
 		}

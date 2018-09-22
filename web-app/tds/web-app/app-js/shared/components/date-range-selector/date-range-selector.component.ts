@@ -1,11 +1,13 @@
 import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
-import { SelectionRange } from '@progress/kendo-angular-dateinputs';
 
 import {UIExtraDialog} from '../../services/ui-dialog.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
 import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
 import {DateRangeSelectorModel} from './model/date-range-selector.model';
 import {DateUtils, DurationParts} from '../../utils/date.utils';
+import { SelectionRange } from '@progress/kendo-angular-dateinputs';
+import { Day, prevDayOfWeek, nextDayOfWeek } from '@progress/kendo-date-math';
+
 
 @Component({
 	selector: 'tds-date-range-selector',
@@ -16,6 +18,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	title: string;
 	modalOptions: DecoratorOptions;
 	durationParts: DurationParts = { days: null, minutes: null, hours: null };
+	activeRangeEnd: string = 'start';
 
 	constructor(
 		public model: DateRangeSelectorModel,
@@ -88,5 +91,45 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 			}, 0);
 
 		}
+	}
+
+	public handleSelectionRange(range: SelectionRange): void {
+		const {start, end, locked, format} = this.model;
+
+		if (locked) {
+			// preserve start hours
+			const hours = start.getHours();
+			const minutes = start.getMinutes();
+
+			let seed = null;
+
+			if (range.end > end) {
+				seed = range.end;
+			} else {
+				if (range.start < start) {
+					seed = range.start;
+				} else {
+					seed = range[this.activeRangeEnd] ? range[this.activeRangeEnd] : range.start;
+				}
+			}
+
+			let newStart = DateUtils.increment(seed, hours, 'hours');
+			newStart = DateUtils.increment(newStart, minutes, 'minutes');
+
+			let newEnd = DateUtils.increment(newStart, this.durationParts.days, 'days');
+			newEnd = DateUtils.increment(newEnd, this.durationParts.hours, 'hours');
+			newEnd = DateUtils.increment(newEnd, this.durationParts.minutes, 'minutes');
+
+			this.model = {start: newStart, end: newEnd, locked, format};
+		} else {
+			const firstWeekDay = prevDayOfWeek(range.start, Day.Sunday);
+			const lastWeekDay = nextDayOfWeek(firstWeekDay, Day.Saturday);
+
+			// this.range = { start: firstWeekDay, end: lastWeekDay };
+			this.model.start = firstWeekDay;
+			this.model.end = lastWeekDay;
+		}
+
+
 	}
 }
