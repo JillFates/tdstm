@@ -8,6 +8,11 @@ export interface DurationParts {
 	minutes: number;
 }
 
+export interface IncrementDateArgument {
+	value: number;
+	unit: 'days' | 'hours' | 'months' | 'minutes';
+}
+
 export class DateUtils {
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
@@ -269,12 +274,23 @@ export class DateUtils {
 	 * @param unit (string)
 	 * @returns {Date}
 	 */
+	/*
 	public static increment(date: any, value: number, unit: 'days' | 'hours' | 'minutes'): any {
 		if (value === 0) {
 			return date;
 		}
 
 		return new Date(moment(date).add(value, unit));
+	}
+	*/
+	public static increment(date: any, incrementArguments: IncrementDateArgument[]): any {
+		let resultingDate = date;
+
+		incrementArguments.forEach((argument: IncrementDateArgument) => {
+			resultingDate =  new Date(moment(resultingDate).add(argument.value, argument.unit));
+		});
+
+		return resultingDate;
 	}
 
 }

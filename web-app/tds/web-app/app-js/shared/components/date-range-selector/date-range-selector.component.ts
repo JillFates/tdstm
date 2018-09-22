@@ -6,8 +6,6 @@ import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
 import {DateRangeSelectorModel} from './model/date-range-selector.model';
 import {DateUtils, DurationParts} from '../../utils/date.utils';
 import { SelectionRange } from '@progress/kendo-angular-dateinputs';
-import { Day, prevDayOfWeek, nextDayOfWeek } from '@progress/kendo-date-math';
-
 
 @Component({
 	selector: 'tds-date-range-selector',
@@ -18,7 +16,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	title: string;
 	modalOptions: DecoratorOptions;
 	durationParts: DurationParts = { days: null, minutes: null, hours: null };
-	activeRangeEnd: string = 'start';
+	activeRangeEnd = 'start';
 
 	constructor(
 		public model: DateRangeSelectorModel,
@@ -78,29 +76,32 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * @param selectedDate -  current date selected
 	 * @returns {void}
 	 */
+	/*
 	onValueChange(selectedDate: any): void {
 
 		if (this.model.locked) {
 			if (this.model.start) {
 				this.model.start = selectedDate;
-				this.model.end = DateUtils.increment(event, this.durationParts.days, 'days');
+				// this.model.end = DateUtils.increment(event, this.durationParts.days, 'days');
+				this.model.end = DateUtils.increment(event, [{value: this.durationParts.days, unit: 'days'}]);
 			}
 		} else {
 			setTimeout(() => {
 				this.durationParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 			}, 0);
-
 		}
 	}
+	*/
 
 	public handleSelectionRange(range: SelectionRange): void {
 		const {start, end, locked, format} = this.model;
+		let newStart = null;
+		let newEnd = null;
+		// preserve start hours
+		const startHours = start.getHours();
+		const startMinutes = start.getMinutes();
 
 		if (locked) {
-			// preserve start hours
-			const hours = start.getHours();
-			const minutes = start.getMinutes();
-
 			let seed = null;
 
 			if (range.end > end) {
@@ -113,21 +114,14 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 				}
 			}
 
-			let newStart = DateUtils.increment(seed, hours, 'hours');
-			newStart = DateUtils.increment(newStart, minutes, 'minutes');
-
-			let newEnd = DateUtils.increment(newStart, this.durationParts.days, 'days');
-			newEnd = DateUtils.increment(newEnd, this.durationParts.hours, 'hours');
-			newEnd = DateUtils.increment(newEnd, this.durationParts.minutes, 'minutes');
+			const {days, hours, minutes} = this.durationParts;
+			newStart = DateUtils.increment(seed, [{value: startHours, unit: 'hours'}, {value: startMinutes, unit: 'minutes'}] );
+			newEnd = DateUtils.increment(newStart, [{value: days, unit: 'days'}, {value: hours, unit: 'hours'}, {value: minutes, unit: 'minutes'}]);
 
 			this.model = {start: newStart, end: newEnd, locked, format};
 		} else {
-			const firstWeekDay = prevDayOfWeek(range.start, Day.Sunday);
-			const lastWeekDay = nextDayOfWeek(firstWeekDay, Day.Saturday);
-
-			// this.range = { start: firstWeekDay, end: lastWeekDay };
-			this.model.start = firstWeekDay;
-			this.model.end = lastWeekDay;
+			this.model = {start: range.start, end: range.end, locked, format};
+			this.durationParts = DateUtils.getDurationPartsAmongDates(range.start, range.end);
 		}
 
 
