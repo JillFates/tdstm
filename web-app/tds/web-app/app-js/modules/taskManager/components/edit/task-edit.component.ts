@@ -161,8 +161,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		return DateUtils.formatUserDateTime(this.dateFormat, date);
 	}
 
-	getDateTimeFormat(): string {
-		return this.dateFormat + ' HH:mm:ss';
+	getDateTimeFormat(value: string): string {
+		return value ? this.dateFormat + ' HH:mm:ss' : '';
 	}
 
 	openRangeDatesSelector(): void {
@@ -305,4 +305,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		this.model.estimatedFinish =  DateUtils.increment(this.model.estimatedFinish, [{value: diff, unit}]);
 	}
+
+	cleanEstimatedDates(): void {
+		this.model.estimatedFinish = '';
+		this.model.estimatedStart = '';
+		this.model.durationParts = { days: null, minutes: null, hours: null};
+	}
+
 }

@@ -227,7 +227,7 @@
                                                                 name="estimatedStart"
                                                                 class="clickable"
                                                                 (click)="openRangeDatesSelector()"
-                                                                [format]="getDateTimeFormat()"
+                                                                [format]="getDateTimeFormat(model.estimatedStart)"
                                                                 [(value)]="model.estimatedStart" readonly="true">
                                                         </kendo-dateinput>
                                                     </td>
@@ -240,11 +240,12 @@
                                                         <kendo-dateinput
                                                                 name="estimatedFinish"
                                                                 class="clickable"
-                                                                [format]="getDateTimeFormat()"
+                                                                [format]="getDateTimeFormat(model.estimatedFinish)"
                                                                 (click)="openRangeDatesSelector()"
                                                                 [(ngModel)]="model.estimatedFinish">
                                                         </kendo-dateinput>
-                                                        <span class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
+                                                        <span (click)="cleanEstimatedDates()" *ngIf="model.estimatedFinish"
+                                                              class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
