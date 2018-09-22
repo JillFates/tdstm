@@ -169,7 +169,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		const dateModel: DateRangeSelectorModel = {
 			start: this.model.estimatedStart,
 			end: this.model.estimatedFinish,
-			locked: true,
+			locked: this.model.locked,
 			format: this.dateFormat
 		};
 
