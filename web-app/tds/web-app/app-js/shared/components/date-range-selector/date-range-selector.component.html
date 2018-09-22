@@ -38,18 +38,23 @@
 		                    <div class="duration-controls">
 			                    <div class="duration-value"><label>Estimated duration</label></div>
 			                    <div class="duration-value">
-				                    <input type="text" [(ngModel)]="durationParts.days" name="durationDays" id="durationDays" readonly>
+				                    <input type="number"
+				                           (change)="updateEstimatedFinish('days')"
+				                           [(ngModel)]="durationParts.days" name="durationDays" id="durationDays" >
 				                    <label class="label-part" for="durationDays">Days</label>
 			                    </div>
 			                    <div  class="duration-value">
-				                    <input type="text" [(ngModel)]="durationParts.hours" name="durationHours" id="durationHours" readonly>
+				                    <input type="number"
+				                           (change)="updateEstimatedFinish('hours')"
+				                           [(ngModel)]="durationParts.hours" name="durationHours" id="durationHours" >
 				                    <label class="label-part" for="durationHours">Hours</label>
 			                    </div>
 			                    <div  class="duration-value">
-				                    <input type="text" [(ngModel)]="durationParts.minutes" name="durationMinutes" id="durationMinutes" readonly>
+				                    <input type="number"
+				                           (change)="updateEstimatedFinish('minutes')"
+				                           [(ngModel)]="durationParts.minutes" name="durationMinutes" id="durationMinutes" >
 				                    <label class="label-part" for="durationMinutes">Minutes</label>
 			                    </div>
-
 			                    <label data-toggle="popover"
 			                           data-trigger="hover"
 			                           class="duration-value label-part"

@@ -123,7 +123,17 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 			this.model = {start: range.start, end: range.end, locked, format};
 			this.durationParts = DateUtils.getDurationPartsAmongDates(range.start, range.end);
 		}
-
-
 	}
+
+	updateEstimatedFinish(unit: 'days' | 'hours' | 'minutes'): void {
+		const {start, format, locked} = this.model;
+
+		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
+		const diff = this.durationParts[unit] - originalParts[unit];
+
+		const end =  DateUtils.increment(this.model.end, [{value: diff, unit}]);
+
+		this.model = {start, end, format, locked};
+	}
+
 }
