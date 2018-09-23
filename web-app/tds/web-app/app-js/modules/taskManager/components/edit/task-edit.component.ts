@@ -40,6 +40,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public model: any = null;
 	public getAssetList: Function;
 	public yesNoList = ['Yes', 'No'];
+	public predecessorSuccesorColumns: any[];
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -51,12 +52,14 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		super('#task-edit-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
+		this.getPredecessorsForComboBox = this.getPredecessorsForComboBox.bind(this);
 	}
 
 	ngOnInit() {
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
+		this.predecessorSuccesorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property !== 'category');
 
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
