@@ -331,6 +331,9 @@
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
+                                                        <button (click)="onAddPredecessor()" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
+                                                            <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
+                                                        </button>
                                                     </ng-template>
                                                     <!-- Columns -->
                                                     <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
@@ -370,6 +373,9 @@
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
+                                                    <button (click)="onAddSuccessor()" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
+                                                        <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
+                                                    </button>
                                                 </ng-template>
                                                 <!-- Columns -->
                                                 <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"

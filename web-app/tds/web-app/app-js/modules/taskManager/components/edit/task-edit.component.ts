@@ -77,6 +77,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				this.dateFormat = dateFormat;
 			});
 
+
+		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.predecessorList, null, null);
+		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
+
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -151,6 +155,12 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onTeamChange(asset): void {
+	}
+
+	onAddPredecessor(): void {
+	}
+
+	onAddSuccessor(): void {
 	}
 
 	onLockChange(): void {
