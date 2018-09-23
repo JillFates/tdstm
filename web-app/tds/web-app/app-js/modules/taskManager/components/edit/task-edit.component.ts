@@ -17,6 +17,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
+import {DependencySupportModel} from "../../../../shared/components/supports-depends/model/support-on-columns.model";
 
 declare var jQuery: any;
 
@@ -59,7 +60,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
-		this.predecessorSuccesorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property !== 'category');
+		this.predecessorSuccesorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property === 'desc');
 
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
@@ -81,7 +82,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			});
 
 
-		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.predecessorList, null, null);
+		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
 
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
@@ -95,6 +96,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		const assetComment = detail['assetComment'] || {};
 
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
+		// this.taskDetailModel.detail.predecessorList
 
 		return  {
 			id: assetComment.id,
@@ -123,6 +125,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			statusList: [],
 			personList: [],
 			teamList: [],
+			predecessorList: (this.taskDetailModel.detail.predecessorList || [])
+				.map((item) => ({id: item.id, desc: item.desc})),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: detail.categories || [],
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
@@ -161,6 +165,33 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onAddPredecessor(): void {
+		const predecessorTask = {
+			id: 0,
+			desc: ''
+		};
+
+		/*
+		let dependencySupportModel: DependencySupportModel = {
+			id: 0,
+			dataFlowFreq: this.dataFlowFreqList[0],
+			assetClass: this.dependencyClassList[0],
+			assetDepend: {
+				id: '',
+				text: '',
+				moveBundle: {
+					id: 0,
+					name: ''
+				}
+			},
+			type: this.typeList[0],
+			status: this.statusList[0],
+			dependencyType: dependencyType,
+			comment: ''
+		};
+		dataGridTaskPredecessorsHelper
+		dataGrid.addDataItem(dependencySupportModel);
+		this.onChangeInternalModel();
+		*/
 	}
 
 	onAddSuccessor(): void {

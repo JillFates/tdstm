@@ -326,8 +326,7 @@
                                                     [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
-                                                    (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)"
-                                                    [rowClass]="rowStatusColor">
+                                                    (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)">
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
@@ -368,8 +367,7 @@
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
-                                                    (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)"
-                                                    [rowClass]="rowStatusColor">
+                                                    (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
