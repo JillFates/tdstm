@@ -166,6 +166,16 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	onAddSuccessor(): void {
 	}
 
+
+	/**
+	 * Pass Service as Reference
+	 * @param {ComboBoxSearchModel} searchParam
+	 * @returns {Observable<any>}
+	 */
+	public getPredecessorsForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
+		return this.taskManagerService.getTasksForComboBox(searchParam);
+	}
+
 	onLockChange(): void {
 		this.model.locked = !this.model.locked;
 	}

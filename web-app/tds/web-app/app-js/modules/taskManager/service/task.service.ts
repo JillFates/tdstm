@@ -171,4 +171,45 @@ export class TaskService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	/**
+	 *
+	 * @param searchParams
+	 * @returns {Observable<any>}
+	 */
+	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		const params = [];
+		const filters = [];
+
+		params.push({name: 'category', value: 'general'});
+		params.push({name: 'commentId', value: '233347'});
+		params.push({name: 'take', value: searchParams.maxPage});
+		params.push({name: 'skip', value: 0});
+		params.push({name: 'page', value: searchParams.currentPage});
+		params.push({name: 'pageSize', value: searchParams.maxPage});
+
+		filters.push({name: 'value', value: searchParams.query });
+		filters.push({name: 'field', value: 'desc'});
+		filters.push({name: 'operator', value: 'contains'});
+		filters.push({name: 'ignoreCase', value: true});
+		filters.push({name: 'login', value: 'and'});
+
+		const queryString = params
+			.map((param) =>  `${param.name}=${param.value}&`)
+			.concat(filters.map((filter) => `filter[filters][0][${filter.name}]=${filter.value}&`));
+
+
+		// return this.http.get(`../${this.baseURL}/assetEntity/tasksSearch?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+		return this.http.get(`../${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data && response.data.list,
+					total: response.data && response.total,
+					page: response.page || searchParams.currentPage
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
 }
