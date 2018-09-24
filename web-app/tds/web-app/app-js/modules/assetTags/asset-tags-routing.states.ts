@@ -1,7 +1,5 @@
-import {HeaderComponent} from '../../shared/modules/header/header.component';
 import {TagListComponent} from './components/tag-list/tag-list.component';
 import {Permission} from '../../shared/model/permission.model';
-import {SecurityRoute, SecurityRouteStates} from '../security/security-route.module';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
@@ -15,7 +13,7 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 export class AssetTagsRouteStates {
 	public static readonly TAG_LIST = {
 		name: 'tds.tag_list',
-		url: 'tag/list'
+		url: 'list'
 	};
 }
 
@@ -31,7 +29,7 @@ export const AssetTagsRoute: Routes = [
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
 			},
 			requiresAuth: true,
-			requiresPermission: Permission.TagView,
+			// requiresPermission: Permission.TagView,
 		},
 		component: TagListComponent
 	}

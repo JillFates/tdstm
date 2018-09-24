@@ -148,7 +148,7 @@ import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'dashboard'},
 	{path: 'dashboard', loadChildren: '../modules/lazy-test/lazy-test.module#LazyTestModule'},
-	{path: 'tag/**', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
+	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
 ];
 
 @NgModule({

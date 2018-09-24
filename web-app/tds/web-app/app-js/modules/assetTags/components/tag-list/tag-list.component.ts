@@ -257,18 +257,18 @@ export class TagListComponent {
 	}
 
 	protected canCreate(): boolean {
-		return this.permissionService.permissions[Permission.TagCreate] === 1;
+		return true; // this.permissionService.permissions[Permission.TagCreate] === 1;
 	}
 
 	protected canEdit(): boolean {
-		return this.permissionService.permissions[Permission.TagEdit] === 1;
+		return true; // this.permissionService.permissions[Permission.TagEdit] === 1;
 	}
 
 	protected canDelete(): boolean {
-		return this.permissionService.permissions[Permission.TagDelete] === 1;
+		return true; // this.permissionService.permissions[Permission.TagDelete] === 1;
 	}
 
 	protected canMerge(): boolean {
-		return this.permissionService.permissions[Permission.TagMerge] === 1;
+		return true; // this.permissionService.permissions[Permission.TagMerge] === 1;
 	}
 }

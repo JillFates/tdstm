@@ -3,8 +3,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SharedModule} from '../../shared/shared.module';
 import {FormsModule} from '@angular/forms';
-import {BrowserModule} from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 // Kendo
 import {GridModule} from '@progress/kendo-angular-grid';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
@@ -23,7 +21,6 @@ import {TagMergeDialogComponent} from './components/tag-merge/tag-merge-dialog.c
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		BrowserAnimationsModule,
 		// Kendo
 		GridModule,
 		DropDownsModule,
