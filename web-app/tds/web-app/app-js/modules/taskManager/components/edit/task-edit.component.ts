@@ -100,6 +100,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		return  {
 			id: assetComment.id,
+			note: '',
 			duration: assetComment.duration,
 			taskSpec: assetComment.taskSpec,
 			taskNumber: assetComment.taskNumber,
