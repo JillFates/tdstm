@@ -169,4 +169,16 @@ class NumberUtilTests extends Specification {
 			'3.142'                 | null     || 3 as Long
 			new BigDecimal('3.142') | null     || 3 as Long
 	}
+
+	def 'Test toDouble method'() {
+		expect:
+			result == NumberUtil.toDouble(value, precision, defValue)
+		where:
+			value       | precision	| defValue	| result
+			'123.1236'	| null		| null		| 123.1236
+			'123.1236'	| 3			| null		| 123.124
+			null		| 2			| 5.0		| 5.0
+			'foo'		| 2			| 5.0		| 5.0
+	}
+
 }

@@ -249,4 +249,25 @@ class NumberUtil {
 	static Boolean isaNumber(Object object) {
 		return (object instanceof Integer) || (object instanceof Long)
 	}
+
+	/**
+	 * Safely converts a String to a Double without an exception
+	 * @param value
+	 * @param precision - the number of decimal places to round the value to (default null / no rounding)
+	 * @param defaultValue - the value to set if the string can not be converted (default null)
+	 * @return the value converted to a Double
+	 */
+	static toDouble(CharSequence value, Integer precision = null, Double defaultValue=null) {
+		Double result = defaultValue
+		try {
+			if (value?.size() > 0) {
+				result = value.toBigDecimal()
+				if (precision) {
+					result = result.round(precision)
+				}
+			}
+		} catch (java.lang.NumberFormatException e) {
+		}
+		return result
+	}
 }

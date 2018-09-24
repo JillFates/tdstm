@@ -92,4 +92,8 @@ class AssetDependency {
 			[assetEntity]
 		)
 	}
+
+	String toString() {
+		"(${asset?.id}) ${asset?.assetName} > depends on > (${dependent?.id}) ${dependent?.assetName}"
+	}
 }
