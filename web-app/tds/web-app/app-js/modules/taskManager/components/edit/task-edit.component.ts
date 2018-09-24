@@ -126,7 +126,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			personList: [],
 			teamList: [],
 			predecessorList: (this.taskDetailModel.detail.predecessorList || [])
-				.map((item) => ({id: item.id, desc: item.desc})),
+				.map((item) => ({id: item.id, desc: item.desc, model: {id: item.id, text: item.desc }})),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: detail.categories || [],
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
@@ -164,36 +164,29 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	onTeamChange(asset): void {
 	}
 
+	onPredecessorChange(event: any, dataItem: any, rowIndex: number): void {
+		let id = null;
+		let text = null;
+
+		if (event) {
+			id = event.id;
+			text = event.text;
+		}
+
+		this.model.predecessorList[rowIndex].id = id;
+		this.model.predecessorList[rowIndex].desc = text;
+		this.model.predecessorList[rowIndex].model = {id: id, text: text};
+		console.log(this.model.predecessorList);
+	}
+
 	onAddPredecessor(): void {
 		const predecessorTask = {
 			id: 0,
-			text: ''
+			desc: '',
+			model: {id: 0, text: ''}
 		};
+		this.model.predecessorList.unshift(predecessorTask);
 		this.dataGridTaskPredecessorsHelper.addDataItem(predecessorTask);
-
-
-		/*
-		let dependencySupportModel: DependencySupportModel = {
-			id: 0,
-			dataFlowFreq: this.dataFlowFreqList[0],
-			assetClass: this.dependencyClassList[0],
-			assetDepend: {
-				id: '',
-				text: '',
-				moveBundle: {
-					id: 0,
-					name: ''
-				}
-			},
-			type: this.typeList[0],
-			status: this.statusList[0],
-			dependencyType: dependencyType,
-			comment: ''
-		};
-		dataGridTaskPredecessorsHelper
-		dataGrid.addDataItem(dependencySupportModel);
-		this.onChangeInternalModel();
-		*/
 	}
 
 	onAddSuccessor(): void {

@@ -352,10 +352,10 @@
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                             <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                             <tds-combobox
-                                                                    [(model)]="dataItem.id"
+                                                                    [(model)]="dataItem.model"
                                                                     [(metaParam)]="dataItem.id"
                                                                     [serviceRequest]="getTasksForComboBox"
-                                                                    (selectionChange)="onPredecessorChange($event, dataItem)">
+                                                                    (selectionChange)="onPredecessorChange($event, dataItem, rowIndex)">
                                                             </tds-combobox>
                                                         </ng-template>
 
