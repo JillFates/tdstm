@@ -351,6 +351,7 @@
                                                         <!-- Header Template -->
                                                         <ng-template kendoGridHeaderTemplate>
                                                             <label>{{column.label}}</label>
+                                                            <label *ngIf="hasDuplicates(model.predecessorList)" class="duplicate-error">There are duplicates entries</label>
                                                         </ng-template>
 
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
@@ -389,6 +390,7 @@
                                                     <!-- Header Template -->
                                                     <ng-template kendoGridHeaderTemplate>
                                                         <label>{{column.label}}</label>
+                                                        <label *ngIf="hasDuplicates(model.successorList)" class="duplicate-error">There are duplicates entries</label>
                                                     </ng-template>
 
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">

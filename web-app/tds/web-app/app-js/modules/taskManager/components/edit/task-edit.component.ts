@@ -1,5 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
+import * as R from 'ramda';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
@@ -388,6 +389,18 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	cleanEstimatedDates(): void {
 		this.model.estimatedFinish = '';
 		this.model.estimatedStart = '';
+	}
+
+	hasDuplicates(array: any[]): boolean {
+		const ids = [];
+
+		array.forEach((item) => {
+			if (ids.indexOf(item.id) === -1) {
+				ids.push(item.id);
+			}
+		});
+
+		return ids.length < array.length;
 	}
 
 }
