@@ -353,12 +353,6 @@
                                                             <label>{{column.label}}</label>
                                                         </ng-template>
 
-                                                        <!--
-                                                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
-                                                            <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</label>
-                                                        </ng-template>
-                                                        -->
-
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                             <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                             <tds-combobox
@@ -368,14 +362,6 @@
                                                                     (selectionChange)="onPredecessorChange($event, dataItem, rowIndex)">
                                                             </tds-combobox>
                                                         </ng-template>
-
-                                                        <!--
-                                                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                                            <label class="pad-left-7">{{dataItem[column.property]}}</label>
-                                                        </ng-template>
-                                                        -->
-
-
                                                     </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>
@@ -405,12 +391,6 @@
                                                         <label>{{column.label}}</label>
                                                     </ng-template>
 
-                                                    <!--
-                                                    <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
-                                                        <label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</label>
-                                                    </ng-template>
-                                                    -->
-
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                         <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                         <tds-combobox
@@ -420,13 +400,6 @@
                                                                 (selectionChange)="onSuccessorChange($event, dataItem, rowIndex)">
                                                         </tds-combobox>
                                                     </ng-template>
-
-	                                                <!--
-                                                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" >
-                                                        <label class="pad-left-7">{{dataItem[column.property]}}</label>
-                                                    </ng-template>
-                                                    -->
-
                                                 </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>

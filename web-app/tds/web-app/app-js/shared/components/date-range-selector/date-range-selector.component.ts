@@ -15,7 +15,6 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	dataSignature: string;
 	title: string;
 	modalOptions: DecoratorOptions;
-	durationParts: DurationParts = { days: null, minutes: null, hours: null };
 	activeRangeEnd = 'start';
 
 	constructor(
@@ -28,10 +27,9 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
-		const {start, end, format, locked, duration} = this.model;
-
+		// const {start, end, format, locked, duration} = this.model;
 		// this.model = {start: start ? start : new Date(), end: end ? end : new Date(), format, locked: locked || false, duration};
-		this.durationParts =  duration; // DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
+		// this.durationParts =  duration; // DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 	}
 	/**
 	 * Verify the Object has not changed
@@ -100,14 +98,13 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 				}
 			}
 
-			const {days, hours, minutes} = this.durationParts;
+			const {days, hours, minutes} = this.model.duration;
 			newStart = DateUtils.increment(seed, [{value: startHours, unit: 'hours'}, {value: startMinutes, unit: 'minutes'}] );
 			newEnd = DateUtils.increment(newStart, [{value: days, unit: 'days'}, {value: hours, unit: 'hours'}, {value: minutes, unit: 'minutes'}]);
 
 			this.model = {start: newStart, end: newEnd, locked, format, duration};
 		} else {
-			this.model = {start: range.start, end: range.end, locked, format, duration};
-			this.durationParts = DateUtils.getDurationPartsAmongDates(range.start, range.end);
+			this.model = {start: range.start, end: range.end, locked, format, duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
 		}
 	}
 
@@ -115,7 +112,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		const {start, format, locked, duration} = this.model;
 
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
-		const diff = this.durationParts[unit] - originalParts[unit];
+		const diff = duration[unit] - originalParts[unit];
 
 		const end =  DateUtils.increment(this.model.end, [{value: diff, unit}]);
 
