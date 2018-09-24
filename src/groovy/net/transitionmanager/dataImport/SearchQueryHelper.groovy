@@ -701,12 +701,17 @@ class SearchQueryHelper {
 	 */
 	private static List fetchReferenceOfEntityField(Object entity, String fieldName, Map fieldsValueMap, Map context) {
 		List<Object> entities = []
-		String errorMsg
 		String searchValue = fieldsValueMap[fieldName]
 		Manufacturer mfg
+		String errorMsg
 
 		log.debug 'fetchReferenceOfEntityField() Fetching {}.{} with value {}', entity.getClass().getName(), fieldName, searchValue
-		if (searchValue?.size() > 0) {
+
+		if (! fieldsValueMap.containsKey(fieldName)) {
+			errorMsg = "Field $fieldName must be defined"
+		}
+
+		if (! errorMsg && searchValue?.size() > 0) {
 			Class refDomainClass = GormUtil.getDomainPropertyType(entity, fieldName)
 			String refDomainName = GormUtil.domainShortName(refDomainClass)
 
@@ -834,7 +839,9 @@ class SearchQueryHelper {
 					log.debug 'fetchReferenceOfEntityField() Searching by alias'
 					switch (refDomainName) {
 						case 'Model':
-							entities = [ Model.lookupFirstAlias(searchValue, mfg) ]
+							if (mfg) {
+								entities = [ Model.lookupFirstAlias(searchValue, mfg) ]
+							}
 							break
 
 						case 'Manufacturer':
