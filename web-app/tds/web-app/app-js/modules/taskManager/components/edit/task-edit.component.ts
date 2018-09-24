@@ -171,56 +171,30 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	updateTask(): void {
 	}
 
-	onPredecessorChange(event: any, dataItem: any, rowIndex: number): void {
+	onDependencyTaskChange(event: any, collection: any[], gridHelper: DataGridOperationsHelper, rowIndex: number): void {
 		let id = null;
 		let text = null;
 
 		if (event) {
 			id = event.id;
 			text = event.text;
+			collection[rowIndex] = { id, desc:text, model: {id, text}};
+			return;
 		}
 
-		this.model.predecessorList[rowIndex].id = id;
-		this.model.predecessorList[rowIndex].desc = text;
-		this.model.predecessorList[rowIndex].model = {id: id, text: text};
-		console.log(this.model.predecessorList);
+		collection.splice(rowIndex, 1);
+		gridHelper.reloadData(collection);
 	}
 
-	onSuccessorChange(event: any, dataItem: any, rowIndex: number): void {
-		let id = null;
-		let text = null;
-
-		if (event) {
-			id = event.id;
-			text = event.text;
-		}
-
-		this.model.successorList[rowIndex].id = id;
-		this.model.successorList[rowIndex].desc = text;
-		this.model.successorList[rowIndex].model = {id: id, text: text};
-		console.log(this.model.successorList);
-	}
-
-	onAddPredecessor(): void {
+	onAddTaskDependency(collection: any, gridHelper: DataGridOperationsHelper): void {
 		const predecessorTask = {
 			id: 0,
 			desc: '',
 			model: {id: 0, text: ''}
 		};
-		this.model.predecessorList.unshift(predecessorTask);
-		this.dataGridTaskPredecessorsHelper.addDataItem(predecessorTask);
+		collection.unshift(predecessorTask);
+		gridHelper.addDataItem(predecessorTask);
 	}
-
-	onAddSuccessor(): void {
-		const successorTask = {
-			id: 0,
-			desc: '',
-			model: {id: 0, text: ''}
-		};
-		this.model.successorList.unshift(successorTask);
-		this.dataGridTaskSuccessorsHelper.addDataItem(successorTask);
-	}
-
 
 	/**
 	 * Pass Service as Reference
