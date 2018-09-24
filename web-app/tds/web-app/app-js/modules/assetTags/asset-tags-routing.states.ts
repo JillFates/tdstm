@@ -2,6 +2,7 @@ import {TagListComponent} from './components/tag-list/tag-list.component';
 import {Permission} from '../../shared/model/permission.model';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+import {AuthGuardService} from '../security/services/auth.guard.service';
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 
@@ -18,7 +19,7 @@ export class AssetTagsRouteStates {
 }
 
 export const AssetTagsRoute: Routes = [
-	{ path: '', pathMatch: 'full', redirectTo: AssetTagsRouteStates.TAG_LIST.url },
+	{path: '', pathMatch: 'full', redirectTo: AssetTagsRouteStates.TAG_LIST.url},
 	{
 		path: AssetTagsRouteStates.TAG_LIST.url,
 		data: {
@@ -26,12 +27,13 @@ export const AssetTagsRoute: Routes = [
 				title: 'ASSET_TAGS.MANAGE_TAGS',
 				instruction: '',
 				menu: ['GLOBAL.PROJECTS', 'ASSET_TAGS.MANAGE_TAGS'],
-				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
+				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
 			},
 			requiresAuth: true,
-			// requiresPermission: Permission.TagView,
+			requiresPermissions: [Permission.TagView],
 		},
-		component: TagListComponent
+		component: TagListComponent,
+		canActivate: [AuthGuardService]
 	}
 ];
 

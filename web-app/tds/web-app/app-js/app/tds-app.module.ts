@@ -17,6 +17,9 @@ import { TDSAppComponent } from './tds-app.component';
 // Router Logic
 // import { UIRouterModule, UIView } from '@uirouter/angular';
 // import { TdsAppRoute, AuthConfig, PermissionConfig, MiscConfig } from './tds-app.route';
+// Singleton Services
+import {PermissionService} from '../shared/services/permission.service';
+//
 import {TDSAppRouteModule} from './tds-app-route.module';
 import {SharedModule} from '../shared/shared.module';
 import {SecurityModule} from '../modules/security/security.module';
@@ -54,6 +57,7 @@ import {SecurityModule} from '../modules/security/security.module';
 		TDSAppComponent,
 	],
 	providers: [
+		PermissionService
 		// { provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
 	],
 	bootstrap: [

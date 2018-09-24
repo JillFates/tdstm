@@ -1,9 +1,9 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Components
-import {ErrorPageComponent} from './error-page/error-page.component';
-import {UnauthorizedPageComponent} from './unauthorized-page/unauthorized-page.component';
-import {NotFoundPageComponent} from './not-found-page/not-found-page.component';
+import {ErrorPageComponent} from './components/error-page/error-page.component';
+import {UnauthorizedPageComponent} from './components/unauthorized-page/unauthorized-page.component';
+import {NotFoundPageComponent} from './components/not-found-page/not-found-page.component';
 
 /**
  * Security Route States
