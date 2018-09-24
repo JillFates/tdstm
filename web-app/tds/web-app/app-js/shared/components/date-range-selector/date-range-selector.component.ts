@@ -7,6 +7,7 @@ import {DateRangeSelectorModel} from './model/date-range-selector.model';
 import {DateUtils, DurationParts} from '../../utils/date.utils';
 import { SelectionRange } from '@progress/kendo-angular-dateinputs';
 
+declare var jQuery: any;
 @Component({
 	selector: 'tds-date-range-selector',
 	templateUrl: '../tds/web-app/app-js/shared/components/date-range-selector/date-range-selector.component.html'
@@ -27,6 +28,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
+		jQuery('[data-toggle="popover"]').popover();
 	}
 	/**
 	 * Verify the Object has not changed
