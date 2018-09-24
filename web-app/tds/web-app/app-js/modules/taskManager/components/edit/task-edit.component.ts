@@ -247,7 +247,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			start: this.model.estimatedStart,
 			end: this.model.estimatedFinish,
 			locked: this.model.locked,
-			format: this.dateFormat
+			format: this.dateFormat,
+			duration: this.model.durationParts
 		};
 
 		this.dialogService.extra(DateRangeSelectorComponent,

@@ -28,10 +28,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
-		const {start, end, format, locked} = this.model;
+		const {start, end, format, locked, duration} = this.model;
 
-		this.model = {start: start ? start : new Date(), end: end ? end : new Date(), format, locked: locked || false};
-		this.durationParts =  DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
+		// this.model = {start: start ? start : new Date(), end: end ? end : new Date(), format, locked: locked || false, duration};
+		this.durationParts =  duration; // DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 	}
 	/**
 	 * Verify the Object has not changed
@@ -80,7 +80,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * @returns {void}
 	 */
 	public handleSelectionRange(range: SelectionRange): void {
-		const {start, end, locked, format} = this.model;
+		const {start, end, locked, format, duration} = this.model;
 		let newStart = null;
 		let newEnd = null;
 		// preserve start hours
@@ -104,26 +104,32 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 			newStart = DateUtils.increment(seed, [{value: startHours, unit: 'hours'}, {value: startMinutes, unit: 'minutes'}] );
 			newEnd = DateUtils.increment(newStart, [{value: days, unit: 'days'}, {value: hours, unit: 'hours'}, {value: minutes, unit: 'minutes'}]);
 
-			this.model = {start: newStart, end: newEnd, locked, format};
+			this.model = {start: newStart, end: newEnd, locked, format, duration};
 		} else {
-			this.model = {start: range.start, end: range.end, locked, format};
+			this.model = {start: range.start, end: range.end, locked, format, duration};
 			this.durationParts = DateUtils.getDurationPartsAmongDates(range.start, range.end);
 		}
 	}
 
 	updateEstimatedFinish(unit: 'days' | 'hours' | 'minutes'): void {
-		const {start, format, locked} = this.model;
+		const {start, format, locked, duration} = this.model;
 
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 		const diff = this.durationParts[unit] - originalParts[unit];
 
 		const end =  DateUtils.increment(this.model.end, [{value: diff, unit}]);
 
-		this.model = {start, end, format, locked};
+		this.model = {start, end, format, locked, duration};
 	}
 
 	getTitle(): string {
-		return this.activeRangeEnd === 'start' ? 'Select a Start date' : 'Select a Finish date';
+		const startMessage = 'Select a Start Date';
+		const endMessage = 'Select a Finish Date';
+
+		if (this.model.locked) {
+			return startMessage;
+		}
+		return this.activeRangeEnd === 'start' ? startMessage : endMessage;
 	}
 
 }
