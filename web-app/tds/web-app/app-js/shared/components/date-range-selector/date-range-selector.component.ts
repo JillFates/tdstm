@@ -27,9 +27,6 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
-		// const {start, end, format, locked, duration} = this.model;
-		// this.model = {start: start ? start : new Date(), end: end ? end : new Date(), format, locked: locked || false, duration};
-		// this.durationParts =  duration; // DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 	}
 	/**
 	 * Verify the Object has not changed
@@ -81,9 +78,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		const {start, end, locked, format, duration} = this.model;
 		let newStart = null;
 		let newEnd = null;
+
 		// preserve start hours
-		const startHours = start.getHours();
-		const startMinutes = start.getMinutes();
+		const startHours = start ? start.getHours() : 0;
+		const startMinutes = start ? start.getMinutes(): 0;
 
 		if (locked) {
 			let seed = null;
