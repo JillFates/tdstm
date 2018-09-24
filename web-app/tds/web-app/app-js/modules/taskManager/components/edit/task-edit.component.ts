@@ -166,6 +166,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	onTeamChange(asset): void {
 	}
 
+	updateTask(): void {
+	}
+
 	onPredecessorChange(event: any, dataItem: any, rowIndex: number): void {
 		let id = null;
 		let text = null;

@@ -75,27 +75,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	}
 
 	/**
-	 * On selected date, if lock in on just adjust the end date to the current duration, otherwise set the correct interval
-	 * @param selectedDate -  current date selected
+	 * On range selected, if lock in on just adjust the end date to the current duration, otherwise set the correct interval
+	 * @param range -  current range selected
 	 * @returns {void}
 	 */
-	/*
-	onValueChange(selectedDate: any): void {
-
-		if (this.model.locked) {
-			if (this.model.start) {
-				this.model.start = selectedDate;
-				// this.model.end = DateUtils.increment(event, this.durationParts.days, 'days');
-				this.model.end = DateUtils.increment(event, [{value: this.durationParts.days, unit: 'days'}]);
-			}
-		} else {
-			setTimeout(() => {
-				this.durationParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
-			}, 0);
-		}
-	}
-	*/
-
 	public handleSelectionRange(range: SelectionRange): void {
 		const {start, end, locked, format} = this.model;
 		let newStart = null;
