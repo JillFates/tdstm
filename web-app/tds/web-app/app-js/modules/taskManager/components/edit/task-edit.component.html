@@ -47,7 +47,7 @@
                                                     <td class="valueNW task-{{model.status |  lowercase}}">
                                                         <kendo-dropdownlist
                                                                 name="statusList"
-                                                                class="form-control"
+                                                                class="form-control status"
                                                                 [data]="model.statusList"
                                                                 [(ngModel)]="model.status"
                                                                 (valueChange)="onStatusChange($event)">
