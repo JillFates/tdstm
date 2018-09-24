@@ -255,14 +255,13 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			[
 				{provide: UIPromptService, useValue: this.promptService},
 				{provide: DateRangeSelectorModel, useValue: dateModel}
-			], false, false).then(result => {
-				console.log(result);
+			], false, false).then((result: DateRangeSelectorModel) => {
 				if (result) {
-					const {start, end} = result;
+					const {start, end, duration, locked} = result;
 					this.model.estimatedStart = start;
 					this.model.estimatedFinish = end;
-					this.model.durationParts =  DateUtils.getDurationPartsAmongDates(start, end);
-
+					this.model.durationParts =  duration;
+					this.model.locked = locked;
 				}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
