@@ -5,7 +5,17 @@ import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.Person
 
 class Application extends AssetEntity {
-	static final String UNKNOWN = "Unknown"
+	static final String       UNKNOWN     = "Unknown"
+	static final List<String> CRITICALITY = [
+		'Mission Critical',
+		'Business Critical',
+		'Business Operational',
+		'Administrative Services',
+		'Critical',
+		'Major',
+		'Important',
+		'Minor'
+	]
 
 	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor
@@ -51,9 +61,7 @@ class Application extends AssetEntity {
 		appVendor nullable: true
 		appVersion nullable: true
 		businessUnit nullable: true
-		criticality nullable: true, size: 0..25, inList: ['Mission Critical', 'Business Critical',
-		                                                  'Business Operational', 'Administrative Services',
-		                                                  'Critical', 'Major', 'Important', 'Minor']
+		criticality nullable: true, size: 0..25, inList: CRITICALITY
 		drRpoDesc nullable: true
 		drRtoDesc nullable: true
 		latency nullable: true

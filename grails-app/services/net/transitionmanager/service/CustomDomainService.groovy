@@ -462,7 +462,7 @@ class CustomDomainService implements ServiceMethods {
 
         fieldSpecsWithCommon(currentProject).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = [bulkChangeService: field.bulkChangeService, bulkChangeActions: field.bulkChangeActions]
+                fields[field.field] = [bulkChangeService: field.bulkChangeService, bulkChangeActions: field.bulkChangeActions, customValues: field?.constraints?.values ?: []]
             }
         }
 
