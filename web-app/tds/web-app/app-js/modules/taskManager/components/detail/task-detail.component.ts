@@ -32,6 +32,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public collapsedTaskDetail = false;
 	public hasCookbookPermission = false;
+	public hasEditTaskPermission = false;
+	public hasDeleteTaskPermission = false;
 	public modalOptions: DecoratorOptions;
 
 	constructor(
@@ -49,6 +51,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	ngOnInit() {
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 	}
 
 	/**
