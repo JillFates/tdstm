@@ -154,6 +154,10 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			console.log('Will come clone implementation');
 		}
 
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
+		}
+
 	}
 	return DeviceShowComponent;
 }

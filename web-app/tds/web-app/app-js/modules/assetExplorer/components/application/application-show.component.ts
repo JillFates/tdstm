@@ -98,6 +98,10 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			console.log('Will come clone implementation');
 		}
 
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
+		}
+
 	}
 	return ApplicationShowComponent;
 }
