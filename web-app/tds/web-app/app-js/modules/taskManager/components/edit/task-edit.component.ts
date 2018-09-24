@@ -83,7 +83,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
-		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
+		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
 
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
@@ -126,6 +126,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			personList: [],
 			teamList: [],
 			predecessorList: (this.taskDetailModel.detail.predecessorList || [])
+				.map((item) => ({id: item.id, desc: item.desc, model: {id: item.id, text: item.desc }})),
+			successorList: (this.taskDetailModel.detail.successorList || [])
 				.map((item) => ({id: item.id, desc: item.desc, model: {id: item.id, text: item.desc }})),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: detail.categories || [],
@@ -179,6 +181,21 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		console.log(this.model.predecessorList);
 	}
 
+	onSuccessorChange(event: any, dataItem: any, rowIndex: number): void {
+		let id = null;
+		let text = null;
+
+		if (event) {
+			id = event.id;
+			text = event.text;
+		}
+
+		this.model.successorList[rowIndex].id = id;
+		this.model.successorList[rowIndex].desc = text;
+		this.model.successorList[rowIndex].model = {id: id, text: text};
+		console.log(this.model.successorList);
+	}
+
 	onAddPredecessor(): void {
 		const predecessorTask = {
 			id: 0,
@@ -190,6 +207,13 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	onAddSuccessor(): void {
+		const successorTask = {
+			id: 0,
+			desc: '',
+			model: {id: 0, text: ''}
+		};
+		this.model.successorList.unshift(successorTask);
+		this.dataGridTaskSuccessorsHelper.addDataItem(successorTask);
 	}
 
 
