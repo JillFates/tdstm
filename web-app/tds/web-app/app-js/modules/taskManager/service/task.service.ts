@@ -195,16 +195,17 @@ export class TaskService {
 		filters.push({name: 'login', value: 'and'});
 
 		const queryString = params
-			.map((param) =>  `${param.name}=${param.value}&`)
-			.concat(filters.map((filter) => `filter[filters][0][${filter.name}]=${filter.value}&`));
+			.map((param) =>  `${param.name}=${param.value}`)
+			.concat(filters.map((filter) => `filter[filters][0][${filter.name}]=${filter.value}`))
+			.join('&');
 
 
 		// return this.http.get(`../${this.baseURL}/assetEntity/tasksSearch?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
-		return this.http.get(`../${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
+		return this.http.get(`${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
-					result: response.data && response.data.list,
+					result: (response.data && response.data.list || []).map((item) => ({id: item.id, text: item.desc})),
 					total: response.data && response.total,
 					page: response.page || searchParams.currentPage
 				};

@@ -53,7 +53,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		super('#task-edit-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
-		this.getPredecessorsForComboBox = this.getPredecessorsForComboBox.bind(this);
+		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 
 	ngOnInit() {
@@ -167,8 +167,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	onAddPredecessor(): void {
 		const predecessorTask = {
 			id: 0,
-			desc: ''
+			text: ''
 		};
+		this.dataGridTaskPredecessorsHelper.addDataItem(predecessorTask);
+
 
 		/*
 		let dependencySupportModel: DependencySupportModel = {
@@ -203,7 +205,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @param {ComboBoxSearchModel} searchParam
 	 * @returns {Observable<any>}
 	 */
-	public getPredecessorsForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
+	public getTasksForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
 		return this.taskManagerService.getTasksForComboBox(searchParam);
 	}
 
