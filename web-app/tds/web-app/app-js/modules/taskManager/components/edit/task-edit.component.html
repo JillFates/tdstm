@@ -255,10 +255,19 @@
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
-                                                        Estimated Duration
+                                                       <label><span>TaskSpec ID</span></label>
                                                     </td>
 
                                                     <td class="valueNW">
+                                                        <span>{{model.taskSpec}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+
                                                         <div class="duration-controls">
                                                             <div class="duration-value">
                                                                 <input type="number"
@@ -290,14 +299,6 @@
                                                                 </i>
                                                             </label>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>TaskSpec ID</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <span>{{model.taskSpec}}</span>
                                                     </td>
                                                     <td colspan="4">
                                                     </td>
