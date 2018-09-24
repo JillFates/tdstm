@@ -99,12 +99,26 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 			}
 
 			const {days, hours, minutes} = this.model.duration;
-			newStart = DateUtils.increment(seed, [{value: startHours, unit: 'hours'}, {value: startMinutes, unit: 'minutes'}] );
-			newEnd = DateUtils.increment(newStart, [{value: days, unit: 'days'}, {value: hours, unit: 'hours'}, {value: minutes, unit: 'minutes'}]);
+			newStart = DateUtils.increment(seed, [
+				{value: startHours, unit: 'hours'},
+				{value: startMinutes, unit: 'minutes'}] );
+			newEnd = DateUtils.increment(newStart, [
+				{value: days, unit: 'days'},
+				{value: hours, unit: 'hours'},
+				{value: minutes, unit: 'minutes'}]);
 
 			this.model = {start: newStart, end: newEnd, locked, format, duration};
 		} else {
 			this.model = {start: range.start, end: range.end, locked, format, duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
+		}
+	}
+
+	onDateChanged(type: string, value: any): void {
+		const start = type === 'start' ? value : this.model.start;
+		const end = type === 'end' ? value : this.model.end;
+
+		if (this.model.start && this.model.end) {
+			this.model.duration = DateUtils.getDurationPartsAmongDates(start, end);
 		}
 	}
 
