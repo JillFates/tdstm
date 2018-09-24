@@ -475,7 +475,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test yes/no field bulkChange replace'() {
 		setup: 'given an edit command for replacing yes/no field, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: 'yes')
+			EditCommand editCommand = new EditCommand(fieldName: 'latency', action: 'replace', value: 'yes')
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -484,13 +484,13 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkReplace(null, 'validation', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkReplace(null, 'latency', [device.id, device2.id], [:])
 	}
 
 	@See('TM-12334')
 	void 'Test yes/no field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: '')
+			EditCommand editCommand = new EditCommand(fieldName: 'latency', action: 'clear', value: '')
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -499,6 +499,6 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkClear(null, 'validation', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkClear(null, 'latency', [device.id, device2.id], [:])
 	}
 }

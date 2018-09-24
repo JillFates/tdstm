@@ -71,7 +71,7 @@ class BulkChangeYesNoServiceIntegrationSpec  extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
-			bulkChangeYesNoService.bulkClear('validation', [device.id, device2.id, device3.id], null)
+			bulkChangeYesNoService.bulkClear(null, 'validation', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
 			[device, device2, device3].each {
