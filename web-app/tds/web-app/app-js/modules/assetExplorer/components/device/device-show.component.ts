@@ -14,6 +14,9 @@ import { ModelDeviceShowComponent } from './model-device/components/model-device
 import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
@@ -31,7 +34,10 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			private dialogService: UIDialogService,
 			private assetService: DependecyService,
 			private modelService: ModelService,
-			private manufacturerService: ManufacturerService) {
+			private manufacturerService: ManufacturerService,
+			private prompt: UIPromptService,
+			private assetsExplorerService: AssetExplorerService,
+			private notifierService: NotifierService) {
 			this.manufacturerName = null;
 		}
 
@@ -116,6 +122,36 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							}
 						}).catch((error) => console.log(error));
 				});
+		}
+
+		/**
+		 allows to delete the application assets
+		 */
+		onDeleteAsset() {
+
+			this.prompt.open('Confirmation Required',
+				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'Yes', 'No')
+				.then( success => {
+					if (success) {
+						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
+							if (res) {
+								this.notifierService.broadcast({
+									name: 'reloadCurrentAssetList'
+								});
+								this.activeDialog.dismiss();
+							}
+						}, (error) => console.log(error));
+					}
+				})
+				.catch((error) => console.log(error));
+		}
+
+		/**
+		 * Allows to clone an device asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
 		}
 
 	}

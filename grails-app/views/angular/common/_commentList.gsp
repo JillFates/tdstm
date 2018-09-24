@@ -4,7 +4,7 @@
 			[has-publish-permission]="${hasPublishPermission}"
 	 		[can-edit-comments]="${canEdit}"
 			[can-edit-tasks]="${canEditTasks}"
-			[asset-name]="'${raw(asset.assetName).replace("'","\\'")}'"
+			[asset-name]="'${(raw(asset.assetName).replace("'","\\'")).replace("\"","\"")}'"
 			[asset-type]="'${asset.assetType}'">
 	</task-comment>
 </td>

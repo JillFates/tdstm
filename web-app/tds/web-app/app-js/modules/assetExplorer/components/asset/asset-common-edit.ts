@@ -136,4 +136,27 @@ export class AssetCommonEdit implements OnInit {
 
 		this.cancelCloseDialog();
 	}
+
+	/**
+	 allows to delete the application assets
+	 */
+	deleteAsset(assetId) {
+
+		this.promptService.open('Confirmation Required',
+			'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+			'Yes', 'No')
+			.then( success => {
+				if (success) {
+					this.assetExplorerService.deleteAssets([assetId]).subscribe( res => {
+						if (res) {
+							this.notifierService.broadcast({
+								name: 'reloadCurrentAssetList'
+							});
+							this.activeDialog.dismiss();
+						}
+					}, (error) => console.log(error));
+				}
+			})
+			.catch((error) => console.log(error));
+	}
 }

@@ -114,6 +114,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected CurrentValueAction = CurrentValueAction;
 	protected FieldInfoType = FieldInfoType;
 	protected BatchStatus = BatchStatus;
+	private readonly NULL_OBJECT_LABEL = '(null)';
 
 	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
 		this.state.filter.filters.push(this.fieldsFilter.nameFilter);
@@ -136,7 +137,9 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		this.importBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
+					let currentValues = this.batchRecord.currentValues;
 					this.batchRecord = result.data;
+					this.batchRecord.currentValues = currentValues;
 					this.onBatchRecordUpdated.emit({batchRecord: this.batchRecord});
 					this.buildGridData(this.batchRecord.fieldsInfo);
 					this.processStatus.state = CHECK_ACTION.NONE;
@@ -176,7 +179,8 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			if (this.batchRecord.operation === BATCH_RECORD_OPERATION.UPDATE) {
 				// Before POSTING the record
 				if (this.batchRecord.status.code === BatchStatus.PENDING) {
-					currentPreviousValue = this.batchRecord[fieldName];
+					// Use current record property
+					currentPreviousValue = this.batchRecord.existingRecord[fieldName];
 				} else {
 					// After the POSTING the record
 					if ('previousValue' in fields[fieldName] && !ValidationUtils.isEmptyObject(fields[fieldName].previousValue)) {
@@ -200,7 +204,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				this.fieldsInfo.push({
 					name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
 					currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
-						? fields[fieldName].originalValue : '(null)',
+						? fields[fieldName].originalValue : this.NULL_OBJECT_LABEL,
 					currentPreviousValue: currentPreviousValue,
 					currentValueAction: currentValueAction,
 					importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
@@ -408,7 +412,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 			if (field[fieldName]) {
 				popupFields.push({
 					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
-					value: field[fieldName]
+					value: !ValidationUtils.isEmptyObject(field[fieldName]) ? field[fieldName] : this.NULL_OBJECT_LABEL
 				});
 			}
 		}
@@ -427,7 +431,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 		field.query.forEach( (item, index) => {
 			const domain = item.domain;
 			let recordsFound = null;
-			if (matchOn && results && matchOn === index && results.length > 0) {
+			if ((matchOn !== null && results !== null) && (matchOn === index) && results.length > 0) {
 				recordsFound = results.length;
 				this.popup.results = results;
 			}
@@ -438,7 +442,8 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 						domainIndex: index,
 						domainName: domain,
 						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
-						value: field.value,
+						value: !ValidationUtils.isEmptyObject(field.value) ? field.value : this.NULL_OBJECT_LABEL,
+						operator: field.operator,
 						recordsFound: recordsFound
 					});
 				});

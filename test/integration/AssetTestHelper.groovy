@@ -62,9 +62,6 @@ class AssetTestHelper {
 		)
 
 		app.moveBundle = project.getDefaultBundle()
-		app.customDomainService = new CustomDomainService()
-		app.customDomainService.settingService = new SettingService()
-		app.customDomainService.jdbcTemplate = new JdbcTemplate()
 
 		if (!app.save(flush: true)) {
 			throw new RuntimeException("createApplication() failed because " + GormUtil.allErrorsString(app))
@@ -127,9 +124,6 @@ class AssetTestHelper {
 			 }
 		 }
 		AssetEntity asset = new AssetEntity(params)
-		asset.customDomainService = new CustomDomainService()
-		asset.customDomainService.settingService = new SettingService()
-		asset.customDomainService.jdbcTemplate = new JdbcTemplate()
 
 		return asset.save(flush: true, failOnError: true)
 	 }

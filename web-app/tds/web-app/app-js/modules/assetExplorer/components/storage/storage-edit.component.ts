@@ -82,6 +82,13 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			});
 		}
 
+		/**
+		 * Delete the storage asset
+		 */
+		onDeleteAsset(): void {
+			this.deleteAsset(this.model.asset.id);
+		}
+
 	}
 
 	return StorageShowComponent;
