@@ -676,8 +676,42 @@ class Element implements RangeChecker {
 		return copy(this.value + value)
 	}
 
+	/**
+	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
+	 * <code>
+	 *  extract 1 load 'description' when populated
+	 *     ...
+	 * 	load 'description' with myVar when populated
+	 * </code>
+	 * @param reservedWord
+	 * @return current {@code Element} instance
+	 */
 	Element when(ReservedWord reservedWord){
+		if(reservedWord != ReservedWord.populated){
+			throw ETLProcessorException.incorrectWhenCommandStructure()
+		}
 
+		return when { Object val ->
+			val != null || (val instanceof CharSequence && val.trim().isEmpty())
+		}
+	}
+
+	/**
+	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
+	 * <code>
+	 *  extract 1 load 'description' when { it > 1000 }
+	 *     ...
+	 * 	load 'description' with myVar when { it > 1000 }
+	 * </code>
+	 * @param closure Closure to determine if it is necessary
+	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
+	 * @return current {@code Element} instance
+	 */
+	Element when(Closure closure){
+		if(!closure(value)){
+			processor.removeElement(this)
+		}
+		return this
 	}
 
 	/**

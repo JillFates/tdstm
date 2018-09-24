@@ -1202,6 +1202,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	}
 
 	/**
+	 * Removes an element instance value from etl results
+	 * @param element ans instance of {@code Element}
+	 */
+	void removeElement(Element element){
+		result.removeElement(element)
+	}
+
+	/**
 	 * Add a FoundElement in the result based on its fieldName
 	 * <pre>
 	 *		whenFound 'asset' create {
