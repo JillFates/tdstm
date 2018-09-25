@@ -31,8 +31,8 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	 *
 	 * <p>It can apply filters over the some columns</p>
 	 * <code>
-	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=Production|Development
-	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment=!Production&filter=Name=PDV*
+	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment%3DProduction%7CDevelopment
+	 *    /tdstm/ws/dataview/1/data?limit=3&offset=2&filter=environment%3D%21Production&filter=Name%3DPDV*
 	 * </code>
 	 * <p>Response contains a JSON structure with records and pagination details</p>
 	 *
@@ -58,11 +58,10 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 	 *     }
 	 * }
 	 * </code>
-	 * @param id ID for a {@code Dataview} instance already created in database
 	 * @param apiParamsCommand API params validated by a typicall
 	 */
 	@HasPermission(Permission.AssetView)
-	def data(Long id) {
+	def data() {
 
 		Project project = getProjectForWs()
 		DataviewApiParamsCommand apiParamsCommand = populateCommandObject(DataviewApiParamsCommand)
@@ -74,7 +73,7 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		Dataview dataview = Dataview.get(id)
+		Dataview dataview = fetchDomain(Dataview, params)
 		if (!dataview) {
 			renderErrorJson('Dataview invalid')
 			return

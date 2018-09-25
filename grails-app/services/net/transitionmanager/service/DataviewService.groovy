@@ -321,7 +321,7 @@ class DataviewService implements ServiceMethods {
 		return previewQuery(project, dataviewSpec)
 	}
 
-	/**x
+	/**
 	 * Gets the hql for filtering by asset ids, based of the filters from the all asset views.
 	 *
 	 * @param project The current project used to limit the query.

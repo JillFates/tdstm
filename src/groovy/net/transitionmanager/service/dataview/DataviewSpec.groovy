@@ -1,7 +1,7 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
-import grails.util.Pair
+import net.transitionmanager.command.DataviewApiFilterParam
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -78,10 +78,14 @@ class DataviewSpec {
 		spec.domains = jsonDataview.domains.collect { it.toLowerCase() }
 		spec.columns = jsonDataview.columns
 
-		apiParamsCommand?.filterParams.each { Pair<String, String> pair ->
-			List matchingColumns = spec.columns.findAll{it.property == pair.aValue || it.label == pair.aValue }
+		apiParamsCommand?.filterParams.each { DataviewApiFilterParam filter ->
+
+			List matchingColumns = spec.columns.findAll{ Map columnSpec ->
+				filter.matchWithDataviewColumnSpec(columnSpec)
+			}
+
 			if(matchingColumns.size() == 1){
-				matchingColumns[0].filter = pair.bValue
+				matchingColumns[0].filter = filter.filter
 			} else {
 				throw new RuntimeException('Multiple results for column name')
 			}
@@ -110,7 +114,6 @@ class DataviewSpec {
 			}
 		}
 	}
-
 
     void addColumn(domain, property, filter = null){
         spec.columns += [
