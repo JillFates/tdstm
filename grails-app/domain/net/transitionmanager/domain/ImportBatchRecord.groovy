@@ -142,6 +142,7 @@ class ImportBatchRecord {
 			importBatch: [ id: importBatch.id ],
 			domainPrimaryId: domainPrimaryId,
 			duplicateReferences: duplicateReferences,
+			errorCount: errorCount,
 			lastUpdated: lastUpdated,
 			operation: operation.name(),
 			sourceRowId: sourceRowId,
@@ -152,21 +153,12 @@ class ImportBatchRecord {
 			warn: warn
 		]
 
-		Map fieldsInfoMap = fieldsInfoAsMap()
-
-		// Determine the number of errors for this record by iterating the fields info map.
-		int fieldErrors = 0
-		fieldsInfoMap.each { key, value ->
-			fieldErrors += value.errors.size()
-		}
-
-		domainMap.errorCount = fieldErrors
-
 		if (minimalInfo) {
 			// Populate the currentValues map with the current values from the fieldsInfo
 			// for each field specified in the batch
 			//
 
+			Map info = fieldsInfoAsMap()
 			Map currentValues = [:]
 			Map initValues = [:]
 
@@ -174,8 +166,8 @@ class ImportBatchRecord {
 				def value = null
 				def initVal = null
 
-				if (fieldsInfoMap.containsKey(fieldName)) {
-					def record = ( fieldsInfoMap[fieldName] ?: [:] )
+				if (info.containsKey(fieldName)) {
+					def record = ( info[fieldName] ?: [:] )
 
 					value = record.value
 					initVal = record.init
@@ -196,7 +188,7 @@ class ImportBatchRecord {
 		} else {
 			// Populate the full errors and fieldsInfo sections instead of the currentValues
 			domainMap.errorList = errorListAsList()
-			domainMap.fieldsInfo = fieldsInfoMap
+			domainMap.fieldsInfo = fieldsInfoAsMap()
 
 			// Populate the results of the find/elseFind queries if the record is pending
 			if (status == ImportBatchStatusEnum.PENDING) {

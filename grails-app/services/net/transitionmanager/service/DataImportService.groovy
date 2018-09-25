@@ -778,7 +778,7 @@ class DataImportService implements ServiceMethods {
 	 */
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		try {
-			Map fieldsInfo = record.fieldsInfoAsMap()
+			Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
