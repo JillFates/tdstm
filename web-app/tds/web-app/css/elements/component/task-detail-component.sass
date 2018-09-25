@@ -1,3 +1,5 @@
+@import "../../base/taskstatus-mixins"
+
 .task-detail-component
   .tds-angular-component-content
     .successor-predecessor-table
@@ -126,6 +128,7 @@
   overflow-y: auto!important
 
 
+// Give more specificity to status rules in order to avoid the use of important in task-status.sass
 .task-detail-component
   .task-status
     .task-hold
