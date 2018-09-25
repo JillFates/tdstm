@@ -1,4 +1,4 @@
-import {DurationParts} from "../../../utils/date.utils";
+import {DurationParts} from '../../../utils/date.utils';
 
 export class DateRangeSelectorModel {
 	start: any;

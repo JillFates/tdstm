@@ -199,8 +199,6 @@ export class TaskService {
 			.concat(filters.map((filter) => `filter[filters][0][${filter.name}]=${filter.value}`))
 			.join('&');
 
-
-		// return this.http.get(`../${this.baseURL}/assetEntity/tasksSearch?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
 		return this.http.get(`${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
 			.map((res: Response) => {
 				let response = res.json();

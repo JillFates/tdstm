@@ -83,7 +83,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 		// preserve start hours
 		const startHours = start ? start.getHours() : 0;
-		const startMinutes = start ? start.getMinutes(): 0;
+		const startMinutes = start ? start.getMinutes() : 0;
 
 		if (locked) {
 			let seed = null;

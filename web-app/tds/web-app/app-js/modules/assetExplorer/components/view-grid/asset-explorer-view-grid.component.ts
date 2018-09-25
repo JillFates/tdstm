@@ -18,8 +18,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from "../tds-checkbox/model/tds-checkbox.model";
-
+import {CheckboxState, CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 
 const {

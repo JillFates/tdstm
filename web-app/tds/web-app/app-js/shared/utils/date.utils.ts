@@ -1,5 +1,4 @@
 import {INTERVAL} from '../model/constants';
-
 import * as moment from 'moment-timezone';
 
 export interface DurationParts {
@@ -8,9 +7,11 @@ export interface DurationParts {
 	minutes: number;
 }
 
+export type DatePartUnit = 'days' | 'hours' | 'months' | 'minutes';
+
 export interface IncrementDateArgument {
 	value: number;
-	unit: 'days' | 'hours' | 'months' | 'minutes';
+	unit: DatePartUnit
 }
 
 export class DateUtils {
@@ -268,27 +269,18 @@ export class DateUtils {
 	}
 
 	/**
-	 * Increment/decrement a date
+	 * Apply an array of Increment/decrement operations to the date provided
 	 * @param date (date)
-	 * @param value (number)
-	 * @param unit (string)
+	 * @param incrementArguments (object[])
 	 * @returns {Date}
 	 */
-	/*
-	public static increment(date: any, value: number, unit: 'days' | 'hours' | 'minutes'): any {
-		if (value === 0) {
-			return date;
-		}
-
-		return new Date(moment(date).add(value, unit));
-	}
-	*/
 	public static increment(date: any, incrementArguments: IncrementDateArgument[]): any {
 		let resultingDate = date;
 
-		incrementArguments.forEach((argument: IncrementDateArgument) => {
-			resultingDate =  new Date(moment(resultingDate).add(argument.value, argument.unit));
-		});
+		incrementArguments.forEach(
+			(argument: IncrementDateArgument) =>
+				resultingDate =  new Date(moment(resultingDate).add(argument.value, argument.unit))
+		);
 
 		return resultingDate;
 	}

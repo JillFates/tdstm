@@ -24,7 +24,7 @@ import { TaskEditComponent} from '../taskManager/components/edit/task-edit.compo
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
-import { TDSCheckboxComponent} from "./components/tds-checkbox/tds-checkbox.component";
+import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import { ManufacturerEditComponent } from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';

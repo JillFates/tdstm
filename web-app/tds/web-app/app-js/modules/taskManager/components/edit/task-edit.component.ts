@@ -6,7 +6,7 @@ import {TaskDetailModel} from './../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
@@ -163,7 +163,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		if (dataItem) {
 			collection[rowIndex] = {
 				id: dataItem.id,
-				desc:dataItem.text,
+				desc: dataItem.text,
 				model: {id: dataItem.id, text: dataItem.text}
 			};
 			return;
@@ -352,7 +352,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		});
 	}
 
-	updateEstimatedFinish(unit: 'days' | 'hours' | 'minutes'): void {
+	updateEstimatedFinish(unit: DatePartUnit): void {
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.estimatedStart, this.model.estimatedFinish);
 		const diff = this.model.durationParts[unit] - originalParts[unit];
 
