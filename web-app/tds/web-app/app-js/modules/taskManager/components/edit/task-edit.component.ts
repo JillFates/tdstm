@@ -1,6 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
-import * as R from 'ramda';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
@@ -41,7 +40,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public model: any = null;
 	public getAssetList: Function;
 	public yesNoList = ['Yes', 'No'];
-	public predecessorSuccesorColumns: any[];
+	public predecessorSuccessorColumns: any[];
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -60,7 +59,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
-		this.predecessorSuccesorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property === 'desc');
+		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property === 'desc');
 
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
@@ -110,13 +109,17 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			durationScale,
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			durationLocked: assetComment.durationLocked,
-			actualStart: assetComment.actStart ? new Date(assetComment.actStart) : '',
-			actualFinish: assetComment.dateResolved ? new Date(assetComment.dateResolved) : '',
+			//actualStart: assetComment.actStart ? new Date(assetComment.actStart) : '',
+			actualStart: detail.atStart ? new Date(detail.atStart) : '',
+			// actualFinish: assetComment.dateResolved ? new Date(assetComment.dateResolved) : '',
+			actualFinish: detail.dtResolved ? new Date(detail.dtResolved) : '',
 			dueDate: assetComment.dueDate ? new Date(assetComment.dueDate) : '',
 			estimatedStartUTC: assetComment.estStart,
 			estimatedFinishUTC: assetComment.estFinish,
-			estimatedStart: assetComment.estStart ? new Date(assetComment.estStart) : '',
-			estimatedFinish: assetComment.estFinish ? new Date(assetComment.estFinish) : '',
+			// estimatedStart: assetComment.estStart ? new Date(assetComment.estStart) : '',
+			// estimatedFinish: assetComment.estFinish ? new Date(assetComment.estFinish) : '',
+			estimatedStart: detail.etStart ? new Date(detail.etStart) : '',
+			estimatedFinish: detail.etFinish ? new Date(detail.etFinish) : '',
 			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
 			priority: assetComment.priority,
 			assetName: detail.assetName,
@@ -214,7 +217,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	getDateTimeFormat(value: string): string {
-		return value ? this.dateFormat + ' HH:mm:ss' : '';
+		return value ? this.dateFormat + ' h:mm a' : '';
 	}
 
 	openRangeDatesSelector(): void {

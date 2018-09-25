@@ -18,13 +18,6 @@
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td class="task-details" colspan="2">
-	                                <!--
-                                    <div class="btn-collapsed-fixed-right">
-                                        <button class="btn btn-default" (click)="onCollapseTaskDetail()">
-                                            <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
-                                        </button>
-                                    </div>
-                                    -->
                                     <div class="dialog">
                                         <table>
                                             <tbody>
@@ -200,13 +193,13 @@
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual start</span></label>
+                                                        <label><span>Actual Start</span></label>
                                                     </td>
 
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="actualStart"
-                                                                [format]="dateFormat"
+                                                                [format]="getDateTimeFormat(model.actualStart)"
                                                                 [(value)]="model.actualStart">
                                                         </kendo-datepicker>
                                                     </td>
@@ -218,7 +211,7 @@
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="actualFinish"
-                                                                [format]="dateFormat"
+                                                                [format]="getDateTimeFormat(model.actualFinish)"
                                                                 [(value)]="model.actualFinish">
                                                         </kendo-datepicker>
                                                     </td>
@@ -345,7 +338,7 @@
                                                         </button>
                                                     </ng-template>
                                                     <!-- Columns -->
-                                                    <kendo-grid-column *ngFor="let column of predecessorSuccesorColumns"
+                                                    <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
                                                                        field="{{column.property}}"
                                                                        [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
                                                         <!-- Header Template -->
@@ -384,7 +377,7 @@
                                                     </button>
                                                 </ng-template>
                                                 <!-- Columns -->
-                                                <kendo-grid-column *ngFor="let column of predecessorSuccesorColumns"
+                                                <kendo-grid-column *ngFor="let column of predecessorSuccessorColumns"
                                                                    field="{{column.property}}"
                                                                    [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
                                                     <!-- Header Template -->
