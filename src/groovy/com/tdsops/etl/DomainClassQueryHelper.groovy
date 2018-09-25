@@ -310,7 +310,7 @@ class DomainClassQueryHelper {
 	 * @return true if should query using the ID
 	 */
 	static private boolean shouldQueryByReferenceId(clazz, field, value) {
-		return (value instanceof Long) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
+		return ((value instanceof Long) || value instanceof Integer ) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 	}
 
 	/**
@@ -338,11 +338,15 @@ class DomainClassQueryHelper {
 	 * @param hqlParams
 	 * @return a HQL sentence defined by a property operator and named parameter
 	 */
-	static String buildSentenceAndHqlParam(FindCondition condition, String property, String namedParameter, Map<String, ?> hqlParams){
+	static String buildSentenceAndHqlParam(
+		FindCondition condition,
+		String property,
+		String namedParameter,
+		Map<String, ?> hqlParams) {
 
 		String sentence
 
-		switch (condition.operator){
+		switch (condition.operator) {
 			case FindOperator.eq:
 				sentence = " ${property} = :${namedParameter}\n"
 				hqlParams[namedParameter] = condition.value

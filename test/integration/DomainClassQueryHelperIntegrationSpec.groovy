@@ -1,19 +1,21 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
 import com.tdsops.etl.FindOperator
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -677,4 +679,33 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
 	}
 
+	@IgnoreRest
+	void '35. can Model by a modelName and manufacturer id'() {
+
+		given:
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', model.modelName),
+					new FindCondition('manufacturer', manufacturer.id)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
 }
