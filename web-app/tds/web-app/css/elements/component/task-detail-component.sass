@@ -26,9 +26,13 @@
             margin: 0;
             padding: 0;
             border: 0;
+            display: inline-flex
+            outline-style: none
             span.k-dropdown-wrap
               background: inherit
               color: inherit
+              span.k-select
+                border-left: 0
         td.description-container
           max-width: 100%
           input
@@ -46,7 +50,7 @@
           justify-content: space-between
           width: 100%
           align-items: center
-          .k-dateinput
+          .estimated-date-container
             width: 90%
           .delete-command
             cursor: pointer
@@ -120,3 +124,57 @@
 
 .task-detail-component.tds-ui-modal-decorator
   overflow-y: auto!important
+
+
+.task-detail-component
+  .task-status
+    .task-hold
+      @include task-hold
+
+    .task-hold_overtime
+      @include task-hold_overtime
+
+    .task-planned
+      @include task-planned
+
+    .task-pending
+      @include task-pending
+
+    .task-ready
+      @include task-ready
+
+    .task-started
+      @include task-started
+
+    .task-completed2
+      @include task-completed2
+
+    .task-completed5
+      @include task-completed5
+
+    .task-completed
+      @include task-completed
+
+    .task-done2
+      @include task-done2
+
+    .task-done5
+      @include task-done5
+
+    .task-done
+      @include task-done
+
+    .task-na
+      @include task-na
+
+    .task-term
+      @include task-term
+
+    .task-tardy
+      @include task-tardy
+
+    .task-late
+      @include task-late
+
+    .task-overdue
+      @include task-overdue

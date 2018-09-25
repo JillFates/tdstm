@@ -36,7 +36,7 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Status</span></label>
                                                     </td>
-                                                    <td class="valueNW">
+                                                    <td class="valueNW task-status">
                                                         <kendo-dropdownlist
                                                                 name="statusList"
                                                                 [class]="'form-control status task-' + model.status.toLowerCase()"
@@ -227,13 +227,15 @@
                                                     </td>
 
                                                     <td class="valueNW estimated-finish">
-                                                        <kendo-dateinput
-                                                                name="estimatedFinish"
-                                                                class="clickable"
-                                                                [format]="getDateTimeFormat(model.estimatedFinish)"
-                                                                (click)="openRangeDatesSelector()"
-                                                                [(ngModel)]="model.estimatedFinish">
-                                                        </kendo-dateinput>
+                                                        <div class="estimated-date-container">
+                                                            <kendo-dateinput
+                                                                    name="estimatedFinish"
+                                                                    class="clickable"
+                                                                    [format]="getDateTimeFormat(model.estimatedFinish)"
+                                                                    (click)="openRangeDatesSelector()"
+                                                                    [(ngModel)]="model.estimatedFinish">
+                                                            </kendo-dateinput>
+                                                        </div>
                                                         <span (click)="cleanEstimatedDates()" *ngIf="model.estimatedFinish"
                                                               class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
                                                     </td>
