@@ -114,7 +114,7 @@ export class TaskService {
 	 * Get Laste Created Task Params from Session
 	 */
 	getLastCreatedTaskSessionParams(): Observable<any> {
-		return this.http.get(`${this.baseURL}/task/taskCreateDefaults`)
+		return this.http.get(`${this.baseURL}/ws/task/taskCreateDefaults`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
