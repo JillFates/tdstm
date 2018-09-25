@@ -1173,25 +1173,29 @@ class DataImportService implements ServiceMethods {
 				case Date:
 					// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
 					if (valueToSet instanceof CharSequence) {
-						// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
-						if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-							valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-						} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
-							valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-						} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
-							valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
+						try {
+							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
+							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
+								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
+							}
+						} catch (e) {
+							errorMsg = 'Error parsing date: ' + e.message
+							break
 						}
-
-						// Attempt to parse a Date / DateTime based on the underlying database table column type
-						// def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-						// def propConfig = mapping.getPropertyConfig(fieldName)
 					}
 
 					if (! (valueToSet instanceof Date)) {
 						String columnType
 						errorMsg = 'Value must be a Date or in ISO-8601 format (yyyy-MM-dd | yyyy-MM-ddTHH:mm:ssZ)'
 					} else {
-						valueToSet.clearTime()
+						// Attempt to parse a Date / DateTime based on the underlying database table column type
+						// def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+						// def propConfig = mapping.getPropertyConfig(fieldName)
+						// valueToSet.clearTime()
 						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
 					}
 					break
@@ -1285,7 +1289,9 @@ class DataImportService implements ServiceMethods {
 			if (! isMatch) {
 				log.debug "_recordChangeOnField() changed field {} = '{}'", fieldName, newValue
 				domainInstance[fieldName] = newValue
-				log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
+				if (! isNewEntity) {
+					log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
+				}
 
 				// Record the change on the fieldsInfo if it was passed in
 				if (fieldsInfo && ! isNewEntity) {
@@ -1471,7 +1477,7 @@ class DataImportService implements ServiceMethods {
 			entity.getClass().getName(), entity, fieldsValueMap
 
 		// Get the list of all the fields to be set from the create section of the fieldsInfo of the referenceField
-		fieldsValueMap.each{ fieldName, value ->
+		fieldsValueMap.each { fieldName, value ->
 			failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
 			if (failureMsg) {
 				errMsgs << failureMsg
@@ -1545,11 +1551,7 @@ class DataImportService implements ServiceMethods {
 
 				} else {
 					// Set the non-reference / Java types (e.g. Date, Integer, String, Boolean)
-					Object valueToSet = fieldsValueMap[fieldName]
-					errorMsg = setNonReferenceField(entity, fieldName, valueToSet)
-					if (entity[fieldName] != valueToSet) {
-						entity[fieldName] = valueToSet
-					}
+					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName])
 				}
 			}
 			break
