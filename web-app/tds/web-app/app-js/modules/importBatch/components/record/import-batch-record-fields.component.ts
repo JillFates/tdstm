@@ -16,6 +16,8 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
+import {NULL_OBJECT_LABEL} from '../../../../shared/model/constants';
 
 /**
  * This is the various options that the Current Value column will have for display
@@ -98,13 +100,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected saveStatus: OperationStatusModel = new OperationStatusModel();
 	protected processStatus: OperationStatusModel = new OperationStatusModel();
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
-	protected popup: any = {
-		offset: null,
-		show: false,
-		type: null,
-		gridData: null,
-		gridGroups: [{field: 'domainIndex'}]
-	};
+	protected fieldReferencePopupHelper: FieldReferencePopupHelper;
 
 	// Contains the Current/Previous value column label based on the state of the record
 	protected currentPreviousColumnLabel = '';
@@ -114,12 +110,12 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	protected CurrentValueAction = CurrentValueAction;
 	protected FieldInfoType = FieldInfoType;
 	protected BatchStatus = BatchStatus;
-	private readonly NULL_OBJECT_LABEL = '(null)';
 
 	constructor(private importBatchService: ImportBatchService, private translatePipe: TranslatePipe) {
 		this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 		this.processStatus.state = CHECK_ACTION.NONE;
 		this.saveStatus.state = CHECK_ACTION.NONE;
+		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
 	}
 
 	/**
@@ -204,7 +200,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 				this.fieldsInfo.push({
 					name: (fieldLabelMap && fieldLabelMap[fieldName]) || fieldName,
 					currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
-						? fields[fieldName].originalValue : this.NULL_OBJECT_LABEL,
+						? fields[fieldName].originalValue : NULL_OBJECT_LABEL,
 					currentPreviousValue: currentPreviousValue,
 					currentValueAction: currentValueAction,
 					importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
@@ -376,79 +372,5 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 */
 	private handleError(e): void {
 		console.log(e);
-	}
-
-	/**
-	 * Opens and positions the popup based on the click event.
-	 * @param {MouseEvent} $event
-	 */
-	protected onShowPopup($event: MouseEvent, type: FieldInfoType, field: any): void {
-		let typeString = this.FieldInfoType[type].toLowerCase();
-		if (type === FieldInfoType.FIND) {
-			this.buildPopupFieldDataForFindObject(field[typeString]);
-		} else {
-			this.buildPopupFieldData(field[typeString]);
-			// this ugly will be removed when the BE returns the correct domain on the create/update object.
-			if (field.find && field.find.query && field.find.query.length > 0) {
-				this.popup.domain = field.find.query[0].domain;
-			}
-		}
-		this.popup.type = type;
-		this.popup.mouseEvent = $event;
-		if (this.popup.show) {
-			this.popup.offset = { left: $event.pageX, top: $event.pageY};
-		}
-		this.popup.show = true;
-	}
-
-	/**
-	 * Builds the popup grid field info data.
-	 * @param field
-	 */
-	private buildPopupFieldData(field: any): void {
-		let popupFields: Array<any> = [];
-		const {fieldLabelMap} = this.importBatch;
-		for (let fieldName in field) {
-			if (field[fieldName]) {
-				popupFields.push({
-					fieldName: fieldLabelMap[fieldName] ? fieldLabelMap[fieldName] : fieldName,
-					value: !ValidationUtils.isEmptyObject(field[fieldName]) ? field[fieldName] : this.NULL_OBJECT_LABEL
-				});
-			}
-		}
-		this.popup.gridData = process(popupFields, {});
-	}
-
-	/**
-	 * Builds the popup grid field info data.
-	 * @param field
-	 */
-	private buildPopupFieldDataForFindObject(field: any): void {
-		this.popup.results = [];
-		const {matchOn, results} = field;
-		const {fieldLabelMap} = this.importBatch;
-		let popupFields: Array<any> = [];
-		field.query.forEach( (item, index) => {
-			const domain = item.domain;
-			let recordsFound = null;
-			if ((matchOn !== null && results !== null) && (matchOn === index) && results.length > 0) {
-				recordsFound = results.length;
-				this.popup.results = results;
-			}
-			// safe null check for the new json object structure vs the old one.
-			if (item.criteria) {
-				item.criteria.forEach( field => {
-					popupFields.push({
-						domainIndex: index,
-						domainName: domain,
-						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
-						value: !ValidationUtils.isEmptyObject(field.value) ? field.value : this.NULL_OBJECT_LABEL,
-						operator: field.operator,
-						recordsFound: recordsFound
-					});
-				});
-			}
-		});
-		this.popup.gridData = process(popupFields, { group: this.popup.gridGroups});
 	}
 }

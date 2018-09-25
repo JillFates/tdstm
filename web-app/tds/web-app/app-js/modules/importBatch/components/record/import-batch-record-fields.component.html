@@ -1,16 +1,15 @@
 <div class="import-batch-record-fields-component fields-container row" *ngIf="fieldsInfo">
 
     <!-- Fields Info Popup -->
-    <!-- TODO: add the operator column in the component find grid -->
-    <field-reference-popup *ngIf="popup.show"
-                           [mouseEvent]="popup.mouseEvent"
-                           [type]="popup.type"
-                           [domain]="popup.domain"
-                           [results]="popup.results"
-                           [gridData]="popup.gridData"
-                           [gridGroups]="popup.gridGroups"
-                           [offset]="popup.offset"
-                           (onClose)="popup.show = false">
+    <field-reference-popup *ngIf="fieldReferencePopupHelper.popup.show"
+                           [mouseEvent]="fieldReferencePopupHelper.popup.mouseEvent"
+                           [type]="fieldReferencePopupHelper.popup.type"
+                           [domain]="fieldReferencePopupHelper.popup.domain"
+                           [results]="fieldReferencePopupHelper.popup.results"
+                           [gridData]="fieldReferencePopupHelper.popup.gridData"
+                           [gridGroups]="fieldReferencePopupHelper.popup.gridGroups"
+                           [offset]="fieldReferencePopupHelper.popup.offset"
+                           (onClose)="fieldReferencePopupHelper.popup.show = false">
     </field-reference-popup>
 
     <kendo-grid
@@ -81,12 +80,12 @@
         <!-- Reference Icons Column -->
         <kendo-grid-column title="Reference" [width]="80">
             <ng-template kendoGridCellTemplate let-dataItem>
-                <i *ngIf="dataItem.create" (click)="onShowPopup($event, FieldInfoType.CREATE, dataItem)"
+                <i *ngIf="dataItem.create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem, importBatch.fieldLabelMap)"
                    title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
-                <i *ngIf="dataItem.update" (click)="onShowPopup($event, FieldInfoType.UPDATE, dataItem)"
+                <i *ngIf="dataItem.update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem, importBatch.fieldLabelMap)"
                    title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
                 <i *ngIf="dataItem.find && dataItem.find.query.length > 0"
-                   (click)="onShowPopup($event, FieldInfoType.FIND, dataItem)"
+                   (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem, importBatch.fieldLabelMap)"
                    title="View Find Results" class="field-info-icon fa fa-search"></i>
             </ng-template>
         </kendo-grid-column>

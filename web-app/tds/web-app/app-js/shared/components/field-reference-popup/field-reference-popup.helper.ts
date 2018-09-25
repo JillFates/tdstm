@@ -1,5 +1,7 @@
 import {process} from '@progress/kendo-data-query';
 import {FieldInfoType} from '../../../modules/importBatch/components/record/import-batch-record-fields.component';
+import {ValidationUtils} from '../../utils/validation.utils';
+import {NULL_OBJECT_LABEL} from '../../model/constants';
 
 /**
  * Class to do common shared operations for building the field reference popups content.
@@ -65,7 +67,7 @@ export class FieldReferencePopupHelper {
 		field.query.forEach( (item, index) => {
 			const domain = item.domain;
 			let recordsFound = null;
-			if (matchOn && results && matchOn === index && results.length > 0) {
+			if ((matchOn !== null && results !== null) && (matchOn === index) && results.length > 0) {
 				recordsFound = results.length;
 				this.popup.results = results;
 			}
@@ -76,7 +78,8 @@ export class FieldReferencePopupHelper {
 						domainIndex: index,
 						domainName: domain,
 						fieldName: fieldLabelMap[field.propertyName] ? fieldLabelMap[field.propertyName] : field.propertyName,
-						value: field.value,
+						value: !ValidationUtils.isEmptyObject(field.value) ? field.value : NULL_OBJECT_LABEL,
+						operator: field.operator,
 						recordsFound: recordsFound
 					});
 				});

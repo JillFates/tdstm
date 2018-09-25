@@ -71,11 +71,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private importAssetsService: ImportAssetsService,
 		private notifierService: NotifierService,
 		private promptService: UIPromptService) {
-		super('#etlBuilder');
-		this.script = '';
-		this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
-		this.loadETLScript();
-		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
+			super('#etlBuilder');
+			this.script = '';
+			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
+			this.loadETLScript();
+			this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
 	}
 
 	ngAfterViewInit(): void {
