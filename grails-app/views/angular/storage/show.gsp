@@ -85,7 +85,8 @@
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-default" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
+		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
+		<a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
 	    <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
 
 	</div>
