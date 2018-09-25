@@ -2,15 +2,13 @@ import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import grails.test.spock.IntegrationSpec
 import grails.validation.ValidationException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.CredentialService
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.ProjectRequiredException
 import net.transitionmanager.service.SecurityService
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
@@ -64,11 +62,10 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
             Provider provider = providerTestHelper.createProvider(project)
-            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
-
+            Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
+            credential.save(flush: true, failOnError: true)
         when:
             def foundCredential = credentialService.findById(credential.id)
-
         then:
             foundCredential
             null != foundCredential.id
@@ -78,11 +75,10 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
         setup:
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
-            credentialTestHelper.createAndSaveCredential(project, provider)
-
+            Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
+            credential.save(flush: true, failOnError: true)
         when:
             def foundCredentials = credentialService.findAllByProject(project)
-
         then:
             foundCredentials
             1 == foundCredentials.size()
@@ -94,11 +90,10 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
             Provider provider = providerTestHelper.createProvider(project)
-            credentialTestHelper.createAndSaveCredential(project, provider)
-
+            Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
+            credential.save(flush: true, failOnError: true)
         when:
             def foundCredentials = credentialService.findAllByProvider(provider)
-
         then:
             foundCredentials
             1 == foundCredentials.size()
@@ -110,9 +105,9 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
 
             Provider provider = providerTestHelper.createProvider(project)
-            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
+            Credential credential = credentialTestHelper.createCredential(project, provider, AuthenticationMethod.BASIC_AUTH, 'a@cookie:b', 'status code equal 200', 'http://b.ic', "", null, null)
+            credential.save(flush: true, failOnError: true)
             final Long id = credential.id
-
         when: 'the credential is deleted'
             credentialService.delete(id)
             sessionFactory.getCurrentSession().flush()
