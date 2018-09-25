@@ -98,6 +98,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
 		const [yes, no] = this.yesNoList;
 
+		// add empty default value
+		detail.categories = (detail.categories || []);
+		detail.categories.push('');
+
 		return  {
 			id: assetComment.id,
 			note: '',
@@ -131,7 +135,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			successorList: (this.taskDetailModel.detail.successorList || [])
 				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
-			categoriesList: detail.categories || [],
+			categoriesList: detail.categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: [1, 2, 3, 4, 5],
 			asset: {id: detail.assetId, text: detail.assetName},

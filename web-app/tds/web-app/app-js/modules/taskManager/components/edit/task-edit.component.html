@@ -23,7 +23,7 @@
                                             <tbody>
                                                 <tr class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label style="min-width: 104px;"><span>Task # {{model.taskNumber}}</span></label>
+                                                        <label><span class="required-field">Task # {{model.taskNumber}}</span></label>
                                                     </td>
                                                     <td class="valueNW description-container" colspan="5">
                                                         <input type="text" name="comment" [(ngModel)]="model.comment" required>
@@ -156,13 +156,13 @@
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Category</span></label>
+                                                        <label><span class="required-field">Category</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <kendo-dropdownlist
                                                                 name="category"
                                                                 [data]="model.categoriesList"
-                                                                [(ngModel)]="model.category">
+                                                                [(ngModel)]="model.category" required>
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
