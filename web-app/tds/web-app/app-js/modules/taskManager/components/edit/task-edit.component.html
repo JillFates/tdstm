@@ -41,8 +41,7 @@
                                                                 name="statusList"
                                                                 [class]="'form-control status task-' + model.status.toLowerCase()"
                                                                 [data]="model.statusList"
-                                                                [(ngModel)]="model.status"
-                                                                (valueChange)="onStatusChange($event)">
+                                                                [(ngModel)]="model.status">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label url U" nowrap="nowrap">
@@ -55,8 +54,7 @@
                                                                 [data]="model.assetClasses"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
-                                                                [(ngModel)]="model.assetClass"
-                                                                (valueChange)="onAssetClassChange($event)">
+                                                                [(ngModel)]="model.assetClass">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
@@ -66,8 +64,7 @@
                                                         <tds-combobox
                                                                 [(model)]="model.asset"
                                                                 [(metaParam)]="model.assetClass.id"
-                                                                [serviceRequest]="getAssetList"
-                                                                (valueChange)="onAssetNameChange($event)">
+                                                                [serviceRequest]="getAssetList">
                                                         </tds-combobox>
                                                     </td>
                                                 </tr>
@@ -82,8 +79,7 @@
                                                                 [data]="model.teamList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
-                                                                [(ngModel)]="model.assignedTeam"
-                                                                (valueChange)="onTeamChange($event)">
+                                                                [(ngModel)]="model.assignedTeam">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
@@ -121,8 +117,7 @@
                                                                 [data]="model.personList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
-                                                                [(ngModel)]="model.assignedTo"
-                                                                (valueChange)="onPersonChange($event)">
+                                                                [(ngModel)]="model.assignedTo">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label url U" nowrap="nowrap">
@@ -281,7 +276,7 @@
                                                                    data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
                                                                 <i class="fa fa-fw  lock-state"
                                                                    [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
-                                                                   (click)="onLockChange()">
+                                                                   (click)="toggleLocked()">
                                                                 </i>
                                                             </label>
                                                         </div>
@@ -434,7 +429,7 @@
             </div>
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
-	                    (click)="updateTask()" type="button">
+	                    (click)="onSave()" type="button">
 		            <span  class="fa fa-fw fa-floppy-o"></span>
 		            <span>Update</span>
 	            </button>

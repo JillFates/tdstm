@@ -61,7 +61,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
-		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns.filter((column) => column.property === 'desc');
+		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns
+			.filter((column) => column.property === 'desc');
 
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
@@ -82,12 +83,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				this.dateFormat = dateFormat;
 			});
 
-
-
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
 		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
-
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 	}
 
@@ -97,9 +95,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	extractModel(): any {
 		const detail = this.taskDetailModel.detail;
 		const assetComment = detail['assetComment'] || {};
-
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
-		// this.taskDetailModel.detail.predecessorList
+		const [yes, no] = this.yesNoList;
 
 		return  {
 			id: assetComment.id,
@@ -107,8 +104,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			duration: assetComment.duration,
 			taskSpec: assetComment.taskSpec,
 			taskNumber: assetComment.taskNumber,
-			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? 'Yes' : 'No',
-			sendNotification: Boolean(assetComment.sendNotification) ? 'Yes' : 'No',
+			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
+			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
 			durationScale,
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			durationLocked: assetComment.durationLocked,
@@ -155,32 +152,20 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		return this.taskManagerService.getAssetListForComboBox(searchParam);
 	}
 
-	onAssetClassChange(asset): void {
-	}
-
-	onStatusChange(asset): void {
-	}
-
-	onAssetNameChange(asset): void {
-	}
-
-	onPersonChange(asset): void {
-	}
-
-	onTeamChange(asset): void {
-	}
-
-	updateTask(): void {
-	}
-
-	onDependencyTaskChange(event: any, collection: any[], gridHelper: DataGridOperationsHelper, rowIndex: number): void {
-		let id = null;
-		let text = null;
-
-		if (event) {
-			id = event.id;
-			text = event.text;
-			collection[rowIndex] = { id, desc:text, model: {id, text}};
+	/**
+	 * Everytime a task dependency changes, then update the corresponding collection that hold predeccessor/successor  tasks
+	 * @param {object} dataItem
+	 * @param {object[]} collection
+	 * @param {object} gridHelper
+	 * @returns {void}
+	 */
+	onDependencyTaskChange(dataItem: any, collection: any[], gridHelper: DataGridOperationsHelper, rowIndex: number): void {
+		if (dataItem) {
+			collection[rowIndex] = {
+				id: dataItem.id,
+				desc:dataItem.text,
+				model: {id: dataItem.id, text: dataItem.text}
+			};
 			return;
 		}
 
@@ -207,16 +192,30 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		return this.taskManagerService.getTasksForComboBox(searchParam);
 	}
 
-	onLockChange(): void {
+	/**
+	 * Toggle lock property value
+	 */
+	toggleLocked(): void {
 		this.model.locked = !this.model.locked;
 	}
 
+	/**
+	 * Return the date passed as argument formatted using the user timezone
+	 * @param {any} date
+	 * @returns {string}
+	 */
 	getFormattedDate(date): any {
 		return new Date(DateUtils.formatUserDateTime(this.userTimeZone, date));
 	}
 
-	getDateTimeFormat(value: any): string {
-		return value ? this.dateFormat + ' h:mm a' : '';
+	/**
+	 * Passing a valid date returns the user preference date format plus the default time format
+	 * Otherwise returns empty string
+	 * @param {any} date
+	 * @returns {string}
+	 */
+	getDateTimeFormat(date: any): string {
+		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` : '';
 	}
 
 	openRangeDatesSelector(): void {
