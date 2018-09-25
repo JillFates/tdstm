@@ -17,14 +17,14 @@
                                     <kendo-dateinput
 		                                    [disabled]="model.locked"
 		                                    (valueChange)="onDateChanged('start', $event)"
-                                            [format]="model.start ? 'dd-MMM-yyyy HH:mm:ss' : ''"
+                                            [format]="model.start ? model.format : ''"
                                             [(value)]="model.start"></kendo-dateinput>
                                 </div>
                                 <div class="times-section">
                                     <kendo-dateinput
 		                                    [disabled]="model.locked"
 		                                    (valueChange)="onDateChanged('end', $event)"
-                                            [format]="model.end ? 'dd-MMM-yyyy HH:mm:ss' : ''"
+                                            [format]="model.end ? model.format : ''"
                                             [(value)]="model.end"></kendo-dateinput>
                                 </div>
 	                        </div>

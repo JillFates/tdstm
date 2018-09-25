@@ -215,7 +215,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		return new Date(DateUtils.formatUserDateTime(this.userTimeZone, date));
 	}
 
-	getDateTimeFormat(value: string): string {
+	getDateTimeFormat(value: any): string {
 		return value ? this.dateFormat + ' h:mm a' : '';
 	}
 
@@ -224,7 +224,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			start: this.model.estimatedStart,
 			end: this.model.estimatedFinish,
 			locked: this.model.locked,
-			format: this.dateFormat,
+			format: this.getDateTimeFormat(true),
 			duration: this.model.durationParts
 		};
 
