@@ -778,7 +778,7 @@ class DataImportService implements ServiceMethods {
 	 */
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		try {
-			Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
+			Map fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
@@ -835,6 +835,8 @@ class DataImportService implements ServiceMethods {
 
 			// Update the fieldsInfo back into the Import Batch Record
 			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+			// Register error count accordingly
+			record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
 		} catch (e) {
 			record.addError(e.getMessage())
 			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e, 80)
