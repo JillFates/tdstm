@@ -1,3 +1,6 @@
+import net.transitionmanager.command.PersonCO
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.*
 import com.tds.asset.Application
 import net.transitionmanager.domain.MoveEvent
@@ -707,15 +710,22 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 		Map results = [:]
+		MockHttpServletRequest mockRequest = new MockHttpServletRequest()
 
 		// Setup the From Person with a UserLogin
 		Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
 		UserLogin fromUser = personHelper.createUserLogin(fromPerson)
+		fromPerson.nickName = "test"
 		Long fromUID = fromUser.id
 
 		// Setup the To Person
 		Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
-		UserLogin toUser = personHelper.createUserLogin(fromPerson)
+		UserLogin toUser = personHelper.createUserLogin(toPerson)
+
+		mockRequest.addParameter("fromId", Long.toString(fromPerson.id))
+		mockRequest.addParameter("toId", Long.toString(toPerson.id))
+
+		def params = new GrailsParameterMap(mockRequest)
 
 		// Closure used a few times for testing
 		def findTestPersons = { return GormUtil.findAllByProperties(Person, personMap) }
@@ -731,11 +741,11 @@ class PersonServiceIntegrationTests extends Specification {
 
 		when: 'the persons are merged together'
 		// Perform the merge of the accounts
-		securityService.processMergePersonRequest(toPerson.userLogin, null, null)
+		personService.processMergePersonRequest(toPerson.userLogin, new PersonCO(), params)
 		toPerson = Person.get(toPerson.id)
 		UserLogin toUserLogin = toPerson.userLogin
 		then: 'the From user should be switched to the To person'
-		toUserLogin.id == fromUID
+		toUserLogin.person.nickName == "testy"
 	}
 
 	// Used to convert a person object into a map used by the PersonService
