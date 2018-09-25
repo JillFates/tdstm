@@ -41,6 +41,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public getAssetList: Function;
 	public yesNoList = ['Yes', 'No'];
 	public predecessorSuccessorColumns: any[];
+	public userTimeZone: string;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -56,6 +57,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
@@ -79,6 +81,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 			});
+
 
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
@@ -111,11 +114,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			durationLocked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			dueDate: assetComment.dueDate ? new Date(assetComment.dueDate) : '',
+			dueDate: assetComment.dueDate ? this.getFormattedDate(assetComment.dueDate) : '',
 			estimatedStartUTC: assetComment.estStart,
 			estimatedFinishUTC: assetComment.estFinish,
-			estimatedStart: detail.etStart ? new Date(detail.etStart) : '',
-			estimatedFinish: detail.etFinish ? new Date(detail.etFinish) : '',
+			estimatedStart: assetComment.estStart ? this.getFormattedDate(assetComment.estStart) : '',
+			estimatedFinish: assetComment.estFinish ? this.getFormattedDate(assetComment.estFinish)  : '',
 			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
 			priority: assetComment.priority,
 			assetName: detail.assetName,
@@ -208,8 +211,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.model.locked = !this.model.locked;
 	}
 
-	getFormattedDate(date): string {
-		return DateUtils.formatUserDateTime(this.dateFormat, date);
+	getFormattedDate(date): any {
+		return new Date(DateUtils.formatUserDateTime(this.userTimeZone, date));
 	}
 
 	getDateTimeFormat(value: string): string {
