@@ -127,9 +127,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			personList: [],
 			teamList: [],
 			predecessorList: (this.taskDetailModel.detail.predecessorList || [])
-				.map((item) => ({id: item.id, desc: item.desc, model: {id: item.id, text: item.desc }})),
+				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
 			successorList: (this.taskDetailModel.detail.successorList || [])
-				.map((item) => ({id: item.id, desc: item.desc, model: {id: item.id, text: item.desc }})),
+				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: detail.categories || [],
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
