@@ -13,8 +13,13 @@
         <ng-template kendoGridToolbarTemplate [position]="'top'">
             <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks ({{dataGridTaskHelper.gridData.data.length}})</label>
 
+            <label class="form-check-label aligned-label" for="showAllTasks">
+                <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
+                View All Tasks
+            </label>
+
             <label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
-                <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadGrid()">
+                <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadTasksGrid()">
                 View Unpublished Tasks
             </label>
             <!-- we do not support yet Task Creation
@@ -88,6 +93,11 @@
         <!-- Toolbar Template -->
         <ng-template kendoGridToolbarTemplate [position]="'top'">
             <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Comments ({{dataGridCommentHelper.gridData.data.length}})</label>
+
+            <label class="form-check-label aligned-label" for="showAllComments">
+                <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadCommentsGrid()">
+                View All Comments
+            </label>
 
             <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
                 <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
