@@ -185,7 +185,7 @@
         <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
-			$(".menu-parent-assets-database-list").addClass('active');
+			$($(".menu-parent-assets-database-list")[1]).addClass('active');
 			$(".menu-parent-assets").addClass('active');
 		</script>
 	</body>

@@ -241,11 +241,11 @@
 			currentMenuId = "#assetMenu";
 			var filter = '${filter}';
 			if(filter && filter == 'all') {
-				$(".menu-parent-assets-all-list").addClass('active');
+				$($(".menu-parent-assets-all-list")[1]).addClass('active');
 			} else if(filter && filter == 'storage') {
-				$(".menu-parent-assets-storage-list").addClass('active');
+				$($(".menu-parent-assets-storage-list")[1]).addClass('active');
 			} else {
-				$(".menu-parent-assets-server-list").addClass('active');
+				$($(".menu-parent-assets-server-list")[1]).addClass('active');
 			}
 			$(".menu-parent-assets").addClass('active');
 
