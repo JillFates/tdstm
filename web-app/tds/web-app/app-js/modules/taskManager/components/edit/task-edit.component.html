@@ -2,7 +2,6 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content resizable tds-angular-component-content"
              tds-ui-modal-decorator=""
-             (resizeEvent)="resizeWindow($event)"
              [options]="modalOptions"
              [style.width.px]="860"
              [style.height.px]="706">
@@ -182,7 +181,7 @@
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="dueDate"
-                                                                [format]="dateFormat"
+                                                                [format]="getDateTimeFormat()"
                                                                 [(value)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>

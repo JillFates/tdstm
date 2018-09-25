@@ -4,6 +4,7 @@ export class DateRangeSelectorModel {
 	start: any;
 	end: any;
 	locked?: boolean;
-	format?: string;
+	dateFormat: string;
+	timeFormat: string;
 	duration: DurationParts;
 }

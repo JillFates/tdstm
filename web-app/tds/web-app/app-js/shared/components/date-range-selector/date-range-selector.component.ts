@@ -4,7 +4,7 @@ import {UIExtraDialog} from '../../services/ui-dialog.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
 import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
 import {DateRangeSelectorModel} from './model/date-range-selector.model';
-import {DateUtils, DurationParts} from '../../utils/date.utils';
+import {DateUtils} from '../../utils/date.utils';
 import { SelectionRange } from '@progress/kendo-angular-dateinputs';
 
 declare var jQuery: any;
@@ -46,6 +46,16 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		return this.isDirty();
 	}
 
+	/**
+	 * Passing a valid date returns the user preference date format plus the default time format
+	 * Otherwise returns empty string
+	 * @param {any} date
+	 * @returns {string}
+	 */
+	getDateTimeFormat(date: any): string {
+		return date ? `${this.model.dateFormat} ${this.model.timeFormat}` :  this.model.dateFormat;
+	}
+
 	save(): void {
 		this.close(this.model);
 	}
@@ -77,7 +87,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * @returns {void}
 	 */
 	public handleSelectionRange(range: SelectionRange): void {
-		const {start, end, locked, format, duration} = this.model;
+		const {start, end, locked, dateFormat, timeFormat, duration} = this.model;
 		let newStart = null;
 		let newEnd = null;
 
@@ -107,9 +117,9 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 				{value: hours, unit: 'hours'},
 				{value: minutes, unit: 'minutes'}]);
 
-			this.model = {start: newStart, end: newEnd, locked, format, duration};
+			this.model = {start: newStart, end: newEnd, locked, dateFormat, timeFormat, duration};
 		} else {
-			this.model = {start: range.start, end: range.end, locked, format, duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
+			this.model = {start: range.start, end: range.end, locked, dateFormat, timeFormat, duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
 		}
 	}
 
@@ -123,14 +133,13 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	}
 
 	updateEstimatedFinish(unit: 'days' | 'hours' | 'minutes'): void {
-		const {start, format, locked, duration} = this.model;
+		const {start, dateFormat, timeFormat, locked, duration} = this.model;
 
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.start, this.model.end);
 		const diff = duration[unit] - originalParts[unit];
 
 		const end =  DateUtils.increment(this.model.end, [{value: diff, unit}]);
-
-		this.model = {start, end, format, locked, duration};
+		this.model = {start, end, dateFormat, timeFormat, locked, duration};
 	}
 
 	getTitle(): string {

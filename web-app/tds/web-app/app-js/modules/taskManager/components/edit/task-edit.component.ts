@@ -177,7 +177,13 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		gridHelper.reloadData(collection);
 	}
 
-	onAddTaskDependency(collection: any, gridHelper: DataGridOperationsHelper): void {
+	/**
+	 * Adda a task predecessor/successor to the top of the corresponding collection sent as parameter
+	 * @param {object[]} collection
+	 * @param {object} gridHelper
+	 * @returns {void}
+	 */
+	onAddTaskDependency(collection: any[], gridHelper: DataGridOperationsHelper): void {
 		const predecessorTask = {
 			id: 0,
 			desc: '',
@@ -218,16 +224,20 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @param {any} date
 	 * @returns {string}
 	 */
-	getDateTimeFormat(date: any): string {
-		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` : '';
+	getDateTimeFormat(date = null): string {
+		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` :  this.dateFormat;
 	}
 
+	/**
+	 * Open the view to allow select a range of estimated dates
+	 */
 	openRangeDatesSelector(): void {
 		const dateModel: DateRangeSelectorModel = {
 			start: this.model.estimatedStart,
 			end: this.model.estimatedFinish,
 			locked: this.model.locked,
-			format: this.getDateTimeFormat(true),
+			dateFormat: this.dateFormat,
+			timeFormat: DateUtils.DEFAULT_FORMAT_TIME,
 			duration: this.model.durationParts
 		};
 
@@ -299,10 +309,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			.catch((error) => console.log(error));
 	}
 
-	protected resizeWindow(resize: any): void {
-		console.log(resize);
-	}
-
 	/**
 	 * Get the assigned team name
 	 * @param commentId
@@ -322,6 +328,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		});
 	}
 
+	/**
+	 * Toggle task details
+	 */
 	public onCollapseTaskDetail(): void {
 		this.collapsedTaskDetail = !this.collapsedTaskDetail;
 	}
@@ -341,6 +350,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	protected cancelCloseDialog(): void {
 		this.dismiss();
 	}
+
 	/**
 	 * Prompt confirm delete a task
 	 * delegate operation to host component
@@ -356,6 +366,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		});
 	}
 
+	/**
+	 * Based upon the date unit, increment/decrement the value of estimated finish date
+	 * @param {DatePartUnit} unit
+	 * @returns {void}
+	 */
 	updateEstimatedFinish(unit: DatePartUnit): void {
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.estimatedStart, this.model.estimatedFinish);
 		const diff = this.model.durationParts[unit] - originalParts[unit];
@@ -365,11 +380,19 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		}
 	}
 
+	/**
+	 * Clear the values of start/finish estimated dates
+	 */
 	cleanEstimatedDates(): void {
 		this.model.estimatedFinish = '';
 		this.model.estimatedStart = '';
 	}
 
+	/**
+	 * Determine if the array of objects passed as argument has duplicated id properties
+	 * @param {any[]} array
+	 * @returns {boolean}
+	 */
 	hasDuplicates(array: any[]): boolean {
 		const ids = [];
 
