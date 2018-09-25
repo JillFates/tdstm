@@ -186,7 +186,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			Rack rack = rackTestHelper.createRack(project, room)
 
 		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Rack, project, [room: room])
+			List results = DomainClassQueryHelper.where(ETLDomain.Rack, project, [room: room.id])
 
 		then:
 			results.size() == 1
@@ -679,8 +679,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			e.message == ETLProcessorException.unrecognizedFindCriteria('equality').message
 	}
 
-	@IgnoreRest
-	void '35. can Model by a modelName and manufacturer id'() {
+	void '35. can find Model by a modelName and manufacturer id'() {
 
 		given:
 			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
@@ -708,4 +707,45 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then:
 			results.size() == 1
 	}
+
+
+	void '36. can find Device by a Model id'() {
+
+		given:
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', model.id)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
+
 }

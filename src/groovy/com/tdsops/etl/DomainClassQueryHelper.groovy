@@ -220,7 +220,12 @@ class DomainClassQueryHelper {
 			}
 
 		} else {
-			return "${DOMAIN_ALIAS}.${fieldName}"
+			if(GormUtil.isReferenceProperty(clazz, fieldName)){
+				return "${DOMAIN_ALIAS}.${fieldName}.id"
+			} else {
+				return "${DOMAIN_ALIAS}.${fieldName}"
+			}
+
 		}
 	}
 
@@ -278,7 +283,6 @@ class DomainClassQueryHelper {
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
-
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
 					where += " and ${property}.project =:${namedParameter}_project \n"
