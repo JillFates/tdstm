@@ -2,13 +2,12 @@
  * App or Root Module
  * it identify how the TDS App is being constructed
  */
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angular/core';
-import { HttpModule, Http } from '@angular/http';
-import { TDSAppComponent } from './tds-app.component';
+import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
+import {HttpModule, Http} from '@angular/http';
+import {TDSAppComponent} from './tds-app.component';
 // Feature modules
-// import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 // import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 // import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 // import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
@@ -19,10 +18,12 @@ import { TDSAppComponent } from './tds-app.component';
 // import { TdsAppRoute, AuthConfig, PermissionConfig, MiscConfig } from './tds-app.route';
 // Singleton Services
 import {PermissionService} from '../shared/services/permission.service';
-//
+// Root Basic modules
 import {TDSAppRouteModule} from './tds-app-route.module';
 import {SharedModule} from '../shared/shared.module';
 import {SecurityModule} from '../modules/security/security.module';
+// Feature modules
+import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 
 // Decorator that tells to Angular is a module.
 @NgModule({
@@ -32,10 +33,10 @@ import {SecurityModule} from '../modules/security/security.module';
 		HttpModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
-		// SharedModule,
+		SharedModule,
 		SecurityModule,
+		TaskManagerModule,
 		// Feature Modules
-		// SharedModule,
 		// TaskManagerModule,
 		// FieldSettingsModule,
 		// AssetExplorerModule,

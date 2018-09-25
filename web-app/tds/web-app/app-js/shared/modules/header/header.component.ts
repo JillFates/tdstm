@@ -1,10 +1,10 @@
-import {Component, Inject, AfterViewInit, Renderer2} from '@angular/core';
+import {Component, AfterViewInit, Renderer2} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import { NotifierService } from '../../services/notifier.service';
-import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ASSET_MENU_CSS_TREE } from './model/asset-menu.model';
+import {TaskService} from '../../../modules/taskManager/service/task.service';
 
 declare var jQuery: any;
 @Component({
@@ -24,10 +24,8 @@ export class HeaderComponent implements AfterViewInit {
 		topMenu: any
 	};
 
-	taskCount: Number;
-
 	constructor(
-		@Inject('taskCount') tasks,
+		private taskService: TaskService,
 		translatePipe: TranslatePipe,
 		private route: ActivatedRoute,
 		notifierService: NotifierService,
@@ -47,29 +45,23 @@ export class HeaderComponent implements AfterViewInit {
 					});
 			}
 		});
-		tasks.subscribe(
+
+		const page = this.route.data.map(d => d.page);
+
+		this.taskService.retrieveUserToDoCount().subscribe(
 			(result) => {
-				this.taskCount = result.count;
 				// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
-				jQuery('#todoCountProjectId').html(this.taskCount);
+				jQuery('#todoCountProjectId').html(result.count);
+			}
+		);
 
-			},
-			(err) => {
-				notifierService.broadcast({
-					name: AlertType.WARNING,
-					message: err
-				});
-
-				console.log(err);
-			});
-
-		if (this.route && this.route.snapshot && route.snapshot.data && route.snapshot.data.page) {
+		if (this.route && this.route.data && route.data['page']) {
 			this.pageMetaData = {
-				id: route.snapshot.data.page.id,
-				title: route.snapshot.data.page.title,
-				instruction: route.snapshot.data.page.instruction,
-				menu: route.snapshot.data.page.menu,
-				topMenu: route.snapshot.data.pagetopMenu
+				id: route.data['page'].id,
+				title: route.data['page'].title,
+				instruction: route.data['page'].instruction,
+				menu: route.data['page'].menu,
+				topMenu: route.data['page'].pagetopMenu
 			};
 
 			document.title = translatePipe.transform(this.pageMetaData.title, []);
