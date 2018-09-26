@@ -1,6 +1,7 @@
 import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {NgForm} from '@angular/forms';
+import {clone} from 'ramda';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
@@ -265,7 +266,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dialogService.extra(DateRangeSelectorComponent,
 			[
 				{provide: UIPromptService, useValue: this.promptService},
-				{provide: DateRangeSelectorModel, useValue: dateModel}
+				{provide: DateRangeSelectorModel, useValue: clone(dateModel)}
 			], false, false).then((result: DateRangeSelectorModel) => {
 				if (result) {
 					const {start, end, duration, locked} = result;
