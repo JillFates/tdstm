@@ -25,6 +25,16 @@ class DatabaseService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to retrieve a model map of the properties to display a database asset
+	 * @param params - request parameters
+	 */
+	@Transactional(readOnly = true)
+	Map getModelForCreate(Map params) {
+		Project project = securityService.getUserCurrentProject()
+		return assetEntityService.getCommonModelForCreate('Database', 'DATABASE', project, params)
+	}
+
+	/**
 	 * Used to create a new Database asset that is called from the controller
 	 * @param params - the request parameters
 	 * @param device - the device to update
