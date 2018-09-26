@@ -53,7 +53,10 @@ form .error-msg{
 	width: 16px;
 	height: 16px;
 	background-position: -97px -129px;
-	background-image: url(../../images/ui-icons_ef8c08_256x240.png);
+	background-image: url(../../plugins/jquery-ui-1.10.4/jquery-ui/themes/ui-lightness/images/ui-icons_ffffff_256x240.png) !important;
+	background-position-x: -95px !important;
+    background-position-y: 112px !important;
+	background-color: initial !important;
 	border-width: 1px;
 }
 
