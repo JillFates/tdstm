@@ -431,7 +431,7 @@
             </div>
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
-                        [disabled]="!taskEditForm.form.valid || hasInvalidFields() ||  !(taskEditForm.form.dirty || hasModelChanges)" (click)="onSave()" type="button">
+                        [disabled]="isFormInvalid()" (click)="onSave()" type="button">
 		            <span  class="fa fa-fw fa-floppy-o"></span>
 		            <span>Update</span>
 	            </button>

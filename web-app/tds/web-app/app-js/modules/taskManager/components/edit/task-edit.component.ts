@@ -1,5 +1,6 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
+import {NgForm} from '@angular/forms';
 import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
@@ -26,6 +27,7 @@ declare var jQuery: any;
 	styles: []
 })
 export class TaskEditComponent extends UIExtraDialog  implements OnInit {
+	@ViewChild('taskEditForm') public taskEditForm: NgForm;
 
 	public modalType = ModalType;
 	public dateFormat: string;
@@ -368,7 +370,18 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * Close Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.isFormDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel').then(result => {
+				if (result) {
+					this.dismiss();
+				}
+			});
+		} else {
+			this.dismiss();
+		}
 	}
 
 	/**
@@ -442,18 +455,41 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {boolean}
 	 */
 	hasInvalidFields(): boolean {
-		const {predecessorList, successorList} = this.model;
-
-		if (this.dataSignatureDependencyTasks === JSON.stringify({predecessors: predecessorList, successors: successorList}) ) {
+		if (!this.hasDependencyTasksChanges()) {
 			return false;
 		}
 
+		const {predecessorList, successorList} = this.model;
 		return this.hasDuplicates(predecessorList) ||
 			this.hasDuplicates(successorList) ||
 			this.hasEmptyIds(predecessorList) ||
 			this.hasEmptyIds(successorList);
 	}
 
+	/**
+	 * Determine whether the form should be disabled because of invalid fields
+	 * @returns {boolean}
+	 */
+	isFormInvalid(): boolean {
+		return !this.taskEditForm.form.valid ||
+				this.hasInvalidFields() ||
+				!(this.taskEditForm.form.dirty || this.hasModelChanges)
+	}
 
+	/**
+	 * Determine if the form has changes based upon ngModel,external tds-checkbox or task grids changes
+	 * @returns {boolean}
+	 */
+	isFormDirty(): boolean {
+		return this.hasDependencyTasksChanges() || this.taskEditForm.dirty || this.hasModelChanges;
+	}
+
+	/**
+	 * Determine if predecessor/succesor collections contain changes
+	 * @returns {boolean}
+	 */
+	hasDependencyTasksChanges(): boolean {
+		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+	}
 
 }
