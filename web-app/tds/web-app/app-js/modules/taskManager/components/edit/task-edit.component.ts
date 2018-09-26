@@ -42,6 +42,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public yesNoList = ['Yes', 'No'];
 	public predecessorSuccessorColumns: any[];
 	public userTimeZone: string;
+	public hasModelChanges = false;
+	private dataSignatureDependencyTasks: string;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -60,6 +62,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.model = this.extractModel();
+		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns
 			.filter((column) => column.property === 'desc');
@@ -158,6 +161,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	/**
 	 * Everytime a task dependency changes, then update the corresponding collection that hold predeccessor/successor  tasks
+	 * If the task is deleted set the model changes flag to true
 	 * @param {object} dataItem
 	 * @param {object[]} collection
 	 * @param {object} gridHelper
@@ -173,6 +177,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			return;
 		}
 
+		if (collection[rowIndex].id) {
+			this.hasModelChanges = true;
+		}
+
 		collection.splice(rowIndex, 1);
 		gridHelper.reloadData(collection);
 	}
@@ -184,10 +192,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {void}
 	 */
 	onAddTaskDependency(collection: any[], gridHelper: DataGridOperationsHelper): void {
+		const defaultText = 'Please Select';
 		const predecessorTask = {
-			id: 0,
-			desc: '',
-			model: {id: 0, text: ''}
+			id: '',
+			desc: defaultText,
+			model: {id: 0, text: defaultText}
 		};
 		collection.unshift(predecessorTask);
 		gridHelper.addDataItem(predecessorTask);
@@ -207,6 +216,16 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 */
 	toggleLocked(): void {
 		this.model.locked = !this.model.locked;
+		this.hasModelChanges = true;
+	}
+
+	/**
+	 * Set the flag to determine if some property handled outside [(ngModel)] has changed
+	 */
+	onModelChange(value: any): void {
+		if (value) {
+			this.hasModelChanges = true;
+		}
 	}
 
 	/**
@@ -252,6 +271,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 					this.model.estimatedFinish = end;
 					this.model.durationParts =  duration;
 					this.model.locked = locked;
+					this.hasModelChanges = true;
 				}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
@@ -384,8 +404,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * Clear the values of start/finish estimated dates
 	 */
 	cleanEstimatedDates(): void {
-		this.model.estimatedFinish = '';
-		this.model.estimatedStart = '';
+		if (this.model.estimatedStart || this.model.estimatedFinish) {
+			this.model.estimatedFinish = '';
+			this.model.estimatedStart = '';
+			this.hasModelChanges = true;
+		}
 	}
 
 	/**
@@ -404,5 +427,33 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		return ids.length < array.length;
 	}
+
+	/**
+	 * Determine if the array of objects passed as argument contains empty ids
+	 * @param {any[]} array
+	 * @returns {boolean}
+	 */
+	hasEmptyIds(array: any[]): boolean {
+		return array.filter((item) => item.id === '').length > 0;
+	}
+
+	/**
+	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
+	 * @returns {boolean}
+	 */
+	hasInvalidFields(): boolean {
+		const {predecessorList, successorList} = this.model;
+
+		if (this.dataSignatureDependencyTasks === JSON.stringify({predecessors: predecessorList, successors: successorList}) ) {
+			return false;
+		}
+
+		return this.hasDuplicates(predecessorList) ||
+			this.hasDuplicates(successorList) ||
+			this.hasEmptyIds(predecessorList) ||
+			this.hasEmptyIds(successorList);
+	}
+
+
 
 }

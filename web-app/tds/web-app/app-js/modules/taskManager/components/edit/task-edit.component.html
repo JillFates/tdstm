@@ -63,6 +63,7 @@
                                                         <tds-combobox
                                                                 [(model)]="model.asset"
                                                                 [(metaParam)]="model.assetClass.id"
+                                                                (valueChange)="onModelChange($event)"
                                                                 [serviceRequest]="getAssetList">
                                                         </tds-combobox>
                                                     </td>
@@ -182,7 +183,7 @@
                                                         <kendo-datepicker
                                                                 name="dueDate"
                                                                 [format]="getDateTimeFormat()"
-                                                                [(value)]="model.dueDate">
+                                                                [(ngModel)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>
 
@@ -212,7 +213,7 @@
                                                                 class="clickable"
                                                                 (click)="openRangeDatesSelector()"
                                                                 [format]="getDateTimeFormat(model.estimatedStart)"
-                                                                [(value)]="model.estimatedStart" readonly="true">
+                                                                [(ngModel)]="model.estimatedStart">
                                                         </kendo-dateinput>
                                                     </td>
 
@@ -340,6 +341,7 @@
                                                             <tds-combobox
                                                                     [(model)]="dataItem.model"
                                                                     [(metaParam)]="dataItem.id"
+                                                                    (valueChange)="onModelChange($event)"
                                                                     [serviceRequest]="getTasksForComboBox"
                                                                     (selectionChange)="onDependencyTaskChange($event, model.predecessorList, dataGridTaskPredecessorsHelper,  rowIndex)">
                                                             </tds-combobox>
@@ -379,6 +381,7 @@
                                                         <tds-combobox
                                                                 [(model)]="dataItem.model"
                                                                 [(metaParam)]="dataItem.id"
+                                                                (valueChange)="onModelChange($event)"
                                                                 [serviceRequest]="getTasksForComboBox"
                                                                 (selectionChange)="onDependencyTaskChange($event, model.successorList, dataGridTaskSuccessorsHelper,  rowIndex)">
                                                         </tds-combobox>
@@ -428,7 +431,7 @@
             </div>
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
-	                    (click)="onSave()" type="button">
+                        [disabled]="!taskEditForm.form.valid || hasInvalidFields() ||  !(taskEditForm.form.dirty || hasModelChanges)" (click)="onSave()" type="button">
 		            <span  class="fa fa-fw fa-floppy-o"></span>
 		            <span>Update</span>
 	            </button>

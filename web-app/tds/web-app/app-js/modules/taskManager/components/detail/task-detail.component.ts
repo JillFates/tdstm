@@ -14,6 +14,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
+import {clone} from 'ramda';
 
 @Component({
 	selector: `task-detail`,
@@ -197,7 +198,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				{provide: UIPromptService, useValue: this.promptService},
 				{provide: PreferenceService, useValue: this.userPreferenceService} ,
 				{provide: PermissionService, useValue: this.permissionService},
-			{provide: TaskDetailModel, useValue: this.taskDetailModel}
+			{provide: TaskDetailModel, useValue: clone(this.taskDetailModel)}
 		], false, false).then(result => {
 			console.log(result);
 		}).catch(result => {
