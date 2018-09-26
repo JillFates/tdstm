@@ -9,14 +9,14 @@ import {
 	Inject
 } from '@angular/core';
 
-import { Observable } from 'rxjs/Observable';
-import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.provider';
-import { DynamicComponent } from '../../../../shared/components/dynamic.component';
+import {Observable} from 'rxjs/Observable';
+import {HttpInterceptor} from '../../../../shared/providers/http-interceptor.provider';
+import {DynamicComponent} from '../../../../shared/components/dynamic.component';
 
-import { DatabaseEditComponent } from '../database/database-edit.component';
-import { StorageEditComponent } from  '../storage/storage-edit.component';
-import {DeviceEditComponent} from '../device/device-edit.component';
-import { ApplicationEditComponent } from '../application/application-edit.component';
+import {DatabaseCreateComponent} from '../database/database-create.component';
+import {StorageCreateComponent} from '../storage/storage-create.component';
+import {DeviceCreateComponent} from '../device/device-create.component';
+import {ApplicationCreateComponent} from '../application/application-create.component';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
@@ -41,23 +41,22 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get('../ws/asset/createTemplate')
+			this.http.get(`../ws/asset/createTemplate/${this.asset}`)
 				.subscribe(res => {
-					let template = res[0].text();
-					let model = res[1].json();
+					let template = res.text();
 
 					switch (this.asset) {
 						case 'APPLICATION':
-							this.registerAndCreate(ApplicationEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(ApplicationCreateComponent(template, metadata), this.view);
 							break;
 						case 'DATABASE':
-							this.registerAndCreate(DatabaseEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(DatabaseCreateComponent(template, metadata), this.view);
 							break;
 						case 'DEVICE':
-							this.registerAndCreate(DeviceEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(DeviceCreateComponent(template, metadata), this.view);
 							break;
 						case 'STORAGE':
-							this.registerAndCreate(StorageEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(StorageCreateComponent(template, metadata), this.view);
 							break;
 
 					}

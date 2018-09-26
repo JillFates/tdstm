@@ -22,13 +22,13 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function DeviceCreateComponent(template, editModel, metadata: any) {
+export function DeviceCreateComponent(template, metadata: any) {
 
 	@Component({
 		selector: `tds-device-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: editModel }
+			{ provide: 'model', useValue: {} }
 		]
 	}) class DeviceCreateComponent extends AssetCommonEdit {
 
@@ -64,7 +64,7 @@ export function DeviceCreateComponent(template, editModel, metadata: any) {
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = R.clone(editModel.asset);
+			this.model.asset = {}; // R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			if (this.model.asset.scale === null) {
