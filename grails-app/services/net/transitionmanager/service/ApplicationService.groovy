@@ -114,7 +114,7 @@ class ApplicationService implements ServiceMethods {
 
 		return [moveEventList: moveEventList, availableRoles: availableRoles, partyGroupList: partyGroupList,
 				staffTypes: Person.constraints.staffType.inList, personList: personList] +
-				assetEntityService.getCommonModelForCreate('Application', project, params)
+				assetEntityService.getCommonModelForCreate('Application', 'APPLICATION', project, params)
 	}
 
 	/**

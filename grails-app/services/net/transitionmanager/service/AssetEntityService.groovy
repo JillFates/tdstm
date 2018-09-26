@@ -1509,7 +1509,7 @@ class AssetEntityService implements ServiceMethods {
 	 * The default/common properties shared between all of the Asset Create views
 	 */
 	@Transactional(readOnly = true)
-	Map getCommonModelForCreate(String type, Project project, Map params) {
+	Map getCommonModelForCreate(String type, String assetClassName, Project project, Map params) {
 
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
@@ -1517,7 +1517,7 @@ class AssetEntityService implements ServiceMethods {
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
-		def customFields = getCustomFieldsSettings(project, type, true)
+		def customFields = getCustomFieldsSettings(project, assetClassName, true)
 		[
 			errors: params.errors,
 			prefValue: prefValue,
