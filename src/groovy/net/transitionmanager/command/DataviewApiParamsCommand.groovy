@@ -23,7 +23,7 @@ class DataviewApiParamsCommand implements CommandObject {
 			if(val){
 				obj.filterParams = []
 				val.each { String param ->
-					filterParams.add(new DataviewApiFilterParam(param))
+					obj.filterParams.add(new DataviewApiFilterParam(param))
 				}
 				return true
 			}
@@ -41,23 +41,39 @@ class DataviewApiParamsCommand implements CommandObject {
 class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
-	static final String FILTER_PARAMETER_FILEDNAME_SEPARATOR_CHARACTER = '.'
+	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '.'
 
 	String domain
 	String fieldName
 	String filter
 
+	/**
+	 * It constructs an instance of {@code DataviewApiFilterParam}
+	 * splitting String param by {@code FILTER_PARAMETER_SEPARATOR_CHARACTER}
+	 * and then by {@code FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER}
+	 * <dl>
+	 * 	<dt>
+	 * 	    <pre>
+	 *			common.environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
+	 *			assetName=Production ==  DataviewApiFilterParam(domain: null, fieldName: 'assetName', filter: 'Production')
+	 * 	    </pre>
+	 * 	</dt>
+	 *
+	 * </dl>
+	 * @param stringValue
+	 */
 	DataviewApiFilterParam(String stringValue){
 		def (String key, String value) = stringValue.split(FILTER_PARAMETER_SEPARATOR_CHARACTER)
 		this.filter = value
 		//TODO: add exception if key or value are null??
-		def (String root, String path) = key.split(FILTER_PARAMETER_FILEDNAME_SEPARATOR_CHARACTER)
-		if(path){
+
+		if(key.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)){
+			def (String root, String path) = key.split(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)
 			this.domain = root
 			this.fieldName = path
 		} else{
 			this.domain = null
-			this.fieldName = root
+			this.fieldName = key
 		}
 	}
 
@@ -69,10 +85,10 @@ class DataviewApiFilterParam {
 	 *			concidence with a dataview column spec
 	 */
 	Boolean matchWithDataviewColumnSpec(Map columnSpec){
-		if(domain){
-			return domain.equalsIgnoreCase(columnSpec.domain) && (columnSpec.property == fieldName || columnSpec.label == fieldName)
+		if(this.domain){
+			return this.domain.equalsIgnoreCase(columnSpec.domain) && (columnSpec.property == this.fieldName || columnSpec.label == this.fieldName)
 		} else {
-			return columnSpec.property == fieldName || columnSpec.label == fieldName
+			return columnSpec.property == this.fieldName || columnSpec.label == this.fieldName
 		}
 	}
 }
