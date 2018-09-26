@@ -22,7 +22,7 @@ declare var jQuery: any;
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `device-show`,
+		selector: `tds-device-show`,
 		template: template
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;

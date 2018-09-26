@@ -14,7 +14,7 @@ declare var jQuery: any;
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `application-show`,
+		selector: `tds-application-show`,
 		template: template
 	}) class ApplicationShowComponent implements OnInit {
 		mainAsset = modelId;
