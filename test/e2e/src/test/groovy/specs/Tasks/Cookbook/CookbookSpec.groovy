@@ -1,6 +1,7 @@
 package specs.Tasks.Cookbook
 
 import geb.spock.GebReportingSpec
+import utils.CommonActions
 import pages.Tasks.Cookbook.CookbookPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
@@ -28,11 +29,10 @@ class CookbookSpec extends GebReportingSpec {
     }
 
     def "1. Going to the Cookbook Section"() {
-        testKey = "TM-7179"
         given: 'The User is at the Menu Page'
             at MenuPage
         when: 'The User Goes to the Tasks > Cookbook Section'
-            menuModule.goToTasksCookbook()
+            tasksModule.goToTasksCookbook()
 
         then: 'Cookbook Section should be displayed'
             at CookbookPage
@@ -40,7 +40,6 @@ class CookbookSpec extends GebReportingSpec {
     }
 
     def "2. Checking Cookbook page active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Cookbook Section'
             at CookbookPage
             commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
