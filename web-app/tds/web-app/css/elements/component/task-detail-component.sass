@@ -12,19 +12,31 @@
     .modal-body
       height: 86%
       form
+        .error-message
+          color: $color-message-error--red
+          margin-top: 3px
+          display: none
         .ng-invalid
           border-color: $color-message-error--red
+        .validated-field
+          .ng-invalid + .error-message
+            display: block
+        .validated-field > .ng-invalid
+          & ~ .error-message
+            display: block
         .required-field::after
           content: "*"
           color: $color-message-error--red
         .duplicate-error
+          margin-right: 8px;
           font-weight: normal
           color: $color-message-error--red
-          font-weight: bold
           float: right
         td.valueNW
           width: 160px
           max-width: 160px
+          .category-list
+            margin-bottom: 2px
           .read-only-dates
             padding-left: 5px
           kendo-dropdownlist

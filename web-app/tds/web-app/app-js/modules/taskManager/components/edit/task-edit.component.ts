@@ -19,6 +19,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
+import {ValidationUtils} from "../../../../shared/utils/validation.utils";
 
 declare var jQuery: any;
 
@@ -491,6 +492,22 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 */
 	hasDependencyTasksChanges(): boolean {
 		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+	}
+
+	/**
+	 *  Determine if a string has the format URL or label|URL
+	 * @param labelURL {string}
+	 * @returns {boolean}
+	 */
+	validateLabelURL(labelURL: string): void {
+		let isEmpty = false;
+
+		if (!labelURL) {
+			isEmpty = true
+		}
+
+		const errors =  (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect' : true}  : null;
+		this.taskEditForm.form.controls['instructionLink'].setErrors(errors);
 	}
 
 }

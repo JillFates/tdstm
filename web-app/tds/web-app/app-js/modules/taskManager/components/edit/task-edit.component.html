@@ -25,10 +25,13 @@
                                                         <label><span class="required-field">Task # {{model.taskNumber}}</span></label>
                                                     </td>
                                                     <td class="valueNW description-container" colspan="5">
-                                                        <input type="text" name="comment" [(ngModel)]="model.comment" required>
-                                                        <button class="btn btn-default" (click)="onCollapseTaskDetail()">
-                                                            <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
-                                                        </button>
+	                                                    <div class="validated-field">
+                                                            <input type="text" name="comment" [(ngModel)]="model.comment" required>
+                                                            <button class="btn btn-default" (click)="onCollapseTaskDetail()">
+                                                                <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
+                                                            </button>
+                                                            <div class="error-message">Task name is required</div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
@@ -159,19 +162,29 @@
                                                         <label><span class="required-field">Category</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="category"
-                                                                [data]="model.categoriesList"
-                                                                [(ngModel)]="model.category" required>
-                                                        </kendo-dropdownlist>
+                                                        <div class="validated-field">
+															<kendo-dropdownlist
+                                                                    class="category-list"
+																	name="category"
+																	[data]="model.categoriesList"
+																	[(ngModel)]="model.category" required>
+															</kendo-dropdownlist>
+															<div class="error-message">Category is required</div>
+                                                        </div>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW instructions-link">
-                                                        <input type="text" name="instructionLink"
-                                                               placeholder="Enter URL or Label|URL"
-                                                               [(ngModel)]="model.instructionLink" />
+                                                        <div class="validated-field">
+                                                            <input type="text" name="instructionLink"
+                                                                   #instructionLink="ngModel"
+                                                                   (change)="validateLabelURL($event.target.value)"
+                                                                   placeholder="Enter URL or Label|URL"
+                                                                   [(ngModel)]="model.instructionLink" />
+                                                            <div class="error-message">Invalid URL</div>
+                                                        </div>
+
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
