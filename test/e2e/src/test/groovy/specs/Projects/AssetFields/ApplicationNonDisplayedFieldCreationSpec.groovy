@@ -20,15 +20,15 @@ class ApplicationNonDisplayedFieldCreationSpec extends GebReportingSpec{
     def testKey
     static testCount
     static randStr = CommonActions.getRandomString()
-    static baseName = "QAE2E"
+    static baseName = "QAE2E" + randStr
     @Shared
     static fieldInfo = [
             "fieldName": null,
-            "label": baseName + " Non-Displayed",
+            "label": baseName,
             "highlighting": null,
             "required": "No",
             "display": "No",
-            "defaultValue": baseName + " Non-Displayed",
+            "defaultValue": baseName,
             "control": "String",
             "stringMin": "0",
             "stringMax": "200",
