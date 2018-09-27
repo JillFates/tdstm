@@ -123,7 +123,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
 			jQuery(modalDialog).css({
 				'display': 'none',
-				'visibility': 'hidden'
+				'visibility': 'hidden',
+				'width': ''
 			});
 		});
 
