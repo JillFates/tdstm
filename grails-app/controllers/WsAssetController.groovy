@@ -395,13 +395,15 @@ class WsAssetController implements ControllerMethods {
 	 * @param id - the id of the asset to retrieve the model for
 	 * @return JSON map
 	 */
-	@HasPermission(Permission.BundleCreate)
-	def getModelSupportDepends() {
+	@HasPermission(Permission.AssetView)
+	def getDefaultCreateModel() {
 		Project project = securityService.getUserCurrentProject()
 		Map model = [:]
 		// Required for Supports On and Depends On
 		model.dependencyMap = assetEntityService.dependencyCreateMap(project)
 		model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
+		model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
+		model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
 		renderAsJson(model)
 	}
 

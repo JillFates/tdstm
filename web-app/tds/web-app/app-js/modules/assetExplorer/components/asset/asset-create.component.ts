@@ -19,7 +19,6 @@ import {DeviceCreateComponent} from '../device/device-create.component';
 import {ApplicationCreateComponent} from '../application/application-create.component';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {TagModel} from '../../../assetTags/model/tag.model';
 
 @Component({
 	selector: `tds-asset-all-create`,
@@ -43,7 +42,7 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
-				this.http.get(`../ws/asset/supportDependsModel`))
+				this.http.get(`../ws/asset/defaultCreateModel`))
 				.subscribe(res => {
 					let template = res[0].text();
 					let model = res[1].json();
