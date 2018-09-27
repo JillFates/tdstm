@@ -144,7 +144,7 @@ export class AssetCommonEdit implements OnInit {
 
 		this.promptService.open('Confirmation Required',
 			'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-			'Yes', 'No')
+			'OK', 'Cancel')
 			.then( success => {
 				if (success) {
 					this.assetExplorerService.deleteAssets([assetId]).subscribe( res => {
