@@ -47,10 +47,7 @@ class AssetEntityControllerIntegrationSpec extends IntegrationSpec {
 	 * Used to create a test project and user that is logged in
 	 */
 	def setupSpec() {
-		//personService = ApplicationContextHolder.getBean('personService')
-		//securityService = ApplicationContextHolder.getBean('securityService')
-		//userPreferenceService = ApplicationContextHolder.getBean('userPreferenceService')
-
+		
 		project = projectHelper.createProject()
 
 		adminPerson = personHelper.createStaff(project.owner)
