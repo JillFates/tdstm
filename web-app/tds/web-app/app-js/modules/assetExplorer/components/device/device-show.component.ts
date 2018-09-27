@@ -69,7 +69,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -86,7 +86,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showModel(id: string): void {

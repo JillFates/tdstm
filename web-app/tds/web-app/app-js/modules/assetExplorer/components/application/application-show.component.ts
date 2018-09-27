@@ -45,7 +45,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -65,7 +65,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 		}
 
 		/**
