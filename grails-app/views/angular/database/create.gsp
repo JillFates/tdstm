@@ -60,7 +60,8 @@
 														[(ngModel)]="model.asset.scale.name"
 														[defaultItem]="''"
 														[textField]="'text'"
-														[valueField]="'value'">
+														[valueField]="'value'"
+														style="width: 100px;">
 												</kendo-dropdownlist>
 											</td>
 
