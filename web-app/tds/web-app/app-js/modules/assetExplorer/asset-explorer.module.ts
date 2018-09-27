@@ -15,6 +15,7 @@ import { AssetExplorerViewShowComponent } from './components/view-show/asset-exp
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { AssetShowComponent } from './components/asset/asset-show.component';
 import { AssetEditComponent } from './components/asset/asset-edit.component';
+import { AssetCreateComponent } from './components/asset/asset-create.component';
 import { SharedModule } from '../../shared/shared.module';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
@@ -67,6 +68,7 @@ import { ModelService } from  './service/model.service';
 		AssetExplorerViewShowComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
@@ -95,6 +97,7 @@ import { ModelService } from  './service/model.service';
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		TaskDetailComponent,

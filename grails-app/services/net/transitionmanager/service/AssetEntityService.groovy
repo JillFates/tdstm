@@ -1506,6 +1506,31 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * The default/common properties shared between all of the Asset Create views
+	 */
+	@Transactional(readOnly = true)
+	Map getCommonModelForCreate(String type, String assetClassName, Project project, Map params) {
+
+		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
+		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
+		// Obtains the domain out of the asset type string
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
+
+		def customFields = getCustomFieldsSettings(project, assetClassName, true)
+		[
+			errors: params.errors,
+			prefValue: prefValue,
+			project: project,
+			client: project.client,
+			viewUnpublishedValue: viewUnpublishedValue,
+			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+			customs: customFields,
+			standardFieldSpecs: standardFieldSpecs
+		]
+	}
+
+	/**
 	 * Used to provide the default properties used for the Asset Dependency views
 	 * @param listType - indicates the type of list [Application|AssetEntity|Files|Storage]
 	 * @param moveEvent

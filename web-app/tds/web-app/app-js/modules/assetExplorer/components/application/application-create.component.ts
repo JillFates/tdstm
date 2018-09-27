@@ -20,15 +20,15 @@ import { PersonModel } from '../../../../shared/components/add-person/model/pers
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
-export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
+export function ApplicationCreateComponent(template: string, metadata: any): any {
 	@Component({
-		selector: 'tds-application-edit',
+		selector: 'tds-application-create',
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: editModel }
+			{ provide: 'model', useValue: {} }
 		]
 	})
-	class ApplicationShowComponent extends AssetCommonEdit {
+	class ApplicationCreateComponent extends AssetCommonEdit {
 		defaultItem = {fullName: 'Please Select', personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
@@ -58,7 +58,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = R.clone(editModel.asset);
+			this.model.asset = {}; // R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			this.model.asset.sme = this.model.asset.sme || { id: null };
@@ -98,7 +98,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * Method makes proper model modification to send the correct information to
 		 * the endpoint.
 		 */
-		public onUpdate(): void {
+		public onCreate(): void {
 			const modelRequest   = R.clone(this.model);
 
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
@@ -115,7 +115,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
+			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
@@ -167,14 +167,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.persons.appOwner = { personId: this.model.asset.appOwner.id};
 		}
 
-		/**
-			allows to delete the application assets
-		*/
-		onDeleteAsset() {
-
-			this.deleteAsset(this.model.asset.id);
-		}
 	}
 
-	return ApplicationShowComponent;
+	return ApplicationCreateComponent;
 }

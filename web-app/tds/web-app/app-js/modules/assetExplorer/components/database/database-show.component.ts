@@ -14,7 +14,7 @@ declare var jQuery: any;
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `database-show`,
+		selector: `tds-database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
 		private mainAsset = modelId;

@@ -22,15 +22,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function DeviceEditComponent(template, editModel, metadata: any) {
+export function DeviceCreateComponent(template, metadata: any) {
 
 	@Component({
-		selector: `tds-device-edit`,
+		selector: `tds-device-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: editModel }
+			{ provide: 'model', useValue: {} }
 		]
-	}) class DeviceEditComponent extends AssetCommonEdit {
+	}) class DeviceCreateComponent extends AssetCommonEdit {
 
 		private showRackFields = true;
 		private showRackSourceInput: 'none'|'new'|'select' = 'none';
@@ -64,7 +64,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = R.clone(editModel.asset);
+			this.model.asset = {}; // R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			if (this.model.asset.scale === null) {
@@ -108,7 +108,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 * Method makes proper model modification to send the correct information to
 		 * the endpoint.
 		 */
-		private onUpdate(): void {
+		private onCreate(): void {
 			let modelRequest = R.clone(this.model);
 
 			// currentAssetType, manufacturerId, modelId
@@ -186,7 +186,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 				}
 			});
 
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
+			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
@@ -303,10 +303,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			}
 		}
 
-		private onDeleteAsset() {
-			this.deleteAsset(this.model.asset.id);
-		}
-
 		/**
 		 * Function that handles the request of the Asset Types tds-combobox
 		 * @param {ComboBoxSearchModel} searchModel
@@ -392,5 +388,5 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		}
 
 	}
-	return DeviceEditComponent;
+	return DeviceCreateComponent;
 }

@@ -14,7 +14,7 @@ declare var jQuery: any;
 
 export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `storage-show`,
+		selector: `tds-storage-show`,
 		template: template
 	}) class StorageShowComponent implements OnInit {
 		mainAsset = modelId;

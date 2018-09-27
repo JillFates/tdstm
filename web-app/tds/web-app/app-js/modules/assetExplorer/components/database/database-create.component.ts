@@ -6,8 +6,9 @@
  */
 import {Component, Inject} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import { PreferenceService } from '../../../../shared/services/preference.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
@@ -17,15 +18,15 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
+export function DatabaseCreateComponent(template, metadata: any) {
+
 	@Component({
-		selector: 'tds-storage-edit',
+		selector: `tds-database-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: editModel }
+			{ provide: 'model', useValue: {} }
 		]
-	})
-	class StorageShowComponent extends AssetCommonEdit {
+	}) class DatabaseCreateComponent extends AssetCommonEdit {
 
 		constructor(
 			@Inject('model') model: any,
@@ -38,13 +39,11 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-			this.initModel();
-		}
 
-		/**
-		 * Init model with necessary changes to support UI components.
-		 */
-		private initModel(): void {
+			this.model.asset = {}; // R.clone(editModel.asset);
+			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
+			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -57,7 +56,7 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		/**
 		 * Prepare te model and format all pending changes
 		 */
-		public onUpdate(): void {
+		public onCreate(): void {
 			let modelRequest = R.clone(this.model);
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
@@ -69,10 +68,8 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
-			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
+
+			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
@@ -81,15 +78,7 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 				}
 			});
 		}
-
-		/**
-		 * Delete the storage asset
-		 */
-		onDeleteAsset(): void {
-			this.deleteAsset(this.model.asset.id);
-		}
-
 	}
 
-	return StorageShowComponent;
+	return DatabaseCreateComponent;
 }
