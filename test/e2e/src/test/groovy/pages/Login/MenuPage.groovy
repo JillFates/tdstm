@@ -7,6 +7,8 @@ import modules.ProjectsModule
 import modules.AssetsModule
 import modules.TasksModule
 
+import modules.PlanningModule
+
 class MenuPage extends Page {
 
     static at = {
@@ -21,5 +23,6 @@ class MenuPage extends Page {
         assetsModule { module AssetsModule}
         tasksModule { module TasksModule}
 
+        planningModule { module PlanningModule}
     }
 }
