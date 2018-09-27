@@ -647,6 +647,9 @@ class TimeUtil {
 			case FORMAT_DATE_TIME_26:
 				format = FORMAT_DATE_TIME_26
 				break
+			case FORMAT_DATE_TIME_ISO8601:
+				format = FORMAT_DATE_TIME_ISO8601
+				break
 		}
 
 		if (!format) {
