@@ -449,9 +449,11 @@ var GraphUtil = (function ($) {
 		public.linkBindings.attr("class", function(d) {
 			return 'link'
 				+ ((d.selected == 1) ? ' selected' : '')
-				+ ((d.unresolved) ? ' unresolved' : '')
-				+ ((d.notApplicable) ? ' notApplicable' : '')
-				+ ((d.future) ? ' future' : '')
+				+ ((d.unresolved && !d.partOfCycle) ? ' unresolved' : '')
+				+ ((d.notApplicable && !d.partOfCycle) ? ' notApplicable' : '')
+				+ ((d.future && !d.partOfCycle) ? ' future' : '')
+				+ ((d.validated && !d.partOfCycle) ? ' validated' : '')
+				+ ((d.questioned && !d.partOfCycle) ? ' questioned' : '')
 				+ ((d.cut) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
