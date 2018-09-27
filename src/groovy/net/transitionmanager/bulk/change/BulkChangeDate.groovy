@@ -1,38 +1,47 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ServiceMethods
 
 @Transactional
-class BulkChangeDateService implements ServiceMethods {
+class BulkChangeDate implements ServiceMethods {
+	/**
+	 * Actions that are allowed to be dynamically called by the Bulk Services.
+	 */
+	static final List<String> ALLOWED_ACTIONS = ['replace', 'clear']
 
 	/**
 	 * Bulk replace asset entity specified field with given date
 	 *
+	 * @param type the class to use in the query.
 	 * @param date - new date
 	 * @param fieldName - field name
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	void bulkReplace(Date date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	static void replace(Class type, Date date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
 		if (!date) {
 			throw new InvalidParamException('New date value cannot be null')
 		}
 
-		bulkUpdate(date, fieldName, assetIds, assetIdsFilterQuery)
+		update(type, date, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
 	 * Bulk clear asset entity specified field
 	 *
+	 * @param type the class to use in the query.
+	 * @param value the value is not used, just here for interface consistency.
 	 * @param fieldName - field name
 	 * @param assetIds - list of assets to update
 	 * @param assetIdsFilterQuery - additional assets query filter
 	 */
-	void bulkClear(Date date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate(null, fieldName, assetIds, assetIdsFilterQuery)
+	static void clear(Class type, Date date, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+		update(type,null, fieldName, assetIds, assetIdsFilterQuery)
 	}
 
 	/**
@@ -42,7 +51,7 @@ class BulkChangeDateService implements ServiceMethods {
 	 * @param currentProject - current project, not used but passed by hierarchical service
 	 * @return - parsed Date object
 	 */
-	Date coerceBulkValue(Project currentProject, String value) {
+	static Date coerceBulkValue(Project currentProject, String value) {
 		def parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 		if (!parsedValue) {
 			parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
@@ -54,26 +63,16 @@ class BulkChangeDateService implements ServiceMethods {
 	/**
 	 * Bulk update asset entity specified field with given value
 	 *
+	 * @param type the class to use in the query.
 	 * @param value - new value
 	 * @param fieldName - field name
-	 * @param assetIds - list of assets to update
-	 * @param assetIdsFilterQuery - additional assets query filter
+	 * @param ids - list of assets to update
+	 * @param idsFilterQuery - additional assets query filter
 	 */
-	private void bulkUpdate(Date value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		String queryForAssetIds
+	private static void update(Class type, Date value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 		String setFieldQueryPart
 		Map params = [:]
-		Map assetQueryParams = [:]
-
-		if (assetIds && !assetIdsFilterQuery) {
-			queryForAssetIds = ':assetIds'
-			params.assetIds = assetIds
-			assetQueryParams['assetIds'] = assetIds
-		} else {
-			queryForAssetIds = assetIdsFilterQuery.query
-			params << assetIdsFilterQuery.params
-			assetQueryParams = assetIdsFilterQuery.params
-		}
+		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
 
 		if (value) {
 			params.value = value
@@ -83,8 +82,8 @@ class BulkChangeDateService implements ServiceMethods {
 		}
 
 		String query = """
-			UPDATE AssetEntity ${setFieldQueryPart}
-			WHERE id IN ($queryForAssetIds)
+			UPDATE ${type.simpleName} ${setFieldQueryPart}
+			WHERE id IN ($queryForIds)
 		"""
 
 		AssetEntity.executeUpdate(query, params)
@@ -96,7 +95,7 @@ class BulkChangeDateService implements ServiceMethods {
 	 * @param format - format
 	 * @return - parsed Date object
 	 */
-	private Date parseDateTime(String value, String format) {
+	static private Date parseDateTime(String value, String format) {
 		return TimeUtil.parseDateTime(value, format)
 	}
 
