@@ -18,13 +18,13 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function DatabaseCreateComponent(template, metadata: any) {
+export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 	@Component({
 		selector: `tds-database-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: { asset: {} } }
+			{ provide: 'model', useValue: model }
 		]
 	}) class DatabaseCreateComponent extends AssetCommonEdit {
 

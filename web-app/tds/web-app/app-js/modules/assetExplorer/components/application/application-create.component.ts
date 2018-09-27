@@ -20,12 +20,12 @@ import { PersonModel } from '../../../../shared/components/add-person/model/pers
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
-export function ApplicationCreateComponent(template: string, metadata: any): any {
+export function ApplicationCreateComponent(template: string, model: any, metadata: any): any {
 	@Component({
 		selector: 'tds-application-create',
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: { asset: {} } }
+			{ provide: 'model', useValue: model }
 		]
 	})
 	class ApplicationCreateComponent extends AssetCommonEdit {
