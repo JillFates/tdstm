@@ -1,5 +1,6 @@
 package net.transitionmanager.command.bulk
 
+import com.tdsops.tm.enums.domain.AssetClass
 import grails.validation.Validateable
 import net.transitionmanager.command.DataviewUserParamsCommand
 
@@ -18,15 +19,16 @@ class BulkChangeCommand {
 	DataviewUserParamsCommand userParams
 	Long                      dataViewId
 	List<EditCommand>         edits
-	List<Long>                assetIds
-	Boolean                   allAssets = false
+	List<Long>                ids
+	Boolean                   allIds = false
+	String                    type   = AssetClass.APPLICATION.toString()
 
 	static constraints = {
 		userParams cascade: true, nullable:true
 		dataViewId nullable: true
 		edits cascade: true
-		assetIds nullable: true, validator: { assetIds, command ->
-			if (!assetIds && !(command.allAssets && command.dataViewId && command.userParams)) {
+		ids nullable: true, validator: { assetIds, command ->
+			if (!assetIds && !(command.allIds && command.dataViewId && command.userParams)) {
 				return 'code for assets need to be specified or all assets'
 			}
 		}
