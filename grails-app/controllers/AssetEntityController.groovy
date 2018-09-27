@@ -661,7 +661,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {
 			if (map.error) {
 				flash.message = map.error
