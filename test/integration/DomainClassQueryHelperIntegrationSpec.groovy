@@ -703,13 +703,40 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 					new FindCondition('manufacturer', manufacturer.id)
 				]
 			)
+		then:
+			results.size() == 1
+	}
+
+	void '36. can find Model by a modelName and manufacturer id Integer value'() {
+
+		given:
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', model.modelName),
+					new FindCondition('manufacturer', manufacturer.id.intValue())
+				]
+			)
 
 		then:
 			results.size() == 1
 	}
 
-
-	void '36. can find Device by a Model id'() {
+	void '37. can find Device by a Model id'() {
 
 		given:
 
@@ -748,4 +775,42 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.size() == 1
 	}
 
+	void '38. can find Device by a Model id'() {
+
+		given:
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+
+			Manufacturer manufacturer = new Manufacturer(name: "Dell 12345").save(failOnError: true, flush: true)
+
+			Model model = new Model(
+				modelName: 'BladeCenter HS20',
+				manufacturer: manufacturer,
+				assetType: "Server",
+				poweruse: 1200,
+				connectorLabel: "PE5",
+				type: "Power",
+				connectorPosX: 250,
+				connectorPosY: 90
+			).save(failOnError: true, flush: true)
+
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', model.modelName)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
 }

@@ -162,26 +162,57 @@ class DomainClassQueryHelper {
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
 	 */
-	static String getNamedParameterForField(Class clazz, String fieldName) {
+	static String getNamedParameterForField(Class clazz, FindCondition condition) {
 
-		if(otherAlternateKeys.containsKey(fieldName)){
-			return otherAlternateKeys[fieldName].namedParameter
+		if(otherAlternateKeys.containsKey(condition.propertyName)){
+			return otherAlternateKeys[condition.propertyName].namedParameter
 		}
 
-		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
-			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
+		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, condition.propertyName)){
+			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 
 			if(Person.isAssignableFrom(propertyClazz)){
-				return fieldName
+				return condition.propertyName
+			} else if(NumberUtil.isaNumber(condition.value)){
+				return "${condition.propertyName}_id"
 			} else {
 				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-				return "${fieldName}_${alternateKey}"
+				return "${condition.propertyName}_${alternateKey}"
 			}
 		} else {
-			return fieldName
+			return condition.propertyName
 		}
 	}
 
+	/**
+	 * Get the named parameter for an HQL query based on a field name
+	 * It uses clazz parameter to detect several scenarios. <br>
+	 * First of all, it validates if fieldName is an alternativeKey.
+	 * See details more details about those fields on otherAlternateKeys map.<br>
+	 * After that step, it validates if AssetEntity.isAssignableFrom(clazz)
+	 * and if field name is a reference property in domain class<br>
+	 * If that is true, then It needs to check if field name is a Person domain reference
+	 * or if it clazz has an alternateKey. Having an alternateKey, it is used
+	 * for domain references.
+	 * @param domain
+	 * @param condition
+	 * @return a named parameter value for a HQL query.
+	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, com.tdsops.etl.FindCondition)
+	 */
+	static String getNamedParameterForField(ETLDomain domain, FindCondition condition) {
+		return getNamedParameterForField(domain.clazz, condition)
+	}
+
+	/**
+	 * Get a property name the hql where sentence.
+	 * @param domain
+	 * @param condition
+	 * @return a property value for a HQL query.
+	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, com.tdsops.etl.FindCondition)
+	 */
+	static String getPropertyForField(ETLDomain domain, FindCondition condition) {
+		return getPropertyForField(domain.getClazz(), condition)
+	}
 	/**
 	 * Get a property name the hql where sentence.
 	 * First of all it checks if there is an option alternateKey in otherAlternateKeys map.
@@ -190,6 +221,7 @@ class DomainClassQueryHelper {
 	 * <pre>
 	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'id') == 'D.id'
 	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'manufacturer') == 'D.manufacturer.name'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Model.getClazz(), 'manufacturer') == 'D.manufacturer.id'
 	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'moveBundle') == 'D.moveBundle.name'
 	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'rackSource') == 'D.rackSource.tag'
 	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'locationSource') == 'D.roomSource.location'
@@ -204,28 +236,64 @@ class DomainClassQueryHelper {
 	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
 	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
 	 */
-	static String getPropertyForField(Class clazz, String fieldName) {
+	static String getPropertyForField(Class clazz, FindCondition condition) {
 
-		if(otherAlternateKeys.containsKey(fieldName)){
-			return otherAlternateKeys[fieldName].property
+		if (otherAlternateKeys.containsKey(condition.propertyName)) {
+			return otherAlternateKeys[condition.propertyName].property
 		}
 
-		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
-			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
-			if(Person.isAssignableFrom(propertyClazz)){
-				return SqlUtil.personFullName(fieldName, DOMAIN_ALIAS)
-			} else {
-				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-				return "${DOMAIN_ALIAS}.${fieldName}.${alternateKey}"
-			}
-
+		if (AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, condition.propertyName)) {
+			return getPropertyForAssetClassAndField(clazz, condition)
 		} else {
-			if(GormUtil.isReferenceProperty(clazz, fieldName)){
-				return "${DOMAIN_ALIAS}.${fieldName}.id"
-			} else {
-				return "${DOMAIN_ALIAS}.${fieldName}"
+			return getPropertyForNonAssetClassAndField(clazz, condition)
+		}
+	}
+
+	/**
+	 * Get a property name the hql where sentence for a non AssetEntity domain instance.
+	 * // 1) If fieldName is Reference
+	 * // 2) 	If reference value is Long, then fieldName.id
+	 * // 3)	else if reference getAlternateKeyPropertyName
+	 * // 4)    else if reference is Alias (Model || Manufacturer) //TODO:dcorrea. I need to add this logic in other ticket
+	 * // 5) else fieldName
+	 * @param clazz
+	 * @param condition
+	 * @return a property value for a HQL query.
+	 */
+	static String getPropertyForNonAssetClassAndField(Class clazz, FindCondition condition) {
+
+		if (GormUtil.isReferenceProperty(clazz, condition.propertyName)) {
+
+			if(NumberUtil.isaNumber(condition.value)){
+				return "${DOMAIN_ALIAS}.${condition.propertyName}.id"
 			}
 
+			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
+			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
+			if(alternateKey){
+				return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
+			}
+			//TODO: dcorrea 26/09/2018 add logic for Alias table in case of Model or Manufacturer
+		}
+
+		return "${DOMAIN_ALIAS}.${condition.propertyName}"
+	}
+
+	/**
+	 * Get a property name the hql where sentence for an AssetEntity domain instance
+	 * @param clazz
+	 * @param condition
+	 * @return a property value for a HQL query.
+	 */
+	static String getPropertyForAssetClassAndField(Class clazz, FindCondition condition) {
+		Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
+		if (Person.isAssignableFrom(propertyClazz)) {
+			return SqlUtil.personFullName(condition.propertyName, DOMAIN_ALIAS)
+		} else if(NumberUtil.isaNumber(condition.value)){
+			return "${DOMAIN_ALIAS}.${condition.propertyName}.id"
+		} else {
+			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
+			return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
 		}
 	}
 
@@ -268,8 +336,8 @@ class DomainClassQueryHelper {
 	 * @param  conditions a list of {@code FindCondition} use for preparing where and params in the HQL sentence.
 	 * @return a alist with 2 values: first the where sentence part for an HQL query using Clazz
 	 *          and second the hql params for an HQL query..
-	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
-	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
+	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, com.tdsops.etl.FindCondition)
+	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, com.tdsops.etl.FindCondition)
 	 */
 	static List hqlWhereAndHqlParams(Project project, Class clazz, List<FindCondition> conditions) {
 
@@ -277,12 +345,17 @@ class DomainClassQueryHelper {
 
 		String hqlWhere = conditions.collect { FindCondition condition ->
 
-			String property = getPropertyForField(clazz, condition.propertyName)
-			String namedParameter = getNamedParameterForField(clazz, condition.propertyName)
+			String property = getPropertyForField(clazz, condition)
+			String namedParameter = getNamedParameterForField(clazz, condition)
 
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				// If user is trying to use find command by id, automatically we convert that value to a long
+				if(property.endsWith('.id') && NumberUtil.isaNumber(condition.value)) {
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
+				}
+
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
 					where += " and ${property}.project =:${namedParameter}_project \n"
@@ -313,8 +386,8 @@ class DomainClassQueryHelper {
 	 * @param value - value to query with
 	 * @return true if should query using the ID
 	 */
-	static private boolean shouldQueryByReferenceId(clazz, field, value) {
-		return ((value instanceof Long) || value instanceof Integer ) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
+	static private boolean shouldQueryByReferenceId(Class clazz, String field, Object value) {
+		return (NumberUtil.isaNumber(value) ) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 	}
 
 	/**
@@ -328,7 +401,6 @@ class DomainClassQueryHelper {
 			getJoinForField(clazz, condition.propertyName)
 		}.join('  ')
 	}
-
 
 	/**
 	 * <p>It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator</p>
