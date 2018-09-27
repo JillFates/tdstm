@@ -22,7 +22,7 @@ export function StorageCreateComponent(template: string, metadata: any): any {
 		selector: 'tds-storage-create',
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: { asset: {} } }
 		]
 	})
 	class StorageCreateComponent extends AssetCommonEdit {

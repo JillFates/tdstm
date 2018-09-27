@@ -28,7 +28,7 @@ export function DeviceCreateComponent(template, metadata: any) {
 		selector: `tds-device-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: { asset: {} } }
 		]
 	}) class DeviceCreateComponent extends AssetCommonEdit {
 

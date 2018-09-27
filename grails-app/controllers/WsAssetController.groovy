@@ -391,6 +391,21 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
+	 * Used to retrieve the model data for the List o parameters required for Support and Depend of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.BundleCreate)
+	def getModelSupportDepends() {
+		Project project = securityService.getUserCurrentProject()
+		Map model = [:]
+		// Required for Supports On and Depends On
+		model.dependencyMap = assetEntityService.dependencyCreateMap(project)
+		model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
+		renderAsJson(model)
+	}
+
+	/**
 	 * Endpoint that needs to be executed when the user changes the selected
 	 * bundle in dropdowns.
 	 * The request must have: assetId, dependencyId and status.

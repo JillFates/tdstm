@@ -28,7 +28,8 @@ class StorageService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getModelForCreate(Map params) {
 		Project project = securityService.getUserCurrentProject()
-		return assetEntityService.getCommonModelForCreate('Files', 'STORAGE', project, params)
+		Files file = new Files();
+		return [assetInstance: file] + assetEntityService.getCommonModelForCreate('Files', project, file)
 	}
 
 	/**

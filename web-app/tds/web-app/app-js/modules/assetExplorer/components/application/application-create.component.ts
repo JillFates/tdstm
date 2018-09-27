@@ -25,7 +25,7 @@ export function ApplicationCreateComponent(template: string, metadata: any): any
 		selector: 'tds-application-create',
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: { asset: {} } }
 		]
 	})
 	class ApplicationCreateComponent extends AssetCommonEdit {

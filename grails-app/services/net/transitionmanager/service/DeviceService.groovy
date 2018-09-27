@@ -155,8 +155,10 @@ class DeviceService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getModelForCreate(Map params) {
 		Project project = securityService.getUserCurrentProject()
-		def model = assetEntityService.getCommonModelForCreate('AssetEntity', 'DEVICE', project, params)
+		AssetEntity assetEntity = new AssetEntity();
+		def model = assetEntityService.getCommonModelForCreate('AssetEntity', project, assetEntity)
 
+		model.assetInstance = assetEntity
 		model.roomSource = null
 		model.roomTarget = null
 		model.sourceChassis = ''
