@@ -5,21 +5,21 @@ package net.transitionmanager.command
 @grails.validation.Validateable
 class DataviewApiParamsCommand implements CommandObject {
 
-    int offset = 0
-    int limit
+	int offset = 0
+	int limit
 	/**
 	 * Defined by the following structure:
 	 * filter=environment=Production&filter=assetName=PDV*
 	 */
-    List<String> filter
+	List<String> filter
 
 	List<DataviewApiFilterParam> filterParams = []
 
-    static constraints = {
-        offset min: 0
-        limit nullable: true, min: 0, max: Integer.MAX_VALUE
+	static constraints = {
+		offset min: 0
+		limit nullable: true, min: 0, max: Integer.MAX_VALUE
 		filter nullable: true, blank: true, validator: { val, obj ->
-			if(val){
+			if (val) {
 				obj.filterParams = []
 				val.each { String param ->
 					obj.filterParams.add(new DataviewApiFilterParam(param))
@@ -28,7 +28,7 @@ class DataviewApiParamsCommand implements CommandObject {
 			}
 		}
 		filterParams nullable: true
-    }
+	}
 }
 
 /**
@@ -41,6 +41,7 @@ class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
 	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '.'
+	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '\\.'
 
 	String domain
 	String fieldName
@@ -53,25 +54,24 @@ class DataviewApiFilterParam {
 	 * <dl>
 	 * 	<dt>
 	 * 	    <pre>
-	 *			common.environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
-	 *			assetName=Production ==  DataviewApiFilterParam(domain: null, fieldName: 'assetName', filter: 'Production')
+	 * 			common.environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
+	 * 			assetName=Production ==  DataviewApiFilterParam(domain: null, fieldName: 'assetName', filter: 'Production')
 	 * 	    </pre>
 	 * 	</dt>
 	 *
 	 * </dl>
 	 * @param stringValue
 	 */
-	DataviewApiFilterParam(String stringValue){
-		def (String key, String value) = stringValue.split(FILTER_PARAMETER_SEPARATOR_CHARACTER)
+	DataviewApiFilterParam(String stringValue) {
+		def (String key, String value) = stringValue.split(DataviewApiFilterParam.FILTER_PARAMETER_SEPARATOR_CHARACTER)
+		this.domain = null
+		this.fieldName = key
 		this.filter = value
 
-		if(key.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)){
-			def (String root, String path) = key.split(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)
+		if (key.contains(DataviewApiFilterParam.FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)) {
+			def (String root, String path) = key.split(DataviewApiFilterParam.FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER)
 			this.domain = root
 			this.fieldName = path
-		} else{
-			this.domain = null
-			this.fieldName = key
 		}
 	}
 
@@ -80,10 +80,10 @@ class DataviewApiFilterParam {
 	 *
 	 * @param columnSpec a Map instance with column spec content
 	 * @return true if current instance of {@code DataviewApiFilterParam}
-	 *			concidence with a dataview column spec
+	 * 			concidence with a dataview column spec
 	 */
-	Boolean matchWithDataviewColumnSpec(Map columnSpec){
-		if(this.domain){
+	Boolean matchWithDataviewColumnSpec(Map columnSpec) {
+		if (this.domain) {
 			return this.domain.equalsIgnoreCase(columnSpec.domain) && (columnSpec.property == this.fieldName || columnSpec.label == this.fieldName)
 		} else {
 			return columnSpec.property == this.fieldName || columnSpec.label == this.fieldName
