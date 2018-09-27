@@ -143,6 +143,8 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
+		"/ws/asset/supportDependsModel" (controller:'wsAsset', action:'getModelSupportDepends', method:'GET')
+
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
 			action = [

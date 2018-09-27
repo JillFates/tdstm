@@ -1509,7 +1509,7 @@ class AssetEntityService implements ServiceMethods {
 	 * The default/common properties shared between all of the Asset Create views
 	 */
 	@Transactional(readOnly = true)
-	Map getCommonModelForCreate(String type, String assetClassName, Project project, Map params) {
+	Map getCommonModelForCreate(String type, Project project, assetEntity) {
 
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
@@ -1517,9 +1517,8 @@ class AssetEntityService implements ServiceMethods {
 		String domain = AssetClass.getDomainForAssetType(type)
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
-		def customFields = getCustomFieldsSettings(project, assetClassName, true)
+		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
 		[
-			errors: params.errors,
 			prefValue: prefValue,
 			project: project,
 			client: project.client,
@@ -3029,6 +3028,22 @@ class AssetEntityService implements ServiceMethods {
 			moveBundleList: getMoveBundles(project),
 			nonNetworkTypes: AssetType.nonNetworkTypes,
 			supportAssets: getDependentsOrSupporting(asset, false)
+		]
+	}
+
+	/**
+	 * Return the map of information for show/create dependencies.
+	 * @param project
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyCreateMap(Project project) {
+		return [
+				assetClassOptions: AssetClass.classOptions,
+				dependencyStatus: getDependencyStatuses(),
+				dependencyType: getDependencyTypes(),
+				moveBundleList: getMoveBundles(project),
+				nonNetworkTypes: AssetType.nonNetworkTypes,
 		]
 	}
 

@@ -31,7 +31,8 @@ class DatabaseService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getModelForCreate(Map params) {
 		Project project = securityService.getUserCurrentProject()
-		return assetEntityService.getCommonModelForCreate('Database', 'DATABASE', project, params)
+		Database database = new Database()
+		return [assetInstance: database] + assetEntityService.getCommonModelForCreate('Database', project, database)
 	}
 
 	/**

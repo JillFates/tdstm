@@ -18,13 +18,13 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function DatabaseCreateComponent(template, metadata: any) {
+export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 	@Component({
 		selector: `tds-database-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: model }
 		]
 	}) class DatabaseCreateComponent extends AssetCommonEdit {
 
@@ -40,17 +40,11 @@ export function DatabaseCreateComponent(template, metadata: any) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 
-			this.model.asset = {}; // R.clone(editModel.asset);
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-
-			if (this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: ''
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
-			}
+			this.model.asset.retireDate = DateUtils.compose(new Date());
+			this.model.asset.maintExpDate = DateUtils.compose(new Date());
+			this.model.asset.scale = {
+				name: ''
+			};
 		}
 
 		/**
