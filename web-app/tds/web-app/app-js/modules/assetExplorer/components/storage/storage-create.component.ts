@@ -17,12 +17,12 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function StorageCreateComponent(template: string, metadata: any): any {
+export function StorageCreateComponent(template: string, model: any, metadata: any): any {
 	@Component({
 		selector: 'tds-storage-create',
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: model }
 		]
 	})
 	class StorageCreateComponent extends AssetCommonEdit {

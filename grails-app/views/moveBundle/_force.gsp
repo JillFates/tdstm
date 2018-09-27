@@ -82,6 +82,7 @@ $(window).resize( function(a, b) {
 	GraphUtil.resetGraphSize()
 })
 
+// initialize edge cutting variables and listeners
 var maxCutAttempts = serverParams.maxCutAttempts
 var maxEdgeCountInput = $('#maxEdgeCountId')
 var maxEdgeCount = maxEdgeCountInput.val()
@@ -95,6 +96,7 @@ maxEdgeCountInput.unbind('change').on('change', function (e) {
 
 var zoomBehavior
 var dragBehavior
+var selectionBehavior
 var vis = canvas
 var background
 var defaults = serverParams.defaults
@@ -103,13 +105,17 @@ var defaultPrefs = serverParams.defaultPrefs
 var selectedBundle = serverParams.selectedBundle
 var assetTypes = serverParams.assetTypes
 var links = serverParams.links
-var nodes = serverParams.nodes
+// populate the nodes
+var nodeData = serverParams.nodes
+var nodes = []
+for (let nodeParams of nodeData)
+	nodes.push(new GraphNode(nodeParams))
 var colorByGroups = serverParams.colorByGroups
 var colorByGroupLabels = serverParams.colorByGroupLabels
 
 var cutLinks = []
 var cutNodes = []
-var graphstyle = 'z-index:90;'
+var graphstyle = 'z-index:0;'
 var fill = d3.scale.category10()
 var fillMode = 'bundle'
 var gravity = serverParams.gravity
@@ -130,7 +136,7 @@ var groupCount = 0
 var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.value()}'
 var isIE = GraphUtil.isIE()
 
-var nodeSelected = -1
+var selectedNodes = []
 var defaultColor = '#0000ff'
 var selectedParentColor = '#00ff00'
 var selectedChildColor = '#00cc99'
@@ -192,6 +198,7 @@ function createForceLayout (config) {
 		this.px = this.x
 		this.y = (config.height / 2) + (10 * Math.random())
 		this.py = this.py
+		this.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
 	});
 	
 	// Create the force layout
@@ -256,14 +263,8 @@ function createGraph (config) {
 	// updates the current fillMode
 	fillMode = GraphUtil.getFillMode()
 	
-	// create the zoom and drag behaviors and add their handlers
-	dragBehavior = d3.behavior.drag()
-	zoomBehavior = d3.behavior.zoom()
-	createBehaviorHandler(zoomBehavior, dragBehavior)
-	svgContainer
-		.call(zoomBehavior)
-		.on("dblclick", resetView)
-		.on("dblclick.zoom", null)
+	// create the zoom, drag, and selection behaviors and add their handlers
+	createBehaviorHandler()
 	
 	setGraphDimensions(config.width, config.height)
 	
@@ -273,14 +274,12 @@ function createGraph (config) {
 	canvas
 		.attr("class", 'draggable chart')
 		.attr("style", graphstyle)
-		.style('cursor', 'default')
 		.on("dblclick.zoom", null)
 	
 	// add key listeners to the graph
 	GraphUtil.addKeyListeners()
 	
 	// transform the canvas
-	GraphUtil.transformElement(transformContainer, -canvasSize/2, -canvasSize/2, 1)
 	GraphUtil.transformElement(canvas, canvasSize/2, canvasSize/2, 1)
 	
 	// create the main group in the SVG
@@ -290,6 +289,25 @@ function createGraph (config) {
 			.style('width', 'auto')
 			.style('height', 'auto')
 		.append('svg:g')
+	
+	
+	// create the group element to contain the selection region
+	GraphUtil.selectionElements.layer = canvas
+		.append('svg:g')
+			.attr('class', 'selectionLayer')
+			.on("dblclick.zoom", null)
+			.style('width', 'auto')
+			.style('height', 'auto')
+			.style('display', 'none')
+		
+	GraphUtil.selectionElements.regionPath = GraphUtil.selectionElements.layer.append('path')
+		.attr('class', 'selectionPath')
+	GraphUtil.selectionElements.regionProjection = GraphUtil.selectionElements.layer.append('path')
+		.attr('class', 'selectionProjection')
+
+	
+	transformContainer = vis
+	GraphUtil.transformElement(transformContainer, -canvasSize/2, -canvasSize/2, 1)
 	
 	// create the SVG bindings for the nodes, labels, and edges
 	createSVGBindings(nodes, links)
@@ -408,13 +426,28 @@ function createSVGBindings (nodes, links) {
 }
 
 // sets up the handlers to use with the zoom and drag behaviors
-function createBehaviorHandler (zoomBehavior, dragBehavior) {
+function createBehaviorHandler () {
+	
+	
+	// set the region selection behavior
+	selectionBehavior = d3.behavior.drag()
+		.on("dragstart", selectStart)
+		.on("drag", selectMove)
+		.on("dragend", selectEnd)
+	
+	svgContainer.call(selectionBehavior)
+	svgContainer[0][0].__chart__ = {x:0,y:0,k:1}
 	
 	// set the zoom behavior
-	zoomBehavior.on("zoom", zooming)
+	zoomBehavior = d3.behavior.zoom()
+		.on("zoom", zooming)
+	svgContainer
+		.call(zoomBehavior)
+		.on("dblclick", resetView)
+		.on("dblclick.zoom", null)
 	
-	// Sets the custom node dragging behavior
-	dragBehavior
+	// set the custom node dragging behavior
+	dragBehavior = d3.behavior.drag()
 		.on("dragstart", dragstart)
 		.on("drag", dragmove)
 		.on("dragend", dragend)
@@ -423,69 +456,182 @@ function createBehaviorHandler (zoomBehavior, dragBehavior) {
 	var startAlpha = 0
 	var dragging = false
 	var clicked = false
+	var selectingRegion = false
+	var dragNodes = []
+	var cursorPosition = new GraphPoint(0, 0)
+	var tempFreeze = false
 	
 	// fires on mousedown on a node
 	function dragstart (d, i) {
-		startAlpha = GraphUtil.force.alpha()
-		dragging = true
-		clicked = true
-		d3.event.sourceEvent.preventDefault()
-		d3.event.sourceEvent.stopPropagation()
+		if (d3.event.sourceEvent.button == 0) {
+			startAlpha = GraphUtil.force.alpha()
+			dragging = true
+			clicked = true
+		}
+		GraphUtil.captureEvent()
 	}
 
 	// fires when the user drags a node
 	function dragmove (d, i) {
-		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
+		if (((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) && dragging) {
+			let dx = d3.event.dx * zoomBehavior.scale()
+			let dy = d3.event.dy * zoomBehavior.scale()
+			// calculate alpha stuff
+			var shouldUpdatePositions = false
+			startAlpha = Math.min(startAlpha+0.005, 0.1)
+			shouldUpdatePositions = (GraphUtil.force.alpha() < startAlpha) && (!GraphUtil.setAlpha(0.1))
+			
+			// the nodes that should be dragged
+			dragNodes = [d]
+			// if the user is dragging a selected node, drag all selected nodes
+			if (d.selected == GraphUtil.SELECTION_STATES.SELECTED_PRIMARY)
+				dragNodes = selectedNodes
+			
+			// get the scale multiplier
 			var multiplier = zoomBehavior.scale()
 			if (isIE)
 				multiplier = 1 // ie doesn't get mouse position correctly
-			d.x += d3.event.dx / multiplier
-			d.y += d3.event.dy / multiplier
-			d.px = d.x
-			d.py = d.y
 			
-			if (d.cutShadow)
-				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
+			// translate each node to the new position
+			for (node of dragNodes) {
+				// fix node in place
+				node.fix = true
+				node.fixed = true
+				// calculate new position for this node
+				node.x += dx / multiplier
+				node.y += dy / multiplier
+				node.px = node.x
+				node.py = node.y
+				if (node.cutShadow)
+					node.cutShadow.transform.baseVal.getItem(0).setTranslate(node.x, node.y)
+				// update the position if needed
+				if (shouldUpdatePositions)
+					GraphUtil.updateNodePosition(node)
+			}
 			
-			d.fix = true
-			d.fixed = true
+			// update the element positions if needed
+			if (shouldUpdatePositions)
+				updateElementPositions()
+			
+			// mark that this is a drag, not a click
 			clicked = false
-			
-			startAlpha = Math.min(startAlpha+0.005, 0.1)
-			if (GraphUtil.force.alpha() < startAlpha)
-				if (!GraphUtil.setAlpha(0.1)) {
-					GraphUtil.updateNodePosition(d)
-					updateElementPositions()
-				}
-			
-			d3.event.sourceEvent.preventDefault()
-			d3.event.sourceEvent.stopPropagation()
+			// stop event from bubbling
+			GraphUtil.captureEvent()
 		}
 	}
 
 	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
 	function dragend (d, i) {
-		d.fix = false
-		d.fixed = false
-		dragging = false
-		if (clicked)
-			toggleNodeSelection(d.index)
-		d3.event.sourceEvent.preventDefault()
-		d3.event.sourceEvent.stopPropagation()
+		if (d3.event.sourceEvent.button == 0) {
+			for (node of dragNodes) {
+				node.fix = false
+				node.fixed = false
+			}
+			dragNodes = []
+			var event = d3.event.sourceEvent
+			dragging = false
+			if (clicked) {
+				var mode = GraphUtil.SELECT_MODES.REPLACE
+				if (event.ctrlKey || GraphUtil.toolStates.selectionAdd) 
+					mode = GraphUtil.SELECT_MODES.TOGGLE
+				modifyNodeSelection([d], mode)
+			}
+			d3.event.sourceEvent.preventDefault()
+			GraphUtil.captureEvent()
+		}
 	}
 	
 	// Rescales the contents of the svg. Called when the user scrolls.
 	function zooming (e) {
-		if (!dragging) {
-			if (d3.event.sourceEvent) {
-				d3.event.sourceEvent.stopPropagation()
-				d3.event.sourceEvent.preventDefault()
-			}
+		if (!dragging && !selectingRegion) {
+			GraphUtil.captureEvent()
 			
 			var offset = canvasSize / 2
 			var x = d3.event.translate[0] - offset
 			var y = d3.event.translate[1] - offset
 			GraphUtil.transformElement(transformContainer, x, y, d3.event.scale)
+		}
+	}
+	
+	// fires when the user begins dragging a selection region
+	function selectStart (d, i) {
+		clicked = true
+		var event = d3.event.sourceEvent
+		var regionSelectMode = (event.shiftKey || GraphUtil.toolStates.lasso)
+		var leftButtonPressed = (event.button == 0)
+		var multiselect = (event.ctrlKey || GraphUtil.toolStates.selectionAdd)
+		
+		// start the region select if the user is in region selection mode and they pressed the left mouse button
+		if (regionSelectMode && leftButtonPressed) {
+			// pause the force graph while the user is selecting
+			if (GraphUtil.force.alpha() > 0) {
+				tempFreeze = true
+				GraphUtil.force.stop()
+			}
+			// get the cursor position on the graph
+			var mPos = d3.mouse(svgContainer[0][0])
+			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
+			// show the region selection layer
+			GraphUtil.selectionElements.layer.style('display','')
+			// initialize the region selection at the current point
+			GraphUtil.initializeSelectionPath(cursorPosition, multiselect)
+			selectingRegion = true
+			// capture the mouse event to avoid further propagation/bubbling
+			GraphUtil.captureEvent()
+		}
+	}
+	// fires whenever the user moves the mouse while selecting a region
+	function selectMove (d, i) {
+		var event = d3.event.sourceEvent
+		var leftButtonPressed = (event.button == 0)
+		
+		// continue the region select if one was already in progress and the left button is held
+		if (selectingRegion && leftButtonPressed) {
+			// get the cursor position on the graph
+			var mPos = d3.mouse(svgContainer[0][0])
+			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
+			// set the mouse cursor to the crosshair while selecting
+			GraphUtil.updateCursorStyle('regionSelectCursor', true)
+			// update the selection path based on this new position
+			GraphUtil.setTempSelectionPath(cursorPosition)
+			GraphUtil.updateSelectionPath(cursorPosition, false)
+			// capture the mouse event to avoid further propagation/bubbling
+			GraphUtil.captureEvent()
+		} else if (d3.event.dx != 0 || d3.event.dy != 0) {
+			clicked = false
+		}
+	}
+	// fires when the user releases the mouse while selecting a region
+	function selectEnd (d, i) {
+		var event = d3.event.sourceEvent
+		var leftButtonPressed = (event.button == 0)
+		var multiselect = (event.ctrlKey || GraphUtil.toolStates.selectionAdd)
+
+		// end the region selection if the user was selecting and the left button is held
+		if (selectingRegion && leftButtonPressed) {
+			// if we paused the graph at the start of this selection, unpause it now
+			if (tempFreeze) {
+				tempFreeze = false
+				GraphUtil.force.resume()
+			}
+			// get the cursor position on the graph
+			var mPos = d3.mouse(svgContainer[0][0])
+			cursorPosition.setScreenCoordinates(mPos[0], mPos[1])
+			// set the mouse cursor back to the default
+			GraphUtil.updateCursorStyle('regionSelectCursor', false)
+			// hide the region select layer
+			GraphUtil.selectionElements.layer.style('display','none')
+			// finalize the selection region and filter the nodes
+			GraphUtil.updateSelectionPath(cursorPosition, true)
+			GraphUtil.filterRegionSelection()
+			selectingRegion = false
+			GraphUtil.deactivateTool(GraphUtil.LASSO_TOOL, $('#lassoButtonId'))
+			// capture the mouse event to avoid further propagation/bubbling
+			GraphUtil.captureEvent()
+		
+		// if the user wasn't in region selection mode and they clicked in place, deselect all nodes
+		} else if (clicked && !multiselect) {
+			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
 		}
 	}
 }
@@ -512,7 +658,7 @@ function calmTick (n) {
 	}
 }
 
-// updates the attributes of all the svg elements
+// updates the attributes of all the svg elements (in as low-level a way as possible for efficiency)
 function updateElementPositions (callback) {
 	var d = null;
 	
@@ -564,52 +710,81 @@ function updateElementPositions (callback) {
 	}
 }
 
-
-// Toggles selection of a node
-function toggleNodeSelection (id) {
-
-	if (nodeSelected == -1 && id == -1)
-		return // No node is selected, so there is nothing to deselect
+// Handles the modification of node selection based on a given list of nodes (the "delta") and a selection mode (from GraphUtil enum)
+function modifyNodeSelection (delta, mode, skipRender) {
+	// keep track of which nodes will be added to or removed from the selection in this function call
+	var toSelect = []
+	var toDeselect = []
 	
-	var node = GraphUtil.force.nodes()[id]
-	
-	// check if we are selecting or deselecting
-	if (nodeSelected == id) {
-		// deselecting
-		nodeSelected = -1
+	// if we are using subtraction mode, just remove these nodes from the selection
+	if (mode == GraphUtil.SELECT_MODES.SUB) {
+		toDeselect = delta
+		selectedNodes = _.difference(selectedNodes, delta)
+		let linksToCheck = []
+		toDeselect.each(function (node, i){
+			node.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
+			linksToCheck = _.union(linksToCheck, GraphUtil.getAdjacentLinks(node))
+		})
+		linksToCheck.each(function (link) {
+			link.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
+		})
 		
-		// The funtion is deselecting a node, so remove the selected class from all elements
-		GraphUtil.force.links().each(function (link, i) {
-			link.selected = 0
-		});
-		GraphUtil.force.nodes().each(function (node, i) {
-			node.selected = 0
-		});
-		
-	} else {
-		// selecting
-		if (nodeSelected != -1)
-			toggleNodeSelection(nodeSelected) // Another node is selected, so deselect that one first
-		nodeSelected = id
-	
-		// Style the selected node
-		node.selected = 2
-		
-		// Style the dependencies of the selected node
-		function styleDependencies (index, linkIndex, useTarget) {
-			var link = GraphUtil.force.links()[linkIndex]
-			var childNode = (useTarget)?(link.target):(link.source)
-			link.selected = 1
-			childNode.selected = 1
+	// if we are in replace mode, change the selection to the current set of nodes
+	} else if (mode == GraphUtil.SELECT_MODES.REPLACE) {
+		toSelect = _.difference(delta, selectedNodes)
+		toDeselect = _.difference(selectedNodes, delta)
+		if (delta.size() == 1 && _.isEqual(delta, selectedNodes)) {
+			toSelect = []
+			toDeselect = delta
 		}
-		$.each(node.dependsOn, function (i, o) {styleDependencies(i, o, true)})
-		$.each(node.supports, function (i, o) {styleDependencies(i, o, false)})
+		modifyNodeSelection(toDeselect, GraphUtil.SELECT_MODES.SUB, true)
+		modifyNodeSelection(toSelect, GraphUtil.SELECT_MODES.ADD, true)
+		
+	// same as normal replace mode, but don't toggle single nodes
+	} else if (mode == GraphUtil.SELECT_MODES.REPLACE_NO_TOGGLE) {
+		toSelect = _.difference(delta, selectedNodes)
+		toDeselect = _.difference(selectedNodes, delta)
+		modifyNodeSelection(toDeselect, GraphUtil.SELECT_MODES.SUB, true)
+		modifyNodeSelection(toSelect, GraphUtil.SELECT_MODES.ADD, true)
+	
+	// if every given node is already selected, deselect them with subtraction mode
+	} else if (_.difference(delta, selectedNodes).size() == 0) {
+		toDeselect = selectedNodes
+		modifyNodeSelection(delta, GraphUtil.SELECT_MODES.SUB, true)
+
+	// if we are in additive mode, add the new nodes to the selection
+	} else if (mode == GraphUtil.SELECT_MODES.ADD) {
+		toSelect = _.difference(delta, selectedNodes)
+		selectedNodes = _.union(selectedNodes, delta)
+		toSelect.each(function (node, i){
+			node.selected = GraphUtil.SELECTION_STATES.SELECTED_PRIMARY
+			GraphUtil.getAdjacentLinks(node).each(function (link) {
+				link.selected = GraphUtil.SELECTION_STATES.SELECTED_PRIMARY
+			})
+		})
+		
+	// if we are in toggle mode, toggle the state of the given nodes
+	} else if (mode == GraphUtil.SELECT_MODES.TOGGLE) {
+		toDeselect = _.intersection(delta, selectedNodes)
+		toSelect = _.difference(delta, selectedNodes)
+		modifyNodeSelection(toDeselect, GraphUtil.SELECT_MODES.SUB, true)
+		modifyNodeSelection(toSelect, GraphUtil.SELECT_MODES.ADD, true)
+
+	// if an unknown mode is given, output a warning to the console
+	} else {
+		console.warn('[WARNING] - Invalid mode: "%o"', mode)
 	}
+
 	
-	GraphUtil.updateAllClasses()
-	
-	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-	GraphUtil.reorderDOM()
+	// if it wasn't specified that the render should be skipped, update the styles and reoreder the DOM
+	if (!skipRender) {
+		// if the selection was changed, update the elements
+		if (toSelect.size() > 0 || toDeselect.size() > 0) {
+			GraphUtil.updateAllClasses()
+			// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
+			GraphUtil.reorderDOM()
+		}
+	}
 }
 
 // Used to rebuild the layout using the new parameters
@@ -791,7 +966,7 @@ function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
 
-		if (event.shiftKey)
+		if (event.shiftKey || event.button == 0)
 			return;
 		var validTags = ['use', 'svg', 'g', 'line'];
 		var target = event.target.correspondingUseElement || event.target;

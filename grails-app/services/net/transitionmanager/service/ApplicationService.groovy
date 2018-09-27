@@ -105,16 +105,16 @@ class ApplicationService implements ServiceMethods {
 	 */
 	Map getModelForCreate(Map params) {
 		Project project = securityService.getUserCurrentProject()
-
+		Application application = new Application()
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
 
-		return [moveEventList: moveEventList, availableRoles: availableRoles, partyGroupList: partyGroupList,
+		return [assetInstance: application, moveEventList: moveEventList, availableRoles: availableRoles, partyGroupList: partyGroupList,
 				staffTypes: Person.constraints.staffType.inList, personList: personList] +
-				assetEntityService.getCommonModelForCreate('Application', 'APPLICATION', project, params)
+				assetEntityService.getCommonModelForCreate('Application', project, application)
 	}
 
 	/**

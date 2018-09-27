@@ -22,13 +22,13 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 declare var jQuery: any;
 
-export function DeviceCreateComponent(template, metadata: any) {
+export function DeviceCreateComponent(template, model: any, metadata: any) {
 
 	@Component({
 		selector: `tds-device-create`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: {} }
+			{ provide: 'model', useValue: model }
 		]
 	}) class DeviceCreateComponent extends AssetCommonEdit {
 

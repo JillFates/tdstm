@@ -31,8 +31,8 @@
 	<div id="item1" class="graphContainer">
 		<div id="toolsContainerId">
 			<div id="graphToolbarId">
-				<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
-				--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
+				<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
+				--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div><!--
 			--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton hasMargin hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 			</div>
 
@@ -347,6 +347,5 @@
 
 </script>
 <div style="display: none;" id="graphSVGContainer"></div>
-<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 </body>
 </html>

@@ -143,6 +143,8 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
+		"/ws/asset/defaultCreateModel" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
+
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
 			action = [

@@ -19,7 +19,6 @@ import {DeviceCreateComponent} from '../device/device-create.component';
 import {ApplicationCreateComponent} from '../application/application-create.component';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {TagModel} from '../../../assetTags/model/tag.model';
 
 @Component({
 	selector: `tds-asset-all-create`,
@@ -41,22 +40,26 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get(`../ws/asset/createTemplate/${this.asset}`)
+			Observable.zip(
+				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
+				this.http.get(`../ws/asset/defaultCreateModel`))
 				.subscribe(res => {
-					let template = res.text();
+					let template = res[0].text();
+					let model = res[1].json();
+					model.asset = {};
 
 					switch (this.asset) {
 						case 'APPLICATION':
-							this.registerAndCreate(ApplicationCreateComponent(template, metadata), this.view);
+							this.registerAndCreate(ApplicationCreateComponent(template, model, metadata), this.view);
 							break;
 						case 'DATABASE':
-							this.registerAndCreate(DatabaseCreateComponent(template, metadata), this.view);
+							this.registerAndCreate(DatabaseCreateComponent(template, model, metadata), this.view);
 							break;
 						case 'DEVICE':
-							this.registerAndCreate(DeviceCreateComponent(template, metadata), this.view);
+							this.registerAndCreate(DeviceCreateComponent(template, model, metadata), this.view);
 							break;
 						case 'STORAGE':
-							this.registerAndCreate(StorageCreateComponent(template, metadata), this.view);
+							this.registerAndCreate(StorageCreateComponent(template, model, metadata), this.view);
 							break;
 
 					}

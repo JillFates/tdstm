@@ -43,23 +43,6 @@ var GraphUtil = (function ($) {
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
-	// Stored only on the current page session
-	public.dependencyPanelConfig = {
-		dependencyStatus: {
-			dirty: false,
-			status: 'true',
-			show: [],
-			highlight: [],
-			groupingControl: []
-		},
-		dependencyType: {
-			dirty: false,
-			status: 'true',
-			show: [],
-			highlight: [],
-			groupingControl: []
-		}
-	};
 
 	// ############################################################## graph UI functions ##############################################################
 
@@ -102,7 +85,7 @@ var GraphUtil = (function ($) {
 		if (public.graphExists()) {
 			var dimensions = public.getProperGraphDimensions();
 			resizeGraph(dimensions.width, dimensions.height);
-			public.correctPanelSizes();
+			public.correctBothPanelSizes();
 		}
 	}
 
@@ -121,9 +104,6 @@ var GraphUtil = (function ($) {
 			else
 				public.enableFullscreen();
 		}
-		if($('#dependenciesPanelId').size()) {
-            public.correctActionButtons();
-        }
 	}
 
 	// changes the graph to fullscreen mode
@@ -156,16 +136,10 @@ var GraphUtil = (function ($) {
 		public.correctPanelSize('controlPanelId');
 	}
 
-	// sets the size of the Dependency Panel so that it can scroll when longer than the user's window
-	public.correctDependenciesPanelSize = function () {
-		public.correctPanelSize('dependenciesPanelId');
-	}
-
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
-	public.correctPanelSizes = function () {
+	public.correctBothPanelSizes = function () {
 		public.correctLegendSize();
 		public.correctControlPanelSize();
-		public.correctDependenciesPanelSize();
 	}
 
 	// sets the size of a panel so that it can scroll when longer than the user's window
@@ -188,70 +162,28 @@ var GraphUtil = (function ($) {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
 		}
-		
-        if($('#dependenciesPanelId').size()) {
-            public.correctActionButtons();
-        }
 	}
 
-	public.correctActionButtons = function() {
-		if($('#dependenciesPanelId').has_scrollbar()) {
-			$('.dependency_panel_action_buttons').css('position', 'fixed');
-			$('.dependency_panel_action_buttons').css('bottom', '45px');
-		} else {
-			$('.dependency_panel_action_buttons').css('position', '');
-			$('.dependency_panel_action_buttons').css('bottom', '5px');
-		}
-	};
 
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
-
-        // update the legend twistie preference if applicable
-        var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
-        if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
-            var prefValue = public.serializeLegendTwistiePrefs();
-            setUserPreference('legendTwistieState', prefValue);
-        }
-
 		if (twistieSpan.hasClass('closed')) {
 			twistieSpan.removeClass('closed').addClass('open');
 			container.slideDown(300, function () {
-				if (isCalledFromLegendPanel) {
-				    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
-
+				public.correctControlPanelSize();
 			});
 		} else {
 			twistieSpan.removeClass('open').addClass('closed');
 			container.slideUp(300, function () {
-                if (isCalledFromLegendPanel) {
-                    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
+				public.correctControlPanelSize();
 			});
 		}
-	}
 
-
-	public.toggleDependencyPanel = function(dependencyPanel, event) {
-		var panelStatusOpen = $('.'+dependencyPanel).hasClass('open');
-		if(panelStatusOpen){
-			$(event).find('i.fa-fw').removeClass('fa-caret-down').addClass('fa-caret-right');
-			$('.'+dependencyPanel).removeClass('open').addClass('closed');
-			$('.'+dependencyPanel).slideUp(300, function(){
-				public.correctDependenciesPanelSize();
-			});
-		} else {
-			$(event).find('i.fa-fw').removeClass('fa-caret-right').addClass('fa-caret-down');
-			$('.'+dependencyPanel).removeClass('closed').addClass('open');
-			$('.'+dependencyPanel).slideDown(300, function(){
-				public.correctDependenciesPanelSize();
-			});
+		// update the legend twistie preference if applicable
+		if (twistieSpan.parents('#legendDivId').length > 0 && twistieSpan.parents('.tabInner').length > 0) {
+			var prefValue = public.serializeLegendTwistiePrefs();
+			setUserPreference('legendTwistieState', prefValue);
 		}
 	}
 
@@ -315,9 +247,6 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
-		} else if (panel == 'dependencies') {
-			$('#dependenciesPanelId').removeClass('openPanel');
-			$('#dependenciesPanelTabId').removeClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').removeClass('openPanel');
 			$('#legendTabId').removeClass('activeTab');
@@ -329,9 +258,6 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
-		} else if (panel == 'dependencies') {
-			$('#dependenciesPanelId').addClass('openPanel');
-			$('#dependenciesPanelTabId').addClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').addClass('openPanel');
 			$('#legendTabId').addClass('activeTab');
@@ -346,35 +272,24 @@ var GraphUtil = (function ($) {
 			else
 				public.openPanel('control');
 			public.hidePanel('legend');
-			public.hidePanel('dependencies');
-		} else if (panel == 'dependencies') {
-			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
-				public.hidePanel('dependencies');
-			else {
-				public.openPanel('dependencies');
-			}
-			public.hidePanel('legend');
-			public.hidePanel('control');
 		} else if (panel == 'legend') {
 			if ($('#legendTabId.activeTab').size() > 0)
 				public.hidePanel('legend');
 			else
 				public.openPanel('legend');
 			public.hidePanel('control');
-			public.hidePanel('dependencies');
 		} else if (panel == 'hide') {
 			public.hidePanel('control');
 			public.hidePanel('legend');
-			public.hidePanel('dependencies');
 		}
-		public.correctPanelSizes();
+		public.correctBothPanelSizes();
 	}
 
 	// populates the team select
 	public.populateTeamSelect = function (data) {
 		// get the select element and clear whatever options were in it before
 		teamSelect = $("#teamSelectId");
-        teamSelect.children('option').remove();
+		teamSelect.children('.teamOption').remove();
 
 		// add the default values
 		teamSelect.append('<option value="ALL">All Teams</option>');
@@ -534,14 +449,11 @@ var GraphUtil = (function ($) {
 		public.linkBindings.attr("class", function(d) {
 			return 'link'
 				+ ((d.selected == 1) ? ' selected' : '')
-				+ ((d.unresolved && !d.partOfCycle) ? ' unresolved' : '')
-				+ ((d.notApplicable && !d.partOfCycle) ? ' notApplicable' : '')
-				+ ((d.future && !d.partOfCycle) ? ' future' : '')
-				+ ((d.validated && !d.partOfCycle) ? ' validated' : '')
-				+ ((d.questioned && !d.partOfCycle) ? ' questioned' : '')
+				+ ((d.unresolved) ? ' unresolved' : '')
+				+ ((d.notApplicable) ? ' notApplicable' : '')
+				+ ((d.future) ? ' future' : '')
 				+ ((d.cut) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
-				+ ((d.hide === 'y') ? ' hide_link' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
@@ -567,13 +479,10 @@ var GraphUtil = (function ($) {
 	}
 
 	// updates the class list for ever graph element
-	public.updateAllClasses = function (callback) {
+	public.updateAllClasses = function () {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
-		if(callback){
-			return callback();
-		}
 	}
 
 
@@ -819,26 +728,6 @@ var GraphUtil = (function ($) {
 			cutShadow.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
 		});
 		public.reorderDOM();
-	};
-
-	public.createLineShadows = function (color) {
-		public.force.links().each(function (o, i) {
-			// get the cut shadow object (create it if it doesn't exist)
-			var lineShadow = $(o.linkElement[0][0]);
-
-			lineShadow.css('opacity', null);
-			if (o.highlighted == 'y') {
-				lineShadow.css('opacity', 1);
-				lineShadow.css('stroke-width', 3);
-			} else if (o.highlighted == 'n'){
-				lineShadow.css('opacity', 0.3);
-				lineShadow.css('stroke-width', 1);
-			} else {
-				lineShadow.css('opacity', 1);
-				lineShadow.css('stroke-width', 1);
-			}
-		});
-		public.reorderDOM();
 	}
 
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
@@ -1062,22 +951,6 @@ var GraphUtil = (function ($) {
 		}
 	}
 
-	// highlight assets matching the id from the Group + Tag
-	public.performTagSearch = function (assetList) {
-		var nodes = public.force.nodes();
-		var highlightList = [];
-		for (var i = 0; i < nodes.length; ++i) {
-			var node = nodes[i];
-			var asset = assetList.filter( function(asset) {
-				return asset === node.id;
-			});
-			if (asset && asset.length >= 1){
-				highlightList.push(node.id);
-			}
-		}
-		public.applyHighlights(highlightList);
-	}
-
 	// highlight tasks matching the user's regex
 	public.performSearch = function () {
 
@@ -1126,7 +999,6 @@ var GraphUtil = (function ($) {
 		if (personFilter != '') {
 			// get the list of assets to highlight from the server
 			$.ajax({
-				method: 'POST',
 				url: tdsCommon.createAppURL('/ws/depAnalyzer/filteredAssetList'),
 				// asynchronous: true,
 				data: {'nameFilter':nameFilter, 'isRegex':isRegex, 'personId':personFilter},
@@ -1174,143 +1046,7 @@ var GraphUtil = (function ($) {
 		}
 		public.updateAllClasses();
 		public.createCutShadows(fill);
-	};
-
-	public.restoreDependencyPanel = function(type) {
-		if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
-			$('#dependency' + type + 'Control_show_all').prop('checked', true);
-			$('#dependency' + type + 'Control_show_all').attr('state', 1);
-			if (!GraphUtil.dependencyPanelConfig['dependency' + type].dirty) {
-				$('.dependency' + type + 'ControlsShow').prop('checked', true);
-			} else {
-				$('.dependency' + type + 'ControlsShow').each(function () {
-					$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-				});
-			}
-		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
-			$('#dependency' + type + 'Control_show_all').prop('checked', false);
-			$('#dependency' + type + 'Control_show_all').attr('state', 3);
-			$('.dependency' + type + 'ControlsShow').each(function () {
-				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-			});
-		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'indeterminate'){
-			$('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
-			$('#dependency' + type + 'Control_show_all').attr('state', 2);
-			$('.dependency' + type + 'ControlsShow').each(function(){
-				var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
-				$(this).prop('checked', selected);
-			});
-		}
-
-		if(GraphUtil.dependencyPanelConfig['dependency' + type].highlight.length > 0) {
-			$('.dependency' + type + 'ControlsHighlight').each(function () {
-				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].highlight.indexOf($(this).val()) !== -1);
-			});
-		}
-
-		$('.dependency' + type + 'ControlsShow').each(function(){
-			var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
-			if(selected) {
-				$(this).parent().addClass('groupingControl');
-			}
-		});
-	};
-
-	public.onSelectItemShowDependencyPanel = function(event){
-		if(!$(event).is(":checked")) {
-			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', false);
-		}
-
-		var currentShowClass = $($(event)[0]).attr('class');
-		var parentId = $($(event)[0]).attr('parentid');
-		var noneChecked = true;
-		$('.' + currentShowClass).each(function(){
-			if($(this).is(":checked")) {
-				noneChecked = false;
-			}
-		});
-
-		if(noneChecked) {
-			$('#' + parentId).prop('checked', false);
-			$('#' + parentId).attr('state', 3);
-		}
-	};
-
-	public.onSelectItemHighlightDependencyPanel = function(event){
-		if($(event).is(":checked")) {
-			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', true);
-		}
-	};
-
-	public.onSelectAllDependencyPanel = function(checkboxSelectorClass, config, event) {
-		var state = parseInt($(event).attr('state'));
-		if(state === 1) {
-			state = 3;
-			$('.' + checkboxSelectorClass + 'Show').prop('checked', false);
-			$('.' + checkboxSelectorClass + 'Highlight').prop('checked', false);
-			GraphUtil.dependencyPanelConfig[config].status = 'false';
-		} else if(state === 2) {
-			state = 1;
-			$('.' + checkboxSelectorClass + 'Show').prop('checked', true);
-			$(event).prop("checked", true);
-			GraphUtil.dependencyPanelConfig[config].status = 'true';
-		} else if(state === 3) {
-			state = 2;
-			$(event).prop("indeterminate", true);
-			$('.' + checkboxSelectorClass + 'Show').each(function(){
-				var showCheckbox = $(this);
-				var selected = GraphUtil.dependencyPanelConfig[config].groupingControl.indexOf(showCheckbox.val()) !== -1;
-				$(this).prop('checked', selected);
-			});
-			$('.' + checkboxSelectorClass + 'Highlight').each(function(){
-				if($(this).is(":checked")){
-					var sibling = $(this).parent().siblings()[1];
-					if(!$(sibling).find('input:checkbox').is(":checked")) {
-						$(this).prop('checked', false);
-					}
-				}
-			});
-			GraphUtil.dependencyPanelConfig[config].status = 'indeterminate';
-		}
-		$(event).attr('state', state);
-	};
-
-	public.applyShowHideDependencies = function () {
-		var links = public.force.links();
-		var showTypeItems = $('.dependencyTypeControlsShow:checked').map(function() { return this.value; }).get();
-		var highlightTypeItems = $('.dependencyTypeControlsHighlight:checked').map(function() { return this.value; }).get();
-		var showStatusItems = $('.dependencyStatusControlsShow:checked').map(function() { return this.value; }).get();
-		var highlightStatusItems = $('.dependencyStatusControlsHighlight:checked').map(function() { return this.value; }).get();
-
-		var hideList = [];
-		var highlightList = [];
-		for (var i = 0; i < links.length; ++i) {
-			var link = links[i];
-			var dependencyStatus = link.dependencyStatus;
-			var dependencyType = link.dependencyType;
-			link.hide = ((showTypeItems.indexOf(dependencyType) === -1) || (showStatusItems.indexOf(dependencyStatus) === -1))? 'y' : 'n';
-			if(highlightTypeItems.length > 0 || highlightStatusItems.length > 0) {
-				link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : (highlightStatusItems.indexOf(dependencyStatus) !== -1)? 'y' : 'n';
-			} else if(highlightTypeItems.length == 0 && highlightStatusItems.length == 0) {
-				link.highlighted = null;
-			}
-		}
-
-		public.dependencyPanelConfig.dependencyType.show = showTypeItems;
-		public.dependencyPanelConfig.dependencyType.highlight = highlightTypeItems;
-		public.dependencyPanelConfig.dependencyType.dirty = true;
-
-		public.dependencyPanelConfig.dependencyStatus.show = showStatusItems;
-		public.dependencyPanelConfig.dependencyStatus.highlight = highlightStatusItems;
-		public.dependencyPanelConfig.dependencyStatus.dirty = true;
-
-		public.updateAllClasses(function(){
-			$('.link').show();
-			$('.hide_link').hide();
-			public.createCutShadows(fill);
-			public.createLineShadows(fill)
-		});
-	};
+	}
 
 	// removes the value in the source filter field and performs a new search
 	public.clearFilter = function (source) {
