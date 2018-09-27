@@ -1,4 +1,6 @@
 import grails.test.mixin.TestFor
+import grails.test.spock.IntegrationSpec
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -18,8 +20,8 @@ import com.tdsops.common.ui.Pagination
 /**
  * Integration tests for the CommonController
 */
-@TestFor(AssetEntityController)
-class AssetEntityControllerIntegrationSpec extends Specification {
+
+class AssetEntityControllerIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	PersonService personService
@@ -28,6 +30,9 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 	SecurityService securityService
 	@Shared
 	UserPreferenceService userPreferenceService
+
+	@Shared
+	AssetEntityController controller = new AssetEntityController()
 
 	static Person person
 	static Project project
@@ -42,9 +47,9 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 	 * Used to create a test project and user that is logged in
 	 */
 	def setupSpec() {
-		personService = ApplicationContextHolder.getBean('personService')
-		securityService = ApplicationContextHolder.getBean('securityService')
-		userPreferenceService = ApplicationContextHolder.getBean('userPreferenceService')
+		//personService = ApplicationContextHolder.getBean('personService')
+		//securityService = ApplicationContextHolder.getBean('securityService')
+		//userPreferenceService = ApplicationContextHolder.getBean('userPreferenceService')
 
 		project = projectHelper.createProject()
 
