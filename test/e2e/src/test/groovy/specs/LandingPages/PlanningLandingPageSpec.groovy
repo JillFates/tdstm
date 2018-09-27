@@ -52,15 +52,7 @@ class PlanningLandingPageSpec extends GebReportingSpec {
             at ListEventsPage
     }
 
-    def "3. Verify the Event Details Landing Page"() {
-        when: 'The user goes to the List Events page'
-            planningModule.goToEventDetails()
-
-        then: 'The Event Details Page is loaded successfully'
-            at EventDetailsPage
-    }
-
-    def "4. Verify the List Event News Landing Page"() {
+    def "3. Verify the List Event News Landing Page"() {
         when: 'The user goes to the List Event News page'
             planningModule.goToListEventNews()
 
@@ -68,7 +60,7 @@ class PlanningLandingPageSpec extends GebReportingSpec {
             at ListEventNewsPage
     }
 
-    def "5. Verify the Pre-event Checklist Landing Page"() {
+    def "4. Verify the Pre-event Checklist Landing Page"() {
         when: 'The user goes to the Pre-event Checklist page'
             planningModule.goToPreEventChecklist()
 
@@ -76,7 +68,7 @@ class PlanningLandingPageSpec extends GebReportingSpec {
             at PreEventChecklistPage
     }
 
-    def "6. Verify the Export Runbook Landing Page"() {
+    def "5. Verify the Export Runbook Landing Page"() {
         when: 'The user goes to the Export Runbook page'
             planningModule.goToExportRunbook()
 
@@ -84,7 +76,7 @@ class PlanningLandingPageSpec extends GebReportingSpec {
             at ExportRunbookPage
     }
 
-    def "7. Verify the List Bundles Landing Page"() {
+    def "6. Verify the List Bundles Landing Page"() {
         when: 'The user goes to the List Bundles page'
             planningModule.goToListBundles()
 
