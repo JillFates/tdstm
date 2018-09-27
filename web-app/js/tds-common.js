@@ -297,7 +297,8 @@ var tdsCommon = {
 	 * @return boolean true if valid else false
 	 */
 	isValidEmail: function (email) {
-		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/;
+		//Email RegEx validation: Email can either be in name@domain.tld format or name@<ipAddress> format. One expression for both.
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@([0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63}|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])))+$/;
 		return emailExp.test(email);
 	},
 
