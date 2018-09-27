@@ -14,6 +14,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 
 declare var jQuery: any;
 
@@ -38,6 +39,7 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			console.log(model);
 			this.initModel();
 		}
 
@@ -45,13 +47,16 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			if (this.model.asset.scale === null) {
+			if (!this.model.asset.scale || this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
 			}
+			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
+			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.model.asset.environment = this.model.environmentOptions[0];
 		}
 
 		/**
@@ -61,23 +66,19 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			let modelRequest = R.clone(this.model);
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
-			this.model.customs.forEach((custom: any) => {
-				let customValue = modelRequest.asset[custom.field.toString()];
-				if (customValue && customValue.value) {
-					modelRequest.asset[custom.field.toString()] = customValue.value;
-				}
-			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
-			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
+			modelRequest.asset.assetClass = {
+				name: ASSET_ENTITY_DIALOG_TYPES.STORAGE
+			};
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
+				// if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+				// 	this.saveAssetTags();
+				// }
 				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
-					this.saveAssetTags();
+					this.cancelCloseDialog();
 				}
 			});
 		}
