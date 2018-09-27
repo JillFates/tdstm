@@ -356,7 +356,7 @@
                                                                     [(metaParam)]="dataItem.id"
                                                                     (valueChange)="onModelChange($event)"
                                                                     [serviceRequest]="getTasksForComboBox"
-                                                                    (selectionChange)="onDependencyTaskChange($event, model.predecessorList, dataGridTaskPredecessorsHelper,  rowIndex)">
+                                                                    (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
                                                             </tds-combobox>
                                                         </ng-template>
                                                     </kendo-grid-column>
@@ -396,7 +396,7 @@
                                                                 [(metaParam)]="dataItem.id"
                                                                 (valueChange)="onModelChange($event)"
                                                                 [serviceRequest]="getTasksForComboBox"
-                                                                (selectionChange)="onDependencyTaskChange($event, model.successorList, dataGridTaskSuccessorsHelper,  rowIndex)">
+                                                                (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
                                                         </tds-combobox>
                                                     </ng-template>
                                                 </kendo-grid-column>

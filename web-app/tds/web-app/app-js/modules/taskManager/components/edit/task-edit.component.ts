@@ -20,7 +20,7 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {extractModel, getPayloadForUpdate, YesNoList} from "./model-helper";
+import {YesNoList, TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 
 declare var jQuery: any;
 
@@ -49,6 +49,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public userTimeZone: string;
 	public hasModelChanges = false;
 	private dataSignatureDependencyTasks: string;
+	public modelHelper: TaskEditCreateModelHelper;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -66,7 +67,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	ngOnInit() {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
-		this.model = extractModel(this.taskDetailModel.detail, this.userTimeZone);
+
+		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone);
+		this.model = this.modelHelper.setModel(this.taskDetailModel.detail);
+
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 
@@ -99,67 +103,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
-	 * Extract only the model fields used by the view
-	 */
-	/*
-	extractModel(): any {
-		const detail = this.taskDetailModel.detail;
-		const assetComment = detail['assetComment'] || {};
-		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
-		const [yes, no] = this.yesNoList;
-
-		// add empty default value
-		detail.categories = (detail.categories || []);
-		detail.categories.push('');
-
-		return  {
-			id: assetComment.id,
-			note: '',
-			duration: assetComment.duration,
-			taskSpec: assetComment.taskSpec,
-			taskNumber: assetComment.taskNumber,
-			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
-			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
-			durationScale,
-			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
-			durationLocked: assetComment.durationLocked,
-			actualStart: detail.atStart ? detail.atStart : '',
-			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			dueDate: assetComment.dueDate ? this.getFormattedDate(assetComment.dueDate) : '',
-			estimatedStartUTC: assetComment.estStart,
-			estimatedFinishUTC: assetComment.estFinish,
-			estimatedStart: assetComment.estStart ? this.getFormattedDate(assetComment.estStart) : '',
-			estimatedFinish: assetComment.estFinish ? this.getFormattedDate(assetComment.estFinish)  : '',
-			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
-			priority: assetComment.priority,
-			assetName: detail.assetName,
-			comment:  assetComment.comment || '',
-			assetClass: {id: detail.assetClass, text: ''},
-			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
-			status: assetComment.status,
-			statusList: [],
-			personList: [],
-			teamList: [],
-			predecessorList: (this.taskDetailModel.detail.predecessorList || [])
-				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
-			successorList: (this.taskDetailModel.detail.successorList || [])
-				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
-			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
-			categoriesList: detail.categories.sort(),
-			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
-			priorityList: [1, 2, 3, 4, 5],
-			asset: {id: detail.assetId, text: detail.assetName},
-			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
-			assignedTeam: {id: assetComment.role, text: detail.roles},
-			event: {id: (assetComment.moveEvent && assetComment.moveEvent.id) || null, text: detail.eventName},
-			category: assetComment.category,
-			apiAction: {id: detail.apiAction && detail.apiAction.id || '', text: detail.apiAction && detail.apiAction.name || ''},
-			assetComment
-		}
-	}
-	*/
-
-	/**
 	 * Pass Service as Reference
 	 * @param {ComboBoxSearchModel} searchParam
 	 * @returns {Observable<any>}
@@ -172,26 +115,33 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * Everytime a task dependency changes, then update the corresponding collection that hold predeccessor/successor  tasks
 	 * If the task is deleted set the model changes flag to true
 	 * @param {object} dataItem
-	 * @param {object[]} collection
+	 * @param {string} collectionType  could be predecessor/ successor string
 	 * @param {object} gridHelper
 	 * @returns {void}
 	 */
-	onDependencyTaskChange(dataItem: any, collection: any[], gridHelper: DataGridOperationsHelper, rowIndex: number): void {
-		if (dataItem) {
-			collection[rowIndex] = {
-				id: dataItem.id,
-				desc: dataItem.text,
-				model: {id: dataItem.id, text: dataItem.text}
-			};
-			return;
+	onDependencyTaskChange(dataItem: any, collectionType: string, gridHelper: DataGridOperationsHelper, rowIndex: number): void {
+		let addTask, removeTask, getCollection;
+
+		if (collectionType === 'predecessor') {
+			addTask = this.modelHelper.addPredecessor;
+			removeTask = this.modelHelper.deletePredecessor;
+			getCollection = this.modelHelper.getPredecessor;
+		} else {
+			addTask = this.modelHelper.addSuccessor;
+			removeTask = this.modelHelper.deleteSuccesor;
+			getCollection = this.modelHelper.getSuccessor;
 		}
 
-		if (collection[rowIndex].id) {
+		if (dataItem) {
+			const {id, text} = dataItem;
+			return addTask.bind(this.modelHelper)(rowIndex, id, text)
+		}
+
+		if (removeTask.bind(this.modelHelper)(rowIndex)) {
 			this.hasModelChanges = true;
 		}
 
-		collection.splice(rowIndex, 1);
-		gridHelper.reloadData(collection);
+		gridHelper.reloadData(getCollection.bind(this.modelHelper)());
 	}
 
 	/**
@@ -314,7 +264,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	protected onSave(): void {
-		this.taskManagerService.updateTask(getPayloadForUpdate(this.model))
+		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((res) => {
 				console.log('The response is:');
 				console.log(res);
