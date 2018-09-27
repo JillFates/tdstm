@@ -5,9 +5,8 @@ package net.transitionmanager.command
 @grails.validation.Validateable
 class DataviewApiParamsCommand implements CommandObject {
 
-
     int offset = 0
-    int limit = 25
+    int limit
 	/**
 	 * Defined by the following structure:
 	 * filter=environment=Production&filter=assetName=PDV*
@@ -18,7 +17,7 @@ class DataviewApiParamsCommand implements CommandObject {
 
     static constraints = {
         offset min: 0
-        limit min: 0, max: 100
+        limit nullable: true, min: 0, max: Integer.MAX_VALUE
 		filter nullable: true, blank: true, validator: { val, obj ->
 			if(val){
 				obj.filterParams = []
@@ -65,7 +64,6 @@ class DataviewApiFilterParam {
 	DataviewApiFilterParam(String stringValue){
 		def (String key, String value) = stringValue.split(FILTER_PARAMETER_SEPARATOR_CHARACTER)
 		this.filter = value
-		//TODO: add exception if key or value are null??
 
 		if(key.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)){
 			def (String root, String path) = key.split(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)
@@ -78,7 +76,7 @@ class DataviewApiFilterParam {
 	}
 
 	/**
-	 * Check if Dataview column spec coinciden with current {@code DataviewApiFilterParam} instance
+	 * Check if Dataview column spec matches with current {@code DataviewApiFilterParam} instance
 	 *
 	 * @param columnSpec a Map instance with column spec content
 	 * @return true if current instance of {@code DataviewApiFilterParam}
