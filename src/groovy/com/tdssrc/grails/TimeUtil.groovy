@@ -61,7 +61,8 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
 	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
 
-	static final String FORMAT_DATE_TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm'Z'" // Quoted "Z" to indicate UTC, no timezone offset
+	static final String FORMAT_DATE_TIME_ISO8601   = "yyyy-MM-dd'T'HH:mm'Z'"    // Quoted "Z" to indicate UTC, no timezone offset
+	static final String FORMAT_DATE_TIME_ISO8601_2 = "yyyy-MM-dd'T'HH:mm:ss'Z'" // Quoted "Z" to indicate UTC, no timezone offset (with seconds)
 
 	static final String SHORT = 'S'
 	static final String FULL = 'F'
@@ -506,7 +507,9 @@ class TimeUtil {
 	 * @return the Date or null if there's a problem
 	 */
 	static Date parseDateTime(String dateString, String formatterType = FORMAT_DATE_TIME) {
-		if (StringUtil.isBlank(dateString)) return null
+		if (StringUtil.isBlank(dateString)) {
+			return null
+		}
 		parseDateTimeWithFormatter(userPreferenceService.timeZone, dateString, createFormatter(formatterType))
 	}
 
@@ -518,13 +521,14 @@ class TimeUtil {
 	 * @return the Date or null if there's a problem
 	 */
 	static Date parseDateTimeWithFormatter(String tzId, String dateString, DateFormat formatter) {
-		if (StringUtil.isBlank(dateString)) return null
+		if (StringUtil.isBlank(dateString)) {
+			return null
+		}
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		try {
 			return formatter.parse(dateString)
-		}
-		catch (e) {
-			logger.debug 'Invalid date time: {}, {}, {}', dateString, tzId, formatter.toPattern()
+		} catch (e) {
+			logger.debug 'Invalid DateTime: {}, {}, {}, {}', dateString, tzId, formatter.toPattern(), e.message
 		}
 	}
 
@@ -645,7 +649,9 @@ class TimeUtil {
 				format = isMiddleEndian ? FORMAT_DATE_TIME_25 : "dd/MM/yyyy hh:mm"
 				break
 			case FORMAT_DATE_TIME_26:
-				format = FORMAT_DATE_TIME_26
+			case FORMAT_DATE_TIME_ISO8601:
+			case FORMAT_DATE_TIME_ISO8601_2:
+				format = formatterType
 				break
 			case FORMAT_DATE_TIME_ISO8601:
 				format = FORMAT_DATE_TIME_ISO8601

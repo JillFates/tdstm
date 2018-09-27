@@ -137,7 +137,7 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	 *  Validates fields meet with proper values based on data types
 	 */
 	validateFields(): Promise<boolean> {
-		const emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+		const emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/
 		const mobileExp = /^([0-9 +-])+$/
 
 		console.log(this.personModel);

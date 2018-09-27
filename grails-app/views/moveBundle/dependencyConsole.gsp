@@ -250,7 +250,7 @@
 				$('#refreshButtonId').addClass('warning-change');
 			});
 
-			function getList(value,dependencyBundle, force, distance, labels) {
+			function getList(value, dependencyBundle, force, distance, labels) {
 				$('#refreshButtonId').removeClass('warning-change');
 				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
@@ -298,11 +298,7 @@
 					case "graph" :
 						var labelsList = "Application"
 						var bundle = $("#planningBundleSelectId").val()
-						var showControls = 'hide'
-						if ($('#controlPanelId').css('display') == 'block')
-							showControls = 'controls'
-						if ($('#legendDivId').css('display') == 'block')
-							showControls = 'legend'
+						var showControls = GraphUtil.getOpenPanel();
 						compressList();
 						ajaxRequest = ${remoteFunction(
 							controller:'assetEntity',
@@ -402,7 +398,6 @@
 				}
 				return objectString
 			}
-
 			function getListBySort(value,dependencyBundle,sort){
 				var bundle = $("#planningBundleSelectId").val()
 				var sortBy = $("#sortBy").val()
