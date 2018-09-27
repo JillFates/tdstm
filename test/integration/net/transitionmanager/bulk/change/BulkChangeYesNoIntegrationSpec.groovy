@@ -1,18 +1,19 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.InvalidParamException
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangeDateServiceIntegrationSpec extends IntegrationSpec {
-	BulkChangeDateService bulkChangeDateService
+class BulkChangeYesNoIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
@@ -71,34 +72,33 @@ class BulkChangeDateServiceIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
-			bulkChangeDateService.bulkClear(null,'retireDate', [device.id, device2.id, device3.id], null)
+			BulkChangeYesNo.clear(Application.class, null, 'validation', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
 			[device, device2, device3].each {
 				it.refresh()
-				null == it.retireDate
+				null == it.validation
 			}
 	}
 
 	@See('TM-12334')
 	void 'Test replace'() {
 		setup:
-			def retireDate = new Date(2019, 1 , 1, 0, 0, 0)
+			def validation = BulkChangeYesNo.coerceBulkValue(project, 'yes')
 
 		when: 'replace is called with a list of assets'
-			bulkChangeDateService.bulkReplace(retireDate, 'retireDate', [device.id, device2.id, device3.id], null)
+			BulkChangeYesNo.replace(Application.class, validation, 'validation', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
 			[device, device2, device3].each {
 				it.refresh()
-				retireDate == it.retireDate
+				'Y' == it.validation
 			}
 
 		when: 'replace is called with a null replacement value'
-			bulkChangeDateService.bulkReplace(null, 'retireDate', [device.id, device2.id, device3.id], null)
+			BulkChangeYesNo.replace(Application.class, null, 'validation', [device.id, device2.id, device3.id], null)
 
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException
 	}
-
 }

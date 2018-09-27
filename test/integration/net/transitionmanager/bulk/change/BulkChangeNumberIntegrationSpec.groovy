@@ -1,19 +1,21 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.NumberUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.InvalidParamException
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
-import test.helper.PersonTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
-	BulkChangePersonService bulkChangePersonService
+class BulkChangeNumberIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
@@ -23,9 +25,6 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-
-	@Shared
-	PersonTestHelper personTestHelper = new PersonTestHelper()
 
 	@Shared
 	Project project = projectTestHelper.createProject()
@@ -75,31 +74,31 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
-		bulkChangePersonService.bulkClear(null,'modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangeNumber.clear(Application.class, null, 'size', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
-		[device, device2, device3].each {
-			it.refresh()
-			null == it.modifiedBy
-		}
+			[device, device2, device3].each {
+				it.refresh()
+				null == it.size
+			}
 	}
 
 	@See('TM-12334')
 	void 'Test replace'() {
 		setup:
-			def modifiedBy = personTestHelper.createPerson()
+			def size = NumberUtil.toPositiveInteger(RandomStringUtils.randomNumeric(5))
 
 		when: 'replace is called with a list of assets'
-			bulkChangePersonService.bulkReplace(modifiedBy, 'modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangeNumber.replace(Application.class, size, 'size', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
 			[device, device2, device3].each {
 				it.refresh()
-				modifiedBy == it.modifiedBy
+				size == it.size
 			}
 
 		when: 'replace is called with a null replacement value'
-			bulkChangePersonService.bulkReplace(null, 'modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangeNumber.replace(Application.class, null, 'size', [device.id, device2.id, device3.id], null)
 
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException
