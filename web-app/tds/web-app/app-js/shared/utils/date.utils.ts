@@ -285,4 +285,13 @@ export class DateUtils {
 		return resultingDate;
 	}
 
+	/**
+	 * Convert a datepart object to the equivalent minutes
+	 * @param durationParts (DurationParts)
+	 * @returns {number}
+	 */
+	public static convertDurationPartsToMinutes(durationParts: DurationParts): number {
+		return (durationParts.days * 24 * 60) + (durationParts.hours * 60) + durationParts.minutes;
+	}
+
 }

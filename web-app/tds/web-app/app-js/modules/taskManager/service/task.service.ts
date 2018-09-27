@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Response} from '@angular/http';
+import {Response, RequestOptions, Headers} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
 import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
@@ -8,6 +8,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name TaskService
@@ -211,4 +212,71 @@ export class TaskService {
 			})
 			.catch((error: any) => error.json());
 	}
+	/**
+	 * Update a task
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	updateTask(model: any): Observable<any> {
+		const params = [
+			{name: 'assetClass', value: model.assetClass.id},
+			{name: 'assetEntity', value: model.asset.id},
+			{name: 'assetType', value: 'Application'}, /* ? */
+			{name: 'assignedTo', value: model.assignedTo.id},
+			{name: 'category', value: model.category},
+			{name: 'apiAction', value: model.apiAction.id},
+			{name: 'actionInvocable', value: ''},
+			{name: 'actionMode', value: ''},
+			{name: 'comment', value: model.comment},
+			{name: 'commentFromId', value: ''},
+			{name: 'commentId', value: model.id},
+			{name: 'commentType', value: 'issue'},
+			{name: 'deletePredId', value: ''},  /* ? */
+			{name: 'dueDate', value: model.dueDate ? model.dueDate.toISOString() : ''},
+			{name: 'duration', value: DateUtils.convertDurationPartsToMinutes(model.durationParts)},
+			{name: 'durationScale', value: model.durationScale},
+			{name: 'estFinish', value: model.estimatedFinish ? model.estimatedFinish.toISOString() : ''},
+			{name: 'estStart', value: model.estimatedStart ? model.estimatedStart.toISOString() : ''},
+			{name: 'forWhom', value: ''},
+			{name: 'hardAssigned', value: model.hardAssigned === 'No' ? 0 : 1},
+			{name: 'sendNotification', value: model.sendNotification === 'No' ? 0 : 1},
+			{name: 'isResolved', value: 0}, /* ? */
+			{name: 'instructionsLink', value: model.instructionLink},
+			{name: 'manageDependency', value: 1}, /* ? */
+			{name: 'moveEvent', value: model.event.id},
+			{name: 'mustVerify', value: 0}, /* ? */
+			{name: 'override', value: 0}, /* ? */
+			{name: 'predCount', value: -1}, /* ? */
+			{name: 'predecessorCategory', value: ''}, /* ? */
+			{name: 'prevAsset', value: ''}, /* ? */
+			{name: 'priority', value: model.priority}, /* ? */
+			{name: 'resolution', value: ''}, /* ? */
+			{name: 'role', value: model.assignedTeam.id},
+			{name: 'status', value: model.status},
+			{name: 'taskDependendy[]', value: '3002_233386'}, /* ? */
+			{name: 'taskSuccessor[]', value: '3012_233398'}, /* ? */
+			{name: 'workflowTransition', value: ''}, /* ? */
+			{name: 'canEdit', value: true}, /* ? */
+			{name: 'durationLocked', value: model.durationLocked},
+			{name: 'durationText', value: `${model.durationParts.days} days ${model.durationParts.hours} hrs ${model.durationParts.minutes} mins`},
+			{name: 'taskNumber', value: model.taskNumber},
+			{name: 'note', value: model.note},
+			{name: 'id', value: model.id},
+			{name: 'apiActionId', value: model.apiAction.id || 0},
+			{name: 'deletedPreds', value: ''}
+		];
+		const body = params
+			.map((item) => `${item.name}=${item.value}`)
+			.join('&');
+
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/x-www-form-urlencoded');
+		const requestOptions = new RequestOptions({headers: headers});
+
+		const url = `${this.baseURL}/assetEntity/updateComment`;
+		return this.http.post(url, body, requestOptions)
+			.map(res => res.ok)
+			.catch((error: any) => error);
+	}
+
 }
