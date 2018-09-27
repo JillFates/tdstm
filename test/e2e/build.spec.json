@@ -31,6 +31,7 @@
     "specs.LandingPages.AssetsLandingPageSpec",
     "specs.LandingPages.ProjectsLandingPageSpec",
     "specs.LandingPages.TasksLandingPageSpec",
+    "specs.LandingPages.PlanningLandingPageSpec",
     "specs.Login.LoginSpec",
     "specs.Projects.ETLScripts.ETLScriptsCreationSpec",
     "specs.Projects.ETLScripts.ETLScriptsDesignerTransformWithPastedDataSpec",
