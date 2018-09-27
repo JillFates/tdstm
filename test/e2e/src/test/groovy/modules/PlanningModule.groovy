@@ -73,10 +73,6 @@ class PlanningModule extends Module {
         selectItem(planningListBundles)
     }
 
-    def assertEventDetails(){
-        planningEventDetails.text().contains("Event Details")
-    }
-
     def verifyEventsTitle(){
         planningEventsTitle.isDisplayed()
     }

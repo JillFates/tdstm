@@ -41,8 +41,6 @@ class PlanningLandingPageSpec extends GebReportingSpec {
         then: 'The Events and Bundles titles are displayed'
             planningModule.verifyEventsTitle()
             planningModule.verifyBundlesTitle()
-        and: 'It contains the Event Details of an Event'
-            planningModule.assertEventDetails()
             at MenuPage
     }
 
