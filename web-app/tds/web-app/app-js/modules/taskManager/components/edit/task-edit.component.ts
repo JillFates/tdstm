@@ -20,6 +20,7 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {extractModel, getPayloadForUpdate, YesNoList} from "./model-helper";
 
 declare var jQuery: any;
 
@@ -43,7 +44,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public modalOptions: DecoratorOptions;
 	public model: any = null;
 	public getAssetList: Function;
-	public yesNoList = ['Yes', 'No'];
+	public yesNoList =  [...YesNoList];
 	public predecessorSuccessorColumns: any[];
 	public userTimeZone: string;
 	public hasModelChanges = false;
@@ -65,9 +66,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	ngOnInit() {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
-		this.model = this.extractModel();
+		this.model = extractModel(this.taskDetailModel.detail, this.userTimeZone);
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
+
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns
 			.filter((column) => column.property === 'desc');
 
@@ -99,6 +101,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	/**
 	 * Extract only the model fields used by the view
 	 */
+	/*
 	extractModel(): any {
 		const detail = this.taskDetailModel.detail;
 		const assetComment = detail['assetComment'] || {};
@@ -154,6 +157,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			assetComment
 		}
 	}
+	*/
 
 	/**
 	 * Pass Service as Reference
@@ -310,7 +314,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	protected onSave(): void {
-		this.taskManagerService.updateTask(this.model)
+		this.taskManagerService.updateTask(getPayloadForUpdate(this.model))
 			.subscribe((res) => {
 				console.log('The response is:');
 				console.log(res);
