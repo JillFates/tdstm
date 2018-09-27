@@ -19,7 +19,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
-import {ValidationUtils} from "../../../../shared/utils/validation.utils";
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 declare var jQuery: any;
 
@@ -150,7 +150,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent && assetComment.moveEvent.id) || null, text: detail.eventName},
 			category: assetComment.category,
-			apiAction: {id: detail.apiAction && detail.apiAction.id || '', text: detail.apiAction && detail.apiAction.name || ''}
+			apiAction: {id: detail.apiAction && detail.apiAction.id || '', text: detail.apiAction && detail.apiAction.name || ''},
+			assetComment
 		}
 	}
 
@@ -309,10 +310,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	protected onSave(): void {
-		/* this.taskManagerService.saveComment(this.singleCommentModel).subscribe((res) => {
-			this.close();
-		}); */
-		this.close();
+		this.taskManagerService.updateTask(this.model)
+			.subscribe((res) => {
+				console.log('The response is:');
+				console.log(res);
+			});
 	}
 
 	/**
