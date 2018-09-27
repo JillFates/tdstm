@@ -20,5 +20,6 @@ class MenuPage extends Page {
         projectsModule { module ProjectsModule}
         assetsModule { module AssetsModule}
         planningModule { module PlanningModule}
+
     }
 }
