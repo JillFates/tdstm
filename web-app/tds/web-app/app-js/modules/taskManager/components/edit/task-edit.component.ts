@@ -128,7 +128,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			getCollection = this.modelHelper.getPredecessor;
 		} else {
 			addTask = this.modelHelper.addSuccessor;
-			removeTask = this.modelHelper.deleteSuccesor;
+			removeTask = this.modelHelper.deleteSuccessor;
 			getCollection = this.modelHelper.getSuccessor;
 		}
 

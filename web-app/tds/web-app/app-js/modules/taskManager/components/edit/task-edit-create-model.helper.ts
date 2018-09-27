@@ -127,27 +127,19 @@ export class TaskEditCreateModelHelper {
 	}
 
 	public addPredecessor(index: number, id: string, text: string) {
-		this.model.predecessorList[index] = { id, desc: text, model: {id , text} };
+		this.model.predecessorList[index] = this.makeTaskItem(id, text) ;
 	}
 
 	public addSuccessor(index: number, id: string, text: string) {
-		this.model.successorList[index] = {id, desc: text, model: {id, text}};
+		this.model.successorList[index] = this.makeTaskItem(id, text);
 	}
 
-	public deleteSuccesor(index: number): boolean {
-		const exists = Boolean(this.model.successorList[index].id);
-
-		this.model.successorList.splice(index, 1);
-
-		return exists;
+	public deleteSuccessor(index: number): boolean {
+		return this.deleteTaskItem(index, this.model.successorList, this.model.deletedSuccessorList);
 	}
 
 	public deletePredecessor(index: number): boolean {
-		const exists = Boolean(this.model.predecessorList[index].id);
-
-		this.model.predecessorList.splice(index, 1);
-
-		return exists;
+		return this.deleteTaskItem(index, this.model.predecessorList, this.model.deletedPredecessorList);
 	}
 
 	public getPredecessor(): any[] {
@@ -156,6 +148,22 @@ export class TaskEditCreateModelHelper {
 
 	public getSuccessor(): any[] {
 		return this.model.successorList;
+	}
+
+	private deleteTaskItem(index: number, collection: any[], deletedCollection: any[]): boolean {
+			const id = collection[index].id;
+			const exists = Boolean(id);
+
+			if (exists) {
+				deletedCollection.push(id);
+			}
+
+			collection.splice(index, 1);
+			return exists;
+	}
+
+	private makeTaskItem(id: string, text: string): any {
+		return { id, desc: text, model: {id , text} };
 	}
 
 
