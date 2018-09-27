@@ -69,7 +69,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToTasksCookbook()
+        tasksModule.goToTasksCookbook()
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         // Create clean recipe verify stuff
@@ -113,7 +113,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "1. Selecting the Empty Recipe to verify its History"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks in the Recipe'
@@ -124,7 +123,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     // History Tab (empty)
 
     def "2. Verifying the Information in the 'History' tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the History Option'
@@ -136,7 +134,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "3. Check Empty Elements in the 'History' tab"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the History Section'
             at TabHistoryPage
 
@@ -147,7 +144,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "4. Checking The Cookbook page title"(){
-        testKey = "TM-XXXX"
         when: 'The User is in the Cookbook Section'
             at CookbookPage
 
@@ -156,7 +152,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "5. Going to the empty 'Actions' tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Section'
             at TabHistoryPage
         when: 'The User clicks on that Option'
@@ -168,7 +163,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "6. Checking blocked elements on The 'Actions' tab"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the History Section'
             at TabHistoryTabActionsPage
 
@@ -182,7 +176,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "7. Going to the empty 'Generation Log' tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Section'
             at TabHistoryPage
         when: 'The User Clicks the Generation Log Tab'
@@ -194,7 +187,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "8, Checking 'Generation Log' tab 'Exception' empty text"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Log Section'
             at TabHistoryTabGenLogPage
 
@@ -204,7 +196,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "9. Checking 'Generation Log' tab 'Info/Warning' empty text"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Log Section'
             at TabHistoryTabGenLogPage
         when: 'The User clicks the Info Radio Option'
@@ -216,7 +207,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "10. Selecting the Recipe with generated tasks to verify History"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the CookBook Section'
             at CookbookPage
         when: 'The User searches by a Recipe'
@@ -228,7 +218,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "11. Going to the populated 'History' tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the CookBook Section'
             at CookbookPage
         when: 'The User Clicks the History Tab Option'
@@ -240,7 +229,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "12. Checking the History tab active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the History Tab Section'
             at TabHistoryPage
 
@@ -258,7 +246,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "13. Going to Actions tab with actived buttons"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Tab Section'
             at TabHistoryPage
         when: 'The User Clicks the Tab'
@@ -269,7 +256,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "14. Checking Actions tab active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the History Tab Section'
             at TabHistoryTabActionsPage
 
@@ -282,7 +268,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "15. Going to Tasks tab with recipe tasks values "() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Tab Section'
             at TabHistoryPage
         when: 'The User Clicks the Tab'
@@ -294,7 +279,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "16. Checking Tasks tab active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the History Tab Section'
             at TabHistoryTabTasksPage
 
@@ -310,7 +294,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "17. Selecting the first task for getting its details"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Tab Section'
             at TabHistoryTabTasksPage
         when: 'The User clicks on it'
@@ -320,7 +303,6 @@ class RecipeHistorySpec extends GebReportingSpec {
             at TaskDetailsPage
     }
     def "18. Closing 'Tasks Details' modal window"() {
-        testKey = "TM-XXXX"
         given: 'The User is inthe Task Details Section'
             at TaskDetailsPage
         when: 'The User clicks the "Close" Option'
@@ -333,7 +315,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "19. Going to the Generation Log tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the History Tab Section'
             at TabHistoryPage
         when: 'The User clicks the Generation Log Tab'
@@ -344,7 +325,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "20. Checking Generation Log tab active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Log Tab Section'
             at TabHistoryTabGenLogPage
 
@@ -354,7 +334,6 @@ class RecipeHistorySpec extends GebReportingSpec {
     }
 
     def "21. Clicking on Info/Warning radio"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Log Tab Section'
             at TabHistoryTabGenLogPage
         when: 'The User Clicks the Info Checkbox'

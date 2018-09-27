@@ -148,6 +148,24 @@ class DeviceService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to provide a map/model of the properties used by the DEVICE Create view
+	 * @param project
+	 * @return a Map that includes the list of common properties
+	 */
+	@Transactional(readOnly = true)
+	Map getModelForCreate(Map params) {
+		Project project = securityService.getUserCurrentProject()
+		def model = assetEntityService.getCommonModelForCreate('AssetEntity', 'DEVICE', project, params)
+
+		model.roomSource = null
+		model.roomTarget = null
+		model.sourceChassis = ''
+		model.targetChassis = ''
+
+		return model
+	}
+
+	/**
 	 * Used to save a new device which is called from the controller
 	 * @param project - the user's project
 	 * @param params - the request parameters

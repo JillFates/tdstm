@@ -168,7 +168,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152254']
+									['id', FindOperator.eq.name(), 152254]
 								]
 							)
 						}
@@ -184,7 +184,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152255']
+									['id', FindOperator.eq.name(), 152255]
 								]
 							)
 						}
@@ -267,7 +267,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152254']
+									['id', FindOperator.eq.name(), 152254]
 								]
 							)
 						}
@@ -283,7 +283,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152255']
+									['id', FindOperator.eq.name(), 152255]
 								]
 							)
 						}
@@ -860,7 +860,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toString()]
+									['id', FindOperator.eq.name(), value.toLong()]
 								]
 							)
 						}
@@ -877,7 +877,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['id', FindOperator.eq.name(), 151954l]
 								]
 							)
 							assertQueryResult(
@@ -1036,7 +1036,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toString()]
+									['id', FindOperator.eq.name(), value.toLong()]
 								]
 							)
 						}
@@ -1053,7 +1053,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['id', FindOperator.eq.name(), 151954l]
 								]
 							)
 							assertQueryResult(
@@ -1435,7 +1435,7 @@ class ETLFindSpec extends ETLBaseSpec {
 										query[0],
 										ETLDomain.Application,
 										[
-											['id', 'eq', '152254']
+											['id', 'eq', 152254l]
 										]
 									)
 
@@ -1476,7 +1476,7 @@ class ETLFindSpec extends ETLBaseSpec {
 										query[0],
 										ETLDomain.Application,
 										[
-											['id', 'eq', '152255']
+											['id', 'eq', 152255l]
 										]
 									)
 
@@ -1560,7 +1560,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
-											['id', 'eq', '152254']
+											['id', 'eq', 152254l]
 										]
 									)
 									assertQueryResult(query[1], ETLDomain.Application,
@@ -1588,7 +1588,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
-											['id', 'eq', '152255']
+											['id', 'eq', 152255l]
 										]
 									)
 									assertQueryResult(query[1], ETLDomain.Application,
@@ -2225,7 +2225,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -2245,7 +2245,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -3433,7 +3433,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Microsoft']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 0l]])
 							}
 						}
 					}
@@ -3459,7 +3459,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Mozilla']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 0l]])
 							}
 						}
 					}

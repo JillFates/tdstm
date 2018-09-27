@@ -5,6 +5,9 @@ import com.tdssrc.grails.TimeUtil
 
 class Database extends AssetEntity {
 
+	// Override default value set by parent class
+	String assetType = 'Database'
+
 	AssetClass assetClass = AssetClass.DATABASE
 	String dbFormat
 

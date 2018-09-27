@@ -8,6 +8,7 @@ import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
+import groovy.util.logging.Slf4j
 import java.util.Map.Entry
 
 /**
@@ -26,6 +27,7 @@ import java.util.Map.Entry
  *            and D.id = : id
  *  </pre>
  */
+@Slf4j
 class DomainClassQueryHelper {
 
 	/**
@@ -103,7 +105,11 @@ class DomainClassQueryHelper {
 			   and $hqlWhere
 		""".stripIndent()
 
+
 		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams
+
+		log.debug 'assetEntities() hql={}, args={}', hql, args
+
 		return AssetEntity.executeQuery(hql, args, [readOnly: true])
 	}
 
@@ -120,7 +126,7 @@ class DomainClassQueryHelper {
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
 
-		if(GormUtil.isDomainProperty(clazz, 'project')){
+		if (GormUtil.isDomainProperty(clazz, 'project')) {
 			hqlWhere += " and ${DOMAIN_ALIAS}.project = :project \n".toString()
 			hqlParams += [project: project]
 		}
@@ -131,6 +137,8 @@ class DomainClassQueryHelper {
 			       $hqlJoins
              where $hqlWhere
 		""".stripIndent()
+
+		log.debug 'nonAssetEntities() hql={}, params={}', hql, hqlParams
 
 		return clazz.executeQuery(hql,  hqlParams, [readOnly: true])
 	}
@@ -277,10 +285,12 @@ class DomainClassQueryHelper {
 
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
 
-				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				String where = buildSentenceAndHqlParam(condition, property + '.id', namedParameter, hqlParams)
 
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
-				if(GormUtil.isDomainProperty(propertyClazz, 'project')){
+
+				// Why is Project being queried ONLY if query is by reference ID?
+				if (GormUtil.isDomainProperty(propertyClazz, 'project')) {
 					where += " and ${property}.project =:${namedParameter}_project \n"
 					hqlParams[namedParameter + '_project'] = project
 				}
@@ -290,7 +300,7 @@ class DomainClassQueryHelper {
 
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
-				if(condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
+				if (condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
 					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
 				}
 
@@ -310,7 +320,9 @@ class DomainClassQueryHelper {
 	 * @return true if should query using the ID
 	 */
 	static private boolean shouldQueryByReferenceId(clazz, field, value) {
-		return (value instanceof Long) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
+		boolean should = NumberUtil.isaNumber(value) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
+		// log.debug 'shouldQueryByReferenceId() value={}, type={}, result={}', value, value.getClass().getName(), should
+		return should
 	}
 
 	/**
@@ -341,6 +353,11 @@ class DomainClassQueryHelper {
 	static String buildSentenceAndHqlParam(FindCondition condition, String property, String namedParameter, Map<String, ?> hqlParams){
 
 		String sentence
+
+		// Small numbers loaded from JSON are Integer and need to be forced to Long for HQL
+		if (property.endsWith('.id')) {
+			condition.value = NumberUtil.toPositiveLong(condition.value, 0)
+		}
 
 		switch (condition.operator){
 			case FindOperator.eq:

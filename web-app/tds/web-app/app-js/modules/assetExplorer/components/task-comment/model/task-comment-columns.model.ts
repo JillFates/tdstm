@@ -65,13 +65,7 @@ export class CommentColumnsModel {
 				label: 'Comment',
 				property: 'commentInstance.comment',
 				type: 'text',
-				width: 230
-			},
-			{
-				label: 'Status',
-				property: 'commentInstance.status',
-				type: 'text',
-				width: 100
+				width: 330
 			},
 			{
 				label: 'Category',

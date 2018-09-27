@@ -39,18 +39,16 @@ class TaskCreationSpec extends GebReportingSpec {
     }
 
     def "1. Displaying the Task Manager Section"() {
-        testKey = "TM-XXXX"
         given: 'The User is at the Menu Page'
             at MenuPage
         when: 'User Goes to the Tasks > Task Manager Section'
-            menuModule.goToTasksManager()
+            tasksModule.goToTasksManager()
 
         then: 'Task Manager Section should be Displayed'
             at TaskManagerPage
     }
 
     def "2. Opening the Create Task Pop-Up"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User clicks the "Create" Button'
@@ -61,7 +59,6 @@ class TaskCreationSpec extends GebReportingSpec {
     }
 
     def "3. Creating a brand new Task"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Creation Pop-Up'
             at TaskCreationPage
         when: 'The User completes all related information such as Name, Event, Status, Person, Team'
@@ -79,7 +76,6 @@ class TaskCreationSpec extends GebReportingSpec {
     }
 
     def "5. Filtering out by the brand New Task on the List"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User filters by the brand new Task'
@@ -95,7 +91,6 @@ class TaskCreationSpec extends GebReportingSpec {
     }
 
     def "6. Validate Task Details"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Task Details Section'
             at TaskDetailsPage
 

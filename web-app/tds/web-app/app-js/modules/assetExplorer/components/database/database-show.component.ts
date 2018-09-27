@@ -14,7 +14,7 @@ declare var jQuery: any;
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `database-show`,
+		selector: `tds-database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
 		private mainAsset = modelId;
@@ -78,7 +78,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 
 			this.prompt.open('Confirmation Required',
 				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'Yes', 'No')
+				'Yes', 'Cancel')
 				.then( success => {
 					if (success) {
 						this.assetExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
@@ -99,6 +99,10 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 		 */
 		onCloneAsset(): void {
 			console.log('Will come clone implementation');
+		}
+
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

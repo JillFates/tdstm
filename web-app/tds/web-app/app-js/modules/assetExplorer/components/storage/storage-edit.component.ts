@@ -19,7 +19,7 @@ declare var jQuery: any;
 
 export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
-		selector: 'storage-edit',
+		selector: 'tds-storage-edit',
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }

@@ -308,6 +308,51 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
+	 * Used to retrieve the Angular HTML template used for the create views of an asset
+	 * @param domainName - the domain of the asset to generate the create view for
+	 * @return html template
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def getCreateTemplate(String domainName) {
+		final List domains = ['APPLICATION','DEVICE','STORAGE','DATABASE']
+		if (!domains.contains(domainName)) {
+			sendBadRequest()
+			return
+		}
+
+		Map model = [:]
+
+		switch (domainName) {
+			case "APPLICATION":
+				model << applicationService.getModelForCreate(params)
+				break
+			case "DEVICE":
+				model << deviceService.getModelForCreate(params)
+				break
+			case "STORAGE":
+				model << storageService.getModelForCreate(params)
+				break
+			case "DATABASE":
+				model << databaseService.getModelForCreate(params)
+				break
+		}
+
+		domainName=domainName.toLowerCase()
+		try {
+			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/create", model: model)
+			if (pageHtml) {
+				render pageHtml
+			} else {
+				log.error "getCreateTemplate() Generate page failed domainName=$domainName\n  model:$model"
+				sendNotFound()
+			}
+		} catch (e) {
+			log.error "getCreateTemplate() Generate page for domainName=$domainName had an exception: ${e.getMessage()}"
+			sendNotFound()
+		}
+	}
+
+	/**
 	 * Used to retrieve the model data for the show view of an asset
 	 * @param id - the id of the asset to retrieve the model for
 	 * @return JSON map

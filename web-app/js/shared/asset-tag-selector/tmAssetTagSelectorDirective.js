@@ -68,6 +68,15 @@ currentAngularModule.directive.TmAssetTagSelectorDirective = function ($http, ut
 			($scope.assetSelector.tag.length > 1)? $(element).find('.km-switch').show(): $(element).find('.km-switch').hide();
 
 			/**
+			 * Use to re-load the pre-selected Tags after the component has been initialized
+			 */
+			$scope.$watch('preAssetSelector', function(newVal, oldVal){
+				if (newVal && newVal['tag']) {
+					setTimeout(preSelectTags, 600);
+				}
+			}, true);
+
+			/**
 			 * Regenerate the Switch, Kendo does not allow to change the value on fly
 			 */
 			function createSwitchButton() {
