@@ -21,7 +21,7 @@ declare var jQuery: any;
 export function DatabaseEditComponent(template, editModel, metadata: any) {
 
 	@Component({
-		selector: `database-edit`,
+		selector: `tds-database-edit`,
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }
@@ -48,6 +48,8 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 				this.model.asset.scale = {
 					name: ''
 				};
+			} else {
+				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
 			}
 		}
 
@@ -75,6 +77,10 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 					this.saveAssetTags();
 				}
 			});
+		}
+
+		onDeleteAsset() {
+			this.deleteAsset(this.model.asset.id);
 		}
 	}
 

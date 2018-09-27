@@ -330,7 +330,7 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element toLong() {
-		value = NumberUtil.toLong(value)
+		value = NumberUtil.toLongNumber(value)
 		return this
 	}
 
@@ -343,7 +343,7 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element toInteger() {
-		value = NumberUtil.toInteger(value)
+		value = NumberUtil.toLongNumber(value)?.intValue()
 		return this
 	}
 

@@ -6,7 +6,6 @@
         <g:javascript src="entity.crud.js" />
         <g:render template="../layouts/responsiveAngularResources" />
         <g:javascript src="asset.comment.js" />
-        <g:javascript src="shared/asset-tag-selector/tmAssetTagSelectorDirective.js"/>
 
         <title>Edit Event</title>
     <script type="text/javascript">

@@ -6,7 +6,7 @@ import {SingleCommentModel} from '../single-comment/model/single-comment.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ModalType} from '../../../../shared/model/constants';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskCommentColumnsModel} from './model/task-comment-columns.model';
+import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-columns.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
@@ -26,52 +26,63 @@ export class TaskCommentComponent implements OnInit {
 	@Input('asset-name') assetName: string;
 	@Input('asset-type') assetType: string;
 
-	private dataGridTaskCommentOnHelper: DataGridOperationsHelper;
-	private taskCommentColumnModel = new TaskCommentColumnsModel();
+	// Grid Configuration for Task and Comment
+	private dataGridTaskHelper: DataGridOperationsHelper;
+	private dataGridCommentHelper: DataGridOperationsHelper;
+
+	protected taskColumnModel = new TaskColumnsModel();
+	protected commentColumnModel = new CommentColumnsModel();
 	private modalType = ModalType;
 	private viewUnpublished = false;
 
-	private showAllTasks: boolean;
 	private showAllComments: boolean;
-	private comments: any[] = [];
+	private showAllTasks: boolean;
+	private taskCommentsList: any[] = [];
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
 		this.getPreferences();
 	}
 
 	ngOnInit(): void {
-		this.showAllTasks = false;
 		this.showAllComments = false;
-		this.getAllComments();
+		this.showAllTasks = false;
+		this.createDataGrids();
 	}
 
 	/**
-	 * Get all comments
+	 * Create the List for the Data Grids for Task and Comments
 	 * @returns {any}
 	 */
-	private getAllComments(): any {
+	private createDataGrids(): any {
 		this.taskService.searchComments(this.id, '')
 			.subscribe((res) => {
-				this.comments = res;
-				this.dataGridTaskCommentOnHelper = new DataGridOperationsHelper(this.getCommentsWithFilter(), null, null);
+				this.taskCommentsList = res;
+				this.dataGridTaskHelper = new DataGridOperationsHelper(this.getTaskWithFilter(), null, null);
+				this.dataGridCommentHelper = new DataGridOperationsHelper(this.getCommentsWithFilter(), null, null);
 			}, (err) => console.log(err));
 	}
 
 	/**
-	 * Change the list based on the Filters being applied
+	 * Get the Tasks and change the list based on the Filters being applied
+	 * @returns {any}
+	 */
+	public getTaskWithFilter(): any {
+		return this.taskCommentsList
+			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
+			.filter(comment => comment.commentInstance.commentType === 'issue' || comment.commentInstance.taskNumber)
+			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
+	}
+
+	/**
+	 * Get the Comments and change the list based on the Filters being applied
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		const tasks = this.comments
-			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
-			.filter(comment => comment.commentInstance.commentType === 'issue')
-			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
-
-		const comments = this.comments
-			.filter(comment => comment.commentInstance.commentType === 'comment')
-			.filter(comment => this.showAllComments || !comment.commentInstance.dateResolved);
-
-		return [...tasks, ...comments];
+		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.resolvedBy === null);
+		if (this.showAllComments) {
+			filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment');
+		}
+		return filteredList;
 	}
 
 	public getAssignedTo(comment): any {
@@ -104,7 +115,7 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], true, false).then(result => {
-			this.getAllComments();
+			this.createDataGrids();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -150,7 +161,7 @@ export class TaskCommentComponent implements OnInit {
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], false, false).then(result => {
-			this.getAllComments();
+			this.createDataGrids();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -185,8 +196,12 @@ export class TaskCommentComponent implements OnInit {
 		});
 	}
 
-	public reloadGrid(): void {
-		this.dataGridTaskCommentOnHelper.reloadData(this.getCommentsWithFilter());
+	public reloadTasksGrid(): void {
+		this.dataGridTaskHelper.reloadData(this.getTaskWithFilter());
+	}
+
+	public reloadCommentsGrid(): void {
+		this.dataGridCommentHelper.reloadData(this.getCommentsWithFilter());
 	}
 
 	/**
@@ -231,10 +246,13 @@ export class TaskCommentComponent implements OnInit {
 
 			this.taskManagerService.deleteTaskComment(commentId).subscribe((res) => {
 				// delete the item
-				this.dataGridTaskCommentOnHelper.removeDataItem(dataItem);
-				this.dataGridTaskCommentOnHelper.reloadData(this.dataGridTaskCommentOnHelper.gridData.data);
-				// update comments collections
-				this.comments = this.comments.filter((comment) => comment.commentInstance.id !== commentId);
+				this.dataGridTaskHelper.removeDataItem(dataItem);
+				this.dataGridCommentHelper.removeDataItem(dataItem);
+				// Reload Grids
+				this.dataGridTaskHelper.reloadData(this.dataGridTaskHelper.gridData.data);
+				this.dataGridCommentHelper.reloadData(this.dataGridCommentHelper.gridData.data);
+				// update task and comment collections
+				this.taskCommentsList = this.taskCommentsList.filter((comment) => comment.commentInstance.id !== commentId);
 				return resolve(true);
 			}, err => reject(false));
 		});

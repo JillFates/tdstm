@@ -43,8 +43,8 @@ class Point {
 	getRasterization () {
 		let tl = zoomBehavior.translate()
 		let zoom = zoomBehavior.scale()
-		let newX = this.x + (tl[0] * zoom) 
-		let newY = this.y + (tl[1] * zoom) 
+		let newX = this.x + (tl[0] * zoom)
+		let newY = this.y + (tl[1] * zoom)
 	}
 	toString () {
 		return '(' + this.x + ',' + this.y + ')'
@@ -89,7 +89,7 @@ class GraphPoint {
 		raster.x = (p.x * tf.zoom) + tf.tl[0]
 		raster.y = (p.y * tf.zoom) + tf.tl[1]
 		return raster
-		
+
 	}
 	derasterize (p) {
 		let tf = this.getTransformData()
@@ -97,7 +97,7 @@ class GraphPoint {
 		deraster.x = (p.x - tf.tl[0]) / tf.zoom
 		deraster.y = (p.y - tf.tl[1]) / tf.zoom
 		return deraster
-		
+
 	}
 	update () {
 		setScreenCoordinates(this.screenPos)
@@ -181,7 +181,7 @@ var GraphUtil = (function ($) {
 		SELECTED_PRIMARY: 2
 	}
 	public.SELECTION_STATES = SELECTION_STATES // represents the selection state of any given node or link
-	
+
 	// public member variables
 	public.force = null;
 	public.nodeBindings = null;
@@ -234,8 +234,8 @@ var GraphUtil = (function ($) {
 		lasso: false,
 		selectionAdd: false
 	}
-	
-	
+
+
 	// ############################################################## graph UI functions ##############################################################
 
 	// returns true if the graph is loaded
@@ -319,7 +319,7 @@ var GraphUtil = (function ($) {
 		public.resetGraphSize();
 	}
 
-	
+
 	// sets the size of the legend so that it can scroll when longer than the user's window
 	public.correctLegendSize = function () {
 		public.correctPanelSize('legendDivId');
@@ -380,7 +380,7 @@ var GraphUtil = (function ($) {
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
-		
+
 		// update the legend twistie preference if applicable
 		var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
 		if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
@@ -481,7 +481,7 @@ var GraphUtil = (function ($) {
 		}
 	}
 
-	
+
 	// gets the currently open panel (using the PANELS enum)
 	public.getOpenPanel = function () {
 		if ($('#controlPanelId').css('display') == 'block')
@@ -562,18 +562,18 @@ var GraphUtil = (function ($) {
 		// get the select element and clear whatever options were in it before
 		teamSelect = $("#teamSelectId");
 		teamSelect.children('option').remove();
-		
+
 		// add the default values
 		teamSelect.append('<option value="ALL">All Teams</option>');
 		teamSelect.append('<option value="NONE">No Team Assignment</option>');
 		teamSelect.append('<option disabled>──────────</option>');
 		teamSelect.val('ALL');
-		
+
 		// add all the roles from the data
 		$.each(data.roles, function (index, team) {
 			teamSelect.append('<option value="' + team + '">' + team + '</option>');
 		});
-		
+
 		return teamSelect;
 	}
 
@@ -607,7 +607,7 @@ var GraphUtil = (function ($) {
 			public.enableFreeze();
 		}
 	}
-	
+
 	/*
 	// handles the cursor change for a key event
 	public.handleKeyCursorChange = function (key, state) {
@@ -616,14 +616,14 @@ var GraphUtil = (function ($) {
 			className = 'shift_key'
 		else if (key == KEY_CODES.CTRL)
 			className = 'ctrl_key'
-		
+
 		if (state == KEY_STATE_DOWN)
 			public.updateCursorStyle(className, true)
 		else if (state == KEY_STATE_UP)
 			public.updateCursorStyle(className, false)
 	}
 	*/
-	
+
 	// updates the cursor style for the graph based on input
 	public.updateCursorStyle = function (cursorClass, enabled) {
 		var target = canvas[0][0]
@@ -631,10 +631,10 @@ var GraphUtil = (function ($) {
 			target.classList.add(cursorClass)
 		else
 			target.classList.remove(cursorClass)
-		
+
 		public.forceReflow(canvas)
 	}
-	
+
 	// called to activate a tool for the graph (for example: the lasso select tool)
 	public.activateTool = function (tool, button) {
 		button.addClass('toolActive')
@@ -645,7 +645,7 @@ var GraphUtil = (function ($) {
 			public.toolStates.selectionAdd = true
 		}
 	}
-	
+
 	// called to deactivate a tool for the graph (for example: the lasso select tool)
 	public.deactivateTool = function (tool, button) {
 		button.removeClass('toolActive')
@@ -656,7 +656,7 @@ var GraphUtil = (function ($) {
 			public.toolStates.selectionAdd = false
 		}
 	}
-	
+
 	// toggles the active state of a tool
 	public.toggleToolState = function (tool, button) {
 		var toolActive = button.hasClass('toolActive')
@@ -665,19 +665,19 @@ var GraphUtil = (function ($) {
 		else
 			public.activateTool(tool, button)
 	}
-	
+
 	// ############################################################## graph data and control functions ##############################################################
-	
+
 	// gets the complete list of nodes applied to the force layout
 	public.getNodes = function () {
 		return GraphUtil.force.nodes()
 	}
-	
+
 	// gets the complete list of links applied to the force layout
 	public.getLinks = function () {
 		return GraphUtil.force.links()
 	}
-	
+
 	// calculates node families
 	public.setNodeFamilies = function (nodes) {
 		var uncheckedNodes = nodes.clone();
@@ -1210,7 +1210,7 @@ var GraphUtil = (function ($) {
 		var oldTransformString = public.getTransformString(transformElement)
 		var newTransformString = public.constructTransformString(translate[0], translate[1], scale, 'px')
 		var transformInterpolation = d3.interpolateString(oldTransformString, newTransformString)
-		
+
 		// perform the transform, only animating the transition if an SVG element is used
 		if (transformElement[0][0].tagName == 'DIV')
 			transformElement.style('transform', newTransformString)
@@ -1239,13 +1239,13 @@ var GraphUtil = (function ($) {
 		brush.extent([new Date(newRange[0]), new Date(newRange[1])]);
 		displayCallback(true)
 	}
-	
+
 	// sets the current position for the new selection temp path (connecting the current cursor position to the origin)
 	public.setTempSelectionPath = function (next) {
 		let nextRaster = next.screenPos.copy()
 		public.tempPathString = ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
 	}
-	
+
 	// initiallizes all the variables/elements for a new selection path starting at the given point, performing a multiselection if the multiselect parameter is true
 	public.initializeSelectionPath = function (next, multiselect) {
 		let nextRaster = next.screenPos.copy()
@@ -1268,19 +1268,19 @@ var GraphUtil = (function ($) {
 		else
 			public.preselectionList = selectedNodes
 	}
-	
+
 	// updates the selection path based on the new given cursor position. it will be added to the selection path if it is far enough from the last point to meet the distance threshold or the forceAdd parameter is given
 	public.updateSelectionPath = function (next, forceAdd) {
 		let nextRaster = next.screenPos.copy()
 		let nextPos = next.graphPos.copy()
 		var prev = lastSelectionPoint
-		
+
 		// only add the point to the region path if it is far enough from the previous one
 		if (forceAdd || prev.screenPos.distanceTo(nextRaster) > public.SELECTION_MIN_EDGE_LENGTH) {
 			public.selectionPathString += ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
 			lastSelectionPoint = next.copy()
 			public.selectionPath.push(lastSelectionPoint)
-			
+
 			// TODO : rmacfarlane 7/2018 : add some quadtree and heuristic based pruning here to decreases the search space for large graphs
 			// check if any new nodes should be selected
 			var newSelection = []
@@ -1289,7 +1289,7 @@ var GraphUtil = (function ($) {
 			for (let node of nodes) {
 				let isLeftOfNewEdge = isLeftOfEdge(node, prev.graphPos, lastSelectionPoint.graphPos)		// is this node left of the new edge?
 				let isLeftOfProjection = isLeftOfEdge(node, lastSelectionPoint.graphPos, startPoint.graphPos)	// is this node left of the projected edge of the new point to the start point?
-				
+
 				let tempLeftEdges = node.leftRegionEdges
 				if (isLeftOfNewEdge) {
 					++node.leftRegionEdges
@@ -1298,24 +1298,24 @@ var GraphUtil = (function ($) {
 				if (isLeftOfProjection) {
 					++tempLeftEdges
 				}
-				
+
 				node.insideRegion = (tempLeftEdges % 2 == 1)
 				if (node.insideRegion)
 					newSelection.push(node)
 			}
-			
+
 			// if realtime highlighting is enabled, update the selection now
 			if (public.realtimeSelectionHighlighting) {
 				newSelection = _.union(newSelection, public.preselectionList)
 				modifyNodeSelection(newSelection, SELECT_MODES.REPLACE_NO_TOGGLE)
 			}
 		}
-		
+
 		// update the selection path elements
 		public.selectionElements.regionPath.attr('d', public.selectionPathString + public.tempPathString)
 		public.selectionElements.regionProjection.attr('d', public.selectionPathString + public.tempPathString + 'Z')
 	}
-	
+
 	// filters the node selection list based on the current region select path
 	public.filterRegionSelection = function () {
 		var selectionPoints = []
@@ -1323,7 +1323,7 @@ var GraphUtil = (function ($) {
 			var point = public.selectionPath[i].graphPos
 			selectionPoints.push(point)
 		}
-		
+
 		var newSelectionList = []
 		var nodes = public.force.nodes()
 		for (var n = 0; n < nodes.length; ++n) {
@@ -1332,7 +1332,7 @@ var GraphUtil = (function ($) {
 			for (var e = 0; e < selectionPoints.length; ++e) {
 				var v1 = selectionPoints[e]
 				var v2 = selectionPoints[(e+1)%(selectionPoints.length)]
-				
+
 				if (isLeftOfEdge(node, v1, v2))
 					intersections++
 			}
@@ -1343,43 +1343,43 @@ var GraphUtil = (function ($) {
 		public.preselectionList = []
 		modifyNodeSelection(newSelectionList, SELECT_MODES.REPLACE_NO_TOGGLE)
 	}
-	
+
 	// returns true if a ray starting at the given node and going right would intersect with the edge defined by the two given vertices
 	function isLeftOfEdge (node, v1, v2) {
 		// salt the xy values so we don't have to worry about the edge cases of matching xy coordinates causing 0/inifinite slope
 		v1 = v1.salted()
 		v2 = v2.salted()
-		
+
 		// to simplify things always make the leftmost vertex v1
 		if (v1.x > v2.x) {
 			var temp = v2
 			v2 = v1
 			v1 = temp
 		}
-		
+
 		// negate the y values to make the math easier to follow
 		v1 = v1.inverted()
 		v2 = v2.inverted()
 		node = new Point(node.x, -1*node.y)
-		
+
 		// if the node is above or below both vertices they cannot intersect so if either of these cases are true we should stop here
 		var nodeIsBelow = Math.min(v1.y, v2.y) > node.y
 		var nodeIsAbove = Math.max(v1.y, v2.y) < node.y
 		if (nodeIsBelow || nodeIsAbove)
 			return false
-		
+
 		// calculate the slope/intercept of the line and use f(x)=mx+b to get the projected y value of the function when given the node's x
 		var slope = (v2.y - v1.y) / (v2.x - v1.x)
 		var offset = -1 * (slope * v1.x - v1.y)
 		var projectedY = slope*node.x + offset
-		
+
 		// make final calculations and checks to see if the node is left of the edge
 		var nodeIsLess = projectedY > node.y		// true if y valvue of the node is less than the projected y on the edge
 		var positiveSlope = (slope > 0)			// true if the slope of the edge is positive
 		var isLeft = (nodeIsLess != positiveSlope)	// true if the node is left of the edge
 		return isLeft
 	}
-	
+
 	// ############################################################## key binding functions ##############################################################
 
 	// add key listeners for graph features such as zooming, panning, and freezing
@@ -1387,7 +1387,7 @@ var GraphUtil = (function ($) {
 		$(window).off('keydown', public.handleKeyEvent)
 		$(window).on('keydown', public.handleKeyEvent)
 	}
-	
+
 	// triggers the appropriate graph behavior for a given keyboard event
 	public.handleKeyEvent = function (event) {
 		// ignore keystrokes while the user is typing in an text field
@@ -1779,7 +1779,7 @@ var GraphUtil = (function ($) {
 	Math.degrees = function (radians) {
 		return radians * 180 / Math.PI;
 	};
-	
+
 	public.getDistance = function (x1, y1, x2, y2) {
 		var dx = x1 - x2;
 		var dy = y1 - y2;
@@ -1792,23 +1792,23 @@ var GraphUtil = (function ($) {
 		unit = unit ? unit : ''
 		return 'translate(' + x + unit + ',' + y + unit  + ')scale(' + scale + ')'
 	}
-	
+
 	// gets the correctly formatted transform string of an element in a d3 selection
 	public.getTransformString = function (d3Element) {
 		return d3Element[0][0].style.transform.replace(/ /g,'')
 	}
-	
+
 	// adds a negligible tiny value to a given number for the sole purpose of preventing matches when it would be inconvenient
 	public.saltValue = function (value) {
 		var salt = Math.random() * SALT_MULTIPLIER
 		return value + salt
 	}
-	
+
 	// why doesn't javascript have XOR???
 	public.xor = function (a, b) {
 		return (a || b) && (a != b)
 	}
-	
+
 	// prevents any further propagation or default behaviors from triggering off of the given event
 	public.captureEvent = function (event) {
 		event = event ? event : d3.event.sourceEvent
@@ -1820,9 +1820,9 @@ var GraphUtil = (function ($) {
 	}
 
 	// ############################################################## meta functions ##############################################################
-	
-	 
-	
+
+
+
 	// ############################################################## return object ##############################################################
 	// return the public object to make the public functions accessable
 	return public;

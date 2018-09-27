@@ -141,7 +141,7 @@
 
 					</table>
 				</form>
-				
+
 				<!-- Preference controls -->
 				<table class="labelTree" cellpadding="0" cellspacing="0">
 

@@ -22,7 +22,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 @Component({
-	selector: `asset-database-show`,
+	selector: `tds-asset-all-show`,
 	template: `<div #view></div>`
 })
 export class AssetShowComponent extends DynamicComponent implements AfterViewInit {

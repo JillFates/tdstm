@@ -4,6 +4,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 
 class StorageService implements ServiceMethods {
@@ -18,6 +19,16 @@ class StorageService implements ServiceMethods {
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
 		[filesInstance: storage] + assetEntityService.getCommonModelForShows('Files', project, params)
+	}
+
+	/**
+	 * Used to retrieve a model map of the properties to display a Storage asset
+	 * @param params - parameters coming from the request
+	 */
+	@Transactional(readOnly = true)
+	Map getModelForCreate(Map params) {
+		Project project = securityService.getUserCurrentProject()
+		return assetEntityService.getCommonModelForCreate('Files', 'STORAGE', project, params)
 	}
 
 	/**

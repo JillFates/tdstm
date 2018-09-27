@@ -168,7 +168,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152254']
+									['id', FindOperator.eq.name(), 152254]
 								]
 							)
 						}
@@ -184,7 +184,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152255']
+									['id', FindOperator.eq.name(), 152255]
 								]
 							)
 						}
@@ -267,7 +267,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152254']
+									['id', FindOperator.eq.name(), 152254]
 								]
 							)
 						}
@@ -283,7 +283,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '152255']
+									['id', FindOperator.eq.name(), 152255]
 								]
 							)
 						}
@@ -610,6 +610,46 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void "test exception when [into] keyword is not found in find with multiple fields"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' load 'id'
+							extract 'AssetName' set primaryNameVar
+							
+							find Application by 'Name', 'id' into 'id' // <-- Missing with keyword
+						}
+						""".stripIndent())
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == 'Incorrect structure for find command at line 9'
+				startLine == 9
+				endLine == 9
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void "test exception when [find operation] keywords are not found"(){
 
 		given:
@@ -820,7 +860,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toString()]
+									['id', FindOperator.eq.name(), value.toLong()]
 								]
 							)
 						}
@@ -837,7 +877,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['id', FindOperator.eq.name(), 151954l]
 								]
 							)
 							assertQueryResult(
@@ -996,7 +1036,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Dependency,
 								[
-									['id', FindOperator.eq.name(), value.toString()]
+									['id', FindOperator.eq.name(), value.toLong()]
 								]
 							)
 						}
@@ -1013,7 +1053,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								query[0],
 								ETLDomain.Application,
 								[
-									['id', FindOperator.eq.name(), '151954']
+									['id', FindOperator.eq.name(), 151954l]
 								]
 							)
 							assertQueryResult(
@@ -1395,7 +1435,7 @@ class ETLFindSpec extends ETLBaseSpec {
 										query[0],
 										ETLDomain.Application,
 										[
-											['id', 'eq', '152254']
+											['id', 'eq', 152254l]
 										]
 									)
 
@@ -1436,7 +1476,7 @@ class ETLFindSpec extends ETLBaseSpec {
 										query[0],
 										ETLDomain.Application,
 										[
-											['id', 'eq', '152255']
+											['id', 'eq', 152255l]
 										]
 									)
 
@@ -1520,7 +1560,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
-											['id', 'eq', '152254']
+											['id', 'eq', 152254l]
 										]
 									)
 									assertQueryResult(query[1], ETLDomain.Application,
@@ -1548,7 +1588,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 									assertQueryResult(query[0], ETLDomain.Application,
 										[
-											['id', 'eq', '152255']
+											['id', 'eq', 152255l]
 										]
 									)
 									assertQueryResult(query[1], ETLDomain.Application,
@@ -2185,7 +2225,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254l]])
 							}
 						}
 					}
@@ -2205,7 +2245,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with(find) {
 								results == []
 								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255l]])
 							}
 						}
 					}
@@ -3393,7 +3433,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Microsoft']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 0l]])
 							}
 						}
 					}
@@ -3419,7 +3459,7 @@ class ETLFindSpec extends ETLBaseSpec {
 								results == []
 								matchOn == null
 								query.size() == 1
-								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 'Mozilla']])
+								assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 0l]])
 							}
 						}
 					}

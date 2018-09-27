@@ -19,7 +19,7 @@
                     <tr>
                         <td colspan="2" class="dialog-container">
                             <div class="dialog">
-                                <table>
+                                <table class="asset-edit-view">
                                     <tbody>
                                     <tr>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
@@ -48,22 +48,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}" nowrap="nowrap">
+                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip ?: standardFieldSpecs.size.label}">
-                                                ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+                                                ${standardFieldSpecs.size.label}
                                             </label>
                                         </td>
                                         <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
-                                            <kendo-dropdownlist
-                                                    class="tm-input-control"
-                                                    name="modelAssetScaleName"
-                                                    [data]="${SizeScale.getAsJsonList() as JSON}"
-                                                    [(ngModel)]="model.asset.scale.name"
-                                                    [defaultItem]="''"
-                                                    [textField]="'text'"
-                                                    [valueField]="'value'">
-                                            </kendo-dropdownlist>
                                         </td>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="23" ngmodel="model.asset.externalRefId"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
@@ -87,13 +78,26 @@
                                         </td>
                                     </tr>
                                     <tr>
+
+                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">Scale</td>
+                                        <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
+                                            <kendo-dropdownlist
+                                                    class="tm-input-control"
+                                                    name="modelAssetScaleName"
+                                                    [data]="${SizeScale.getAsJsonList() as JSON}"
+                                                    [(ngModel)]="model.asset.scale.name"
+                                                    [defaultItem]="''"
+                                                    [textField]="'text'"
+                                                    [valueField]="'value'">
+                                            </kendo-dropdownlist>
+                                        </td>
+
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
                                         <td>
                                             <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${asset.rateOfChange}" tabindex="14" ngmodel="model.asset.rateOfChange"/>
                                         </td>
-                                        <td colspan="2">
-                                        <td colspan="2">
-                                            <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
+                                        <td colspan="2"></td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
                                         <td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                             <kendo-dropdownlist
                                                     class="tm-input-control"
@@ -125,7 +129,7 @@
     <div class="modal-footer form-group-center">
         <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
-            <button class="btn btn-danger pull-left mar-left-50 component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
         <button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

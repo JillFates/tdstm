@@ -21,6 +21,7 @@ export class ImportBatchRecordModel {
 	currentValues: any;
 	fieldsInfo?: any;
 	init?: any;
+	existingRecord?: any;
 }
 
 export class ImportBatchRecordDetailColumnsModel {

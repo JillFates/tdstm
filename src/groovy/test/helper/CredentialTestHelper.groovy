@@ -32,7 +32,7 @@ class CredentialTestHelper {
 				status: CredentialStatus.ACTIVE,
 				authenticationMethod: authenticationMethod == null ? AuthenticationMethod.BASIC_AUTH : authenticationMethod,
 				sessionName: sessionName == null ? 'JSESSIONID' : sessionName,
-				validationExpression: validationExpression == null ? '' : validationExpression,
+				validationExpression: validationExpression == null ? 'status code contains "200"' : validationExpression,
 				name: RandomStringUtils.randomAlphanumeric(10),
 				username: username == null ? 'username' : username,
 				password: password == null ? 'password' : password,

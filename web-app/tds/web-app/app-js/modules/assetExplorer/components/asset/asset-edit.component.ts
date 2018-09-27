@@ -22,7 +22,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 
 @Component({
-	selector: `asset-database-edit`,
+	selector: `tds-asset-all-edit`,
 	template: `<div #view></div>`
 })
 export class AssetEditComponent extends DynamicComponent implements AfterViewInit {
