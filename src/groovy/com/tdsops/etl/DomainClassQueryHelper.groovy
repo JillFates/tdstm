@@ -219,16 +219,15 @@ class DomainClassQueryHelper {
 	 * If not, it needs to detect if fieldName belongs to a property for AssetEntity hierarchy
 	 * (Device, Application, Database and Storage). <br>
 	 * <pre>
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'id') == 'D.id'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'manufacturer') == 'D.manufacturer.name'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Model.getClazz(), 'manufacturer') == 'D.manufacturer.id'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'moveBundle') == 'D.moveBundle.name'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'rackSource') == 'D.rackSource.tag'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), 'locationSource') == 'D.roomSource.location'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), new FindCondition('id', 123l)) == 'D.id'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), new FindCondition('manufacturer, 'IBM')') == 'D.manufacturer.name'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), new FindCondition('manufacturer, 123l)') == 'D.manufacturer.id'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Device.getClazz(), new FindCondition('moveBundle', 'FooBar')) == 'D.moveBundle.name'
 	 *
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Room.getClazz(), 'roomName') == 'D.roomName'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Rack.getClazz(), 'room') == 'D.room'
-	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Dependency.getClazz(), 'asset') == 'D.asset'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Room.getClazz(), new FindCondition('roomName', 'FuBar')) == 'D.roomName'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Rack.getClazz(), new FindCondition('room', 'FuBar')) == 'D.room'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Dependency.getClazz(), new FindCondition('asset', 'Fubar')) == 'D.asset.assetName'
+	 *  assert DomainClassQueryHelper.getPropertyForField(ETLDomain.Dependency.getClazz(), new FindCondition('asset', 123l)) == 'D.asset.id'
 	 * </pre>
 	 * @param clazz
 	 * @param fieldName
