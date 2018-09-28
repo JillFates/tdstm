@@ -123,7 +123,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 						value == '152254'
 
 						find.query.size() == 1
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152254]])
 					}
 
 					with(data[1].fields.environment) {
@@ -136,7 +136,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 						value == '152255'
 
 						find.query.size() == 1
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 152255]])
 					}
 				}
 			}
@@ -267,14 +267,14 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					(1..14).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value]])
 						}
 					}
 
 					// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
 					with(data[0].fields.asset.find) {
 						query.size() == 3
-						assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 151954]])
 						assertQueryResult(query[1], ETLDomain.Application, [
 							['assetName', 'eq', 'ACMEVMPROD01'],
 							['assetClass', 'eq', 'VM']
@@ -365,7 +365,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					(1..13).eachWithIndex { int value, int index ->
 						with(data[index].fields.id.find) {
 							query.size() == 1
-							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value.toString()]])
+							assertQueryResult(query[0], ETLDomain.Dependency, [['id', 'eq', value]])
 						}
 					}
 					// Validates command: set comment with 'Asset results found'
@@ -591,7 +591,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152254']])
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152254]])
 							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Microsoft']])
 						}
 					}
@@ -608,7 +608,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 						// Validating queries
 						with(fields.id.find) {
-							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', '152255']])
+							assertQueryResult(query[0], ETLDomain.Application, [['id', 'eq', 152255]])
 							assertQueryResult(query[1], ETLDomain.Application, [['appVendor', 'eq', 'Mozilla']])
 						}
 
@@ -823,7 +823,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 					with(data[0].fields.asset) {
 
 						find.query.size() == 3
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
 						assertQueryResult(find.query[1], ETLDomain.Application, [
 							['assetName', 'eq', 'ACMEVMPROD01'],
 							['assetClass', 'eq', 'VM']
@@ -1179,7 +1179,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 					with(data[0].fields.asset) {
 						find.query.size() == 3
-						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', '151954']])
+						assertQueryResult(find.query[0], ETLDomain.Application, [['id', 'eq', 151954]])
 						assertQueryResult(find.query[1], ETLDomain.Application, [
 							['assetName', 'eq', 'ACMEVMPROD01'],
 							['assetClass', 'eq', 'VM']
