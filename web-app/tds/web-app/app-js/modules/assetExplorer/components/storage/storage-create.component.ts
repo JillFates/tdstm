@@ -11,7 +11,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
@@ -75,16 +74,14 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			modelRequest.asset.assetClass = {
 				name: ASSET_ENTITY_DIALOG_TYPES.STORAGE
 			};
+			this.model.asset.assetClass = modelRequest.asset.assetClass;
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				// if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
-				// 	this.saveAssetTags();
-				// }
-				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
-					this.cancelCloseDialog();
+				if (result.id && !isNaN(result.id) && result.id > 0) {
+					this.createTags(result.id);
 				}
 			});
 		}

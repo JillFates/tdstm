@@ -61,6 +61,20 @@ export class AssetCommonEdit implements OnInit {
 	}
 
 	/**
+	 * Used on Create Asset view.
+	 * Creates the tag associations if configured.
+	 */
+	protected createTags(assetId: number): void {
+		let tagsToAdd = {tags: []};
+		if (this.newAssetTagsSelection.tags && this.newAssetTagsSelection.tags.length > 0) {
+			tagsToAdd = this.newAssetTagsSelection;
+		}
+		this.tagService.createAssetTags(assetId, tagsToAdd.tags.map( item => item.id)).subscribe( result => {
+			this.showAssetDetailView(this.model.asset.assetClass.name, assetId);
+		}, error => console.error('Error while saving asset tags', error));
+	}
+
+	/**
 	 * Save Asset Tags configuration
 	 */
 	protected saveAssetTags(): void {
