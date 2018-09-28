@@ -2962,7 +2962,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because command is incorrect was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
 			with (ETLProcessor.getErrorMessage(e)) {
-				message == 'Incorrect structure for when command at line 5'
+				message == "${ETLProcessorException.incorrectWhenCommandStructure().message} at line 5"
 				startLine == 5
 				endLine == 5
 				startColumn == null
