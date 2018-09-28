@@ -38,7 +38,6 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-			console.log(model);
 			this.initModel();
 		}
 
