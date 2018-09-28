@@ -3,20 +3,21 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tds.asset.Database
-import com.tdsops.etl.ETLDomain
 import com.tdsops.common.lang.CollectionUtils
+import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import grails.test.spock.IntegrationSpec
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.command.UploadFileCommand
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -26,8 +27,6 @@ import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.SecurityService
 import org.apache.commons.lang3.RandomStringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.web.multipart.MultipartFile
 import spock.lang.Ignore
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -997,6 +996,37 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			server.modifiedBy == clientStaff1
 
 
+	}
+
+	void '21 Test the SearchQueryHelper.fetchEntityByAlternateKey method'() {
+		setup:
+			def context = [
+					  domainClass: AssetEntity
+			]
+
+			def fieldsInfo = [
+					  manufacturer: [
+								 value:'HP'
+					  ]
+			]
+
+		when: 'A Manufacturer "HP" is seek by alias "Hewlett Packard"'
+			Map retVal = SearchQueryHelper.fetchEntityByAlternateKey(Manufacturer, 'Hewlett Packard', '', [:], context)
+
+		then: 'the Manufacturer is found'
+			retVal != null
+			retVal.error == ''
+			retVal.entities.size() > 0
+			((Manufacturer)retVal.entities[0]).name == 'HP'
+
+		when: 'A Model "ProLiant BL460c G1" from "HP" is seek by alias "BL460C G1"'
+			retVal = SearchQueryHelper.fetchEntityByAlternateKey(Model, 'BL460C G1', 'model', fieldsInfo, context)
+
+		then: 'the Manufacturer is found'
+			retVal != null
+			retVal.error == ''
+			retVal.entities.size() > 0
+			((Model)retVal.entities[0]).modelName == 'ProLiant BL460c G1'
 	}
 
 	// void '20 Test the _fetchEntityByFindResults method'() {
