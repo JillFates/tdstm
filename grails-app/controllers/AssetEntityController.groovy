@@ -2512,7 +2512,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
+			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber, status: it.status]
 		}
 
 		tasksData.list = list
