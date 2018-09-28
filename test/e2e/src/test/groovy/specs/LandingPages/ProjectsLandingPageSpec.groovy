@@ -2,6 +2,7 @@ package specs.LandingPages
 
 import geb.spock.GebReportingSpec
 import pages.Projects.*
+import pages.Projects.AssetFields.AssetFieldSettingsPage
 import pages.Projects.Project.*
 import pages.Projects.Providers.*
 import pages.Projects.Tags.*
