@@ -15,7 +15,8 @@ export class TaskEditCreateModelHelper {
 	/**
 	 * Set the model passing the all detail object
 	 */
-	public setModel(detail: any): any {
+	public setModel(task: any): any {
+		const detail = task.detail;
 		const assetComment = detail['assetComment'] || {};
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
 		const [yes, no] = YesNoList;
@@ -24,10 +25,16 @@ export class TaskEditCreateModelHelper {
 		categories.push(''); // add empty default value
 
 		this.model = {
+			title: task.modal.title,
+			recipe: detail.recipe || null,
 			id: assetComment.id,
+			personCreateObj: detail.personCreateObj || '',
 			note: '',
 			duration: assetComment.duration,
+			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
+			lastUpdated: assetComment.lastUpdated,
+			taskSpecId: detail.taskSpecId || '',
 			taskNumber: assetComment.taskNumber,
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
 			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,

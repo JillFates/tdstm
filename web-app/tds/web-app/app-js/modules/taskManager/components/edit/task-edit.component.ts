@@ -34,6 +34,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	public modalType = ModalType;
 	public dateFormat: string;
+	public dateFormatTime: string;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
@@ -69,9 +70,10 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	ngOnInit() {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
+		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone);
-		this.model = this.modelHelper.setModel(this.taskDetailModel.detail);
+		this.model = this.modelHelper.setModel(this.taskDetailModel);
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);

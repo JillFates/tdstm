@@ -9,7 +9,7 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Edit: {{taskDetailModel.modal.title}}</h4>
+                <h4 class="modal-title">Edit: {{model.title}}</h4>
             </div>
             <div class="modal-body">
                 <form #taskEditForm="ngForm" class="full-height">
@@ -311,10 +311,10 @@
                                     <table class="dates-info">
                                         <tbody>
                                             <tr>
-                                                <td class="date-created">Created by {{taskDetailModel.detail?.personCreateObj}} at {{taskDetailModel.detail?.assetComment?.dateCreated | date:dateFormatTime}}
-                                                    {{(taskDetailModel.detail?.taskSpecId)? ' with spec id ' + taskDetailModel.detail?.taskSpecId: ''}}
-                                                    <span *ngIf="taskDetailModel.detail?.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{taskDetailModel.detail?.recipe?.id}}/gentasks/start"> {{taskDetailModel.detail?.recipe?.name}}</a></span>
-                                                <td class="last-updated">Last updated: {{taskDetailModel.detail?.assetComment?.lastUpdated | date:dateFormatTime}}</td>
+                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | date:dateFormatTime}}
+                                                    {{(model.taskSpecId)? ' with spec id ' + model.taskSpecId: ''}}
+                                                    <span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
+                                                <td class="last-updated">Last updated: {{model.lastUpdated | date:dateFormatTime}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
