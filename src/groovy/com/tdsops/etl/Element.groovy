@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.etl.ETLProcessor.ReservedWord
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.ObjectUtil
 import com.tdssrc.grails.StringUtil
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.StringUtils
@@ -692,7 +693,7 @@ class Element implements RangeChecker {
 		}
 
 		return when { Object val ->
-			val != null || (val instanceof CharSequence && val.trim().isEmpty())
+			ObjectUtil.isNotNullOrBlankString(val)
 		}
 	}
 

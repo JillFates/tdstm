@@ -603,7 +603,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using DOMAINproperty'() {
+	void 'test can load a field using DOMAIN property'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -2781,13 +2781,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	}
 
 	@See('TM-11590')
-	void 'test can use use when populated qualifiercommand'() {
+	void 'test can use use when populated qualifier command'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name,cpu,description,nothingThere
-				xraysrv01,2,,
-				zuludb01,,Some description,
+				name,cpu,description,nothingThere,retire date
+				xraysrv01,2,,,2018-06-25
+				zuludb01,,Some description,,
 			""".stripIndent())
 
 		and:
@@ -2808,6 +2808,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				   extract 'description' set descVar
 				   load 'description' with descVar when populated
 				   extract 'nothingThere' load 'custom2' when populated
+				   extract 'retire date' transform with toDate() load 'Retire Date' when populated
 				}
 				""".stripIndent())
 
@@ -2830,8 +2831,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								originalValue == '2'
 								value == '2'
 							}
-							it.description == null
 
+							with(it.retireDate, FieldResult) {
+								value == new Date(2018 - 1900, 6 - 1, 25)
+								init == null
+								errors == []
+							}
+							it.description == null
 							it.custom2 == null
 						}
 					}
@@ -2851,6 +2857,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								value == 'Some description'
 							}
 							it.custom2 == null
+							it.retireDate == null
 						}
 					}
 				}
