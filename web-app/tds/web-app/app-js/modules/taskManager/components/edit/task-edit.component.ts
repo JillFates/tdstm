@@ -193,6 +193,14 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
+	 * Set the reference to the asset entityt once combobox changed
+	 */
+	onAssetEntityChange(assetSelected: any): void {
+		this.model.asset = assetSelected;
+		this.onModelChange(assetSelected);
+	}
+
+	/**
 	 * Return the date passed as argument formatted using the user timezone
 	 * @param {any} date
 	 * @returns {string}

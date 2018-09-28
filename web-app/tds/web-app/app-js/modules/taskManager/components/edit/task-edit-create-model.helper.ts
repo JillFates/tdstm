@@ -174,7 +174,7 @@ export class TaskEditCreateModelHelper {
 		return ids;
 	}
 
-	haveDoubleAssignment(): boolean {
+	hasDoubleAssignment(): boolean {
 		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
 		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
 
@@ -203,7 +203,7 @@ export class TaskEditCreateModelHelper {
 			this.hasDuplicates(successorList) ||
 			this.hasEmptyIds(predecessorList) ||
 			this.hasEmptyIds(successorList) ||
-			this.haveDoubleAssignment();
+			this.hasDoubleAssignment();
 	}
 
 
