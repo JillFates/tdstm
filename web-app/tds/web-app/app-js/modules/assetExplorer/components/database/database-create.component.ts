@@ -49,6 +49,9 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.model.asset.assetClass = {
+				name: ASSET_ENTITY_DIALOG_TYPES.DATABASE
+			};
 		}
 
 		/**
@@ -58,23 +61,14 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			let modelRequest = R.clone(this.model);
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
-			// this.model.customs.forEach((custom: any) => {
-			// 	let customValue = modelRequest.asset[custom.field.toString()];
-			// 	if (customValue && customValue.value) {
-			// 		modelRequest.asset[custom.field.toString()] = customValue.value;
-			// 	}
-			// });
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
-
-			modelRequest.asset.assetClass = {
-				name: ASSET_ENTITY_DIALOG_TYPES.DATABASE
-			};
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
+				if (result.id) {
+					this.model.assetId = result.id;
 					this.saveAssetTags();
 				}
 			});

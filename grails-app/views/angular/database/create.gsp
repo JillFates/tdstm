@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()" class="modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()" class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Create</h4>
