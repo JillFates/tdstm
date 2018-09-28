@@ -202,8 +202,14 @@ export class TaskEditCreateModelHelper {
 		const ids = [];
 
 		array.forEach((item) => {
-			if (ids.indexOf(item.id) === -1) {
-				ids.push(item.id);
+			let idField = 'id';
+
+			if (item.hasOwnProperty('taskId')) {
+				// existing tasks have taskId as key, new ones use id
+				idField = 'taskId';
+			}
+			if (ids.indexOf(item[idField]) === -1) {
+				ids.push(item[idField]);
 			}
 		});
 
