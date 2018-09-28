@@ -85,6 +85,7 @@ export class TaskEditCreateModelHelper {
 			.map((item) => {
 				return {
 					id: item.id,
+					taskId: item.taskId,
 					desc: `${item.taskNumber}: ${item.desc}`,
 					taskNumber: item.taskNumber,
 					model: {
@@ -99,6 +100,12 @@ export class TaskEditCreateModelHelper {
 		return tasks
 			.filter(task => !originalTasks.find(original => original.id === task.id))
 			.map((task, index) => (`-${index + 1}_${task.id}`));
+	}
+
+	private getTaskPrevious(tasks: any[], originalTasks: any[]) : string[] {
+		return tasks
+			.filter(task => originalTasks.find(original => original.id === task.id))
+			.map((task, index) => (`${task.id}_${task.taskNumber}`));
 	}
 
 	public getPayloadForUpdate(): any {
@@ -147,9 +154,11 @@ export class TaskEditCreateModelHelper {
 			resolution: '', /* ? */
 			role: assignedTeam.id,
 			status: status,
-			manageDependency: "1", /* ? */
-			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList),
-			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList),
+			manageDependency: "1",
+			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
+				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
+				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '', /* ? */
 			canEdit: true, /* ? */
@@ -204,6 +213,9 @@ export class TaskEditCreateModelHelper {
 	hasDoubleAssignment(): boolean {
 		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
 		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
+
+		console.log('Predecessors:', this.model.predecessorList);
+		console.log('Successors:', this.model.successorList);
 
 		return predecessors.some((p) => successors.indexOf(p) >= 0)
 			||
