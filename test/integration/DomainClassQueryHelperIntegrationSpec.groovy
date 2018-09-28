@@ -363,19 +363,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.first() == room.id
 	}
 
-	void '20. can throws an Exception if find a Room by id with a negative String value'() {
-
-		given:
-			Room room = roomTestHelper.createRoom(project)
-			Long negativeId = room.id * -1
-		when:
-			DomainClassQueryHelper.where(ETLDomain.Room, project, [id: (negativeId).toString()])
-
-		then: 'It throws an Exception because find command is incorrect'
-			Exception e = thrown Exception
-			e.message == 'java.lang.String cannot be cast to java.lang.Long'
-	}
-
 	void '21. can find a Device by its id using a FindCondition'() {
 
 		given:

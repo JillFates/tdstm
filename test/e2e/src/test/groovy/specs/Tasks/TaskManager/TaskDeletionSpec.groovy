@@ -26,7 +26,7 @@ class TaskDeletionSpec extends GebReportingSpec {
         login()
 
         at MenuPage
-        menuModule.goToTasksManager()
+        tasksModule.goToTasksManager()
         at TaskManagerPage
         tmCreateTaskBtn.click()
         at TaskCreationPage
@@ -48,7 +48,6 @@ class TaskDeletionSpec extends GebReportingSpec {
     }
 
     def "1. Filtering out by Tasks on the List"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User searches by a specific Task'
@@ -64,7 +63,6 @@ class TaskDeletionSpec extends GebReportingSpec {
     }
 
     def "2. Opens up the Task Details Section"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Task Details Section'
             at TaskDetailsPage
 
@@ -73,7 +71,6 @@ class TaskDeletionSpec extends GebReportingSpec {
     }
 
     def "3. Deleting the Task"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Details Section'
             at TaskDetailsPage
         when: 'The User clicks the "Delete" Button'

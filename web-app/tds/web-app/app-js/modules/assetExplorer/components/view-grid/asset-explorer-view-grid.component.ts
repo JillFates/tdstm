@@ -23,6 +23,8 @@ import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
+import {AssetCreateComponent} from '../asset/asset-create.component';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -55,6 +57,7 @@ export class AssetExplorerViewGridComponent {
 	showMessage = true;
 	typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
+	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -256,6 +259,10 @@ export class AssetExplorerViewGridComponent {
 		}, 500);
 	}
 
+	/**
+	 * On Show the Dialog for the current selected Asset
+	 * @param data
+	 */
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
@@ -267,6 +274,21 @@ export class AssetExplorerViewGridComponent {
 			}).catch(x => {
 				console.log(x);
 			});
+	}
+
+	/**
+	 *
+	 */
+	protected onCreateAsset(assetEntityType: string): void {
+		this.dialog.open(AssetCreateComponent, [
+				{ provide: 'ASSET', useValue: assetEntityType }],
+			DIALOG_SIZE.LG, false).then(x => {
+			if (x) {
+				this.createDependencyPromise(x.assetClass, 0);
+			}
+		}).catch(x => {
+			console.log(x);
+		});
 	}
 
 	onWidthChange(data: any) {
@@ -292,7 +314,7 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
-	canCreateAssets(): boolean {
+	protected canCreateAssets(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 

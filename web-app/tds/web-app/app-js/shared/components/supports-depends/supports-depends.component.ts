@@ -49,6 +49,9 @@ export class SupportsDependsComponent implements OnInit {
 		this.dataFlowFreqList = R.clone(this.model.dataFlowFreq);
 		this.typeList = R.clone(this.model.dependencyMap.dependencyType);
 		this.statusList = R.clone(this.model.dependencyMap.dependencyStatus);
+		if (!this.model.moveBundleList && this.model.dependencyMap && this.model.dependencyMap.moveBundleList) {
+			this.model.moveBundleList = this.model.dependencyMap.moveBundleList;
+		}
 		this.model.moveBundleList.forEach((moveBundle) => {
 			this.moveBundleList.push({id: moveBundle.id, text: moveBundle.name});
 		});
@@ -184,7 +187,7 @@ export class SupportsDependsComponent implements OnInit {
 	 */
 	public getMoveBundleColor(dataItem: any): string {
 		if (dataItem.assetDepend.moveBundle && dataItem.assetDepend.moveBundle.id !== 0) {
-			if (this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.status === 'Validated') {
+			if (this.model.asset.moveBundle && this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.status === 'Validated') {
 				return 'bundle-dep-no-valid';
 			} else {
 				if (dataItem.status !== 'Questioned' && dataItem.status !== 'Validated') {

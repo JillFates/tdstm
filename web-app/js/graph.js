@@ -1,3 +1,131 @@
+/* adds a static constant with the given identifier to a "class" (target) with a given value.
+ * this is kind of a hack but currently I don't know of any better way to define static constants in javascript. */
+function addStaticConstant (target, identifier, value) {
+	Object.defineProperty(target, identifier, {
+		configurable: false,
+		enumerable: false,
+		writable: false,
+		value: value
+	})
+}
+
+// represents a point in the graph space
+class Point {
+	constructor (x, y) {
+		this.x = x
+		this.y = y
+	}
+	update (newX, newY) {
+		this.x = newX
+		this.y = newY
+	}
+	copy () {
+		return new Point(this.x, this.y)
+	}
+	inverted () {
+		return new Point(this.x,-1 * this.y)
+	}
+	salt () {
+		this.x = GraphUtil.saltValue(this.x)
+		this.y = GraphUtil.saltValue(this.y)
+	}
+	salted () {
+		var newPoint = new Point(this.x, this.y)
+		newPoint.salt()
+		return newPoint
+	}
+	distanceTo (other) {
+		if (other instanceof GraphPoint)
+			return this.distanceTo(other.graphPos)
+		else
+			return GraphUtil.getDistance(this.x, this.y, other.x, other.y)
+	}
+	getRasterization () {
+		let tl = zoomBehavior.translate()
+		let zoom = zoomBehavior.scale()
+		let newX = this.x + (tl[0] * zoom)
+		let newY = this.y + (tl[1] * zoom)
+	}
+	toString () {
+		return '(' + this.x + ',' + this.y + ')'
+	}
+}
+
+// same as a point but it keeps track of both the rasterized (gloabal) position and the internal graph (local) position
+class GraphPoint {
+	constructor (screenX, screenY) {
+		this.screenPos = new Point()
+		this.graphPos = new Point()
+		this.setScreenCoordinates(screenX, screenY)
+	}
+	copy () {
+		return new GraphPoint(this.screenPos.x, this.screenPos.y)
+	}
+	// sets the x and y graph coordinates of the point then calculates the screen coordinates based on that
+	setGraphCoordinates (coordinates) {
+		if (coordinates instanceof Point)
+			this.setGraphCoordinates(coordinates.x, coordinates.y)
+		else if (coordinates.length > 1)
+			this.setGraphCoordinates(coordinates[0], coordinates[1])
+	}
+	setGraphCoordinates (x, y) {
+		this.graphPos.update(x, y)
+		this.screenPos = this.rasterize(new Point(x,y))
+	}
+	// sets the x and y screen coordinates of the point then calculates the graph coordinates based on that
+	setScreenCoordinates (coordinates) {
+		if (coordinates instanceof Point)
+			this.setScreenCoordinates(coordinates.x, coordinates.y)
+		else if (coordinates.length > 1)
+			this.setScreenCoordinates(coordinates[0], coordinates[1])
+	}
+	setScreenCoordinates (x, y) {
+		this.screenPos.update(x, y)
+		this.graphPos = this.derasterize(new Point(x,y))
+	}
+	rasterize (p) {
+		let tf = this.getTransformData()
+		var raster = p.copy()
+		raster.x = (p.x * tf.zoom) + tf.tl[0]
+		raster.y = (p.y * tf.zoom) + tf.tl[1]
+		return raster
+
+	}
+	derasterize (p) {
+		let tf = this.getTransformData()
+		var deraster = p.copy()
+		deraster.x = (p.x - tf.tl[0]) / tf.zoom
+		deraster.y = (p.y - tf.tl[1]) / tf.zoom
+		return deraster
+
+	}
+	update () {
+		setScreenCoordinates(this.screenPos)
+	}
+	getTransformData () {
+		return {
+			tl: zoomBehavior.translate(),
+			zoom: zoomBehavior.scale()
+		}
+	}
+	toString () {
+		return '{' + this.screenPos.toString() + '-->' + this.graphPos.toString() + '}'
+	}
+}
+
+// represents a node in the force graph
+class GraphNode extends Point {
+	constructor (params) {
+		super(0,0)
+		this.insideRegion = false
+		// set all the members sent from the server using the parameters list
+		if (params)
+			for (let prop of GraphNode.INITIAL_PARAMS)
+				this[prop] = params[prop]
+	}
+}
+addStaticConstant(GraphNode, 'INITIAL_PARAMS', ['id','name','type','depBundleId','moveBundleId','moveEventId','shape','size','title','color','dependsOn','supports','assetClass','cutGroup','colorByProperties'])
+
 /*
  * Javascript functions used by the graph view utilizing d3
  */
@@ -13,19 +141,46 @@ var GraphUtil = (function ($) {
 		MINUS: KeyEvent.DOM_VK_DASH,
 		PLUS: KeyEvent.DOM_VK_EQUALS,
 		RETURN: KeyEvent.DOM_VK_RETURN,
-		ENTER: KeyEvent.DOM_VK_ENTER
+		ENTER: KeyEvent.DOM_VK_ENTER,
+		SPACE: KeyEvent.DOM_VK_SPACE,
+		SHIFT: KeyEvent.DOM_VK_SHIFT,
+		CTRL: KeyEvent.DOM_VK_CONTROL
 	}
 	const ARROW_KEYS = [KEY_CODES.LEFT, KEY_CODES.UP, KEY_CODES.RIGHT, KEY_CODES.DOWN]
 	const ZOOM_KEYS = [KEY_CODES.MINUS, KEY_CODES.PLUS]
 	const SUBMIT_TEXT_KEYS = [KEY_CODES.RETURN, KEY_CODES.ENTER]
 	const IGNORE_KEY_EVENT_TAGS = ['INPUT', 'TEXTAREA']
+	const KEY_STATE_DOWN = 1
+	const KEY_STATE_UP = 2
+	const SALT_MULTIPLIER = 0.0000001
 
 	// public functions
 	var public = {};
 
-	// public constants
+	// public constants and enums
 	public.NO_TRANSFORM = 'translate(0 0)scale(1)';
 	public.NO_TRANSFORM_CSS = 'translate(0px 0px) scale(1)';
+	const PANELS = {
+		CONTROL: 1,
+		DEPENDENCY: 2,
+		LEGEND: 3,
+		NONE: 4
+	}
+	public.PANELS = PANELS; // represents the options for which panel is currently openned
+	const SELECT_MODES = {
+		ADD: 1,
+		SUB: 2,
+		REPLACE: 3,
+		REPLACE_NO_TOGGLE: 4 ,
+		TOGGLE: 5
+	}
+	public.SELECT_MODES = SELECT_MODES; // represents the diferent modes that are used internally as arguments for the selection function
+	const SELECTION_STATES = {
+		NOT_SELECTED: 0,
+		SELECTED_SECONDARY: 1,
+		SELECTED_PRIMARY: 2
+	}
+	public.SELECTION_STATES = SELECTION_STATES // represents the selection state of any given node or link
 
 	// public member variables
 	public.force = null;
@@ -43,6 +198,18 @@ var GraphUtil = (function ($) {
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
+	public.selectionElements = {
+		layer: null,
+		regionPath: null,
+		regionProjection: null
+	} // stores the svg elements associated with the region selection feature
+	public.selectionPathString = ''; // the svg path 'd' attribute string for the current selection path
+	public.tempPathString = ''; // the svg path 'd' attribute string for the current selection path including the current temporary point
+	var lastSelectionPoint; // the last point selected, this is a helper variable
+	public.selectionPath = []; // the list of points in the current selection path
+	public.preselectionList = []; // stores the nodes that were already selected before a region select began
+	public.SELECTION_MIN_EDGE_LENGTH = 20; // the minimum distance between stored points in a selection path, lower values increase path resolution but decrease speed
+	public.realtimeSelectionHighlighting = false; // set to true if the region select should highlight selected nodes in real time as it is being drawn
 	// Stored only on the current page session
 	public.dependencyPanelConfig = {
 		dependencyStatus: {
@@ -60,6 +227,14 @@ var GraphUtil = (function ($) {
 			groupingControl: []
 		}
 	};
+	public.LASSO_TOOL = 1; // constant to represent the lasso tool
+	public.SELECTION_ADD_TOOL = 2; // constant to represent the selection add tool
+	// the current state of each tool
+	public.toolStates = {
+		lasso: false,
+		selectionAdd: false
+	}
+
 
 	// ############################################################## graph UI functions ##############################################################
 
@@ -121,9 +296,8 @@ var GraphUtil = (function ($) {
 			else
 				public.enableFullscreen();
 		}
-		if($('#dependenciesPanelId').size()) {
-            public.correctActionButtons();
-        }
+
+		public.correctActionButtons();
 	}
 
 	// changes the graph to fullscreen mode
@@ -172,7 +346,7 @@ var GraphUtil = (function ($) {
 	public.correctPanelSize = function (panelId) {
 		var panel = $('#' + panelId);
 		panel.css('height', '');
-		panel.css('overflow-y', '');
+		panel.css('overflow-y', 'scroll');
 		var svgContainer = $('#svgContainerId');
 		if (panel.size() == 0 || svgContainer.size() == 0 || svgContainer.children().size() == 0)
 			return false;
@@ -183,18 +357,17 @@ var GraphUtil = (function ($) {
 		if (bottom >= newBottom) {
 			var newHeight = newBottom - panel.offset().top;
 			panel.css('height', newHeight);
-			panel.css('overflow-y', 'scroll');
 		} else {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
 		}
-		
-        if($('#dependenciesPanelId').size()) {
-            public.correctActionButtons();
-        }
+
+		public.correctActionButtons();
 	}
 
 	public.correctActionButtons = function() {
+		if($('#dependenciesPanelId').size() == 0)
+			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
 			$('.dependency_panel_action_buttons').css('position', 'fixed');
 			$('.dependency_panel_action_buttons').css('bottom', '45px');
@@ -208,31 +381,30 @@ var GraphUtil = (function ($) {
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
 
-        // update the legend twistie preference if applicable
-        var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
-        if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
-            var prefValue = public.serializeLegendTwistiePrefs();
-            setUserPreference('legendTwistieState', prefValue);
-        }
+		// update the legend twistie preference if applicable
+		var isCalledFromLegendPanel = twistieSpan.parents('#legendDivId').length > 0;
+		if (isCalledFromLegendPanel && twistieSpan.parents('.tabInner').length > 0) {
+			var prefValue = public.serializeLegendTwistiePrefs();
+			setUserPreference('legendTwistieState', prefValue);
+		}
 
 		if (twistieSpan.hasClass('closed')) {
 			twistieSpan.removeClass('closed').addClass('open');
 			container.slideDown(300, function () {
 				if (isCalledFromLegendPanel) {
-				    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
-
+					public.correctLegendSize();
+				} else {
+					public.correctControlPanelSize();
+				}
 			});
 		} else {
 			twistieSpan.removeClass('open').addClass('closed');
 			container.slideUp(300, function () {
-                if (isCalledFromLegendPanel) {
-                    public.correctLegendSize();
-                } else {
-                    public.correctControlPanelSize();
-                }
+				if (isCalledFromLegendPanel) {
+					public.correctLegendSize();
+				} else {
+					public.correctControlPanelSize();
+				}
 			});
 		}
 	}
@@ -310,62 +482,77 @@ var GraphUtil = (function ($) {
 	}
 
 
-	// hides the specified panel ('control' or 'legend')
+	// gets the currently open panel (using the PANELS enum)
+	public.getOpenPanel = function () {
+		if ($('#controlPanelId').css('display') == 'block')
+			return PANELS.CONTROL;
+		if ($('#dependenciesPanelId').css('display') == 'block')
+			return PANELS.DEPENDENCY;
+		if ($('#legendDivId').css('display') == 'block')
+			return PANELS.LEGEND;
+		return PANELS.NONE;
+	}
+
+	// hides the specified panel (takes a value from the PANELS enum as a parameter)
 	public.hidePanel = function (panel) {
-		if (panel == 'control') {
+		if (panel == PANELS.CONTROL) {
 			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
-		} else if (panel == 'dependencies') {
+		} else if (panel == PANELS.DEPENDENCY) {
 			$('#dependenciesPanelId').removeClass('openPanel');
 			$('#dependenciesPanelTabId').removeClass('activeTab');
-		} else if (panel == 'legend') {
+		} else if (panel == PANELS.LEGEND) {
 			$('#legendDivId').removeClass('openPanel');
 			$('#legendTabId').removeClass('activeTab');
 		}
 	}
 
-	// opens the specified panel ('control' or 'legend')
+	// opens the specified panel (takes a value from the PANELS enum as a parameter)
 	public.openPanel = function (panel) {
-		if (panel == 'control') {
+		if (panel == PANELS.CONTROL) {
 			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
-		} else if (panel == 'dependencies') {
+		} else if (panel == PANELS.DEPENDENCY) {
 			$('#dependenciesPanelId').addClass('openPanel');
 			$('#dependenciesPanelTabId').addClass('activeTab');
-		} else if (panel == 'legend') {
+		} else if (panel == PANELS.LEGEND) {
 			$('#legendDivId').addClass('openPanel');
 			$('#legendTabId').addClass('activeTab');
 		}
 	}
 
-	// handles switching between the control panel and the legend
+	// handles switching between the various panels in PANELS
 	public.togglePanel = function (panel) {
-		if (panel == 'control') {
+		// control panel
+		if (panel == PANELS.CONTROL) {
 			if ($('#controlPanelTabId.activeTab').size() > 0)
-				public.hidePanel('control');
+				public.hidePanel(PANELS.CONTROL);
 			else
-				public.openPanel('control');
-			public.hidePanel('legend');
-			public.hidePanel('dependencies');
-		} else if (panel == 'dependencies') {
+				public.openPanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.DEPENDENCY);
+		// dependency panel
+		} else if (panel == PANELS.DEPENDENCY) {
 			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
-				public.hidePanel('dependencies');
+				public.hidePanel(PANELS.DEPENDENCY);
 			else {
-				public.openPanel('dependencies');
+				public.openPanel(PANELS.DEPENDENCY);
 			}
-			public.hidePanel('legend');
-			public.hidePanel('control');
-		} else if (panel == 'legend') {
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.CONTROL);
+		// legend panel
+		} else if (panel == PANELS.LEGEND) {
 			if ($('#legendTabId.activeTab').size() > 0)
-				public.hidePanel('legend');
+				public.hidePanel(PANELS.LEGEND);
 			else
-				public.openPanel('legend');
-			public.hidePanel('control');
-			public.hidePanel('dependencies');
-		} else if (panel == 'hide') {
-			public.hidePanel('control');
-			public.hidePanel('legend');
-			public.hidePanel('dependencies');
+				public.openPanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.DEPENDENCY);
+		// hide all panels
+		} else if (panel == 'hide' || panel == PANELS.NONE) {
+			public.hidePanel(PANELS.CONTROL);
+			public.hidePanel(PANELS.LEGEND);
+			public.hidePanel(PANELS.DEPENDENCY);
 		}
 		public.correctPanelSizes();
 	}
@@ -374,7 +561,7 @@ var GraphUtil = (function ($) {
 	public.populateTeamSelect = function (data) {
 		// get the select element and clear whatever options were in it before
 		teamSelect = $("#teamSelectId");
-        teamSelect.children('option').remove();
+		teamSelect.children('option').remove();
 
 		// add the default values
 		teamSelect.append('<option value="ALL">All Teams</option>');
@@ -421,7 +608,75 @@ var GraphUtil = (function ($) {
 		}
 	}
 
+	/*
+	// handles the cursor change for a key event
+	public.handleKeyCursorChange = function (key, state) {
+		var className = ''
+		if (key == KEY_CODES.SHIFT)
+			className = 'shift_key'
+		else if (key == KEY_CODES.CTRL)
+			className = 'ctrl_key'
+
+		if (state == KEY_STATE_DOWN)
+			public.updateCursorStyle(className, true)
+		else if (state == KEY_STATE_UP)
+			public.updateCursorStyle(className, false)
+	}
+	*/
+
+	// updates the cursor style for the graph based on input
+	public.updateCursorStyle = function (cursorClass, enabled) {
+		var target = canvas[0][0]
+		if (enabled)
+			target.classList.add(cursorClass)
+		else
+			target.classList.remove(cursorClass)
+
+		public.forceReflow(canvas)
+	}
+
+	// called to activate a tool for the graph (for example: the lasso select tool)
+	public.activateTool = function (tool, button) {
+		button.addClass('toolActive')
+		if (tool == public.LASSO_TOOL) {
+			public.toolStates.lasso = true
+			public.updateCursorStyle('regionSelectCursor', true)
+		} else if (tool == public.SELECTION_ADD_TOOL) {
+			public.toolStates.selectionAdd = true
+		}
+	}
+
+	// called to deactivate a tool for the graph (for example: the lasso select tool)
+	public.deactivateTool = function (tool, button) {
+		button.removeClass('toolActive')
+		if (tool == public.LASSO_TOOL) {
+			public.toolStates.lasso = false
+			public.updateCursorStyle('regionSelectCursor', false)
+		} else if (tool == public.SELECTION_ADD_TOOL) {
+			public.toolStates.selectionAdd = false
+		}
+	}
+
+	// toggles the active state of a tool
+	public.toggleToolState = function (tool, button) {
+		var toolActive = button.hasClass('toolActive')
+		if (toolActive)
+			public.deactivateTool(tool, button)
+		else
+			public.activateTool(tool, button)
+	}
+
 	// ############################################################## graph data and control functions ##############################################################
+
+	// gets the complete list of nodes applied to the force layout
+	public.getNodes = function () {
+		return GraphUtil.force.nodes()
+	}
+
+	// gets the complete list of links applied to the force layout
+	public.getLinks = function () {
+		return GraphUtil.force.links()
+	}
 
 	// calculates node families
 	public.setNodeFamilies = function (nodes) {
@@ -515,12 +770,12 @@ var GraphUtil = (function ($) {
 
 
 	// sets the class list for every node in the graph
-	public.updateNodeClasses = function () {
+	public.updateNodeClasses = function (changedNodes) {
 		var bundle = public.getFilteredBundle();
 		public.nodeBindings.attr("class", function(d) {
 			return 'node'
-				+ ((d.selected == 1) ? ' selected selectedChild' : '')
-				+ ((d.selected == 2) ? ' selected selectedParent' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_SECONDARY) ? ' selected selectedChild' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_PRIMARY) ? ' selected selectedParent' : '')
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && ! d.hasMoveEvent) ? ' noEvent' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
@@ -530,10 +785,10 @@ var GraphUtil = (function ($) {
 		});
 	}
 	// sets the class list for every link in the graph
-	public.updateLinkClasses = function () {
+	public.updateLinkClasses = function (changedLinks) {
 		public.linkBindings.attr("class", function(d) {
 			return 'link'
-				+ ((d.selected == 1) ? ' selected' : '')
+				+ ((d.selected == SELECTION_STATES.SELECTED_PRIMARY) ? ' selected' : '')
 				+ ((d.unresolved) ? ' unresolved' : '')
 				+ ((d.notApplicable) ? ' notApplicable' : '')
 				+ ((d.future) ? ' future' : '')
@@ -550,7 +805,7 @@ var GraphUtil = (function ($) {
 		});
 	}
 	// sets the class list for every label in the graph
-	public.updateLabelClasses = function () {
+	public.updateLabelClasses = function (changedNodes) {
 		var bundle = public.getFilteredBundle();
 		public.labelBindings.attr("class", function(d) {
 
@@ -559,7 +814,7 @@ var GraphUtil = (function ($) {
 			else
 				$(this).children().attr('dy', '0.35em')
 			return 'label'
-				+ ((d.selected > 0) ? ' selected' : '')
+				+ ((d.selected > SELECTION_STATES.NOT_SELECTED) ? ' selected' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
 				+ ((! d.showLabel) ? ' hidden' : '')
@@ -568,7 +823,7 @@ var GraphUtil = (function ($) {
 	}
 
 	// updates the class list for ever graph element
-	public.updateAllClasses = function (callback) {
+	public.updateAllClasses = function (callback, changedNodes, changedLinks) {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
@@ -952,10 +1207,13 @@ var GraphUtil = (function ($) {
 		translate = (translate != null) ? translate : zoomBehavior.translate()
 		scale = (scale != null) ? scale : zoomBehavior.scale()
 		transformElement = (transformElement != null) ? transformElement : transformContainer
+		var oldTransformString = public.getTransformString(transformElement)
+		var newTransformString = public.constructTransformString(translate[0], translate[1], scale, 'px')
+		var transformInterpolation = d3.interpolateString(oldTransformString, newTransformString)
 
 		// perform the transform, only animating the transition if an SVG element is used
 		if (transformElement[0][0].tagName == 'DIV')
-			transformElement.style('transform', transformString(translate[0], translate[1], scale, 'px'))
+			transformElement.style('transform', newTransformString)
 		else
 			transformElement
 				.transition()
@@ -963,7 +1221,9 @@ var GraphUtil = (function ($) {
 				.ease(function (t) {
 					return Math.min(t, 1)
 				})
-				.attr('transform', transformString(translate[0], translate[1], scale))
+				.styleTween('transform', function (d) {
+					return transformInterpolation
+				})
 	}
 
 	// zooms in or out of the timeline, calling displayCallback when finished
@@ -980,31 +1240,176 @@ var GraphUtil = (function ($) {
 		displayCallback(true)
 	}
 
+	// sets the current position for the new selection temp path (connecting the current cursor position to the origin)
+	public.setTempSelectionPath = function (next) {
+		let nextRaster = next.screenPos.copy()
+		public.tempPathString = ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+	}
+
+	// initiallizes all the variables/elements for a new selection path starting at the given point, performing a multiselection if the multiselect parameter is true
+	public.initializeSelectionPath = function (next, multiselect) {
+		let nextRaster = next.screenPos.copy()
+		let nextPos = next.graphPos.copy()
+		lastSelectionPoint = next.copy()
+		public.tempPathString = ''
+		public.selectionPath = [lastSelectionPoint]
+		public.selectionPathString = 'M ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+		// update the selection path elements
+		public.selectionElements.regionPath.attr('d', public.selectionPathString)
+		public.selectionElements.regionProjection.attr('d', public.selectionPathString + 'Z')
+		// initialize node variables
+		for (let n of nodes) {
+			n.insideRegion = false
+			n.leftRegionEdges = 0
+		}
+		// depending on if multiselect is true, either deselect all nodes or set the current selection list as the "preselection list"
+		if (!multiselect)
+			modifyNodeSelection([], SELECT_MODES.REPLACE)
+		else
+			public.preselectionList = selectedNodes
+	}
+
+	// updates the selection path based on the new given cursor position. it will be added to the selection path if it is far enough from the last point to meet the distance threshold or the forceAdd parameter is given
+	public.updateSelectionPath = function (next, forceAdd) {
+		let nextRaster = next.screenPos.copy()
+		let nextPos = next.graphPos.copy()
+		var prev = lastSelectionPoint
+
+		// only add the point to the region path if it is far enough from the previous one
+		if (forceAdd || prev.screenPos.distanceTo(nextRaster) > public.SELECTION_MIN_EDGE_LENGTH) {
+			public.selectionPathString += ' L ' + Math.round(nextRaster.x) + ' ' + Math.round(nextRaster.y)
+			lastSelectionPoint = next.copy()
+			public.selectionPath.push(lastSelectionPoint)
+
+			// TODO : rmacfarlane 7/2018 : add some quadtree and heuristic based pruning here to decreases the search space for large graphs
+			// check if any new nodes should be selected
+			var newSelection = []
+			var startPoint = public.selectionPath[0]
+			var nodes = public.force.nodes()
+			for (let node of nodes) {
+				let isLeftOfNewEdge = isLeftOfEdge(node, prev.graphPos, lastSelectionPoint.graphPos)		// is this node left of the new edge?
+				let isLeftOfProjection = isLeftOfEdge(node, lastSelectionPoint.graphPos, startPoint.graphPos)	// is this node left of the projected edge of the new point to the start point?
+
+				let tempLeftEdges = node.leftRegionEdges
+				if (isLeftOfNewEdge) {
+					++node.leftRegionEdges
+					++tempLeftEdges
+				}
+				if (isLeftOfProjection) {
+					++tempLeftEdges
+				}
+
+				node.insideRegion = (tempLeftEdges % 2 == 1)
+				if (node.insideRegion)
+					newSelection.push(node)
+			}
+
+			// if realtime highlighting is enabled, update the selection now
+			if (public.realtimeSelectionHighlighting) {
+				newSelection = _.union(newSelection, public.preselectionList)
+				modifyNodeSelection(newSelection, SELECT_MODES.REPLACE_NO_TOGGLE)
+			}
+		}
+
+		// update the selection path elements
+		public.selectionElements.regionPath.attr('d', public.selectionPathString + public.tempPathString)
+		public.selectionElements.regionProjection.attr('d', public.selectionPathString + public.tempPathString + 'Z')
+	}
+
+	// filters the node selection list based on the current region select path
+	public.filterRegionSelection = function () {
+		var selectionPoints = []
+		for (var i = 0; i < public.selectionPath.length; ++i) {
+			var point = public.selectionPath[i].graphPos
+			selectionPoints.push(point)
+		}
+
+		var newSelectionList = []
+		var nodes = public.force.nodes()
+		for (var n = 0; n < nodes.length; ++n) {
+			var node = nodes[n]
+			var intersections = 0
+			for (var e = 0; e < selectionPoints.length; ++e) {
+				var v1 = selectionPoints[e]
+				var v2 = selectionPoints[(e+1)%(selectionPoints.length)]
+
+				if (isLeftOfEdge(node, v1, v2))
+					intersections++
+			}
+			if (intersections % 2 == 1)
+				newSelectionList.push(node)
+		}
+		newSelectionList = _.union(newSelectionList, public.preselectionList)
+		public.preselectionList = []
+		modifyNodeSelection(newSelectionList, SELECT_MODES.REPLACE_NO_TOGGLE)
+	}
+
+	// returns true if a ray starting at the given node and going right would intersect with the edge defined by the two given vertices
+	function isLeftOfEdge (node, v1, v2) {
+		// salt the xy values so we don't have to worry about the edge cases of matching xy coordinates causing 0/inifinite slope
+		v1 = v1.salted()
+		v2 = v2.salted()
+
+		// to simplify things always make the leftmost vertex v1
+		if (v1.x > v2.x) {
+			var temp = v2
+			v2 = v1
+			v1 = temp
+		}
+
+		// negate the y values to make the math easier to follow
+		v1 = v1.inverted()
+		v2 = v2.inverted()
+		node = new Point(node.x, -1*node.y)
+
+		// if the node is above or below both vertices they cannot intersect so if either of these cases are true we should stop here
+		var nodeIsBelow = Math.min(v1.y, v2.y) > node.y
+		var nodeIsAbove = Math.max(v1.y, v2.y) < node.y
+		if (nodeIsBelow || nodeIsAbove)
+			return false
+
+		// calculate the slope/intercept of the line and use f(x)=mx+b to get the projected y value of the function when given the node's x
+		var slope = (v2.y - v1.y) / (v2.x - v1.x)
+		var offset = -1 * (slope * v1.x - v1.y)
+		var projectedY = slope*node.x + offset
+
+		// make final calculations and checks to see if the node is left of the edge
+		var nodeIsLess = projectedY > node.y		// true if y valvue of the node is less than the projected y on the edge
+		var positiveSlope = (slope > 0)			// true if the slope of the edge is positive
+		var isLeft = (nodeIsLess != positiveSlope)	// true if the node is left of the edge
+		return isLeft
+	}
+
 	// ############################################################## key binding functions ##############################################################
 
-	// add key listeners for zooming and panning
-	public.addKeyListeners = function (modifier) {
-		$(window).on('keydown', function (e) {
-			// ignore keystrokes while the user is typing in an text field
-			if ( ! IGNORE_KEY_EVENT_TAGS.contains(e.target.tagName) ) {
-				// handle modifier keys
-				var modifier = 1
-				if (e.shiftKey)
-					modifier = 2
-				if (e.ctrlKey)
-					modifier = 0.5
+	// add key listeners for graph features such as zooming, panning, and freezing
+	public.addKeyListeners = function () {
+		$(window).off('keydown', public.handleKeyEvent)
+		$(window).on('keydown', public.handleKeyEvent)
+	}
 
-				// perform action based on key code
-				switch (e.keyCode) {
-					case KEY_CODES.LEFT:  public.translateLeft(modifier); break;
-					case KEY_CODES.RIGHT: public.translateRight(modifier); break;
-					case KEY_CODES.UP:    public.translateUp(modifier); break;
-					case KEY_CODES.DOWN:  public.translateDown(modifier); break;
-					case KEY_CODES.PLUS:  performZoom('in', modifier); break;
-					case KEY_CODES.MINUS: performZoom('out', modifier); break;
-				}
+	// triggers the appropriate graph behavior for a given keyboard event
+	public.handleKeyEvent = function (event) {
+		// ignore keystrokes while the user is typing in an text field
+		if ( ! IGNORE_KEY_EVENT_TAGS.contains(event.target.tagName) ) {
+			// handle modifier keys
+			var modifier = 1
+			if (event.shiftKey)
+				modifier = 2
+			if (event.ctrlKey)
+				modifier = 0.5
+
+			// perform action based on key code
+			switch (event.keyCode) {
+				case KEY_CODES.LEFT:  public.translateLeft(modifier); break;
+				case KEY_CODES.RIGHT: public.translateRight(modifier); break;
+				case KEY_CODES.UP:    public.translateUp(modifier); break;
+				case KEY_CODES.DOWN:  public.translateDown(modifier); break;
+				case KEY_CODES.PLUS:  performZoom('in', modifier); break;
+				case KEY_CODES.MINUS: performZoom('out', modifier); break;
+				case KEY_CODES.SPACE: public.toggleFreeze(); break;
 			}
-		})
+		}
 	}
 
 	// add key listeners for zooming and panning
@@ -1375,12 +1780,50 @@ var GraphUtil = (function ($) {
 		return radians * 180 / Math.PI;
 	};
 
-	// constructs a string for
-	function transformString (x, y, scale, unit) {
+	public.getDistance = function (x1, y1, x2, y2) {
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		var distance = Math.sqrt(dx * dx + dy * dy);
+		return distance;
+	}
+
+	// constructs a string for a svg transformation attribute
+	public.constructTransformString = function (x, y, scale, unit) {
 		unit = unit ? unit : ''
 		return 'translate(' + x + unit + ',' + y + unit  + ')scale(' + scale + ')'
 	}
 
+	// gets the correctly formatted transform string of an element in a d3 selection
+	public.getTransformString = function (d3Element) {
+		return d3Element[0][0].style.transform.replace(/ /g,'')
+	}
+
+	// adds a negligible tiny value to a given number for the sole purpose of preventing matches when it would be inconvenient
+	public.saltValue = function (value) {
+		var salt = Math.random() * SALT_MULTIPLIER
+		return value + salt
+	}
+
+	// why doesn't javascript have XOR???
+	public.xor = function (a, b) {
+		return (a || b) && (a != b)
+	}
+
+	// prevents any further propagation or default behaviors from triggering off of the given event
+	public.captureEvent = function (event) {
+		event = event ? event : d3.event.sourceEvent
+		if (event) {
+			event.preventDefault()
+			event.stopImmediatePropagation()
+			event.stopPropagation()
+		}
+	}
+
+	// ############################################################## meta functions ##############################################################
+
+
+
+	// ############################################################## return object ##############################################################
 	// return the public object to make the public functions accessable
 	return public;
 

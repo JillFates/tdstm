@@ -25,7 +25,7 @@ declare var jQuery: any;
 export function DeviceEditComponent(template, editModel, metadata: any) {
 
 	@Component({
-		selector: `device-edit`,
+		selector: `tds-device-edit`,
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }
