@@ -51,7 +51,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public hasModelChanges = false;
 	public hasDeleteTaskPermission = false;
 	public hasEditTaskPermission = false;
-	private dataSignatureDependencyTasks: string;
 	public modelHelper: TaskEditCreateModelHelper;
 
 	constructor(
@@ -75,7 +74,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone);
 		this.model = this.modelHelper.setModel(this.taskDetailModel);
 
-		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns
@@ -386,46 +384,16 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		}
 	}
 
-	/**
-	 * Determine if the array of objects passed as argument has duplicated id properties
-	 * @param {any[]} array
-	 * @returns {boolean}
-	 */
-	hasDuplicates(array: any[]): boolean {
-		const ids = [];
-
-		array.forEach((item) => {
-			if (ids.indexOf(item.id) === -1) {
-				ids.push(item.id);
-			}
-		});
-
-		return ids.length < array.length;
-	}
-
-	/**
-	 * Determine if the array of objects passed as argument contains empty ids
-	 * @param {any[]} array
-	 * @returns {boolean}
-	 */
-	hasEmptyIds(array: any[]): boolean {
-		return array.filter((item) => item.id === '').length > 0;
-	}
 
 	/**
 	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
 	 * @returns {boolean}
 	 */
 	hasInvalidFields(): boolean {
-		if (!this.hasDependencyTasksChanges()) {
+		if (!this.modelHelper.hasDependencyTasksChanges()) {
 			return false;
 		}
-
-		const {predecessorList, successorList} = this.model;
-		return this.hasDuplicates(predecessorList) ||
-			this.hasDuplicates(successorList) ||
-			this.hasEmptyIds(predecessorList) ||
-			this.hasEmptyIds(successorList);
+		return this.modelHelper.hasInvalidTasksDependencies();
 	}
 
 	/**
@@ -443,15 +411,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {boolean}
 	 */
 	isFormDirty(): boolean {
-		return this.hasDependencyTasksChanges() || this.taskEditForm.dirty || this.hasModelChanges;
-	}
-
-	/**
-	 * Determine if predecessor/succesor collections contain changes
-	 * @returns {boolean}
-	 */
-	hasDependencyTasksChanges(): boolean {
-		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+		return this.modelHelper.hasDependencyTasksChanges() || this.taskEditForm.dirty || this.hasModelChanges;
 	}
 
 	/**

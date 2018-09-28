@@ -5,7 +5,8 @@ const PriorityList = [1, 2, 3, 4, 5];
 
 export class TaskEditCreateModelHelper {
 	model: any;
-	userTimeZone: string;
+	private userTimeZone: string;
+	private dataSignatureDependencyTasks: string;
 
 	constructor(userTimeZone: string) {
 		this.model = {};
@@ -74,6 +75,8 @@ export class TaskEditCreateModelHelper {
 			deletedSuccessorList: []
 		};
 
+		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+
 		return this.model;
 	}
 
@@ -134,31 +137,101 @@ export class TaskEditCreateModelHelper {
 		// taskSuccessor: '3012_233398', /* ? */
 	}
 
-	public toggleLocked() {
+	/**
+	 * Determine if predecessor/succesor collections contain changes
+	 * @returns {boolean}
+	 */
+	hasDependencyTasksChanges(): boolean {
+		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+	}
+
+	hasDuplicatedPredecessors(): boolean {
+		return this.hasDuplicates(this.model.predecessorList);
+	}
+
+	hasDuplicatedSuccessors(): boolean {
+		return this.hasDuplicates(this.model.successorList);
+	}
+
+	/**
+	 * Determine if the array of objects passed as argument has duplicated id properties
+	 * @param {any[]} array
+	 * @returns {boolean}
+	 */
+	private hasDuplicates(array: any[]): boolean {
+		return this.extractDistinctIds(array).length < array.length;
+	}
+
+	private extractDistinctIds(array): string[] {
+		const ids = [];
+
+		array.forEach((item) => {
+			if (ids.indexOf(item.id) === -1) {
+				ids.push(item.id);
+			}
+		});
+
+		return ids;
+	}
+
+	haveDoubleAssignment(): boolean {
+		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
+		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
+
+		return predecessors.some((p) => successors.indexOf(p) >= 0)
+			||
+			successors.some((s) =>predecessors.indexOf(s) >= 0);
+	}
+
+	/**
+	 * Determine if the array of objects passed as argument contains empty ids
+	 * @param {any[]} array
+	 * @returns {boolean}
+	 */
+	private hasEmptyIds(array: any[]): boolean {
+		return array.filter((item) => item.id === '').length > 0;
+	}
+
+	/**
+	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
+	 * @returns {boolean}
+	 */
+	hasInvalidTasksDependencies(): boolean {
+		const {predecessorList, successorList} = this.model;
+
+		return this.hasDuplicates(predecessorList) ||
+			this.hasDuplicates(successorList) ||
+			this.hasEmptyIds(predecessorList) ||
+			this.hasEmptyIds(successorList) ||
+			this.haveDoubleAssignment();
+	}
+
+
+	toggleLocked() {
 		this.model.locked = !this.model.locked;
 	}
 
-	public addPredecessor(index: number, id: string, text: string) {
+	addPredecessor(index: number, id: string, text: string) {
 		this.model.predecessorList[index] = this.makeTaskItem(id, text) ;
 	}
 
-	public addSuccessor(index: number, id: string, text: string) {
+	addSuccessor(index: number, id: string, text: string) {
 		this.model.successorList[index] = this.makeTaskItem(id, text);
 	}
 
-	public deleteSuccessor(index: number): boolean {
+	deleteSuccessor(index: number): boolean {
 		return this.deleteTaskItem(index, this.model.successorList, this.model.deletedSuccessorList);
 	}
 
-	public deletePredecessor(index: number): boolean {
+	deletePredecessor(index: number): boolean {
 		return this.deleteTaskItem(index, this.model.predecessorList, this.model.deletedPredecessorList);
 	}
 
-	public getPredecessor(): any[] {
+	getPredecessor(): any[] {
 		return this.model.predecessorList;
 	}
 
-	public getSuccessor(): any[] {
+	getSuccessor(): any[] {
 		return this.model.successorList;
 	}
 

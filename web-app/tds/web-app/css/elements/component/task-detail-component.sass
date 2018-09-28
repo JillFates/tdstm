@@ -27,10 +27,15 @@
         .required-field::after
           content: "*"
           color: $color-message-error--red
-        .duplicate-error
-          margin-right: 8px;
+        .duplicate-error,
+        .have-double-assignment
           font-weight: normal
           color: $color-message-error--red
+        .have-double-assignment
+          width: 100%
+          text-align: center
+        .duplicate-error
+          margin-right: 8px;
           float: right
         td.valueNW
           width: 160px
@@ -121,7 +126,7 @@
           display: flex
           .dates-info
             padding-left: 5px
-            padding-right: 5px
+            padding-right: 6px
     .modal-footer
       padding: 15px 18px
 
