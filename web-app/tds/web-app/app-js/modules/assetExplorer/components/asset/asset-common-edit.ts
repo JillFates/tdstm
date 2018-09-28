@@ -93,7 +93,7 @@ export class AssetCommonEdit implements OnInit {
 		this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-			DIALOG_SIZE.XLG);
+			DIALOG_SIZE.LG);
 	}
 
 	/***

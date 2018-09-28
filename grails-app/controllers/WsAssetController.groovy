@@ -485,8 +485,8 @@ class WsAssetController implements ControllerMethods {
 		// Populate the command with the data coming from the request.
 		AssetCommand command = populateCommandObject(AssetCommand)
 		// Save the new asset.
-		assetEntityService.saveOrUpdateAsset(command)
-		renderSuccessJson('Success!')
+		AssetEntity asset = assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson(['id': asset.id])
 	}
 
 	/**
