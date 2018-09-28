@@ -64,12 +64,18 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		 */
 		public onCreate(): void {
 			let modelRequest = R.clone(this.model);
+
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+
+			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+
+			// AssetClass
 			modelRequest.asset.assetClass = {
 				name: ASSET_ENTITY_DIALOG_TYPES.STORAGE
 			};
+
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'

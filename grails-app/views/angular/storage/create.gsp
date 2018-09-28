@@ -5,7 +5,7 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autofocus tds-handle-escape (escPressed)="onCancelEdit()"
      class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
@@ -22,11 +22,11 @@
                                 <table class="asset-edit-view">
                                     <tbody>
                                     <tr>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance?.assetName}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
                                         <td colspan="3">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${assetInstance.assetName}" ngmodel="model.asset.assetName" />
                                         </td>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance?.description}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
                                         <td colspan="3">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${assetInstance.description}" ngmodel="model.asset.description" />
                                         </td>
