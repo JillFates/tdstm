@@ -33,6 +33,7 @@
     "specs.LandingPages.TasksLandingPageSpec",
     "specs.LandingPages.PlanningLandingPageSpec",
     "specs.Login.LoginSpec",
+    "specs.Projects.AssetFields.ApplicationNonDisplayedFieldCreationSpec",
     "specs.Projects.ETLScripts.ETLScriptsCreationSpec",
     "specs.Projects.ETLScripts.ETLScriptsDesignerTransformWithPastedDataSpec",
     "specs.Projects.ETLScripts.ETLScriptsEditionSpec",
