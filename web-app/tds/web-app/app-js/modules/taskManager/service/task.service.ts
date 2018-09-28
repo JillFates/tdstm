@@ -179,25 +179,15 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
-		const params = [];
-		const filters = [];
-
-		params.push({name: 'category', value: 'general'});
-		params.push({name: 'commentId', value: '233347'});
-		params.push({name: 'take', value: searchParams.maxPage});
-		params.push({name: 'skip', value: 0});
-		params.push({name: 'page', value: searchParams.currentPage});
-		params.push({name: 'pageSize', value: searchParams.maxPage});
-
-		filters.push({name: 'value', value: searchParams.query });
-		filters.push({name: 'field', value: 'desc'});
-		filters.push({name: 'operator', value: 'contains'});
-		filters.push({name: 'ignoreCase', value: true});
-		filters.push({name: 'login', value: 'and'});
-
+		const {metaParam, currentPage, maxPage, query} = searchParams;
+		const params = [
+			{name: 'commentId', value: metaParam},
+			{name: 'page', value: currentPage},
+			{name: 'pageSize', value: maxPage},
+			{name: 'filter[filters][0][value]', value: query }
+		];
 		const queryString = params
 			.map((param) =>  `${param.name}=${param.value}`)
-			.concat(filters.map((filter) => `filter[filters][0][${filter.name}]=${filter.value}`))
 			.join('&');
 
 		return this.http.get(`${this.baseURL}/assetEntity/tasksSearch?${queryString}`)
@@ -206,7 +196,7 @@ export class TaskService {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: (response.data && response.data.list || []).map((item) => ({id: item.id, text: item.desc})),
 					total: response.data && response.total,
-					page: response.page || searchParams.currentPage
+					page: response.page || currentPage
 				};
 				return comboBoxSearchResultModel;
 			})
