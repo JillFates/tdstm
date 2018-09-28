@@ -69,9 +69,6 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'

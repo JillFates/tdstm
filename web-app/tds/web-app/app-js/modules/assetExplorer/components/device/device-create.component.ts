@@ -19,6 +19,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 
 declare var jQuery: any;
 
@@ -65,9 +66,9 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 */
 		private initModel(): void {
 			this.model.asset = {}; // R.clone(editModel.asset);
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-			if (this.model.asset.scale === null) {
+			// this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
+			// this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+			if (!this.model.asset.scale || this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
 				};
@@ -75,32 +76,20 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
 			}
 			this.model.asset.assetTypeSelectValue = {id: null};
-			if (this.model.asset.assetType) {
-				this.model.asset.assetTypeSelectValue.id = this.model.asset.assetType;
-				this.model.asset.assetTypeSelectValue.text = this.model.asset.assetType;
-			}
 			this.model.asset.manufacturerSelectValue = {id: null};
-			if (this.model.asset.manufacturer) {
-				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
-				this.model.asset.manufacturerSelectValue.text = this.model.manufacturerName;
-			}
 			this.model.asset.modelSelectValue = {id: null};
-			if (this.model.asset.model) {
-				this.model.asset.modelSelectValue.id = this.model.asset.model.id;
-				this.model.asset.modelSelectValue.text = this.model.modelName;
-			}
-			if (this.model.sourceRackSelect) {
-				this.rackSourceOptions = this.model.sourceRackSelect;
-			}
-			if (this.model.targetRackSelect) {
-				this.rackTargetOptions = this.model.targetRackSelect;
-			}
-			if (this.model.sourceChassisSelect) {
-				this.bladeSourceOptions = this.model.sourceChassisSelect;
-			}
-			if (this.model.targetChassisSelect) {
-				this.bladeTargetOptions = this.model.targetChassisSelect;
-			}
+			// if (this.model.sourceRackSelect) {
+			// 	this.rackSourceOptions = this.model.sourceRackSelect;
+			// }
+			// if (this.model.targetRackSelect) {
+			// 	this.rackTargetOptions = this.model.targetRackSelect;
+			// }
+			// if (this.model.sourceChassisSelect) {
+			// 	this.bladeSourceOptions = this.model.sourceChassisSelect;
+			// }
+			// if (this.model.targetChassisSelect) {
+			// 	this.bladeTargetOptions = this.model.targetChassisSelect;
+			// }
 		}
 
 		/**
@@ -131,7 +120,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
 			}
 			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
-			delete modelRequest.asset.newRoomSource;
+			// delete modelRequest.asset.newRoomSource;
 
 			// roomTargetId, roomTarget(new room)
 			modelRequest.asset.roomTargetId = '0';
@@ -139,7 +128,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
 			}
 			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
-			delete modelRequest.asset.newRoomTarget;
+			// delete modelRequest.asset.newRoomTarget;
 
 			// rackSourceId, rackSource (new rack)
 			modelRequest.asset.rackSourceId = '-1';
@@ -147,7 +136,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
 			}
 			modelRequest.asset.rackSource = this.model.asset.newRackSource;
-			delete modelRequest.asset.newRackSource;
+			// delete modelRequest.asset.newRackSource;
 
 			// rackTargetId, rackTarget(new rack)
 			modelRequest.asset.rackTargetId = '-1';
@@ -155,7 +144,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
 			}
 			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
-			delete modelRequest.asset.newRackTarget;
+			// delete modelRequest.asset.newRackTarget;
 
 			// sourceChassis
 			if (this.model.asset.sourceChassis && this.model.asset.sourceChassis.id > 0) {
@@ -173,18 +162,15 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
-			delete modelRequest.asset.moveBundle;
+			// delete modelRequest.asset.moveBundle;
 
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
 
-			// Custom Fields
-			this.model.customs.forEach((custom: any) => {
-				let customValue = modelRequest.asset[custom.field.toString()];
-				if (customValue && customValue.value) {
-					modelRequest.asset[custom.field.toString()] = customValue.value;
-				}
-			});
+			// AssetClass
+			modelRequest.asset.assetClass = {
+				name: ASSET_ENTITY_DIALOG_TYPES.DEVICE
+			};
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
