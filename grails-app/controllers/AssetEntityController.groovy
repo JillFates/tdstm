@@ -647,6 +647,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
+		// Deal with legacy view parameters.
+		if (request.format != 'json') {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+		}
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, true, flash)
 		if (params.forWhom == "update") {
 			def assetEntity = AssetEntity.get(params.prevAsset)
@@ -665,7 +670,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		if (request.format == 'json') {
 			requestParams = request.JSON
 		} else {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
 			requestParams = params
+
 		}
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {

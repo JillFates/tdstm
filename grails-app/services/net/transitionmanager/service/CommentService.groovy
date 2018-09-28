@@ -380,8 +380,8 @@ class CommentService implements ServiceMethods {
 
 				// Now handle creating / updating task dependencies if the "manageDependency flag was passed
 				if (params.manageDependency) {
-					def taskDependencies = params.list('taskDependency[]')
-					def taskSuccessors = params.list('taskSuccessor[]')
+					def taskDependencies = params['taskDependency']
+					def taskSuccessors = params['taskSuccessor']
 					def deletedPreds = params.deletedPreds
 
 					// If we're updating, we'll delete the existing dependencies and then readd them following
