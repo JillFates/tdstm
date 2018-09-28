@@ -22,7 +22,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
-		selector: 'application-edit',
+		selector: 'tds-application-edit',
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }

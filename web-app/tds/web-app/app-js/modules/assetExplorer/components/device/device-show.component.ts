@@ -22,7 +22,7 @@ declare var jQuery: any;
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `device-show`,
+		selector: `tds-device-show`,
 		template: template
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
@@ -69,7 +69,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -86,7 +86,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showModel(id: string): void {
@@ -131,7 +131,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 			this.prompt.open('Confirmation Required',
 				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'Yes', 'No')
+				'OK', 'Cancel')
 				.then( success => {
 					if (success) {
 						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
@@ -152,6 +152,10 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		 */
 		onCloneAsset(): void {
 			console.log('Will come clone implementation');
+		}
+
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

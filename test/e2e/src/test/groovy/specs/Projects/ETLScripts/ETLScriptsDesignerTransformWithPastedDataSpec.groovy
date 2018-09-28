@@ -44,7 +44,6 @@ class ETLScriptsDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
-        commonsModule.waitForDialogModalHidden()
     }
 
     def setup() {

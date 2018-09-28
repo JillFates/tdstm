@@ -98,6 +98,26 @@ class ApplicationService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to get the model map used to render the create view of an Application domain asset
+	 * @param project - the project of the user
+	 * @param params - request parameters
+	 * @return a map of the properties
+	 */
+	Map getModelForCreate(Map params) {
+		Project project = securityService.getUserCurrentProject()
+		Application application = new Application()
+		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+
+		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+		def availableRoles = partyRelationshipService.getStaffingRoles()
+		def partyGroupList = partyRelationshipService.getCompaniesList()
+
+		return [assetInstance: application, moveEventList: moveEventList, availableRoles: availableRoles, partyGroupList: partyGroupList,
+				staffTypes: Person.constraints.staffType.inList, personList: personList] +
+				assetEntityService.getCommonModelForCreate('Application', project, application)
+	}
+
+	/**
 	 * Used to create a new Database asset that is called from the controller
 	 * @param project - the user's selected project
 	 * @param params - the request parameters

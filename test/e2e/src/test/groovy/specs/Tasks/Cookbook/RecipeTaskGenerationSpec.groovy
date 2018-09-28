@@ -59,7 +59,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToTasksCookbook()
+        tasksModule.goToTasksCookbook()
         /* CREATE Recipe */
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
@@ -88,7 +88,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "1. Selecting the Recipe to Generate Tasks"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Recipe with Task on It'
@@ -98,7 +97,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "2. Going to The Task Generation tab"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Generation Tab'
@@ -110,7 +108,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "3. Event Dropdown should have the 'Please Select' option selected by default"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Task Section'
             at TabTaskGenPage
 
@@ -119,7 +116,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "4. Checking Event selector options"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Task Section'
             at TabTaskGenPage
         when: 'The User clicks in the Selector'
@@ -130,7 +126,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "5. As Default option should be displayed and shown disabled"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Task Section'
             at TabTaskGenPage
 
@@ -141,7 +136,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "6. Generate task should be disabled"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Task Section'
             at TabTaskGenPage
 
@@ -150,7 +144,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "7. Selecting an event from the Dropdown"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Task Section'
             at TabTaskGenPage
         when: 'The Event Selector is M1-Physical'
@@ -161,7 +154,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "8. Setting as Default option should enabled"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Task Section'
             at TabTaskGenPage
 
@@ -170,7 +162,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "9. Setting the event as default. Link change to 'Clear Default' "() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Task Section'
             at TabTaskGenPage
         when: 'The User clicks the Link'
@@ -183,7 +174,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "10. Checkboxes should be unchecked by default"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Generation Task Section'
             at TabTaskGenPage
 
@@ -193,7 +183,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "11. Clicking on Generate Task button and error should be displayed"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Generation Task Section'
             at TabTaskGenPage
         when: 'The User clicks the Generate Task Option'
@@ -204,7 +193,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "12. Validating the error message"() {
-        testKey = "TM-XXXX"
         when: 'The Error is displayed'
             at ErrorMessagePage
 
@@ -213,7 +201,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "13. Closing error msg"() {
-        testKey = "TM-XXXX"
         given: 'The Error is displayed'
             at ErrorMessagePage
         when: 'The User clicks to Close It'
@@ -224,7 +211,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "14. Clicking 'Generate using WIP Recipe' checkbox"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Task Generation Section'
             at TabTaskGenPage
         when: 'The User checks the Generate using WIP Option'
@@ -235,7 +221,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "15. Generating task button should be enabled"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Task Generation Section'
             at TabTaskGenPage
 
@@ -244,7 +229,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "16. Generating a Task"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Task Generation Section'
             at TabTaskGenPage
         when: 'The User Clicks on Generate'
@@ -255,7 +239,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "17. Checking the Summary Section"() {
-        testKey = "TM-XXXX"
         when: 'The User is in the Summary Section'
             at TabTaskGenTabSummaryPage
 
@@ -267,7 +250,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     }
 
     def "18. Clicking on generate task button again should alert the User for tasks previously created"() {
-        testKey = "TM-XXXX"
         given: 'The User is in the Task Generation Section'
             at TabTaskGenPage
         when: 'The User clicks the Generate task Button again'

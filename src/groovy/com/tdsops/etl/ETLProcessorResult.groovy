@@ -668,6 +668,7 @@ class FieldResult {
 class FindResult {
 	List<QueryResult> query = []
 	List<Long> results = []
+	Integer size = 0
 	Integer matchOn
 
 	/**
@@ -692,6 +693,7 @@ class FindResult {
 	private void addResults(ETLFindElement findElement) {
 		if(!this.results && findElement.results){
 			this.results = findElement.results.objects.collect { it as Long }
+			this.size = this.results.size()
 			this.matchOn = findElement.results.matchOn as Integer
 		}
 	}

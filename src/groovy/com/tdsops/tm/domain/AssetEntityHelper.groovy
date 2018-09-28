@@ -66,8 +66,6 @@ class AssetEntityHelper {
 			}
 		}
 
-		asset.customDomainService = new CustomDomainService()
-
 		return asset
 	}
 

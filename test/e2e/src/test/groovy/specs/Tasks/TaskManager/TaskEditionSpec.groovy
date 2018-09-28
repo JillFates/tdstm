@@ -38,7 +38,7 @@ class TaskEditionSpec extends GebReportingSpec {
         // TODO Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
         // TODO NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         at MenuPage
-        menuModule.goToTasksManager()
+        tasksModule.goToTasksManager()
         at TaskManagerPage
         tmCreateTaskBtn.click()
         at TaskCreationPage
@@ -61,7 +61,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "1. Opening the Edit Task Option"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User searches by a specific Task'
@@ -76,7 +75,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "2. Edit Task - Changing Fields and static Dropdowns"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Edition Section'
             at TaskEditionPage
         when: 'The User Modifies some static values such as Name, Person, Team, Event, Link, Status, Note'
@@ -95,7 +93,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "3. Edit Task - Adding Asset Type and Name"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Edition Page'
             at TaskEditionPage
         when: 'The User modifies some values such as Asset Type, Asset Name'
@@ -111,7 +108,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "4. Edit Task - Adding Predeccessor and Successor"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Edition Page'
             at TaskEditionPage
         when: 'The User adds some values such as Predecessor and Successor'
@@ -130,7 +126,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "5. Saving the Edited Task"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Edition Page'
             at TaskEditionPage
         when: 'The User clicks the "Save" Button'
@@ -141,7 +136,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "6. Validating new Task Options"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Task Details Page'
             at TaskDetailsPage
 
@@ -159,7 +153,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "7. Assigning the Task to the Current User"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User searches by his/her own Name'
@@ -175,7 +168,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "8. Changing the Task Status to Done"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The user clicks the "Done" Status'
@@ -187,7 +179,6 @@ class TaskEditionSpec extends GebReportingSpec {
     }
 
     def "9. Deleting the  Task"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Task Manager Section'
             at TaskManagerPage
         when: 'The User clicks the Option to Display the Task'

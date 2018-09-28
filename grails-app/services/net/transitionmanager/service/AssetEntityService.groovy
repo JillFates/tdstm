@@ -1506,6 +1506,30 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * The default/common properties shared between all of the Asset Create views
+	 */
+	@Transactional(readOnly = true)
+	Map getCommonModelForCreate(String type, Project project, assetEntity) {
+
+		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
+		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
+		// Obtains the domain out of the asset type string
+		String domain = AssetClass.getDomainForAssetType(type)
+		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
+
+		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
+		[
+			prefValue: prefValue,
+			project: project,
+			client: project.client,
+			viewUnpublishedValue: viewUnpublishedValue,
+			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+			customs: customFields,
+			standardFieldSpecs: standardFieldSpecs
+		]
+	}
+
+	/**
 	 * Used to provide the default properties used for the Asset Dependency views
 	 * @param listType - indicates the type of list [Application|AssetEntity|Files|Storage]
 	 * @param moveEvent
@@ -3004,6 +3028,22 @@ class AssetEntityService implements ServiceMethods {
 			moveBundleList: getMoveBundles(project),
 			nonNetworkTypes: AssetType.nonNetworkTypes,
 			supportAssets: getDependentsOrSupporting(asset, false)
+		]
+	}
+
+	/**
+	 * Return the map of information for show/create dependencies.
+	 * @param project
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyCreateMap(Project project) {
+		return [
+				assetClassOptions: AssetClass.classOptions,
+				dependencyStatus: getDependencyStatuses(),
+				dependencyType: getDependencyTypes(),
+				moveBundleList: getMoveBundles(project),
+				nonNetworkTypes: AssetType.nonNetworkTypes,
 		]
 	}
 

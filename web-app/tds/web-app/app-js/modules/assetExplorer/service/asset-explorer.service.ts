@@ -366,6 +366,29 @@ export class AssetExplorerService {
 	}
 
 	/**
+	 * Create an Asset
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	createAsset(model: any): Observable<any> {
+		const request: any = {
+			assetClass: model.asset.assetClass.name,
+			asset: model.asset,
+			dependencyMap: {
+				supportAssets: this.prepareDependencies(model.dependencyMap.supportAssets),
+				dependentAssets: this.prepareDependencies(model.dependencyMap.dependentAssets)
+			}
+		};
+
+		return this.http.post(`${this.defaultUrl}/asset`, request)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Prepare Support Assets and Dependent Assets
 	 * @param dependencies
 	 * @returns {any}
