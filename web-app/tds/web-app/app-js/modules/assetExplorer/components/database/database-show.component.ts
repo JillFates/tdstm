@@ -51,14 +51,14 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 			this.dialogService.replace(AssetShowComponent, [
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showAssetEditView() {
 			this.dialogService.replace(AssetEditComponent, [
 				{ provide: 'ID', useValue: this.mainAsset },
 				{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
