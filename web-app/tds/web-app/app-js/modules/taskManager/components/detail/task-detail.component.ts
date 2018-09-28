@@ -199,8 +199,9 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				{provide: PreferenceService, useValue: this.userPreferenceService} ,
 				{provide: PermissionService, useValue: this.permissionService},
 			{provide: TaskDetailModel, useValue: clone(this.taskDetailModel)}
-		], false, false).then(result => {
-			console.log(result);
+		], false, false)
+		.then(result => {
+			this.close(result);
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

@@ -48,6 +48,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	public predecessorSuccessorColumns: any[];
 	public userTimeZone: string;
 	public hasModelChanges = false;
+	public hasDeleteTaskPermission = false;
+	public hasEditTaskPermission = false;
 	private dataSignatureDependencyTasks: string;
 	public modelHelper: TaskEditCreateModelHelper;
 
@@ -100,6 +102,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
 		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 	}
 
 	/**
@@ -174,7 +179,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * Toggle lock property value
 	 */
 	toggleLocked(): void {
-		this.model.locked = !this.model.locked;
+		this.modelHelper.toggleLocked();
 		this.hasModelChanges = true;
 	}
 
@@ -265,10 +270,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
-			.subscribe((res) => {
-				console.log('The response is:');
-				console.log(res);
-			});
+			.subscribe((result) => this.close(result));
 	}
 
 	/**

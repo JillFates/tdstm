@@ -444,7 +444,7 @@
             </div>
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
-                        [disabled]="isFormInvalid()" (click)="onSave()" type="button">
+                        [disabled]="isFormInvalid() || !hasEditTaskPermission" (click)="onSave()" type="button">
 		            <span  class="fa fa-fw fa-floppy-o"></span>
 		            <span>Update</span>
 	            </button>
@@ -452,7 +452,7 @@
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Cancel</span>
                 </button>
-                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete">
+                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
                     <span  class="glyphicon glyphicon-trash"></span>
                     <span>Delete</span>
                 </button>
