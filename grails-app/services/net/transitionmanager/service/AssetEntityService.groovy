@@ -31,6 +31,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.Manufacturer
@@ -51,7 +52,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
-import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -3099,18 +3099,15 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Used to clone an asset and optionally the dependencies associated with the asset
-	 * @param assetId - the id of the asset to be cloned
-	 * @param name - the name to set the new asset name to
-	 * @param dependencies - a flag to control if dependencies should be cloned
+	 * @param command - command object with the parameters for the clone operation (id, name and dependencies flag).
 	 * @param errors - an initialize List object that will be populated with one or more error messages if the method fails
 	 * @return the id number of the newly created asset
 	 */
-	Long clone(Long assetId, String name, Boolean cloneDependencies, List<String> errors) {
+	Long clone(Project project, CloneAssetCommand command, List<String> errors) {
 		AssetEntity clonedAsset
 		if(!errors) {
-
 			//  params son assetId
-			AssetEntity assetToClone = AssetEntity.get(assetId)
+			AssetEntity assetToClone = GormUtil.findInProject(project, AssetEntity, command.id)
 			if (!assetToClone) {
 				errors << "The asset specified to clone was not found"
 			} else {
@@ -3124,7 +3121,7 @@ class AssetEntityService implements ServiceMethods {
 				}
 				if (!errors) {
 					Map defaultValues = [
-						assetName : name,
+						assetName : command.name,
 						validation: ValidationType.DIS,
 						environment: ''
 					]
@@ -3134,7 +3131,7 @@ class AssetEntityService implements ServiceMethods {
 					clonedAsset = assetToClone.clone(defaultValues)
 
 					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && cloneDependencies) {
+					if (clonedAsset.save() && command.cloneDependencies) {
 						for (dependency in assetToClone.supportedDependencies()) {
 							AssetDependency clonedDependency = dependency.clone([
 									dependent: clonedAsset,
