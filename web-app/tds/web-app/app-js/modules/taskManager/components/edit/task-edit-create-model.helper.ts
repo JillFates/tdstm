@@ -57,10 +57,10 @@ export class TaskEditCreateModelHelper {
 			statusList: [],
 			personList: [],
 			teamList: [],
-			predecessorList: (detail.predecessorList || [])
-				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
-			successorList: (detail.successorList || [])
-				.map((item) => ({id: item.id, desc: `${item.taskNumber}: ${item.desc}`, model: {id: item.id, text: `${item.taskNumber}: ${item.desc}` }})),
+			originalPredecessorList: (detail.predecessorList || []),
+			originalSuccessorList: (detail.successorList || []),
+			predecessorList: this.extractDependencieTasks (detail.predecessorList || []),
+			successorList: this.extractDependencieTasks(detail.successorList || []),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
@@ -80,57 +80,84 @@ export class TaskEditCreateModelHelper {
 		return this.model;
 	}
 
+	private extractDependencieTasks(array: any[]): any[] {
+		return array
+			.map((item) => {
+				return {
+					id: item.id,
+					desc: `${item.taskNumber}: ${item.desc}`,
+					taskNumber: item.taskNumber,
+					model: {
+						id: item.id,
+						text: `${item.taskNumber}: ${item.desc}`
+					}
+				}
+			});
+	}
+
+	private getTaskAdded(tasks: any[], originalTasks: any[]) : string[] {
+		return tasks
+			.filter(task => !originalTasks.find(original => original.id === task.id))
+			.map((task, index) => (`-${index + 1}_${task.id}`));
+	}
+
 	public getPayloadForUpdate(): any {
+		const {
+			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
+			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, durationLocked,
+			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
+			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+
 		const deletedItems = this.model.deletedPredecessorList
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
 
 		return  {
-			assetClass: this.model.assetClass.id,
-			assetEntity: this.model.asset.id.toString(),
-			assetType: this.model.assetClass.text, // 'Application', /* ? */
-			assignedTo: this.model.assignedTo.id.toString(),
-			category: this.model.category,
-			apiAction: this.model.apiAction.id,
+			assetClass: assetClass.id,
+			assetEntity: asset.id.toString(),
+			assetType: assetClass.text, // 'Application', /* ? */
+			assignedTo: assignedTo.id.toString(),
+			category: category,
+			apiAction: apiAction.id,
+			apiActionId: apiAction.id.toString() || "0",
 			actionInvocable: '',
 			actionMode: '',
-			comment: this.model.comment,
+			comment: comment,
 			commentFromId: '',
-			commentId: this.model.id.toString(),
+			commentId: id.toString(),
 			commentType: 'issue',
 			deletePredId: '',  /* ? */
-			dueDate: this.model.dueDate ? this.model.dueDate.toISOString() : '',
-			duration: DateUtils.convertDurationPartsToMinutes(this.model.durationParts).toString(),
-			durationScale: this.model.durationScale,
-			estFinish: this.model.estimatedFinish ? this.model.estimatedFinish.toISOString() : '',
-			estStart: this.model.estimatedStart ? this.model.estimatedStart.toISOString() : '',
+			dueDate: dueDate ? dueDate.toISOString() : '',
+			duration: DateUtils.convertDurationPartsToMinutes(durationParts).toString(),
+			durationScale: durationScale,
+			estFinish: estimatedFinish ? estimatedFinish.toISOString() : '',
+			estStart: estimatedStart ? estimatedStart.toISOString() : '',
 			forWhom: '',
-			hardAssigned: this.model.hardAssigned === 'No' ? "0" : "1",
-			sendNotification: this.model.sendNotification === 'Yes',
+			hardAssigned: hardAssigned === 'No' ? "0" : "1",
+			sendNotification: sendNotification === 'Yes',
 			isResolved: "0", /* ? */
-			instructionsLink: this.model.instructionLink,
-			moveEvent: this.model.event.id.toString(),
+			instructionsLink: instructionLink,
+			moveEvent: event.id.toString(),
 			mustVerify: "0", /* ? */
 			override: "0", /* ? */
 			predCount: "-1", /* ? */
 			predecessorCategory: '', /* ? */
 			prevAsset: '', /* ? */
-			priority: this.model.priority.toString(), /* ? */
+			priority: priority.toString(), /* ? */
 			resolution: '', /* ? */
-			role: this.model.assignedTeam.id,
-			status: this.model.status,
-			// manageDependency: "1", /* ? */
-			// taskDependency: [], /* ? */
-			// taskSuccessor: [], /* ? */
-			// deletedPreds: deletedItems
+			role: assignedTeam.id,
+			status: status,
+			manageDependency: "1", /* ? */
+			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList),
+			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList),
+			deletedPreds: deletedItems,
 			workflowTransition: '', /* ? */
 			canEdit: true, /* ? */
-			durationLocked: this.model.durationLocked,
-			durationText: `${this.model.durationParts.days} days ${this.model.durationParts.hours} hrs ${this.model.durationParts.minutes} mins`,
-			taskNumber: this.model.taskNumber.toString(),
-			note: this.model.note,
-			id: this.model.id,
-			apiActionId: this.model.apiAction.id.toString() || "0"
+			durationLocked: durationLocked,
+			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
+			taskNumber: taskNumber.toString(),
+			note: note,
+			id: id
 		};
 
 		// taskDependency: '3002_233386', /* ? */
