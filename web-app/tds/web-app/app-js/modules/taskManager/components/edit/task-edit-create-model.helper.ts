@@ -322,18 +322,24 @@ export class TaskEditCreateModelHelper {
 	private makeTaskItem(task: any): ITask {
 		const {id, desc='', taskId = '', taskNumber, category, status, text=''} = task;
 
+		const description = this.removeTaskNumberFromDescription(desc || text, taskNumber);
+
 		return {
 			id,
 			taskId,
 			category,
 			status,
 			taskNumber,
-			desc: desc || text,
+			desc: description,
 			model: {
 				id,
-				text: desc || text
+				text: description
 			}
 		}
+	}
+
+	private removeTaskNumberFromDescription(description: string, taskNumber: string): string {
+		return description.replace(new RegExp(`^${taskNumber}: `), "")
 	}
 }
 
