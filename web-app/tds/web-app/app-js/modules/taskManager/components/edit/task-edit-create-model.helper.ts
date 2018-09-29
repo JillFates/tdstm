@@ -21,12 +21,16 @@ export class TaskEditCreateModelHelper {
 	model: any;
 	private userTimeZone: string;
 	private userCurrentDateFormat: string;
+	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
 
-	constructor(userTimeZone: string, userCurrentDateFormat: string) {
+	constructor(userTimeZone: string,
+				userCurrentDateFormat: string) {
 		this.model = {};
+
 		this.userTimeZone = userTimeZone;
 		this.userCurrentDateFormat = userCurrentDateFormat;
+		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 	}
 
 	/**
@@ -57,7 +61,7 @@ export class TaskEditCreateModelHelper {
 			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
 			durationScale,
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
-			durationLocked: assetComment.durationLocked,
+			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
 			dueDate: assetComment.dueDate ? new Date(DateUtils.formatUserDateTime(this.userTimeZone, assetComment.dueDate)) : '',
@@ -114,9 +118,10 @@ export class TaskEditCreateModelHelper {
 	}
 
 	public getPayloadForUpdate(): any {
+		const [Yes, No] = YesNoList;
 		const {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
-			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, durationLocked,
+			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
 			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
 
@@ -126,31 +131,30 @@ export class TaskEditCreateModelHelper {
 
 		return  {
 			assetClass: assetClass.id,
-			assetEntity: asset.id.toString(),
-			assetType: assetClass.text, // 'Application', /* ? */
-			assignedTo: assignedTo.id.toString(),
+			assetEntity: this.getEmptyStringIfNull(asset.id).toString(),
+			assetType: assetClass.text,
+			assignedTo: this.getEmptyStringIfNull(assignedTo.id).toString(),
 			category: category,
-			apiAction: apiAction.id,
-			apiActionId: apiAction.id.toString() || "0",
+			apiAction: this.getEmptyStringIfNull(apiAction.id),
+			apiActionId: this.getEmptyStringIfNull(apiAction.id).toString() || "0",
 			actionInvocable: '',
 			actionMode: '',
 			comment: comment,
 			commentFromId: '',
-			commentId: id.toString(),
+			commentId: this.getEmptyStringIfNull(id).toString(),
 			commentType: 'issue',
 			deletePredId: '',  /* ? */
-			// dueDate: dueDate ? this.formatISODate(dueDate.toISOString(), this.dateFormat) : '',
 			dueDate: dueDate ? DateUtils.formatDate(dueDate, this.userCurrentDateFormat) : '',
 			duration: DateUtils.convertDurationPartsToMinutes(durationParts).toString(),
 			durationScale: durationScale,
-			estFinish: estimatedFinish ? estimatedFinish.toISOString() : '',
-			estStart: estimatedStart ? estimatedStart.toISOString() : '',
+			estFinish: estimatedFinish ? DateUtils.formatDate(estimatedFinish, this.userCurrentDateTimeFormat) : '',
+			estStart: estimatedStart ? DateUtils.formatDate(estimatedStart, this.userCurrentDateTimeFormat) : '',
 			forWhom: '',
-			hardAssigned: hardAssigned === 'No' ? "0" : "1",
-			sendNotification: sendNotification === 'No' ? "0": "1",
+			hardAssigned: hardAssigned === No ? "0" : "1",
+			sendNotification: sendNotification === No ? "0": "1",
 			isResolved: "0", /* ? */
 			instructionsLink: this.addProtocolToLabelURL(instructionLink),
-			moveEvent: event.id.toString(),
+			moveEvent: this.getEmptyStringIfNull(event.id).toString(),
 			mustVerify: "0", /* ? */
 			override: "0", /* ? */
 			predCount: "-1", /* ? */
@@ -158,7 +162,7 @@ export class TaskEditCreateModelHelper {
 			prevAsset: '', /* ? */
 			priority: priority.toString(), /* ? */
 			resolution: '', /* ? */
-			role: assignedTeam.id,
+			role: this.getEmptyStringIfNull(assignedTeam.id),
 			status: status,
 			manageDependency: "1",
 			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
@@ -168,7 +172,7 @@ export class TaskEditCreateModelHelper {
 			deletedPreds: deletedItems,
 			workflowTransition: '', /* ? */
 			canEdit: true, /* ? */
-			durationLocked: durationLocked,
+			durationLocked: locked ? "1" : "0",
 			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
 			taskNumber: taskNumber.toString(),
 			note: note,
@@ -177,6 +181,10 @@ export class TaskEditCreateModelHelper {
 
 		// taskDependency: '3002_233386', /* ? */
 		// taskSuccessor: '3012_233398', /* ? */
+	}
+
+	getEmptyStringIfNull(value: any): any {
+		return value === null || typeof value === 'undefined' ?  '' : value;
 	}
 
 	/**
@@ -241,9 +249,6 @@ export class TaskEditCreateModelHelper {
 	hasDoubleAssignment(): boolean {
 		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
 		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
-
-		console.log('P', this.model.predecessorList);
-		console.log('S', this.model.successorList);
 
 		return predecessors.some((p) => successors.indexOf(p) >= 0)
 			||
