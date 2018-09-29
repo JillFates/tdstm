@@ -20,11 +20,13 @@ export interface ITask {
 export class TaskEditCreateModelHelper {
 	model: any;
 	private userTimeZone: string;
+	private userCurrentDateFormat: string;
 	private dataSignatureDependencyTasks: string;
 
-	constructor(userTimeZone: string) {
+	constructor(userTimeZone: string, userCurrentDateFormat: string) {
 		this.model = {};
 		this.userTimeZone = userTimeZone;
+		this.userCurrentDateFormat = userCurrentDateFormat;
 	}
 
 	/**
@@ -137,7 +139,8 @@ export class TaskEditCreateModelHelper {
 			commentId: id.toString(),
 			commentType: 'issue',
 			deletePredId: '',  /* ? */
-			dueDate: dueDate ? dueDate.toISOString() : '',
+			// dueDate: dueDate ? this.formatISODate(dueDate.toISOString(), this.dateFormat) : '',
+			dueDate: dueDate ? DateUtils.formatDate(dueDate, this.userCurrentDateFormat) : '',
 			duration: DateUtils.convertDurationPartsToMinutes(durationParts).toString(),
 			durationScale: durationScale,
 			estFinish: estimatedFinish ? estimatedFinish.toISOString() : '',

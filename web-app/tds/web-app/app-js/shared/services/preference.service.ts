@@ -140,4 +140,14 @@ export class PreferenceService {
 		});
 	}
 
+	/**
+	 * Used to retrieve the user preference current date format
+	 */
+	getUserCurrentDateFormatOrDefault(): string {
+		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+
+		return userDateFormat ? userDateFormat : DateUtils.DEFAULT_FORMAT_DATE;
+	}
+
+
 }

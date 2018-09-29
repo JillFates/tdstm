@@ -294,4 +294,15 @@ export class DateUtils {
 		return (durationParts.days * 24 * 60) + (durationParts.hours * 60) + durationParts.minutes;
 	}
 
+	/**
+	 * Return the provided dated formated using moment
+	 * @param date (Object)
+	 * @param format (String)
+	 * @returns {string}
+	 */
+	public static formatDate(date: any, format: string): string {
+		return moment(date)
+			.format(format);
+	}
+
 }

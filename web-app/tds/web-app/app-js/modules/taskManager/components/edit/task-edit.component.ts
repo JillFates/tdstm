@@ -71,7 +71,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
-		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone);
+		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
 		this.model = this.modelHelper.setModel(this.taskDetailModel);
 
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
