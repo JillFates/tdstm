@@ -179,6 +179,18 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.searchTasks(searchParams)
+			.map(res => {
+				return {
+					result: res.result.map((item) =>
+						({id: item.id, text: item.desc, metaFields: {category: item.category, status: item.status, taskNumber: item.taskNumber}})),
+					total: res.total,
+					page: res.page
+				}
+			});
+	}
+
+	searchTasks(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		const {metaParam, currentPage, maxPage, query} = searchParams;
 		const params = [
 			{name: 'commentId', value: metaParam},
@@ -194,7 +206,7 @@ export class TaskService {
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
-					result: (response.data && response.data.list || []).map((item) => ({id: item.id, text: item.desc})),
+					result: (response.data && response.data.list || []),
 					total: response.data && response.total,
 					page: response.page || currentPage
 				};
@@ -202,6 +214,7 @@ export class TaskService {
 			})
 			.catch((error: any) => error.json());
 	}
+
 	/**
 	 * Update a task
 	 * @param model

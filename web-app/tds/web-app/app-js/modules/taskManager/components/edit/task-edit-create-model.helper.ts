@@ -3,6 +3,20 @@ export const YesNoList = ['Yes', 'No'];
 const PriorityList = [1, 2, 3, 4, 5];
 
 
+export interface ITask {
+	id: string | number;
+	taskId: string | number;
+	taskNumber: string | number ,
+	category: string;
+	status: string;
+	desc: string;
+	model: {
+		id: string | number;
+		text: string;
+	}
+}
+
+
 export class TaskEditCreateModelHelper {
 	model: any;
 	private userTimeZone: string;
@@ -59,8 +73,8 @@ export class TaskEditCreateModelHelper {
 			teamList: [],
 			originalPredecessorList: (detail.predecessorList || []),
 			originalSuccessorList: (detail.successorList || []),
-			predecessorList: this.extractDependencieTasks (detail.predecessorList || []),
-			successorList: this.extractDependencieTasks(detail.successorList || []),
+			predecessorList: this.extractDependencyTasks (detail.predecessorList || []),
+			successorList: this.extractDependencyTasks(detail.successorList || []),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
@@ -80,20 +94,28 @@ export class TaskEditCreateModelHelper {
 		return this.model;
 	}
 
-	private extractDependencieTasks(array: any[]): any[] {
+	private extractDependencyTasks(array: any[]): any[] {
+		return array
+			.map((task) => this.makeTaskItem2(task));
+
+		/*
 		return array
 			.map((item) => {
+				const {id, taskId, taskNumber, desc, category, status} = item;
 				return {
-					id: item.id,
-					taskId: item.taskId,
-					desc: `${item.taskNumber}: ${item.desc}`,
-					taskNumber: item.taskNumber,
+					taskId,
+					id,
+					desc: `${taskNumber}: ${desc}`,
+					taskNumber: taskNumber,
+					category,
+					status,
 					model: {
-						id: item.id,
-						text: `${item.taskNumber}: ${item.desc}`
+						id,
+						text: `${taskNumber}: ${desc}`
 					}
 				}
 			});
+			*/
 	}
 
 	private getTaskAdded(tasks: any[], originalTasks: any[]) : string[] {
@@ -220,8 +242,8 @@ export class TaskEditCreateModelHelper {
 		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
 		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
 
-		console.log('Predecessors:', this.model.predecessorList);
-		console.log('Successors:', this.model.successorList);
+		console.log('P', this.model.predecessorList);
+		console.log('S', this.model.successorList);
 
 		return predecessors.some((p) => successors.indexOf(p) >= 0)
 			||
@@ -296,7 +318,22 @@ export class TaskEditCreateModelHelper {
 		return { id, desc: text, model: {id , text} };
 	}
 
+	private makeTaskItem2(task: any): ITask {
+		const {id, desc, taskId = '', taskNumber, category, status} = task;
 
+		return {
+			id,
+			taskId,
+			category,
+			status,
+			taskNumber,
+			desc: `${taskNumber}: ${desc}`,
+			model: {
+				id,
+				text: `${taskNumber}: ${desc}`
+			}
+		}
+	}
 }
 
 
