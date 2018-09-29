@@ -438,7 +438,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.taskEditForm.form.controls['instructionLink'].setErrors(errors);
 	}
 
-	onAssetClassChange(dataItem: any): void {
+	/**
+	 * On change selection on asset class reset asset entity value
+	 * @returns {void}
+	 */
+	onAssetClassChange(): void {
 		this.model.asset = {id: '', text: ''};
 	}
 

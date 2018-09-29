@@ -27,7 +27,7 @@
                                                     <td class="valueNW description-container" colspan="5">
 	                                                    <div class="validated-field">
                                                             <input type="text" name="comment" [(ngModel)]="model.comment" required>
-                                                            <button class="btn btn-default" (click)="onCollapseTaskDetail()">
+                                                            <button class="btn btn-default" (click)="onCollapseTaskDetail()" type="button">
                                                                 <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
                                                             </button>
                                                             <div class="error-message">Task name is required</div>
@@ -299,7 +299,9 @@
                                                         <label><span>Note</span></label>
                                                     </td>
 	                                                <td class="valueNW" colspan="4">
-                                                        <textarea name="note" id="note" rows="3" [(ngModel)]="model.note"></textarea>
+                                                        <textarea name="note"
+                                                                  placeholder="Enter a new note"
+                                                                  id="note" rows="3" [(ngModel)]="model.note"></textarea>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -338,7 +340,8 @@
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
-                                                        <button (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
+                                                        <button (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)"
+                                                                class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-2" type="button">
                                                             <i class="fa fa-med fa-fw fa-plus-circle"></i> <span>Add</span>
                                                         </button>
                                                     </ng-template>
