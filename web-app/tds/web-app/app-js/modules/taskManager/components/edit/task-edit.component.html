@@ -322,9 +322,7 @@
                             </tr>
                             <tr class="deps no-grow-container">
                                 <table>
-                                    <tr>
-                                        <td colspan="2" class="have-double-assignment" *ngIf="modelHelper.hasDoubleAssignment()">One or more tasks are assigned as both a Predecessor and Successor which is not allowed.</td>
-                                    </tr>
+
                                     <tr>
                                         <td valign="top">
                                             <kendo-grid
@@ -350,7 +348,6 @@
                                                         <!-- Header Template -->
                                                         <ng-template kendoGridHeaderTemplate>
                                                             <label>{{column.label}}</label>
-                                                            <label *ngIf="modelHelper.hasDuplicatedPredecessors()" class="duplicate-error">There are duplicate entries</label>
                                                         </ng-template>
 
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
@@ -372,6 +369,7 @@
                                                     </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>
+
                                         </td>
                                         <td valign="top">
                                             <kendo-grid
@@ -397,7 +395,6 @@
                                                     <!-- Header Template -->
                                                     <ng-template kendoGridHeaderTemplate>
                                                         <label>{{column.label}}</label>
-                                                        <label *ngIf="modelHelper.hasDuplicatedSuccessors()" class="duplicate-error">There are duplicate entries</label>
                                                     </ng-template>
 
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
@@ -416,8 +413,43 @@
                                             </kendo-grid>
                                          </td>
                                     </tr>
+
                                 </table>
                             </tr>
+                            <tr class="dependency-error-section"
+                                [ngClass]="{'has-duplicated-predecessors':modelHelper.hasDuplicatedPredecessors(),
+                                            'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors()}">
+	                            <table>
+		                            <tr>
+										<td>
+											<label class="has-duplicated-predecessors duplicate-error">There are duplicate entries</label>
+										</td>
+										<td>
+											<label class="has-duplicated-successors duplicate-error">There are duplicate entries</label>
+										</td>
+                                    </tr>
+
+								</table>
+                            </tr>
+                            <tr class="dependency-error-section"
+                                [ngClass]="{'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+	                            <table>
+		                            <tr>
+                                        <td colspan="2">
+                                            <label class="has-double-assignment">One or more tasks are assigned as both a Predecessor and Successor which is not allowed.</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </tr>
+
+                            <!--
+							<tr class="dependency-error-section"
+								[ngClass]="{'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+								<td colspan="2">
+									<label class="has-double-assignment">One or more tasks are assigned as both a Predecessor and Successor which is not allowed.</label>
+								</td>
+							</tr>
+							-->
                             <tr class="deps grow-container">
                                 <td colspan="5">
                                     <kendo-grid

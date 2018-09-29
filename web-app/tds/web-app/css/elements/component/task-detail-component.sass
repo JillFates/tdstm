@@ -18,6 +18,7 @@
   .tds-angular-component-content
     .successor-predecessor-table
       max-height: 200px
+      height: 200px
   .modal-content
     min-height: 760px
     min-width: 769px
@@ -26,6 +27,27 @@
     .modal-body
       height: 86%
       form
+        tr.dependency-error-section
+          display: none
+          td
+            label
+              visibility: hidden
+        tr.dependency-error-section.has-duplicated-predecessors,
+        tr.dependency-error-section.has-duplicated-successors,
+        tr.dependency-error-section.has-double-assignment
+          display: block
+        tr.dependency-error-section.has-duplicated-predecessors
+          td
+            label.has-duplicated-predecessors
+              visibility: visible
+        tr.dependency-error-section.has-duplicated-successors
+          td
+            label.has-duplicated-successors
+              visibility: visible
+        tr.dependency-error-section.has-double-assignment
+          td
+            label.has-double-assignment
+              visibility: visible
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
@@ -45,15 +67,16 @@
           content: "*"
           color: $color-message-error--red
         .duplicate-error,
-        .have-double-assignment
+        .has-double-assignment
           font-weight: normal
           color: $color-message-error--red
-        .have-double-assignment
+        .has-double-assignment
           width: 100%
           text-align: center
         .duplicate-error
-          margin-right: 8px;
-          float: right
+          text-align: center;
+          width: 100%;
+          margin-top: 10px;
         tds-combobox.status > kendo-combobox
           color: inherit
           font-weight: normal
