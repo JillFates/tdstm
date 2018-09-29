@@ -334,6 +334,7 @@
                                                     [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
+                                                    [rowClass]="rowStatusColor"
                                                     (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)">
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -352,9 +353,14 @@
                                                             <label *ngIf="modelHelper.hasDuplicatedPredecessors()" class="duplicate-error">There are duplicate entries</label>
                                                         </ng-template>
 
+                                                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
+                                                            <div (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</div>
+                                                        </ng-template>
+
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                             <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                             <tds-combobox
+                                                                    class="status"
                                                                     [(model)]="dataItem.model"
                                                                     [(metaParam)]="model.id"
                                                                     (valueChange)="onModelChange($event)"
@@ -362,6 +368,7 @@
                                                                     (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
                                                             </tds-combobox>
                                                         </ng-template>
+
                                                     </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>
@@ -374,6 +381,7 @@
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
+                                                    [rowClass]="rowStatusColor"
                                                     (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -395,6 +403,7 @@
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                         <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                         <tds-combobox
+                                                                class="status"
                                                                 [(model)]="dataItem.model"
                                                                 [(metaParam)]="model.id"
                                                                 (valueChange)="onModelChange($event)"

@@ -76,8 +76,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 
-		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns
-			.filter((column) => column.property === 'desc');
+		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
 
 		this.taskManagerService.getStatusList(this.model.id)
 			.subscribe((data: string[]) => this.model.statusList = data);
@@ -139,11 +138,11 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		if (dataItem) {
 			const {id, text} = dataItem;
-			return addTask.bind(this.modelHelper)(rowIndex, id, text)
-		}
-
-		if (removeTask.bind(this.modelHelper)(rowIndex)) {
-			this.hasModelChanges = true;
+			addTask.bind(this.modelHelper)(rowIndex, {id, text, ...dataItem.metaFields})
+		} else {
+			if (removeTask.bind(this.modelHelper)(rowIndex)) {
+				this.hasModelChanges = true;
+			}
 		}
 
 		gridHelper.reloadData(getCollection.bind(this.modelHelper)());
@@ -331,7 +330,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {string}
 	 */
 	protected rowStatusColor(context: RowClassArgs) {
-		return 'task-' + context.dataItem.status.toLowerCase();
+		const status = context.dataItem && context.dataItem.status || ' ';
+		return 'task-' + status.toLowerCase();
 	}
 
 	/**

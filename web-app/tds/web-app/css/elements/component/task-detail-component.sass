@@ -1,5 +1,19 @@
 @import "../../base/taskstatus-mixins"
 
+@mixin combo-status
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: inline-flex
+  outline-style: none
+  span.k-dropdown-wrap
+    background: inherit
+    color: inherit
+    span.k-select
+      border-left: 0
+      background: inherit
+      color: inherit
+
 .task-detail-component
   .tds-angular-component-content
     .successor-predecessor-table
@@ -12,6 +26,9 @@
     .modal-body
       height: 86%
       form
+        kendo-grid.successor-predecessor-table
+          .k-grid-content tr td
+            font-weight: normal
         .error-message
           color: $color-message-error--red
           margin-top: 3px
@@ -37,6 +54,12 @@
         .duplicate-error
           margin-right: 8px;
           float: right
+        tds-combobox.status > kendo-combobox
+          color: inherit
+          font-weight: normal
+          @include combo-status
+          span input
+            padding-top: 1px
         td.valueNW
           width: 160px
           max-width: 160px
@@ -48,16 +71,7 @@
             span.k-dropdown-wrap
               background: white
           kendo-dropdownlist.status
-            margin: 0;
-            padding: 0;
-            border: 0;
-            display: inline-flex
-            outline-style: none
-            span.k-dropdown-wrap
-              background: inherit
-              color: inherit
-              span.k-select
-                border-left: 0
+            @include combo-status
         td.description-container
           max-width: 100%
           input

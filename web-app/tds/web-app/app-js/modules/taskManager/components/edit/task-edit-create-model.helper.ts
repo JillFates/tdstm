@@ -96,26 +96,7 @@ export class TaskEditCreateModelHelper {
 
 	private extractDependencyTasks(array: any[]): any[] {
 		return array
-			.map((task) => this.makeTaskItem2(task));
-
-		/*
-		return array
-			.map((item) => {
-				const {id, taskId, taskNumber, desc, category, status} = item;
-				return {
-					taskId,
-					id,
-					desc: `${taskNumber}: ${desc}`,
-					taskNumber: taskNumber,
-					category,
-					status,
-					model: {
-						id,
-						text: `${taskNumber}: ${desc}`
-					}
-				}
-			});
-			*/
+			.map((task) => this.makeTaskItem(task));
 	}
 
 	private getTaskAdded(tasks: any[], originalTasks: any[]) : string[] {
@@ -226,7 +207,7 @@ export class TaskEditCreateModelHelper {
 		array.forEach((item) => {
 			let idField = 'id';
 
-			if (item.hasOwnProperty('taskId')) {
+			if (item.taskId) {
 				// existing tasks have taskId as key, new ones use id
 				idField = 'taskId';
 			}
@@ -278,12 +259,12 @@ export class TaskEditCreateModelHelper {
 		this.model.locked = !this.model.locked;
 	}
 
-	addPredecessor(index: number, id: string, text: string) {
-		this.model.predecessorList[index] = this.makeTaskItem(id, text) ;
+	addPredecessor(index: number, task: any): ITask {
+		return this.model.predecessorList[index] = this.makeTaskItem(task) ;
 	}
 
-	addSuccessor(index: number, id: string, text: string) {
-		this.model.successorList[index] = this.makeTaskItem(id, text);
+	addSuccessor(index: number, task: any): ITask {
+		return this.model.successorList[index] = this.makeTaskItem(task);
 	}
 
 	deleteSuccessor(index: number): boolean {
@@ -314,12 +295,8 @@ export class TaskEditCreateModelHelper {
 			return exists;
 	}
 
-	private makeTaskItem(id: string, text: string): any {
-		return { id, desc: text, model: {id , text} };
-	}
-
-	private makeTaskItem2(task: any): ITask {
-		const {id, desc, taskId = '', taskNumber, category, status} = task;
+	private makeTaskItem(task: any): ITask {
+		const {id, desc='', taskId = '', taskNumber, category, status, text=''} = task;
 
 		return {
 			id,
@@ -327,10 +304,10 @@ export class TaskEditCreateModelHelper {
 			category,
 			status,
 			taskNumber,
-			desc: `${taskNumber}: ${desc}`,
+			desc: desc || text,
 			model: {
 				id,
-				text: `${taskNumber}: ${desc}`
+				text: desc || text
 			}
 		}
 	}
