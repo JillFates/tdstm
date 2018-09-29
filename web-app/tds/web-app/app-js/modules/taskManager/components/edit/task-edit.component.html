@@ -56,6 +56,7 @@
                                                                 [data]="model.assetClasses"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
+                                                                (selectionChange)="onAssetClassChange($event)"
                                                                 [(ngModel)]="model.assetClass">
                                                         </kendo-dropdownlist>
                                                     </td>

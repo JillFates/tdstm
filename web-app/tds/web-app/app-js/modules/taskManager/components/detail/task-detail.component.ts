@@ -149,7 +149,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				if (team.length > 1) {
 					team = team[0];
 				}
-				this.taskDetailModel.detail.assignedTeam = team.nameRole.split(':')[0];
+				this.taskDetailModel.detail.assignedTeam = (team && team.nameRole || '').split(':')[0];
 			}
 		});
 	}
