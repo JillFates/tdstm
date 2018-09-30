@@ -354,7 +354,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	isFormInvalid(): boolean {
 		return !this.taskEditForm.form.valid ||
 				this.hasInvalidFields() ||
-				!this.model.asset ||
 				!(this.taskEditForm.form.dirty || this.hasModelChanges)
 	}
 

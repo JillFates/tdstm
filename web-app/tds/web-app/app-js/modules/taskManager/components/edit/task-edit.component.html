@@ -142,19 +142,17 @@
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U edge-cell" nowrap="nowrap">
-                                                        <label><span class="required-field">Asset</span></label>
+                                                        <label><span>Asset</span></label>
                                                     </td>
-                                                    <td class="valueNW">
-	                                                    <div class="validated-field">
+                                                    <td class="valueNW asset-entity">
                                                             <tds-combobox
                                                                     name="asset"
                                                                     [(model)]="model.asset"
                                                                     [(metaParam)]="model.assetClass.id"
                                                                     (valueChange)="onAssetEntityChange($event)"
-                                                                    [serviceRequest]="getAssetList" required="true">
+                                                                    [required]="false"
+                                                                    [serviceRequest]="getAssetList">
                                                             </tds-combobox>
-                                                            <div *ngIf="!model.asset" class="error-missing-field">Asset is required</div>
-                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">

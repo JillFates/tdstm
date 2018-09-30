@@ -221,11 +221,6 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	updateTask(payload: any): Observable<any> {
-		/*
-		console.log(payload);
-		return Observable.of(true);
-		*/
-
 		const url = `${this.baseURL}/assetEntity/updateComment`;
 		return this.http.post(url, JSON.stringify(payload))
 			.map(res =>  res && res.json())
