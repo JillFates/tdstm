@@ -148,6 +148,4 @@ export class PreferenceService {
 
 		return userDateFormat ? userDateFormat : DateUtils.DEFAULT_FORMAT_DATE;
 	}
-
-
 }

@@ -57,13 +57,15 @@
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
-        .error-message
+        .error-message,
+        .error-missing-field
           color: $color-message-error--red
           margin-top: 3px
+        .error-message
           display: none
-        .ng-invalid
-          border-color: $color-message-error--red
         .validated-field
+          .ng-invalid
+            border-color: $color-message-error--red
           .ng-invalid + .error-message
             display: block
         .validated-field > .ng-invalid
@@ -72,6 +74,7 @@
         .required-field::after
           content: "*"
           color: $color-message-error--red
+          margin-left: 4px
         .duplicate-error,
         .has-double-assignment
           font-weight: normal

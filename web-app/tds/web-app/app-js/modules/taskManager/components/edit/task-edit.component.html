@@ -142,15 +142,19 @@
                                                         </kendo-dropdownlist>
                                                     </td>
                                                     <td class="label U edge-cell" nowrap="nowrap">
-                                                        <label><span>Asset</span></label>
+                                                        <label><span class="required-field">Asset</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <tds-combobox
-                                                                [(model)]="model.asset"
-                                                                [(metaParam)]="model.assetClass.id"
-                                                                (valueChange)="onAssetEntityChange($event)"
-                                                                [serviceRequest]="getAssetList">
-                                                        </tds-combobox>
+	                                                    <div class="validated-field">
+                                                            <tds-combobox
+                                                                    name="asset"
+                                                                    [(model)]="model.asset"
+                                                                    [(metaParam)]="model.assetClass.id"
+                                                                    (valueChange)="onAssetEntityChange($event)"
+                                                                    [serviceRequest]="getAssetList" required="true">
+                                                            </tds-combobox>
+                                                            <div *ngIf="!model.asset" class="error-missing-field">Asset is required</div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
@@ -392,7 +396,7 @@
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
-                                                    [rowClass]="modelHelper && rowStatusColor"
+                                                    [rowClass]="modelHelper.rowStatusColor"
                                                     (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">

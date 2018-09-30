@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {NgForm} from '@angular/forms';
 import {clone} from 'ramda';
-import {KEYSTROKE, ModalType} from '../../../../shared/model/constants';
+import {ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from './../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
@@ -12,7 +12,6 @@ import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
-import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -196,7 +195,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 */
 	onAssetEntityChange(assetSelected: any): void {
 		this.model.asset = assetSelected;
-		this.onModelChange(assetSelected);
+		this.hasModelChanges = true;
 	}
 
 	/**
@@ -259,63 +258,24 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
-			.subscribe((result) => this.close(result));
-	}
+			.subscribe((result) => {
+				console.log(result);
+				console.log(this.model.id);
+				// save last updated field
+				this.model.lastUpdated = result && result.assetComment && result.assetComment.lastUpdated ?
+					result.assetComment && result.assetComment.lastUpdated
+					:
+					this.model.lastUpdated;
 
-	/**
-	 * Delete the Asset Comment
-	 */
-	protected onDelete(): void {
-		this.promptService.open(
-			'Confirmation Required',
-			'Confirm deletion of this record. There is no undo for this action?',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					// this.taskManagerService.deleteTaskComment(this.singleCommentModel.id).subscribe((res) => {
-					this.close();
-					// });
-				}
-			})
-			.catch((error) => console.log(error));
+				this.close(this.model);
+			});
 	}
-
-	/**
-	 * Get the assigned team name
-	 * @param commentId
-	 * @param assignedToId
-	 * @returns {any}
-	 */
-	/*
-	public getAssignedTeam(commentId: any, assignedToId: any): void {
-		this.taskManagerService.getAssignedTeam(commentId).subscribe((res: any) => {
-			let team = res.filter((team) => team.id === assignedToId);
-			if (team) {
-				// is this a real case in the legacy view?
-				if (team.length > 1) {
-					team = team[0];
-				}
-				this.taskDetailModel.detail.assignedTeam = team.nameRole.split(':')[0];
-			}
-		});
-	}
-	*/
 
 	/**
 	 * Toggle task details
 	 */
 	public onCollapseTaskDetail(): void {
 		this.collapsedTaskDetail = !this.collapsedTaskDetail;
-	}
-
-	/**
-	 * Change the background color based on the task status
-	 * @param {RowClassArgs} context
-	 * @returns {string}
-	 */
-	protected rowStatusColor(context: RowClassArgs) {
-		const status = context.dataItem && context.dataItem.status || ' ';
-		return 'task-' + status.toLowerCase();
 	}
 
 	/**
@@ -376,7 +336,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		}
 	}
 
-
 	/**
 	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
 	 * @returns {boolean}
@@ -395,6 +354,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	isFormInvalid(): boolean {
 		return !this.taskEditForm.form.valid ||
 				this.hasInvalidFields() ||
+				!this.model.asset ||
 				!(this.taskEditForm.form.dirty || this.hasModelChanges)
 	}
 
@@ -407,7 +367,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
-	 *  Determine if a string has the format URL or label|URL
+	 *  Mark labelURL field as invalid if it doesn't fit the format
 	 * @param labelURL {string}
 	 * @returns {boolean}
 	 */
@@ -427,7 +387,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {void}
 	 */
 	onAssetClassChange(): void {
-		this.model.asset = {id: '', text: ''};
+		this.model.asset = null;
 	}
 
 }

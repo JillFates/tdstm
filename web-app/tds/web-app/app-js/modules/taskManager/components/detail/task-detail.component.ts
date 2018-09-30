@@ -9,13 +9,12 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
-import {RowClassArgs} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
-import {TaskEditCreateModelHelper} from "../edit/task-edit-create-model.helper";
+import {TaskEditCreateModelHelper} from '../edit/task-edit-create-model.helper';
 
 @Component({
 	selector: `task-detail`,
@@ -100,69 +99,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.close({commentInstance: {id: task.taskId}});
 	}
 
-
-
-	protected onSave(): void {
-		/* this.taskManagerService.saveComment(this.singleCommentModel).subscribe((res) => {
-			this.close();
-		}); */
-		this.close();
-	}
-
-	/**
-	 * Delete the Asset Comment
-	 */
-	protected onDelete(): void {
-		this.promptService.open(
-			'Confirmation Required',
-			'Confirm deletion of this record. There is no undo for this action?',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					// this.taskManagerService.deleteTaskComment(this.singleCommentModel.id).subscribe((res) => {
-					this.close();
-					// });
-				}
-			})
-			.catch((error) => console.log(error));
-	}
-
-	protected resizeWindow(resize: any): void {
-		console.log(resize);
-	}
-
-	/**
-	 * Get the assigned team name
-	 * @param commentId
-	 * @param assignedToId
-	 * @returns {any}
-	 */
-	/*
-	public getAssignedTeam(commentId: any, assignedToId: any): void {
-		this.taskManagerService.getAssignedTeam(commentId).subscribe((res: any) => {
-			let team = res.filter((team) => team.id === assignedToId);
-			if (team) {
-				// is this a real case in the legacy view?
-				if (team.length > 1) {
-					team = team[0];
-				}
-				this.model.assignedTeamText = (team && team.nameRole || '').split(':')[0];
-			}
-		});
-	}
-	*/
-
 	public onCollapseTaskDetail(): void {
 		this.collapsedTaskDetail = !this.collapsedTaskDetail;
-	}
-
-	/**
-	 * Change the background color based on the task status
-	 * @param {RowClassArgs} context
-	 * @returns {string}
-	 */
-	protected rowStatusColor(context: RowClassArgs) {
-		return this.modelHelper.rowStatusColor(context);
 	}
 
 	/**
@@ -199,7 +137,9 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			{provide: TaskDetailModel, useValue: clone(this.taskDetailModel)}
 		], false, false)
 		.then(result => {
-			this.close(result);
+			if (result) {
+				this.model = result;
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

@@ -228,7 +228,7 @@ export class TaskService {
 
 		const url = `${this.baseURL}/assetEntity/updateComment`;
 		return this.http.post(url, JSON.stringify(payload))
-			.map(res => res.ok)
+			.map(res =>  res && res.json())
 			.catch((error: any) => error);
 	}
 

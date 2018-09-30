@@ -1,8 +1,7 @@
-import {DateUtils} from "../../../../shared/utils/date.utils";
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 export const YesNoList = ['Yes', 'No'];
 const PriorityList = [1, 2, 3, 4, 5];
-
 
 export interface ITask {
 	id: string | number;
@@ -17,7 +16,6 @@ export interface ITask {
 	}
 }
 
-
 export class TaskEditCreateModelHelper {
 	model: any;
 	private userTimeZone: string;
@@ -25,8 +23,7 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
 
-	constructor(userTimeZone: string,
-				userCurrentDateFormat: string) {
+	constructor(userTimeZone: string, userCurrentDateFormat: string) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
@@ -50,7 +47,7 @@ export class TaskEditCreateModelHelper {
 			instructionLink = detail.instructionsLinkURL;
 		} else {
 			if (detail.instructionsLinkLabel && detail.instructionsLinkURL) {
-				instructionLink =`${detail.instructionsLinkLabel}|${detail.instructionsLinkURL}`;
+				instructionLink = `${detail.instructionsLinkLabel}|${detail.instructionsLinkURL}`;
 			}
 		}
 
@@ -122,13 +119,13 @@ export class TaskEditCreateModelHelper {
 			.map((task) => this.makeTaskItem(task));
 	}
 
-	private getTaskAdded(tasks: any[], originalTasks: any[]) : string[] {
+	private getTaskAdded(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
 			.filter(task => !originalTasks.find(original => original.id === task.id))
 			.map((task, index) => (`-${index + 1}_${task.id}`));
 	}
 
-	private getTaskPrevious(tasks: any[], originalTasks: any[]) : string[] {
+	private getTaskPrevious(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
 			.filter(task => originalTasks.find(original => original.id === task.id))
 			.map((task, index) => (`${task.id}_${task.taskNumber}`));
@@ -148,12 +145,12 @@ export class TaskEditCreateModelHelper {
 
 		return  {
 			assetClass: assetClass.id,
-			assetEntity: this.getEmptyStringIfNull(asset.id).toString(),
+			assetEntity: this.getEmptyStringIfNull(asset && asset.id).toString(),
 			assetType: assetClass.text,
-			assignedTo: this.getEmptyStringIfNull(assignedTo.id).toString(),
+			assignedTo: this.getEmptyStringIfNull(assignedTo && assignedTo.id).toString(),
 			category: category,
-			apiAction: this.getEmptyStringIfNull(apiAction.id),
-			apiActionId: this.getEmptyStringIfNull(apiAction.id).toString() || "0",
+			apiAction: this.getEmptyStringIfNull(apiAction && apiAction.id),
+			apiActionId: this.getEmptyStringIfNull(apiAction && apiAction.id).toString() || '0',
 			actionInvocable: '',
 			actionMode: '',
 			comment: comment,
@@ -167,29 +164,29 @@ export class TaskEditCreateModelHelper {
 			estFinish: estimatedFinish ? DateUtils.formatDate(estimatedFinish, this.userCurrentDateTimeFormat) : '',
 			estStart: estimatedStart ? DateUtils.formatDate(estimatedStart, this.userCurrentDateTimeFormat) : '',
 			forWhom: '',
-			hardAssigned: hardAssigned === No ? "0" : "1",
-			sendNotification: sendNotification === No ? "0": "1",
-			isResolved: "0", /* ? */
+			hardAssigned: hardAssigned === No ? '0' : '1',
+			sendNotification: sendNotification ===  No ? '0' : '1',
+			isResolved: '0', /* ? */
 			instructionsLink: this.addProtocolToLabelURL(instructionLink),
-			moveEvent: this.getEmptyStringIfNull(event.id).toString(),
-			mustVerify: "0", /* ? */
-			override: "0", /* ? */
-			predCount: "-1", /* ? */
-			predecessorCategory: '', /* ? */
-			prevAsset: '', /* ? */
-			priority: priority.toString(), /* ? */
-			resolution: '', /* ? */
-			role: this.getEmptyStringIfNull(assignedTeam.id),
+			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
+			mustVerify: '0',
+			override: '0',
+			predCount: '-1',
+			predecessorCategory: '',
+			prevAsset: '',
+			priority: priority.toString(),
+			resolution: '',
+			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
-			manageDependency: "1",
+			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
 				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
 			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
 				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
 			deletedPreds: deletedItems,
-			workflowTransition: '', /* ? */
+			workflowTransition: '',
 			canEdit: true, /* ? */
-			durationLocked: locked ? "1" : "0",
+			durationLocked: locked ? '1' : '0',
 			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
 			taskNumber: taskNumber.toString(),
 			note: note,
@@ -198,7 +195,7 @@ export class TaskEditCreateModelHelper {
 	}
 
 	getEmptyStringIfNull(value: any): any {
-		return value === null || typeof value === 'undefined' ?  '' : value;
+		return value === null || typeof value === 'undefined' || value === false ?  '' : value;
 	}
 
 	/**
@@ -243,7 +240,7 @@ export class TaskEditCreateModelHelper {
 
 		return ids;
 	}
-	private addProtocolToLabelURL(labelURL: string = ''): string {
+	private addProtocolToLabelURL(labelURL = ''): string {
 		const separator = '|';
 		let isJustURL = false;
 		let [label, url] = labelURL.split(separator);
@@ -266,7 +263,7 @@ export class TaskEditCreateModelHelper {
 
 		return predecessors.some((p) => successors.indexOf(p) >= 0)
 			||
-			successors.some((s) =>predecessors.indexOf(s) >= 0);
+			successors.some((s) => predecessors.indexOf(s) >= 0);
 	}
 
 	/**
@@ -291,7 +288,6 @@ export class TaskEditCreateModelHelper {
 			this.hasEmptyIds(successorList) ||
 			this.hasDoubleAssignment();
 	}
-
 
 	toggleLocked() {
 		this.model.locked = !this.model.locked;
@@ -334,7 +330,7 @@ export class TaskEditCreateModelHelper {
 	}
 
 	private makeTaskItem(task: any): ITask {
-		const {id, desc='', taskId = '', taskNumber, category, status, text=''} = task;
+		const {id, desc = '', taskId = '', taskNumber, category, status, text = ''} = task;
 
 		const description = this.removeTaskNumberFromDescription(desc || text, taskNumber);
 
@@ -353,7 +349,7 @@ export class TaskEditCreateModelHelper {
 	}
 
 	private removeTaskNumberFromDescription(description: string, taskNumber: string): string {
-		return description.replace(new RegExp(`^${taskNumber}: `), "")
+		return description.replace(new RegExp(`^${taskNumber}: `), '')
 	}
 
 	/**
@@ -381,8 +377,3 @@ export class TaskEditCreateModelHelper {
 		return 'task-' + status.toLowerCase();
 	}
 }
-
-
-
-
-
