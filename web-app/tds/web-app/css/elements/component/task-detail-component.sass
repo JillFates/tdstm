@@ -29,6 +29,8 @@
       form
         .note
           resize: none
+        .vertical-note-status
+          vertical-align: top
         .duration-container
           vertical-align: top
         tr.dependency-error-section
@@ -88,13 +90,18 @@
           span input
             padding-top: 1px
         td.label.edge-cell
-          height: 40px;
-          max-height: 40px;
+          height: 35px
+        td.label.status-cell
+          height: 35px;
+          max-height: 35px;
           display: inline-table;
           width: 100%;
+        td.valueNW.note
+          vertical-align: top
         td.valueNW
           width: 160px
           max-width: 160px
+          padding-top: 0
           .category-list
             margin-bottom: 2px
           .read-only-dates
@@ -126,6 +133,10 @@
             width: 90%
           .delete-command
             cursor: pointer
+        td.valueNW.estimated-finish
+          .disabled-delete-estimated
+            color: gray
+            cursor: none
         .clickable
           input
             cursor: pointer

@@ -21,7 +21,7 @@
                                         <table>
                                             <tbody>
                                                 <tr class="prop">
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span class="required-field">Task # {{model.taskNumber}}</span></label>
                                                     </td>
                                                     <td class="valueNW description-container" colspan="5">
@@ -34,19 +34,100 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Status</span></label>
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Person</span></label>
                                                     </td>
-                                                    <td class="valueNW task-status">
+                                                    <td class="valueNW">
                                                         <kendo-dropdownlist
-                                                                name="statusList"
-                                                                [class]="'form-control status task-' + model.status.toLowerCase()"
-                                                                [data]="model.statusList"
-                                                                [(ngModel)]="model.status">
+                                                                name="assignedTo"
+                                                                class="form-control"
+                                                                [data]="model.personList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.assignedTo">
                                                         </kendo-dropdownlist>
                                                     </td>
-                                                    <td class="label url U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Team</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="team"
+                                                                class="form-control"
+                                                                [data]="model.teamList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.assignedTeam">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Event</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="event"
+                                                                class="form-control"
+                                                                [data]="model.eventList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.event" readonly="true">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label url U edge-cell" nowrap="nowrap">
+                                                        <label><span>Fixed Assignment</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="hardAssignment"
+                                                                [(ngModel)]="model.hardAssigned"
+                                                                [data]="yesNoList">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                    <td class="label url U edge-cell" nowrap="nowrap">
+                                                        <label><span>Send Notification</span></label>
+                                                    </td>
+                                                    <td  class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="sendNotification"
+                                                                [(ngModel)]="model.sendNotification"
+                                                                [data]="yesNoList">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Action</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="apiActionList"
+                                                                [data]="model.apiActionList"
+                                                                [textField]="'text'"
+                                                                [valueField]="'id'"
+                                                                [(ngModel)]="model.apiAction">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span class="required-field">Category</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <div class="validated-field">
+                                                            <kendo-dropdownlist
+                                                                    class="category-list"
+                                                                    name="category"
+                                                                    [data]="model.categoriesList"
+                                                                    [(ngModel)]="model.category" required>
+                                                            </kendo-dropdownlist>
+                                                            <div class="error-message">Category is required</div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="label url U edge-cell" nowrap="nowrap">
                                                         <label><span>Asset Class</span></label>
                                                     </td>
                                                     <td class="valueNW">
@@ -60,7 +141,7 @@
                                                                 [(ngModel)]="model.assetClass">
                                                         </kendo-dropdownlist>
                                                     </td>
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
                                                     <td class="valueNW">
@@ -73,107 +154,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Team</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="team"
-                                                                class="form-control"
-                                                                [data]="model.teamList"
-                                                                [textField]="'text'"
-                                                                [valueField]="'id'"
-                                                                [(ngModel)]="model.assignedTeam">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Priority</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="priority"
-                                                                class="form-control"
-                                                                [data]="model.priorityList"
-                                                                [(ngModel)]="model.priority">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Action</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="apiActionList"
-                                                                [data]="model.apiActionList"
-                                                                [textField]="'text'"
-                                                                [valueField]="'id'"
-                                                                [(ngModel)]="model.apiAction">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Person</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="assignedTo"
-                                                                class="form-control"
-                                                                [data]="model.personList"
-                                                                [textField]="'text'"
-                                                                [valueField]="'id'"
-                                                                [(ngModel)]="model.assignedTo">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                    <td class="label url U" nowrap="nowrap">
-                                                        <label><span>Fixed Assignment</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="hardAssignment"
-                                                                [(ngModel)]="model.hardAssigned"
-                                                                [data]="yesNoList">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                    <td class="label url U" nowrap="nowrap">
-                                                        <label><span>Send Notification</span></label>
-                                                    </td>
-                                                    <td  class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="sendNotification"
-                                                                [(ngModel)]="model.sendNotification"
-                                                                [data]="yesNoList">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Event</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dropdownlist
-                                                                name="event"
-                                                                class="form-control"
-                                                                [data]="model.eventList"
-                                                                [textField]="'text'"
-                                                                [valueField]="'id'"
-                                                                [(ngModel)]="model.event" readonly="true">
-                                                        </kendo-dropdownlist>
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span class="required-field">Category</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <div class="validated-field">
-															<kendo-dropdownlist
-                                                                    class="category-list"
-																	name="category"
-																	[data]="model.categoriesList"
-																	[(ngModel)]="model.category" required>
-															</kendo-dropdownlist>
-															<div class="error-message">Category is required</div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW instructions-link">
@@ -187,9 +168,18 @@
                                                         </div>
 
                                                     </td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Priority</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dropdownlist
+                                                                name="priority"
+                                                                class="form-control"
+                                                                [data]="model.priorityList"
+                                                                [(ngModel)]="model.priority">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
 
@@ -200,63 +190,8 @@
                                                                 [(ngModel)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>
-
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Start</span></label>
-                                                    </td>
-
-                                                    <td class="valueNW">
-                                                        <span class="read-only-dates">{{model.actualStart}}</span>
-                                                    </td>
-
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Finish</span></label>
-                                                    </td>
-
-                                                    <td class="valueNW">
-                                                        <span class="read-only-dates">{{model.actualFinish}}</span>
-                                                    </td>
                                                 </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
-                                                    </td>
-                                                    <td class="valueNW">
-                                                        <kendo-dateinput
-                                                                name="estimatedStart"
-                                                                class="clickable"
-                                                                (click)="openRangeDatesSelector()"
-                                                                [format]="getDateTimeFormat(model.estimatedStart)"
-                                                                [(ngModel)]="model.estimatedStart">
-                                                        </kendo-dateinput>
-                                                    </td>
 
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
-                                                    </td>
-
-                                                    <td class="valueNW estimated-finish">
-                                                        <div class="estimated-date-container">
-                                                            <kendo-dateinput
-                                                                    name="estimatedFinish"
-                                                                    class="clickable"
-                                                                    [format]="getDateTimeFormat(model.estimatedFinish)"
-                                                                    (click)="openRangeDatesSelector()"
-                                                                    [(ngModel)]="model.estimatedFinish">
-                                                            </kendo-dateinput>
-                                                        </div>
-                                                        <span (click)="cleanEstimatedDates()" *ngIf="model.estimatedFinish"
-                                                              class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
-                                                    </td>
-
-                                                    <td class="label U" nowrap="nowrap">
-                                                       <label><span>TaskSpec ID</span></label>
-                                                    </td>
-
-                                                    <td class="valueNW">
-                                                        <span class="read-only-dates">{{model.taskSpec}}</span>
-                                                    </td>
-                                                </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
@@ -295,13 +230,87 @@
                                                         </div>
                                                     </td>
                                                     <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Estimated Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <kendo-dateinput
+                                                                name="estimatedStart"
+                                                                class="clickable"
+                                                                (click)="openRangeDatesSelector()"
+                                                                [format]="getDateTimeFormat(model.estimatedStart)"
+                                                                [(ngModel)]="model.estimatedStart">
+                                                        </kendo-dateinput>
+                                                    </td>
+
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Estimated Finish</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW estimated-finish">
+                                                        <div class="estimated-date-container">
+                                                            <kendo-dateinput
+                                                                    name="estimatedFinish"
+                                                                    class="clickable"
+                                                                    [format]="getDateTimeFormat(model.estimatedFinish)"
+                                                                    (click)="openRangeDatesSelector()"
+                                                                    [(ngModel)]="model.estimatedFinish">
+                                                            </kendo-dateinput>
+                                                        </div>
+                                                        <span (click)="cleanEstimatedDates()"
+                                                              [ngClass]="{'disabled-delete-estimated': !model.estimatedFinish && !model.estimatedStart}"
+                                                              class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
+                                                    </td>
+
+                                                </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Actual Start</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <span class="read-only-dates">{{model.actualStart}}</span>
+                                                    </td>
+
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>Actual Finish</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <span class="read-only-dates">{{model.actualFinish}}</span>
+                                                    </td>
+
+                                                    <td class="label U edge-cell" nowrap="nowrap">
+                                                        <label><span>TaskSpec ID</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <span class="read-only-dates">{{model.taskSpec}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U status-cell" nowrap="nowrap">
+                                                        <label><span>Status</span></label>
+                                                    </td>
+                                                    <td class="valueNW task-status vertical-note-status">
+                                                        <kendo-dropdownlist
+                                                                name="statusList"
+                                                                [class]="'form-control status task-' + model.status.toLowerCase()"
+                                                                [data]="model.statusList"
+                                                                [(ngModel)]="model.status">
+                                                        </kendo-dropdownlist>
+                                                    </td>
+
+
+
+                                                    <td class="label U edge-cell vertical-note-status" nowrap="nowrap">
                                                         <label><span>Note</span></label>
                                                     </td>
-	                                                <td class="valueNW" colspan="4">
+                                                    <td class="valueNW.note" colspan="4">
                                                         <textarea name="note"
                                                                   class="note"
                                                                   placeholder="Enter a new note"
-                                                                  id="note" rows="3" [(ngModel)]="model.note"></textarea>
+                                                                  id="note" rows="4" [(ngModel)]="model.note"></textarea>
                                                     </td>
                                                 </tr>
                                             </tbody>
