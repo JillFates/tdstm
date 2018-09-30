@@ -10,7 +10,7 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">{{taskDetailModel.modal.title}}</h4>
+                <h4 class="modal-title">{{model.title}}</h4>
             </div>
             <div class="modal-body">
                 <div class="full-height">
@@ -28,59 +28,63 @@
                                             <tbody>
                                                 <tr class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label style="min-width: 104px;"><span>Task # {{taskDetailModel.detail?.assetComment?.taskNumber}}</span></label>
+                                                        <label style="min-width: 104px;"><span>Task # {{model.taskNumber}}</span></label>
                                                     </td>
                                                     <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
-                                                        <span>{{taskDetailModel.detail?.assetComment?.comment}}</span>
+                                                        <span>{{model.comment}}</span>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Person</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="valueNW"><span>{{model.assignedTo && model.assignedTo.text || ''}}</span></td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Team</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
+                                                    <td class="valueNW"><span>{{model.assignedTeam && model.assignedTeam.text || ''}}</span></td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Event</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.eventName}}</span></td>
+                                                    <td class="valueNW"><span>{{model.event && model.event.text || ''}}</span></td>
 
 
 
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-	                                                <td colspan="2">Fixed ASSIGN</td>
+	                                                <td class="label U" nowrap="nowrap">
+                                                        <label><span>Fixed Assignment</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{model.hardAssigned}}</span></td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Send Notification</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span>
+                                                    <td class="valueNW">
+                                                        <span>{{ model.sendNotification }}</span>
                                                     </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Action</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
+                                                    <td class="valueNW"><span>{{model.apiAction && model.apiAction.text || ''}}</span></td>
                                                 </tr>
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Category</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
+                                                    <td class="valueNW"><span>{{model.category}}</span></td>
                                                     <td class="label url U" nowrap="nowrap">
                                                         <label><span>Asset class</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <span>{{(taskDetailModel.detail && taskDetailModel.detail.assetClasses && taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]) || ''}}</span>
+                                                        <span>{{ model.assetClass && model.assetClass.text || ''}}</span>
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetName}}</span></td>
+                                                    <td class="valueNW"><span>{{model.asset && model.asset.text}}</span></td>
                                                 </tr>
 
 
@@ -89,18 +93,18 @@
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span>
+                                                        <span><tds-url-viewer *ngIf="model.instructionLink" [model]="model.instructionLink"></tds-url-viewer></span>
                                                     </td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Priority</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
+                                                    <td class="valueNW"><span>{{model.priority}}</span></td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.dueDate | date:dateFormat}}</span></td>
+                                                    <td class="valueNW"><span>{{model.dueDate | date:dateFormat}}</span></td>
                                                 </tr>
 
 
@@ -108,17 +112,17 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationText}}</span>
+                                                    <td class="valueNW"><span>{{model.durationText}}</span>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etStart}}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedStart | date:dateFormatTime}}</span></td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etFinish}}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedFinish | date:dateFormatTime }}</span></td>
 
                                                 </tr>
 
@@ -127,18 +131,18 @@
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.atStart}}</span></td>
+                                                    <td class="valueNW"><span>{{model.actualStart || ''}}</span></td>
 
                                                      <td class="label U" nowrap="nowrap">
 														<label><span>Actual Finish</span></label>
 														</td>
-														<td class="valueNW"><span>{{taskDetailModel.detail?.dtResolved}}</span>
+														<td class="valueNW"><span>{{model.actualFinish || ''}}</span>
                                                      </td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Actual Duration</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.actualDuration}}</span></td>
+                                                    <td class="valueNW"><span>{{model.actualDuration}}</span></td>
 
 
                                                 </tr>
@@ -150,18 +154,18 @@
                                                      <td class="label U" nowrap="nowrap">
 													  <label><span>Status</span></label>
 												  </td>
-												  <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}">
-													  <span>{{taskDetailModel.detail?.assetComment?.status}}</span>
+												  <td class="valueNW task-{{model.status |  lowercase}}">
+													  <span>{{model.status}}</span>
 												  </td>
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Workflow</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
+                                                    <td class="valueNW"><span>{{model.workflowTransitionName}}</span></td>
 
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Duration Delta</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationDelta}}</span></td>
+                                                    <td class="valueNW"><span>{{model.durationDelta}}</span></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -173,10 +177,10 @@
                                     <table class="dates-info">
                                         <tbody>
                                             <tr>
-                                                <td class="date-created">Created by {{taskDetailModel.detail?.personCreateObj}} at {{taskDetailModel.detail?.assetComment?.dateCreated | date:dateFormatTime}}
-                                                    {{(taskDetailModel.detail?.taskSpecId)? ' with spec id ' + taskDetailModel.detail?.taskSpecId: ''}}
-                                                    <span *ngIf="taskDetailModel.detail?.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{taskDetailModel.detail?.recipe?.id}}/gentasks/start"> {{taskDetailModel.detail?.recipe?.name}}</a></span>
-                                                <td class="last-updated">Last updated: {{taskDetailModel.detail?.assetComment?.lastUpdated | date:dateFormatTime}}</td>
+                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | date:dateFormatTime}}
+                                                    {{(model.taskSpecId)? ' with spec id ' + model.taskSpecId: ''}}
+                                                    <span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
+                                                <td class="last-updated">Last updated: {{model.lastUpdated | date:dateFormatTime}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -187,14 +191,14 @@
                                     <tr>
                                         <td valign="top">
                                             <kendo-grid
-                                                    *ngIf="dataGridTaskPredecessorsHelper"
+                                                    *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
                                                     class="successor-predecessor-table"
                                                     [data]="dataGridTaskPredecessorsHelper.gridData"
                                                     [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
                                                     (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)"
-                                                    [rowClass]="rowStatusColor">
+                                                    [rowClass]="modelHelper.rowStatusColor">
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                         <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessors ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
@@ -226,14 +230,14 @@
                                         </td>
                                         <td valign="top">
                                             <kendo-grid
-                                                    *ngIf="dataGridTaskSuccessorsHelper"
+                                                    *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
                                                     class="successor-predecessor-table"
                                                     [data]="dataGridTaskSuccessorsHelper.gridData"
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
                                                     [resizable]="false"
                                                     (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)"
-                                                    [rowClass]="rowStatusColor">
+                                                    [rowClass]="modelHelper.rowStatusColor">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>

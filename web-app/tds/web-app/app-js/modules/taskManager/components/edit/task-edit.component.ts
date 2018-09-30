@@ -99,7 +99,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
-		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
+		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
@@ -257,24 +257,6 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		this.close({commentInstance: {id: task.taskId}});
 	}
 
-	/**
-	 * Create the structure of the notes from the simple array returned in the API
-	 * @param notes
-	 * @returns {Array<any>}
-	 */
-	private generateNotes(notes: any): Array<any> {
-		let noteList = new Array<any>();
-		notes.forEach((note) => {
-			noteList.push({
-				dateCreated: note[0],
-				createdBy: note[1],
-				note: note[2],
-			});
-		});
-
-		return noteList;
-	}
-
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((result) => this.close(result));
@@ -304,6 +286,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @param assignedToId
 	 * @returns {any}
 	 */
+	/*
 	public getAssignedTeam(commentId: any, assignedToId: any): void {
 		this.taskManagerService.getAssignedTeam(commentId).subscribe((res: any) => {
 			let team = res.filter((team) => team.id === assignedToId);
@@ -316,6 +299,7 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 			}
 		});
 	}
+	*/
 
 	/**
 	 * Toggle task details

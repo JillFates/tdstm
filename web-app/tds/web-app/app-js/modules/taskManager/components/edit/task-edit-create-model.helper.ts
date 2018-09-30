@@ -1,4 +1,5 @@
 import {DateUtils} from "../../../../shared/utils/date.utils";
+import {clone} from 'ramda';
 export const YesNoList = ['Yes', 'No'];
 const PriorityList = [1, 2, 3, 4, 5];
 
@@ -37,21 +38,33 @@ export class TaskEditCreateModelHelper {
 	 * Set the model passing the all detail object
 	 */
 	public setModel(task: any): any {
-		const detail = task.detail;
+		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
 		const [yes, no] = YesNoList;
 
 		const categories =  [...(detail.categories || [])];
 		categories.push(''); // add empty default value
+		let  instructionLink = '';
+		if (!detail.instructionsLinkLabel  && detail.instructionsLinkURL)  {
+			instructionLink = detail.instructionsLinkURL;
+		} else {
+			if (detail.instructionsLinkLabel && detail.instructionsLinkURL) {
+				instructionLink =`${detail.instructionsLinkLabel}|${detail.instructionsLinkURL}`;
+			}
+		}
 
 		this.model = {
 			title: task.modal.title,
+			workflow: detail.workflow || '',
+			workflowTransitionName: assetComment.workflowTransition && assetComment.workflowTransition.name || '',
+			durationDelta: detail.durationDelta || '',
 			recipe: detail.recipe || null,
 			id: assetComment.id,
 			personCreateObj: detail.personCreateObj || '',
 			note: '',
 			duration: assetComment.duration,
+			actualDuration: detail.actualDuration || '',
 			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
 			lastUpdated: assetComment.lastUpdated,
@@ -60,6 +73,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
 			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
 			durationScale,
+			durationText: '',
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
@@ -67,7 +81,9 @@ export class TaskEditCreateModelHelper {
 			dueDate: assetComment.dueDate ? new Date(DateUtils.formatUserDateTime(this.userTimeZone, assetComment.dueDate)) : '',
 			estimatedStart: assetComment.estStart ? new Date(DateUtils.formatUserDateTime(this.userTimeZone, assetComment.estStart)) : '',
 			estimatedFinish: assetComment.estFinish ? new Date(DateUtils.formatUserDateTime(this.userTimeZone, assetComment.estFinish))  : '',
-			instructionLink: detail.instructionLink === '|' ? '' : detail.instructionLink,
+			instructionLink,
+			instructionsLinkLabel: detail.instructionsLinkLabel || '',
+			instructionsLinkURL: detail.instructionsLinkURL || '',
 			priority: assetComment.priority,
 			assetName: detail.assetName,
 			comment:  assetComment.comment || '',
@@ -79,6 +95,7 @@ export class TaskEditCreateModelHelper {
 			teamList: [],
 			originalPredecessorList: (detail.predecessorList || []),
 			originalSuccessorList: (detail.successorList || []),
+			notesList: (detail.notes || []),
 			predecessorList: this.extractDependencyTasks (detail.predecessorList || []),
 			successorList: this.extractDependencyTasks(detail.successorList || []),
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
@@ -178,9 +195,6 @@ export class TaskEditCreateModelHelper {
 			note: note,
 			id: id
 		};
-
-		// taskDependency: '3002_233386', /* ? */
-		// taskSuccessor: '3012_233398', /* ? */
 	}
 
 	getEmptyStringIfNull(value: any): any {
@@ -340,6 +354,31 @@ export class TaskEditCreateModelHelper {
 
 	private removeTaskNumberFromDescription(description: string, taskNumber: string): string {
 		return description.replace(new RegExp(`^${taskNumber}: `), "")
+	}
+
+	/**
+	 * Create the structure of the notes from the simple array returned in the API
+	 * @param notes
+	 * @returns {Array<any>}
+	 */
+	public generateNotes(notes: any): Array<any> {
+		let noteList = new Array<any>();
+		notes.forEach((item: string[]) => {
+			const [dateCreated, createdBy, note] = item;
+			noteList.push({ dateCreated, createdBy, note });
+		});
+
+		return noteList;
+	}
+
+	/**
+	 * Change the background color based on the task status
+	 * @param {any} context
+	 * @returns {string}
+	 */
+	public rowStatusColor(context: any) {
+		const status = context.dataItem && context.dataItem.status || '';
+		return 'task-' + status.toLowerCase();
 	}
 }
 

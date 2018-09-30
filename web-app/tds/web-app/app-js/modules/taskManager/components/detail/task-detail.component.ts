@@ -15,6 +15,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
+import {TaskEditCreateModelHelper} from "../edit/task-edit-create-model.helper";
 
 @Component({
 	selector: `task-detail`,
@@ -26,6 +27,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public modalType = ModalType;
 	public dateFormat: string;
 	public dateFormatTime: string;
+	public userTimeZone: string;
+	public modelHelper: TaskEditCreateModelHelper;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
@@ -36,6 +39,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public hasEditTaskPermission = false;
 	public hasDeleteTaskPermission = false;
 	public modalOptions: DecoratorOptions;
+	public model: any = {};
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -50,6 +54,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
@@ -64,19 +69,26 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.dateFormat = this.userPreferenceService.getUserDateFormat();
 			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 			this.taskDetailModel.detail = res;
-			this.taskDetailModel.detail.instructionLink = this.taskDetailModel.detail.instructionsLinkLabel + '|' + this.taskDetailModel.detail.instructionsLinkURL;
 
-			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.predecessorList, null, null);
-			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.taskDetailModel.detail.successorList, null, null);
+			this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+			this.model = this.modelHelper.setModel(this.taskDetailModel);
+
+			this.model.instructionLink = this.model.instructionsLinkLabel + '|' + this.model.instructionsLinkURL;
+
+			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
+			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
 			// Notes are coming into an Array of Arrays...
-			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.generateNotes(this.taskDetailModel.detail.notes), null, null);
+			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 			// Convert the Duration into a Human Readable form
-			this.taskDetailModel.detail.durationText = DateUtils.formatDuration(this.taskDetailModel.detail.assetComment.duration, this.taskDetailModel.detail.assetComment.durationScale.name);
+			this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
 
 			// Get Assigned Team
-			if (this.taskDetailModel.detail.assetComment.assignedTo) {
-				this.getAssignedTeam(this.taskDetailModel.detail.assetComment.id, this.taskDetailModel.detail.assetComment.assignedTo.id);
+			/*
+			if (this.model.assignedTo) {
+				this.getAssignedTeam(this.model.id, this.model.assignedTo.id);
 			}
+			*/
+
 		});
 	}
 
@@ -88,23 +100,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.close({commentInstance: {id: task.taskId}});
 	}
 
-	/**
-	 * Create the structure of the notes from the simple array returned in the API
-	 * @param notes
-	 * @returns {Array<any>}
-	 */
-	private generateNotes(notes: any): Array<any> {
-		let noteList = new Array<any>();
-		notes.forEach((note) => {
-			noteList.push({
-				dateCreated: note[0],
-				createdBy: note[1],
-				note: note[2],
-			});
-		});
 
-		return noteList;
-	}
 
 	protected onSave(): void {
 		/* this.taskManagerService.saveComment(this.singleCommentModel).subscribe((res) => {
@@ -141,6 +137,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @param assignedToId
 	 * @returns {any}
 	 */
+	/*
 	public getAssignedTeam(commentId: any, assignedToId: any): void {
 		this.taskManagerService.getAssignedTeam(commentId).subscribe((res: any) => {
 			let team = res.filter((team) => team.id === assignedToId);
@@ -149,10 +146,11 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				if (team.length > 1) {
 					team = team[0];
 				}
-				this.taskDetailModel.detail.assignedTeam = (team && team.nameRole || '').split(':')[0];
+				this.model.assignedTeamText = (team && team.nameRole || '').split(':')[0];
 			}
 		});
 	}
+	*/
 
 	public onCollapseTaskDetail(): void {
 		this.collapsedTaskDetail = !this.collapsedTaskDetail;
@@ -164,7 +162,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {string}
 	 */
 	protected rowStatusColor(context: RowClassArgs) {
-		return 'task-' + context.dataItem.status.toLowerCase();
+		return this.modelHelper.rowStatusColor(context);
 	}
 
 	/**
