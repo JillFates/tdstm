@@ -27,6 +27,10 @@
     .modal-body
       height: 86%
       form
+        .note
+          resize: none
+        .duration-container
+          vertical-align: top
         tr.dependency-error-section
           display: none
           td
@@ -83,6 +87,11 @@
           @include combo-status
           span input
             padding-top: 1px
+        td.label.edge-cell
+          height: 40px;
+          max-height: 40px;
+          display: inline-table;
+          width: 100%;
         td.valueNW
           width: 160px
           max-width: 160px
@@ -107,8 +116,9 @@
         .instructions-link  input,
         textarea
           width: 100%
-        .estimated-finish
+        td.valueNW.estimated-finish
           display: flex
+          max-width: unset
           justify-content: space-between
           width: 100%
           align-items: center

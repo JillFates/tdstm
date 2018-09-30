@@ -258,11 +258,10 @@
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
                                                     </td>
-                                                    <td class="valueNW">
-
+                                                    <td class="valueNW duration-container">
                                                         <div class="duration-controls">
                                                             <div class="duration-value">
                                                                 <input type="number"
@@ -295,11 +294,12 @@
                                                             </label>
                                                         </div>
                                                     </td>
-                                                    <td class="label U" nowrap="nowrap">
+                                                    <td class="label U edge-cell" nowrap="nowrap">
                                                         <label><span>Note</span></label>
                                                     </td>
 	                                                <td class="valueNW" colspan="4">
                                                         <textarea name="note"
+                                                                  class="note"
                                                                   placeholder="Enter a new note"
                                                                   id="note" rows="3" [(ngModel)]="model.note"></textarea>
                                                     </td>
