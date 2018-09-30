@@ -36,98 +36,128 @@
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Status</span></label>
+                                                        <label><span>Person</span></label>
                                                     </td>
-                                                    <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}"><span>{{taskDetailModel.detail?.assetComment?.status}}</span></td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Team</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Event</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.eventName}}</span></td>
+
+
+
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+	                                                <td colspan="2">Fixed ASSIGN</td>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Send Notification</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span>
+                                                    </td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Action</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
+                                                </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Category</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
                                                     <td class="label url U" nowrap="nowrap">
                                                         <label><span>Asset class</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <span>{{(taskDetailModel.detail && taskDetailModel.detail.assetClasses && taskDetailModel.detail.assetClasses[taskDetailModel.detail.assetClass]) || ''}}</span>
                                                     </td>
+
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{taskDetailModel.detail?.assetName}}</span></td>
                                                 </tr>
+
+
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Team</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTeam}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Priority</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Action</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.apiAction?.name}}</span></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Person</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assignedTo}}</span></td>
                                                     <td class="label url U" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <span><tds-url-viewer *ngIf="taskDetailModel.detail?.instructionLink" [model]="taskDetailModel.detail.instructionLink"></tds-url-viewer></span>
                                                     </td>
-	                                                <td colspan="2"></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+
                                                     <td class="label U" nowrap="nowrap">
-                                                        <label><span>Send Notification</span></label>
+                                                        <label><span>Priority</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{ (taskDetailModel.detail?.assetComment?.sendNotification === 0 || taskDetailModel.detail?.assetComment?.sendNotification === false)? 'N' : 'Y' }}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etStart}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Start</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.atStart}}</span></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Event</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.eventName}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etFinish}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Finish</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.dtResolved}}</span></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Category</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.category}}</span></td>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Estimated Duration</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationText}}</span>
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Actual Duration</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.actualDuration}}</span></td>
-                                                </tr>
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label U" nowrap="nowrap">
-                                                        <label><span>Workflow</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.priority}}</span></td>
+
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.dueDate | date:dateFormat}}</span></td>
+                                                </tr>
+
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.durationText}}</span>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etStart}}</span></td>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Estimated Finish</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.etFinish}}</span></td>
+
+                                                </tr>
+
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Start</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.atStart}}</span></td>
+
+                                                     <td class="label U" nowrap="nowrap">
+														<label><span>Actual Finish</span></label>
+														</td>
+														<td class="valueNW"><span>{{taskDetailModel.detail?.dtResolved}}</span>
+                                                     </td>
+
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Actual Duration</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.actualDuration}}</span></td>
+
+
+                                                </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                     <td class="label U" nowrap="nowrap">
+													  <label><span>Status</span></label>
+												  </td>
+												  <td class="valueNW task-{{taskDetailModel.detail?.assetComment?.status |  lowercase}}">
+													  <span>{{taskDetailModel.detail?.assetComment?.status}}</span>
+												  </td>
+                                                    <td class="label U" nowrap="nowrap">
+                                                        <label><span>Workflow</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{taskDetailModel.detail?.assetComment?.workflowTransition?.name}}</span></td>
+
                                                     <td class="label U" nowrap="nowrap">
                                                         <label><span>Duration Delta</span></label>
                                                     </td>
