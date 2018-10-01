@@ -6,6 +6,7 @@ import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
 import {DateRangeSelectorModel} from './model/date-range-selector.model';
 import {DateUtils} from '../../utils/date.utils';
 import { SelectionRange } from '@progress/kendo-angular-dateinputs';
+import {TranslatePipe} from '../../pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
@@ -20,7 +21,8 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	constructor(
 		public model: DateRangeSelectorModel,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe) {
 
 		super('#date-range-selector-component');
 		this.modalOptions = { isDraggable: true, isResizable: false, isCentered: false };
@@ -35,7 +37,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.model);
+		return this.dataSignature !== JSON.stringify(this.model) && this.model.start && this.model.end;
 	}
 
 	/**
@@ -67,9 +69,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		if (this.isDirty()) {
 
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')	,
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'))
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();
@@ -119,20 +122,53 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 			this.model = {start: newStart, end: newEnd, locked, dateFormat, timeFormat, duration};
 		} else {
-			this.model = {start: range.start, end: range.end, locked, dateFormat, timeFormat, duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
+			this.model = {start: range.start, end: range.end, locked, dateFormat, timeFormat,
+				duration: DateUtils.getDurationPartsAmongDates(range.start, range.end) };
 		}
 	}
 
-	onDateChanged(type: string, value: any): void {
+	/**
+	 * On date changed if lock is off update the duration, if lock is on shift start and end dates to keep duration intact
+	 * @param {string} type: Could be start or end
+	 * @param {any} value: Current date value selected
+	 * @returns {void}
+	 */
+	onDateChanged(type: 'start' | 'end', value: any): void {
+		if (!value) {
+			return;
+		}
+
 		const start = type === 'start' ? value : this.model.start;
 		const end = type === 'end' ? value : this.model.end;
 
-		if (this.model.start && this.model.end) {
-			this.model.duration = DateUtils.getDurationPartsAmongDates(start, end);
+		if (!this.model.locked) {
+			if (this.model.start && this.model.end) {
+				this.model.duration = DateUtils.getDurationPartsAmongDates(start, end);
+			}
+		} else {
+			if (type === 'end' && value) {
+				const duration = DateUtils.getDurationPartsAmongDates(this.model.end, value);
+				this.model.start = DateUtils.increment(this.model.start,
+					[
+										{value: duration.days, unit: 'days'},
+										{value: duration.hours, unit: 'hours'},
+										{value: duration.minutes, unit: 'minutes'}]);
+
+				this.model.end = DateUtils.increment(this.model.end,
+					[
+										{value: duration.days, unit: 'days'},
+										{value: duration.hours, unit: 'hours'},
+										{value: duration.minutes, unit: 'minutes'}]);
+			}
 		}
 	}
 
-	updateEstimatedFinish(unit: 'days' | 'hours' | 'minutes'): void {
+	/**
+	 * On change duration calculates the increment/decrement and shift the end date correspondingly
+	 * @param {string} unit: unit to increment
+	 * @returns {void}
+	 */
+	onChangeDuration(unit: 'days' | 'hours' | 'minutes'): void {
 		if (!this.model.start || !this.model.end) {
 			return;
 		}
@@ -146,9 +182,13 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		this.model = {start, end, dateFormat, timeFormat, locked, duration};
 	}
 
+	/**
+	 * Based upon current activeRangeEnd value display the window title
+	 * @returns {void}
+	 */
 	getTitle(): string {
-		const startMessage = 'Select a Start Date';
-		const endMessage = 'Select a Finish Date';
+		const startMessage = this.translatePipe.transform('TASK_MANAGER.EDIT.SELECT_START_DATE');
+		const endMessage = this.translatePipe.transform('TASK_MANAGER.EDIT.SELECT_END_DATE');
 
 		if (this.model.locked) {
 			return startMessage;

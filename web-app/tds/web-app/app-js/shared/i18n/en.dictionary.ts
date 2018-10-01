@@ -210,7 +210,9 @@ export const en_DICTIONARY: Object = {
 		'EDIT': {
 			'REQUIRED_FIELD': 'Field is required',
 			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',
-			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.'
+			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
+			'SELECT_START_DATE': 'Select a start date',
+			'SELECT_END_DATE': 'Select an end date'
 		}
 	},
 	'NOTICE_MANAGER': {

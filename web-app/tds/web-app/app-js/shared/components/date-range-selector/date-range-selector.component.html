@@ -22,7 +22,6 @@
                                 </div>
                                 <div class="times-section">
                                     <kendo-dateinput
-		                                    [disabled]="model.locked"
 		                                    (valueChange)="onDateChanged('end', $event)"
 		                                    [format]="getDateTimeFormat(model.end)"
                                             [(value)]="model.end"></kendo-dateinput>
@@ -41,21 +40,21 @@
 			                    <div class="duration-value">
 				                    <input type="number"
 				                           min="0"
-				                           (change)="updateEstimatedFinish('days')"
+				                           (change)="onChangeDuration('days')"
 				                           [(ngModel)]="model.duration.days" name="durationDays" id="durationDays" >
 				                    <label class="label-part" for="durationDays">Days</label>
 			                    </div>
 			                    <div  class="duration-value">
 				                    <input type="number"
 				                           min="0"
-				                           (change)="updateEstimatedFinish('hours')"
+				                           (change)="onChangeDuration('hours')"
 				                           [(ngModel)]="model.duration.hours" name="durationHours" id="durationHours" >
 				                    <label class="label-part" for="durationHours">Hours</label>
 			                    </div>
 			                    <div  class="duration-value">
 				                    <input type="number"
 				                           min="0"
-				                           (change)="updateEstimatedFinish('minutes')"
+				                           (change)="onChangeDuration('minutes')"
 				                           [(ngModel)]="model.duration.minutes" name="durationMinutes" id="durationMinutes" >
 				                    <label class="label-part" for="durationMinutes">Minutes</label>
 			                    </div>
