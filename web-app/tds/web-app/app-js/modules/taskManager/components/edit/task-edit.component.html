@@ -206,21 +206,21 @@
                                                             <div class="duration-value">
                                                                 <input type="number"
                                                                        min="0"
-                                                                       (change)="updateEstimatedFinish('days')"
+                                                                       (change)="updateEstimatedFinish($event.target.value,'days')"
                                                                        [(ngModel)]="model.durationParts.days" name="durationDays" id="durationDays">
                                                                 <label for="durationDays">Days</label>
                                                             </div>
                                                             <div  class="duration-value">
                                                                 <input type="number"
                                                                        min="0"
-                                                                       (change)="updateEstimatedFinish('hours')"
+                                                                       (change)="updateEstimatedFinish($event.target.value, 'hours')"
                                                                        [(ngModel)]="model.durationParts.hours" name="durationHours" id="durationHours">
                                                                 <label for="durationHours">Hours</label>
                                                             </div>
                                                             <div  class="duration-value">
                                                                 <input type="number"
                                                                        min="0"
-                                                                       (change)="updateEstimatedFinish('minutes')"
+                                                                       (change)="updateEstimatedFinish($event.target.value, 'minutes')"
                                                                        [(ngModel)]="model.durationParts.minutes" name="durationMinutes" id="durationMinutes">
                                                                 <label for="durationMinutes">Minutes</label>
                                                             </div>

@@ -298,8 +298,13 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 * @param {DatePartUnit} unit
 	 * @returns {void}
 	 */
-	updateEstimatedFinish(unit: DatePartUnit): void {
+	updateEstimatedFinish(value: string, unit: DatePartUnit): void {
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.estimatedStart, this.model.estimatedFinish);
+
+		if (value === '') {
+			this.model.durationParts[unit] = 0;
+		}
+
 		const diff = this.model.durationParts[unit] - originalParts[unit];
 
 		if (this.model.estimatedFinish) {
