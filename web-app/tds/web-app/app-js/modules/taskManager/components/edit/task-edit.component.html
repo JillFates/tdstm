@@ -13,7 +13,10 @@
             </div>
             <div class="modal-body">
                 <form #taskEditForm="ngForm" class="full-height">
-                    <table style="border: 0;" class="full-height">
+                    <table style="border: 0;" class="full-height"
+                           [ngClass]="{'has-duplicated-predecessors': modelHelper.hasDuplicatedPredecessors(),
+                                       'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors(),
+                                       'has-double-assignment': modelHelper.hasDoubleAssignment()}">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td class="task-details" colspan="2">
@@ -336,12 +339,11 @@
                             </tr>
                             <tr class="deps no-grow-container">
                                 <table>
-
                                     <tr>
                                         <td valign="top">
                                             <kendo-grid
                                                     *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
-                                                    class="successor-predecessor-table"
+                                                    class="successor-predecessor-table has-duplicated-predecessors"
                                                     [data]="dataGridTaskPredecessorsHelper.gridData"
                                                     [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
@@ -388,7 +390,7 @@
                                         <td valign="top">
                                             <kendo-grid
                                                     *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
-                                                    class="successor-predecessor-table"
+                                                    class="successor-predecessor-table has-duplicated-successors"
                                                     [data]="dataGridTaskSuccessorsHelper.gridData"
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
@@ -429,9 +431,7 @@
 
                                 </table>
                             </tr>
-                            <tr class="dependency-error-section"
-                                [ngClass]="{'has-duplicated-predecessors':modelHelper.hasDuplicatedPredecessors(),
-                                            'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors()}">
+                            <tr class="dependency-error-section has-duplicated">
 	                            <table>
 		                            <tr>
 										<td>
@@ -444,8 +444,7 @@
 
 								</table>
                             </tr>
-                            <tr class="dependency-error-section"
-                                [ngClass]="{'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+                            <tr class="dependency-error-section has-double-assignment">
 	                            <table>
 		                            <tr>
                                         <td colspan="2">

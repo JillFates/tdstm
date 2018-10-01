@@ -39,22 +39,49 @@
           td
             label
               visibility: hidden
-        tr.dependency-error-section.has-duplicated-predecessors,
-        tr.dependency-error-section.has-duplicated-successors,
-        tr.dependency-error-section.has-double-assignment
-          display: block
-        tr.dependency-error-section.has-duplicated-predecessors
-          td
-            label.has-duplicated-predecessors
-              visibility: visible
-        tr.dependency-error-section.has-duplicated-successors
-          td
-            label.has-duplicated-successors
-              visibility: visible
-        tr.dependency-error-section.has-double-assignment
-          td
-            label.has-double-assignment
-              visibility: visible
+
+        table.has-duplicated-successors
+          tr.dependency-error-section.has-duplicated
+            display: block
+            td
+              label.has-duplicated-successors
+                visibility: visible
+
+        table.has-duplicated-predecessors
+          tr.dependency-error-section.has-duplicated
+            display: block
+            td
+              label.has-duplicated-predecessors
+                visibility: visible
+
+        table.has-duplicated-predecessors,
+        table.has-duplicated-successors
+          kendo-grid.successor-predecessor-table
+            max-height: 160px
+
+        table.has-double-assignment
+          tr.dependency-error-section.has-double-assignment
+            display: block
+            td
+              label.has-double-assignment
+                visibility: visible
+
+        //tr.dependency-error-section.has-duplicated-successors,
+        //tr.dependency-error-section.has-double-assignment
+        //  display: block
+        //tr.dependency-error-section.has-duplicated-predecessors
+        //  td
+        //    label.has-duplicated-predecessors
+        //      visibility: visible
+        //tr.dependency-error-section.has-duplicated-successors
+        //  td
+        //    label.has-duplicated-successors
+        //      visibility: visible
+        //tr.dependency-error-section.has-double-assignment
+        //  td
+        //    label.has-double-assignment
+        //      visibility: visible
+
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
@@ -77,7 +104,7 @@
           color: $color-message-error--red
           margin-left: 4px
         .duplicate-error,
-        .has-double-assignment
+        .dependency-error-section label.has-double-assignment
           font-weight: normal
           color: $color-message-error--red
         .has-double-assignment
