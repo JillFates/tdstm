@@ -104,7 +104,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 
 			const cloneModalModel: CloneModalModel = {
 				assetType: DOMAIN.DATABASE,
-				id: this.mainAsset
+				assetId: this.mainAsset
 			}
 			this.dialogService.extra(AssetCloneComponent, [
 				{provide: CloneModalModel, useValue: cloneModalModel}
@@ -112,7 +112,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 
 				if (result.clonedAsset && result.showEditView) {
 					const componentParameters = [
-						{ provide: 'ID', useValue: result.id },
+						{ provide: 'ID', useValue: result.assetId },
 						{ provide: 'ASSET', useValue: DOMAIN.DATABASE }
 					];
 

@@ -18,11 +18,11 @@ import {CloneModalModel} from '../../model/clone-modal.model';
 export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 
 	public modalOptions: DecoratorOptions;
-    public ASSET_NAME_POPUP_MESSAGE = `Cloned asset will have Environment = 'Select...' and the next available Asset Tag number for device class`;
-    protected asset: any;
-    protected assetName: string;
-    protected uniqueAssetName: boolean;
-    protected existAsset: any;
+	public ASSET_NAME_POPUP_MESSAGE = `Cloned asset will have Environment = 'Select...' and the next available Asset Tag number for device class`;
+	protected asset: any;
+	protected assetName: string;
+	protected uniqueAssetName: boolean;
+	protected existAsset: any;
 	@ViewChild('includeDependencies') includeDependencies: ElementRef;
 
 	constructor(
@@ -39,7 +39,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 
 	ngOnInit() {
 		console.log('AssetClone', this.cloneModalModel);
-		this.assetExplorerService.getAsset(this.cloneModalModel.id)
+		this.assetExplorerService.getAsset(this.cloneModalModel.assetId)
 			.subscribe( (res) => {
 				this.asset = res;
 				this.assetName = res.assetName;
@@ -65,7 +65,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	 */
 	protected isAssetUnique() {
 		const assetToValid = {
-			id: this.cloneModalModel.id,
+			id: this.cloneModalModel.assetId,
 			name: this.assetName
 		}
 		this.assetExplorerService.checkAssetForUniqueName(assetToValid)
@@ -83,7 +83,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	 */
 	protected cloneAssetValidations(displayEdit: boolean) {
 
-		if (this.existAsset && !this.existAsset.unique) {
+		if ((this.existAsset && !this.existAsset.unique) || !this.uniqueAssetName) {
 			this.prompt.open('Asset already exists',
 				'The Asset Name you want to create already exists, do you want to proceed?',
 				'Confirm', 'Cancel')
@@ -104,7 +104,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 
 	protected cloneAsset(displayEdit: boolean) {
 		const assetToClone = {
-			id: this.cloneModalModel.id,
+			assetId: this.cloneModalModel.assetId,
 			cloneDependencies: this.includeDependencies.nativeElement.checked,
 			name: this.assetName
 		}
@@ -144,12 +144,12 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 		let cloneCloseModel: CloneCLoseModel = {
 			clonedAsset: true,
 			showEditView : false,
-			id: null
+			assetId: null
 		}
 
 		if (displayEdit) {
 			cloneCloseModel.showEditView = true;
-			cloneCloseModel.id = id;
+			cloneCloseModel.assetId = id;
 		}
 
 		this.close(cloneCloseModel);

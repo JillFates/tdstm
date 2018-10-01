@@ -4,5 +4,5 @@
  */
 export class CloneModalModel {
 	assetType: string;
-	id: number;
+	assetId: number;
 }
