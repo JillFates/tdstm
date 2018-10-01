@@ -177,18 +177,22 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], false, false).then(result => {
-			if (result) {
-				if (result.isDeleted) {
-					this.deleteTaskComment(dataItem);
-				} else if (result.commentInstance) {
-					this.openTaskDetail(result, ModalType.VIEW);
+		], false, false)
+			.then(result => {
+				if (result) {
+					if (result.isDeleted) {
+						this.deleteTaskComment(dataItem);
+					} else if (result.commentInstance) {
+						this.openTaskDetail(result, ModalType.VIEW);
+					}
+					this.createDataGrids();
 				}
-			}
 
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+			}).catch(result => {
+				if (result) {
+					this.createDataGrids();
+				}
+			});
 	}
 
 	public reloadGrid(): void {

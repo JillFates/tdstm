@@ -40,6 +40,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public hasDeleteTaskPermission = false;
 	public modalOptions: DecoratorOptions;
 	public model: any = {};
+	private hasChanges: boolean;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -55,6 +56,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
+		this.hasChanges = false;
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
@@ -82,14 +84,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 			// Convert the Duration into a Human Readable form
 			this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
-
-			// Get Assigned Team
-			/*
-			if (this.model.assignedTo) {
-				this.getAssignedTeam(this.model.id, this.model.assignedTo.id);
-			}
-			*/
-
 		});
 	}
 
@@ -109,7 +103,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Close Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.dismiss();
+		this.dismiss(this.hasChanges);
 	}
 	/**
 	 * Prompt confirm delete a task
@@ -142,10 +136,16 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		], false, false)
 		.then(result => {
 			if (result) {
-				this.loadTaskDetail();
+				if (result.isDeleted) {
+					this.close({id: this.taskDetailModel, isDeleted: true})
+				}
+				else {
+					this.hasChanges = true;
+					this.loadTaskDetail();
+				}
 			}
 		}).catch(result => {
-			this.dismiss();
+			this.dismiss(this.hasChanges);
 		});
 	}
 }
