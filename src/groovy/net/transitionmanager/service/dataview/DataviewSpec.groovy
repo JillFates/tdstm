@@ -87,7 +87,7 @@ class DataviewSpec {
 			if(matchingColumns.size() == 1){
 				matchingColumns[0].filter = filter.filter
 			} else {
-				throw new RuntimeException('Multiple results for column name')
+				throw new RuntimeException('Non-unique field specified in filter parameter. Add domain prefix to uniquely identify field (e.g. device.custom1)')
 			}
 		}
 	}

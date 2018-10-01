@@ -74,10 +74,6 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 		}
 
 		Dataview dataview = fetchDomain(Dataview, params)
-		if (!dataview) {
-			renderErrorJson('Dataview invalid')
-			return
-		}
 
 		Map queryResult = dataviewService.query(project, dataview, apiParamsCommand)
 		renderSuccessJson(queryResult)

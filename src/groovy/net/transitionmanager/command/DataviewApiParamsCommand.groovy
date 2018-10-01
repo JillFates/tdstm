@@ -1,4 +1,7 @@
 package net.transitionmanager.command
+
+import com.tdssrc.grails.StringUtil
+
 /**
  * The DataviewApiParamsCommand is used to filter API dataviews requests
  */
@@ -6,6 +9,9 @@ package net.transitionmanager.command
 class DataviewApiParamsCommand implements CommandObject {
 
 	int offset = 0
+	/**
+	 * The API should be able to call the endpoint and receive ALL records without pagination but the API should support pagination if the consumer of the API specifies an offset/size.
+	 */
 	int limit
 	/**
 	 * Defined by the following structure:
@@ -20,11 +26,9 @@ class DataviewApiParamsCommand implements CommandObject {
 		limit nullable: true, min: 0, max: Integer.MAX_VALUE
 		filter nullable: true, blank: true, validator: { val, obj ->
 			if (val) {
-				obj.filterParams = []
-				val.each { String param ->
-					obj.filterParams.add(new DataviewApiFilterParam(param))
-				}
-				return true
+				obj.filterParams = val.collect { new DataviewApiFilterParam(content: it) }
+
+				return obj.filterParams.every { it.validate() }
 			}
 		}
 		filterParams nullable: true
@@ -37,12 +41,14 @@ class DataviewApiParamsCommand implements CommandObject {
  *   common.environment=Production&filter=assetName=PDV*
  * </pre>
  */
+@grails.validation.Validateable
 class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
 	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '.'
 	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '\\.'
 
+	String content
 	String domain
 	String fieldName
 	String filter
@@ -62,17 +68,37 @@ class DataviewApiFilterParam {
 	 * </dl>
 	 * @param stringValue
 	 */
-	DataviewApiFilterParam(String stringValue) {
-		def (String key, String value) = stringValue.split(DataviewApiFilterParam.FILTER_PARAMETER_SEPARATOR_CHARACTER)
-		this.domain = null
-		this.fieldName = key
-		this.filter = value
+	static constraints = {
+		content nullable: false, blank: false, validator: { val, obj ->
 
-		if (key.contains(DataviewApiFilterParam.FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)) {
-			def (String root, String path) = key.split(DataviewApiFilterParam.FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER)
-			this.domain = root
-			this.fieldName = path
+			if (!val.contains(FILTER_PARAMETER_SEPARATOR_CHARACTER)) {
+				return false
+			}
+
+
+			List<String> filter = val.split(FILTER_PARAMETER_SEPARATOR_CHARACTER) as List
+			if (filter?.size() != 2 || StringUtil.isBlank(filter[0]) || StringUtil.isBlank(filter[1])) {
+				return false
+			}
+
+			obj.domain = null
+			obj.fieldName = filter[0]
+			obj.filter = filter[1]
+
+			if (obj.fieldName.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)) {
+				List<String> parts = obj.fieldName.split(FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER) as List
+				if (parts?.size() != 2 || StringUtil.isBlank(parts[0]) || StringUtil.isBlank(parts[1])) {
+					return false
+				}
+				obj.domain = parts[0]
+				obj.fieldName = parts[1]
+			}
+
+			return true
 		}
+		domain nullable: true
+		fieldName nullable: true
+		filter nullable: true
 	}
 
 	/**

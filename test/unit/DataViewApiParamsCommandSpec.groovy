@@ -16,24 +16,19 @@ class DataViewApiParamsCommandSpec extends Specification {
 			command.validate()
 
 		when: 'limit offset is less than 0'
+			command = new DataviewApiParamsCommand()
 			command.offset = -1
 
 		then: 'validation fails'
 			!command.validate()
 
 		when: 'limit is less than zero'
+			command = new DataviewApiParamsCommand()
 			command.limit = -1
 
 		then: 'validation fails'
 			!command.validate()
-
-		when: 'limit is bigger than 100'
-			command.limit = 101
-
-		then: 'validation fails'
-			!command.validate()
 	}
-
 
 	void 'test can define filters'(){
 
@@ -70,7 +65,27 @@ class DataViewApiParamsCommandSpec extends Specification {
 			command.filter = ['common.=Production']
 
 		then: 'validation fails'
+			!command.validate()
 
+		when: 'filters contains incorrect field definition'
+			command = new DataviewApiParamsCommand()
+			command.filter = ['.environment=Production']
 
+		then: 'validation fails'
+			!command.validate()
+
+		when: 'filters contains incorrect field definition'
+			command = new DataviewApiParamsCommand()
+			command.filter = ['.=Production']
+
+		then: 'validation fails'
+			!command.validate()
+
+		when: 'filters contains incorrect field definition'
+			command = new DataviewApiParamsCommand()
+			command.filter = ['environment=']
+
+		then: 'validation fails'
+			!command.validate()
 	}
 }
