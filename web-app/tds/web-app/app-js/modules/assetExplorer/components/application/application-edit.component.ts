@@ -22,7 +22,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
-		selector: 'application-edit',
+		selector: 'tds-application-edit',
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }
@@ -47,7 +47,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService) {
+			promptService: UIPromptService,
+			private prompt: UIPromptService,
+			) {
 				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 				this.initModel();
 		}
@@ -163,6 +165,14 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.persons.sme = { personId: this.model.asset.sme.id};
 			this.persons.sme2 = { personId: this.model.asset.sme2.id};
 			this.persons.appOwner = { personId: this.model.asset.appOwner.id};
+		}
+
+		/**
+			allows to delete the application assets
+		*/
+		onDeleteAsset() {
+
+			this.deleteAsset(this.model.asset.id);
 		}
 	}
 

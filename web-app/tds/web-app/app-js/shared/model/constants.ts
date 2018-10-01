@@ -27,6 +27,8 @@ export const FILE_UPLOAD_TYPE_PARAM = 'uploadType';
 export const ETL_SCRIPT_FILE_UPLOAD_TYPE = 'ETLScript';
 export const ASSET_IMPORT_FILE_UPLOAD_TYPE = 'assetImport';
 
+export const NULL_OBJECT_LABEL = '(null)';
+
 // Intervals
 export enum INTERVAL {
 	SECONDS = 'Seconds',

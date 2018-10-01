@@ -1,32 +1,27 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetClass
 import grails.transaction.Transactional
+import net.transitionmanager.bulk.change.BulkChangeDate
+import net.transitionmanager.bulk.change.BulkChangeNumber
+import net.transitionmanager.bulk.change.BulkChangePerson
+import net.transitionmanager.bulk.change.BulkChangeString
+import net.transitionmanager.bulk.change.BulkChangeTag
+import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.bulk.change.BulkChangeListService
-import net.transitionmanager.service.bulk.change.BulkChangeMoveBundleService
-
-import static com.tds.asset.AssetOptions.AssetOptionsType.STATUS_OPTION
-import static com.tdsops.validators.CustomValidators.optionsClosure
+import net.transitionmanager.domain.TagAsset
 
 /**
  * This handles taking in a bulk change json and delegating the bulk change to the appropriate service.
  */
 @Transactional
 class BulkAssetChangeService implements ServiceMethods {
-	TagAssetService             tagAssetService
-	DataviewService             dataviewService
-	BulkChangeDateService       bulkChangeDateService
-	BulkChangeStringService     bulkChangeStringService
-	BulkChangeNumberService     bulkChangeNumberService
-	BulkChangePersonService     bulkChangePersonService
-	BulkChangeYesNoService      bulkChangeYesNoService
-	BulkChangeMoveBundleService bulkChangeMoveBundleService
-	BulkChangeListService       bulkChangeListService
+	TagAssetService tagAssetService
+	DataviewService dataviewService
 
 	/**
 	 * A list of valid field names
@@ -76,6 +71,16 @@ class BulkAssetChangeService implements ServiceMethods {
 		]
 	]
 
+	//Maps field control types to services.
+	static Map bulkServiceMapping = [
+		(TagAsset.class.name): BulkChangeTag,
+		(Date.class.name)    : BulkChangeDate,
+		'String'             : BulkChangeString,
+		(Integer.class.name) : BulkChangeNumber,
+		(Person.class.name)  : BulkChangePerson,
+		'YesNo'              : BulkChangeYesNo
+	]
+
 	/**
 	 * Handles the bulk change json, and delegates the bulk change to the appropriate service.
 	 *
@@ -83,117 +88,87 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @param bulkChange the command object that holds the bulk change json.
 	 */
 	void bulkChange(Project currentProject, BulkChangeCommand bulkChange) {
-		List assetIds = []
-		Map assetQueryFilter = [:]
-
-		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
-		Map<String, Map> filedMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
+		List ids = []
+		Map queryFilter = [:]
+		Map<String, Map> filedMapping
+		String action
+		List<String> actions
 		def service
 		def value
-		String action
-		List<String> customValues
+		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
+		def type = AssetClass.domainClassFor(assetClass)
 
-		//Maps field control types to services.
-		Map bulkServiceMapping = [
-			'tagAssetService'            : tagAssetService,
-			'bulkChangeDateService'      : bulkChangeDateService,
-			'bulkChangeStringService'    : bulkChangeStringService,
-			'bulkChangeNumberService'    : bulkChangeNumberService,
-			'bulkChangePersonService'    : bulkChangePersonService,
-			'bulkChangeYesNoService'     : bulkChangeYesNoService,
-			'bulkChangeMoveBundleService': bulkChangeMoveBundleService,
-			'bulkChangeListService'      : bulkChangeListService,		]
+		switch (type) {
+			case AssetClass.domainClassFor(AssetClass.APPLICATION):
+			case AssetClass.domainClassFor(AssetClass.DATABASE):
+			case AssetClass.domainClassFor(AssetClass.DEVICE):
+			case AssetClass.domainClassFor(AssetClass.STORAGE):
+				//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
+				filedMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
 
+				if (bulkChange.allIds) {
+					queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
+				} else {
+					ids = bulkChange.ids
+					int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
 
+					if (validAssetCount != ids.size()) {
+						throw new InvalidParamException('Some asset ids, are not part of your project, and may have been deleted.')
+					}
+				}
 
-		if (bulkChange.allAssets) {
-			assetQueryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
-		} else {
-			assetIds = bulkChange.assetIds
-
-			int validAssetCount = AssetEntity.where { id in assetIds && project == currentProject }.count()
-
-			if (validAssetCount != assetIds.size()) {
-				throw new InvalidParamException('Some asset ids, are not part of your project, and may have been deleted.')
-			}
+				break
+			default:
+				throw new InvalidParamException("Bulk change is not setup for $bulkChange.type")
 		}
 
 		//Looks up and runs all the edits for a bulk change call.
 		bulkChange.edits.each { EditCommand edit ->
-			service = getService(edit.fieldName, filedMapping, bulkServiceMapping)
-			action = getAction(edit.fieldName, edit.action, filedMapping)
-			customValues = filedMapping[edit.fieldName]?.customValues ?: getListValues(edit.fieldName)
+			service = getService(type, edit.fieldName, filedMapping, bulkServiceMapping)
+			value = service.coerceBulkValue(currentProject, edit.value)
+			action = edit.action
+			actions = filedMapping[edit.fieldName].bulkChangeActions ?: []
 
-			if (customValues) {
-				value = service.coerceBulkValue(currentProject, edit.fieldName, edit.value, customValues)
-			} else {
-				value = service.coerceBulkValue(currentProject, edit.value)
+			if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
+				throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
 			}
 
-			service."$action"(value, edit.fieldName, assetIds, assetQueryFilter)
+			service."$action"(type, value, edit.fieldName, ids, queryFilter)
 		}
-	}
-
-
-	List getListValues(String field) {
-		Map validations = [
-			validation : ValidationType.list,
-			railType   : AssetEntity.RAIL_TYPES,
-			criticality: Application.CRITICALITY,
-			planStatus : optionsClosure(STATUS_OPTION)()
-		]
-
-		return validations[field]
 	}
 
 	/**
 	 * Looks up the bulkChangeService, for a field, based on the bulkServiceMapping mappings.
 	 * If no service is found, an InvalidParamException is thrown.
 	 *
+	 * @param type the class to use to look up what bulk service to use.
 	 * @param fieldName The name to get the service for.
 	 * @param fieldMapping the field mapping settings.
 	 * @param bulkServiceMapping the mapping of the name of the service to the wired instance
 	 *
 	 * @return The wired instance of the bulkChangeService, for the field.
 	 */
-	private def getService(String fieldName, Map<String, Map> fieldMapping, Map bulkServiceMapping) {
-		String serviceName = fieldMapping[fieldName]?.bulkChangeService
+	private def getService(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkServiceMapping) {
+		def property = type.declaredFields.find{it.name == fieldName} ?: type.superclass.declaredFields.find{it.name == fieldName}
 
-		if (!serviceName) {
-			throw new InvalidParamException("Bulk update is not configured for $fieldName")
+		if (!property) {
+			throw new InvalidParamException("Bulk update for invalid field name: $fieldName")
 		}
 
-		def service = bulkServiceMapping[serviceName]
+		String dataType = property.type.name
+
+		if (dataType == String.class.name) {
+			dataType = fieldMapping[fieldName]?.control
+		}else if(dataType == Collection.class.name && fieldName == 'tagAssets'){
+			dataType = TagAsset.class.name
+		}
+
+		def service = bulkServiceMapping[dataType]
 
 		if (!service) {
 			throw new InvalidParamException("Bulk update is not configured for $fieldName")
 		}
 
 		return service
-	}
-
-	/**
-	 * Looks up the bulk action to run against the bulk service looked up.
-	 * If no valid action is found, an InvalidParamException is thrown.
-	 *
-	 * @param fieldName The name of the field to look up the bulk action for.
-	 * @param action The name of the action to look up/verify.
-	 * @param fieldMapping The field settings with will have the actions.
-	 *
-	 * @return the action to execute
-	 */
-	private String getAction(String fieldName, String action, Map<String, Map> fieldMapping) {
-		Map actions = fieldMapping[fieldName]?.bulkChangeActions
-
-		if (!actions) {
-			throw new InvalidParamException("Bulk update action $action, is not configured for $fieldName")
-		}
-		String lookedUpAction = actions[action]
-
-		if (!lookedUpAction) {
-			throw new InvalidParamException("Bulk update action $action, is not configured for $fieldName")
-		}
-
-		return lookedUpAction
 	}
 }

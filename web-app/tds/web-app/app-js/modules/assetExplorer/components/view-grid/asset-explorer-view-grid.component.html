@@ -6,9 +6,26 @@
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 		<div class="col-sm-6 bulkchange-section">
+			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
+					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_APPLICATIONS"
+					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
+				{{'ASSET_EXPLORER.CREATE_APPLICATION' | translate}}</button>
+			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
+					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DATABASES"
+					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
+				{{'ASSET_EXPLORER.CREATE_DATABASE' | translate}}</button>
+			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
+					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DEVICE ||
+					       _viewId === ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL || _viewId === ASSET_ENTITY_MENU.All_SERVERS"
+					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
+				{{'ASSET_EXPLORER.CREATE_DEVICE' | translate}}</button>
+			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
+					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL"
+					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
+				{{'ASSET_EXPLORER.CREATE_STORAGE' | translate}}</button>
 			<tds-bulk-change-button [bulkItems]="bulkItems"
 			                        [enabled]="hasSelectedItems()"
-			                        (clickBulk)="onClickBulkButton()"
+									(clickBulk)="onClickBulkButton()"
 			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
 			<div *ngIf="hasSelectedItems()" class="selected-assets">
 				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>

@@ -24,20 +24,18 @@ databaseChangeLog = {
 					// Add the default actions of [:] and the default service of null.
 					if (settingsJson.fields) {
 						settingsJson.fields.each { field ->
-							field.bulkChangeService = null
-							field.bulkChangeActions = [:]
+							field.bulkChangeActions = []
 						}
 
 						//Adds the service and actions for tags
 						def mapForTags = settingsJson.fields.find { it.field == "tagAssets" }
 
 						if (mapForTags) {
-							mapForTags.bulkChangeService = "tagAssetService"
 							mapForTags.bulkChangeActions = [
-								add    : 'bulkAdd',
-								clear  : 'bulkClear',
-								replace: 'bulkReplace',
-								remove : 'bulkRemove'
+								add,
+								clear,
+								replace,
+								remove
 							]
 						}
 					}

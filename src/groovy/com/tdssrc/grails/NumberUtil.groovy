@@ -55,6 +55,42 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types into a Long value. If value param is a number with Decimal,
+	 * it also returns the Long-part of the decimal value
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Long value if valid else null
+	 */
+	static Long toLongNumber(value, Long defVal = null) {
+
+		if(value == null) {
+			value = defVal
+		} else {
+
+			if (value instanceof CharSequence) {
+				if( value.isDouble() ){
+					value = value.toDouble()
+				} else if( value.isBigDecimal() ) {
+					value = value.toBigDecimal()
+				} else if( value.isLong() ) {
+					value = value.toLong()
+				}
+			}
+
+			if (value.class in [Double, BigDecimal, BigInteger, Integer]) {
+				value = value.longValue()
+			}
+
+			if (!(value instanceof Long)){
+				value = defVal
+			}
+
+		}
+
+		return value
+	}
+
+	/**
 	 * Constrain a number to be between a minimum and maximum value.
 	 * @param value  the value
 	 * @param min  the minimum allowed
@@ -225,4 +261,25 @@ class NumberUtil {
 		return NumberUtils.isNumber(number)
 	}
 	
+
+	/**
+	 * Safely converts a String to a Double without an exception
+	 * @param value
+	 * @param precision - the number of decimal places to round the value to (default null / no rounding)
+	 * @param defaultValue - the value to set if the string can not be converted (default null)
+	 * @return the value converted to a Double
+	 */
+	static toDouble(CharSequence value, Integer precision = null, Double defaultValue=null) {
+		Double result = defaultValue
+		try {
+			if (value?.size() > 0) {
+				result = value.toBigDecimal()
+				if (precision) {
+					result = result.round(precision)
+				}
+			}
+		} catch (java.lang.NumberFormatException e) {
+		}
+		return result
+	}
 }

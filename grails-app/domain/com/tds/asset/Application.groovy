@@ -17,6 +17,9 @@ class Application extends AssetEntity {
 		'Minor'
 	]
 
+	// Override default value set by parent class
+	String assetType = 'Application'
+
 	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor
 	String appVersion
@@ -54,6 +57,7 @@ class Application extends AssetEntity {
 	Integer testingDuration
 
 	static constraints = {
+
 		appAccess nullable: true
 		appFunction nullable: true
 		appSource nullable: true

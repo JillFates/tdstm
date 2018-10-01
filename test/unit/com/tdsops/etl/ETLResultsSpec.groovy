@@ -170,12 +170,15 @@ class ETLResultsSpec extends ETLBaseSpec {
 						originalValue == '152254'
 						value == '152254'
 
+						 
 						find.query.size() == 1
 						with(find.query[0]) {
 							domain == 'Application'
-							criteria == [
-								[propertyName: 'id', value: '152254', operator: 'eq']
-							]
+							with(criteria[0]){
+								propertyName == 'id'
+								operator == 'eq'
+								value == 152254l
+							}
 						}
 					}
 
@@ -191,9 +194,11 @@ class ETLResultsSpec extends ETLBaseSpec {
 						find.query.size() == 1
 						with(find.query[0]) {
 							domain == 'Application'
-							criteria == [
-								[propertyName: 'id', value:'152255', operator: 'eq']
-							]
+							with(criteria[0]){
+								propertyName == 'id'
+								operator == 'eq'
+								value == 152255l
+							}
 						}
 					}
 				}
