@@ -14,7 +14,8 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
-import {TaskEditCreateModelHelper} from '../edit/task-edit-create-model.helper';
+import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TranslatePipe} from "../../../../shared/pipes/translate.pipe";
 
 @Component({
 	selector: `task-detail`,
@@ -46,7 +47,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private dialogService: UIDialogService,
 		public promptService: UIPromptService,
 		public userPreferenceService: PreferenceService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe) {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -115,13 +117,15 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	deleteTask(): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'Confirm deletion of this task. There is no undo for this action',
-			'Confirm', 'Cancel').then(result => {
-			if (result) {
-				this.close({id: this.taskDetailModel, isDeleted: true})
-			}
-		});
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'))
+			.then(result => {
+				if (result) {
+					this.close({id: this.taskDetailModel, isDeleted: true})
+				}
+			});
 	}
 	/**
 	 * Open view to edit task details

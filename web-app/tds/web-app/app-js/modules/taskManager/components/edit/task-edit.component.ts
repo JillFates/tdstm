@@ -19,7 +19,8 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {YesNoList, TaskEditCreateModelHelper} from './task-edit-create-model.helper';
+import {YesNoList, TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -58,7 +59,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		private dialogService: UIDialogService,
 		public promptService: UIPromptService,
 		public userPreferenceService: PreferenceService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe) {
 
 		super('#task-edit-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -266,13 +268,15 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	protected cancelCloseDialog(): void {
 		if (this.isFormDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-				if (result) {
-					this.dismiss();
-				}
-			});
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')	,
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'))
+				.then(result => {
+					if (result) {
+						this.dismiss();
+					}
+				});
 		} else {
 			this.dismiss();
 		}
@@ -284,13 +288,15 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 	 */
 	deleteTask(): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'Confirm deletion of this task. There is no undo for this action',
-			'Confirm', 'Cancel').then(result => {
-			if (result) {
-				this.close({id: this.taskDetailModel, isDeleted: true})
-			}
-		});
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'))
+			.then(result => {
+				if (result) {
+					this.close({id: this.taskDetailModel, isDeleted: true})
+				}
+			});
 	}
 
 	/**

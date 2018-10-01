@@ -30,7 +30,7 @@
                                                             <button class="btn btn-default" (click)="onCollapseTaskDetail()" type="button">
                                                                 <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
                                                             </button>
-                                                            <div class="error-message">Task name is required</div>
+                                                            <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -124,7 +124,7 @@
                                                                     [data]="model.categoriesList"
                                                                     [(ngModel)]="model.category" required>
                                                             </kendo-dropdownlist>
-                                                            <div class="error-message">Category is required</div>
+                                                            <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                         </div>
                                                     </td>
                                                     <td class="label url U edge-cell" nowrap="nowrap">
@@ -435,10 +435,10 @@
 	                            <table>
 		                            <tr>
 										<td>
-											<label class="has-duplicated-predecessors duplicate-error">There are duplicate entries</label>
+											<label class="has-duplicated-predecessors duplicate-error">{{'TASK_MANAGER.EDIT.ERROR_DUPLICATE_ENTRIES' | translate}}</label>
 										</td>
 										<td>
-											<label class="has-duplicated-successors duplicate-error">There are duplicate entries</label>
+											<label class="has-duplicated-successors duplicate-error">{{'TASK_MANAGER.EDIT.ERROR_DUPLICATE_ENTRIES' | translate}}</label>
 										</td>
                                     </tr>
 
@@ -449,20 +449,11 @@
 	                            <table>
 		                            <tr>
                                         <td colspan="2">
-                                            <label class="has-double-assignment">One or more tasks are assigned as both a Predecessor and Successor which is not allowed.</label>
+                                            <label class="has-double-assignment">{{'TASK_MANAGER.EDIT.ERROR_DOUBLE_ASSIGNMENT' | translate}}</label>
                                         </td>
                                     </tr>
                                 </table>
                             </tr>
-
-                            <!--
-							<tr class="dependency-error-section"
-								[ngClass]="{'has-double-assignment': modelHelper.hasDoubleAssignment()}">
-								<td colspan="2">
-									<label class="has-double-assignment">One or more tasks are assigned as both a Predecessor and Successor which is not allowed.</label>
-								</td>
-							</tr>
-							-->
                             <tr class="deps grow-container">
                                 <td colspan="5">
                                     <kendo-grid

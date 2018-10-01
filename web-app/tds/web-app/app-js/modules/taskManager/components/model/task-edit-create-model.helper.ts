@@ -1,7 +1,6 @@
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 export const YesNoList = ['Yes', 'No'];
-const PriorityList = [1, 2, 3, 4, 5];
 
 export interface ITask {
 	id: string | number;
@@ -106,7 +105,7 @@ export class TaskEditCreateModelHelper {
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
-			priorityList: [...PriorityList],
+			priorityList: detail.priorityList,
 			asset: {id: detail.assetId, text: detail.assetName},
 			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},

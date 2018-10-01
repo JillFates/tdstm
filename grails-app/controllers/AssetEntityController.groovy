@@ -589,6 +589,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			commentList << [
 				assetComment:assetComment,
 				apiActionList:apiActionList,
+				priorityList: assetEntityService.getAssetPriorityOptions(),
 				durationScale:assetComment.durationScale.value(),
 				durationLocked: assetComment.durationLocked,
 				personCreateObj:personCreateObj,
