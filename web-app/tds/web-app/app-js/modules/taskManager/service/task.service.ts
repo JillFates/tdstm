@@ -156,6 +156,7 @@ export class TaskService {
 	}
 	/**
 	 *
+	 * Search assets
 	 * @param searchParams
 	 * @returns {Observable<any>}
 	 */
@@ -175,6 +176,7 @@ export class TaskService {
 
 	/**
 	 *
+	 * Returns a set of filtered tasks
 	 * @param searchParams
 	 * @returns {Observable<any>}
 	 */
@@ -190,6 +192,12 @@ export class TaskService {
 			});
 	}
 
+	/**
+	 *
+	 * Filter tasks
+	 * @param searchParams
+	 * @returns {Observable<any>}
+	 */
 	searchTasks(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		const {metaParam, currentPage, maxPage, query} = searchParams;
 		const params = [

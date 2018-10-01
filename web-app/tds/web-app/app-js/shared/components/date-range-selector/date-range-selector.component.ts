@@ -58,6 +58,9 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		return date ? `${this.model.dateFormat} ${this.model.timeFormat}` :  this.model.dateFormat;
 	}
 
+	/**
+	 * Save the changes
+	 */
 	save(): void {
 		this.close(this.model);
 	}

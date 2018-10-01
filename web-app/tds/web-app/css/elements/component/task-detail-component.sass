@@ -70,22 +70,6 @@
               label.has-double-assignment
                 visibility: visible
 
-        //tr.dependency-error-section.has-duplicated-successors,
-        //tr.dependency-error-section.has-double-assignment
-        //  display: block
-        //tr.dependency-error-section.has-duplicated-predecessors
-        //  td
-        //    label.has-duplicated-predecessors
-        //      visibility: visible
-        //tr.dependency-error-section.has-duplicated-successors
-        //  td
-        //    label.has-duplicated-successors
-        //      visibility: visible
-        //tr.dependency-error-section.has-double-assignment
-        //  td
-        //    label.has-double-assignment
-        //      visibility: visible
-
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
@@ -248,7 +232,8 @@
   overflow-y: auto!important
 
 
-// Give more specificity to status rules in order to avoid the use of important in task-status.sass
+// Kendo combo color rules has more specificity , in order to apply correct color status in those controls in this component
+// without using !important, we need to give more specificity to status rules
 .task-detail-component
   .task-status
     .task-hold

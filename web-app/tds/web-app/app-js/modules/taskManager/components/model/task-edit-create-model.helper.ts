@@ -30,6 +30,11 @@ export class TaskEditCreateModelHelper {
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 	}
 
+	/**
+	 * Set the model and keep the reference to the initial data to detect changes
+	 * @param {any} model Model to set
+	 * @returns {any}
+	 */
 	public setModel(model: any): any {
 		this.model = model;
 
@@ -40,6 +45,8 @@ export class TaskEditCreateModelHelper {
 
 	/**
 	 * Set the model passing the all detail object
+	 * @param {any} task Holds the detail object coming from the service, this will be extracted and cleaned
+	 * @returns {any}
 	 */
 	public cleanAndSetModel(task: any): any {
 		const detail = clone(task.detail);
@@ -121,23 +128,43 @@ export class TaskEditCreateModelHelper {
 		return this.model;
 	}
 
+	/**
+	 * Convert the array provided by the service to a task array
+	 * @param {any[]} array coming from service holding task info
+	 * @returns {any[]}
+	 */
 	private extractDependencyTasks(array: any[]): any[] {
 		return array
 			.map((task) => this.makeTaskItem(task));
 	}
 
+	/**
+	 * Extract only the task added by the user
+	 * @param {any[]} tasks Current task array manipulated by the user
+	 * @param {any[]} originalTasks Original task array not touched
+	 * @returns {string[]}
+	 */
 	private getTaskAdded(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
 			.filter(task => !originalTasks.find(original => original.id === task.id))
 			.map((task, index) => (`-${index + 1}_${task.id}`));
 	}
 
+	/**
+	 * Extract only the task previously present (not added by the user)
+	 * @param {any[]} tasks Current task array manipulated by the user
+	 * @param {any[]} originalTasks Original task array not touched
+	 * @returns {string[]}
+	 */
 	private getTaskPrevious(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
 			.filter(task => originalTasks.find(original => original.id === task.id))
 			.map((task, index) => (`${task.id}_${task.taskNumber}`));
 	}
 
+	/**
+	 * Get and clean the object that will send to the service update the task
+	 */
 	public getPayloadForUpdate(): any {
 		const [Yes, No] = YesNoList;
 		const {
@@ -201,6 +228,10 @@ export class TaskEditCreateModelHelper {
 		};
 	}
 
+	/**
+	 * Returns empty string whenever value is null, undefined or false
+	 * @param {any} value to validate
+	 */
 	getEmptyStringIfNull(value: any): any {
 		return value === null || typeof value === 'undefined' || value === false ?  '' : value;
 	}
@@ -213,10 +244,18 @@ export class TaskEditCreateModelHelper {
 		return this.dataSignatureDependencyTasks !== JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 	}
 
+	/**
+	 * Determine if array predecessor contains duplicated tasks
+	 * @returns {boolean}
+	 */
 	hasDuplicatedPredecessors(): boolean {
 		return this.hasDuplicates(this.model.predecessorList);
 	}
 
+	/**
+	 * Determine if array successors contains duplicated tasks
+	 * @returns {boolean}
+	 */
 	hasDuplicatedSuccessors(): boolean {
 		return this.hasDuplicates(this.model.successorList);
 	}
@@ -230,6 +269,11 @@ export class TaskEditCreateModelHelper {
 		return this.extractDistinctIds(array).length < array.length;
 	}
 
+	/**
+	 * Extract only distinct task ids from the array provided
+	 * @param {any[]} array
+	 * @returns {string[]}
+	 */
 	private extractDistinctIds(array): string[] {
 		const ids = [];
 
@@ -247,6 +291,12 @@ export class TaskEditCreateModelHelper {
 
 		return ids;
 	}
+
+	/**
+	 * Add protocol in case is not present
+	 * @param {string} labelURL
+	 * @returns {string}
+	 */
 	private addProtocolToLabelURL(labelURL = ''): string {
 		const separator = '|';
 		let isJustURL = false;
@@ -264,6 +314,10 @@ export class TaskEditCreateModelHelper {
 		return isJustURL ? url : [label, url].join(separator);
 	}
 
+	/**
+	 * Determine if predecessors and successors tasks share a common task
+	 * @returns {boolean}
+	 */
 	hasDoubleAssignment(): boolean {
 		const predecessors = this.extractDistinctIds(this.model.predecessorList).filter((id) => id);
 		const successors = this.extractDistinctIds(this.model.successorList).filter((id) => id);
@@ -296,34 +350,74 @@ export class TaskEditCreateModelHelper {
 			this.hasDoubleAssignment();
 	}
 
+	/**
+	 * Toggle the locked state of estimated dates
+	 */
 	toggleLocked() {
 		this.model.locked = !this.model.locked;
 	}
 
+	/**
+	 * Add a task to predecessor tasks array
+	 * @param {number} index Index where the task will be allocated
+	 * @param {any} task  Task to insert
+	 * @returns {ITask}
+	 */
 	addPredecessor(index: number, task: any): ITask {
 		return this.model.predecessorList[index] = this.makeTaskItem(task) ;
 	}
 
+	/**
+	 * Add a task to successor tasks array
+	 * @param {number} index Index where the task will be allocated
+	 * @param {any} task  Task to insert
+	 * @returns {ITask}
+	 */
 	addSuccessor(index: number, task: any): ITask {
 		return this.model.successorList[index] = this.makeTaskItem(task);
 	}
 
+	/**
+	 * Delete a task from successors task array
+	 * @param {number} index Index to delete
+	 * @returns {boolean}
+	 */
 	deleteSuccessor(index: number): boolean {
 		return this.deleteTaskItem(index, this.model.successorList, this.model.deletedSuccessorList);
 	}
 
+	/**
+	 * Delete a task from predecessors task array
+	 * @param {number} index Index to delete
+	 * @returns {boolean}
+	 */
 	deletePredecessor(index: number): boolean {
 		return this.deleteTaskItem(index, this.model.predecessorList, this.model.deletedPredecessorList);
 	}
 
+	/**
+	 * Get the reference to the predecessor array
+	 * @returns {any[]}
+	 */
 	getPredecessor(): any[] {
 		return this.model.predecessorList;
 	}
 
+	/**
+	 * Get the reference to the successor array
+	 * @returns {any[]}
+	 */
 	getSuccessor(): any[] {
 		return this.model.successorList;
 	}
 
+	/**
+	 * Delete a task from predecessors or successors task array, put the delete item in the tasks deleted array
+	 * @param {number} index Index to delete
+	 * @param {array[]} collection Could be predecessors or succesors array
+	 * @param {array[]}  deletedCollection Collection that contains the reference to deleted items
+	 * @returns {boolean}
+	 */
 	private deleteTaskItem(index: number, collection: any[], deletedCollection: any[]): boolean {
 			const id = collection[index].id;
 			const exists = Boolean(id);
@@ -336,6 +430,11 @@ export class TaskEditCreateModelHelper {
 			return exists;
 	}
 
+	/**
+	 * Format an object and return a task object
+	 * @param {any} task Object to format on
+	 * @returns {ITask}
+	 */
 	private makeTaskItem(task: any): ITask {
 		const {id, desc = '', taskId = '', taskNumber, category, status, text = ''} = task;
 
@@ -355,6 +454,13 @@ export class TaskEditCreateModelHelper {
 		}
 	}
 
+	/**
+	 * Task description is coming with the taskNumber mixed into the description
+	 * This function removes the taskNumber from the description
+	 * @param {string} description Text that contains the description and taskNumber
+	 * @param {string} taskNumber Task number to delete
+	 * @returns {string}
+	 */
 	private removeTaskNumberFromDescription(description: string, taskNumber: string): string {
 		return description.replace(new RegExp(`^${taskNumber}: `), '')
 	}
