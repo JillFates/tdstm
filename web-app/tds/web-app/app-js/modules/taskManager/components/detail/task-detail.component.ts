@@ -141,7 +141,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.loadTaskDetail();
 			}
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			this.dismiss();
 		});
 	}
 }
