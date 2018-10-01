@@ -1,19 +1,22 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.InvalidParamException
 import spock.lang.Shared
+import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
 
 class BulkChangeListIntegrationSpec extends IntegrationSpec {
-	BulkChangeList bulkChangeListService
 
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	ApplicationTestHelper applicationTestHelper = new ApplicationTestHelper()
 
 	@Shared
 	FileSystemService fileSystemService
@@ -64,14 +67,14 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
+		device = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
+		device2 = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
+		device3 = applicationTestHelper.createApplication(AssetClass.DEVICE, otherProject, moveBundle2)
 	}
 
 	void 'test replace'() {
 		when: 'bulk replacing a list value with a new one'
-			bulkChangeListService.bulkReplace('new value', 'custom9', [device.id, device2.id])
+			BulkChangeList.replace(Application, 'new value', 'custom9', [device.id, device2.id])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the list value has the new value'
@@ -88,7 +91,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
 			"""
 		when: 'bulk replacing a list value with a new one, using a query filter'
-			bulkChangeListService.bulkReplace('new value', 'custom9', [], [query: query, params: params])
+			BulkChangeList.replace(Application, 'new value', 'custom9', [], [query: query, params: params])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the list value has the new value'
@@ -98,7 +101,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 
 	void 'test clear'() {
 		when: 'bulk clear a list field'
-			bulkChangeListService.bulkClear(null, 'custom9', [device.id, device2.id])
+			BulkChangeList.clear(Application, null, 'custom9', [device.id, device2.id])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the assets, list field is cleared'
@@ -108,7 +111,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 
 	void 'test clear with value'() {
 		when: 'bulk clear a list field, sending in a value'
-			bulkChangeListService.bulkClear('one potato', 'custom9', [device.id, device2.id])
+			BulkChangeList.clear(Application, 'one potato', 'custom9', [device.id, device2.id])
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException
 	}
@@ -122,7 +125,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
 			"""
 		when: 'bulk clearing a list filed using a query filter'
-			bulkChangeListService.bulkClear('', 'custom9', [], [query: query, params: params])
+			BulkChangeList.clear(Application, '', 'custom9', [], [query: query, params: params])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the assets, list field is cleared'
@@ -132,7 +135,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue'() {
 		when: 'coercing a string value validating that it is in a list'
-			def value = bulkChangeListService.coerceBulkValue(project, 'custom9', 'one potato', ['one potato', 'two potato'])
+			def value = BulkChangeList.coerceBulkValue(project, 'custom9', 'one potato', [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
 
 		then: 'the list value is returned'
 			value == 'one potato'
@@ -140,7 +143,7 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue value not is list of values'() {
 		when: 'coercing a string value validating that it is in a list '
-			bulkChangeListService.coerceBulkValue(project, 'custom9', 'no potato', ['one potato', 'two potato'])
+			BulkChangeList.coerceBulkValue(project, 'custom9', 'no potato', [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
 
 		then: 'an InvalidParamException is returned'
 			thrown InvalidParamException

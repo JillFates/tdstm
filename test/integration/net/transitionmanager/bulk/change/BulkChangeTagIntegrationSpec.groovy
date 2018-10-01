@@ -343,7 +343,7 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue'() {
 		when: 'coercing a string value that contains a list of numbers, that are valid tag ids'
-			def value = BulkChangeTag.coerceBulkValue(project, "[${tag1.id},${tag2.id}]")
+			def value = BulkChangeTag.coerceBulkValue(project, 'tagAssets', "[${tag1.id},${tag2.id}]", [:])
 
 		then: 'a list of longs is returned'
 			value == [tag1.id, tag2.id]
@@ -351,7 +351,7 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue a list of numbers with an invalid tag id.'() {
 		when: 'coercing and '
-			BulkChangeTag.coerceBulkValue(project, "[1,${tag2.id}]")
+			BulkChangeTag.coerceBulkValue(project, 'tagAssets', "[1,${tag2.id}]", [:])
 
 		then: 'an EmptyResultException is returned'
 			thrown InvalidParamException
@@ -359,7 +359,7 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue input false'() {
 		when: 'coercing a string value of false'
-			BulkChangeTag.coerceBulkValue(project, 'false')
+			BulkChangeTag.coerceBulkValue(project, 'tagAssets', 'false', [:])
 
 		then: 'InvalidParamException is returned'
 			thrown InvalidParamException
@@ -367,7 +367,7 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue input object'() {
 		when: 'coercing a string value of a map'
-			BulkChangeTag.coerceBulkValue(project, '{"data": [1,2]}')
+			BulkChangeTag.coerceBulkValue(project, 'tagAssets', '{"data": [1,2]}', [:])
 
 		then: 'InvalidParamException is returned'
 			thrown InvalidParamException

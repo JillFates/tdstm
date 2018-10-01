@@ -1,19 +1,20 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
-import net.transitionmanager.bulk.change.BulkChangeMoveBundle
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.FileSystemService
 import spock.lang.Shared
+import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
 
 class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
-	BulkChangeMoveBundle bulkChangeMoveBundleService
-
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	ApplicationTestHelper applicationTestHelper = new ApplicationTestHelper()
 
 	@Shared
 	FileSystemService fileSystemService
@@ -64,16 +65,16 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
+		device = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
+		device2 = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
+		device3 = applicationTestHelper.createApplication(AssetClass.DEVICE, otherProject, moveBundle2)
 	}
 
 	void 'test replace'() {
 		setup: 'given a new move bundle, not yet assigned to assets'
 			MoveBundle moveBundle3 = moveBundleTestHelper.createBundle(project, null)
 		when: 'bulk replacing tags on a list of devices, with the new tags'
-			bulkChangeMoveBundleService.bulkReplace(moveBundle3, '', [device.id, device2.id])
+			BulkChangeMoveBundle.replace(AssetEntity, moveBundle3, 'moveBundle', [device.id, device2.id])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the assets, have the new moveBundle, but not the old one'
@@ -91,7 +92,7 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
 			"""
 		when: 'bulk replacing tags for assets from the AssetFilterQuery, with the new tags'
-			bulkChangeMoveBundleService.bulkReplace(moveBundle4, '', [], [query: query, params: params])
+			BulkChangeMoveBundle.replace(AssetEntity, moveBundle4, 'moveBundle', [], [query: query, params: params])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the assets, have the new moveBundle, but not the old one'
@@ -101,7 +102,7 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue'() {
 		when: 'coercing a string value that contains a moveBundle id to a moveBundle'
-			def value = bulkChangeMoveBundleService.coerceBulkValue(project, "${moveBundle.id}")
+			def value = BulkChangeMoveBundle.coerceBulkValue(project, 'moveBundle', "${moveBundle.id}", [:])
 
 		then: 'the moveBundle is returned'
 			value.id == moveBundle.id
@@ -109,7 +110,7 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue move bundle from another project'() {
 		when: 'coercing and '
-			bulkChangeMoveBundleService.coerceBulkValue(project, "${moveBundle2.id}")
+			BulkChangeMoveBundle.coerceBulkValue(project, 'moveBundle', "${moveBundle2.id}", [:])
 
 		then: 'an EmptyResultException is returned'
 			thrown EmptyResultException

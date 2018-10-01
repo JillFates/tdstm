@@ -1,3 +1,5 @@
+package net.transitionmanager.service
+
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
@@ -5,6 +7,8 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.bulk.change.BulkChangeMoveBundle
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
@@ -14,22 +18,15 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.service.BulkAssetChangeService
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeNumber
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeYesNo
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.TagAssetService
 import spock.lang.See
-import net.transitionmanager.service.bulk.change.BulkChangeListService
-import net.transitionmanager.service.bulk.change.BulkChangeMoveBundleService
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
+import test.helper.PersonTestHelper
 
 class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	BulkAssetChangeService bulkAssetChangeService
@@ -183,24 +180,24 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 						]
 					],
 					'moveBundle' : [
-						bulkChangeService: 'bulkChangeMoveBundleService',
+						control          : '',
 						bulkChangeActions: [
-							replace: 'bulkReplace'
+							'replace'
 						]
 					],
 					'custom9'    : [
-						bulkChangeService: 'bulkChangeListService',
+						control          : 'List',
 						bulkChangeActions: [
-							clear  : 'bulkClear',
-							replace: 'bulkReplace'
+							'clear',
+							'replace'
 						],
 						customValues     : ['one potato', 'two potato']
 					],
 					'validation' : [
-						bulkChangeService: 'bulkChangeListService',
+						control          : 'InList',
 						bulkChangeActions: [
-							clear  : 'bulkClear',
-							replace: 'bulkReplace'
+							'clear',
+							'replace'
 						]
 					]
 				]
@@ -219,12 +216,14 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		] as DataviewService
 
 		bulkAssetChangeService.bulkServiceMapping = [
-			(TagAsset.class.name): GroovySpy(BulkChangeTag, global: true),
-			(Date.class.name)    : GroovySpy(BulkChangeDate, global: true),
-			'String'             : GroovySpy(BulkChangeString, global: true),
-			(Integer.class.name) : GroovySpy(BulkChangeNumber, global: true),
-			(Person.class.name)  : GroovySpy(BulkChangePerson, global: true),
-			'YesNo'              : GroovySpy(BulkChangeYesNo, global: true),
+			(TagAsset.class.name)  : GroovySpy(BulkChangeTag, global: true),
+			(Date.class.name)      : GroovySpy(BulkChangeDate, global: true),
+			'String'               : GroovySpy(BulkChangeString, global: true),
+			(Integer.class.name)   : GroovySpy(BulkChangeNumber, global: true),
+			(Person.class.name)    : GroovySpy(BulkChangePerson, global: true),
+			'YesNo'                : GroovySpy(BulkChangeYesNo, global: true),
+			'List'                 : GroovySpy(BulkChangeList, global: true),
+			(MoveBundle.class.name): GroovySpy(BulkChangeMoveBundle, global: true)
 		]
 
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
@@ -271,7 +270,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkAdd function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].add(AssetClass.domainClassFor(AssetClass.APPLICATION), [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
@@ -287,7 +286,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkAdd is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].add(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
@@ -301,7 +300,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkRemove function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].clear(Application.class, [], 'tagAssets', [device.id, device2.id], [:])
 	}
 
@@ -317,7 +316,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkRemove is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].clear(Application.class, [], 'tagAssets', [], [query: query, params: params])
 	}
 
@@ -331,7 +330,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
@@ -347,7 +346,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkReplace is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].replace(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
@@ -361,7 +360,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkRemove function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [device.id, device2.id], [:])
 	}
 
@@ -377,7 +376,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'The sql for getting the assets is looked up, and bulkRemove is invoked with that query to filter assets.'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].coerceBulkValue(project, 'tagAssets', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(TagAsset.class.name)].remove(Application.class, [tag1.id, tag2.id], 'tagAssets', [], [query: query, params: params])
 	}
 
@@ -420,7 +419,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].coerceBulkValue(project, 'retireDate', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].replace(Application.class, _ as Date, 'retireDate', [device.id, device2.id], [:])
 	}
 
@@ -435,7 +434,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].coerceBulkValue(project, 'retireDate', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Date.class.name)].clear(Application.class, null, 'retireDate', [device.id, device2.id], [:])
 	}
 
@@ -450,7 +449,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping['String'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping['String'].coerceBulkValue(project, 'externalRefId', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping['String'].replace(Application.class, '1abcd', 'externalRefId', [device.id, device2.id], [:])
 	}
 
@@ -465,7 +464,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping['String'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping['String'].coerceBulkValue(project, 'externalRefId', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping['String'].clear(Application.class, null, 'externalRefId', [device.id, device2.id], [:])
 	}
 
@@ -480,7 +479,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].coerceBulkValue(project, 'size', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].replace(Application.class, 1, 'size', [device.id, device2.id], [:])
 	}
 
@@ -495,7 +494,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].coerceBulkValue(project, 'size', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Integer.class.name)].clear(Application.class, null, 'size', [device.id, device2.id], [:])
 	}
 
@@ -510,7 +509,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].coerceBulkValue(project, 'appOwner', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].replace(Application.class, person, 'appOwner', [device.id, device2.id], [:])
 	}
 
@@ -525,7 +524,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].coerceBulkValue(project, 'appOwner', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping[(Person.class.name)].clear(Application.class, null, 'appOwner', [device.id, device2.id], [:])
 	}
 
@@ -540,7 +539,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].coerceBulkValue(project, 'latency', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].replace(Application, 'Y', 'latency', [device.id, device2.id], [:])
 	}
 
@@ -555,7 +554,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].coerceBulkValue(project, 'latency', editCommand.value, _ as Map)
 			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].clear(Application, 'N', 'latency', [device.id, device2.id], [:])
 	}
 
@@ -569,8 +568,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkChangeMoveBundleService.coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkChangeMoveBundleService.bulkReplace(null, 'moveBundle', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping[MoveBundle.class.name].coerceBulkValue(project, 'moveBundle', editCommand.value, _ as Map)
+			1 * bulkAssetChangeService.bulkServiceMapping[MoveBundle.class.name].replace(Application, moveBundle, 'moveBundle', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace list'() {
@@ -583,8 +582,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkChangeListService.coerceBulkValue(project, 'custom9', editCommand.value, ['one potato', 'two potato'])
-			1 * bulkAssetChangeService.bulkChangeListService.bulkReplace(null, 'custom9', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping['List'].coerceBulkValue(project, 'custom9', editCommand.value, [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
+			1 * bulkAssetChangeService.bulkServiceMapping['List'].replace(Application, editCommand.value, 'custom9', [device.id, device2.id], [:])
 	}
 
 
@@ -598,22 +597,23 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkChangeListService.coerceBulkValue(project, 'custom9', editCommand.value, ['one potato', 'two potato'])
-			1 * bulkAssetChangeService.bulkChangeListService.bulkClear(null, 'custom9', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping['List'].coerceBulkValue(project, 'custom9', editCommand.value, [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
+			1 * bulkAssetChangeService.bulkServiceMapping['List'].clear(Application, editCommand.value, 'custom9', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Discovery")
 			bulkChangeCommand.edits = [editCommand]
+			bulkAssetChangeService.bulkServiceMapping.InList = bulkAssetChangeService.bulkServiceMapping.List
 
 		when: 'bulk change is called with the bulk change command'
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkChangeListService.coerceBulkValue(project, 'validation', editCommand.value, ValidationType.list)
-			1 * bulkAssetChangeService.bulkChangeListService.bulkReplace(null, 'validation', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping['InList'].coerceBulkValue(project, 'validation', editCommand.value, _ as Map)
+			1 * bulkAssetChangeService.bulkServiceMapping['InList'].replace(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
 	}
 
 
@@ -621,14 +621,15 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
 			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: null)
 			bulkChangeCommand.edits = [editCommand]
+			bulkAssetChangeService.bulkServiceMapping.InList = bulkAssetChangeService.bulkServiceMapping.List
 
 		when: 'bulk change is called with the bulk change command'
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
 		then: 'the bulkReplace function is invoked'
 			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkChangeListService.coerceBulkValue(project, 'validation', editCommand.value, ValidationType.list)
-			1 * bulkAssetChangeService.bulkChangeListService.bulkClear(null, 'validation', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping['InList'].coerceBulkValue(project, 'validation', editCommand.value, _ as Map)
+			1 * bulkAssetChangeService.bulkServiceMapping['InList'].clear(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
 	}
 
 
