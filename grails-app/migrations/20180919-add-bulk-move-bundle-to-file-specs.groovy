@@ -25,9 +25,8 @@ databaseChangeLog = {
 						def mapForMoveBundle = settingsJson.fields.find { it.field == "moveBundle" }
 
 						if (mapForMoveBundle) {
-							mapForMoveBundle.bulkChangeService = "bulkChangeMoveBundleService"
 							mapForMoveBundle.bulkChangeActions = [
-								replace: 'bulkReplace'
+								'replace'
 							]
 						}
 					}

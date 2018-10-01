@@ -26,10 +26,9 @@ databaseChangeLog = {
 
 						if (fields) {
 							fields.each { field ->
-								field.bulkChangeService = "bulkChangeListService"
 								field.bulkChangeActions = [
-									replace: 'bulkReplace',
-									clear  : 'bulkClear'
+									'replace',
+									'clear'
 								]
 							}
 						}
