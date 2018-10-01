@@ -262,6 +262,8 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 				console.log(result);
 				console.log(this.model.id);
 				// save last updated field
+				const duration = DateUtils.convertDurationPartsToMinutes(this.model.durationParts);
+				this.model.durationText = DateUtils.formatDuration(duration, this.model.durationScale);
 				this.model.lastUpdated = result && result.assetComment && result.assetComment.lastUpdated ?
 					result.assetComment && result.assetComment.lastUpdated
 					:

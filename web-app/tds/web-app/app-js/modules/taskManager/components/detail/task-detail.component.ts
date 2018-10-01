@@ -70,7 +70,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.taskDetailModel.detail = res;
 
 			this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
-			this.model = this.modelHelper.setModel(this.taskDetailModel);
+			this.model = this.modelHelper.cleanAndSetModel(this.taskDetailModel);
 
 			this.model.instructionLink = this.model.instructionsLinkLabel + '|' + this.model.instructionsLinkURL;
 
@@ -134,11 +134,13 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				{provide: UIPromptService, useValue: this.promptService},
 				{provide: PreferenceService, useValue: this.userPreferenceService} ,
 				{provide: PermissionService, useValue: this.permissionService},
-			{provide: TaskDetailModel, useValue: clone(this.taskDetailModel)}
+			{provide: TaskDetailModel, useValue: clone(this.model)}
 		], false, false)
 		.then(result => {
 			if (result) {
 				this.model = result;
+				this.dataGridTaskPredecessorsHelper.reloadData(this.model.predecessorList);
+				this.dataGridTaskSuccessorsHelper.reloadData(this.model.successorList);
 			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');

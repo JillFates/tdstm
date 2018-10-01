@@ -31,10 +31,16 @@ export class TaskEditCreateModelHelper {
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 	}
 
+	public setModel(model: any): any {
+		this.model = model;
+
+		return model;
+	}
+
 	/**
 	 * Set the model passing the all detail object
 	 */
-	public setModel(task: any): any {
+	public cleanAndSetModel(task: any): any {
 		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
@@ -61,6 +67,7 @@ export class TaskEditCreateModelHelper {
 			personCreateObj: detail.personCreateObj || '',
 			note: '',
 			duration: assetComment.duration,
+			durationText: DateUtils.formatDuration(assetComment.duration, durationScale),
 			actualDuration: detail.actualDuration || '',
 			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
@@ -70,7 +77,6 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
 			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
 			durationScale,
-			durationText: '',
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
