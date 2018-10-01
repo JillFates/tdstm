@@ -224,7 +224,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
 			app.refresh() // needed to refresh because of Grails test transaction caching entities
 		and: 'the clone method is called'
-			Long newAssetId = assetEntityService.clone(project, new CloneAssetCommand(id: app.id, name: assetName, cloneDependencies: cloneDependencies), errors)
+			Long newAssetId = assetEntityService.clone(project, new CloneAssetCommand(assetId: app.id, name: assetName, cloneDependencies: cloneDependencies), errors)
 		then: 'a new asset id should be returned'
 			newAssetId
 		and: 'there should be no errors reported'

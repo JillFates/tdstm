@@ -3107,55 +3107,45 @@ class AssetEntityService implements ServiceMethods {
 		AssetEntity clonedAsset
 		if(!errors) {
 			//  params son assetId
-			AssetEntity assetToClone = GormUtil.findInProject(project, AssetEntity, command.id)
+			AssetEntity assetToClone = GormUtil.findInProject(project, AssetEntity, command.assetId)
 			if (!assetToClone) {
 				errors << "The asset specified to clone was not found"
-			} else {
-				//check that the asset is part of the project
-				if (!securityService.isCurrentProjectId(assetToClone.projectId)) {
-					log.error(
-							"Security Violation, user {} attempted to access an asset not associated to the project",
-							securityService.getCurrentUsername()
-					)
-					errors << "Asset not found in current project"
+			} else{
+				Map defaultValues = [
+					assetName : command.name,
+					validation: ValidationType.DIS,
+					environment: ''
+				]
+				if (assetToClone.isaDevice()) {
+					defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
 				}
-				if (!errors) {
-					Map defaultValues = [
-						assetName : command.name,
-						validation: ValidationType.DIS,
-						environment: ''
-					]
-					if (assetToClone.isaDevice()) {
-						defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
-					}
-					clonedAsset = assetToClone.clone(defaultValues)
+				clonedAsset = assetToClone.clone(defaultValues)
 
-					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && command.cloneDependencies) {
-						for (dependency in assetToClone.supportedDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									dependent: clonedAsset,
-									status   : AssetDependencyStatus.QUESTIONED
-							])
+				// Cloning assets dependencies if requested
+				if (clonedAsset.save() && command.cloneDependencies) {
+					for (dependency in assetToClone.supportedDependencies()) {
+						AssetDependency clonedDependency = dependency.clone([
+								dependent: clonedAsset,
+								status   : AssetDependencyStatus.QUESTIONED
+						])
 
-							clonedDependency.save()
-						}
-						for (dependency in assetToClone.requiredDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									asset : clonedAsset,
-									status: AssetDependencyStatus.QUESTIONED
-							])
-							clonedDependency.save()
-						}
+						clonedDependency.save()
 					}
-					// copy asset Tags
-					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
-					if (sourceTagIds) {
-						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+					for (dependency in assetToClone.requiredDependencies()) {
+						AssetDependency clonedDependency = dependency.clone([
+								asset : clonedAsset,
+								status: AssetDependencyStatus.QUESTIONED
+						])
+						clonedDependency.save()
 					}
-
-					return clonedAsset.id
 				}
+				// copy asset Tags
+				List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
+				if (sourceTagIds) {
+					tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+				}
+
+				return clonedAsset.id
 			}
 		}
 	}

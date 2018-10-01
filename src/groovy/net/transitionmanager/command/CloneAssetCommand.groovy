@@ -5,7 +5,7 @@ class CloneAssetCommand {
 	/**
 	 * Id of the asset being cloned.
 	 */
-	Long id
+	Long assetId
 
 	/**
 	 * Name of the asset to be cloned
@@ -19,7 +19,7 @@ class CloneAssetCommand {
 
 	static constraints = {
 		name nullable: false, blank: false
-		id nullable: false
+		assetId nullable: false
 		cloneDependencies nullable: false
 
 	}

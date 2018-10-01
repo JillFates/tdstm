@@ -60,8 +60,8 @@ class WsAssetController implements ControllerMethods {
 
 		List<String> errors = []
 
-		if(command.id){
-			AssetEntity sampleAssetEntity = fetchDomain(AssetEntity, [id: command.id])
+		if(command.assetId){
+			AssetEntity sampleAssetEntity = fetchDomain(AssetEntity, [id: command.assetId])
 			//check that the asset is part of the project
 			if(!securityService.isCurrentProjectId(sampleAssetEntity?.projectId)){
 				securityService.reportViolation(

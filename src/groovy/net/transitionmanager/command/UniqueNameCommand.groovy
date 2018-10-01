@@ -4,7 +4,7 @@ class UniqueNameCommand {
 	/**
 	 * Id of the domain object.
 	 */
-	Long id
+	Long assetId
 
 	/**
 	 * String representing the name be validated.
@@ -13,7 +13,7 @@ class UniqueNameCommand {
 
 	static constraints = {
 		name nullable: false, blank: false
-		id nullable: true
+		assetId nullable: true
 	}
 
 
