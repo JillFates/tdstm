@@ -259,6 +259,18 @@ class Model {
 	}
 
 	/**
+	 * Seartch for the first Alias Model
+	 * @param aliasName String representing the alias
+	 * @param manufactr Manufaturer of the Model
+	 * @return
+	 */
+	static Model lookupFirstAlias(String aliasName, Manufacturer manufactr) {
+		ModelAlias.where {
+			name == aliasName && manufacturer == manufactr
+		}.find()?.model
+	}
+
+	/**
 	 * Prepend "http://" for sourceURL if http:// or https:// does not exist.
 	 */
 	private void prependHttp() {

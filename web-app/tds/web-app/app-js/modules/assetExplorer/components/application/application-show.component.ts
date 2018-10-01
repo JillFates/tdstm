@@ -6,18 +6,27 @@ import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { DOMAIN, DIALOG_SIZE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `application-show`,
+		selector: `tds-application-show`,
 		template: template
 	}) class ApplicationShowComponent implements OnInit {
 		mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
 
-		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		constructor(
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetService: DependecyService,
+			private prompt: UIPromptService,
+			private assetsExplorerService: AssetExplorerService,
+			private notifierService: NotifierService) {
 
 		}
 
@@ -36,7 +45,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -56,7 +65,41 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+		}
+
+		/**
+			allows to delete the application assets
+		 */
+		onDeleteAsset() {
+
+			this.prompt.open('Confirmation Required',
+				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'OK', 'Cancel')
+				.then( success => {
+					if (success) {
+						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
+							if (res) {
+								this.notifierService.broadcast({
+									name: 'reloadCurrentAssetList'
+								});
+								this.activeDialog.dismiss();
+							}
+						}, (error) => console.log(error));
+					}
+				})
+				.catch((error) => console.log(error));
+		}
+
+		/**
+		 * Allows to clone an application asset
+		 */
+		onCloneAsset(): void {
+			console.log('Will come clone implementation');
+		}
+
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

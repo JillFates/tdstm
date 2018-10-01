@@ -20,9 +20,10 @@ class CredentialSpec extends IntegrationSpec {
 			createTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
 
 		where:
-		method				| sessionName	| valExp				 | authUrl		 | renewUrl		| httpMethod 	| requestMode		| result
-			am.BASIC_AUTH		| ''			| '' 					 | ''			 | '' 			| null			| null				| true		// HAPPY PATH
-			am.BASIC_AUTH		| 'bogus'		| 'bogus'				 | ''			 | '' 			| null			| null				| true		// Still happy with bogus values that are unnecessary
+		method					| sessionName	| valExp				 | authUrl		 | renewUrl		| httpMethod 	| requestMode		| result
+			am.BASIC_AUTH		| 'a@cookie:b'	| 'status code equal 200'| 'http://b.ic' | '' 			| null			| null				| true		// HAPPY PATH
+			am.BASIC_AUTH		| 'bogus'		| 'bogus'				 | 'http://b.ic' | '' 			| null			| null				| false		// Bogus validation expression will fail
+			am.BASIC_AUTH		| ''			| '' 					 | ''			 | '' 			| null			| null				| false		// Session name is mandatory for BASIC_AUTH
 			am.JWT				| ''			| '' 					 | 'http://b.ic' | 'http://p.ic'| null			| null				| true		// HAPPY PATH
 			am.JWT				| 'bogus'		| 'bogus' 				 | 'http://b.ic' | 'http://p.ic'| null			| null				| true		// Still happy with bogus values that are unnecessary
 			am.JWT				| ''			| '' 					 | 'http://b.ic' | 'http://b.ic'| null			| null				| false		// Authentication and renewUrl can not be the same

@@ -229,6 +229,11 @@ class StringUtilTests extends Specification {
 			'a'     | null
 			'2'     | null
 			''      | null
+			1		| true
+			0		| false
+			-1		| true
+			false	| false
+			true	| true
 	}
 
 	void "Test the containsPathTraversals for any possible hacks"() {

@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import test.helper.AssetEntityTestHelper
 
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
@@ -62,6 +63,59 @@ ${device.id},${device.assetName}""".stripIndent())
 				iterate {
 					
 					extract 'asset id' load 'id'
+					fetch 'id' set deviceVar
+					if(ROW == 1){
+						assert deviceVar == null
+					}
+					if(ROW == 2){
+						assert deviceVar.id == ${device.id}
+					}
+				}
+			""".stripIndent())
+
+		then: 'Results should contain results'
+			with(etlProcessor.finalResult()) {
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can fetch results without using id'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+			device.save(failOnError: true, flush: true)
+
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+asset id,asset name,environment
+12323434,A1 PDU1 A,Development
+${device.id},${device.assetName},${device.environment}""".stripIndent())
+
+			ETLProcessor etlProcessor = new ETLProcessor(
+				project,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+
+				domain Device
+				iterate {
+					
+					extract 'asset name' load 'Name' set nameVar
+					extract 'environment' load 'Environment' set envVar
+					find Device by 'Name' eq nameVar and 'Environment' eq envVar into 'id'
 					fetch 'id' set deviceVar
 					if(ROW == 1){
 						assert deviceVar == null
@@ -255,10 +309,16 @@ ${manufacturer.name},${model.modelName}
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-	/** TODO:dcorrea. Review with John in SearchQueryHelper, this line -> fieldsInfo[propertyName].find.size = recordsFound
+
 	void 'test can fetch results by find/elseFind'() {
 
 		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.assetName = 'AGPM'
+			device.environment = 'Production'
+			device.os = 'Microsoft'
+			device.ipAddress = '192.168.1.10'
+
 			Manufacturer manufacturer = new Manufacturer(name : "Dell 12345").save(failOnError: true, flush: true)
 
 			Model model = new Model(
@@ -271,6 +331,10 @@ ${manufacturer.name},${model.modelName}
 				connectorPosX  : 250,
 				connectorPosY  : 90
 			).save(failOnError: true, flush: true)
+
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
 
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 model,manufacturer
@@ -294,14 +358,14 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 					extract 'manufacturer' set manufacturerNameVar
 					extract 'model' set modelNameVar
 					find Device by 'manufacturer', 'model' with manufacturerNameVar, modelNameVar into 'model'
-					fetch 'Model' set modelVar
+					fetch 'Model' set deviceVar
 
 					if(ROW == 1){
-						assert modelVar == null
+						assert deviceVar == null
 					} 	
 
 					if(ROW == 2){
-						assert modelVar.id == ${model.id}
+						assert deviceVar.id == ${device.id}
 					}
 				}
 			""".stripIndent())
@@ -315,7 +379,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-	} */
+	}
 
 	void 'test can fetch model based on manufacturer and model'() {
 

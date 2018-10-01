@@ -11,9 +11,17 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.BulkAssetChangeService
+import net.transitionmanager.service.BulkChangeDateService
+import net.transitionmanager.service.BulkChangeNumberService
+import net.transitionmanager.service.BulkChangePersonService
+import net.transitionmanager.service.BulkChangeStringService
+import net.transitionmanager.service.BulkChangeYesNoService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.FileSystemService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.TagAssetService
+import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 
@@ -102,8 +110,23 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	BulkChangeCommand bulkChangeCommand
 
 	void setup() {
+		bulkAssetChangeService.dataviewService.projectService.customDomainService = [
+				fieldToControlMapping: {Project currentProject -> [
+						tagAssets: 'asset-tag-selector',
+						retireDate: 'date-time-selector',
+						externalRefId: 'string-selector',
+						size: 'number-selector',
+						modifiedBy: 'person-selector',
+						validation: 'yes-no-selector'
+				]}
+		] as CustomDomainService
 		bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
 		bulkAssetChangeService.dataviewService = Mock(DataviewService)
+		bulkAssetChangeService.bulkChangeDateService = Mock(BulkChangeDateService)
+		bulkAssetChangeService.bulkChangeStringService = Mock(BulkChangeStringService)
+		bulkAssetChangeService.bulkChangeNumberService = Mock(BulkChangeNumberService)
+		bulkAssetChangeService.bulkChangePersonService = Mock(BulkChangePersonService)
+		bulkAssetChangeService.bulkChangeYesNoService = Mock(BulkChangeYesNoService)
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
@@ -259,4 +282,167 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			1 * bulkAssetChangeService.tagAssetService.bulkRemove(null, [], null)
 	}
 
+	void 'Test bulkChange invalid action'() {
+			setup: 'given an edit command for removing tags, where allAssets it true, and a bulk change command holding the edit'
+				EditCommand editCommand = new EditCommand(fieldName: 'tagAssets', action: 'inaction', value: "[${tag1.id}, ${tag2.id}]")
+				bulkChangeCommand.edits = [editCommand]
+				bulkChangeCommand.assetIds = []
+				bulkChangeCommand.allAssets = true
+
+			when: 'bulk change is called with the bulk change command'
+				bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+			then: 'an InvalidParameter Exception is thrown'
+				thrown InvalidParamException
+		}
+
+	@See('TM-12334')
+	void 'Test date/time field bulkChange replace'() {
+		setup: 'given an edit command for replacing date/time, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'replace', value: '2018-09-19')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeDateService.bulkReplace(null, 'retireDate', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test date/time field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'retireDate', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeDateService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeDateService.bulkClear('retireDate', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test string field bulkChange replace'() {
+		setup: 'given an edit command for replacing string field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'replace', value: '1abcd')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeStringService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeStringService.bulkReplace(null, 'externalRefId', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test string field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'externalRefId', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeStringService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeStringService.bulkClear('externalRefId', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test numeric field bulkChange replace'() {
+		setup: 'given an edit command for replacing numeric field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'replace', value: '1')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeNumberService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeNumberService.bulkReplace(null, 'size', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test numeric field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeNumberService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeNumberService.bulkClear('size', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test person field bulkChange replace'() {
+		setup: 'given an edit command for replacing person field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'replace', value: '1')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangePersonService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangePersonService.bulkReplace(null, 'modifiedBy', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test person field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'modifiedBy', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangePersonService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test yes/no field bulkChange replace'() {
+		setup: 'given an edit command for replacing yes/no field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: 'yes')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkReplace(null, 'validation', [device.id, device2.id], [:])
+	}
+
+	@See('TM-12334')
+	void 'Test yes/no field bulkChange clear'() {
+		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: '')
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkClear function is invoked, with no tags specified'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkChangeYesNoService.coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkChangeYesNoService.bulkClear('validation', [device.id, device2.id], [:])
+	}
 }
