@@ -34,6 +34,8 @@ export class TaskEditCreateModelHelper {
 	public setModel(model: any): any {
 		this.model = model;
 
+		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+
 		return model;
 	}
 

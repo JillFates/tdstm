@@ -366,11 +366,10 @@
                                                         </ng-template>
 
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem let-rowIndex="rowIndex">
-                                                            <div (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.taskNumber}}</div>
+                                                            <div>{{dataItem.taskNumber}}</div>
                                                         </ng-template>
 
                                                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
-                                                            <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                             <tds-combobox
                                                                     class="status"
                                                                     [(model)]="dataItem.model"
@@ -413,7 +412,6 @@
                                                     </ng-template>
 
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
-                                                        <!--<label class="pointer pad-left-7" (click)="openTaskDetail(dataItem, modalType.VIEW)">{{dataItem.desc}}</label>-->
                                                         <tds-combobox
                                                                 class="status"
                                                                 [(model)]="dataItem.model"

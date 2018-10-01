@@ -248,29 +248,9 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 		});
 	}
 
-	/**
-	 * Open the Task Detail
-	 * @param task
-	 */
-	public openTaskDetail(task: any, modalType: ModalType): void {
-		this.close({commentInstance: {id: task.taskId}});
-	}
-
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
-			.subscribe((result) => {
-				console.log(result);
-				console.log(this.model.id);
-				// save last updated field
-				const duration = DateUtils.convertDurationPartsToMinutes(this.model.durationParts);
-				this.model.durationText = DateUtils.formatDuration(duration, this.model.durationScale);
-				this.model.lastUpdated = result && result.assetComment && result.assetComment.lastUpdated ?
-					result.assetComment && result.assetComment.lastUpdated
-					:
-					this.model.lastUpdated;
-
-				this.close(this.model);
-			});
+			.subscribe((result) => this.close(result));
 	}
 
 	/**

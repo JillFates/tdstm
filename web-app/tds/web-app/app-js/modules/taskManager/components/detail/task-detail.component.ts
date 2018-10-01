@@ -138,9 +138,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		], false, false)
 		.then(result => {
 			if (result) {
-				this.model = result;
-				this.dataGridTaskPredecessorsHelper.reloadData(this.model.predecessorList);
-				this.dataGridTaskSuccessorsHelper.reloadData(this.model.successorList);
+				this.loadTaskDetail();
 			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
