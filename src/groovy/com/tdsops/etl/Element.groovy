@@ -1,7 +1,9 @@
 package com.tdsops.etl
 
 import com.tdsops.common.lang.CollectionUtils
+import com.tdsops.etl.ETLProcessor.ReservedWord
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.ObjectUtil
 import com.tdssrc.grails.StringUtil
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.StringUtils
@@ -673,6 +675,44 @@ class Element implements RangeChecker {
 	 */
 	Element plus(String value) {
 		return copy(this.value + value)
+	}
+
+	/**
+	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
+	 * <code>
+	 *  extract 1 load 'description' when populated
+	 *     ...
+	 * 	load 'description' with myVar when populated
+	 * </code>
+	 * @param reservedWord
+	 * @return current {@code Element} instance
+	 */
+	Element when(ReservedWord reservedWord){
+		if(reservedWord != ReservedWord.populated){
+			throw ETLProcessorException.incorrectWhenCommandStructure()
+		}
+
+		return when { Object val ->
+			ObjectUtil.isNotNullOrBlankString(val)
+		}
+	}
+
+	/**
+	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
+	 * <code>
+	 *  extract 1 load 'description' when { it > 1000 }
+	 *     ...
+	 * 	load 'description' with myVar when { it > 1000 }
+	 * </code>
+	 * @param closure Closure to determine if it is necessary
+	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
+	 * @return current {@code Element} instance
+	 */
+	Element when(Closure closure){
+		if(!closure(value)){
+			processor.removeElement(this)
+		}
+		return this
 	}
 
 	/**

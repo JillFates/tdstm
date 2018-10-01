@@ -200,7 +200,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <b> ... transform with ...</b>
 	 */
 	static enum ReservedWord {
-		labels, with, on, off, record, ControlCharacters
+		labels, with, on, off, record, ControlCharacters, populated
 	}
 
 	/**
@@ -1199,6 +1199,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		findOrCreateCurrentElement(findElement.currentFind.fieldDefinition)
 		result.addFindElement(findElement)
 		popFromStack()
+	}
+
+	/**
+	 * Removes an element instance value from etl results
+	 * @param element ans instance of {@code Element}
+	 */
+	void removeElement(Element element){
+		result.removeElement(element)
 	}
 
 	/**
