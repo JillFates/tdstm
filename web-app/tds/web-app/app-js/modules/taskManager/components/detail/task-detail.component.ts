@@ -138,11 +138,11 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			if (result) {
 				if (result.isDeleted) {
 					this.close({id: this.taskDetailModel, isDeleted: true})
+					return;
 				}
-				else {
-					this.hasChanges = true;
-					this.loadTaskDetail();
-				}
+
+				this.hasChanges = true;
+				this.loadTaskDetail();
 			}
 		}).catch(result => {
 			this.dismiss(this.hasChanges);
