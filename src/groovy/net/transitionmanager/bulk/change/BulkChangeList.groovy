@@ -1,11 +1,12 @@
-package net.transitionmanager.service.bulk.change
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
-import com.tdssrc.grails.NumberUtil
+import com.tds.asset.AssetOptions
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.validators.CustomValidators
 import grails.transaction.Transactional
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 
@@ -13,9 +14,12 @@ import net.transitionmanager.service.ServiceMethods
  * A service for managing bulk operations on Assets for assigning values from a list.
  */
 @Transactional
-class BulkChangeListService implements ServiceMethods {
+class BulkChangeList implements ServiceMethods {
 
-	AssetEntityService assetEntityService
+	/**
+	 * Actions that are allowed to be dynamically called by the Bulk Services.
+	 */
+	static final List<String> ALLOWED_ACTIONS = ['replace', 'clear']
 
 	/**
 	 * Coerces the string value passed from the BulkChangeService and validates it to be a value from a list.
@@ -23,11 +27,13 @@ class BulkChangeListService implements ServiceMethods {
 	 * @param currentProject the current project passed from the controller for use in validating the tag ids.
 	 * @param field the list field to update
 	 * @param value The string value that needs to be coerce.
-	 * @param values the looked up values to use to validate the value to be in the list of values.
+	 * @param fieldMapping the mapping to use to validate the value for custom fields. For standard fields there in an internal mapping to the
+	 * values used to validate the value.
 	 *
 	 * @return a string, that is valid for a list.
 	 */
-	String coerceBulkValue(Project currentProject, String field, String value, List<String> values = []) {
+	static String coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
+		List values = fieldMapping.customValues ?: getListValues(field)
 
 		if (value && !values.contains(value)) {
 			throw new InvalidParamException("Value $value is not valid bulk update of $field.")
@@ -37,60 +43,76 @@ class BulkChangeListService implements ServiceMethods {
 	}
 
 	/**
+	 * A helper method to look up values used in validating standard fields.
+	 *
+	 * @param field the field to get the list of values used for validation.
+	 *
+	 * @return the list of values used for validation.
+	 */
+	static List getListValues(String field) {
+		switch (field) {
+			case 'validation':
+				return ValidationType.list
+			case 'railType':
+				return AssetEntity.RAIL_TYPES
+			case 'criticality':
+				return Application.CRITICALITY
+			case 'planStatus':
+				return CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION)()
+			default:
+				throw new InvalidParamException("For Bulk update of list field $field is invalid.")
+		}
+	}
+
+	/**
 	 * Clears the current value from a list with ''.
 	 *
+	 * @param type the class to use in the query.
 	 * @param value the value which should be null for clear.
 	 * @param field the list field to update
-	 * @param assetIds The ids of the assets to clear the list for.
-	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 * @param ids The ids of the domain to clear the list for.
+	 * @param idsFilterQuery filtering query to use if ids are not present.
 	 */
-	void bulkClear(String value, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	static void clear(Class type, String value, String field, List<Long> ids = [], Map idsFilterQuery = null) {
 		if (value) {
 			throw new InvalidParamException("For bulk clear you can not specify a value.")
 		}
 
-		replace('', field, assetIds, assetIdsFilterQuery)
+		bulkReplace(type, '', field, ids, idsFilterQuery)
 	}
 
 	/**
 	 * Replaces the current list value with a new one.
 	 *
+	 * @param type the class to use in the query.
 	 * @param value to replace the current list value with a new one. The value can't be '' or null.
 	 * @param field the list field to update
-	 * @param assetIds The ids of the assets to replace the list  for.
-	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 * @param ids The ids of the domain to replace the list for.
+	 * @param idsFilterQuery filtering query to use if ids are not present.
 	 */
-	void bulkReplace(String value, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	static void replace(Class type, String value, String field, List<Long> ids = [], Map idsFilterQuery = null) {
 		if (!value) {
 			throw new InvalidParamException("For bulk replace you need to specify a valid $field value.")
 		}
 
-		replace(value, field, assetIds, assetIdsFilterQuery)
+		bulkReplace(type, value, field, ids, idsFilterQuery)
 	}
 
 	/**
 	 * Replaces the current list value with a new one.
 	 *
+	 * @param type the class to use in the query.
 	 * @param value to replace the current list value with a new one.
 	 * @param field the list field to update
-	 * @param assetIds The ids of the assets to replace the list for.
-	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present.
+	 * @param ids The ids of the domains to replace the list for.
+	 * @param idsFilterQuery filtering query to use if ids are not present.
 	 */
-	void replace(String value, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		String queryForAssetIds
+	static void bulkReplace(Class type, String value, String field, List<Long> ids = [], Map idsFilterQuery = null) {
 		Map params = [:]
-
-		if (assetIds && !assetIdsFilterQuery) {
-			queryForAssetIds = ':assetIds'
-			params.assetIds = assetIds
-		} else {
-			queryForAssetIds = assetIdsFilterQuery.query
-			params << assetIdsFilterQuery.params
-		}
-
+		String queryForIds = BulkChangeUtil.getIdsquery(type, ids, idsFilterQuery, params)
 		params.value = value
 
-		AssetEntity.executeUpdate("UPDATE AssetEntity a SET $field = :value WHERE a.id in($queryForAssetIds)", params)
+		AssetEntity.executeUpdate("UPDATE ${type.simpleName} a SET $field = :value WHERE a.id in($queryForIds)", params)
 	}
 
 

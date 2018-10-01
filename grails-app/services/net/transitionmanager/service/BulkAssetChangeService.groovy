@@ -4,6 +4,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
+import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.bulk.change.BulkChangeMoveBundle
 import net.transitionmanager.bulk.change.BulkChangeNumber
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
@@ -11,6 +13,7 @@ import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.TagAsset
@@ -73,12 +76,15 @@ class BulkAssetChangeService implements ServiceMethods {
 
 	//Maps field control types to services.
 	static Map bulkServiceMapping = [
-		(TagAsset.class.name): BulkChangeTag,
-		(Date.class.name)    : BulkChangeDate,
-		'String'             : BulkChangeString,
-		(Integer.class.name) : BulkChangeNumber,
-		(Person.class.name)  : BulkChangePerson,
-		'YesNo'              : BulkChangeYesNo
+		(TagAsset.class.name)  : BulkChangeTag,
+		(Date.class.name)      : BulkChangeDate,
+		'String'               : BulkChangeString,
+		(Integer.class.name)   : BulkChangeNumber,
+		(Person.class.name)    : BulkChangePerson,
+		'YesNo'                : BulkChangeYesNo,
+		'List'                 : BulkChangeList,
+		'InList'               : BulkChangeList,
+		(MoveBundle.class.name): BulkChangeMoveBundle
 	]
 
 	/**
@@ -95,6 +101,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		List<String> actions
 		def service
 		def value
+		String field
 		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
 		def type = AssetClass.domainClassFor(assetClass)
 
@@ -124,16 +131,17 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Looks up and runs all the edits for a bulk change call.
 		bulkChange.edits.each { EditCommand edit ->
-			service = getService(type, edit.fieldName, filedMapping, bulkServiceMapping)
-			value = service.coerceBulkValue(currentProject, edit.value)
+			field = edit.fieldName
+			service = getService(type, field, filedMapping, bulkServiceMapping)
+			value = service.coerceBulkValue(currentProject, field, edit.value, filedMapping[field])
 			action = edit.action
-			actions = filedMapping[edit.fieldName].bulkChangeActions ?: []
+			actions = filedMapping[field].bulkChangeActions ?: []
 
 			if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
 				throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
 			}
 
-			service."$action"(type, value, edit.fieldName, ids, queryFilter)
+			service."$action"(type, value, field, ids, queryFilter)
 		}
 	}
 

@@ -24,11 +24,13 @@ class BulkChangeTag {
 	 * Coerces the string value passed from the BulkChangeService to a List of longs, and validates them as tag ids.
 	 *
 	 * @param currentProject the current project passed from the controller for use in validating the tag ids.
+	 * @param field not used by this class, just here for the interface.
 	 * @param value The string value that need to be coerce.
+	 * @param fieldMapping not used in this class, just here for the interface.
 	 *
 	 * @return a List of longs, that represent tag ids.
 	 */
-	static List<Long> coerceBulkValue(Project currentProject, String value) {
+	static List<Long> coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
 		JsonSlurper jsonSlurper = new JsonSlurper()
 		def parsedValue = jsonSlurper.parseText(value)
 

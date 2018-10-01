@@ -46,12 +46,15 @@ class BulkChangeNumber {
 	/**
 	 * Parse the given value to determine if it is valid or not
 	 *
-	 * @param value - numeric value
+	 *
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param field  not used this class just here for the interface
+	 * @param value - numeric value
+	 * @param fieldMapping not used for this class just here for the interface.
 	 *
 	 * @return - same number if it is a number
 	 */
-	static Integer coerceBulkValue(Project currentProject, String value) {
+	static Integer coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
 		if (NumberUtil.isNumber(value)) {
 			return NumberUtil.toPositiveInteger(value)
 		}

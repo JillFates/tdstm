@@ -47,11 +47,13 @@ class BulkChangePerson {
 	/**
 	 * Parse the given person id to determine if it belongs to current project or it has access to it
 	 *
-	 * @param personId - a person id
 	 * @param currentProject - current project
+	 * @param personId - a person id
+	 * @param field not used in this class just here for the interface.
+	 * @param fieldMapping not used for this class just here for the interface.
 	 * @return - person if found
 	 */
-	static Person coerceBulkValue(Project currentProject, String personId) {
+	static Person coerceBulkValue(Project currentProject, String field , String personId, Map fieldMapping) {
 		if (!NumberUtil.isNumber(personId)) {
 			return null
 		}

@@ -49,9 +49,11 @@ class BulkChangeDate implements ServiceMethods {
 	 *
 	 * @param value - date value
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param fieldMapping not used for this class just here for the interface.
+	 *
 	 * @return - parsed Date object
 	 */
-	static Date coerceBulkValue(Project currentProject, String value) {
+	static Date coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
 		def parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
 		if (!parsedValue) {
 			parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
