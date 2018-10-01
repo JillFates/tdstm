@@ -15,7 +15,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
-import {TranslatePipe} from "../../../../shared/pipes/translate.pipe";
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `task-detail`,

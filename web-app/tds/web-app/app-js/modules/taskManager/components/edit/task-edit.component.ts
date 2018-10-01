@@ -74,28 +74,22 @@ export class TaskEditComponent extends UIExtraDialog  implements OnInit {
 
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
 		this.model = this.modelHelper.setModel(this.taskDetailModel);
-
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
-
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
 
-		this.taskManagerService.getStatusList(this.model.id)
-			.subscribe((data: string[]) => this.model.statusList = data);
+		Observable.forkJoin(
+			this.taskManagerService.getStatusList(this.model.id),
+			this.taskManagerService.getAssignedTeam(this.model.id),
+			this.taskManagerService.getStaffRoles(),
+			this.userPreferenceService.getUserDatePreferenceAsKendoFormat())
+			.subscribe((results: any[]) => {
+				const [status, personList, staffRoles, dateFormat] = results;
 
-		this.taskManagerService.getAssignedTeam(this.model.id)
-			.subscribe((data: any[]) => {
-				jQuery('[data-toggle="popover"]').popover();
-				this.model.personList = data.map((item) => ({id: item.id, text: item.nameRole}))
-			});
-
-		this.taskManagerService.getStaffRoles()
-			.subscribe((data: any[]) => {
-				this.model.teamList = data.map((item) => ({id: item.id, text: item.description }));
-			});
-
-		this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
+				this.model.statusList = status;
+				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
+				this.model.teamList = staffRoles.map((item) => ({id: item.id, text: item.description }));
 				this.dateFormat = dateFormat;
+				jQuery('[data-toggle="popover"]').popover();
 			});
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
