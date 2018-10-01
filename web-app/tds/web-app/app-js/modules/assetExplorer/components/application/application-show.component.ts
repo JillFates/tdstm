@@ -9,6 +9,9 @@ import {TagModel} from '../../../assetTags/model/tag.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
+import {CloneModalModel} from '../../model/clone-modal.model';
 
 declare var jQuery: any;
 
@@ -95,7 +98,26 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		 * Allows to clone an application asset
 		 */
 		onCloneAsset(): void {
-			console.log('Will come clone implementation');
+
+			const cloneModalModel: CloneModalModel = {
+				assetType: DOMAIN.APPLICATION,
+				id: this.mainAsset
+			}
+			this.dialogService.extra(AssetCloneComponent, [
+				{provide: CloneModalModel, useValue: cloneModalModel}
+			], false, false).then( (result: CloneCLoseModel)  => {
+
+				if (result.clonedAsset && result.showEditView) {
+					const componentParameters = [
+						{ provide: 'ID', useValue: result.id },
+						{ provide: 'ASSET', useValue: DOMAIN.APPLICATION }
+					];
+
+					this.dialogService
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				}
+			})
+				.catch( error => console.log('error', error));
 		}
 
 		getGraphUrl(): string {

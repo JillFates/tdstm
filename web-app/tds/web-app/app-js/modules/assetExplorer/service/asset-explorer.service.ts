@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {Response} from '@angular/http';
+import {Response, Headers} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Permission} from '../../../shared/model/permission.model';
@@ -385,6 +385,41 @@ export class AssetExplorerService {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
 			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get an Asset by id
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	getAsset(assetId: number): Observable<any> {
+		return this.http.get(`${this.assetUrl}/${assetId}`)
+			.map((res: Response) => res.json().data.result)
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Validate Asset uniqueness by its Name
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	checkAssetForUniqueName(assetToValid: any): Observable<any> {
+
+		return this.http.post(`${this.assetUrl}/checkForUniqueName`, assetToValid)
+			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Clone Asset
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	cloneAsset(assetToClone): Observable<any> {
+
+		return this.http.post(`${this.assetUrl}/clone`, assetToClone)
+			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
 

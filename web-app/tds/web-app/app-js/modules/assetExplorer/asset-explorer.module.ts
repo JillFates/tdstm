@@ -44,6 +44,8 @@ import { BulkChangeService } from './service/bulk-change.service';
 import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
+import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
+import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 
 @NgModule({
 	imports: [
@@ -79,7 +81,9 @@ import { ModelService } from  './service/model.service';
 		TDSCheckboxComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
-		ManufacturerEditComponent
+		ManufacturerEditComponent,
+		AssetCloneComponent,
+		PopupAssetMessageComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -107,7 +111,8 @@ import { ModelService } from  './service/model.service';
 		TDSCheckboxComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
-		ModelDeviceShowComponent
+		ModelDeviceShowComponent,
+		AssetCloneComponent
 	],
 })
 
