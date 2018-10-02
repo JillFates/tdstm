@@ -2,7 +2,7 @@
  * Created by Jorge Morayta on 03/21/2018.
  */
 
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit, Input, SimpleChanges, OnChanges} from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
@@ -25,7 +25,7 @@ export class URLViewerComponent implements OnInit {
 		if (!this.target || this.target === '') {
 			this.target = '_blank';
 		}
-		this.getURLContext();
+		this.getURLContext(this.model);
 	}
 
 	/**
@@ -33,15 +33,26 @@ export class URLViewerComponent implements OnInit {
 	 * i.e. This URL | http://www.google.com
 	 * @returns {string}
 	 */
-	protected getURLContext(): void {
-		if (this.model && this.model.indexOf('|') !== -1) {
-			const [label, url] = this.model.split('|');
+	protected getURLContext(model: string): void {
+		if (model && model.indexOf('|') !== -1) {
+			const [label, url] = model.split('|');
 
 			this.label = label || url; // if there is no label fall back to url, (for label in the template is shown interpolated, we don't need sanitize)
 			this.trustedUrl = this.sanitizer.bypassSecurityTrustUrl(url);
 		} else {
-			this.trustedUrl = this.sanitizer.bypassSecurityTrustUrl(this.model);
+			this.trustedUrl = this.sanitizer.bypassSecurityTrustUrl(model);
 			this.label = 'Click to View';
+		}
+	}
+
+	/**
+	 * Hook when the new Value is assigned to the ComboBox
+	 * @param {SimpleChanges} changes
+	 */
+	ngOnChanges(changes: SimpleChanges) {
+		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
+		if (changes['model'] && changes['model'].currentValue) {
+			this.getURLContext(changes['model'].currentValue);
 		}
 	}
 }
