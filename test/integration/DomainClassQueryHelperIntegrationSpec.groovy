@@ -824,4 +824,16 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then:
 			results.size() == 1
 	}
+
+	void '39. can skip query if Conditions contains null values'() {
+
+		given: 'a list of conditions with null values'
+			List<FindCondition> conditions = [new FindCondition('model', null)]
+
+		when: 'where method is evaluated'
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, conditions)
+
+		then: 'results are an empty list'
+			results.size() == 0
+	}
 }

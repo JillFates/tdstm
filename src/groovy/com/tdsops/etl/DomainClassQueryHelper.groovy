@@ -5,6 +5,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import groovy.json.internal.LazyMap
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -60,20 +61,9 @@ class DomainClassQueryHelper {
 	 * @return a list of assets returned by an HQL query
 	 */
 	static List where(ETLDomain domain, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
-		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
-		boolean skipQuery=false
-		for (condition in conditions) {
-			if (
-				(! [ FindOperator.isNull, FindOperator.isNotNull].contains(condition.operator))
-			    && (condition.value == null || (condition.value instanceof groovy.json.internal.LazyMap))
-			) {
-				skipQuery = true
-				break
-			}
-		}
 
 		List<Object> results = []
-		if (!skipQuery) {
+		if (!skipQuery(conditions)) {
 			if (domain.isAsset()) {
 				results = assetEntities(domain.clazz, project, conditions, returnIdOnly)
 			} else {
@@ -82,6 +72,26 @@ class DomainClassQueryHelper {
 		}
 
 		return results
+	}
+
+	/**
+	 * Defines if a list of conditions contains
+	 * @param conditions
+	 * @return
+	 */
+	private static boolean skipQuery(List<FindCondition> conditions) {
+		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
+		boolean skipQuery = false
+		for (condition in conditions) {
+			if (
+			(![FindOperator.isNull, FindOperator.isNotNull].contains(condition.operator))
+				&& (condition.value == null || (condition.value instanceof LazyMap))
+			) {
+				skipQuery = true
+				break
+			}
+		}
+		skipQuery
 	}
 
 	/**
