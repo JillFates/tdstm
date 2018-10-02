@@ -46,7 +46,7 @@ export class URLViewerComponent implements OnInit {
 	}
 
 	/**
-	 * Hook when the new Value is assigned to the ComboBox
+	 * Hook when the new Value is assigned
 	 * @param {SimpleChanges} changes
 	 */
 	ngOnChanges(changes: SimpleChanges) {
