@@ -44,6 +44,24 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
+	 * Concatenates the label and url part of the labelURL field
+	 * @param {any} Object which contains the parts
+	 * @returns {string}
+	 */
+	public getInstructionsLink(detail: any): string {
+		let  instructionLink = '';
+
+		if (!detail.instructionsLinkLabel  && detail.instructionsLinkURL)  {
+			instructionLink = detail.instructionsLinkURL;
+		} else {
+			if (detail.instructionsLinkLabel && detail.instructionsLinkURL) {
+				instructionLink = `${detail.instructionsLinkLabel}|${detail.instructionsLinkURL}`;
+			}
+		}
+		return instructionLink;
+	}
+
+	/**
 	 * Set the model passing the all detail object
 	 * @param {any} task Holds the detail object coming from the service, this will be extracted and cleaned
 	 * @returns {any}
@@ -56,14 +74,7 @@ export class TaskEditCreateModelHelper {
 
 		const categories =  [...(detail.categories || [])];
 		categories.push(''); // add empty default value
-		let  instructionLink = '';
-		if (!detail.instructionsLinkLabel  && detail.instructionsLinkURL)  {
-			instructionLink = detail.instructionsLinkURL;
-		} else {
-			if (detail.instructionsLinkLabel && detail.instructionsLinkURL) {
-				instructionLink = `${detail.instructionsLinkLabel}|${detail.instructionsLinkURL}`;
-			}
-		}
+		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
 			title: task.modal.title,
