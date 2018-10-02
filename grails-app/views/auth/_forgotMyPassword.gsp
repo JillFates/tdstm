@@ -25,6 +25,7 @@
 	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
+	<g:javascript src="tds-common.js" />
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -91,16 +92,10 @@
 <script type="text/javascript">
 
 	$( document ).ready(function() {
-
-		function isValidEmail(email) {
-			var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/ ;
-			return emailExp.test(email);
-		}
-
 		$("#forgotPasswordForm").on("submit", function(event) {
 			event.preventDefault();
 			var emailField = $("#email");
-			if (!isValidEmail(emailField.val())) {
+			if (!tdsCommon.isValidEmail(emailField.val())) {
 				alert("Please enter a valid email address");
 				emailField.focus();
 				return false;

@@ -2,6 +2,10 @@ svg {
 	border: 1px solid rgb(0, 128, 0);
 }
 
+svg.regionSelectCursor {
+	cursor: crosshair;
+}
+
 .hidden {
 	display: none !important;
 }

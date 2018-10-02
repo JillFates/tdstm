@@ -1,57 +1,16 @@
 <div class="import-batch-record-fields-component fields-container row" *ngIf="fieldsInfo">
 
     <!-- Fields Info Popup -->
-    <kendo-popup #infoPopup *ngIf="popup.show" class="fields-info-popup"
-                 [margin]="popup.margin"
-                 [popupClass]="'content popup'"
-                 [offset]="popup.offset"
-                 [positionMode]="popup.position">
-        <div class="popup-content" tds-handle-escape (escPressed)="popup.show=false">
-            <div class="popup-header">
-                <button #focusElement autofocus class="invisible-button"></button>
-                <label>
-                    {{popup.title}}
-                </label>
-                <i class="glyphicon glyphicon-remove" (click)="popup.show=false"></i>
-            </div>
-            <div class="popup-body">
-
-                <!-- Find Type-->
-                <div class="find-field-info" *ngIf="popup.type === FieldInfoType.FIND">
-                    <kendo-grid [data]="popupGridData"
-                                [groupable]="false" [group]="popupGridGroups">
-                        <kendo-grid-column [title]="'Domain'" field="domainIndex" [width]="1">
-                            <ng-template kendoGridGroupHeaderTemplate let-field="field" let-value="value" let-group="group">
-                                <span class="domain-group-header">Domain: {{group.items[0].domainName}}</span>
-                                <span *ngIf="group.items[0].recordsFound">Records Found: {{group.items[0].recordsFound}}</span>
-                            </ng-template>
-                        </kendo-grid-column>
-                        <kendo-grid-column [title]="'Field Name'" field="fieldName"></kendo-grid-column>
-                        <kendo-grid-column [title]="'Value'" field="value"></kendo-grid-column>
-                    </kendo-grid>
-                    <div class="footer-results">
-                        <label>Results:</label>
-                        <span *ngIf="popup.results">
-                            <span *ngFor="let id of popup.results" class="badge">{{id}}</span>
-                        </span>
-                        <span *ngIf="!popup.results"><i>No results found</i></span>
-                    </div>
-                </div>
-
-                <!-- Create/Update Type-->
-                <div class="create-update-field-info" *ngIf="popup.type === FieldInfoType.CREATE || popup.type === FieldInfoType.UPDATE">
-                    <div>
-                        <label>Domain: {{popup.domain}}</label>
-                    </div>
-                    <kendo-grid [data]="popupGridData">
-                        <kendo-grid-column [title]="'Field Name'" field="fieldName"></kendo-grid-column>
-                        <kendo-grid-column [title]="'Value'" field="value"></kendo-grid-column>
-                    </kendo-grid>
-                </div>
-
-            </div>
-        </div>
-    </kendo-popup>
+    <field-reference-popup *ngIf="fieldReferencePopupHelper.popup.show"
+                           [mouseEvent]="fieldReferencePopupHelper.popup.mouseEvent"
+                           [type]="fieldReferencePopupHelper.popup.type"
+                           [domain]="fieldReferencePopupHelper.popup.domain"
+                           [results]="fieldReferencePopupHelper.popup.results"
+                           [gridData]="fieldReferencePopupHelper.popup.gridData"
+                           [gridGroups]="fieldReferencePopupHelper.popup.gridGroups"
+                           [offset]="fieldReferencePopupHelper.popup.offset"
+                           (onClose)="fieldReferencePopupHelper.popup.show = false">
+    </field-reference-popup>
 
     <kendo-grid
             [data]="gridData"
@@ -117,14 +76,16 @@
                 </div>
             </ng-template>
         </kendo-grid-column>
+
+        <!-- Reference Icons Column -->
         <kendo-grid-column title="Reference" [width]="80">
             <ng-template kendoGridCellTemplate let-dataItem>
-                <i *ngIf="dataItem.create" (click)="onShowPopup($event, FieldInfoType.CREATE, dataItem)"
+                <i *ngIf="dataItem.create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem, importBatch.fieldLabelMap)"
                    title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
-                <i *ngIf="dataItem.update" (click)="onShowPopup($event, FieldInfoType.UPDATE, dataItem)"
+                <i *ngIf="dataItem.update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem, importBatch.fieldLabelMap)"
                    title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
                 <i *ngIf="dataItem.find && dataItem.find.query.length > 0"
-                   (click)="onShowPopup($event, FieldInfoType.FIND, dataItem)"
+                   (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem, importBatch.fieldLabelMap)"
                    title="View Find Results" class="field-info-icon fa fa-search"></i>
             </ng-template>
         </kendo-grid-column>

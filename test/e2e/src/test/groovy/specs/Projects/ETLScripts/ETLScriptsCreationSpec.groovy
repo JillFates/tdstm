@@ -73,7 +73,7 @@ class ETLScriptsCreationSpec extends GebReportingSpec{
             datascriptNameField = datascriptName
             waitFor {datascriptSaveBtn.isDisplayed()}
             waitFor {datascriptSaveBtn.click()}
-            commonsModule.waitForDialogModalHidden()
+
         then: 'The ETLScripts Detail page is displayed'
             at ETLScriptsDetailsPage
     }

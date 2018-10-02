@@ -1,0 +1,1339 @@
+{
+	"info": {
+		"_postman_id": "3822f568-cbb6-488f-ba7f-f7a71eae1c34",
+		"name": "New Tags Events",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign In",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set current project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"project",
+						"addUserPreference",
+						"{{projectId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "68d015c5-3903-4a68-beaa-4e6f58ae5300",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"A new tag is created.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data.name).to.contain('Brand new Tag');",
+							"    pm.expect(data.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(data.color).to.eql('Red');",
+							"    pm.expect(data.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_id\", data.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"Brand new Tag {{$randomInt}}\",\n  \"description\":\"Tag to test new tags events.\",\n  \"color\":\"Red\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create another tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fbee500e-d785-4a85-a757-1418bba9df45",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Creating another tag.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data.name).to.contain('Return of the Tag');",
+							"    pm.expect(data.description).to.eql('The tag returns');",
+							"    pm.expect(data.color).to.eql('Red');",
+							"    pm.expect(data.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_id2\", data.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"name\":\"Return of the Tag {{$randomInt}}\",\n  \"description\":\"The tag returns\",\n  \"color\":\"Red\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tagEvent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b228c835-9f50-4371-bdd4-720b9c2ffef2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Create new tagEvent.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var record = jsonData.data[0];",
+							"    var record2 = jsonData.data[1];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"    ",
+							"    pm.expect(record2.name).to.contain('Return of the Tag');",
+							"    pm.expect(record2.description).to.eql('The tag returns');",
+							"    pm.expect(record2.color).to.eql('Red');",
+							"    pm.expect(record2.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_event_id\", record.id);",
+							"    postman.setGlobalVariable(\"tag_event_id2\", record2.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"tagIds\":[{{tag_id}},{{tag_id2}}],\n  \"eventId\":{{event1}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvent after creating",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "47b94463-9faf-4ae2-afcd-e7d25071f4b1",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get the newly created eventTags.\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    var record = json.data[0];",
+							"    var record2 = json.data[1];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"    ",
+							"    pm.expect(record2.name).to.contain('Return of the Tag');",
+							"    pm.expect(record2.description).to.eql('The tag returns');",
+							"    pm.expect(record2.color).to.eql('Red');",
+							"    pm.expect(record2.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tagEvent 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "efdab324-f67f-429c-ad74-44f1b410f25d",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Created tagEvent2\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data1 = jsonData.data[0];",
+							"    ",
+							"    pm.expect(data1.name).to.contain('Brand new Tag');",
+							"    pm.expect(data1.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(data1.color).to.eql('Red');",
+							"    pm.expect(data1.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_event_id3\", data1.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"tagIds\":[{{tag_id}}],\n  \"eventId\":{{event2}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tagEvent 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f321b0ef-76db-4600-bc83-52e341dbdbd6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Created tagEvent3.\", function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json.status).to.eql('success');",
+							"    ",
+							"    var data1 = json.data[0];",
+							"    ",
+							"    pm.expect(data1.name).to.contain('Return of the Tag');",
+							"    pm.expect(data1.description).to.eql('The tag returns');",
+							"    pm.expect(data1.color).to.eql('Red');",
+							"    pm.expect(data1.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_event_id4\", data1.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"tagIds\":[{{tag_id2}}],\n  \"eventId\":{{event3}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tagEvent 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8fb47a0d-e6f2-4219-8633-174876fea8f9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Created tagEvent4.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data1 = jsonData.data[0];",
+							"    ",
+							"    pm.expect(data1.name).to.contain('Return of the Tag');",
+							"    pm.expect(data1.description).to.eql('The tag returns');",
+							"    pm.expect(data1.color).to.eql('Red');",
+							"    pm.expect(data1.css).to.eql('tag-red');",
+							"    ",
+							"    postman.setGlobalVariable(\"tag_event_id5\", data1.id);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"tagIds\":[{{tag_id2}}],\n  \"eventId\":{{event4}}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvents before merge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "253cba24-9d59-4b47-a428-eb87a3fc38e0",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Checking tagEvent4.\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    var record = json.data[0];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Return of the Tag');",
+							"    pm.expect(record.description).to.eql('The tag returns');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Merge tags",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "032ac9a8-aa95-4151-8f48-b2d99daa7ba3",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Merged tags\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}/merge/{{tag_id2}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}",
+						"merge",
+						"{{tag_id2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvents after merge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a7ffbe31-26d4-44f5-8c91-f549f2cebf33",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get updated list for first event, after merged\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    pm.expect(json.data.length).to.eql(1);",
+							"    ",
+							"    var record = json.data[0];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvents after merge 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d4f67500-a84b-4803-ba7e-b47ad00b97b3",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get updated list for second event, after merged.\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    var record = json.data[0];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event2}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvents after merge 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "055b1b50-6017-4889-90fd-74c1e7792913",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get updated list for third event, after merged\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    var record = json.data[0];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event3}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event3}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvents after merge 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a1a6db4-5c61-411a-95a2-f0ba3c300b23",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get updated list for fourth event, after merged\", function () {",
+							"    var json = pm.response.json();",
+							"    ",
+							"    var record = json.data[0];",
+							"    ",
+							"    pm.expect(record.name).to.contain('Brand new Tag');",
+							"    pm.expect(record.description).to.eql('Tag to test new tags events.');",
+							"    pm.expect(record.color).to.eql('Red');",
+							"    pm.expect(record.css).to.eql('tag-red');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete TagEvent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data).to.eql({});",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"ids\":[{{tag_event_id}},{{tag_event_id3}},{{tag_event_id4}},{{tag_event_id5}}]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvent after delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "33c3d2b2-c554-4ce6-9dee-07ba44973824",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get an empty list, tagEvent deleted.\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response.data).to.eql([]);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvent after delete 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa828d61-e0e3-4d35-bded-1ae61bdf281f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get an empty list, tagEvent deleted.\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response.data).to.eql([]);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event2}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvent after delete 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "22456c53-4d7a-4dc3-a19f-7c2daa96f809",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get an empty list, tagEvent deleted.\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response.data).to.eql([]);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event3}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event3}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tagEvent after delete 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "83825b1a-2cd0-47e7-bb57-fddbc746b806",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get an empty list, tagAsets deleted.\", function () {",
+							"    var response = pm.response.json();",
+							"    pm.expect(response.data).to.eql([]);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/event/{{event4}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"event",
+						"{{event4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Tag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success no data returned.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    ",
+							"    var data = jsonData.data",
+							"    pm.expect(data).to.eql({});",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag/{{tag_id}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag",
+						"{{tag_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tags after delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Tags that had been created are now deleted.\", function () {",
+							"    var response = pm.response.json();",
+							"     pm.expect(pm.response.text()).to.not.include(\"Brand new Tag\");",
+							"     pm.expect(pm.response.text()).to.not.include(\"Return of the Tag\");",
+							"});",
+							"",
+							"//cleanup code",
+							"pm.globals.unset(\"tag_id\");",
+							"pm.globals.unset(\"tag_id2\");",
+							"pm.globals.unset(\"tag_event_id\");",
+							"pm.globals.unset(\"tag_event_id2\");",
+							"pm.globals.unset(\"tag_event_id3\");",
+							"pm.globals.unset(\"tag_event_id4\");",
+							"pm.globals.unset(\"tag_event_id5\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "43493b28-f182-4072-8158-febb5a29128b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "df2564eb-afb6-492c-b718-de955d16cb37",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "16d4f8f7-5bbe-4f67-9fde-38e05581a2e4",
+			"key": "projectId",
+			"value": "2445",
+			"type": "string"
+		},
+		{
+			"id": "67229d7e-a237-42a4-bc8e-0318a337981f",
+			"key": "event1",
+			"value": "348",
+			"type": "string"
+		},
+		{
+			"id": "cc1a640a-7b3c-46f3-8220-3d39260df001",
+			"key": "event2",
+			"value": "349",
+			"type": "string"
+		},
+		{
+			"id": "67158b87-8e54-44bb-9554-51cae4c7c8a3",
+			"key": "event3",
+			"value": "350",
+			"type": "string"
+		},
+		{
+			"id": "fb61bf3d-fb80-42e8-b2c9-3e8e9cac4b98",
+			"key": "event4",
+			"value": "364",
+			"type": "string"
+		}
+	]
+}

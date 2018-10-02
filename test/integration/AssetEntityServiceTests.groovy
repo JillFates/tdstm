@@ -1,6 +1,7 @@
 import com.tds.asset.Application
 import com.tdsops.tm.enums.domain.Color
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
@@ -223,7 +224,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
 			app.refresh() // needed to refresh because of Grails test transaction caching entities
 		and: 'the clone method is called'
-			Long newAssetId = assetEntityService.clone(app.id, assetName, cloneDependencies, errors)
+			Long newAssetId = assetEntityService.clone(project, new CloneAssetCommand(assetId: app.id, name: assetName, cloneDependencies: cloneDependencies), errors)
 		then: 'a new asset id should be returned'
 			newAssetId
 		and: 'there should be no errors reported'

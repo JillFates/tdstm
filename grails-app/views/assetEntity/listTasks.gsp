@@ -387,6 +387,7 @@
 
 		<g:render template="../layouts/error"/>
 	</div>
+	<div class="tdsAssetsApp" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets"></div>
 	<div id="createStaffDialog" style="display:none;" class="static-dialog">
 		<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 	</div>

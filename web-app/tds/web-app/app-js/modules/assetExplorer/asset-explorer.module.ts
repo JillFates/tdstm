@@ -15,6 +15,7 @@ import { AssetExplorerViewShowComponent } from './components/view-show/asset-exp
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
 import { AssetShowComponent } from './components/asset/asset-show.component';
 import { AssetEditComponent } from './components/asset/asset-edit.component';
+import { AssetCreateComponent } from './components/asset/asset-create.component';
 import { SharedModule } from '../../shared/shared.module';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
@@ -43,6 +44,8 @@ import { BulkChangeService } from './service/bulk-change.service';
 import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
+import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
+import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 
 @NgModule({
 	imports: [
@@ -67,6 +70,7 @@ import { ModelService } from  './service/model.service';
 		AssetExplorerViewShowComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
@@ -77,7 +81,9 @@ import { ModelService } from  './service/model.service';
 		TDSCheckboxComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
-		ManufacturerEditComponent
+		ManufacturerEditComponent,
+		AssetCloneComponent,
+		PopupAssetMessageComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -95,6 +101,7 @@ import { ModelService } from  './service/model.service';
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		TaskDetailComponent,
@@ -104,7 +111,8 @@ import { ModelService } from  './service/model.service';
 		TDSCheckboxComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
-		ModelDeviceShowComponent
+		ModelDeviceShowComponent,
+		AssetCloneComponent
 	],
 })
 

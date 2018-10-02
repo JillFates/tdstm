@@ -36,6 +36,7 @@ export class TaskCommentComponent implements OnInit {
 	private viewUnpublished = false;
 
 	private showAllComments: boolean;
+	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
 
 	constructor(private taskService: TaskCommentService, private dialogService: UIDialogService, public promptService: UIPromptService, public taskManagerService: TaskService, private preferenceService: PreferenceService) {
@@ -44,6 +45,7 @@ export class TaskCommentComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.showAllComments = false;
+		this.showAllTasks = false;
 		this.createDataGrids();
 	}
 
@@ -68,7 +70,7 @@ export class TaskCommentComponent implements OnInit {
 		return this.taskCommentsList
 			.filter(comment => this.viewUnpublished || comment.commentInstance.isPublished)
 			.filter(comment => comment.commentInstance.commentType === 'issue' || comment.commentInstance.taskNumber)
-			.filter(comment => comment.commentInstance.status !== 'Completed');
+			.filter(comment => this.showAllTasks || comment.commentInstance.status !== 'Completed');
 	}
 
 	/**
@@ -76,8 +78,11 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		return this.taskCommentsList
-			.filter(comment => comment.commentInstance.commentType === 'comment');
+		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.resolvedBy === null);
+		if (this.showAllComments) {
+			filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment');
+		}
+		return filteredList;
 	}
 
 	public getAssignedTo(comment): any {
@@ -191,8 +196,12 @@ export class TaskCommentComponent implements OnInit {
 		});
 	}
 
-	public reloadGrid(): void {
-		this.dataGridTaskHelper.reloadData(this.getCommentsWithFilter());
+	public reloadTasksGrid(): void {
+		this.dataGridTaskHelper.reloadData(this.getTaskWithFilter());
+	}
+
+	public reloadCommentsGrid(): void {
+		this.dataGridCommentHelper.reloadData(this.getCommentsWithFilter());
 	}
 
 	/**

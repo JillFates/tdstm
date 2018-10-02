@@ -36,7 +36,7 @@
 				<div id="toolsContainerId">
 					<!-- controls toolbar -->
 					<div id="graphToolbarId" style="width: 100%;">
-						<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
+						<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
 						<span class="controlSpan">
 							<label for="moveEventId">Event:</label>
 							<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />

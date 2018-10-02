@@ -125,6 +125,15 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Removes an element instance value current results
+	 * @param element ans instance of {@code Element}
+	 */
+	void removeElement(Element element){
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.removeElement(element.fieldDefinition.name)
+	}
+
+	/**
 	 * Add a FoundElement in the result based on its property
 	 * <pre>
 	 *		whenFound asset create {
@@ -536,6 +545,16 @@ class RowResult {
 	}
 
 	/**
+	 * Removes an element instance value current results
+	 * @param fieldName a field name used in {@code RowResul#fields}
+	 */
+	void removeElement(String fieldName){
+		if(fields.containsKey(fieldName)){
+			fields.remove(fieldName)
+		}
+	}
+
+	/**
 	 * Find or creates a Field Data content based onf fieldName parameter
 	 * @param element
 	 * @return
@@ -649,6 +668,7 @@ class FieldResult {
 class FindResult {
 	List<QueryResult> query = []
 	List<Long> results = []
+	Integer size = 0
 	Integer matchOn
 
 	/**
@@ -673,6 +693,7 @@ class FindResult {
 	private void addResults(ETLFindElement findElement) {
 		if(!this.results && findElement.results){
 			this.results = findElement.results.objects.collect { it as Long }
+			this.size = this.results.size()
 			this.matchOn = findElement.results.matchOn as Integer
 		}
 	}

@@ -7,6 +7,9 @@ import net.transitionmanager.domain.Person
 class Application extends AssetEntity {
 	static final String UNKNOWN = "Unknown"
 
+	// Override default value set by parent class
+	String assetType = 'Application'
+
 	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor
 	String appVersion
@@ -44,6 +47,7 @@ class Application extends AssetEntity {
 	Integer testingDuration
 
 	static constraints = {
+
 		appAccess nullable: true
 		appFunction nullable: true
 		appSource nullable: true
