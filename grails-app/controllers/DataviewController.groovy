@@ -65,13 +65,8 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 
 		Project project = getProjectForWs()
 		DataviewApiParamsCommand apiParamsCommand = populateCommandObject(DataviewApiParamsCommand)
-		// 09/21/2018 dcorrea: It's necessary to convert command.filter in to command.filterParams
-		apiParamsCommand.validate()
 
-		if (apiParamsCommand.hasErrors()) {
-			renderErrorJson('API filtering was invalid')
-			return
-		}
+		validateCommandObject(apiParamsCommand)
 
 		Dataview dataview = fetchDomain(Dataview, params)
 

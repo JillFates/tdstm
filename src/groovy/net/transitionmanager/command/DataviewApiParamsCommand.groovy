@@ -28,7 +28,13 @@ class DataviewApiParamsCommand implements CommandObject {
 			if (val) {
 				obj.filterParams = val.collect { new DataviewApiFilterParam(content: it) }
 
-				return obj.filterParams.every { it.validate() }
+				List<DataviewApiFilterParam> filters = obj.filterParams.findAll{ !it.validate() }
+				if(filters.isEmpty()){
+					return true
+				} else {
+					return ['dataviewApiParamsCommand.filter.error.message', filters*.content]
+				}
+
 			}
 		}
 		filterParams nullable: true
@@ -74,7 +80,6 @@ class DataviewApiFilterParam {
 			if (!val.contains(FILTER_PARAMETER_SEPARATOR_CHARACTER)) {
 				return false
 			}
-
 
 			List<String> filter = val.split(FILTER_PARAMETER_SEPARATOR_CHARACTER) as List
 			if (filter?.size() != 2 || StringUtil.isBlank(filter[0]) || StringUtil.isBlank(filter[1])) {
