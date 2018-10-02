@@ -1,20 +1,24 @@
-import {Component, AfterViewInit, Renderer2} from '@angular/core';
+import {Component, Renderer2} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import { NotifierService } from '../../services/notifier.service';
-import { UIPromptService } from '../../directives/ui-prompt.directive';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { ASSET_MENU_CSS_TREE } from './model/asset-menu.model';
+import {NotifierService} from '../../services/notifier.service';
+import {UIPromptService} from '../../directives/ui-prompt.directive';
+import {TranslatePipe} from '../../pipes/translate.pipe';
+import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
+import {Title} from '@angular/platform-browser';
 
 declare var jQuery: any;
+
 @Component({
 	selector: 'tds-header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 	providers: [TranslatePipe],
-	styles: [`.font-weight-bold { font-weight:bold; }`]
+	styles: [`.font-weight-bold {
+        font-weight: bold;
+    }`]
 })
 
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent {
 
 	private pageMetaData: {
 		id: any,
@@ -26,9 +30,10 @@ export class HeaderComponent implements AfterViewInit {
 
 	constructor(
 		private taskService: TaskService,
-		translatePipe: TranslatePipe,
+		private translatePipe: TranslatePipe,
 		private route: ActivatedRoute,
-		notifierService: NotifierService,
+		private notifierService: NotifierService,
+		private titleService: Title,
 		promptService: UIPromptService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
@@ -38,15 +43,13 @@ export class HeaderComponent implements AfterViewInit {
 					'Confirmation Required',
 					'You have changes that have not been saved. Do you want to continue and lose those changes?',
 					'Confirm', 'Cancel').then(result => {
-						if (result) {
-							this.route.snapshot.data['hasPendingChanges'] = false;
-							window.location.assign(e.currentTarget.href);
-						}
-					});
+					if (result) {
+						this.route.snapshot.data['hasPendingChanges'] = false;
+						window.location.assign(e.currentTarget.href);
+					}
+				});
 			}
 		});
-
-		const page = this.route.data.map(d => d.page);
 
 		this.taskService.retrieveUserToDoCount().subscribe(
 			(result) => {
@@ -55,23 +58,24 @@ export class HeaderComponent implements AfterViewInit {
 			}
 		);
 
-		if (this.route && this.route.data && route.data['page']) {
-			this.pageMetaData = {
-				id: route.data['page'].id,
-				title: route.data['page'].title,
-				instruction: route.data['page'].instruction,
-				menu: route.data['page'].menu,
-				topMenu: route.data['page'].pagetopMenu
-			};
+		jQuery('.menu-parent-tasks > a')[0].onclick = null;
 
-			document.title = translatePipe.transform(this.pageMetaData.title, []);
-		}
+		this.headerListeners();
 	}
 
-	ngAfterViewInit(): void {
-		// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
-		jQuery('.menu-parent-tasks > a')[0].onclick = null;
-		this.selectTopMenuSections();
+	/**
+	 * Create the Lister for any changes made to the Routing that affects the Header Component
+	 * Includes breadcrumbs, tiles, and other menu changes
+	 */
+	private headerListeners(): void {
+		this.notifierService.on('notificationRouteNavigationEnd', event => {
+			if(event.route.snapshot.data && event.route.snapshot.data.page)  {
+				this.pageMetaData = event.route.snapshot.data.page;
+				// Set Title
+				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));
+				this.selectTopMenuSections();
+			}
+		});
 	}
 
 	/**
