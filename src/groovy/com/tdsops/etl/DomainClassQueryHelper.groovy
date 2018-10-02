@@ -177,6 +177,7 @@ class DomainClassQueryHelper {
 		}
 
 		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, condition.propertyName)){
+
 			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 
 			if(Person.isAssignableFrom(propertyClazz)){
@@ -185,8 +186,13 @@ class DomainClassQueryHelper {
 				return "${condition.propertyName}_id"
 			} else {
 				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-				return "${condition.propertyName}_${alternateKey}"
+				if(alternateKey){
+					return "${condition.propertyName}_${alternateKey}"
+				} else {
+					throw new RuntimeException("${condition.propertyName} field does not have alternate key for class ${clazz}".toString())
+				}
 			}
+
 		} else {
 			return condition.propertyName
 		}
@@ -279,8 +285,10 @@ class DomainClassQueryHelper {
 			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
 			if(alternateKey){
 				return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
+			} else {
+				//TODO: dcorrea 26/09/2018 add logic for Alias table in case of Model or Manufacturer
+				throw new RuntimeException("${condition.propertyName} field does not have alternate key for class ${clazz}".toString())
 			}
-			//TODO: dcorrea 26/09/2018 add logic for Alias table in case of Model or Manufacturer
 		}
 
 		return "${DOMAIN_ALIAS}.${condition.propertyName}"
@@ -300,7 +308,11 @@ class DomainClassQueryHelper {
 			return "${DOMAIN_ALIAS}.${condition.propertyName}.id"
 		} else {
 			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-			return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
+			if(alternateKey){
+				return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
+			} else {
+				throw new RuntimeException("${condition.propertyName} field does not have alternate key for class ${clazz}".toString())
+			}
 		}
 	}
 
@@ -360,7 +372,7 @@ class DomainClassQueryHelper {
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
 				if(property.endsWith('.id') && NumberUtil.isaNumber(condition.value)) {
-					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
 				}
 
 				Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
@@ -377,7 +389,7 @@ class DomainClassQueryHelper {
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
 				if (condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
-					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter])
+					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
 				}
 
 				return where
