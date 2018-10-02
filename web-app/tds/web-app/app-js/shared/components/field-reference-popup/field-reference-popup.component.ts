@@ -19,8 +19,9 @@ export class FieldReferencePopupComponent implements OnInit {
 
 	protected margin = {horizontal: 2, vertical: 2};
 	protected position = 'fixed';
-
 	protected FieldInfoType = FieldInfoType;
+	public static POPUP_ESC_TRIGGER_CLASS = 'field-reference-esc-trigger';
+	protected BTN_POPUP_ESC_TRIGGER_CLASS = FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS;
 
 	ngOnInit(): void {
 		this.offset = { left: this.mouseEvent.pageX, top: this.mouseEvent.pageY};
@@ -35,8 +36,8 @@ export class FieldReferencePopupComponent implements OnInit {
 	/**
 	 * On Close.
 	 */
-	protected onClose(): void {
-		this.onCloseEvent.emit();
+	protected onClose($event): void {
+		this.onCloseEvent.emit($event);
 	}
 
 	/**

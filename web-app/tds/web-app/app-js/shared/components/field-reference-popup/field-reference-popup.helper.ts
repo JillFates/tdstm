@@ -87,4 +87,12 @@ export class FieldReferencePopupHelper {
 		});
 		this.popup.gridData = process(popupFields, { group: this.popup.gridGroups});
 	}
+
+	/**
+	 * Close this popup.
+ 	 * @param $event
+	 */
+	public closePopup($event): void {
+		this.popup.show = false;
+	}
 }

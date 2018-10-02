@@ -23,6 +23,7 @@ import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/ut
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
 import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
+import {FieldReferencePopupComponent} from '../../../../shared/components/field-reference-popup/field-reference-popup.component';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -204,7 +205,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		});
 	}
 
-	protected cancelCloseDialog(): void {
+	protected cancelCloseDialog($event): void {
+		if ($event.target && $event.target.classList.contains(FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS)) {
+			return;
+		}
 		if (this.isScriptDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
