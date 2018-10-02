@@ -75,9 +75,10 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 * Defines if a list of conditions contains
-	 * @param conditions
-	 * @return
+	 * Defines if a list of conditions contains a null reference.
+	 * If some of the {@code FindCondition#value} contains a null value, then queery must be skipped.
+	 * @param conditions a list of {@code FindCondition}
+	 * @return true if {@code FindCondition#value} contains a null value, otherwise return false
 	 */
 	private static boolean skipQuery(List<FindCondition> conditions) {
 		// Scan the criteria values for NULL or LazyMap and ignore the query if such (see TM-12374)
@@ -91,7 +92,7 @@ class DomainClassQueryHelper {
 				break
 			}
 		}
-		skipQuery
+		return skipQuery
 	}
 
 	/**
