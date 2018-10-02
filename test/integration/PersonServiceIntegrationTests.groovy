@@ -8,6 +8,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.RoleType
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PersonService
@@ -707,53 +708,29 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 
 	def "18. Merge Person using ProcessMergePersonRequest"() {
-		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
-		when: 'Setup the initial data for the test cases'
-		Map results = [:]
+		when: 'Setup the initial data for the test'
 		MockHttpServletRequest mockRequest = new MockHttpServletRequest()
 
 		// Setup the From Person with a UserLogin
 		Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
-		UserLogin fromUser = personHelper.createUserLogin(fromPerson)
-		fromPerson.nickName = "test"
-		Long fromUID = fromUser.id
+		fromPerson.firstName = "John"
+		fromPerson.middleName = "Jeffrey"
+		fromPerson.lastName = "Doe"
+		String[] fromIDs = [Long.toString(fromPerson.id)]
 
 		// Setup the To Person
 		Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
 		UserLogin toUser = personHelper.createUserLogin(toPerson)
-
-		mockRequest.addParameter("fromId", Long.toString(fromPerson.id))
+		toPerson.firstName = "Jane"
+		toPerson.middleName = "Mary"
+		toPerson.lastName = "Doe"
+		mockRequest.addParameter("fromId[]", fromIDs)
 		mockRequest.addParameter("toId", Long.toString(toPerson.id))
 
 		def params = new GrailsParameterMap(mockRequest)
-
-		// Closure used a few times for testing
-		def findTestPersons = { return GormUtil.findAllByProperties(Person, personMap) }
-		List persons = findTestPersons()
-
-		then: 'we should find two people'
-		// We should have two people
-		persons.size() == 2
-		and: 'fromPerson has a userLogin'
-		fromPerson.userLogin
-		and: 'the toPerson has a userLogin'
-		toPerson.userLogin
-
-		when: 'the persons are merged together'
 		// Perform the merge of the accounts
-		personService.processMergePersonRequest(toPerson.userLogin, new PersonCO(), params)
-		toPerson = Person.get(toPerson.id)
-		UserLogin toUserLogin = toPerson.userLogin
-		then: 'the From user should be switched to the To person'
-		toUserLogin.person.nickName == "testy"
+		def test = personService.processMergePersonRequest(toUser, new PersonCO(), params)
+		then: 'the From UserLogin should be switched to the To Person'
+        test == "John Jeffrey Doe was merged to Jane Mary Doe"
 	}
-
-	// Used to convert a person object into a map used by the PersonService
-	private Map personToNameMap(Person p) {
-		[first:p.firstName, middle:p.middleName, last:p.lastName]
-	}
-	private Map emptyNameMap() {
-		[first:'', middle:'', last:'']
-	}
-
 }

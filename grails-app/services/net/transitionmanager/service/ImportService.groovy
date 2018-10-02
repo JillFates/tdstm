@@ -1944,6 +1944,7 @@ class ImportService implements ServiceMethods {
 	 * @param params - http parameters received in the controller
 	 * @return
 	 */
+	@Transactional
 	def validateAndProcessWorkbookSheets(Project project, CommonsMultipartFile file, Map<String, String> params) {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
