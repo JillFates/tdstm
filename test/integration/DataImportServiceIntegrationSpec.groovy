@@ -17,7 +17,9 @@ import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -897,6 +899,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			SearchQueryHelper.hasFindQuery(fieldName, fieldsInfo)
 	}
 
+	@Ignore
 	void '20 Test the bindFieldsInfoValuesToEntity method for bugs'() {
 		given: 'a fieldsInfo for a device'
 			Map fieldsInfo = initFieldsInfoForDevice()
@@ -1000,33 +1003,41 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	void '21 Test the SearchQueryHelper.fetchEntityByAlternateKey method'() {
 		setup:
+			String manufacturerAliasName = 'Hewlett Packard'
+			String manufacturerName = 'HP'
+			String modelAliasName = 'BL460C G1'
+			String modelName = 'ProLiant BL460c G1'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			initializeModel(modelName, modelAliasName, manufacturer)
+
 			def context = [
 					  domainClass: AssetEntity
 			]
 
 			def fieldsInfo = [
 					  manufacturer: [
-								 value:'HP'
+								 value: manufacturerName
 					  ]
 			]
 
-		when: 'A Manufacturer "HP" is seek by alias "Hewlett Packard"'
-			Map retVal = SearchQueryHelper.fetchEntityByAlternateKey(Manufacturer, 'Hewlett Packard', '', [:], context)
+		when: 'A Manufacturer is seek by alias'
+			Map retVal = SearchQueryHelper.fetchEntityByAlternateKey(Manufacturer, manufacturerAliasName, '', [:], context)
 
 		then: 'the Manufacturer is found'
 			retVal != null
 			retVal.error == ''
 			retVal.entities.size() > 0
-			((Manufacturer)retVal.entities[0]).name == 'HP'
+			((Manufacturer)retVal.entities[0]).name == manufacturerName
 
-		when: 'A Model "ProLiant BL460c G1" from "HP" is seek by alias "BL460C G1"'
-			retVal = SearchQueryHelper.fetchEntityByAlternateKey(Model, 'BL460C G1', 'model', fieldsInfo, context)
+		when: 'A Model from a Manufacturer is seek by alias'
+			retVal = SearchQueryHelper.fetchEntityByAlternateKey(Model, modelAliasName, 'model', fieldsInfo, context)
 
 		then: 'the Manufacturer is found'
 			retVal != null
 			retVal.error == ''
 			retVal.entities.size() > 0
-			((Model)retVal.entities[0]).modelName == 'ProLiant BL460c G1'
+			((Model)retVal.entities[0]).modelName == modelName
 	}
 
 	// void '20 Test the _fetchEntityByFindResults method'() {
@@ -1119,6 +1130,51 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		initializeFieldElement('id', fieldsInfo, '')
 		initializeFieldElement('assetName', fieldsInfo, '')
 		return fieldsInfo
+	}
+
+	/**
+	 * Creates a Manufacturer and an alias in case that it doesn't exist for testing
+	 * @param manufacturerName
+	 * @param manufacturerAliasName
+	 * @return
+	 */
+	private Manufacturer initializeManufacturer(String manufacturerName, String manufacturerAliasName) {
+		ManufacturerAlias manufacturerAlias = ManufacturerAlias.findByName(manufacturerAliasName)
+
+		Manufacturer manufacturer
+		if (manufacturerAlias) {
+			manufacturer = manufacturerAlias.manufacturer
+		} else {
+			manufacturer = Manufacturer.findOrSaveWhere( name: manufacturerName )
+			new ManufacturerAlias(
+					  name: manufacturerAliasName, manufacturer: manufacturer
+			).save(failOnError: true, flush: true)
+		}
+
+		return manufacturer
+	}
+
+	/**
+	 * Create a Model and alias linked to a Manufacturer in case that it doesn't exist for testing
+	 * @param modelName
+	 * @param modelAliasName
+	 * @param manufacturer
+	 * @return
+	 */
+	private Model initializeModel(String modelName, String modelAliasName, Manufacturer manufacturer) {
+		ModelAlias modelAlias = ModelAlias.findByName(modelAliasName)
+
+		Model model
+		if ( modelAlias ) {
+			model = modelAlias.model
+		} else {
+			model = Model.findOrSaveWhere( modelName:modelName , manufacturer: manufacturer )
+			new ModelAlias(
+					  name: modelAliasName, model: model, manufacturer: manufacturer
+			).save(failOnError: true, flush: true)
+		}
+
+		return model
 	}
 
 }
