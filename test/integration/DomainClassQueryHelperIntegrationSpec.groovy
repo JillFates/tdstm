@@ -10,6 +10,7 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
@@ -18,6 +19,7 @@ import net.transitionmanager.service.FileSystemService
 import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
+import test.helper.MoveEventTestHelper
 import test.helper.RackTestHelper
 import test.helper.RoomTestHelper
 
@@ -34,6 +36,9 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+
+	@Shared
+	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 
 	@Shared
 	PersonTestHelper personTestHelper = new PersonTestHelper()
@@ -76,8 +81,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-			moveBundleTestHelper.createBundle(otherProject, null))
+		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundleTestHelper.createBundle(otherProject, null))
 		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
 		context.record = new ImportBatchRecord(sourceRowId: 1)
 
@@ -361,6 +365,26 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then:
 			results.size() == 1
 			results.first() == room.id
+	}
+
+	void '20. can throw an exception if domain does not have alternate key'() {
+
+		given:
+			MoveBundle bundle = moveBundleTestHelper.createBundle(project, 'TEST')
+			MoveEvent event = moveEventTestHelper.createMoveEvent(project)
+			bundle.save(failOnError: true, flush: true)
+
+		when:
+			DomainClassQueryHelper.where(
+				ETLDomain.Bundle, project,
+				[
+					moveEvent: event.name
+				]
+			)
+
+		then: 'It throws an Exception because MoveEvent does not have an alternate key'
+			RuntimeException e = thrown RuntimeException
+			e.message == 'MoveEvent does not have alternate key'
 	}
 
 	void '21. can find a Device by its id using a FindCondition'() {

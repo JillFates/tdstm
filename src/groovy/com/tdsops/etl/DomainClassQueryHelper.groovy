@@ -5,10 +5,10 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
-import groovy.util.logging.Slf4j
 import java.util.Map.Entry
 
 /**
@@ -121,7 +121,7 @@ class DomainClassQueryHelper {
 	 * @param returnIdOnly a flag to control if the method returns the result IDs (true - default) or full domain objects (false)
 	 * @return a list of assets returned by an HQL query
 	 */
-	static <T> List nonAssetEntities(Class<T> clazz, Project project, List<FindCondition> conditions, Boolean returnIdOnly=true) {
+	static <T> List nonAssetEntities(Class<T> clazz, Project project, List<FindCondition> conditions, Boolean returnIdOnly = true) {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
@@ -140,7 +140,7 @@ class DomainClassQueryHelper {
 
 		log.debug 'nonAssetEntities() hql={}, params={}', hql, hqlParams
 
-		return clazz.executeQuery(hql,  hqlParams, [readOnly: true])
+		return clazz.executeQuery(hql, hqlParams, [readOnly: true])
 	}
 
 	/**
@@ -172,21 +172,21 @@ class DomainClassQueryHelper {
 	 */
 	static String getNamedParameterForField(Class clazz, FindCondition condition) {
 
-		if(otherAlternateKeys.containsKey(condition.propertyName)){
+		if (otherAlternateKeys.containsKey(condition.propertyName)) {
 			return otherAlternateKeys[condition.propertyName].namedParameter
 		}
 
-		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, condition.propertyName)){
+		if (AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, condition.propertyName)) {
 
 			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 
-			if(Person.isAssignableFrom(propertyClazz)){
+			if (Person.isAssignableFrom(propertyClazz)) {
 				return condition.propertyName
-			} else if(NumberUtil.isaNumber(condition.value)){
+			} else if (NumberUtil.isaNumber(condition.value)) {
 				return "${condition.propertyName}_id"
 			} else {
 				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-				if(alternateKey){
+				if (alternateKey) {
 					return "${condition.propertyName}_${alternateKey}"
 				} else {
 					throw new RuntimeException("${condition.propertyName} field does not have alternate key for class ${clazz}".toString())
@@ -277,17 +277,17 @@ class DomainClassQueryHelper {
 
 		if (GormUtil.isReferenceProperty(clazz, condition.propertyName)) {
 
-			if(NumberUtil.isaNumber(condition.value)){
+			if (NumberUtil.isaNumber(condition.value)) {
 				return "${DOMAIN_ALIAS}.${condition.propertyName}.id"
 			}
 
 			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, condition.propertyName)
 			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-			if(alternateKey){
+			if (alternateKey) {
 				return "${DOMAIN_ALIAS}.${condition.propertyName}.${alternateKey}"
 			} else {
 				//TODO: dcorrea 26/09/2018 add logic for Alias table in case of Model or Manufacturer
-				throw new RuntimeException("${condition.propertyName} field does not have alternate key for class ${clazz}".toString())
+				throw new RuntimeException("${propertyClazz?.simpleName} does not have alternate key".toString())
 			}
 		}
 
@@ -338,11 +338,11 @@ class DomainClassQueryHelper {
 	 */
 	static String getJoinForField(Class clazz, String fieldName) {
 
-		if(otherAlternateKeys.containsKey(fieldName)){
+		if (otherAlternateKeys.containsKey(fieldName)) {
 			return otherAlternateKeys[fieldName].join
 		}
 
-		if(GormUtil.isReferenceProperty(clazz, fieldName)){
+		if (GormUtil.isReferenceProperty(clazz, fieldName)) {
 			return "left outer join ${DOMAIN_ALIAS}.${fieldName}".toString()
 		} else {
 			return ''
@@ -367,11 +367,11 @@ class DomainClassQueryHelper {
 			String property = getPropertyForField(clazz, condition)
 			String namedParameter = getNamedParameterForField(clazz, condition)
 
-			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value) ) {
+			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value)) {
 
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
-				if(property.endsWith('.id') && NumberUtil.isaNumber(condition.value)) {
+				if (property.endsWith('.id') && NumberUtil.isaNumber(condition.value)) {
 					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
 				}
 
@@ -388,7 +388,7 @@ class DomainClassQueryHelper {
 
 				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
-				if (condition.propertyName== 'id' && NumberUtil.isPositiveLong(condition.value)) {
+				if (condition.propertyName == 'id' && NumberUtil.isPositiveLong(condition.value)) {
 					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
 				}
 
