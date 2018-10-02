@@ -26,7 +26,7 @@ class SequenceServiceTests extends IntegrationSpec {
 			for (int i = 0; i < numbersCount; i++) {
 				service.execute(new Runnable() {
 					void run() {
-						def sleepMills = Math.round(Math.random() * 100)
+						def sleepMills = Math.round(Math.random() * 200)
 						Thread.sleep(sleepMills)
 
 						Integer n = sequenceService.next(contextId, name, maxTries)
@@ -38,7 +38,7 @@ class SequenceServiceTests extends IntegrationSpec {
 				})
 			}
 
-			latch.await(10, TimeUnit.SECONDS)
+			latch.await(20, TimeUnit.SECONDS)
 
 		then:
 			numbers.size() == numbersCount
