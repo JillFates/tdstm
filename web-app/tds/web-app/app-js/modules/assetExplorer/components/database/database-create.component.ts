@@ -47,9 +47,6 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
-			this.model.asset.assetClass = {
-				name: ASSET_ENTITY_DIALOG_TYPES.DATABASE
-			};
 		}
 
 		/**
@@ -66,7 +63,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 			// AssetClass
 			modelRequest.asset.assetClass = {
-				name: ASSET_ENTITY_DIALOG_TYPES.STORAGE
+				name: ASSET_ENTITY_DIALOG_TYPES.DATABASE
 			};
 			this.model.asset.assetClass = modelRequest.asset.assetClass;
 
