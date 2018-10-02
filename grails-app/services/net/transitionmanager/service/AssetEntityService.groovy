@@ -1421,19 +1421,23 @@ class AssetEntityService implements ServiceMethods {
 
 		// Required lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
-			map << [
-					railTypeOption: getAssetRailTypeOptions(),
-					sourceRoomSelect: getRoomSelectOptions(project, true, true),
-					targetRoomSelect: getRoomSelectOptions(project, false, true),
-					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
-					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
-                    sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
-                    targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
-			]
+			map << getCommontDeviceMapForCreateEdit(project, asset)
 		}
 
 		map
 	}
+
+    Map getCommontDeviceMapForCreateEdit(Project project, Object asset) {
+        return [
+                railTypeOption: getAssetRailTypeOptions(),
+                sourceRoomSelect: getRoomSelectOptions(project, true, true),
+                targetRoomSelect: getRoomSelectOptions(project, false, true),
+                sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+                targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
+                sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
+                targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
+        ]
+    }
 
 	/**
 	 * The default/common properties shared between all of the Asset Show views

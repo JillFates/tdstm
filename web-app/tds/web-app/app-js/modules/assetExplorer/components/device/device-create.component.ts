@@ -66,8 +66,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 */
 		private initModel(): void {
 			this.model.asset = {}; // R.clone(editModel.asset);
-			// this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			// this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			if (!this.model.asset.scale || this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -78,18 +76,9 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			this.model.asset.assetTypeSelectValue = {id: null};
 			this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
-			// if (this.model.sourceRackSelect) {
-			// 	this.rackSourceOptions = this.model.sourceRackSelect;
-			// }
-			// if (this.model.targetRackSelect) {
-			// 	this.rackTargetOptions = this.model.targetRackSelect;
-			// }
-			// if (this.model.sourceChassisSelect) {
-			// 	this.bladeSourceOptions = this.model.sourceChassisSelect;
-			// }
-			// if (this.model.targetChassisSelect) {
-			// 	this.bladeTargetOptions = this.model.targetChassisSelect;
-			// }
+			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
+			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.model.asset.environment = this.model.environmentOptions[0];
 		}
 
 		/**
@@ -135,16 +124,16 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			if (this.model.asset.rackSource && this.model.asset.rackSource.id > 0) {
 				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
 			}
+
 			modelRequest.asset.rackSource = this.model.asset.newRackSource;
-			// delete modelRequest.asset.newRackSource;
 
 			// rackTargetId, rackTarget(new rack)
 			modelRequest.asset.rackTargetId = '-1';
 			if (this.model.asset.rackTarget && this.model.asset.rackTarget.id > 0) {
 				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
 			}
+
 			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
-			// delete modelRequest.asset.newRackTarget;
 
 			// sourceChassis
 			if (this.model.asset.sourceChassis && this.model.asset.sourceChassis.id > 0) {
@@ -162,7 +151,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
-			// delete modelRequest.asset.moveBundle;
 
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
@@ -172,12 +160,18 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 				name: ASSET_ENTITY_DIALOG_TYPES.DEVICE
 			};
 
+			// AssetClass
+			modelRequest.asset.assetClass = {
+				name: ASSET_ENTITY_DIALOG_TYPES.DEVICE
+			};
+			this.model.asset.assetClass = modelRequest.asset.assetClass;
+
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
-					this.saveAssetTags();
+				if (result.id && !isNaN(result.id) && result.id > 0) {
+					this.createTags(result.id);
 				}
 			});
 		}
