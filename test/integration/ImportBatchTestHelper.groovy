@@ -17,6 +17,7 @@ class ImportBatchTestHelper {
 		ImportBatch importBatch = new ImportBatch(
 			project: project,
 			domainClassName: domainClass,
+		   // fieldNameList: '["field1"]'
 		)
 		importBatch.save(flush: true, failOnError: true)
 		return importBatch
@@ -32,7 +33,8 @@ class ImportBatchTestHelper {
 			importBatch: importBatch,
 			operation: ImportOperationEnum.INSERT,
 			errorList: '[]',
-			fieldsInfo: '[]'
+		   fieldsInfo: '[]'
+		   // fieldsInfo: '{"field1":{"value":"old value"}}'
 		)
 		record.save(flush: true, failOnError: true)
 		return record

@@ -35,7 +35,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			importBatchService.updateBatchRecord(project, batch.id, record.id, cmd)
 			Map fieldsInfo = record.fieldsInfoAsMap()
 		then: 'The record was successfully.'
-			fieldsInfo[field1] == field1Value
+			fieldsInfo[field1].value == field1Value
 		when: 'Overriding the previous value'
 			String field1UpdatedValue = 'some other value'
 			newValues = [fieldName: field1, value: field1UpdatedValue]
@@ -44,7 +44,7 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			fieldsInfo = record.fieldsInfoAsMap()
 		then: 'The record was successfully updated again.'
 
-			fieldsInfo[field1] == field1UpdatedValue
+			fieldsInfo[field1].value == field1UpdatedValue
 	}
 
 	def "test get info of batch"() {
