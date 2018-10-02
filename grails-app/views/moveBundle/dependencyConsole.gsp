@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <%@page import="net.transitionmanager.security.Permission"%>
 <html>
 	<head>
