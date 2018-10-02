@@ -250,6 +250,7 @@ class ImportBatchRecord {
 
 	// Used to clear out any existing errors on the record
 	void resetErrors() {
+		errorCount = 0
 		errorList = '[]'
 	}
 

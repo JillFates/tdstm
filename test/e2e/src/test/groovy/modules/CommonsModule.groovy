@@ -11,6 +11,7 @@ class CommonsModule extends Module {
         modalDialog {$('div#tdsUiDialog')}
         prompDialog {$('div#tdsUiPrompt')}
         prompDialogButton {prompDialog.find("button")}
+        modalDialogButton {modalDialog.find("button")}
         confirmationAlertMessage {prompDialog.find(".box-body p")}
         deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
         deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
@@ -83,6 +84,15 @@ class CommonsModule extends Module {
 
     def waitForDialogModalHidden(){
         waitFor{!modalDialog.jquery.attr("class").contains("in")}
+    }
+
+    def waitForDialogModalDisplayed(){
+        waitFor{modalDialog.jquery.attr("class").contains("in")}
+    }
+
+    def clickOnButtonDialogModalByText(text){
+        waitFor{modalDialogButton.find{it.text().contains(text)}.click()}
+        waitForPromptModalHidden()
     }
 
     def waitForTaskModal() {

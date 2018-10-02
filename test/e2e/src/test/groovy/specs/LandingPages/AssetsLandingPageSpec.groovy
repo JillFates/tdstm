@@ -5,7 +5,9 @@ import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import pages.Assets.*
-import pages.AssetViewManager.*
+import pages.Assets.AssetViewManager.*
+import pages.Assets.AssetViews.*
+import pages.Assets.Application.*
 import spock.lang.Stepwise
 
 /**

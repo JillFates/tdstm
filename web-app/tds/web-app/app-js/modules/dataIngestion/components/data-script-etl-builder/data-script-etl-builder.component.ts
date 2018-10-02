@@ -21,6 +21,9 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
+import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
+import {FieldReferencePopupComponent} from '../../../../shared/components/field-reference-popup/field-reference-popup.component';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -58,13 +61,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
-
-	ngAfterViewInit(): void {
-		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
-		setTimeout(() => {
-			this.collapsed.code = false;
-		}, 300);
-	}
+	protected FieldInfoType = FieldInfoType;
+	protected fieldReferencePopupHelper: FieldReferencePopupHelper;
 
 	constructor(
 		private translatePipe: TranslatePipe,
@@ -78,6 +76,14 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.script = '';
 			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
 			this.loadETLScript();
+			this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
+	}
+
+	ngAfterViewInit(): void {
+		this.MESSAGE_FIELD_WILL_BE_INITIALIZED =  this.translatePipe.transform('DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED');
+		setTimeout(() => {
+			this.collapsed.code = false;
+		}, 300);
 	}
 
 	/**
@@ -199,7 +205,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		});
 	}
 
-	protected cancelCloseDialog(): void {
+	protected cancelCloseDialog($event): void {
+		if ($event.target && $event.target.classList.contains(FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS)) {
+			return;
+		}
 		if (this.isScriptDirty()) {
 			this.promptService.open(
 				'Confirmation Required',

@@ -20,9 +20,6 @@ class ApplicationTestHelper {
 			assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10)
 		)
 
-		application.customDomainService = new CustomDomainService()
-		application.customDomainService.settingService = new SettingService()
-		application.customDomainService.jdbcTemplate = new JdbcTemplate()
 		application.save(flush: true, failOnError: true)
 
 		return application
