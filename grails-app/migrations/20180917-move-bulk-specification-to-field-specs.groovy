@@ -32,10 +32,10 @@ databaseChangeLog = {
 
 						if (mapForTags) {
 							mapForTags.bulkChangeActions = [
-								add,
-								clear,
-								replace,
-								remove
+								'add',
+								'clear',
+								'replace',
+								'remove'
 							]
 						}
 					}
