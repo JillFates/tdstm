@@ -1167,20 +1167,20 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 
 		// Fetch the tasks and the total count.
-		Map filterResults = taskService.filterTasks(project, params, viewUnpublished, sortIndex, sortOrder, maxRows, rowOffset)
+		Map filterResults = commentService.filterTasks(project, params, viewUnpublished, sortIndex, sortOrder, maxRows, rowOffset)
 
 		List<AssetComment> tasks = filterResults.tasks
-		def today = new Date().clearTime()
-		def totalRows = filterResults.totalCount
+		Date today = new Date().clearTime()
+		Integer totalRows = filterResults.totalCount
 
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-		def updatedTime
-		def dueClass
-		def estStartClass
-		def estFinishClass
-		def updatedClass
-		def nowGMT = TimeUtil.nowGMT()
-		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
+		Integer numberOfPages = Math.ceil(totalRows / maxRows)
+		Date updatedTime
+		String dueClass
+		String estStartClass
+		String estFinishClass
+		String updatedClass
+		Date nowGMT = TimeUtil.nowGMT()
+		Map taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
 
 		def results = tasks?.collect {

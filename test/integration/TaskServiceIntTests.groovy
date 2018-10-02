@@ -19,6 +19,8 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import test.helper.ApiCatalogTestHelper
+import test.helper.AssetCommentTestHelper
+import test.helper.MoveEventTestHelper
 
 import java.util.concurrent.Future
 
@@ -27,9 +29,7 @@ class TaskServiceIntTests extends IntegrationSpec {
     TaskService taskService
 
     ApiCatalogTestHelper apiCatalogTestHelper
-    AssetCommentTestHelper assetCommentTestHelper
     AssetTestHelper assetTestHelper
-    MoveEventTestHelper moveEventTestHelper
     PersonTestHelper personTestHelper
     ProjectTestHelper projectTestHelper
     ProviderTestHelper providerTestHelper
@@ -40,8 +40,6 @@ class TaskServiceIntTests extends IntegrationSpec {
 
     /* Test SetUp */
     void setup() {
-        assetCommentTestHelper = new AssetCommentTestHelper()
-        moveEventTestHelper = new MoveEventTestHelper()
         personTestHelper = new PersonTestHelper()
         projectTestHelper = new ProjectTestHelper()
         providerTestHelper = new ProviderTestHelper()
@@ -211,40 +209,5 @@ class TaskServiceIntTests extends IntegrationSpec {
                 }
             }
             ['Ready', 'Ready'] == results
-    }
-
-    void 'test filterTasks under different scenarios'() {
-        given: 'a project with some tasks for different events'
-            Project project = projectTestHelper.createProject()
-            MoveEvent event1 = moveEventTestHelper.createMoveEvent(project)
-            MoveEvent event2 = moveEventTestHelper.createMoveEvent(project)
-            MoveEvent event3 = moveEventTestHelper.createMoveEvent(project)
-            AssetComment task1 = assetCommentTestHelper.createAssetComment(project, event1, false)
-            AssetComment task2 = assetCommentTestHelper.createAssetComment(project, event1)
-            AssetComment task3 = assetCommentTestHelper.createAssetComment(project, event1)
-            AssetComment task4 = assetCommentTestHelper.createAssetComment(project, event2)
-        when: 'requesting published and unpublished tasks for the first event sorted by their comment.'
-            Map params = ['event': event1.name]
-            Map result = taskService.filterTasks(project, params, true, 'comment', 'desc', 10, 0)
-        then: 'the total number of tasks is three'
-            result['totalCount'] == 3
-        and: 'the list of filtered tasks has three elements'
-            result['tasks'].size == 3
-        and: 'the sorting is correct'
-            result['tasks'][0].comment.toUpperCase() > result['tasks'][1].comment.toUpperCase()
-            result['tasks'][1].comment.toUpperCase() > result['tasks'][2].comment.toUpperCase()
-        when: 'requesting multiple tasks (published only)'
-            result = taskService.filterTasks(project, params, false, 'comment', 'desc', 10, 0)
-        then: 'two tasks were found'
-            result['tasks'].size() == 2
-        and: 'results are properly sorted'
-            result['tasks'][0].comment.toUpperCase() > result['tasks'][1].comment.toUpperCase()
-        when: 'requesting tasks for an event with no tasks'
-            params = ['moveEvent': event3.id]
-            result = taskService.filterTasks(project, params, false, 'comment', 'desc', 10, 0)
-        then: 'no results were found'
-            result['tasks'].size() == 0
-
-
     }
 }

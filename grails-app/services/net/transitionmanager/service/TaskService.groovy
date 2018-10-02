@@ -5556,28 +5556,4 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return newMethodParams
 	}
 
-	/**
-	 * Find tasks based on the params received sorting and limiting results accordingly.
-	 * @param project
-	 * @param params
-	 * @param sortIndex
-	 * @param sortOrder
-	 * @param maxRows
-	 * @param rowOffset
-	 * @return [total tasks count, tasks]
-	 */
-	Map filterTasks(Project project, Map params, boolean viewUnpublished, String sortIndex, String sortOrder, Integer maxRows, Integer rowOffset) {
-
-		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder, viewUnpublished)
-		Map queryInfo = queryBuilder.buildQueries()
-		Map metaParams = [max: maxRows, offset: rowOffset, readOnly: true]
-		List<AssetComment> results = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
-		Integer totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
-
-		return [
-			tasks: results,
-			totalCount: totalCount
-		]
-
-	}
 }
