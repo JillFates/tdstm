@@ -116,6 +116,7 @@ var tdsCommon = {
 	 * To disable this behavior add the class 'static-dialog' to the DIV (class="static-dialog" or modal.addClass('static-dialog'))
 	 */
 	autoClearDialogOnClose: function () {
+		if($.ui) {
 		$.widget("ui.dialog", $.ui.dialog, {
 			close: function (event) {
 				var result = this._super();
@@ -136,6 +137,7 @@ var tdsCommon = {
 				return result;
 			}
 		});
+        }
 	},
 
 	/**
@@ -295,7 +297,7 @@ var tdsCommon = {
 	 * @return boolean true if valid else false
 	 */
 	isValidEmail: function (email) {
-		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/;
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/;
 		return emailExp.test(email);
 	},
 
