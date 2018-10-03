@@ -76,11 +76,11 @@ class AssetCommentQueryBuilder {
 	/**
 	 * Constructor that takes all the parameters required for building the query for tasks.
 	 *
-	 * @param project
-	 * @param params
-	 * @param sortIndex
-	 * @param sortOrder
-	 * @param viewUnpublished
+	 * @param project - the project the tasks must belong to.
+	 * @param params - map with the params sent in the request.
+	 * @param sortIndex - column used for sorting results.
+	 * @param sortOrder - asc/desc order for sorting the results.
+	 * @param viewUnpublished - when set to true, this flag will limit the results to only those that are unpublished.
 	 */
 	AssetCommentQueryBuilder(Project project, Map params, String sortIndex, String sortOrder, boolean viewUnpublished) {
 		this.project = project
@@ -184,12 +184,12 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
-	 * Process a field by constructing the corresponding where clause and adding the parameter to the param map.
-	 * @param field
-	 * @param fieldMap
-	 * @param operator
-	 * @param argument
-	 * @param value
+	 * Process a field by constructing the corresponding 'where' clause and adding the parameter to the param map.
+	 * @param field - the name of the field being processed.
+	 * @param fieldMap - the map with the info for constructing the clause for the field being handled.
+	 * @param operator - which operator is needed when building the clause ( =, !=, etc.).
+	 * @param argument - named parameter for the clause.
+	 * @param value - actual value for the argument.
 	 */
 	private void processField(String field, Map fieldMap, String operator, String argument, value) {
 		String property = fieldMap['property']
