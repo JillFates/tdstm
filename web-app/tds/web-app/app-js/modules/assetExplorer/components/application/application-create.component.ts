@@ -19,6 +19,9 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
+
+const pleaseSelectMessage = 'Please Select';
 
 export function ApplicationCreateComponent(template: string, model: any, metadata: any): any {
 	@Component({
@@ -29,7 +32,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		]
 	})
 	class ApplicationCreateComponent extends AssetCommonEdit {
-		defaultItem = {fullName: 'Please Select', personId: null};
+		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
@@ -58,22 +61,26 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = {}; // R.clone(editModel.asset);
-			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+			this.model.asset = {};
+			this.model.asset.retireDate =   '';
+			this.model.asset.maintExpDate =  '';
+
+			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
+			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.model.asset.assetClass = {
+				name: ASSET_ENTITY_DIALOG_TYPES.APPLICATION
+			};
+
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
 			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
-			if (this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: ''
-				};
-			}
-			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
-			if (this.model.asset.startUpBySelectedValue) {
-				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
-			}
-			this.updatePersonReferences();
+
+			this.model.asset.scale = { name: '' };
+			this.model.asset.startUpBySelectedValue = { id: null, text: pleaseSelectMessage};
+
+			this.persons.sme = { personId: null};
+			this.persons.sme2 = { personId: null };
+			this.persons.appOwner = { personId: null};
 		}
 
 		/**
@@ -101,19 +108,30 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		public onCreate(): void {
 			const modelRequest   = R.clone(this.model);
 
-			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
-			delete modelRequest.asset.moveBundle;
+			if (modelRequest && modelRequest.asset.moveBundle) {
+				modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+			}
 
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			if (modelRequest.asset && modelRequest.asset.scale) {
+				modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			}
 
 			// Custom Fields
-			this.model.customs.forEach((custom: any) => {
+			Object.keys(modelRequest.asset)
+				.filter((key: string) => key.startsWith('custom'))
+				.forEach((key: string) => {
+					modelRequest.asset[key] = modelRequest.asset[key].value ? modelRequest.asset[key].value : modelRequest.asset[key];
+				});
+
+			/*
+			(this.model.customs || []).forEach((custom: any) => {
 				let customValue = modelRequest.asset[custom.field.toString()];
 				if (customValue && customValue.value) {
 					modelRequest.asset[custom.field.toString()] = customValue.value;
 				}
 			});
+			*/
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
@@ -154,6 +172,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
+
 		getPersonList(personList: any[]): any[] {
 			if (!this.personList) {
 				this.personList = personList;
@@ -161,6 +180,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			}
 			return this.personList;
 		}
+
 		updatePersonReferences(): void {
 			this.persons.sme = { personId: this.model.asset.sme.id};
 			this.persons.sme2 = { personId: this.model.asset.sme2.id};
