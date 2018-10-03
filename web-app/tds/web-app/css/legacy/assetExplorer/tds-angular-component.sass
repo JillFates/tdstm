@@ -101,10 +101,15 @@
       input#assetName, input#description
         width: 100%
         max-width: 100%
-      input.duration
-        width: 90%
-      input.duration + label
-        font-weight: normal
+      td.tm-input-control.duration-container
+        display: flex;
+        justify-content: space-between;
+        padding-right: 0
+        input.duration
+          width: 80%
+        input.duration + label
+          font-weight: normal
+          align-self: center
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,

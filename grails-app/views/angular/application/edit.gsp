@@ -227,7 +227,7 @@
 												</tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-											<td class="tm-input-control">
+											<td class="tm-input-control duration-container">
 												<input type="text" id="shutdownDuration" name="shutdownDuration"
 													   class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 													   [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>
@@ -258,7 +258,7 @@
                                                 </tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-											<td class="tm-input-control">
+											<td class="tm-input-control duration-container">
 												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
 												duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>
 												<label>m</label>
