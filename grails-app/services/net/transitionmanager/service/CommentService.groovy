@@ -21,6 +21,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.search.AssetCommentQueryBuilder
 import net.transitionmanager.security.Permission
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import org.quartz.Scheduler
@@ -814,5 +815,31 @@ class CommentService implements ServiceMethods {
 		}
 
 		assetComment.save(failOnError: true)
+	}
+
+
+	/**
+	 * Find tasks based on the params received sorting and limiting results accordingly.
+	 * @param project - user's project
+	 * @param params - params as provided by the front-end.
+	 * @param sortIndex - column to sort on.
+	 * @param sortOrder - asc or desc
+	 * @param maxRows - max number of records to be fetched.
+	 * @param rowOffset - used for paginating results.
+	 * @return A map with the tasks found plus the total number of tasks.
+	 */
+	Map filterTasks(Project project, Map params, boolean viewUnpublished, String sortIndex, String sortOrder, Integer maxRows, Integer rowOffset) {
+
+		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder, viewUnpublished)
+		Map queryInfo = queryBuilder.buildQueries()
+		Map metaParams = [max: maxRows, offset: rowOffset, readOnly: true]
+		List<AssetComment> results = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
+		Integer totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
+
+		return [
+			tasks: results,
+			totalCount: totalCount
+		]
+
 	}
 }
