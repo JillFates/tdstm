@@ -10,7 +10,7 @@ import {PersonModel} from '../components/add-person/model/person.model';
 @Injectable()
 export class PersonService {
 
-	private personUrl = '/tdstm/person/save';
+	private personUrl = '/tdstm/person';
 
 	constructor(private http: HttpInterceptor) {
 	}
