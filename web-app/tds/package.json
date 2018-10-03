@@ -81,7 +81,7 @@
     "lodash": "4.17.10",
     "ng-router-loader": "^2.1.0",
     "protractor": "5.3.1",
-    "ts-loader": "4.2.0",
+    "ts-loader": "5.2.1",
     "ts-node": "6.0.1",
     "tslint": "5.11.0",
     "tslint-loader": "3.6.0",

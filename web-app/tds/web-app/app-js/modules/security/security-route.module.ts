@@ -1,3 +1,4 @@
+// Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Components
@@ -11,29 +12,39 @@ import {NotFoundPageComponent} from './components/not-found-page/not-found-page.
  * @classdesc To use externally to reference possible state of the Security Model
  */
 export class SecurityRouteStates {
+	public static readonly PARENT = 'security';
 	public static readonly ERROR = {
-		name: 'tds.error',
-		url: 'pages/error'
+		name: 'tds.security_error',
+		url: 'error'
 	};
 	public static readonly UNAUTHORIZED = {
-		name: 'tds.unauthorized',
-		url: 'pages/unauthorized'
+		name: 'tds.security_unauthorized',
+		url: 'unauthorized'
 	};
 	public static readonly NOT_FOUND = {
-		name: 'tds.notfound',
-		url: 'pages/notfound'
+		name: 'tds.security_notfound',
+		url: 'notfound'
 	};
 }
 
 // routes
 export const SecurityRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: SecurityRouteStates.NOT_FOUND.url},
+	{
+		path: SecurityRouteStates.NOT_FOUND.url,
+		data: {
+			page: {
+				title: '', instruction: '', menu: []
+			}
+		},
+		component: NotFoundPageComponent
+	},
 	{
 		path: SecurityRouteStates.ERROR.url,
 		data: {
 			page: {
 				title: '', instruction: '', menu: []
-			},
-			requiresAuth: true
+			}
 		},
 		component: ErrorPageComponent
 	},
@@ -42,21 +53,10 @@ export const SecurityRoute: Routes = [
 		data: {
 			page: {
 				title: '', instruction: '', menu: []
-			},
-			requiresAuth: true
+			}
 		},
 		component: UnauthorizedPageComponent
 	},
-	{
-		path: SecurityRouteStates.NOT_FOUND.url,
-		data: {
-			page: {
-				title: '', instruction: '', menu: []
-			},
-			requiresAuth: true
-		},
-		component: NotFoundPageComponent
-	}
 ];
 
 @NgModule({

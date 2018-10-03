@@ -69,7 +69,7 @@ export class HeaderComponent {
 	 */
 	private headerListeners(): void {
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
-			if(event.route.snapshot.data && event.route.snapshot.data.page)  {
+			if (event.route.snapshot.data && event.route.snapshot.data.page) {
 				this.pageMetaData = event.route.snapshot.data.page;
 				// Set Title
 				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));

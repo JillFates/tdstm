@@ -141,12 +141,14 @@ export const TdsAppRoute = [
 ];
 */
 
+// Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 
 export const TDSAppRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: 'tag'},
+	{path: '', pathMatch: 'full', redirectTo: 'security'},
+	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'}
 ];
 

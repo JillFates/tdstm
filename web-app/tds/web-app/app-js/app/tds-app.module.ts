@@ -16,12 +16,12 @@ import {TDSAppComponent} from './tds-app.component';
 // Router Logic
 // import { UIRouterModule, UIView } from '@uirouter/angular';
 // import { TdsAppRoute, AuthConfig, PermissionConfig, MiscConfig } from './tds-app.route';
-// Singleton Services
+// Hight level Services
 import {PermissionService} from '../shared/services/permission.service';
+import {AuthGuardService} from '../modules/security/services/auth.guard.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-app-route.module';
 import {SharedModule} from '../shared/shared.module';
-import {SecurityModule} from '../modules/security/security.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 
@@ -34,7 +34,6 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
 		SharedModule,
-		SecurityModule,
 		TaskManagerModule,
 		// Feature Modules
 		// TaskManagerModule,
@@ -58,7 +57,8 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		TDSAppComponent,
 	],
 	providers: [
-		PermissionService
+		AuthGuardService,
+		PermissionService,
 		// { provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
 	],
 	bootstrap: [

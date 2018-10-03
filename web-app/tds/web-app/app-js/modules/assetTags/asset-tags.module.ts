@@ -1,8 +1,9 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SharedModule} from '../../shared/shared.module';
 import {FormsModule} from '@angular/forms';
+// Shared
+import {SharedModule} from '../../shared/shared.module';
 // Kendo
 import {GridModule} from '@progress/kendo-angular-grid';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
@@ -25,9 +26,8 @@ import {TagMergeDialogComponent} from './components/tag-merge/tag-merge-dialog.c
 		GridModule,
 		DropDownsModule,
 		DateInputsModule,
-		// Internal
+		// Route
 		AssetTagsRouteModule
-
 	],
 	declarations: [
 		TagListComponent,

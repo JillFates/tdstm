@@ -1,8 +1,12 @@
-import {TagListComponent} from './components/tag-list/tag-list.component';
-import {Permission} from '../../shared/model/permission.model';
+// Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
+// Components
+import {TagListComponent} from './components/tag-list/tag-list.component';
+// Models
+import {Permission} from '../../shared/model/permission.model';
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 
@@ -12,6 +16,7 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
  * @classdesc To use externally to reference possible state of the Security Model
  */
 export class AssetTagsRouteStates {
+	public static readonly PARENT = 'tag';
 	public static readonly TAG_LIST = {
 		name: 'tds.tag_list',
 		url: 'list'

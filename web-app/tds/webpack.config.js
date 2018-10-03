@@ -25,25 +25,25 @@ module.exports = function (env) {
 			chunkFilename: '[name].js',
 			publicPath: '../tds/web-app/dist/'
 		},
+		resolve: {
+			extensions: [".ts", ".tsx", ".js"]
+		},
 		module: {
 			rules: [
-				{test: /\.tsx?$/, loaders: ['awesome-typescript-loader']},
+				{test: /\.tsx?$/, loader: 'ts-loader'},
 				{test: /\.(ts|js)$/, loaders: ['angular-router-loader']},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
 				// Ignore warnings about System.import in Angular
 				{test: /[\/\\]@angular[\/\\].+\.js$/, parser: {system: true}},
 			]
 		},
-		resolve: {
-			extensions: ['.ts', '.tsx', '.js', '.jsx'],
-			unsafeCache: true
-		},
 		plugins: [
 			new webpack.DefinePlugin({
 				'process.env.NODE_ENV': '"production"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map'
+				filename: '[name].js.map',
+				exclude: ['vendor.js', 'polyfills.js'],
 			}),
 			new webpack.ContextReplacementPlugin(
 				/\@angular(\\|\/)core(\\|\/)esm5/,
