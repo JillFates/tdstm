@@ -361,6 +361,7 @@ class AccountImportExportService implements ServiceMethods {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
+	@Transactional
 	Map processFileUpload(request, Project project, Map formOptions) {
 		if (formOptions.flagToUpdatePerson) {
 			securityService.requirePermission(Permission.PersonImport, true)
@@ -1514,6 +1515,7 @@ class AccountImportExportService implements ServiceMethods {
 	 * Used to delete the uploaded spreadsheet file from the temporary upload directory
 	 * @param filename - the name of the file without a path
 	 */
+	@Transactional
 	private void deleteUploadedSpreadsheet(String filename) {
 		File fqfn = getFile(filename)
 		if (fqfn.exists()) {
@@ -3072,6 +3074,7 @@ class AccountImportExportService implements ServiceMethods {
 	 *    String - an error message if the save or update failed
 	 *    boolean - a flag indicating if the Person object was changed (true) or unchanged (false)
 	 */
+	@Transactional
 	private List applyPersonChanges(Person person, Map account, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed=false
@@ -3122,6 +3125,7 @@ class AccountImportExportService implements ServiceMethods {
 	 *    String - an error message if the save or update failed
 	 *    boolean - a flag indicating if the Person object was changed (true) or unchanged (false)
 	 */
+	@Transactional
 	private List applyUserLoginChanges(UserLogin userLogin, Map account, Map sheetInfoOpts, Map formOptions) {
 		boolean changed=false
 		String error
