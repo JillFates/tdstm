@@ -16,31 +16,17 @@ export class PersonService {
 	}
 
 	savePerson(person: PersonModel): Observable<any> {
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/x-www-form-urlencoded');
-		const requestOptions = new RequestOptions({headers: headers});
-
-		let body = `createstaff=${person.asset}&company=${person.company && person.company.id || ''}`;
-		body += `&firstName=${person.firstName}&middleName=${person.middleName}`;
-		body += `&lastName=${person.lastName}&nickName=${person.nickName}`;
-		body += `&title=${person.title}&staffType=${person.staffTypeId || 'Salary'}`;
-		body += `&email=${person.email}&active=${person.active}`;
-		body += `&department=${person.department}&location=${person.location}`;
-		body += `&workPhone=${person.workPhone}&mobilePhone=${person.mobilePhone}`;
-
-		if (person.selectedTeams && person.selectedTeams.length) {
-			const teams = person.selectedTeams
+		const params =  {
+			createstaff: person.asset,
+			company: person.company && person.company.id || '',
+			staffType: person.staffTypeId || 'Salary',
+			'function': person.selectedTeams
 				.map(item => item.team && item.team.id)
 				.filter(item => Boolean(item))
-				.map((team) => `&function=${team}`)
-				.join('');
+		};
 
-			body += teams;
-		}
-		body += `&funcToAdd=ACCT_MGR&fieldName=${person.fieldName}`;
-
-		console.log(body);
-		return this.http.post(`${this.personUrl}/save`, body, requestOptions)
+		const payload = { ...person, ...params};
+		return this.http.post(`${this.personUrl}/save`, JSON.stringify(payload))
 			.map((res: Response) => {
 				return res.json();
 			})
