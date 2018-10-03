@@ -37,7 +37,7 @@ export class HeaderComponent {
 		promptService: UIPromptService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
-			if (this.route.snapshot.data['hasPendingChanges']) {
+			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
 				promptService.open(
 					'Confirmation Required',

@@ -149,7 +149,8 @@ import {LocationStrategy, PathLocationStrategy} from '@angular/common';
 export const TDSAppRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: 'security'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
-	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'}
+	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
+	{path: 'asset', loadChildren: '../modules/assetExplorer/asset-explorer.module#AssetExplorerModule'}
 ];
 
 @NgModule({

@@ -1,7 +1,6 @@
-import {Component, Inject, ViewChild, OnInit, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Component, Inject, ViewChild, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
+import {Observable} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {StateService} from '@uirouter/angular';
 
 import {ViewGroupModel} from '../../model/view.model';
 import {ViewType} from '../../model/view.model';
@@ -41,7 +40,6 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 
 	constructor(
 		private service: AssetExplorerService,
-		private stateService: StateService,
 		private permissionService: PermissionService,
 		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
 		reportsResolve.subscribe((result) => {
@@ -90,8 +88,9 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	 */
 	protected onCreateNew(item: ViewGroupModel): void {
 		if (this.isCreateAvailable(item)) {
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{system: item.type === ViewType.SYSTEM_VIEWS});
+			// TODO: STATE SERVICE GO
+			// this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
+			// 	{system: item.type === ViewType.SYSTEM_VIEWS});
 		}
 	}
 

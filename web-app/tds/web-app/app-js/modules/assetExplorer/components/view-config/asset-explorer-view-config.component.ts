@@ -4,9 +4,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
-import { StateService } from '@uirouter/angular';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
+import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
@@ -69,7 +67,6 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private state: StateService,
 		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
@@ -83,7 +80,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 				if (this.model.id) {
 					this.updateFilterbyModel();
 					this.currentTab = 1;
-					this.state.$current.data.page.title = this.model.name;
+					// TODO: STATE SERVICE TITLE ?
+					// this.state.$current.data.page.title = this.model.name;
 					document.title = this.model.name;
 					this.draggableColumns = this.model.schema.columns.slice();
 				}
@@ -224,7 +222,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
 			setTimeout(() => {
-				this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				// TODO: STATE SERVICE GO
+				// this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
 			});
 		}).catch(result => {
 			console.log('error');
@@ -247,9 +246,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		}
+		// TODO: STATE SERVICE GO
+		// if (this.state && this.state.$current && this.state.$current.data) {
+		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
+		// }
 		return result;
 	}
 
@@ -302,11 +302,12 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected onCancel() {
 		const routeState = this.dictionary.get(LAST_VISITED_PAGE);
-		if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
-			this.state.go(routeState, { id: this.model.id });
-		} else {
-			this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
-		}
+		// TODO: STATE SERVICE GO
+		// if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
+		// 	this.state.go(routeState, { id: this.model.id });
+		// } else {
+		// 	this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
+		// }
 	}
 
 	protected onSave() {

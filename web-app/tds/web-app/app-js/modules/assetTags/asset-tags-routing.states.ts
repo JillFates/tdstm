@@ -13,7 +13,7 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 /**
  * Asset Tag Route States
  * @class
- * @classdesc To use externally to reference possible state of the Security Model
+ * @classdesc To use externally to reference possible state of the Asset Tag Module
  */
 export class AssetTagsRouteStates {
 	public static readonly PARENT = 'tag';

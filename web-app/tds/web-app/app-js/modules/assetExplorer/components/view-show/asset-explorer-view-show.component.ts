@@ -1,6 +1,5 @@
 import { Component, Inject, ViewChild, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { StateService } from '@uirouter/angular';
+import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -39,7 +38,6 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private stateService: StateService,
 		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
@@ -48,7 +46,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				this.domains = result[0];
 				this.model = result[1];
 				this.dataSignature = JSON.stringify(this.model);
-				this.stateService.$current.data.page.title = this.model.name;
+				// TODO: STATE SERVICE GO
+				// this.stateService.$current.data.page.title = this.model.name;
 				document.title = this.model.name;
 			}, (err) => console.log(err));
 	}
@@ -86,7 +85,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected onEdit(): void {
 		if (this.isEditAvailable()) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+			// TODO: STATE SERVICE GO
+			// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
 		}
 	}
 
@@ -108,7 +108,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				this.model = result;
 				this.dataSignature = JSON.stringify(this.model);
 				setTimeout(() => {
-					this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+					// TODO: STATE SERVICE GO
+					// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
 				});
 			}).catch(result => {
 				console.log('error');

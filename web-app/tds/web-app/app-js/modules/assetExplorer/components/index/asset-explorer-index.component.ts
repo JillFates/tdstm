@@ -1,10 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewGroupModel, ViewModel, ViewType } from '../../model/view.model';
-import { Observable } from 'rxjs/Observable';
-import { zip } from 'rxjs/observable/zip';
-
+import { Observable } from 'rxjs';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -32,7 +29,6 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private gridColumns: GridColumnModel[];
 
 	constructor(
-		private stateService: StateService,
 		@Inject('reports') private report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
@@ -44,7 +40,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 	ngOnInit() {
 		this.gridColumns = ViewManagerColumnsHelper.createColumns();
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
-		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
+		Observable.zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
 			.subscribe(this.setupDefaultSettings.bind(this), (err) => console.log(err.message || err));
 	}
 
@@ -84,18 +80,21 @@ export class AssetExplorerIndexComponent implements OnInit {
 					isShared: selectedFolderType === this.viewType.SHARED_VIEWS,
 					isFavorite: selectedFolderType === this.viewType.FAVORITES
 				});
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, params);
+			// TODO: STATE SERVICE GO
+			// this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, params);
 		}
 	}
 
 	protected onEditReport(report: ViewModel): void {
 		if (this.isEditAvailable(report)) {
-			this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
+			// TODO: STATE SERVICE GO
+			// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
 		}
 	}
 
 	protected onShowReport(report: ViewModel): void {
-		this.stateService.go(AssetExplorerStates.REPORT_SHOW.name, { id: report.id });
+		// TODO: STATE SERVICE GO
+		// this.stateService.go(AssetExplorerStates.REPORT_SHOW.name, { id: report.id });
 	}
 
 	protected onDeleteReport(report: ViewModel): void {
