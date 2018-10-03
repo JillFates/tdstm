@@ -10,7 +10,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
-	DIALOG_SIZE
+	DIALOG_SIZE, ModalType
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
@@ -25,6 +25,10 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {AssetCreateComponent} from '../asset/asset-create.component';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
+import {TaskCommentDialogComponent} from '../task-comment/dialog/task-comment-dialog.component';
+import {SingleCommentModel} from '../single-comment/model/single-comment.model';
+import {SingleCommentComponent} from '../single-comment/single-comment.component';
+import {AssetModalModel} from '../../model/asset-modal.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -316,6 +320,53 @@ export class AssetExplorerViewGridComponent {
 
 	protected canCreateAssets(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
+	protected showComment(dataItem: any) {
+
+		const assetModalModel: AssetModalModel = {
+			assetId: dataItem.common_id,
+			assetName: dataItem.common_assetName,
+			assetType: dataItem.common_assetClass
+		}
+
+		this.dialog.open(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel}
+		], DIALOG_SIZE.LG).then(result => {
+			if (result) {
+				console.log('Show Comment Result',  result);
+			}
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	protected createComment(dataItem: any) {
+		let singleCommentModel: SingleCommentModel = {
+			modal: {
+				title: 'Create Comment',
+				type: ModalType.CREATE
+			},
+			archive: false,
+			comment: '',
+			category: '',
+			assetClass: {
+				text: dataItem.common_assetClass
+			},
+			asset: {
+				id: dataItem.common_id,
+				text: dataItem.common_assetName
+			}
+		};
+
+		this.dialog.extra(SingleCommentComponent, [
+			{provide: SingleCommentModel, useValue: singleCommentModel}
+		], true, false).then(result => {
+			console.log('RESULT SINGLE COMMENT', result);
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+		console.log('createComment', dataItem);
 	}
 
 	/**

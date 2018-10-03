@@ -46,6 +46,7 @@ import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
+import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
 
 @NgModule({
 	imports: [
@@ -83,7 +84,8 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		AssetCloneComponent,
-		PopupAssetMessageComponent
+		PopupAssetMessageComponent,
+		TaskCommentDialogComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -112,7 +114,8 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent
+		AssetCloneComponent,
+		TaskCommentDialogComponent
 	],
 })
 
