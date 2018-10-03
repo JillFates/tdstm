@@ -20,7 +20,7 @@ import {TDSAppComponent} from './tds-app.component';
 import {PermissionService} from '../shared/services/permission.service';
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
 // Root Basic modules
-import {TDSAppRouteModule} from './tds-app-route.module';
+import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
