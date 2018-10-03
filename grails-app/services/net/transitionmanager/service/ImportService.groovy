@@ -1852,7 +1852,6 @@ class ImportService implements ServiceMethods {
 	 * @param projectStaff - the list of the staff assigned to the project
 	 * @param result - the Map that is returned by the method that is updated by this method
 	 */
-    @Transactional
 	private void assignWhomHelperByName(String name, Project project, List projectStaff, Map result) {
 		PersonService personService = grailsApplication.mainContext.personService
 
