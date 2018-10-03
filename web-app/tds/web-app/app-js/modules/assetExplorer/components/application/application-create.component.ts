@@ -124,21 +124,13 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 					modelRequest.asset[key] = modelRequest.asset[key].value ? modelRequest.asset[key].value : modelRequest.asset[key];
 				});
 
-			/*
-			(this.model.customs || []).forEach((custom: any) => {
-				let customValue = modelRequest.asset[custom.field.toString()];
-				if (customValue && customValue.value) {
-					modelRequest.asset[custom.field.toString()] = customValue.value;
-				}
-			});
-			*/
-
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
 				});
-				if (result === ApiResponseModel.API_SUCCESS || result === 'Success!') {
-					this.saveAssetTags();
+
+				if (result.id && !isNaN(result.id) && result.id > 0) {
+					this.createTags(result.id);
 				}
 			});
 		}
