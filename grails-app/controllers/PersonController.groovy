@@ -354,9 +354,10 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
+		Map personParams = (request.format == 'json') ? request.JSON : params
 		def duplicatePersonId
 		try {
-			person = personService.savePerson(params, companyId, project, true)
+			person = personService.savePerson(personParams, companyId, project, true)
 		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
