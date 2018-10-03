@@ -18,7 +18,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
-import {StateService} from '@uirouter/angular';
 import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
 
 @Component({
@@ -61,8 +60,7 @@ export class ImportBatchListComponent implements OnDestroy {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService,
-		private stateService: StateService) {
+		private userPreferenceService: PreferenceService) {
 			this.onLoad();
 	}
 
@@ -91,14 +89,15 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Checks if batchId is given and should be open.
 	 */
 	private preSelectBatch(): void {
-		if (this.stateService.$current.data && this.stateService.$current.data.batchId) {
-			const batchId = this.stateService.$current.data.batchId;
-			const match = this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
-			if (match) {
-				let cellClickEvent = { dataItem: match };
-				this.openBatchDetail(cellClickEvent);
-			}
-		}
+		// TODO: STATE SERVICE GO
+		// if (this.stateService.$current.data && this.stateService.$current.data.batchId) {
+		// 	const batchId = this.stateService.$current.data.batchId;
+		// 	const match = this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
+		// 	if (match) {
+		// 		let cellClickEvent = { dataItem: match };
+		// 		this.openBatchDetail(cellClickEvent);
+		// 	}
+		// }
 	}
 
 	/**

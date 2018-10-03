@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit, ViewChildren, QueryList } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { StateService } from '@uirouter/angular';
+import { Observable } from 'rxjs';
 
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -38,7 +37,6 @@ export class FieldSettingsListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
-		private state: StateService
 	) {
 		fields.subscribe(
 			(result) => {
@@ -134,9 +132,10 @@ export class FieldSettingsListComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.domains);
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result;
-		}
+		// TODO: STATE SERVICE GO
+		// if (this.state && this.state.$current && this.state.$current.data) {
+		// 	this.state.$current.data.hasPendingChanges = result;
+		// }
 		result = result || this.hasPendingDeletes();
 		return result;
 	}

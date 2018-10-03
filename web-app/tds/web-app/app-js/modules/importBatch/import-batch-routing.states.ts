@@ -1,62 +1,64 @@
-import {Ng2StateDeclaration} from '@uirouter/angular';
-import {HeaderComponent} from '../../shared/modules/header/header.component';
-import {Permission} from '../../shared/model/permission.model';
+// Angular
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+// Services
+import {AuthGuardService} from '../security/services/auth.guard.service';
+// Components
 import {ImportBatchListComponent} from './components/list/import-batch-list.component';
 import {ImportAssetsComponent} from './components/import-assets/import-assets.component';
+// Models
+import {Permission} from '../../shared/model/permission.model';
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
 export class ImportBatchStates {
+	public static readonly PARENT = 'importbatch';
 	public static readonly IMPORT_BATCH_LIST = {
-		name: 'tds.importbatch_list',
-		url: '/importbatch/list'
+		url: 'list'
 	};
 	public static readonly IMPORT_ASSETS = {
-		name: 'tds.importassets',
-		url: '/import/assets'
+		url: '/assets'
 	};
 }
 
-export const importBatchList: Ng2StateDeclaration = <Ng2StateDeclaration>{
-	name: ImportBatchStates.IMPORT_BATCH_LIST.name,
-	url: ImportBatchStates.IMPORT_BATCH_LIST.url,
-	data: {
-		page: {
-			title: 'IMPORT_BATCH.MANAGE_LIST',
-			instruction: '',
-			menu: ['IMPORT_BATCH.IMPORT_BATCH', 'IMPORT_BATCH.MANAGE_LIST'],
-			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-manage-dep-batches'}
+export const ImportBatchRoute: Routes = [
+	{
+		path: ImportBatchStates.IMPORT_BATCH_LIST.url,
+		data: {
+			page: {
+				title: 'IMPORT_BATCH.MANAGE_LIST',
+				instruction: '',
+				menu: ['IMPORT_BATCH.IMPORT_BATCH', 'IMPORT_BATCH.MANAGE_LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-manage-dep-batches'}
+			},
+			requiresAuth: true,
+			requiresPermission: Permission.DataTransferBatchView
 		},
-		requiresAuth: true,
-		requiresPermission: Permission.DataTransferBatchView
+		component: ImportBatchListComponent,
+		canActivate: [AuthGuardService]
 	},
-	views: {
-		'headerView@tds': {component: HeaderComponent},
-		'containerView@tds': {component: ImportBatchListComponent}
-	}
-};
-
-export const importAssetsState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-	name: ImportBatchStates.IMPORT_ASSETS.name,
-	url: ImportBatchStates.IMPORT_ASSETS.url,
-	data: {
-		page: {
-			title: 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL',
-			instruction: '',
-			menu: ['ASSETS.ASSETS', 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL'],
-			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-import-assets-etl'}
+	{
+		path: ImportBatchStates.IMPORT_ASSETS.url,
+		data: {
+			page: {
+				title: 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-import-assets-etl'}
+			},
+			requiresAuth: true,
+			// requiresPermission: Permission.ProjectFieldSettingsView, TODO: add permissions.
+			hasPendingChanges: false
 		},
-		requiresAuth: true,
-		// requiresPermission: Permission.ProjectFieldSettingsView, TODO: add permissions.
-		hasPendingChanges: false
-	},
-	views: {
-		'headerView@tds': { component: HeaderComponent },
-		'containerView@tds': { component: ImportAssetsComponent }
+		component: ImportAssetsComponent,
+		canActivate: [AuthGuardService]
 	}
-};
-
-export const IMPORT_BATCH_STATES = [
-	importBatchList,
-	importAssetsState
 ];
+
+@NgModule({
+	exports: [RouterModule],
+	imports: [RouterModule.forChild(ImportBatchRoute)]
+})
+
+export class ImportBatchRouteModule {
+}

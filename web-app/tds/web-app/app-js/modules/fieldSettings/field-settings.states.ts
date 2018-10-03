@@ -1,13 +1,20 @@
-import { Ng2StateDeclaration } from '@uirouter/angular';
-import { FieldSettingsListComponent } from './components/list/field-settings-list.component';
-import { HeaderComponent } from '../../shared/modules/header/header.component';
-import { Permission } from '../../shared/model/permission.model';
-import { FieldSettingsService } from './service/field-settings.service';
+// Angular
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+// Services
+import {AuthGuardService} from '../security/services/auth.guard.service';
+import {FieldSettingsService} from './service/field-settings.service';
+// Components
+import {FieldSettingsListComponent} from './components/list/field-settings-list.component';
+// Models
+import {Permission} from '../../shared/model/permission.model';
+import {TagListComponent} from '../assetTags/components/tag-list/tag-list.component';
+import {AssetTagsRoute} from '../assetTags/asset-tags-routing.states';
 
 export class FieldSettingsStates {
+	public static readonly PARENT = 'fieldsettings';
 	public static readonly LIST = {
-		name: 'tds.fieldsettingslist',
-		url: '/fieldsettings/list'
+		url: 'list'
 	};
 }
 
@@ -16,33 +23,35 @@ export class FieldSettingsStates {
  * It also provides a nested ui-view (viewport) for child states to fill in.
  * The field settings are fetched using a resolve.
  */
-export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
-	name: FieldSettingsStates.LIST.name,
-	url: FieldSettingsStates.LIST.url,
-	data: {
-		page: {
-			title: 'FIELD_SETTINGS.ASSET_FIELD_SETTING',
-			instruction: '',
-			menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
+export const FieldSettingsRoute: Routes = [
+	{
+		path: FieldSettingsStates.LIST.url,
+		data: {
+			page: {
+				title: 'FIELD_SETTINGS.ASSET_FIELD_SETTING',
+				instruction: '',
+				menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
+			},
+			requiresAuth: true,
+			requiresPermission: Permission.ProjectFieldSettingsView,
+			hasPendingChanges: false
 		},
-		requiresAuth: true,
-		requiresPermission: Permission.ProjectFieldSettingsView,
-		hasPendingChanges: false
-	},
-	views: {
-		'headerView@tds': { component: HeaderComponent },
-		'containerView@tds': { component: FieldSettingsListComponent }
-	},
-	resolve: [
-		{
-			token: 'fields',
-			policy: { async: 'RXWAIT' },
-			deps: [FieldSettingsService],
-			resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
-		}
-	]
-};
-
-export const FIELD_SETTINGS_STATES = [
-	fieldSettingListState
+		component: FieldSettingsListComponent,
+		resolve: [
+			{
+				token: 'fields',
+				policy: { async: 'RXWAIT' },
+				deps: [FieldSettingsService],
+				resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
+			}
+		]
+	}
 ];
+
+@NgModule({
+	exports: [RouterModule],
+	imports: [RouterModule.forChild(FieldSettingsRoute)]
+})
+
+export class FieldSettingsRouteModule {
+};

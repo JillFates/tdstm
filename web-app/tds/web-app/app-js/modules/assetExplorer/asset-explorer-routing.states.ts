@@ -25,19 +25,15 @@ import 'rxjs/add/observable/of';
 export class AssetExplorerStates {
 	public static readonly PARENT = 'asset';
 	public static readonly REPORT_SELECTOR = {
-		name: 'tds.asset_explorer',
 		url: 'views'
 	};
 	public static readonly REPORT_CREATE = {
-		name: 'tds.asset_explorer_create',
 		url: 'views/create'
 	};
 	public static readonly REPORT_EDIT = {
-		name: 'tds.asset_explorer_edit',
 		url: 'views/:id/edit'
 	};
 	public static readonly REPORT_SHOW = {
-		name: 'tds.asset_explorer_show',
 		url: 'views/:id/show'
 	};
 }
@@ -117,7 +113,7 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.CREATE']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER'}, 'ASSET_EXPLORER.CREATE']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerCreate',
@@ -148,7 +144,7 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.EDIT']
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER'}, 'ASSET_EXPLORER.EDIT']
 			},
 			requiresAuth: true,
 			requiresPermission: 'AssetExplorerEdit',
@@ -179,7 +175,7 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 				instruction: '',
-				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW'],
+				menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER'}, 'ASSET_EXPLORER.SHOW'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer', subMenu: true }
 			},
 			requiresAuth: true

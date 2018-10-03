@@ -18,7 +18,6 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
 export class AssetTagsRouteStates {
 	public static readonly PARENT = 'tag';
 	public static readonly TAG_LIST = {
-		name: 'tds.tag_list',
 		url: 'list'
 	};
 }

@@ -12,7 +12,7 @@ import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 declare var jQuery: any;
 

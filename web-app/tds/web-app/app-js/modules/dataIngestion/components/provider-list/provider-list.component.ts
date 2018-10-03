@@ -1,5 +1,5 @@
 import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
 

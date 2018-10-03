@@ -23,7 +23,7 @@ import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 
 declare var jQuery: any;
