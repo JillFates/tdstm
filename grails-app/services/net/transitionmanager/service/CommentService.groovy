@@ -763,6 +763,7 @@ class CommentService implements ServiceMethods {
 	 * @param project
 	 * @param assetCommentId
 	 */
+	@Transactional
 	void deleteComment(Project project, Long assetCommentId) {
 		// Fetch the asset comment
 		AssetComment comment = GormUtil.findInProject(project, AssetComment, assetCommentId, true)

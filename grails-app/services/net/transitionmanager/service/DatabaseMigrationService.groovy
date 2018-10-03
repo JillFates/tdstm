@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -131,6 +132,7 @@ class DatabaseMigrationService implements ServiceMethods {
 	 * @param jsonField - name of the field to be updated.
 	 * @param changeScript - the script to be executed.
 	 */
+	@Transactional
 	void updateJsonObjects(List domainObjects, String jsonField, Closure changeScript) {
 		for (domainObject in domainObjects) {
 			// Parse the given field to a JSON object.
