@@ -11,7 +11,6 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -3105,7 +3104,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def assetName
 		if (params.assetId) {
-			assetName = AssetEntityHelper.getAssetById(project, null, params.assetId).assetName
+			assetName = fetchDomain(AssetEntity, [id: params.assetId]).assetName
 		}
 
 		Map<String, String> defaultPrefs = [levelsUp: '0', levelsDown: '3', showCycles: true,
