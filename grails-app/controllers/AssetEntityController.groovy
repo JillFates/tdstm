@@ -12,6 +12,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -48,6 +49,7 @@ import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -119,6 +121,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	AssetEntityService assetEntityService
 	CommentService commentService
 	ControllerService controllerService
+	ApiActionService apiActionService
 	DeviceService deviceService
 	def filterService
 	JdbcTemplate jdbcTemplate
@@ -464,6 +467,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		AssetComment assetComment = AssetComment.get(params.id)
 		if (assetComment) {
+			Project project = controllerService.getProjectForPage(this)
+			List eventList = MoveEvent.findAllByProject(project)
+			def apiActionList = apiActionService.list(project, true,[producesData:0] )
+
 			if (assetComment.createdBy) {
 				personCreateObj = assetComment.createdBy.toString()
 				dtCreated = TimeUtil.formatDateTime(assetComment.dateCreated)
@@ -581,7 +588,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 			commentList << [
 				assetComment:assetComment,
+				apiActionList:apiActionList,
+				priorityList: assetEntityService.getAssetPriorityOptions(),
 				durationScale:assetComment.durationScale.value(),
+				durationLocked: assetComment.durationLocked,
 				personCreateObj:personCreateObj,
 				personResolvedObj:personResolvedObj,
 				dtCreated:dtCreated ?: "",
@@ -620,7 +630,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				action: assetComment.apiAction?.name,
 				recipe: recipeMap,
 				actualDuration: TimeUtil.formatDuration(actualDuration),
-				durationDelta: TimeUtil.formatDuration(durationDelta)
+				durationDelta: TimeUtil.formatDuration(durationDelta),
+				eventList: eventList,
+				categories: AssetCommentCategory.list,
+				assetClasses: assetEntityService.getAssetClasses()
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
@@ -636,6 +649,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
+		// Deal with legacy view parameters.
+		if (request.format != 'json') {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+		}
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, true, flash)
 		if (params.forWhom == "update") {
 			def assetEntity = AssetEntity.get(params.prevAsset)
@@ -650,7 +668,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+			requestParams = params
+
+		}
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {
 			if (map.error) {
 				flash.message = map.error
@@ -2269,7 +2296,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
+			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber, status: it.status]
 		}
 
 		tasksData.list = list

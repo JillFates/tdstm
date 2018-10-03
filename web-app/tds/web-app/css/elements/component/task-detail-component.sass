@@ -1,14 +1,184 @@
+@import "../../base/taskstatus-mixins"
+
+@mixin combo-status
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: inline-flex
+  outline-style: none
+  span.k-dropdown-wrap
+    background: inherit
+    color: inherit
+    span.k-select
+      border-left: 0
+      background: inherit
+      color: inherit
+
 .task-detail-component
   .tds-angular-component-content
     .successor-predecessor-table
       max-height: 200px
+      height: 200px
   .modal-content
     min-height: 760px
     min-width: 769px
     @-moz-document url-prefix()
       display: inline-block
+      min-height: 890px
     .modal-body
       height: 86%
+      form
+        .note
+          resize: none
+        .vertical-note-status
+          vertical-align: top
+        .duration-container
+          vertical-align: top
+        tr.dependency-error-section
+          display: none
+          td
+            label
+              visibility: hidden
+
+        table.has-duplicated-successors
+          tr.dependency-error-section.has-duplicated
+            display: block
+            td
+              label.has-duplicated-successors
+                visibility: visible
+
+        table.has-duplicated-predecessors
+          tr.dependency-error-section.has-duplicated
+            display: block
+            td
+              label.has-duplicated-predecessors
+                visibility: visible
+
+        table.has-duplicated-predecessors,
+        table.has-duplicated-successors
+          kendo-grid.successor-predecessor-table
+            max-height: 160px
+
+        table.has-double-assignment
+          kendo-grid.successor-predecessor-table.has-double-assignment
+            max-height: 110px
+
+        table.has-double-assignment
+          tr.dependency-error-section.has-double-assignment
+            display: block
+            td
+              label.has-double-assignment
+                visibility: visible
+
+        kendo-grid.successor-predecessor-table
+          .k-grid-content tr td
+            font-weight: normal
+        .error-message,
+        .error-missing-field
+          color: $color-message-error--red
+          margin-top: 3px
+        .error-message
+          display: none
+        .validated-field
+          .ng-invalid
+            border-color: $color-message-error--red
+          .ng-invalid + .error-message
+            display: block
+        .validated-field > .ng-invalid
+          & ~ .error-message
+            display: block
+        .required-field::after
+          content: "*"
+          color: $color-message-error--red
+          margin-left: 4px
+        .duplicate-error,
+        .dependency-error-section label.has-double-assignment
+          font-weight: normal
+          color: $color-message-error--red
+        label.has-double-assignment
+          width: 100%
+          text-align: center
+        .duplicate-error
+          text-align: center;
+          width: 100%;
+          margin-top: 10px;
+        tds-combobox.status > kendo-combobox
+          color: inherit
+          font-weight: normal
+          @include combo-status
+          span input
+            padding-top: 1px
+        td.label.edge-cell
+          height: 35px
+        td.label.status-cell
+          height: 35px;
+          max-height: 35px;
+          display: inline-table;
+          width: 100%;
+        td.valueNW.note
+          vertical-align: top
+        td.valueNW
+          width: 160px
+          max-width: 160px
+          padding-top: 0
+          .category-list
+            margin-bottom: 2px
+          .read-only-dates
+            padding-left: 5px
+          kendo-dropdownlist
+            span.k-dropdown-wrap
+              background: white
+          kendo-dropdownlist.status
+            @include combo-status
+        td.description-container
+          max-width: 100%
+          input
+            width: 92%
+          button
+            float: right
+        kendo-dropdownlist.k-widget.k-dropdown,
+        kendo-datepicker.k-widget.k-datepicker,
+        kendo-dateinput.k-widget.k-dateinput,
+        .instructions-link  input,
+        textarea
+          width: 100%
+        td.valueNW.estimated-finish
+          display: flex
+          max-width: unset
+          justify-content: space-between
+          width: 100%
+          align-items: center
+          padding-top: 4px
+          .estimated-date-container
+            width: 90%
+          .delete-command
+            cursor: pointer
+        td.valueNW.estimated-finish
+          .disabled-delete-estimated
+            color: gray
+            cursor: none
+        .clickable
+          input
+            cursor: pointer
+        .duration-controls
+          display: flex
+          align-items: center
+          justify-content: space-between
+          .duration-value
+            flex: 32%
+            display: flex
+            flex-direction: column
+            input
+              width: 95%
+              text-align: center
+            label
+              font-weight: normal
+              margin-bottom: 0
+              width: 85%
+              text-align: center
+          .lock-state
+            cursor: pointer;
+
       .task-layout
         display: flex
         flex-direction: column
@@ -32,6 +202,9 @@
           flex-direction: column
         .dates-info-container
           display: flex
+          .dates-info
+            padding-left: 5px
+            padding-right: 6px
     .modal-footer
       padding: 15px 18px
 
@@ -57,3 +230,59 @@
 
 .task-detail-component.tds-ui-modal-decorator
   overflow-y: auto!important
+
+
+// Kendo combo color rules has more specificity , in order to apply correct color status in those controls in this component
+// without using !important, we need to give more specificity to status rules
+.task-detail-component
+  .task-status
+    .task-hold
+      @include task-hold
+
+    .task-hold_overtime
+      @include task-hold_overtime
+
+    .task-planned
+      @include task-planned
+
+    .task-pending
+      @include task-pending
+
+    .task-ready
+      @include task-ready
+
+    .task-started
+      @include task-started
+
+    .task-completed2
+      @include task-completed2
+
+    .task-completed5
+      @include task-completed5
+
+    .task-completed
+      @include task-completed
+
+    .task-done2
+      @include task-done2
+
+    .task-done5
+      @include task-done5
+
+    .task-done
+      @include task-done
+
+    .task-na
+      @include task-na
+
+    .task-term
+      @include task-term
+
+    .task-tardy
+      @include task-tardy
+
+    .task-late
+      @include task-late
+
+    .task-overdue
+      @include task-overdue
