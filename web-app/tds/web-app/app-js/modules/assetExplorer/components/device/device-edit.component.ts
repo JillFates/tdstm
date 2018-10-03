@@ -126,35 +126,47 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			}
 
 			// roomSourceId, roomSource(new room)
-			modelRequest.asset.roomSourceId = '0';
+			modelRequest.asset.roomSourceId = '0'; // 0 means on the backend leave it null
 			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
 				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
 			}
 			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
+			if (this.model.asset.newRoomSource) {
+				modelRequest.asset.roomSourceId = '-1'; // which -1 means on the backend create a new room
+			}
 			delete modelRequest.asset.newRoomSource;
 
 			// roomTargetId, roomTarget(new room)
-			modelRequest.asset.roomTargetId = '0';
+			modelRequest.asset.roomTargetId = '0'; // 0 means on the backend leave it null
 			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
 				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
 			}
 			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
+			if (this.model.asset.newRoomTarget) {
+				modelRequest.asset.roomTargetId = '-1'; // -1 means on the backend create a new room
+			}
 			delete modelRequest.asset.newRoomTarget;
 
 			// rackSourceId, rackSource (new rack)
-			modelRequest.asset.rackSourceId = '-1';
+			modelRequest.asset.rackSourceId = '0'; // 0 means on the backend leave it null
 			if (this.model.asset.rackSource && this.model.asset.rackSource.id > 0) {
 				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
 			}
 			modelRequest.asset.rackSource = this.model.asset.newRackSource;
+			if (this.model.asset.newRackSource) {
+				modelRequest.asset.rackSourceId = '-1'; // -1 means on the backend create a new room
+			}
 			delete modelRequest.asset.newRackSource;
 
 			// rackTargetId, rackTarget(new rack)
-			modelRequest.asset.rackTargetId = '-1';
+			modelRequest.asset.rackTargetId = '0'; // 0 means on the backend leave it null
 			if (this.model.asset.rackTarget && this.model.asset.rackTarget.id > 0) {
 				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
 			}
 			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
+			if (this.model.asset.newRackTarget) {
+				modelRequest.asset.rackTargetId = '-1'; // -1 means on the backend create a new room
+			}
 			delete modelRequest.asset.newRackTarget;
 
 			// sourceChassis
