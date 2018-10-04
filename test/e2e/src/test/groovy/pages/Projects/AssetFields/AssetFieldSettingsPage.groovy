@@ -30,11 +30,12 @@ class AssetFieldSettingsPage extends Page {
         filterButton { activeTabPane.find("#btnFilter")}
         addCustomFieldButton { activeTabPane.find("#btnAddCustom")}
         kendoGridContainer { activeTabPane.find("kendo-grid.field-settings-grid")}
-        headers { kendoGridContainer.find(".k-grid-header th a")}
+        headers { kendoGridContainer.find(".k-grid-header th")}
         gridRows { kendoGridContainer.find(".k-grid-container tr[kendogridlogicalrow]")}
         firstRow { gridRows.first()}
         minSringControlLenght { $(".modal label[for=minSize]").next().find(".k-numeric-wrap input")}
         maxSringControlLenght { $(".modal label[for=maxSize]").next().find(".k-numeric-wrap input")}
+        deleteButtons { gridRows.find("button span.fa-trash")}
     }
 
     def clickOnEditButton(){
@@ -76,12 +77,13 @@ class AssetFieldSettingsPage extends Page {
     /**
      * This method finds a column by the given name (Eg: "Name") and gets the attribute which is the index
      * that then will be used to find the specific cell in the row we need to find/edit associated by the column.
-     * @return the Geb cell Object in first row.
+     * @return the Geb cell Object in row by given index.
+     * @param: rowIndex = row number displayed in grid
      * @author Sebastian Bigatton
      */
-    def getFirstFieldRowCellByColumnName(columnName){
-        def index = headers.find{it.text().trim() == columnName}.parent().attr("aria-colindex")
-        firstRow.find("aria-colindex": index)
+    def getFieldRowCellByIndexAndColumnName(columnName, rowIndex = 0){
+        def index = headers.find{it.text().trim() == columnName}.attr("aria-colindex")
+        gridRows[rowIndex].find("aria-colindex": index)
     }
 
     /**
@@ -95,7 +97,7 @@ class AssetFieldSettingsPage extends Page {
         labelInput.singleElement() == js."document.activeElement" // verify label has the focus
         labelInput.hasClass("has-error") // verifies red border
 
-        def fieldCell = getFirstFieldRowCellByColumnName "Field"
+        def fieldCell = getFieldRowCellByIndexAndColumnName "Field"
         def fieldInput = fieldCell.find("input")
         fieldInput.jquery.prop('disabled') == true // verify field name is disabled
         fieldInput.value().contains "custom"
@@ -109,7 +111,7 @@ class AssetFieldSettingsPage extends Page {
      * @author Sebastian Bigatton
      */
     def getLabelInput() {
-        def labelCell = getFirstFieldRowCellByColumnName "Label"
+        def labelCell = getFieldRowCellByIndexAndColumnName "Label"
         labelCell.find("input")
     }
 
@@ -135,7 +137,7 @@ class AssetFieldSettingsPage extends Page {
      * @author Sebastian Bigatton
      */
     def setDefaultValue(name){
-        def defaultCell = getFirstFieldRowCellByColumnName "Default Value"
+        def defaultCell = getFieldRowCellByIndexAndColumnName "Default Value"
         def defaultInput = defaultCell.find("input")
         defaultInput.singleElement().sendKeys name
     }
@@ -146,18 +148,18 @@ class AssetFieldSettingsPage extends Page {
      * @author Sebastian Bigatton
      */
     def setToolTipHelp(name){
-        def tooltipCell = getFirstFieldRowCellByColumnName "Tooltip Help"
+        def tooltipCell = getFieldRowCellByIndexAndColumnName "Tooltip Help"
         def tooltipTextArea = tooltipCell.find("textarea")
         tooltipTextArea.singleElement().sendKeys name
     }
 
     def getSelectedControlValueInEdit(){
-        def controlCell = getFirstFieldRowCellByColumnName "Control"
+        def controlCell = getFieldRowCellByIndexAndColumnName "Control"
         controlCell.find("select").value().substring(3) // value example: 1. String, so substring to fix
     }
 
     def clickOnControlWheelIcon(){
-        def controlCell = getFirstFieldRowCellByColumnName "Control"
+        def controlCell = getFieldRowCellByIndexAndColumnName "Control"
         controlCell.find(".open-close-dropdown-icon").click()
         commonsModule.waitForDialogModalDisplayed()
     }
@@ -173,7 +175,7 @@ class AssetFieldSettingsPage extends Page {
     }
 
     def selectRandomHighlighting(){
-        def highlightingCell = getFirstFieldRowCellByColumnName "Highlighting"
+        def highlightingCell = getFieldRowCellByIndexAndColumnName "Highlighting"
         def options = highlightingCell.find("field-settings-imp span")
         def option = CommonActions.getRandomOption options
         option.click()
@@ -181,18 +183,50 @@ class AssetFieldSettingsPage extends Page {
     }
 
     def clickOnDisplayCheckbox(){
-        def displayCell = getFirstFieldRowCellByColumnName "Display"
+        def displayCell = getFieldRowCellByIndexAndColumnName "Display"
         displayCell.find("input").click()
     }
 
     def verifyCustomFieldInfo(fieldInfo){
-        getFirstFieldRowCellByColumnName("Field").text().trim() == fieldInfo.fieldName
-        getFirstFieldRowCellByColumnName("Label").text().trim() == fieldInfo.label
-        getFirstFieldRowCellByColumnName("Highlighting").text().trim() == fieldInfo.highlighting
-        getFirstFieldRowCellByColumnName("Required").text().trim() == fieldInfo.required
-        getFirstFieldRowCellByColumnName("Display").text().trim() == fieldInfo.display
-        getFirstFieldRowCellByColumnName("Default Value").text().trim() == fieldInfo.defaultValue
-        getFirstFieldRowCellByColumnName("Control").text().trim() == fieldInfo.control
-        getFirstFieldRowCellByColumnName("Tooltip Help").text().trim() == fieldInfo.tooltip
+        getFieldRowCellByIndexAndColumnName("Field").text().trim() == fieldInfo.fieldName
+        getFieldRowCellByIndexAndColumnName("Label").text().trim() == fieldInfo.label
+        getFieldRowCellByIndexAndColumnName("Highlighting").text().trim() == fieldInfo.highlighting
+        getFieldRowCellByIndexAndColumnName("Required").text().trim() == fieldInfo.required
+        getFieldRowCellByIndexAndColumnName("Display").text().trim() == fieldInfo.display
+        getFieldRowCellByIndexAndColumnName("Default Value").text().trim() == fieldInfo.defaultValue
+        getFieldRowCellByIndexAndColumnName("Control").text().trim() == fieldInfo.control
+        getFieldRowCellByIndexAndColumnName("Tooltip Help").text().trim() == fieldInfo.tooltip
+    }
+
+    /**
+     * Deletes fields by given min number of fields to avoid deleting or stay in the system
+     * @author Sebastian Bigatton
+     */
+    def deleteFields(minNumberOfFieldsPresent){
+        def count = 0
+        def cell
+        while (deleteButtons.size() > minNumberOfFieldsPresent){
+            cell = getFieldRowCellByIndexAndColumnName("Action", count)
+            waitFor{cell.find("button span.fa-trash").click()}
+            waitFor{cell.find("button span.fa-undo").displayed}
+            count = count + 1
+        }
+        clickOnSaveAllButton()
+    }
+
+    def getGridRowsSize(){
+        gridRows.size()
+    }
+
+    def bulkDelete(minNumberOfFieldsPresent) {
+        if(getGridRowsSize() > minNumberOfFieldsPresent) {
+            clickOnEditButton()
+            deleteFields minNumberOfFieldsPresent
+        }
+        true // done, just return true to avoid test fails
+    }
+
+    def verifyRowsCountDisplayedByGivenNumber(fieldsCount){
+        getGridRowsSize() == fieldsCount
     }
 }
