@@ -80,7 +80,7 @@ class BulkChangeString {
 			params.value = value
 			setFieldQueryPart = "SET ${fieldName} = :value"
 		} else {
-			setFieldQueryPart = "SET ${fieldName} = NULL"
+			setFieldQueryPart = "SET ${fieldName} = ''"
 		}
 
 		String query = """
