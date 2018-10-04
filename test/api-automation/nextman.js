@@ -11,13 +11,12 @@
  * 
  * INSTALLATION
  *  nextman.js was built on top of newman, commander and deepmerge nodejs libraries, therefore
- *  the following libraries must be installed in order to have the nextman.js working properly.
- *      $ npm install -g newman@3.9.3
- *      $ npm install -g deepmerge@2.1.0
- *      $ npm install -g commander@2.15.1
+ *  these libraries must be installed in order to have the nextman.js working properly.
+ *      $ npm install
  * 
- * EXAMPLE OF USAGE: 
+ * EXAMPLE OF USAGE:
  *  the following commands are currently supported by nextman.js
+ *     $ ./nextman --help
  *     $ nextman run <collection1> [collection2.json, ...] - Run one or more collection.
  *     $ nextman rundir <dir1> [dir2, ...] - run a entire directory of collections.
  * 
@@ -31,7 +30,6 @@ const deepmerge = require('deepmerge');
 
 const PROGRAM_VERSION = '1.0.0';
 const PROGRAM_NAME    = 'nextman';
-const PROGRAM_FILE    = process.argv[1];
 
 /**
  * Collection Schema 
@@ -175,16 +173,16 @@ const run_collection = (collection, program, on_start = undefined, on_done = und
         console.info(`Running collection: '${collection.info.name}' : Description '${collection.info.description}'`);
     }
 
-    // define system reporters
-    let newman_reporters = 'cli';
-    if (program.reporters !== undefined) {
-        newman_reports = program.reporters.split(',').map(e => e.trim())
-    }
-
     // fire up newman...
     newman.run({
             collection: collection,
-            reporters: newman_reporters,
+            reporters: ['cli'].concat(program.reporters.split(',').map(e => e.trim())),
+            reporter: {
+                html: {
+                    export: './nextman_report.html',
+                    template: './templates/htmlreqres.hbs',
+                }
+            },
             environment: program.environment,
             globals: program.global,
             interationCount: program.interation_count,

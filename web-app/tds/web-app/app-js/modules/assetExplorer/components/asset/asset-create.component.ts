@@ -47,22 +47,23 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 					let template = res[0].text();
 					let model = res[1].json();
 					model.asset = {};
+					setTimeout( () => {
+						switch (this.asset) {
+							case 'APPLICATION':
+								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata), this.view);
+								break;
+							case 'DATABASE':
+								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata), this.view);
+								break;
+							case 'DEVICE':
+								this.registerAndCreate(DeviceCreateComponent(template, model, metadata), this.view);
+								break;
+							case 'STORAGE':
+								this.registerAndCreate(StorageCreateComponent(template, model, metadata), this.view);
+								break;
 
-					switch (this.asset) {
-						case 'APPLICATION':
-							this.registerAndCreate(ApplicationCreateComponent(template, model, metadata), this.view);
-							break;
-						case 'DATABASE':
-							this.registerAndCreate(DatabaseCreateComponent(template, model, metadata), this.view);
-							break;
-						case 'DEVICE':
-							this.registerAndCreate(DeviceCreateComponent(template, model, metadata), this.view);
-							break;
-						case 'STORAGE':
-							this.registerAndCreate(StorageCreateComponent(template, model, metadata), this.view);
-							break;
-
-					}
+						}
+					}, 700);
 				});
 		});
 	}

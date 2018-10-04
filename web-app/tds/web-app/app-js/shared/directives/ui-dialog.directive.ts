@@ -103,6 +103,13 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			}).modal('show');
 		});
 
+		jQuery(window).on('show.bs.modal', (e) => {
+			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
+			jQuery(modalDialog).css({
+				'visibility': 'hidden !important'
+			});
+		});
+
 		// Show the Dialog on the center of the screen
 		jQuery(window).on('shown.bs.modal', (e) => {
 			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
@@ -123,7 +130,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			let modalDialog = jQuery(jQuery(e.target).find('.modal-dialog'));
 			jQuery(modalDialog).css({
 				'display': 'none',
-				'visibility': 'hidden'
+				'visibility': 'hidden',
+				'width': ''
 			});
 		});
 

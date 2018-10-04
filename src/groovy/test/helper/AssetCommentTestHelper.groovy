@@ -9,14 +9,22 @@ import org.apache.commons.lang3.RandomStringUtils
 
 class AssetCommentTestHelper {
 
-	AssetComment createAssetComment(Project project, MoveEvent moveEvent) {
+	/**
+	 * Create a task based on the given parameters.
+	 * @param project
+	 * @param moveEvent
+	 * @param published
+	 * @return the task created.
+	 */
+	AssetComment createAssetComment(Project project, MoveEvent moveEvent, boolean published = true) {
 		AssetComment assetComment = new AssetComment(
 				project: project,
 				moveEvent: moveEvent,
 				comment: 'Test AssetComment-' + RandomStringUtils.randomAlphabetic(10),
 				status: AssetCommentStatus.READY,
 				commentType: AssetCommentType.TASK,
-				duration: 0
+				duration: 0,
+				isPublished: published
 		).save(flush: true, failOnError: true)
 		return assetComment
 	}

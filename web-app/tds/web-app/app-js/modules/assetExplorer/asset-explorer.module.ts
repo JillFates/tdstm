@@ -21,10 +21,11 @@ import { TaskCommentComponent } from './components/task-comment/task-comment.com
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
 import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
+import { TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
-import { TDSCheckboxComponent } from './tds-checkbox/tds-checkbox.component';
+import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.component';
 import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import { ManufacturerEditComponent } from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';
@@ -44,6 +45,8 @@ import { BulkChangeService } from './service/bulk-change.service';
 import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
+import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
+import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 
 @NgModule({
 	imports: [
@@ -73,13 +76,16 @@ import { ModelService } from  './service/model.service';
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		TaskDetailComponent,
+		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
 		TDSCheckboxComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
-		ManufacturerEditComponent
+		ManufacturerEditComponent,
+		AssetCloneComponent,
+		PopupAssetMessageComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -101,13 +107,15 @@ import { ModelService } from  './service/model.service';
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		TaskDetailComponent,
+		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
 		TDSCheckboxComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
-		ModelDeviceShowComponent
+		ModelDeviceShowComponent,
+		AssetCloneComponent
 	],
 })
 

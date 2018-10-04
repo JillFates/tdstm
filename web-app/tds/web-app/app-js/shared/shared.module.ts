@@ -5,6 +5,9 @@ import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { IntlModule } from '@progress/kendo-angular-intl';
+
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
@@ -44,6 +47,7 @@ import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 import { AddPersonComponent } from './components/add-person/add-person.component';
+import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
@@ -66,6 +70,8 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 		PopupModule,
 		DropDownsModule,
 		GridModule,
+		DateInputsModule,
+		IntlModule,
 		InputsModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
@@ -98,6 +104,7 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
+		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
@@ -145,6 +152,7 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
+		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
@@ -155,7 +163,8 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 	entryComponents: [
 		DynamicComponent,
 		DependentCommentComponent,
-		AddPersonComponent
+		AddPersonComponent,
+		DateRangeSelectorComponent
 	]
 })
 export class SharedModule {

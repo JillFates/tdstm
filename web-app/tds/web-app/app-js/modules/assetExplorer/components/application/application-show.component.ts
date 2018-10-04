@@ -9,6 +9,9 @@ import {TagModel} from '../../../assetTags/model/tag.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
+import {CloneModalModel} from '../../model/clone-modal.model';
 
 declare var jQuery: any;
 
@@ -45,7 +48,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -65,7 +68,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 		}
 
 		/**
@@ -75,7 +78,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 
 			this.prompt.open('Confirmation Required',
 				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'Yes', 'Cancel')
+				'OK', 'Cancel')
 				.then( success => {
 					if (success) {
 						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
@@ -95,7 +98,26 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		 * Allows to clone an application asset
 		 */
 		onCloneAsset(): void {
-			console.log('Will come clone implementation');
+
+			const cloneModalModel: CloneModalModel = {
+				assetType: DOMAIN.APPLICATION,
+				assetId: this.mainAsset
+			}
+			this.dialogService.extra(AssetCloneComponent, [
+				{provide: CloneModalModel, useValue: cloneModalModel}
+			], false, false).then( (result: CloneCLoseModel)  => {
+
+				if (result.clonedAsset && result.showEditView) {
+					const componentParameters = [
+						{ provide: 'ID', useValue: result.assetId },
+						{ provide: 'ASSET', useValue: DOMAIN.APPLICATION }
+					];
+
+					this.dialogService
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				}
+			})
+				.catch( error => console.log('error', error));
 		}
 
 		getGraphUrl(): string {

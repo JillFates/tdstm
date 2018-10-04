@@ -10,7 +10,7 @@ import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-column
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
-import {TaskDetailModel} from '../../../taskManager/components/detail/model/task-detail.model';
+import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
@@ -182,18 +182,22 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], false, false).then(result => {
-			if (result) {
-				if (result.isDeleted) {
-					this.deleteTaskComment(dataItem);
-				} else if (result.commentInstance) {
-					this.openTaskDetail(result, ModalType.VIEW);
+		], false, false)
+			.then(result => {
+				if (result) {
+					if (result.isDeleted) {
+						this.deleteTaskComment(dataItem);
+					} else if (result.commentInstance) {
+						this.openTaskDetail(result, ModalType.VIEW);
+					}
+					this.createDataGrids();
 				}
-			}
 
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+			}).catch(result => {
+				if (result) {
+					this.createDataGrids();
+				}
+			});
 	}
 
 	public reloadTasksGrid(): void {
