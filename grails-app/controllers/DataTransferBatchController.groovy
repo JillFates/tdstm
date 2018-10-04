@@ -10,6 +10,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DataTransferBatchService
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.InvalidParamException
@@ -39,6 +40,7 @@ class DataTransferBatchController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	UserPreferenceService userPreferenceService
+	DataTransferBatchService dataTransferBatchService
 
 	@HasPermission(Permission.AssetImport)
 	def importResults() {
@@ -245,19 +247,26 @@ class DataTransferBatchController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.DataTransferBatchDelete)
 	def delete() {
-		try {
-			DataTransferBatch dtb = DataTransferBatch.get(params.batchId)
-			if (dtb) {
-				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?", [dtb])
-				dtb.delete(flush:true)
-				flash.message = "DataTransferBatch $params.batchId deleted"
-			}
-			else {
-				flash.message = "DataTransferBatch not found with id $params.batchId"
-		   }
-		} catch(e) {
-			log.error "Can't delete batch instance: $e.message", e
-		}
+		// Legacy code. We have support for both option: params.id or params.batchId
+		if(params.batchId) params.id = params.batchId
+		DataTransferBatch dataTransferBatch = fetchDomain(DataTransferBatch, params)
+		dataTransferBatchService.delete(dataTransferBatch)
+
+		flash.message = "DataTransferBatch $params.batchId deleted"
 		redirect(action: "list")
+//		try {
+//			DataTransferBatch dtb = DataTransferBatch.get(params.batchId)
+//			if (dtb) {
+//				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?", [dtb])
+//				dtb.delete(flush:true)
+//				flash.message = "DataTransferBatch $params.batchId deleted"
+//			}
+//			else {
+//				flash.message = "DataTransferBatch not found with id $params.batchId"
+//		   }
+//		} catch(e) {
+//			log.error "Can't delete batch instance: $e.message", e
+//		}
+//		redirect(action: "list")
 	}
 }
