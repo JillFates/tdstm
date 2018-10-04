@@ -128,13 +128,15 @@ export class AssetCommonEdit implements OnInit {
 	/**
 	 * Notify user there are changes
 	 */
-	protected prompSaveChanges(): void {
+	protected promptSaveChanges(): void {
 		this.promptService.open(
 			'Confirmation Required',
 			'You have changes that have not been saved. Do you want to continue and lose those changes?',
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
 				this.cancelCloseDialog();
+			} else {
+				this.focusAssetModal();
 			}
 		});
 	}
@@ -144,11 +146,10 @@ export class AssetCommonEdit implements OnInit {
 	 */
 	protected onCancelEdit(): void {
 		if (this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
-			this.prompSaveChanges();
-			return;
+			this.promptSaveChanges();
+		} else {
+			this.cancelCloseDialog();
 		}
-
-		this.cancelCloseDialog();
 	}
 
 	/**
@@ -172,5 +173,9 @@ export class AssetCommonEdit implements OnInit {
 				}
 			})
 			.catch((error) => console.log(error));
+	}
+
+	protected focusAssetModal(): void {
+		setTimeout(() => jQuery('.modal-content').focus(), 500);
 	}
 }
