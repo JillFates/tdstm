@@ -40,9 +40,8 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 
 	constructor(
 		private service: AssetExplorerService,
-		private permissionService: PermissionService,
-		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
-		reportsResolve.subscribe((result) => {
+		private permissionService: PermissionService) {
+		service.getReports().subscribe((result) => {
 			this.data = result;
 			this.reports = result.slice();
 		});

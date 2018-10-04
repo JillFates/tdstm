@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, ViewEncapsulation, Inject, ViewChild} from '@angular/core';
+import {Component, Input, Output, EventEmitter, ViewChild, OnInit} from '@angular/core';
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
@@ -7,7 +7,6 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { Observable } from 'rxjs';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
 	DIALOG_SIZE
@@ -32,11 +31,12 @@ declare var jQuery: any;
 	exportAs: 'assetExplorerViewGrid',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
-export class AssetExplorerViewGridComponent {
+export class AssetExplorerViewGridComponent implements OnInit {
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
+	@Input() fields: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@Input()
 	set viewId(viewId: number) {
@@ -45,12 +45,12 @@ export class AssetExplorerViewGridComponent {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 	}
 
-	fields = [];
-	justPlanning = false;
-	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
-	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
-	showMessage = true;
-	typingTimeout: any;
+	public currentFields = [];
+	public justPlanning = false;
+	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
+	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
+	public showMessage = true;
+	public typingTimeout: any;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -73,28 +73,30 @@ export class AssetExplorerViewGridComponent {
 	constructor(
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
-				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-				this.bulkCheckboxService.setPageSize(this.state.take);
-				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
-				this.onReload();
-			});
-		fields.subscribe((result: DomainModel[]) => {
-			this.fields = result.reduce((p, c) => {
-				return p.concat(c.fields);
-			}, []).map((f: FieldSettingsModel) => {
-				return {
-					key: `${f['domain']}_${f.field}`,
-					label: f.label
-				};
-			});
-		}, (err) => console.log(err));
+			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+			this.bulkCheckboxService.setPageSize(this.state.take);
+			this.justPlanning = preferences[PREFERENCE_JUST_PLANNING].toString() === 'true';
+			this.onReload();
+		});
+
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
+	}
+
+	ngOnInit(): void {
+		// Iterate Fields to get reference for this context
+		this.currentFields = this.fields.reduce((p, c) => {
+			return p.concat(c.fields);
+		}, []).map((f: FieldSettingsModel) => {
+			return {
+				key: `${f['domain']}_${f.field}`,
+				label: f.label
+			};
+		});
 	}
 
 	private getPreferences(): Observable<any> {
@@ -116,7 +118,7 @@ export class AssetExplorerViewGridComponent {
 	 * @returns {string}
 	 */
 	getPropertyLabel(column: ViewColumn): string {
-		let field = this.fields.find(f => f.key === `${column.domain}_${column.property}`);
+		let field = this.currentFields.find(f => f.key === `${column.domain}_${column.property}`);
 		if (field) {
 			return field.label;
 		}

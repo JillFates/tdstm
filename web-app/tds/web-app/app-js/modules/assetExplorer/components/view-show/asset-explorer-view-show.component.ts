@@ -26,9 +26,11 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
 })
 export class AssetExplorerViewShowComponent implements OnInit {
+
 	private dataSignature: string;
-	model: ViewModel;
-	domains: DomainModel[] = [];
+	public fields: DomainModel[] = [];
+	protected model: ViewModel = new ViewModel();
+	protected domains: DomainModel[] = [];
 	protected metadata: any = {};
 
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
@@ -44,24 +46,25 @@ export class AssetExplorerViewShowComponent implements OnInit {
 			// @Inject('fields') fields: Observable<DomainModel[]>
 			// @Inject('tagList') tagList: Observable<Array<TagModel>>
 			// tagList.subscribe( result => this.metadata.tagList = result);
-			/*Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-				this.domains = result[0];
-				this.model = result[1];
-				this.dataSignature = JSON.stringify(this.model);
-				// TODO: STATE SERVICE GO
-				// this.stateService.$current.data.page.title = this.model.name;
-				document.title = this.model.name;
-			}, (err) => console.log(err));*/
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = this.route.snapshot.data['report'];
+		this.dataSignature = JSON.stringify(this.model);
+		this.notifier.broadcast({
+			name: 'notificationDocumentTitleChange',
+			title: this.model.name
+		});
+
 	}
 
 	ngOnInit(): void {
-		// this.grid.state.sort = [
-		// 	{
-		// 		field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
-		// 		dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
-		// 	}
-		// ];
-		// this.onQuery();
+		this.grid.state.sort = [
+			{
+				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
+				dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+			}
+		];
+		this.onQuery();
 	}
 
 	protected onQuery(): void {

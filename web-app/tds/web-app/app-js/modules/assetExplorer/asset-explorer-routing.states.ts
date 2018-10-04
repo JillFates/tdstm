@@ -13,6 +13,8 @@ import {AssetExplorerViewConfigComponent} from './components/view-config/asset-e
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
 // Models
 import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
+import {ReportsResolveService} from './service/reports-resolve.service';
+import {ReportResolveService} from './service/report-resolve.service';
 
 /**
  * Asset Explorer Route States
@@ -47,24 +49,6 @@ const assetsListSizeResolve = {
 	deps: [PreferenceService],
 	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
 };
-
-// const fieldsResolve = {
-// 	token: 'fields',
-// 	policy: { async: 'RXWAIT' },
-// 	deps: [CustomDomainService],
-// 	resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
-// 		let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
-// 		if (commonIndex !== -1) {
-// 			let common = domains.splice(commonIndex, 1);
-// 			domains = common.concat(domains);
-// 		}
-// 		domains.forEach(d => {
-// 			d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-// 			d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
-// 		});
-// 		return domains;
-// 	})
-// };
 
 const resolveTagList = {
 	token: 'tagList',
@@ -117,9 +101,8 @@ export const AssetExplorerRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: AssetExplorerViewConfigComponent,
-		// resolve: [
+		resolve: {
 		// 	assetsListSizeResolve,
-		// 	fieldsResolve,
 		// 	{
 		// 		token: 'report',
 		// 		policy: { async: 'RXWAIT' },
@@ -132,7 +115,8 @@ export const AssetExplorerRoute: Routes = [
 		// 		resolveFn: (service: AssetExplorerService) => service.getReports()
 		// 	},
 		// 	resolveTagList
-		// ],
+			fields: FieldsResolveService
+		},
 		canActivate: [AuthGuardService]
 	},
 	{
@@ -148,22 +132,24 @@ export const AssetExplorerRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: AssetExplorerViewConfigComponent,
-		// resolve: [
-		// 	assetsListSizeResolve,
-		// 	fieldsResolve,
-		// 	{
-		// 		token: 'report',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [AssetExplorerService, Transition],
-		// 		resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
-		// 	}, {
-		// 		token: 'reports',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [AssetExplorerService],
-		// 		resolveFn: (service: AssetExplorerService) => service.getReports()
-		// 	},
-		// 	resolveTagList
-		// ],
+		resolve: {
+			// 	assetsListSizeResolve,
+			// 	{
+			// 		token: 'report',
+			// 		policy: { async: 'RXWAIT' },
+			// 		deps: [AssetExplorerService, Transition],
+			// 		resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
+			// 	}, {
+			// 		token: 'reports',
+			// 		policy: { async: 'RXWAIT' },
+			// 		deps: [AssetExplorerService],
+			// 		resolveFn: (service: AssetExplorerService) => service.getReports()
+			// 	},
+			// 	resolveTagList
+			report: ReportResolveService,
+			reports: ReportsResolveService,
+			fields: FieldsResolveService
+		},
 		canActivate: [AuthGuardService]
 	},
 	{
@@ -180,20 +166,10 @@ export const AssetExplorerRoute: Routes = [
 		component: AssetExplorerViewShowComponent,
 		resolve: {
 			// assetsListSizeResolve,
-			// fieldsResolve,
-			// {
-			// 	token: 'report',
-			// 	policy: { async: 'RXWAIT' },
-			// 	deps: [AssetExplorerService, Transition],
-			// 	resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
-			// }, {
-			// 	token: 'reports',
-			// 	policy: { async: 'RXWAIT' },
-			// 	deps: [AssetExplorerService],
-			// 	resolveFn: (service: AssetExplorerService) => service.getReports()
-			// },
 			// resolveTagList
-			fieldsResolve: FieldsResolveService
+			report: ReportResolveService,
+			reports: ReportsResolveService,
+			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService]
 	}
