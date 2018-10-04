@@ -179,12 +179,10 @@ export class TaskCommentComponent implements OnInit {
 		let taskCreateModel: TaskDetailModel = {
 			id: this.id.toString(),
 			modal: {
-				title: 'Task Create',
+				title: 'Create Task',
 				type: ModalType.CREATE
 			}
 		};
-
-		alert('Opening task create');
 
 		this.dialogService.extra(TaskCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}

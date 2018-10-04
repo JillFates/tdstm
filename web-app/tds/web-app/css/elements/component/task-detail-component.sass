@@ -83,11 +83,11 @@
         .error-message
           display: none
         .validated-field
-          .ng-invalid
+          .ng-invalid:not(.ng-pristine)
             border-color: $color-message-error--red
-          .ng-invalid + .error-message
+          .ng-invalid:not(.ng-pristine) + .error-message
             display: block
-        .validated-field > .ng-invalid
+        .validated-field > .ng-invalid:not(.ng-pristine)
           & ~ .error-message
             display: block
         .required-field::after

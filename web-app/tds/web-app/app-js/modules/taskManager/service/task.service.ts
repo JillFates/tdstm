@@ -175,6 +175,20 @@ export class TaskService {
 	}
 
 	/**
+	 * Get the asset classes list
+	 * @returns {Observable<any>}
+	 */
+	getAssetClasses(): Observable<any> {
+		return this.http.get(`${this.baseURL}/assetEntity/assetClasses`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+
+	/**
 	 *
 	 * Returns a set of filtered tasks
 	 * @param searchParams

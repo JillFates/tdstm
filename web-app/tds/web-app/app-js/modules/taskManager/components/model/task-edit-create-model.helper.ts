@@ -1,5 +1,6 @@
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
+import {TaskDetailModel} from './task-detail.model';
 export const YesNoList = ['Yes', 'No'];
 
 export interface ITask {
@@ -65,17 +66,17 @@ export class TaskEditCreateModelHelper {
 	 * Get an empty model, used for create task component
 	 * @returns {any}
 	 */
-	public getEmptyModel(assetId: string): any {
+	public getEmptyModel(detailModel: TaskDetailModel): any {
 		const [yes, no] = YesNoList;
 		const defaultDurationScale = 'M';
 
 		this.model = {
-			title: '' ,
+			title: detailModel.modal.title ,
 			workflow: '' ,
 			workflowTransitionName: '' ,
 			durationDelta: '' ,
 			recipe: '' ,
-			id: assetId,
+			id: detailModel.id,
 			personCreateObj:  '',
 			note: '',
 			duration: 0,

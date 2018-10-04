@@ -11,7 +11,6 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -30,20 +29,18 @@ declare var jQuery: any;
 	styles: []
 })
 export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
-	@ViewChild('taskEditForm') public taskEditForm: NgForm;
+	@ViewChild('taskCreateForm') public taskCreateForm: NgForm;
 
 	public modalType = ModalType;
 	public dateFormat: string;
 	public dateFormatTime: string;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
-	public dataGridTaskNotesHelper: DataGridOperationsHelper;
 	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
-	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public collapsedTaskDetail = false;
 	public hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
-	public model: any = null;
+	public model: any = {};
 	public getAssetList: Function;
 	public yesNoList =  [...YesNoList];
 	public predecessorSuccessorColumns: any[];
@@ -73,7 +70,7 @@ export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
-		this.model = this.modelHelper.getEmptyModel(this.taskDetailModel.id);
+		this.model = this.modelHelper.getEmptyModel(this.taskDetailModel);
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
 
@@ -94,7 +91,6 @@ export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
-		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
@@ -339,9 +335,9 @@ export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {boolean}
 	 */
 	isFormInvalid(): boolean {
-		return !this.taskEditForm.form.valid ||
+		return !this.taskCreateForm.form.valid ||
 			this.hasInvalidFields() ||
-			!(this.taskEditForm.form.dirty || this.hasModelChanges)
+			!(this.taskCreateForm.form.dirty || this.hasModelChanges)
 	}
 
 	/**
@@ -349,7 +345,7 @@ export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {boolean}
 	 */
 	isFormDirty(): boolean {
-		return this.modelHelper.hasDependencyTasksChanges() || this.taskEditForm.dirty || this.hasModelChanges;
+		return this.modelHelper.hasDependencyTasksChanges() || this.taskCreateForm.dirty || this.hasModelChanges;
 	}
 
 	/**
@@ -365,7 +361,7 @@ export class TaskCreateComponent extends UIExtraDialog  implements OnInit {
 		}
 
 		const errors =  (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect' : true}  : null;
-		this.taskEditForm.form.controls['instructionLink'].setErrors(errors);
+		this.taskCreateForm.form.controls['instructionLink'].setErrors(errors);
 	}
 
 	/**
