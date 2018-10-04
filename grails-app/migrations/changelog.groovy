@@ -277,4 +277,5 @@ databaseChangeLog = {
 	include file: '20180919-add-bulk-move-bundle-to-file-specs.groovy'
 	include file: '20180919-add-bulk-validation-planstatus-to-file-specs.groovy'
 	include file: '20181002-add-bulk-action-to-standard-fields.groovy'
+	include file: '20181002-add-bulk-action-to-text-fields.groovy'
 }
