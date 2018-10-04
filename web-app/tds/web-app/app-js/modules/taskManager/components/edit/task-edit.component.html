@@ -13,7 +13,7 @@
                 <h4 class="modal-title">Edit: {{model.title}}</h4>
             </div>
             <div class="modal-body">
-                <form #taskEditCreateComponent="ngForm" class="full-height">
+                <form #taskEditCreateForm="ngForm" class="full-height">
                     <table style="border: 0;" class="full-height"
                            [ngClass]="{'has-duplicated-predecessors': modelHelper.hasDuplicatedPredecessors(),
                                        'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors(),

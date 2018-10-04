@@ -18,6 +18,7 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {TaskNotesColumnsModel} from '../model/task-notes-columns.model';
 import {YesNoList, TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -44,6 +45,8 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	public hasDeleteTaskPermission = false;
 	public hasEditTaskPermission = false;
 	public modelHelper: TaskEditCreateModelHelper;
+	public taskNotesColumnsModel = new TaskNotesColumnsModel();
+	public dataGridTaskNotesHelper: DataGridOperationsHelper;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -91,6 +94,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
 		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);

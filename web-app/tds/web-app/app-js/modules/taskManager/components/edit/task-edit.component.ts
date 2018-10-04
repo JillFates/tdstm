@@ -8,12 +8,14 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../service/task.service';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+
 
 declare var jQuery: any;
 
 @Component({
 	selector: `tds-task-edit`,
-	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/edit/task-edit.component.html',
 	styles: []
 })
 export class TaskEditComponent extends TaskCommonComponent  implements OnInit {
@@ -29,5 +31,4 @@ export class TaskEditComponent extends TaskCommonComponent  implements OnInit {
 		super(taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
 
 	}
-
 }
