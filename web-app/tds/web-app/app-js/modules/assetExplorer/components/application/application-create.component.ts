@@ -141,6 +141,16 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 				}
 			});
 		}
+
+		/**
+		 * Open the dialog to allow create a person
+		 * @param {any}  person Contains the info related to the asset in which the person will be  created
+		 * @param {string}  fieldName Contains the field asset type
+		 * @param {any[]}  companies List of companies to display
+		 * @param {any[]}  teams List of teams to display
+		 * @param {any[]}  staffTypes List of staffs types to display
+		 * @returns {void}
+		 */
 		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
@@ -172,6 +182,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 				});
 		}
 
+		/**
+		 * Get the current array containing the person items
+		 * It adds the default Add Person item
+		 */
 		getPersonList(personList: any[]): any[] {
 			if (!this.personList) {
 				this.personList = personList;
@@ -180,6 +194,9 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			return this.personList;
 		}
 
+		/**
+		 * Set the correct model values to objects of type person
+		 */
 		updatePersonReferences(): void {
 			this.persons.sme = { personId: this.model.asset.sme.id};
 			this.persons.sme2 = { personId: this.model.asset.sme2.id};
