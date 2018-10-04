@@ -128,76 +128,78 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
 			Project p ->
 				[
-					'tagAssets'  : [
-						control          : 'Tag',
-						bulkChangeActions: [
-							'add',
-							'clear',
-							'replace',
-							'remove '
-						]
-					],
-					retireDate   : [
-						control          : 'Date',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					externalRefId: [
-						control          : 'String',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					size         : [
-						control          : 'Number',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					appOwner     : [
-						control          : 'Date',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					latency      : [
-						bulkChangeService: 'bulkChangeYesNoService',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					latency      : [
-						control          : 'YesNo',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					'moveBundle' : [
-						control          : '',
-						bulkChangeActions: [
-							'replace'
-						]
-					],
-					'custom9'    : [
-						control          : 'List',
-						bulkChangeActions: [
-							'clear',
-							'replace'
+					(AssetClass.APPLICATION.name()): [
+						'tagAssets'  : [
+							control          : 'Tag',
+							bulkChangeActions: [
+								'add',
+								'clear',
+								'replace',
+								'remove '
+							]
 						],
-						customValues     : ['one potato', 'two potato']
-					],
-					'validation' : [
-						control          : 'InList',
-						bulkChangeActions: [
-							'clear',
-							'replace'
+						retireDate   : [
+							control          : 'Date',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						externalRefId: [
+							control          : 'String',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						size         : [
+							control          : 'Number',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						appOwner     : [
+							control          : 'Date',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						latency      : [
+							bulkChangeService: 'bulkChangeYesNoService',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						latency      : [
+							control          : 'YesNo',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
+						],
+						'moveBundle' : [
+							control          : '',
+							bulkChangeActions: [
+								'replace'
+							]
+						],
+						'custom9'    : [
+							control          : 'List',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							],
+							customValues     : ['one potato', 'two potato']
+						],
+						'validation' : [
+							control          : 'InList',
+							bulkChangeActions: [
+								'clear',
+								'replace'
+							]
 						]
 					]
 				]
@@ -555,7 +557,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].coerceBulkValue(project, 'latency', editCommand.value, _ as Map)
-			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].clear(Application, 'N', 'latency', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkServiceMapping['YesNo'].clear(Application, '', 'latency', [device.id, device2.id], [:])
 	}
 
 	void 'Test bulkChange replace moveBundle'() {
