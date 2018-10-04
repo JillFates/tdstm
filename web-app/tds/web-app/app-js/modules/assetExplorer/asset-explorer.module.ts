@@ -22,6 +22,7 @@ import { AssetDependencyComponent } from './components/asset-dependency/asset-de
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
 import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
 import { TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
+import { TaskCreateComponent } from '../taskManager/components/create/task-create.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -78,6 +79,7 @@ import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-
 		SingleCommentComponent,
 		TaskDetailComponent,
 		TaskEditComponent,
+		TaskCreateComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -110,6 +112,7 @@ import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-
 		SingleCommentComponent,
 		TaskDetailComponent,
 		TaskEditComponent,
+		TaskCreateComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,

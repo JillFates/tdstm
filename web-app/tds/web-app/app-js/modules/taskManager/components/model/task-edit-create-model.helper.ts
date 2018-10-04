@@ -62,6 +62,77 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
+	 * Get an empty model, used for create task component
+	 * @returns {any}
+	 */
+	public getEmptyModel(assetId: string): any {
+		const [yes, no] = YesNoList;
+		const defaultDurationScale = 'M';
+
+		this.model = {
+			title: '' ,
+			workflow: '' ,
+			workflowTransitionName: '' ,
+			durationDelta: '' ,
+			recipe: '' ,
+			id: assetId,
+			personCreateObj:  '',
+			note: '',
+			duration: 0,
+			durationText: '',
+			actualDuration:  '',
+			dateCreated: '',
+			taskSpec: '',
+			lastUpdated: '',
+			taskSpecId: '',
+			taskNumber: '',
+			hardAssigned:  no,
+			sendNotification:  no,
+			durationScale: defaultDurationScale,
+			durationParts: '',
+			locked: false,
+			actualStart:  '',
+			actualFinish:  '',
+			dueDate:  '',
+			estimatedStart:  '',
+			estimatedFinish:  '',
+			instructionLink: '',
+			instructionsLinkLabel: '',
+			instructionsLinkURL:  '',
+			priority: 3,
+			assetName: '',
+			comment:  '',
+			assetClass: {id: null, text: ''},
+			assetClasses: [{id: '', text: ''}],
+			status: 'Ready',
+			statusList: [],
+			personList: [],
+			teamList: [],
+			originalPredecessorList: [],
+			originalSuccessorList: [],
+			notesList: [],
+			predecessorList: [],
+			successorList: [],
+			apiActionList: [{id: '', text: ''}],
+			categoriesList: [],
+			eventList: [{id: '', text: ''}],
+			priorityList: [],
+			asset: {id: '', text: ''},
+			assignedTo: {id : '' , text: ''},
+			assignedTeam: {id: '', text: ''},
+			event: {id: '', text: ''},
+			category: '',
+			apiAction: {id: '', text: ''},
+			deletedPredecessorList: [],
+			deletedSuccessorList: []
+		};
+
+		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+
+		return this.model;
+	}
+
+	/**
 	 * Set the model passing the all detail object
 	 * @param {any} task Holds the detail object coming from the service, this will be extracted and cleaned
 	 * @returns {any}

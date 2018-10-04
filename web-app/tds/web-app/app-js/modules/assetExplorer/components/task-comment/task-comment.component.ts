@@ -10,6 +10,7 @@ import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-column
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
@@ -93,13 +94,13 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	/**
-	 * Create a new comment
+	 * Create a task
 	 * @param comment
 	 */
 	public createComment(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
-				title: 'Create Comment',
+				title: 'Create Task',
 				type: ModalType.CREATE
 			},
 			archive: false,
@@ -167,6 +168,36 @@ export class TaskCommentComponent implements OnInit {
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	/**
+	 * Open the Task Create
+	 * @param dataItem
+	 */
+	public openTaskCreate(): void {
+
+		let taskCreateModel: TaskDetailModel = {
+			id: this.id.toString(),
+			modal: {
+				title: 'Task Create',
+				type: ModalType.CREATE
+			}
+		};
+
+		alert('Opening task create');
+
+		this.dialogService.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					this.createDataGrids();
+				}
+
+			}).catch(result => {
+				console.log('Cancel:', result);
+			});
+
 	}
 
 	/**
