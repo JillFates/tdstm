@@ -1,4 +1,5 @@
-import { Component, Inject, ViewChild, OnInit } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 
@@ -34,32 +35,33 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	constructor(
-		@Inject('report') report: Observable<ViewModel>,
+		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
-		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
-		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
-			tagList.subscribe( result => this.metadata.tagList = result);
-			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
+		private notifier: NotifierService) {
+			// @Inject('report') report: Observable<ViewModel>
+			// @Inject('fields') fields: Observable<DomainModel[]>
+			// @Inject('tagList') tagList: Observable<Array<TagModel>>
+			// tagList.subscribe( result => this.metadata.tagList = result);
+			/*Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 				this.domains = result[0];
 				this.model = result[1];
 				this.dataSignature = JSON.stringify(this.model);
 				// TODO: STATE SERVICE GO
 				// this.stateService.$current.data.page.title = this.model.name;
 				document.title = this.model.name;
-			}, (err) => console.log(err));
+			}, (err) => console.log(err));*/
 	}
 
 	ngOnInit(): void {
-		this.grid.state.sort = [
-			{
-				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
-				dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
-			}
-		];
-		this.onQuery();
+		// this.grid.state.sort = [
+		// 	{
+		// 		field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
+		// 		dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+		// 	}
+		// ];
+		// this.onQuery();
 	}
 
 	protected onQuery(): void {

@@ -4,18 +4,15 @@ import {RouterModule, Routes} from '@angular/router';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {AssetExplorerService} from './service/asset-explorer.service';
-import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 import {PreferenceService} from '../../shared/services/preference.service';
 import {TagService} from '../assetTags/service/tag.service';
+import {FieldsResolveService} from './service/fields-resolve.service';
 // Components
 import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
 import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
 // Models
 import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
-// Others
-import { Observable } from 'rxjs';
-import 'rxjs/add/observable/of';
 
 /**
  * Asset Explorer Route States
@@ -68,15 +65,15 @@ const assetsListSizeResolve = {
 // 		return domains;
 // 	})
 // };
-//
-// const resolveTagList = {
-// 	token: 'tagList',
-// 	policy: { async: 'RXWAIT' },
-// 	deps: [TagService],
-// 	resolveFn: (tagService: TagService) => tagService.getTags().map( (result: ApiResponseModel) => {
-// 		return result.status === ApiResponseModel.API_SUCCESS && result.data ? result.data : [];
-// 	})
-// };
+
+const resolveTagList = {
+	token: 'tagList',
+	policy: { async: 'RXWAIT' },
+	deps: [TagService],
+	resolveFn: (tagService: TagService) => tagService.getTags().map( (result: ApiResponseModel) => {
+		return result.status === ApiResponseModel.API_SUCCESS && result.data ? result.data : [];
+	})
+};
 
 /**
  * This state displays the field settings list.
@@ -181,22 +178,23 @@ export const AssetExplorerRoute: Routes = [
 			requiresAuth: true
 		},
 		component: AssetExplorerViewShowComponent,
-		// resolve: [
-		// 	assetsListSizeResolve,
-		// 	fieldsResolve,
-		// 	{
-		// 		token: 'report',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [AssetExplorerService, Transition],
-		// 		resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
-		// 	}, {
-		// 		token: 'reports',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [AssetExplorerService],
-		// 		resolveFn: (service: AssetExplorerService) => service.getReports()
-		// 	},
-		// 	resolveTagList
-		// ],
+		resolve: {
+			// assetsListSizeResolve,
+			// fieldsResolve,
+			// {
+			// 	token: 'report',
+			// 	policy: { async: 'RXWAIT' },
+			// 	deps: [AssetExplorerService, Transition],
+			// 	resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
+			// }, {
+			// 	token: 'reports',
+			// 	policy: { async: 'RXWAIT' },
+			// 	deps: [AssetExplorerService],
+			// 	resolveFn: (service: AssetExplorerService) => service.getReports()
+			// },
+			// resolveTagList
+			fieldsResolve: FieldsResolveService
+		},
 		canActivate: [AuthGuardService]
 	}
 ];

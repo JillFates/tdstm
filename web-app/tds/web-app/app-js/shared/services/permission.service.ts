@@ -11,7 +11,6 @@ export class PermissionService {
 	private permissions = this.permissionsList.asObservable();
 
 	/**
-	 * Get the entire permission list on Load.
 	 * @param http
 	 */
 	constructor(private http: HttpInterceptor) {}
@@ -32,6 +31,10 @@ export class PermissionService {
 		return Observable.from(this.permissions);
 	}
 
+	/**
+	 * Use a string to validate if the Permission exist on the list
+	 * @param value
+	 */
 	public hasPermission(value: string): boolean {
 		if (this.permissionsList.getValue()) {
 			return this.permissionsList.getValue()[value] as boolean;

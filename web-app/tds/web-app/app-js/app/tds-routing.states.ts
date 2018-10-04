@@ -64,34 +64,9 @@ function requiresAuthHook(transitionService: TransitionService) {
 	transitionService.onBefore(requiresAuthCriteria, redirectToLogin, { priority: 10 });
 }
 
-function requiresPermissionHook(transitionService: TransitionService) {
-	const requiresPermissionCriteria = {
-		to: (state) => state.data && state.data.requiresPermission
-	};
-
-	const redirectToUnauthorized = (transition) => {
-		const permissionService = transition.injector().get(PermissionService) as PermissionService;
-		const $state = transition.router.stateService;
-		const reqPermission = transition.to().data.requiresPermission;
-		const permited = typeof (reqPermission) === 'string' ?
-			permissionService.hasPermission(reqPermission) :
-			reqPermission.reduce((p, c) => p && permissionService.hasPermission(c), true);
-		if (!permited) {
-			return $state.target(SharedStates.UNAUTHORIZED.name, undefined, { location: false });
-		}
-	};
-
-	transitionService.onStart(requiresPermissionCriteria, redirectToUnauthorized, { priority: 10 });
-}
-
 export function AuthConfig(router: UIRouter) {
 	const transitionService = router.transitionService;
 	requiresAuthHook(transitionService);
-}
-
-export function PermissionConfig(router: UIRouter) {
-	const transitionService = router.transitionService;
-	requiresPermissionHook(transitionService);
 }
 
 export function MiscConfig(router: UIRouter) {
