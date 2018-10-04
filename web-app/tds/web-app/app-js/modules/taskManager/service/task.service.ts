@@ -187,7 +187,6 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
-
 	/**
 	 *
 	 * Returns a set of filtered tasks

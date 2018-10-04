@@ -360,7 +360,7 @@ export class TaskEditCreateModelHelper {
 	private extractDistinctIds(array): string[] {
 		const ids = [];
 
-		array.forEach((item) => {
+		(array || []).forEach((item) => {
 			let idField = 'id';
 
 			if (item.taskId) {
