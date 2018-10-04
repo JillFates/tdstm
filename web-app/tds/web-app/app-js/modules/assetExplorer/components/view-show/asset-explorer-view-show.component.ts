@@ -50,14 +50,14 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = this.route.snapshot.data['report'];
 		this.dataSignature = JSON.stringify(this.model);
+	}
+
+	ngOnInit(): void {
 		this.notifier.broadcast({
 			name: 'notificationDocumentTitleChange',
 			title: this.model.name
 		});
 
-	}
-
-	ngOnInit(): void {
 		this.grid.state.sort = [
 			{
 				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,

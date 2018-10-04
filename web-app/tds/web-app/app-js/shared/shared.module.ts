@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopupModule } from '@progress/kendo-angular-popup';
@@ -8,13 +8,13 @@ import { GridModule } from '@progress/kendo-angular-grid';
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
-import { AuthService } from '../shared/services/auth.service';
 import { PreferenceService } from '../shared/services/preference.service';
 import { NotifierService } from '../shared/services/notifier.service';
 import { ComponentCreatorService } from '../shared/services/component-creator.service';
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { PersonService } from './services/person.service';
+import { PermissionService } from './services/permission.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -91,22 +91,6 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		AkaComponent,
 		ConnectorComponent
 	],
-	providers: [
-		AuthService,
-		PersonService,
-		PreferenceService,
-		NotifierService,
-		UILoaderService,
-		HttpServiceProvider,
-		ComponentCreatorService,
-		UIDialogService,
-		UIActiveDialogService,
-		UIPromptService,
-		UISVGIconDirectiveDirective,
-		UIFloatingHeaderKGridDirective,
-		DictionaryService,
-		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
-	],
 	exports: [
 		UILoaderDirective,
 		UIAutofocusDirective,
@@ -145,6 +129,25 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 	]
 })
 export class SharedModule {
-	constructor(private notifier: NotifierService) {
+	static forRoot(): ModuleWithProviders {
+		return {
+			ngModule: SharedModule,
+			providers: [
+				PermissionService,
+				PersonService,
+				PreferenceService,
+				NotifierService,
+				UILoaderService,
+				HttpServiceProvider,
+				ComponentCreatorService,
+				UIDialogService,
+				UIActiveDialogService,
+				UIPromptService,
+				UISVGIconDirectiveDirective,
+				UIFloatingHeaderKGridDirective,
+				DictionaryService,
+				{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
+			]
+		};
 	}
 }
