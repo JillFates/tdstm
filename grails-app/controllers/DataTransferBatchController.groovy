@@ -254,19 +254,5 @@ class DataTransferBatchController implements ControllerMethods {
 
 		flash.message = "DataTransferBatch $params.batchId deleted"
 		redirect(action: "list")
-//		try {
-//			DataTransferBatch dtb = DataTransferBatch.get(params.batchId)
-//			if (dtb) {
-//				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?", [dtb])
-//				dtb.delete(flush:true)
-//				flash.message = "DataTransferBatch $params.batchId deleted"
-//			}
-//			else {
-//				flash.message = "DataTransferBatch not found with id $params.batchId"
-//		   }
-//		} catch(e) {
-//			log.error "Can't delete batch instance: $e.message", e
-//		}
-//		redirect(action: "list")
 	}
 }
