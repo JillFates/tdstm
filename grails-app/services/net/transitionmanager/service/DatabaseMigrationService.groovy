@@ -131,8 +131,10 @@ class DatabaseMigrationService implements ServiceMethods {
 	 * @param domainObjects - list of domain objects
 	 * @param jsonField - name of the field to be updated.
 	 * @param changeScript - the script to be executed.
+     *
+     * Adding transactional here seems to cause problems in the database migration scripts, which
+     * already have an implicit transaction.
 	 */
-	@Transactional
 	void updateJsonObjects(List domainObjects, String jsonField, Closure changeScript) {
 		for (domainObject in domainObjects) {
 			// Parse the given field to a JSON object.
