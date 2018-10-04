@@ -36,6 +36,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
+		haveMissingFields = false;
 		persons = {
 			sme: null,
 			sme2: null,
@@ -106,6 +107,12 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
+			const assetName = this.model.asset.assetName && this.model.asset.assetName.trim() || '';
+			if (!assetName) {
+				this.haveMissingFields = true;
+				return;
+			}
+
 			const modelRequest   = R.clone(this.model);
 
 			if (modelRequest && modelRequest.asset.moveBundle) {
