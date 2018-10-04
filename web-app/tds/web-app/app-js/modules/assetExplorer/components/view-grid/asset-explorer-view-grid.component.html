@@ -80,6 +80,11 @@
 		<ng-template kendoGridCellTemplate let-dataItem>
 			<div class="text-center">
 				<button class="btn btn-action btn-default"
+						title="Edit Asset"
+						(click)="showAssetEditView(dataItem)">
+					<span class="fa fa-fw fa-edit"></span>
+				</button>
+				<button class="btn btn-action btn-default"
 						title="Create Comment or Show Comments"
 						(click)="showComment(dataItem)">
 					<span class="fa fa-fw fa-comment"></span>

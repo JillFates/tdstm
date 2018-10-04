@@ -10,7 +10,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
-	DIALOG_SIZE, ModalType
+	DIALOG_SIZE, ModalType, DOMAIN
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
@@ -29,6 +29,7 @@ import {TaskCommentDialogComponent} from '../task-comment/dialog/task-comment-di
 import {SingleCommentModel} from '../single-comment/model/single-comment.model';
 import {SingleCommentComponent} from '../single-comment/single-comment.component';
 import {AssetModalModel} from '../../model/asset-modal.model';
+import {AssetEditComponent} from '../asset/asset-edit.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -367,6 +368,15 @@ export class AssetExplorerViewGridComponent {
 			console.log('Dismissed Dialog');
 		});
 		console.log('createComment', dataItem);
+	}
+
+	protected showAssetEditView(dataItem: any) {
+		const componentParameters = [
+			{ provide: 'ID', useValue: dataItem.common_id },
+			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
+		];
+
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 	}
 
 	/**
