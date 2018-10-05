@@ -393,14 +393,17 @@ class WsAssetController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.AssetView)
-	def getDefaultCreateModel() {
+	def getDefaultCreateModel(String assetClass) {
 		Project project = securityService.getUserCurrentProject()
-		Map model = [:]
-		// Required for Supports On and Depends On
-		model.dependencyMap = assetEntityService.dependencyCreateMap(project)
-		model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
-		model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
-		model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
+        Map model = [:]
+        // Required for Supports On and Depends On
+        model.dependencyMap = assetEntityService.dependencyCreateMap(project)
+        model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
+        model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
+        model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
+        if (assetClass == AssetClass.DEVICE.toString()) {
+            model << assetEntityService.getCommontDeviceMapForCreateEdit(project, null)
+        }
 		renderAsJson(model)
 	}
 

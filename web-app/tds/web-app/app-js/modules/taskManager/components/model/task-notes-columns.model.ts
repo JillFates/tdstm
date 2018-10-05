@@ -1,4 +1,4 @@
-import {GridColumnModel} from '../../../../../shared/model/data-list-grid.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 /**
  * Defines the columns

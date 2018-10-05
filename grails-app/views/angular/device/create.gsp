@@ -11,7 +11,7 @@
      class="modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Device Edit</h4>
+        <h4 class="modal-title">Device Create</h4>
     </div>
     <div class="modal-body">
         <table style="border: 0" class="ui-widget">
@@ -19,7 +19,7 @@
             <tr>
                 <td colspan="2" class="dialog-container">
                     <div class="dialog">
-                        <table class="asset-edit-view">
+                        <table class="asset-create-view">
                             <tbody>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>

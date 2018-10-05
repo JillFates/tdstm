@@ -69,8 +69,9 @@ dependencies {
 drivers.each { driver ->
     task "${driver}Test"(type: Test) {
         reports {
-            html.destination = reporting.file("$name/tests")
-            junitXml.destination = file("$buildDir/test-results/$name")
+            //html.destination = reporting.file("$name/tests") // dont remove in case is needed in the future
+            //junitXml.destination = file("$buildDir/test-results/$name") // dont remove in case is needed in the future
+            junitXml.destination = file("${buildDir}/tmp/test-reports/$name")
         }
 
         outputs.upToDateWhen { false }  // Always run tests
@@ -78,6 +79,15 @@ drivers.each { driver ->
         systemProperty "geb.build.reportsDir", reporting.file("$name/geb")
         systemProperty "geb.env", driver
 
+    }
+}
+
+task aggregateReports{
+    drivers.each { driver ->
+        doLast {
+            ant.move file: "${buildDir}/tmp/test-reports/${driver}Test/",
+                    todir: "${buildDir}/test-results/e2e/"
+        }
     }
 }
 
