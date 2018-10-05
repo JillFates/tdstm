@@ -15,7 +15,7 @@ export class ComponentCreatorService {
 	 * Inject the current ComponentFactoryResolver per Module
 	 * @param resolver
 	 */
-	public setFactoryResolver(resolver: ComponentFactoryResolver): void{
+	public setFactoryResolver(resolver: ComponentFactoryResolver): void {
 		this.resolver = resolver;
 	}
 
