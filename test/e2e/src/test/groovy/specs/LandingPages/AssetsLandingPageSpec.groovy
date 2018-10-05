@@ -5,7 +5,9 @@ import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import pages.Assets.*
-import pages.AssetViewManager.*
+import pages.Assets.AssetViewManager.*
+import pages.Assets.AssetViews.*
+import pages.Assets.Application.*
 import spock.lang.Stepwise
 
 /**
@@ -18,6 +20,7 @@ import spock.lang.Stepwise
 class AssetsLandingPageSpec extends GebReportingSpec {
     def testKey
     static testCount
+    static assetPagesLinks = 24
 
     def setupSpec() {
         testCount = 0
@@ -41,7 +44,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             assetsModule.goToAssetsMenu()
 
         then: 'The valid clickable pages are displayed'
-            assetsModule.assetsPages.size() == 18
+            assetsModule.assetsPages.size() == assetPagesLinks
             at MenuPage
     }
 

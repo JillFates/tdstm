@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Response} from '@angular/http';
+import {Response, Headers} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Permission} from '../../../shared/model/permission.model';
@@ -362,6 +362,64 @@ export class AssetExplorerService {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
 			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Create an Asset
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	createAsset(model: any): Observable<any> {
+		const request: any = {
+			assetClass: model.asset.assetClass.name,
+			asset: model.asset,
+			dependencyMap: {
+				supportAssets: this.prepareDependencies(model.dependencyMap.supportAssets),
+				dependentAssets: this.prepareDependencies(model.dependencyMap.dependentAssets)
+			}
+		};
+
+		return this.http.post(`${this.defaultUrl}/asset`, request)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get an Asset by id
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	getAsset(assetId: number): Observable<any> {
+		return this.http.get(`${this.assetUrl}/${assetId}`)
+			.map((res: Response) => res.json().data.result)
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Validate Asset uniqueness by its Name
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	checkAssetForUniqueName(assetToValid: any): Observable<any> {
+
+		return this.http.post(`${this.assetUrl}/checkForUniqueName`, assetToValid)
+			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Clone Asset
+	 * @param assetId
+	 * @returns {Observable<any>}
+	 */
+	cloneAsset(assetToClone): Observable<any> {
+
+		return this.http.post(`${this.assetUrl}/clone`, assetToClone)
+			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
 

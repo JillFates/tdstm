@@ -6,18 +6,30 @@ import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.c
 import { DependecyService } from '../../service/dependecy.service';
 import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {CloneModalModel} from '../../model/clone-modal.model';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
 
 declare var jQuery: any;
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `database-show`,
+		selector: `tds-database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
 		private mainAsset = modelId;
 		protected assetTags: Array<TagModel> = metadata.assetTags;
 
-		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		constructor(
+			private activeDialog: UIActiveDialogService,
+			private dialogService: UIDialogService,
+			private assetService: DependecyService,
+			private prompt: UIPromptService,
+			private assetExplorerService: AssetExplorerService,
+			private notifierService: NotifierService) {
 			jQuery('[data-toggle="popover"]').popover();
 		}
 
@@ -42,14 +54,14 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 			this.dialogService.replace(AssetShowComponent, [
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showAssetEditView() {
 			this.dialogService.replace(AssetEditComponent, [
 				{ provide: 'ID', useValue: this.mainAsset },
 				{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -60,6 +72,59 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 						.then(res => console.log(res))
 						.catch(res => console.log(res));
 				}, (error) => console.log(error));
+		}
+
+		/**
+		 allows to delete the application assets
+		 */
+		onDeleteAsset() {
+
+			this.prompt.open('Confirmation Required',
+				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'OK', 'Cancel')
+				.then( success => {
+					if (success) {
+						this.assetExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
+							if (res) {
+								this.notifierService.broadcast({
+									name: 'reloadCurrentAssetList'
+								});
+								this.activeDialog.dismiss();
+							}
+						}, (error) => console.log(error));
+					}
+				})
+				.catch((error) => console.log(error));
+		}
+
+		/**
+		 * Allows to clone an application asset
+		 */
+		onCloneAsset(): void {
+
+			const cloneModalModel: CloneModalModel = {
+				assetType: DOMAIN.DATABASE,
+				assetId: this.mainAsset
+			}
+			this.dialogService.extra(AssetCloneComponent, [
+				{provide: CloneModalModel, useValue: cloneModalModel}
+			], false, false).then( (result: CloneCLoseModel)  => {
+
+				if (result.clonedAsset && result.showEditView) {
+					const componentParameters = [
+						{ provide: 'ID', useValue: result.assetId },
+						{ provide: 'ASSET', useValue: DOMAIN.DATABASE }
+					];
+
+					this.dialogService
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				}
+			})
+				.catch( error => console.log('error', error));
+		}
+
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

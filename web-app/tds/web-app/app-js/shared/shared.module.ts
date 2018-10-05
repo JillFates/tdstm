@@ -47,6 +47,7 @@ import { AddPersonComponent } from './components/add-person/add-person.component
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
+import {FieldReferencePopupComponent} from './components/field-reference-popup/field-reference-popup.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -89,7 +90,8 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
-		ConnectorComponent
+		ConnectorComponent,
+		FieldReferencePopupComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -120,7 +122,8 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 		UIAutoCenterDirective,
 		AkaComponent,
 		ConnectorComponent,
-		PopupModule
+		PopupModule,
+		FieldReferencePopupComponent
 	],
 	entryComponents: [
 		DynamicComponent,

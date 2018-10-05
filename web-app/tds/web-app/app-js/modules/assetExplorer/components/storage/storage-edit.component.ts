@@ -19,7 +19,7 @@ declare var jQuery: any;
 
 export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
-		selector: 'storage-edit',
+		selector: 'tds-storage-edit',
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }
@@ -38,6 +38,20 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			this.initModel();
+		}
+
+		/**
+		 * Init model with necessary changes to support UI components.
+		 */
+		private initModel(): void {
+			if (this.model.asset.scale === null) {
+				this.model.asset.scale = {
+					name: ''
+				};
+			} else {
+				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
+			}
 		}
 
 		/**
@@ -55,9 +69,6 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
@@ -66,6 +77,13 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 					this.saveAssetTags();
 				}
 			});
+		}
+
+		/**
+		 * Delete the storage asset
+		 */
+		onDeleteAsset(): void {
+			this.deleteAsset(this.model.asset.id);
 		}
 
 	}

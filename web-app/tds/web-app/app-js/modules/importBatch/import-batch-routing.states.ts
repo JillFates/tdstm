@@ -28,7 +28,7 @@ export const ImportBatchRoute: Routes = [
 			page: {
 				title: 'IMPORT_BATCH.MANAGE_LIST',
 				instruction: '',
-				menu: ['IMPORT_BATCH.IMPORT_BATCH', 'IMPORT_BATCH.MANAGE_LIST'],
+				menu: ['ASSETS.ASSETS', 'IMPORT_BATCH.MANAGE_LIST'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-manage-dep-batches'}
 			},
 			requiresAuth: true,

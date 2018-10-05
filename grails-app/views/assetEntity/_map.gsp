@@ -2,9 +2,9 @@
 <div id="toolsContainerId">
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">
-		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
-		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('dependencies')"><h4>Dependencies</h4></div>
-		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
+		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
+		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)"><h4>Dependencies</h4></div>
+		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div>
 		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
@@ -49,6 +49,8 @@
 		</div>
 		<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton hasMargin" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
 		<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
+		<div id="lassoButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"></div>
+		<div id="selectionAddButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.SELECTION_ADD_TOOL, $(this))" title="Select multiple nodes in sequence ([ctrl] while selecting, can be combined with the lasso tool)"></div>
 		<div id="refreshButtonId" class="graphButton graphTabButton hasBorders hasMargin" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4><i class="fa fa-fw fa-warning"></i> Refresh</h4></div>
 	</div>
 	<!-- The control panel div containing graph controls and settings -->
@@ -59,12 +61,12 @@
 				<!-- Miscellaneous settings and controls -->
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="playPauseButtonId" type="button" value="Freeze Graph${legendTwistiePref}" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()">
+						<input id="playPauseButtonId" type="button" value="Freeze Graph${legendTwistiePref}" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()" title="Pauses or Unpauses the physics of the force graph (can also be done with the [space] key)">
 					</td>
 				</tr>
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="pointer fullButton graphButton" onclick="setIdealGraphPosition()">
+						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="pointer fullButton graphButton" onclick="setIdealGraphPosition()" title="Adjust the position, zoom, and rotation of the grpah to fit in the window">
 					</td>
 				</tr>
 
@@ -257,7 +259,7 @@
 			height: 33px;
 		}
 		div.fullscreen div.dependency_panel_action_buttons {
-			bottom: 7px !important;
+			bottom: 1px !important;
 		}
 		td.groupingControl {
 			background-color: #dddddd;

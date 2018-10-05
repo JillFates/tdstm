@@ -70,6 +70,16 @@ class DataImportService implements ServiceMethods {
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
 
+	// The property name that will be set on the fieldsInfo of any field that the value is changed during the posting process
+	static final String PREVIOUS_VALUE_PROPERTY='previousValue'
+
+	// The property in the fieldsInfo for each field that has the 'whenNotFound create' mapping
+	static final WHEN_NOT_FOUND_CREATE_PROPERTY = 'create'
+
+	// The property in the fieldsInfo for each field that has the 'whenFound update' mapping
+	static final WHEN_FOUND_UPDATE_PROPERTY = 'update'
+
+	// Globally these are fields that will not be allowed to be modified on any domain record
 	static final List<String> PROPERTIES_THAT_CANNOT_BE_MODIFIED = [
 		'version', 'assetClass', 'createdBy', 'updatedBy', 'project', 'dateCreated', 'lastUpdated'
 	]
@@ -746,13 +756,14 @@ class DataImportService implements ServiceMethods {
 			case ETLDomain.Device:
 			case ETLDomain.Files:
 			case ETLDomain.Storage:
+			case ETLDomain.Task:
 				processEntityRecord(batch, record, context, recordCount)
 				break
 
 			default:
 				String domain = batch.domainClassName.name()
 				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
-				throw new InvalidRequestException("Batch process not supported for domain ${domain}")
+				throw new InvalidRequestException("processEntityRecord ${domain}")
 		}
 	}
 
@@ -767,13 +778,13 @@ class DataImportService implements ServiceMethods {
 	 */
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		try {
-			Map fieldsInfo = JsonUtil.parseJson(record.fieldsInfo)
+			Map fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 
 			Object entity = findOrCreateEntity(fieldsInfo, context)
 
-			if (entity) {
+			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
 
 				// Now add/update the remaining properties on the domain entity appropriately
@@ -824,9 +835,11 @@ class DataImportService implements ServiceMethods {
 
 			// Update the fieldsInfo back into the Import Batch Record
 			record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
+			// Register error count accordingly
+			record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
 		} catch (e) {
 			record.addError(e.getMessage())
-			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e)
+			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e, 80)
 		}
 
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
@@ -847,9 +860,8 @@ class DataImportService implements ServiceMethods {
 	 * @return true if there were any recognized errors otherwise false
 	 */
 	private boolean recordAnySearchQueryHelperErrors(String fieldName, Map fieldsInfo, Map context) {
-		boolean hasErrors=context.searchQueryHelperErrors.size() > 0
+		boolean hasErrors = context.searchQueryHelperErrors?.size() > 0
 		if (hasErrors) {
-
 			for (String errorMsg in context.searchQueryHelperErrors) {
 				addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
 			}
@@ -896,20 +908,19 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to create a new entity and set various mandatory properties if they won't be set
-	 * by the data in fieldsInfo.
-	 * @param fieldsInfo
+	 * Used to create a new entity and set various mandatory properties if the fields won't be set
+	 * by the data in fieldsMap
+	 * @param domainClass - the domain class to be created
+	 * @param fieldsMap - a map of the fields that is either the fieldsInfo map or the whenNotFound create map
 	 * @param context
-	 * @return the newly minted domain entity instance
+	 * @return the newly minted entity instance
 	 */
-	Object createEntity(Class domainClass, Map fieldsInfo, Map context) {
+	Object createEntity(Class domainClass, Map fieldsMap, Map context) {
 		if (! GormUtil.isDomainClass(domainClass)) {
 			throw new DomainUpdateException("Class specified (${domainClass.getName()}) is not a valid domain class")
 		}
 
 		Object entity = domainClass.newInstance()
-
-		// Populate mandatory properties that can be determined at this time
 
 		List propsInDomain = GormUtil.getDomainPropertyNames(domainClass)
 
@@ -920,8 +931,9 @@ class DataImportService implements ServiceMethods {
 
 		// moveBundle
 		if ('moveBundle' in propsInDomain) {
-			// Only bother if it isn't specified in the fieldsInfo which will be set later
-			if (! fieldsInfo.containsKey('moveBundle') || ! fieldsInfo['moveBundle'].value ) {
+			// Only set the bundle to its default if it isn't specified in the fieldsMap which will be set later
+			Object bundle = fieldsMap['moveBundle']
+			if (! (bundle && ( ((bundle instanceof Map) && bundle.value) || (bundle)) ) ) {
 				entity.moveBundle = context.project.getProjectDefaultBundle()
 			}
 		}
@@ -933,7 +945,7 @@ class DataImportService implements ServiceMethods {
 			}
 		}
 
-		// owner (i.e. project.client)
+		// Handle owner references (i.e. project.client)
 		if ('owner' in propsInDomain && GormUtil.getDomainPropertyType(domainClass, 'owner') == PartyGroup) {
 			entity.owner = context.project.client
 		}
@@ -985,6 +997,7 @@ class DataImportService implements ServiceMethods {
 
 		Boolean isNewEntity = (Boolean)(domain.id == null)
 		String domainShortName = GormUtil.domainShortName(domain)
+		Class domainClass = domain.getClass()
 
 		for (fieldName in fieldNames) {
 			if ( fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED ) {
@@ -992,14 +1005,13 @@ class DataImportService implements ServiceMethods {
 				continue
 			}
 
-			log.debug 'bindFieldsInfoValuesToEntity() Processing {}.{}', domainShortName, fieldName
+			log.debug 'bindFieldsInfoValuesToEntity() Processing {}.{} class {}', domainShortName, fieldName, domainClass
 
 			// Check for exception fields that should be ignored
 			if (DOMAIN_FIELD_EXCEPTIONS."$domainShortName"?."$fieldName"?.'ignore') {
 				continue
 			}
-
-			if (! GormUtil.isDomainProperty(domain, fieldName)) {
+			if (! GormUtil.isDomainProperty(domainClass, fieldName)) {
 				recordErrorHelper(fieldName, 'Field name is not a property of this domain')
 				continue
 			}
@@ -1018,16 +1030,16 @@ class DataImportService implements ServiceMethods {
 			Object existingValue = domain[fieldName]
 
 			// --------------------------------------------------
-			// Deal with setting field to NULL
+			// Deal with setting the field to NULL when it's not a reference. References are handled separately.
 			// --------------------------------------------------
-			if (valueToSet == null) {
+			if (!isReference && valueToSet == null) {
 				if (existingValue) {
 					// Check to see if the field is nullable
 					if (GormUtil.getConstraintValue(domain, fieldName, 'nullable')) {
 						if (isReference) {
 							existingValue = existingValue.toString()
 						}
-						_recordChangeOnField(domain, fieldName, null, isInitValue, isNewEntity, fieldsInfo)
+						_recordChangeOnField(domain, fieldName, null, isInitValue, fieldsInfo)
 					} else {
 						addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, 'Field can not be null')
 					}
@@ -1041,9 +1053,11 @@ class DataImportService implements ServiceMethods {
 				// --------------------------------------------------
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
+				Class refDomain = GormUtil.getDomainPropertyType(domainClass, fieldName)
 				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
 				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
-
+				log.debug 'bindFieldsInfoValuesToEntity() {} {} {} {}',
+					fieldName, refDomain.getName(), (valueToSet ? valueToSet.getClass().getName() : null), valueToSet
 				switch (valueToSet) {
 					case -1:
 						noErrorsEncountered = false
@@ -1061,9 +1075,9 @@ class DataImportService implements ServiceMethods {
 
 						// Check to see if there is a create block which would ultimately resolve the issue subsequently
 						if (hasWhenNotFoundCreate(fieldName, fieldsInfo)) {
-							valueToSet = createReferenceEntityForWhenNotFoundCreate(fieldName, fieldsInfo, context)
+							valueToSet = createReferenceEntityFromWhenNotFound(fieldName, fieldsInfo, context)
 							if (valueToSet) {
-								_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+								_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
 								// Update cache for this reference object
 								Class domainClassToCreate
 								(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(fieldName, fieldsInfo, context.domainClass)
@@ -1076,148 +1090,194 @@ class DataImportService implements ServiceMethods {
 									context.cache.put(md5, valueToSet)
 								}
 							} else {
-								log.debug "bindFieldsInfoValuesToEntity() call to createReferenceEntityForWhenNotFoundCreate failed!"
-								// The createReferenceEntityForWhenNotFoundCreate must of recorded some error in the propertyName of fieldsInfo
+								log.debug "bindFieldsInfoValuesToEntity() call to createReferenceEntityFromWhenNotFound failed!"
+								// The createReferenceEntityFromWhenNotFound must of recorded some error in the propertyName of fieldsInfo
 								noErrorsEncountered = false
 							}
 						} else {
-							recordErrorHelper(fieldName, 'Unable to resolve reference lookup')
+							recordErrorHelper(fieldName, 'Unable to find record')
 						}
 						break
 
 					default:
-						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
+						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+
+						if (hasWhenFoundUpdate(fieldName, fieldsInfo)) {
+							// Process the 'whenFound update' logic if it was specified on the reference
+							Map fieldsValueMap = fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY]
+							errMsg = updateReferenceEntityFromWhenFound(fieldName, fieldsValueMap, context)
+							if (errMsg) {
+								recordErrorHelper(fieldName, errMsg)
+							}
+						}
 				}
 
 			} else {
 				// --------------------------------------------------
 				// Process native Java data types
 				// --------------------------------------------------
-				def fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
-				log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
-				// println "bindFieldsInfoValuesToEntity() field $fieldName, value=$valueToSet, fieldClass=${fieldClassType.getName()}"
-				try {
-					switch (fieldClassType) {
-						case String:
-							_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-							break
-
-						case Integer:
-							// TODO : JPM 7/2018 : is a null value an error or an allowed value?
-							Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
-							if (numValueToSet == null) {
-								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
-							} else {
-								_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, isNewEntity, fieldsInfo)
-							}
-							break
-
-						case Long:
-							Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
-							if (numValueToSet == null) {
-								recordErrorHelper(fieldName, 'Value specified must be an numeric value')
-							} else {
-								_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, isNewEntity, fieldsInfo)
-							}
-							break
-
-						case Date:
-							// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
-							if (valueToSet instanceof CharSequence) {
-								// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
-								if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
-									valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
-								} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
-									valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
-								}
-								// Attempt to parse a Date / Date Time based on the underlying database table column type
-								def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
-								def propConfig = mapping.getPropertyConfig(fieldName)
-								// log.debug '**** propConfig fieldName={}, valueToSet={}, type={}, propConfig={}', fieldName, valueToSet, propConfig.type, propConfig
-							}
-
-							if (! (valueToSet instanceof Date)) {
-								String columnType
-								recordErrorHelper(fieldName, 'Value must be transformed to a Date or in ISO-8601 format')
-							} else {
-								valueToSet.clearTime()
-								_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-							}
-							break
-
-						case Enum:
-							try {
-								def enumValue=null
-
-								if (valueToSet != null) {
-									if (valueToSet instanceof CharSequence) {
-										enumValue = fieldClassType.valueOf(valueToSet.toString())
-									} else if (valueToSet.getClass().getName() == fieldClassType.getName()) {
-										enumValue = valueToSet
-									}
-								}
-								_recordChangeOnField(domain, fieldName, enumValue, isInitValue, isNewEntity, fieldsInfo)
-							} catch (e) {
-								recordErrorHelper(fieldName, 'Unable to validate ENUM value')
-							}
-							break
-
-						case Double:
-							_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, isNewEntity, fieldsInfo)
-							break
-
-						default:
-							log.debug 'bindFieldsInfoValuesToEntity() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
-							recordErrorHelper(fieldName, "Import process unable to support setting type ${fieldClassType.getName()}")
-					}
-				} catch (e) {
-					log.error ExceptionUtil.stackTraceToString('Error while setting property', e)
-					recordErrorHelper(fieldName, 'Error while setting property - ' + e.message)
+				errMsg = setNonReferenceField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+				if (errMsg) {
+					recordErrorHelper(fieldName, errMsg)
 				}
-				// println "_recordChangeOnField() noErrorsEncountered=$noErrorsEncountered, ${c++}"
 			}
 		}
-
 		log.debug 'bindFieldsInfoValuesToEntity() dirty fields {}', domain.dirtyPropertyNames
-		// println "bindFieldsInfoValuesToEntity() dirty fields ${domain.dirtyPropertyNames}, noErrorsEncountered ${noErrorsEncountered}"
-
 		return noErrorsEncountered
 	}
 
 	/**
-	 * Used to determine if there is a whenNotFoundCreate data structure for a given property in the ETL meta-data
+	 * Used to assign values to domain fields for non-reference field types (aka Java types). When the fieldsInfo map is
+	 * included then any changed field will get recorded.
+	 *
+	 * @param domainInstance - the domain entity to save values to
+	 * @param fieldName - the field to update
+	 * @param newValue - the value to save
+	 * @param isInitValue - flag if the value being set is an initialize only value
+	 * @param fieldsInfo - the JSON data from the import batch record
+	 * @return a String containing an error that occurred otherwise null
+	 */
+	@Transactional(noRollbackFor=[Exception])
+	String setNonReferenceField(Object domain, String fieldName, Object valueToSet, Boolean isInitValue=false, Map fieldsInfo=null) {
+		String errorMsg
+		Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
+		log.debug 'setNonReferenceField() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+		try {
+			switch (fieldClassType) {
+				case String:
+					_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+					break
+
+				case Integer:
+					// TODO : JPM 7/2018 : is a null value an error or an allowed value?
+					Integer numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toInteger(valueToSet))
+					if (numValueToSet == null) {
+						errorMsg = 'Value specified must be a numeric value'
+					} else {
+						_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, fieldsInfo)
+					}
+					break
+
+				case Long:
+					Long numValueToSet = (NumberUtil.isaNumber(valueToSet) ? valueToSet : NumberUtil.toLong(valueToSet))
+					if (numValueToSet == null) {
+						errorMsg = 'Value specified must be an numeric value'
+					} else {
+						_recordChangeOnField(domain, fieldName, numValueToSet, isInitValue, fieldsInfo)
+					}
+					break
+
+				case Boolean:
+					Boolean boolVal = StringUtil.toBoolean(valueToSet)
+					_recordChangeOnField(domain, fieldName, boolVal, isInitValue, fieldsInfo)
+					break
+
+				case Date:
+					// TODO : JPM 7/2018 : Check the database type to see if the type is Date or Datetime and clearTime if the former, parse accordingly too
+					if (valueToSet instanceof CharSequence) {
+						try {
+							// If it is a String and is an ISO8601 Date or DateTime format then we can attempt to parse it for them
+							if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ) {
+								valueToSet = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME_6, valueToSet, TimeUtil.FORMAT_DATE_TIME_6)
+							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$/ ) {
+								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+							} else if (valueToSet =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/ ) {
+								valueToSet = TimeUtil.parseDateTime(valueToSet, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
+							}
+						} catch (e) {
+							errorMsg = 'Error parsing date: ' + e.message
+							break
+						}
+					}
+
+					if (! (valueToSet instanceof Date)) {
+						String columnType
+						errorMsg = 'Value must be a Date or in ISO-8601 format (yyyy-MM-dd | yyyy-MM-ddTHH:mm:ssZ)'
+					} else {
+						// Attempt to parse a Date / DateTime based on the underlying database table column type
+						// def mapping = GormUtil.getDomainBinderMapping(domain.getClass())
+						// def propConfig = mapping.getPropertyConfig(fieldName)
+						// valueToSet.clearTime()
+						_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+					}
+					break
+
+				case Enum:
+					try {
+						def enumValue=null
+
+						if (valueToSet != null) {
+							if (valueToSet instanceof CharSequence) {
+								enumValue = fieldClassType.valueOf(valueToSet.toString())
+							} else if (valueToSet.getClass().getName() == fieldClassType.getName()) {
+								enumValue = valueToSet
+							}
+						}
+						_recordChangeOnField(domain, fieldName, enumValue, isInitValue, fieldsInfo)
+					} catch (e) {
+						errorMsg = 'Unable to determine ENUM value'
+					}
+					break
+
+				case Double:
+					if ((valueToSet instanceof CharSequence)) {
+						valueToSet = NumberUtil.toDouble(valueToSet)
+						if (valueToSet == null) {
+							errorMsg = 'Unable to convert value to Double'
+							break
+						}
+					}
+					_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+					break
+
+				default:
+					log.debug 'setNonReferenceField() processing {}, type={}, value={}', fieldName, fieldClassType.getName(), valueToSet
+					errorMsg = "Unsupported data type ${fieldClassType.getName()}"
+			}
+		} catch (e) {
+			log.error ExceptionUtil.stackTraceToString('Error while setting property', e)
+			errorMsg = 'Error while setting property - ' + e.message
+		}
+
+		return errorMsg
+	}
+
+	/**
+	 * Used to determine if there is a 'whenNotFound create' data structure for a given property in the ETL meta-data
 	 * @param fieldName - the fieldname in question
 	 * @param fieldsInfo - the map of all fields in the ETL meta data
 	 * @return true if the field contains the 'create' map and the map contains key/value pairs otherwise false
 	 */
 	Boolean hasWhenNotFoundCreate(fieldName, fieldsInfo) {
-		return fieldsInfo[fieldName].containsKey('create') && fieldsInfo[fieldName].create.size() > 0
+		return fieldsInfo[fieldName].containsKey(WHEN_NOT_FOUND_CREATE_PROPERTY) && fieldsInfo[fieldName][WHEN_NOT_FOUND_CREATE_PROPERTY].size() > 0
 	}
 
 	/**
-	 * Used to actually assign values to the domain being created or updated. Additionally it will record the original value when
-	 * the record pre-existed back into the fieldsInfo to allow for showing what fields actually changed.
-	 *
-	 * The original value will be saved to the 'previousValue' property only if the record is pre-existing.
+	 * Used to determine if there is a 'whenFound update' data structure for a given property in the ETL meta-data
+	 * @param fieldName - the fieldname in question
+	 * @param fieldsInfo - the map of all fields in the ETL meta data
+	 * @return true if the field contains the 'update' map and the map contains key/value pairs otherwise false
+	 */
+	Boolean hasWhenFoundUpdate(fieldName, fieldsInfo) {
+		return fieldsInfo[fieldName].containsKey(WHEN_FOUND_UPDATE_PROPERTY) && fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY].size() > 0
+	}
+
+	/**
+	 * Used to actually assign values to the domain being created or updated. Additionally if the fieldsInfo is
+	 * included then the previousValue will be recorded in fieldsInfo when the field changes on an existing entity.
 	 *
 	 * @param domainInstance - the domain entity to save values to
 	 * @param fieldName - the field to update
 	 * @param newValue - the value to save
-	 * @param isNewEntity - flag if the record is new or existing
-	 * @param fieldsInfo - the JSON data from the import batch record
+	 * @param isInitValue - flag if the value being set is an initialize only value (optional default false)
+	 * @param fieldsInfo - the JSON data from the import batch record (optional)
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	void _recordChangeOnField(
-		Object domainInstance,
-		String fieldName,
-		Object newValue,
-		Boolean isInitValue,
-		Boolean isNewEntity,
-		Map fieldsInfo
-	) {
+	void _recordChangeOnField( Object domainInstance, String fieldName, Object newValue, Boolean isInitValue=false, Map fieldsInfo = null) {
 		Object existingValue = domainInstance[fieldName]
+		Boolean isNewEntity = (! domainInstance.id)
 
-		log.debug '_recordChangeOnField() for domain {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
+		log.debug '_recordChangeOnField() for {}.{} existingValue={}, newValue={}, isNewRecord={}, isInitValue={}',
 			domainInstance.getClass().getName(), fieldName, existingValue, newValue, isNewEntity, isInitValue
 
 		if ( !isInitValue || (isInitValue && existingValue == null)) {
@@ -1229,38 +1289,18 @@ class DataImportService implements ServiceMethods {
 				isMatch = existingValue == newValue
 			}
 			if (! isMatch) {
-				log.debug '_recordChangeOnField() changed field {} to {}', fieldName, newValue
+				log.debug "_recordChangeOnField() changed field {} = '{}'", fieldName, newValue
 				domainInstance[fieldName] = newValue
-				log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
 				if (! isNewEntity) {
-					fieldsInfo[fieldName].previousValue = existingValue.toString()
+					log.debug '_recordChangeOnField() dirtyPropertyNames={}', domainInstance.dirtyPropertyNames
+				}
+
+				// Record the change on the fieldsInfo if it was passed in
+				if (fieldsInfo && ! isNewEntity) {
+					fieldsInfo[fieldName][PREVIOUS_VALUE_PROPERTY] = existingValue.toString()
 				}
 			}
 		}
-	}
-
-	/**
-	 * Used to swap around the order of properties when processing fields
-	 * For some functionality the order of the fields will be critial that one or more are done ahead of others such
-	 * as Manufacturer and Model.
-	 * @param fieldNames - a set of the field names to reorder
-	 * @return the reordered list
-	 */
-	@Transactional(noRollbackFor=[Exception])
-	private List fixOrderInWhichToProcessFields(Set fieldNames) {
-		List list = fieldNames.toList()
-		// TODO : JPM 4/2018 : Disabled this functionality until I can figure out why the Set order is screwed up.
-		/*
- 		int indexOfMfg = list.indexOf('manufacturer')
-		int indexOfModel = list.indexOf('model')
-		if (indexOfMfg && indexOfModel && indexOfMfg > indexOfModel) {
-			log.debug 'fixOrderInWhichToProcessFields found mfg in {} and model in {}', indexOfMfg, indexOfModel
-			// Need to swap the two around
-			list[indexOfMfg] = 'model'
-			list[indexOfModel] = 'manufacturer'
-		}
-		*/
-		return list
 	}
 
 	/**
@@ -1356,92 +1396,59 @@ class DataImportService implements ServiceMethods {
 	 * Used to create a reference entity and populate it with the name/value pairs from the whenNotFound data structure. If any
 	 * errors occurred while setting up the new entity one or more errors will be recorded against the reference property field.
 	 *
-	 * @param propertyName - the property of the reference object
+	 * @param referenceFieldName - the field name of the reference object in the primary entity
 	 * @param fieldsInfo - the ETL meta data for the current row
 	 * @param context - the context containing all the goodies for the process
 	 * @return the newly minted domain object or null if an error occurred
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	Object createReferenceEntityForWhenNotFoundCreate(String propertyName, Map fieldsInfo, Map context) {
+	Object createReferenceEntityFromWhenNotFound(String referenceFieldName, Map fieldsInfo, Map context) {
 		Object entity
-		List<String> errorMsg = []
-		Map createInfo
-		String errMsg
+		List<String> errorMsgs = []
 
-		log.debug 'createReferenceEntityForWhenNotFoundCreate() CREATING reference entity for property {}', propertyName
+		log.debug 'createReferenceEntityFromWhenNotFound() CREATING reference entity for property {}', referenceFieldName
 
-		while (true) {
-			if (!fieldsInfo.containsKey(propertyName)) {
-				errorMsg << "Property $propertyName was missing from ETL meta-data"
-				break
-			}
+		// Do some initial validation
+		if (!fieldsInfo.containsKey(referenceFieldName)) {
+			errorMsgs << "Property $referenceFieldName was missing from ETL meta-data"
+		} else {
+			Map referenceField = fieldsInfo[referenceFieldName]
+			Map fieldsValueMap = referenceField[WHEN_NOT_FOUND_CREATE_PROPERTY]
+			if (! fieldsValueMap) {
+				errorMsgs << "Missing 'whenNotFound create' to create new entity"
+			} else {
 
-			createInfo = fieldsInfo[propertyName].create
-			if (! createInfo) {
-				errorMsg << "Missing necessary 'whenNotFound create' information to create new asset"
-				break
-			}
+				// Determine the class to be created (AssetEntity can be tricking due to the inheritance)
+				Class domainClassToCreate
+				String errMsg
+				(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(referenceFieldName, fieldsInfo, context.domainClass)
+				if (errMsg) {
+					errorMsgs << errMsg
+				} else {
 
-			Class domainClassToCreate
-			(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(propertyName, fieldsInfo, context.domainClass)
-			if (errMsg) {
-				errorMsg << errMsg
-				break
-			}
+					// Create the domain and set any of the require properties that are required
+					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
+					fieldsValueMap.each { fieldName, value ->
+						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+						if (errMsg) {
+							errorMsgs << errMsg
+						}
+					}
 
-			log.debug "createReferenceEntityForWhenNotFoundCreate() creating for class {}", domainClassToCreate.getName()
-			if (domainClassToCreate in AssetEntity) {
-				// For Asset classes due to inheritence we need to determine which class that the user intended by looking
-				// at the initial find statement, which we will assume is the class that they really want. If they specified
-				// Asset then that will be an issue since that is ambiguous and will error
-				if (! fieldsInfo[propertyName].containsKey('find') ||
-					! fieldsInfo[propertyName].find.containsKey('query') ||
-					! (fieldsInfo[propertyName].find.query.size() > 0))
-				{
-					errorMsg << "The whenNotFound '$propertyName' create statement - requires that an associated find command preceeded it"
+					// Attempt to save this sucker
+					if (errorMsgs.size() == 0) {
+						if (! entity.save(flush:true, failOnError:false)) {
+							errorMsgs << GormUtil.allErrorsString(entity)
+						}
+					}
 				}
-				String intendedDomainName = fieldsInfo[propertyName].find?.query[0].domain
-				log.debug "domainClassToCreate() intendedDomainName is {}", intendedDomainName
-				if (intendedDomainName == 'Asset') {
-					errorMsg << "The whenNotFound '$propertyName' create command - requires that an associated find command has an explicit asset domain name"
-					break
-				}
-				// Get the class of the domain specified in find of the ETL script
-				domainClassToCreate = ETLDomain.lookup(intendedDomainName)?.getClazz()
-			}
-			if (domainClassToCreate == null) {
-				errorMsg << "Unable to determine class for property $propertyName"
-				break
-			}
-
-			// Actually create the domain and set any of the require properties that are required
-			entity = createEntity(domainClassToCreate, fieldsInfo, context)
-			if (!entity) {
-				break
-			}
-
-			List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
-			for (fieldName in fieldNames) {
-				String failureMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
-				if (failureMsg) {
-					errorMsg << failureMsg
-				}
-			}
-
-			break
-		}
-
-		// Attempt to save this sucker
-		if (errorMsg.size() == 0) {
-			if (! entity.save(flush:true, failOnError:false)) {
-				errorMsg << GormUtil.allErrorsString(entity)
 			}
 		}
 
 		// If there were any errors then record them and cleanup
-		if (errorMsg.size() > 0) {
-			for (String msg in errorMsg) {
-				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, msg)
+		if (errorMsgs.size() > 0) {
+			for (String msg in errorMsgs) {
+				addErrorToFieldsInfoOrRecord(referenceFieldName, fieldsInfo, context, msg)
 			}
 
 			if (entity) {
@@ -1449,57 +1456,104 @@ class DataImportService implements ServiceMethods {
 				entity.discard()
 				entity = null
 			}
-		} else {
 		}
 
 		return entity
 	}
 
 	/**
-	 * Used to set a property onto a domain object
-	 * @param domain - the domain entity to be manipulated
-	 * @param propertyName - the property to be set
-	 * @param value - the value to set onto the domain object
-	 * @param parentPropertyName - the property name of the parent property that the domain will be assigned to
+	 * Used to update a reference entity with values from the 'whenFound update' ETL command. This will set each of
+	 * the fields that were specified in the command. If there are any errors then the changes will rollback and
+	 * the error message(s) returned.
+	 *
+	 * @param entity - the reference entity
+	 * @param fieldsValueMap - the map of field namess and values
+	 * @param context - the context containing all the goodies for the process
+	 * @return a list of any errors that were encountered
+	 */
+	@Transactional(noRollbackFor=[Exception])
+	List<String> updateReferenceEntityFromWhenFound(Object entity, Map fieldsValueMap, Map context) {
+		List<String> errMsgs = []
+
+		log.debug 'updateReferenceEntityFromWhenFound() UPDATING reference entity {} {} with {}',
+			entity.getClass().getName(), entity, fieldsValueMap
+
+		// Get the list of all the fields to be set from the create section of the fieldsInfo of the referenceField
+		fieldsValueMap.each { fieldName, value ->
+			failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+			if (failureMsg) {
+				errMsgs << failureMsg
+			}
+		}
+
+		// Attempt to save this sucker
+		if (errMsgs.size() == 0) {
+			if (! entity.save(flush:true, failOnError:false)) {
+				errMsgs << GormUtil.allErrorsString(entity)
+			}
+		}
+
+		// If there were any errors then record them and cleanup
+		if (errMsgs.size() > 0) {
+			// Discard this new entity that errored while attempting to process
+			entity.discard()
+			log.debug 'updateReferenceEntityFromWhenFound() encountered errors: {}', errMsgs
+		}
+
+		return errMsgs
+	}
+
+	/**
+	 * Used to set a property on a domain entity for the whenNotFound create/whenFound update commands
+	 * @param entity - the domain entity to be manipulated
+	 * @param fieldName - the field to be set
+	 * @param fieldsValueMap - a map consistenting of the values that each of the fields will be set to
 	 * @param context - the grand poopa of objects for the Import Process
 	 * @return null if successful otherwise a string containing the error message that occurred
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	private String setDomainPropertyWithValue(Object domainInstance, String propertyName, Object value, String parentPropertyName, Map fieldsInfo, Map context) {
+	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context) {
 		String errorMsg = null
+		log.debug 'setDomainPropertyWithValue() called with {}.{}',
+			entity.getClass().getName(), fieldName
+
 		while (true) {
 			// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
-			if ( (propertyName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
-				// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
-				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
+			if ( (fieldName in PROPERTIES_THAT_CANNOT_BE_MODIFIED) ) {
+				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:fieldName])
 				break
 			} else {
-				if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {
-					// TODO : JPM 6/2018 : Error message to specific - not only for whenNotFound
-					errorMsg = "Unknown field ${propertyName} in 'whenNotFound create' statement"
+				if (! GormUtil.isDomainProperty(entity, fieldName)) {
+					errorMsg = "Unknown field name ${fieldName}"
 					break
 				}
 
-				// TODO : JPM 8/2018 : The setDomainPropertyWithValue should use the logic in bindFieldsInfoValuesToEntity by refactoring that method
+				if (GormUtil.isReferenceProperty(entity, fieldName)) {
+					List<Object> entities
 
-				// Check if the field is a reference property
-				if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
-					// TODO : JPM 6/2016 : fix do to parentPropertyName being dropped from method and return value changes
-					Object refObject = findDomainReferenceProperty(domainInstance, propertyName, value, parentPropertyName, fieldsInfo, context)
-					if (refObject instanceof CharSequence) {
-						errorMsg = refObject
-					} else {
-						// Only set if different so as not to trigger the dirty flag unnecessarily
-						if (domainInstance[propertyName] != refObject) {
-							domainInstance[propertyName] = refObject
+					// Attempt to find the reference object
+					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context)
+					if (! errorMsg) {
+						if (entities == null) {
+							errorMsg = "Reference field $fieldName does not support alternate key lookup"
+						} else if (entities.size() > 1) {
+							errorMsg = "Multiple results were found for reference field $fieldName"
+						} else if (entities.size() == 0) {
+							errorMsg = "Unable to find reference for field $fieldName"
 						}
 					}
-				} else {
-					// Just a normal data type (e.g. Date, Integer, String, etc)
-					// TODO : JPM 4/2018 : Need to deal with ENUM and Date being resolved
-					if (domainInstance[propertyName] != value) {
-						domainInstance[propertyName] = value
+					if (errorMsg) {
+						break
 					}
+
+					// Only set if different so as not to trigger the dirty flag unnecessarily
+					if (entity[fieldName] != entities[0]) {
+						entity[fieldName] = entities[0]
+					}
+
+				} else {
+					// Set the non-reference / Java types (e.g. Date, Integer, String, Boolean)
+					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName])
 				}
 			}
 			break

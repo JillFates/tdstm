@@ -167,13 +167,9 @@
                                     <label for="description">Estimated Start:</label>
                                 </td>
 				                <td valign="top" class="value ${hasErrors(bean:moveEventInstance,field:'estStartTime','errors')}">
-				                  <script type="text/javascript">
-				                    $(document).ready(function(){
-				                      $("#estStartTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat()  });
-				                    });
-				                  </script> <input type="text" class="dateRange" size="15" style="width: 210px;" id="estStartTime" name="estStartTime"
-				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" format="12hrs" />" />
-				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
+                                  <input type="text" class="dateRange" size="15" style="width: 210px;" id="kendoEstStartTime"/>
+                                  <input type="hidden" id="estStartTime" name="estStartTime" />
+                                  <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveEventInstance}" as="list" field="estStartTime"/>
 				                    </div>
@@ -195,7 +191,7 @@
                 </div>
 			<div class="buttons">
 				<span class="button">
-					<input class="save" type="submit" value="Save" />
+					<input class="save" type="submit" value="Save"  />
 				</span>
 				<span class="button">
 					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()"/>
@@ -207,6 +203,22 @@
 	currentMenuId = "#eventMenu";
     $(".menu-parent-planning-event-list").addClass('active');
     $(".menu-parent-planning").addClass('active');
+
+
+    $(document).ready(function(){
+		$("#kendoEstStartTime").kendoDateTimePicker({ animation: false, change: onEstStartTimeChange, format:tdsCommon.kendoDateTimeFormat(), value: '<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />'  });
+    	function onEstStartTimeChange() {
+        	if ($('#kendoEstStartTime').data("kendoDateTimePicker")) {
+                var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
+                var dateTZ = '';
+                if (userDateInput !== null) {
+                    dateTZ = tdsCommon.getISOString(userDateInput)
+                }
+                $('#estStartTime').val(dateTZ);
+			}
+        }
+    });
+
 </script>
     </body>
 </html>

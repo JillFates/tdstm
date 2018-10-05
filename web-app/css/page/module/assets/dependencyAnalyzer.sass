@@ -11,7 +11,7 @@ div.content-wrapper
         &.floating
           position: fixed
           top: 0px
-          left: 800px
+          left: 850px
           z-index: 110
           margin-left: 0px
           border: 1px solid green
@@ -28,10 +28,18 @@ div.content-wrapper
       &.fullscreen div#filterOptionsMenuId.open
         left: 366px
         top: 20px
-      
+      &:not(.fullscreen)
+        div#toolsContainerId
+          z-index: auto
+          &.graphPanel
+            z-index: 1
+        div#svgContainerId
+          z-index: auto
+          div#svgTranslatorId
+            z-index: 0
       div#graphToolbarId
         height: 26px
-
+      
       // highlighting dropdown menu styles
       div#filterOptionsMenuId
         z-index: 1
@@ -87,7 +95,20 @@ div.content-wrapper
         height: 0px
         svg.chart
           overflow: visible !important
-    
+      
+      // graph region selection styles
+      .selectionLayer 
+        path
+          stroke: rgb(80,80,255)
+          stroke-width: 3px
+        .selectionPath
+          fill: none
+        .selectionProjection
+          fill: rgb(80,80,255)
+          fill-opacity: 0.2
+          stroke-width: 2px
+          stroke-dasharray: 4,4
+
     .containsSpinner
       background-image: url(../images/spinner.gif)
       background-position: center

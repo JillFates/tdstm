@@ -48,6 +48,8 @@ import {TDSCheckboxComponent} from './tds-checkbox/tds-checkbox.component';
 import {ManufacturerShowComponent} from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ManufacturerEditComponent} from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import {ModelDeviceShowComponent} from './components/device/model-device/components/model-device-show/model-device-show.component';
+import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
+import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 
 @NgModule({
 	imports: [
@@ -75,6 +77,7 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 		AssetExplorerViewShowComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
@@ -85,7 +88,9 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 		TDSCheckboxComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
-		ManufacturerEditComponent
+		ManufacturerEditComponent,
+		AssetCloneComponent,
+		PopupAssetMessageComponent
 	],
 	providers: [
 		// Resolve
@@ -110,6 +115,7 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
 		AssetEditComponent,
+		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
 		TaskDetailComponent,
@@ -119,7 +125,8 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 		TDSCheckboxComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
-		ModelDeviceShowComponent
+		ModelDeviceShowComponent,
+		AssetCloneComponent
 	],
 })
 

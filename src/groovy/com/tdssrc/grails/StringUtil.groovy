@@ -325,20 +325,27 @@ class StringUtil {
 	}
 
 	/**
-	 * Compare various string values as boolean
-	 * @param str - the string to compare
+	 * Compare various String, numeric and boolean values and returns Boolean or null if undeterminable
+	 * @param value - the value to compare
 	 * @return true/false if it matches either list otherwize null for undeterminable
 	 */
-	static Boolean toBoolean(String str) {
-		if (str) {
-			String match = str.toLowerCase()
+	static Boolean toBoolean(Object value) {
+		if (value == null) {
+			return null
+		} else if (value instanceof Boolean) {
+			return value
+		} else if (value instanceof CharSequence) {
+			String match = value.toLowerCase()
 			if (trueList.contains(match)) {
 				return true
 			}
 			if (falseList.contains(match)) {
 				return false
  			}
- 		}
+		} else if  (NumberUtil.isaNumber(value)) {
+			return value == 0 ? false : true
+		}
+		return null
 	}
 
 	/**

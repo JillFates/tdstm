@@ -133,6 +133,8 @@ class UrlMappings {
 			mode = 'edit'
 		}
 
+		"/ws/asset/createTemplate/$domainName" (controller:'wsAsset', action:'getCreateTemplate', method:'GET')
+
 		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
 			mode = 'show'
 		}
@@ -140,6 +142,8 @@ class UrlMappings {
 		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
 			mode = 'edit'
 		}
+
+		"/ws/asset/defaultCreateModel" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"

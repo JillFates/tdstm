@@ -61,6 +61,20 @@ export class AssetCommonEdit implements OnInit {
 	}
 
 	/**
+	 * Used on Create Asset view.
+	 * Creates the tag associations if configured.
+	 */
+	protected createTags(assetId: number): void {
+		let tagsToAdd = {tags: []};
+		if (this.newAssetTagsSelection.tags && this.newAssetTagsSelection.tags.length > 0) {
+			tagsToAdd = this.newAssetTagsSelection;
+		}
+		this.tagService.createAssetTags(assetId, tagsToAdd.tags.map( item => item.id)).subscribe( result => {
+			this.showAssetDetailView(this.model.asset.assetClass.name, assetId);
+		}, error => console.error('Error while saving asset tags', error));
+	}
+
+	/**
 	 * Save Asset Tags configuration
 	 */
 	protected saveAssetTags(): void {
@@ -93,7 +107,7 @@ export class AssetCommonEdit implements OnInit {
 		this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-			DIALOG_SIZE.XLG);
+			DIALOG_SIZE.LG);
 	}
 
 	/***
@@ -135,5 +149,28 @@ export class AssetCommonEdit implements OnInit {
 		}
 
 		this.cancelCloseDialog();
+	}
+
+	/**
+	 allows to delete the application assets
+	 */
+	deleteAsset(assetId) {
+
+		this.promptService.open('Confirmation Required',
+			'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+			'OK', 'Cancel')
+			.then( success => {
+				if (success) {
+					this.assetExplorerService.deleteAssets([assetId]).subscribe( res => {
+						if (res) {
+							this.notifierService.broadcast({
+								name: 'reloadCurrentAssetList'
+							});
+							this.activeDialog.dismiss();
+						}
+					}, (error) => console.log(error));
+				}
+			})
+			.catch((error) => console.log(error));
 	}
 }

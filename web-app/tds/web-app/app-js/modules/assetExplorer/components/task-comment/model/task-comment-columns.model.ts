@@ -3,7 +3,7 @@ import {GridColumnModel} from '../../../../../shared/model/data-list-grid.model'
 /**
  * Defines the columns
  */
-export class TaskCommentColumnsModel {
+export class TaskColumnsModel {
 	columns: Array<GridColumnModel>;
 
 	constructor() {
@@ -12,7 +12,7 @@ export class TaskCommentColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 70,
+				width: 82,
 				locked: true
 			},
 			{
@@ -22,7 +22,7 @@ export class TaskCommentColumnsModel {
 				width: 70
 			},
 			{
-				label: 'Task/Comment',
+				label: 'Task',
 				property: 'commentInstance.comment',
 				type: 'text',
 				width: 200
@@ -44,6 +44,34 @@ export class TaskCommentColumnsModel {
 				property: 'assignedTo',
 				type: 'text',
 				width: 105
+			}
+		];
+	}
+}
+
+export class CommentColumnsModel {
+	columns: Array<GridColumnModel>;
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 60,
+				locked: true
+			},
+			{
+				label: 'Comment',
+				property: 'commentInstance.comment',
+				type: 'text',
+				width: 330
+			},
+			{
+				label: 'Category',
+				property: 'commentInstance.category',
+				type: 'text',
+				width: 100
 			}
 		];
 	}

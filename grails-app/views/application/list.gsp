@@ -218,7 +218,7 @@
             <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
-			$(".menu-parent-assets-application-list").addClass('active');
+			$($(".menu-parent-assets-application-list")[1]).addClass('active');
 			$(".menu-parent-assets").addClass('active');
 		</script>
 	</body>

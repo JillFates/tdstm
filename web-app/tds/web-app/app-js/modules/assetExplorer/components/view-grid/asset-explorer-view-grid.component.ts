@@ -19,6 +19,11 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
+import {ASSET_ENTITY_MENU} from '../../model/asset-menu.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {AssetCreateComponent} from '../asset/asset-create.component';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -51,6 +56,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	public showMessage = true;
 	public typingTimeout: any;
+	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
+	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -74,7 +81,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private notifier: NotifierService,
-		private dialog: UIDialogService) {
+		private dialog: UIDialogService,
+		private permissionService: PermissionService) {
 
 		this.getPreferences().subscribe((preferences: any) => {
 			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
@@ -253,17 +261,36 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}, 500);
 	}
 
+	/**
+	 * On Show the Dialog for the current selected Asset
+	 * @param data
+	 */
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.XLG, false).then(x => {
+			DIALOG_SIZE.LG, false).then(x => {
 				if (x) {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}
 			}).catch(x => {
 				console.log(x);
 			});
+	}
+
+	/**
+	 *
+	 */
+	protected onCreateAsset(assetEntityType: string): void {
+		this.dialog.open(AssetCreateComponent, [
+				{ provide: 'ASSET', useValue: assetEntityType }],
+			DIALOG_SIZE.LG, false).then(x => {
+			if (x) {
+				this.createDependencyPromise(x.assetClass, 0);
+			}
+		}).catch(x => {
+			console.log(x);
+		});
 	}
 
 	onWidthChange(data: any) {
@@ -287,6 +314,10 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			this.bulkCheckboxService.uncheckItems();
 			this.onReload();
 		}
+	}
+
+	protected canCreateAssets(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	/**
