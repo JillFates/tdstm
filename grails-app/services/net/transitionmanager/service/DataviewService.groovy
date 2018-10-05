@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.Transactional
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -112,6 +113,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
@@ -151,6 +153,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
 		validateDataviewCreateAccessOrException(dataviewJson)
 
@@ -181,6 +184,7 @@ class DataviewService implements ServiceMethods {
 	 * @param id Dataview id to delete
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	void delete(Long id) {
 		Dataview dataview = fetch(id)
 		validateDataviewDeleteAccessOrException(id, dataview)
@@ -469,6 +473,7 @@ class DataviewService implements ServiceMethods {
 	 * Add the given dataview to the current person's favorites.
 	 * @param dataviewId
 	 */
+	@Transactional
 	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
 		Dataview dataview = fetch(dataviewId)
 
