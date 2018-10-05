@@ -10,6 +10,7 @@
     "specs.Admin.Staff.StaffListSpec",
     "specs.Admin.Staff.StaffSearchAndFilteringSpec",
     "specs.Admin.User.UserSearchAndFilteringSpec",
+	"specs.Assets.AllAssets.AddTagsToAssetSpec",
     "specs.Assets.AllAssets.AllAssetsListSelectAllSpec",
     "specs.Assets.AllAssets.AllAssetsListSelectIndeterminateSpec",
     "specs.Assets.AllAssets.AssetExportSpec",

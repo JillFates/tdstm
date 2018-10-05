@@ -18,9 +18,10 @@ class AssetDetailsPage extends Page{
         modalTitle { assetDetailModal.find(".modal-title")}
         editButton { assetDetailModal.find("button span.glyphicon-pencil")}
         closeButton { assetDetailModal.find("button span.glyphicon-ban-circle")}
-
         adModalAssetName {$('td.label.assetName').next()}
         adModalLastUpdated {$(".last-updated")}
+        tags { assetDetailModal.find("span.tag")}
+        commonsModule { module CommonsModule}
     }
 
     def validateDataIsPresent(List rowData, List dataDisplayed){
@@ -51,5 +52,34 @@ class AssetDetailsPage extends Page{
     }
     def getName(){
         adModalAssetName.text()
+    }
+
+    def clickOnEditButton(){
+        waitFor {editButton.click()}
+    }
+
+    def clickOnCloseButton(){
+        waitFor {closeButton.click()}
+    }
+
+    def getTagNames(){
+        def tagsDisplayed = []
+        waitFor(5){tags.size() > 1}
+        tags.each {
+            tagsDisplayed.add it.text()
+        }
+        tagsDisplayed
+    }
+
+    def verifyTagNamesDisplayed(tagsNameList){
+        def tagsDisplayed = getTagNames()
+        def found = false
+        tagsNameList.each { tag ->
+            if (tagsDisplayed.find {it == tag}) {
+                found = true
+            }
+            assert found, "$tag was not found in the tags list"
+        }
+        true // assertion is inside iteration, just prevent this break
     }
 }

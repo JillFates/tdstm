@@ -87,6 +87,10 @@ class ViewPage extends Page{
         waitFor{ links[0].click() }
     }
 
+    def openFirstAssetDisplayed(){
+        waitFor{ assetNames[0].click() }
+    }
+
     /**
      * saves the text of a row in a list so it can be validated later
      * @param rowIndex
