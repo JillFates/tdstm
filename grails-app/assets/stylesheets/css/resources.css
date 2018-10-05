@@ -1,12 +1,12 @@
 /*
-*= require resources/tds-main
-*= require resources/tds
-*= require resources/ui.core
-*= require resources/ui.dialog
-*= require resources/ui.theme
-*= require resources/ui.datetimepicker
-*= require resources/jquery-ui-smoothness
-*= require resources/combox
-*= require resources/select2
-*= require resources/jquery-ui-1.10.4.custom.min
+*= require css/resources/tds-main.css
+*= require css/resources/tds.css
+*= require css/resources/ui.core.css
+*= require css/resources/ui.dialog.css
+*= require css/resources/ui.theme.css
+*= require css/resources/ui.datetimepicker.css
+*= require css/resources/jquery-ui-smoothness.css
+*= require css/resources/combox.css
+*= require css/resources/select2.css
+*= require css/resources/jquery-ui-1.10.4.custom.min.css
 */

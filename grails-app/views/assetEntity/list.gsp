@@ -28,8 +28,7 @@
 		<asset:stylesheet href="css/ui.slider.css" />
 		<asset:stylesheet href="css/ui.tabs.css" />
 		<asset:stylesheet href="css/ui.datepicker.css" />
-		<asset:stylesheet href="css/resources/ui.datetimepicker.css"/>
-		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
 			$(document).on('entityAssetUpdated',function (e,obj) {
@@ -147,6 +146,7 @@
 						{afterSubmit:deleteMessage});
 				});
 
+				<%-- Add the Column Selector arrow to the customizable columns --%>
 				<g:each var="key" in="${assetPref.keySet().toList()}">
 					$("#assetListIdGrid_${assetPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${assetPref[key]}\\\',\\\'assetList\\\',\\\'${key}\\\')" />');
 				</g:each>

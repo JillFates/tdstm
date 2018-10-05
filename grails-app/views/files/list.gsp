@@ -98,9 +98,9 @@
 
 				populateFilter();
 
-				<g:each var="key" in="['1','2','3','4','5']">
-					var filePref= '${filesPref[key]}';
-					$("#storageIdGrid_"+filePref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${filePref}\',\'storage\',\'${key}\');" />');
+				<%-- Add the Column Selector arrow to the customizable columns --%>
+				<g:each var="key" in="${filesPref.keySet().toList()}">
+					$("#storageIdGrid_${filesPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${filesPref[key]}\\\',\\\'storage\\\',\\\'${key}\\\')" />');
 				</g:each>
 
 				$.jgrid.formatter.integer.thousandsSeparator='';

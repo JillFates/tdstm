@@ -158,10 +158,12 @@
 
 			populateFilter();
 
-			<g:each var="key" in="['1','2','3','4','5']">
-				var taskPref= '${taskPref[key]}';
-				$("#taskListIdGrid_"+taskPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${taskPref}\',\'taskList\',\'${key}\')" />');
+			<%-- Add the Column Selector arrow to the customizable columns --%>
+			<g:each var="key" in="${taskPref.keySet().toList()}">
+				$("#taskListIdGrid_${taskPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${taskPref[key]}\\\',\\\'taskList\\\',\\\'${key}\\\')" />');
 			</g:each>
+
+
 		});
 
 		$.jgrid.formatter.integer.thousandsSeparator='';
@@ -368,7 +370,7 @@
 				<div class="columnDiv_${key} customScroll customizeDiv">
 					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
 					<g:each var="attribute" in="${assetCommentFields}">
-						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
+						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}_${attribute.key}" value="${attribute.key}"
 							${taskPref[key]==attribute.key ? 'checked' : '' }
 							onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Task_Columns}')"
 							/>

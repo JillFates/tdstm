@@ -37,7 +37,7 @@
         <div class="buttons">
             <tds:hasPermission permission="${Permission.CommentCreate}">
                 <a ng-click="createComment()" class="comment-create-button">
-                <asset:image src="icons/comment_add.png" border="0px" style="margin-bottom: -4px;" /> &nbsp;&nbsp;Add Comment
+                    <asset:image src="icons/comment_add.png" border="0px" style="margin-bottom: -4px;" /> &nbsp;&nbsp;Add Comment
                 </a>
             </tds:hasPermission>
         </div>

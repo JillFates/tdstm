@@ -107,9 +107,10 @@
 					{afterSubmit:deleteMessage});
 
 			});
-			<g:each var="key" in="['1','2','3','4','5']">
-				var dbPref= '${dbPref[key]}';
-				$("#databaseIdGrid_"+dbPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${dbPref}\', \'database\',\'${key}\')" />');
+
+			<%-- Add the Column Selector arrow to the customizable columns --%>
+			<g:each var="key" in="${dbPref.keySet().toList()}">
+				$("#databaseIdGrid_${dbPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${dbPref[key]}\\\',\\\'database\\\',\\\'${key}\\\')" />');
 			</g:each>
 
 			$.jgrid.formatter.integer.thousandsSeparator='';

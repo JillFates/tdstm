@@ -5,7 +5,7 @@
 <asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 <!-- LEGACY CODE START -->
-<asset:stylesheet src="resources" />
+<asset:stylesheet src="css/resources.css" />
 
 
 <g:javascript src="prototype/prototype.js" />

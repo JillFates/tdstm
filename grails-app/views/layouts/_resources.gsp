@@ -30,7 +30,7 @@
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir: 'tds/web-app/css/legacy/', file: 'codemirror.css')}"/>
 
-<asset:stylesheet src="angular-support" />
+<asset:stylesheet src="angular-support.css" />
 <asset:javascript src="angular-support" />
 
 <%

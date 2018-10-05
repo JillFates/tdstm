@@ -41,7 +41,7 @@
 def moveEvent = tds.currentMoveEvent() ?: null
 %>
 
-<asset:stylesheet src="resources" />
+<asset:stylesheet src="css/resources.css" />
 <asset:javascript src="resources" />
 
 <!-- Migration Scripts -->

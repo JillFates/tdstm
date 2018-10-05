@@ -120,10 +120,12 @@
 						{afterSubmit:deleteMessage}
 					);
 				});
-				<g:each var="key" in="['1','2','3','4','5']">
-					var appPref = '${appPref[key]}';
-					$("#applicationIdGrid_"+appPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${appPref}\',\'application\',\'${key}\')" />');
+
+				<%-- Add the Column Selector arrow to the customizable columns --%>
+				<g:each var="key" in="${appPref.keySet().toList()}">
+					$("#applicationIdGrid_${appPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${appPref[key]}\\\',\\\'application\\\',\\\'${key}\\\')" />');
 				</g:each>
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 
 			function myLinkFormatter (cellvalue, options, rowObject) {
@@ -134,11 +136,11 @@
 			function myCustomFormatter (cellVal, options, rowObject) {
 				var actionButton = '';
 				if (${hasPerm}) { // Valid what? what does it means hasPerm, perm on what?
-                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'
-						+ "<asset:image src="icons/database_edit.png" border="0px" /></a>&nbsp;&nbsp;';
+                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>' +
+						'<asset:image src="icons/database_edit.png" border="0px" /></a>&nbsp;&nbsp;';
 				}
-                actionButton += "<grid-buttons asset-id='" + options.rowId
-					+ "' asset-type='" + rowObject[8] +
+                actionButton += "<grid-buttons asset-id='" + options.rowId +
+					"' asset-type='" + rowObject[8] +
 					"' tasks='" + rowObject[7] + "' comments='" + rowObject[10] +
                     "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} +
                     "' can-create-tasks='" + ${canCreateTasks} + "' can-create-comments='" + ${canCreateComments} + "'>" +
@@ -146,9 +148,9 @@
 
 				<tds:hasPermission permission="${Permission.AssetCreate}">
 					var value = rowObject[1] ? _.escape(rowObject[1]) : '';
-					actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \''
-						+ value + '\', '+options.rowId+');" title=\'Clone Asset\'>'
-						+ '<asset:image src="icons/database_copy.png" border="0px" /></a>';
+					actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' +
+						value + '\', '+options.rowId+');" title=\'Clone Asset\'>' +
+						'<asset:image src="icons/database_copy.png" border="0px" /></a>';
                 </tds:hasPermission>
 
 				return actionButton;
