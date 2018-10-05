@@ -24,7 +24,7 @@ export class ComponentCreatorService {
 	}
 
 	/**
-	 * Create the component leting you access its methods and variables
+	 * Create the component letting you access its methods and variables
 	 * @param component ComponentType
 	 * @param params properties to be inject in the component creation
 	 */

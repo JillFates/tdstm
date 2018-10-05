@@ -42,8 +42,7 @@ module.exports = function (env) {
 				'process.env.NODE_ENV': '"production"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map',
-				exclude: ['vendor.js', 'polyfills.js'],
+				filename: '[name].js.map'
 			}),
 			new webpack.ContextReplacementPlugin(
 				/\@angular(\\|\/)core(\\|\/)esm5/,

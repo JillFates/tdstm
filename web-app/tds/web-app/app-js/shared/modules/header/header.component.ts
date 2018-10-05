@@ -76,9 +76,10 @@ export class HeaderComponent {
 				this.selectTopMenuSections();
 			}
 		});
-		this.notifierService.on('notificationDocumentTitleChange', event => {
+		this.notifierService.on('notificationHeaderTitleChange', event => {
 			// Set Title
 			this.titleService.setTitle(event.title);
+			this.pageMetaData.title = event.title;
 		});
 	}
 

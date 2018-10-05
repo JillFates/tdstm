@@ -42,8 +42,6 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private notifier: NotifierService) {
-			// @Inject('report') report: Observable<ViewModel>
-			// @Inject('fields') fields: Observable<DomainModel[]>
 			// @Inject('tagList') tagList: Observable<Array<TagModel>>
 			// tagList.subscribe( result => this.metadata.tagList = result);
 		this.fields = this.route.snapshot.data['fields'];
@@ -54,7 +52,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.notifier.broadcast({
-			name: 'notificationDocumentTitleChange',
+			name: 'notificationHeaderTitleChange',
 			title: this.model.name
 		});
 

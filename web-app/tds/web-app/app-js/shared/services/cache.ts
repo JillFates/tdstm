@@ -1,10 +1,8 @@
-import {
-	Observable,
-	Observer,
-	ReplaySubject,
-	Scheduler,
-	Subscription
-} from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import { Scheduler } from 'rxjs/Scheduler';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { Observer } from 'rxjs/Observer';
+import { Subscription } from 'rxjs/Subscription';
 
 export function cache<T>(
 	bufferSize: number = Number.POSITIVE_INFINITY,
