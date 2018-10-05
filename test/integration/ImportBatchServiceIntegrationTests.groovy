@@ -23,11 +23,18 @@ class ImportBatchServiceIntegrationTests extends Specification {
 
 	def "test update batch record"() {
 		setup: 'Create an Import batch and a record'
+
+			String field1 = 'field1'
+			String field1Value = 'some value'
+
 			Project project = projectTestHelper.createProject()
 			ImportBatch batch = importBatchTestHelper.createBatch(project, ETLDomain.Application)
 			ImportBatchRecord record = importBatchTestHelper.createImportBatchRecord(batch)
-			String field1 = 'field1'
-			String field1Value = 'some value'
+			importBatchTestHelper.setFields(record, [
+					  (field1): 'old value'
+			])
+
+
 			ImportBatchRecordUpdateCommand cmd = new ImportBatchRecordUpdateCommand()
 			Map newValues = [fieldName: field1, value: field1Value]
 			cmd.fieldsInfo = [newValues]

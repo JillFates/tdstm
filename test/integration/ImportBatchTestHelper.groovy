@@ -1,5 +1,6 @@
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
@@ -16,8 +17,7 @@ class ImportBatchTestHelper {
 	ImportBatch createBatch(Project project, ETLDomain domainClass) {
 		ImportBatch importBatch = new ImportBatch(
 			project: project,
-			domainClassName: domainClass,
-		   // fieldNameList: '["field1"]'
+			domainClassName: domainClass
 		)
 		importBatch.save(flush: true, failOnError: true)
 		return importBatch
@@ -33,10 +33,36 @@ class ImportBatchTestHelper {
 			importBatch: importBatch,
 			operation: ImportOperationEnum.INSERT,
 			errorList: '[]',
-		   fieldsInfo: '[]'
-		   // fieldsInfo: '{"field1":{"value":"old value"}}'
+		   fieldsInfo: '{}'
 		)
 		record.save(flush: true, failOnError: true)
 		return record
+	}
+
+	/**
+	 * set Fields for an existing importBatch when testing
+	 * @param importBatchRecord
+	 * @param fields
+	 */
+	void setFields(ImportBatchRecord importBatchRecord, Map <String, ?> fields) {
+		ImportBatch importBatch =  importBatchRecord.importBatch
+		String arrayValues = fields.keySet().collect {
+			'"' + it + '"'
+		}.join(',')
+
+		importBatch.fieldNameList = "[$arrayValues]"
+		importBatch.save(flush: true, failOnError: true)
+
+
+		Map fieldsInfo = fields.collectEntries { k, v ->
+			[
+					  (k): [
+								 value: v
+					  ]
+			]
+		}
+
+		importBatchRecord.fieldsInfo = JsonUtil.convertMapToJsonString(fieldsInfo)
+		importBatchRecord.save(flush: true, failOnError: true)
 	}
 }
