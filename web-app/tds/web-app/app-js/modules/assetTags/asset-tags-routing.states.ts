@@ -2,7 +2,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Services
-import {ModuleResolverService} from '../assetExplorer/service/module.resolver.service';
+import {ModuleResolverService} from './service/module.resolver.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {TagListComponent} from './components/tag-list/tag-list.component';
@@ -17,7 +17,6 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-projects';
  * @classdesc To use externally to reference possible state of the Asset Tag Module
  */
 export class AssetTagsRouteStates {
-	public static readonly PARENT = 'tag';
 	public static readonly TAG_LIST = {
 		url: 'list'
 	};

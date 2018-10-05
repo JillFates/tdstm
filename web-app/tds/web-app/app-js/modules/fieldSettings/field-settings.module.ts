@@ -20,6 +20,7 @@ import {SelectListConfigurationPopupComponent} from './components/select-list/se
 import {FieldSettingsImportanceComponent} from './components/imp/field-settings-imp.component';
 
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import {FieldSettingsService} from './service/field-settings.service';
 import {CustomDomainService} from './service/custom-domain.service';
 
@@ -45,7 +46,10 @@ import {CustomDomainService} from './service/custom-domain.service';
 		FieldSettingsImportanceComponent,
 		MinMaxConfigurationPopupComponent
 	],
-	providers: [FieldSettingsService, CustomDomainService],
+	providers: [
+		ModuleResolverService,
+		FieldSettingsService,
+		CustomDomainService],
 	exports: [
 		SelectListConfigurationPopupComponent,
 		FieldSettingsImportanceComponent,

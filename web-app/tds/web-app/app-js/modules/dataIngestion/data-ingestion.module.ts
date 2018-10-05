@@ -33,6 +33,7 @@ import {CredentialListComponent} from './components/credential-list/credential-l
 import {CredentialViewEditComponent} from './components/credential-view-edit/credential-view-edit.component';
 import {PopupValidateExpressionComponent} from './components/popups/popup-validate-expression.component';
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import {DataIngestionService} from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
@@ -77,7 +78,9 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		CredentialListComponent,
 		CredentialViewEditComponent
 	],
-	providers: [DataIngestionService,
+	providers: [
+		ModuleResolverService,
+		DataIngestionService,
 		ImportAssetsService, {
 		provide: HTTP_INTERCEPTORS,
 		useClass: KendoFileUploadInterceptor,

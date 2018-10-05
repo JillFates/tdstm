@@ -11,6 +11,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Route Module
 import {AssetTagsRouteModule} from './asset-tags-routing.states';
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import {TagService} from './service/tag.service';
 // Components
 import {TagListComponent} from './components/tag-list/tag-list.component';
@@ -34,6 +35,7 @@ import {TagMergeDialogComponent} from './components/tag-merge/tag-merge-dialog.c
 		TagMergeDialogComponent
 	],
 	providers: [
+		ModuleResolverService,
 		TagService
 	],
 	exports: [

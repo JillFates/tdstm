@@ -15,6 +15,7 @@ import {LayoutModule} from '@progress/kendo-angular-layout';
 // Route Module
 import {ImportBatchRouteModule} from './import-batch-routing.states';
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import {ImportAssetsService} from './service/import-assets.service';
 // Components
 import {ImportBatchRecordSummaryComponent} from './components/record/import-batch-record-summary.component';
@@ -49,6 +50,7 @@ import {ImportAssetsComponent} from './components/import-assets/import-assets.co
 		ImportAssetsComponent
 	],
 	providers: [
+		ModuleResolverService,
 		ImportBatchService,
 		ImportAssetsService,
 		{
