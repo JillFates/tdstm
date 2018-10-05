@@ -14,6 +14,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 // Route Module
 import {AssetExplorerRouteModule} from './asset-explorer-routing.states';
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
@@ -88,6 +89,7 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 	],
 	providers: [
 		// Resolve
+		ModuleResolverService,
 		FieldsResolveService,
 		ReportResolveService,
 		ReportsResolveService,

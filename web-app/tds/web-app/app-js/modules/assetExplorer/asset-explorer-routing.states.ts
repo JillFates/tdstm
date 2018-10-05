@@ -2,6 +2,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Services
+import {ModuleResolverService} from './service/module.resolver.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {AssetExplorerService} from './service/asset-explorer.service';
 import {PreferenceService} from '../../shared/services/preference.service';
@@ -86,7 +87,7 @@ export const AssetExplorerRoute: Routes = [
 				resolveFn: (service: AssetExplorerService) => service.getReports()
 			}
 		],
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_CREATE.url,
@@ -117,7 +118,7 @@ export const AssetExplorerRoute: Routes = [
 		// 	resolveTagList
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_EDIT.url,
@@ -150,7 +151,7 @@ export const AssetExplorerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_SHOW.url,
@@ -171,7 +172,7 @@ export const AssetExplorerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	}
 ];
 

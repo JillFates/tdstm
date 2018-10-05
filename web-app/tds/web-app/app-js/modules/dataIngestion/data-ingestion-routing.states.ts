@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Services
 import {DataIngestionService} from './service/data-ingestion.service';
+import {ModuleResolverService} from './service/module.resolver.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
@@ -46,7 +47,7 @@ export const DataIngestionRoute: Routes = [
 				resolveFn: (service: DataIngestionService) => service.getDataScripts()
 			}
 		],
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	// TODO: SPLIT INTO PROVIDER MODULE ONE
 	{
@@ -68,7 +69,7 @@ export const DataIngestionRoute: Routes = [
 				resolveFn: (service: DataIngestionService) => service.getProviders()
 			}
 		],
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	// TODO: SPLIT INTO API ACTIONS MODULE ONE
 	{
@@ -90,7 +91,7 @@ export const DataIngestionRoute: Routes = [
 				resolveFn: (service: DataIngestionService) => service.getAPIActions()
 			}
 		],
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	},
 	// TODO: SPLIT INTO CREDENTIALS MODULE ONE
 	{
@@ -112,7 +113,7 @@ export const DataIngestionRoute: Routes = [
 				resolveFn: (service: DataIngestionService) => service.getCredentials()
 			}
 		],
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolverService]
 	}
 ];
 
