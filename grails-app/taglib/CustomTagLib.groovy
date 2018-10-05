@@ -4,7 +4,6 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
-import grails.util.Holders
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -23,8 +22,6 @@ import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.LicenseAdminService
 
 import asset.pipeline.grails.AssetProcessorService
-// import asset.pipeline.grails.AssetResourceLocator
-// import org.springframework.core.io.Resource
 import java.sql.Timestamp
 import java.text.DateFormat
 
@@ -43,7 +40,6 @@ class CustomTagLib implements InitializingBean {
 	                              'startPage', 'timeZone', 'userLogin']
 
 	AssetProcessorService assetProcessorService
-	// AssetResourceLocator assetResourceLocator
 
 	LinkGenerator grailsLinkGenerator
 	SecurityService securityService
@@ -315,8 +311,7 @@ class CustomTagLib implements InitializingBean {
 		long width = NumberUtil.toPositiveLong(attrs.width, 0)
 		name = name.replaceAll(/\./, "")
 		String filename = "icons/svg/${name}.svg"
-		String url = assetProcessorService.getAssetPath(filename)
-		// String url = assetProcessorService.getResolvedAssetPath(filename)
+		String url = assetProcessorService.asset([file:filename], grailsLinkGenerator)
 
 		if (url) {
 			out << "<svg style='" << (height > 0 ? 'height: ' + height + 'px;' : '') << ' '
