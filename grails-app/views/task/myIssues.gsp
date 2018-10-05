@@ -3,8 +3,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="topNav" />
 	<title>My Tasks</title>
-    <link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+	<asset:stylesheet href="css/qvga.css" />
 	<g:javascript src="keyevent_constants.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />

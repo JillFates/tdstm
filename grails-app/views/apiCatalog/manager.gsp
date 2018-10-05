@@ -5,7 +5,7 @@
 
 	<title>API Dictionaries</title>
 	<link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
+    <asset:stylesheet href="css/codemirror/codemirror.css" />
 	<style type="text/css">
         div#dictionaryView {
             overflow: scroll;

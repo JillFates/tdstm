@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 		<title>Event List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 		<script type="text/javascript">
@@ -16,7 +16,7 @@
 					colModel="{name:'name',index: 'name', width:'300',formatter: linkFormatter},
 						{name:'estStartTime', search:false, formatter: tdsCommon.jqgridDateTimeCellFormatter},
 						{name:'description'},
-						{name:'newsBarMode'}, 
+						{name:'newsBarMode'},
 						{name:'runbookStatus'},
 						{name:'moveBundlesString', search:false, sortable:false}"
 					sortname="'name'"
@@ -28,16 +28,16 @@
 					<jqgrid:navigation id="moveEventListId" add="false" edit="false" del="false" search="false" refresh="true" />
 				</jqgrid:grid>
 				TDS.jqGridFilterToolbar('moveEventListId');
-				
+
 			})
-			
+
 			function linkFormatter (cellvalue, options, rowObjcet) {
 				var value = cellvalue ? cellvalue : ''
 				return "<a href="+contextPath+"/moveEvent/show/"+options.rowId+">"+value+"</a>"
 			}
 
 		</script>
-		
+
 	</head>
 	<body>
 		<tds:subHeader title="Event List" crumbs="['Planning','Event', 'List']"/>

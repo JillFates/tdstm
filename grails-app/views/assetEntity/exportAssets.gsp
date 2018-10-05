@@ -3,7 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
     <title>Export Assets</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+	<asset:stylesheet href="css/progressbar.css" />
 	<g:javascript src="import.export.js"/>
 
 	<g:render template="../layouts/responsiveAngularResources" />
@@ -93,7 +93,7 @@
 												<div class="checkbox">
 													<label for="applicationId"><input type="checkbox" id="applicationId" name="application" value="application" onclick="importExportPreference($(this),'ImportApplication')"
 													${prefMap['ImportApplication']=='true' ? 'checked="checked"' :''}/>Application</label>
-												</div>	
+												</div>
 											</li>
 											<li class="list-group-item">
 												<div class="checkbox">

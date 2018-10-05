@@ -5,17 +5,17 @@
 	<meta name="layout" content="projectHeader" />
 	<title>Progress bar demo</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+	<asset:stylesheet href="css/bootstrap.css" />
+	<asset:stylesheet href="css/tds-bootstrap.css" />
 
 	<g:javascript src="bootstrap.js" />
 	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 	<g:javascript src="progressBar.js" />
-	
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$.get('/tdstm/ws/progress${url}', function(data) {
-				var progressBar = new TaskProgressBar(data.data.key, 5000, 
+				var progressBar = new TaskProgressBar(data.data.key, 5000,
 				function() {
 					alert('Completed!');
 				}, function() {

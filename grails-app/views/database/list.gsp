@@ -14,13 +14,13 @@
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<script type="text/javascript">
 
             $(document).on('entityAssetUpdated',function (e,obj) {
@@ -43,12 +43,12 @@
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
-				
 
-				// JqGrid implementations 
+
+				// JqGrid implementations
 				var filter = '${filter}'
 				var event = '${event}'
-				var plannedStatus = '${plannedStatus}' 
+				var plannedStatus = '${plannedStatus}'
 				var validation = '${validation}'
 				var moveBundleId = '${moveBundleId}'
 				var dbName = '${dbName}'
@@ -58,7 +58,7 @@
 				var sizePref = '${sizePref}'
 				var toValidate = '${toValidate}'
 				var unassigned = '${unassigned}'
-					
+
 				var listCaption ='Database: \
 					<tds:hasPermission permission="${Permission.AssetEdit}">\
 						<span class="capBtn">\
@@ -70,7 +70,7 @@
 					</tds:hasPermission>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
 					<g:if test="${fixedFilter}"><g:link class="mmlink" controller="database" action="list"><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" /></span></g:link>\
-					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'databaseId\')"/></g:else></span>'		
+					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'databaseId\')"/></g:else></span>'
 				<jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
@@ -78,7 +78,7 @@
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${dbPref['1']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'${dbPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${dbPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
@@ -105,24 +105,24 @@
 				$("#del_databaseIdGrid").click(function(){
 				$("#databaseId").jqGrid("editGridRow","new",
 					{afterSubmit:deleteMessage});
-				
+
 			});
 			<g:each var="key" in="['1','2','3','4','5']">
 				var dbPref= '${dbPref[key]}';
-				$("#databaseIdGrid_"+dbPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+dbPref+"', 'database','"+${key}+"')\">");
+				$("#databaseIdGrid_"+dbPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${dbPref}\', \'database\',\'${key}\')" />');
 			</g:each>
-				
+
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObject) {
 				var value = cellvalue ? _.escape(cellvalue) : ''
 				return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+');">'+value+'</a>'
 			}
-			
+
 			function myCustomFormatter (cellVal,options,rowObject) {
 				var actionButton = '';
 				if (${hasPerm}) {
                     actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')" title=\'Edit Asset\'>'+
-					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+						'<asset:image src="icons/database_edit.png" border="0px" /></a>&nbsp;&nbsp;';
 				}
                 actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] +
                     "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} +
@@ -132,7 +132,7 @@
 				<tds:hasPermission permission="${Permission.AssetCreate}">
 					var value = rowObject[1] ? _.escape(rowObject[1]) : '';
 					actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
-						"<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+						'<asset:image src="icons/database_copy.png" border="0px" /></a>';
                 </tds:hasPermission>
                 return actionButton;
 			}
@@ -165,9 +165,9 @@
 						%{--<g:each var="attribute" in="${attributesList}">--}%
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}"
-								${dbPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
+								${dbPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Database_Columns}')"
-								/> 
+								/>
 								${attribute.frontendLabel}
 							</label>
 							<br>
@@ -176,7 +176,7 @@
 				</div>
 			</g:each>
 			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
-			    <jqgrid:wrapper id="databaseId" /> 
+			    <jqgrid:wrapper id="databaseId" />
 			</div>
 			<g:render template="../assetEntity/entityCrudDivs" />
 			<g:render template="../assetEntity/dependentAdd" />

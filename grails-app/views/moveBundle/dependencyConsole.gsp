@@ -4,11 +4,11 @@
 		<meta name="layout" content="topNav" />
 		<title>Dependency Analyzer</title>
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-progressbar.css')}" />
+		<asset:stylesheet href="css/force.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/progressbar.css" />
+		<asset:stylesheet href="css/tds-bootstrap.css" />
+		<asset:stylesheet href="css/tds-progressbar.css" />
 
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
@@ -98,7 +98,7 @@
 										<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()" />
 										<label for="assignedGroupCB" class="pointer">Show ONLY Work In Progress</label>
 										<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-											<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
+											<asset:image src="icons/arrow_refresh.png" title="Refresh Data" />
 										</g:link>
 									</div>
 								</div>
@@ -108,7 +108,7 @@
 							<div class="col-md-12">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
 						</div>
 						<div id="processDiv" style="display: none;">
-							<img src="${resource(dir:'images',file:'processing.gif')}" />
+							<asset:image src="images/processing.gif" />
 						</div>
 					</div>
 				</div>

@@ -5,10 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
     <title>Edit Bundle</title>
-
-	<link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
-	<g:javascript src="jquery/jquery.ui.mouse.js"/>
-	<g:javascript src="jquery/jquery.ui.slider.js"/>
+		<asset:stylesheet href="css/jquery-ui.css" />
+		<g:javascript src="jquery/jquery.ui.mouse.js"/>
+		<g:javascript src="jquery/jquery.ui.slider.js"/>
 
 	<script type="text/javascript">
 		function initialize(){
@@ -124,7 +123,7 @@
                   </script><span><input type="text" class="dateRange" size="15" style="width: 200px;" id="startTime" name="startTime"
         					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  format="12hrs" />"
         					onchange="isValidDate(this.value, this.id,'startTimeImg')"/></span>
-        					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+        					<span id="startTimeImg" style="display: none;"><asset:image src="icons/exclamation.png" /></span>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
                       			<g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -146,7 +145,7 @@
                   			id="completionTime" name="completionTime"
 				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  format="12hrs" />"
 				        onchange="isValidDate(this.value, this.id, 'completionTimeImg')"/></span>
-				        <span id="completionTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+				        <span id="completionTimeImg" style="display: none;"><asset:image src="icons/exclamation.png" /></span>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
@@ -298,14 +297,14 @@
 														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' format="12hrs" />"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
-													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><asset:image src="icons/exclamation.png" /></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
 														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' format="12hrs" />"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 														</span>
-													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><asset:image src="icons/exclamation.png" /></span>
 												</div>
 											</td>
 										</tr>
@@ -377,14 +376,14 @@
 													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
-													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><asset:image src="icons/exclamation.png" /></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
 													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 													</span>
-													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><asset:image src="icons/exclamation.png" /></span>
 												</div>
 											</td>
 										</tr>

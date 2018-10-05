@@ -22,6 +22,9 @@ import org.springframework.beans.factory.InitializingBean
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.LicenseAdminService
 
+import asset.pipeline.grails.AssetProcessorService
+// import asset.pipeline.grails.AssetResourceLocator
+// import org.springframework.core.io.Resource
 import java.sql.Timestamp
 import java.text.DateFormat
 
@@ -39,10 +42,12 @@ class CustomTagLib implements InitializingBean {
 	                              'minPasswordLength', 'partyGroup', 'powerType', 'preferenceValue', 'setImage',
 	                              'startPage', 'timeZone', 'userLogin']
 
+	AssetProcessorService assetProcessorService
+	// AssetResourceLocator assetResourceLocator
+
 	LinkGenerator grailsLinkGenerator
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
-
 	LicenseCommonService licenseCommonService
 	LicenseAdminService  licenseAdminService
 
@@ -302,17 +307,24 @@ class CustomTagLib implements InitializingBean {
 	 */
 	def svgIcon = { Map attrs ->
 		String name = attrs.name
-		if (!name) return
+		if (!name) {
+			return
+		}
 
 		long height = NumberUtil.toPositiveLong(attrs.height, 0)
 		long width = NumberUtil.toPositiveLong(attrs.width, 0)
-
 		name = name.replaceAll(/\./, "")
-		out << "<svg style='" << (height > 0 ? 'height: ' + height + 'px;' : '') << ' '
-		out << (width > 0 ? 'width: ' + width + 'px;' : '') << "' class='tds-svg-icons " << (attrs.styleClass ?: '') << "'"
-		out << "viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> "
-		out << "<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' "
-		out << "xlink:href='" << resource(dir: 'icons/svg', file: name + '.svg') << "'></image></svg>"
+		String filename = "icons/svg/${name}.svg"
+		String url = assetProcessorService.getAssetPath(filename)
+		// String url = assetProcessorService.getResolvedAssetPath(filename)
+
+		if (url) {
+			out << "<svg style='" << (height > 0 ? 'height: ' + height + 'px;' : '') << ' '
+			out << (width > 0 ? 'width: ' + width + 'px;' : '') << "' class='tds-svg-icons " << (attrs.styleClass ?: '') << "'"
+			out << "viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> "
+			out << "<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' "
+			out << "xlink:href='${url}'></image></svg>"
+		}
 	}
 
 	/**

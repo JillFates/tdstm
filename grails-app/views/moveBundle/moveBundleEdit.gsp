@@ -3,7 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="main" />
     <title>Edit Bundle</title>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+    <asset:stylesheet href="css/resources/ui.datepicker.css" />
 
     <g:javascript>
       function callBundleChange(val){

@@ -5,9 +5,9 @@
 <html>
 <head>
 <title>Walkthru&gt; Asset Menu</title>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'walkThrough.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'contextmenu.css')}" />
+<asset:stylesheet href="css/qvga.css" />
+<asset:stylesheet href="css/walkThrough.css" />
+<asset:stylesheet href="css/contextmenu.css" />
 <g:javascript src="contextmenu.js" />
 <g:javascript src="betterinnerhtml.js" />
 
@@ -456,8 +456,8 @@ function checkComments(type) {
 				<td class="field" nowrap>
 				<g:select name="sourceRackPosition" from="${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,'Undef']}"
 							id="sourceRackPositionId" value="${assetEntity?.sourceRackPosition}" onchange="setMustSave(this.value,'${assetEntity?.sourceRackPosition}','front2', this.name)"/>
-				<img src="${resource(dir:'images',file:'plus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
-				<img src="${resource(dir:'images',file:'minus.gif')}" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
+				<asset:image src="images/plus.gif" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','up')"/>
+				<asset:image src="images/minus.gif" height="18" onclick="moveOption('sourceRackPosition','${assetEntity?.sourceRackPosition}','front2','down')"/>
 				</td>
 			</tr>
 

@@ -3,10 +3,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>My Tasks</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-    <link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+	<asset:stylesheet href="css/tds.css" />
+	<asset:stylesheet href="css/qvga.css" />
+ 	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+	<asset:stylesheet href="components/comment/comment.css" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />

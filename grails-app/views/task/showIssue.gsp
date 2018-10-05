@@ -1,11 +1,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Task Details</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+	<asset:stylesheet href="css/ui.datepicker.css" />
 </head>
 <body>
 	<a name="top"></a>
-	<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" /></div>
+	<div id="spinner" class="spinner" style="display: none;"><asset:image src="images/spinner.gif" alt="Spinner" /></div>
 	<div class="mainbody" id="mainbody">
 	 	<div id="mydiv" onclick="this.style.display = 'none';">
  			<g:if test="${flash.message}">
@@ -38,8 +38,8 @@
 					<td valign="top" class="name">
 					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount <= 5 && sucCount <= 5 ? 'style="display:none;"' : '' }>
 						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details
-						<img id="rightTriangle_${assetComment.id}" src="${resource(dir:'images',file:'triangle_right.png')}" />
-						<img id="downTriangle_${assetComment.id}" style="display: none;" src="${resource(dir:'images',file:'triangle_down.png')}" />
+						<asset:image src="images/triangle_right.png" />
+						<asset:image src="images/triangle_down.png" />
 						</h4>
 					</div>
 					<div id="predDivId_${assetComment.id}" ${predCount > 5 || sucCount > 5 ? 'style="display:none;"' : ''}>

@@ -88,7 +88,7 @@
 								<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd">
 								<tds:tooltipSpan field="${standardFieldSpecs.sme2}">
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
+								 <asset:image src="images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value, this.id)"
@@ -118,7 +118,7 @@
 								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 								<td data-for="appOwner" class="${standardFieldSpecs.appOwner.imp?:''} suffleTd">
 								<tds:tooltipSpan field="${standardFieldSpecs.appOwner}">
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+								 <asset:image src="images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value, this.id)"

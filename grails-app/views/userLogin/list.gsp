@@ -9,11 +9,11 @@
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/ui.accordion.css"  />
+		<asset:stylesheet href="css/ui.resizable.css"  />
+		<asset:stylesheet href="css/ui.slider.css"  />
+		<asset:stylesheet href="css/ui.tabs.css"  />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<jqgrid:resources />
 		<g:javascript src="admin.js" />
 		<g:javascript src="projectStaff.js" />
@@ -79,7 +79,7 @@
 					<g:if test="${isActive != 'N'}">
 						<tds:hasPermission permission="${Permission.UserUnlock}">
 							if (cellVal.lockedOutUntil && cellVal.lockedOutTime.charAt(0) != '-')
-								unlockButton += "<img tm-unlock-account src='${resource(dir:'icons',file:'lock_delete.png')}' border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
+								unlockButton += "<asset:image src="icons/lock_delete.png' border='0px' title='Click to unlock user account' cellValue='" + JSON.stringify(cellVal) + "' />";
 						</tds:hasPermission>
 					</g:if>
 					return unlockButton;

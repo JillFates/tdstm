@@ -10,9 +10,8 @@
 
 		<g:layoutHead />
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs3.css')}" />
-
+		<asset:stylesheet href="css/dropDown.css" />
+		<asset:stylesheet href="css/daterangepicker-bs3.css" />
 		<g:javascript src="tdsmenu.js" />
 		<g:javascript src="PasswordValidation.js" />
 
@@ -74,7 +73,7 @@ int minPasswordLength = tds.minPasswordLength()
 						<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
 					</g:if>
 					<g:else>
-						<img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/>
+						<asset:image src="images/TMMenuLogo.png" style="float: left;border: 0px;height: 30px;" />
 					</g:else>
 				</div>
 				<div class="title">&nbsp;TransitionManager&trade;
@@ -88,7 +87,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<strong>
 								<div style="float: left;">
 									<g:if test="${isIE6 || isIE7}">
-										<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+										<span><asset:image src="images/skin/warning.png" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 									</g:if>
 									<a class="headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
 										&nbsp;<span id="loginUserId">${tds.currentUsername()}</span>
@@ -280,7 +279,7 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission="${Permission.DepAnalyzerView}">
 							  <li>
 							  	<g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-									<g:img uri="${resource(dir:'icons',file:'brick_magnify.png')}" width="16" height="16"/>
+									<asset:image src="icons/brick_magnify.png" width="16" height="16"/>
 										<div>Dependency Analyzer</div>
 							  	</g:link>
 							  </li>
@@ -288,8 +287,8 @@ int minPasswordLength = tds.minPasswordLength()
 							<tds:hasPermission permission="${Permission.ArchitectureView}">
 							  <li>
 							  	<g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-							  		<g:img uri="${resource(dir:'icons',file:'chart_organisation.png')}" width="16" height="16"/>
-										<div>Architecture Graph</div>
+							  		<asset:image src="icons/chart_organisation.png" width="16" height="16"/>
+									<div>Architecture Graph</div>
 							  	</g:link>
 							  </li>
 							</tds:hasPermission>

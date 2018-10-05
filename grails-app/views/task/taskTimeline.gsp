@@ -13,11 +13,10 @@
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="progressTimer.js" />
 
-		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'task-timeline.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
+    	<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="css/task-timeline.css" />
+		<asset:stylesheet href="css/force.css" />
 		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
 		<g:javascript src="task-timeline.js" />
@@ -109,7 +108,9 @@
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
 										<span>
-											<label id="exportCriticalPathButton" for="exportCriticalPath" class="pointer" onclick="exportCriticalPath()"><img src='${resource(dir:'icons',file:'hourglass_go.png')}' border='0px'/>&nbsp;Export Timeline Data</label>
+											<label id="exportCriticalPathButton" for="exportCriticalPath" class="pointer" onclick="exportCriticalPath()">
+												<asset:image src="icons/hourglass_go.png" border="0px"/>&nbsp;Export Timeline Data
+											</label>
 										</span>
 									</td>
 								</tr>
@@ -119,7 +120,7 @@
 						</form>
 					</div>
 				</div>
-				<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
+				<span id="spinnerId" style="display: none"><asset:image src="images/spinner.gif"/></span>
 				<g:render template="../assetEntity/initAssetEntityData"/>
 				<g:render template="../layouts/error"/>
 				<div id="svgContainerId" style="display: none;"></div>

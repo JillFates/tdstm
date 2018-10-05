@@ -11,15 +11,14 @@
 <g:javascript src="asset.comment.js" />
 <jqgrid:resources />
 <g:javascript src="jqgrid-support.js" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+<asset:stylesheet href="css/jquery.autocomplete.css" />
+<asset:stylesheet href="css/ui.accordion.css" />
+<asset:stylesheet href="css/ui.resizable.css" />
+<asset:stylesheet href="css/ui.slider.css" />
+<asset:stylesheet href="css/ui.tabs.css" />
+<asset:stylesheet href="css/ui.datepicker.css" />
+<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 <script>
 	$(document).ready(function() {
 		$("#showEntityView").dialog({ autoOpen: false })

@@ -5,15 +5,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'tds-main.css')}" type="text/css"/>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />
-    <link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
+   	<asset:stylesheet href="css/tds-main.css" />
+	<asset:stylesheet href="css/tds.css" />
+    <asset:stylesheet href="css/dropDown.css" />
+    <asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
-    <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
+	<asset:stylesheet href="css/ui.core.css" />
+    <asset:stylesheet href="css/ui.dialog.css" />
+    <asset:stylesheet href="css/ui.theme.css" />
+    <asset:stylesheet href="css/resources/ui.datetimepicker.css" />
     <g:javascript src="prototype/prototype.js" />
     <g:layoutHead />
 
@@ -42,7 +42,7 @@ boolean isIE6 = tds.isIE6()
     	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
     	  	</g:if>
 	      	<g:else>
-     			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" height="30" style="float: left;border: 0px"/></a>
+     			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><asset:image src="images/TMMenuLogo.png" height="30" style="float: left;border: 0px"/></a>
     		</g:else>
     	</div>
       	<div class="title">&nbsp;TransitionManager&trade;
@@ -54,7 +54,7 @@ boolean isIE6 = tds.isIE6()
           <div style="font-weight: bold;">
           <sec:ifLoggedIn>
           	<g:if test="${isIE6}">
-				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+				<span><asset:image src="images/skin/warning.png" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
               	<g:remoteLink controller="person" action="retrievePersonDetails" id="${tds.currentPersonId()}" onComplete="updatePersonDetails(XMLHttpRequest)">
 			<strong>

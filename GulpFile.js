@@ -144,21 +144,21 @@ gulp.task('watch-build', ['validate-js'], function () {
  * from command line: gulp sass-compiler --PROD
  */
 gulp.task('sass-compiler', function () {
-    return gulp.src('web-app/css/tds-style.sass')
+    return gulp.src('grails-app/assets/stylesheets/css/tds-style.sass')
         .pipe(sourcemaps.init())
         .pipe(sass({errLogToConsole: true}))
         .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('web-app/css'));
+        .pipe(gulp.dest('grails-app/assets/stylesheets/css'));
 });
 
 gulp.task('sass-compiler-manager', function () {
-    return gulp.src('web-app/css/managerStyle.sass')
+    return gulp.src('grails-app/assets/stylesheets/css/managerStyle.sass')
         .pipe(sourcemaps.init())
         .pipe(sass({errLogToConsole: true}))
         .pipe(autoprefixer({browsers: ['last 2 version'], cascade: false}))
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('web-app/css'));
+        .pipe(gulp.dest('grails-app/assets/stylesheets/css'));
 });
 
 /**

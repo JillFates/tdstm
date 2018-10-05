@@ -4,18 +4,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+<asset:stylesheet href="css/rackLayout.css" />
 <title>Application Event Results</title>
 <g:javascript src="report.js"/>
 </head>
 <body>
 <tds:subHeader title="Application Event Results" crumbs="['Reports', 'Application Event Results']"/>
 	<div class="body">
-		
+
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		
+
 		<g:form action="generateApplicationMigration" name="applicationMigration" method="post" onsubmit="return disableGenerateButton(this.name)">
 			<table class="event-day-table">
 				<tbody>
@@ -62,14 +62,14 @@
 		currentMenuId = "#reportsMenu"
 		$('.menu-reports-application-migration').addClass('active');
 		$('.menu-parent-reports').addClass('active');
-		
+
 		$(document).ready(function() {
 			$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")
 				.prepend("<option value='useForPlanning' id='planningBundlesId'>Planning Bundles</option>");
 			$("#applicationMigrationButton").removeAttr('disabled');
-			
+
 		});
-		
-	</script>	
+
+	</script>
 </body>
 </html>

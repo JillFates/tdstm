@@ -5,8 +5,8 @@
         <meta name="layout" content="topNav" />
         <title>Manage Import Batches (Excel)</title>
 
-        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
-        <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+        <asset:stylesheet href="css/progressbar.css" />
+        <asset:stylesheet href="css/tds-bootstrap.css" />
         <g:render template="../layouts/responsiveAngularResources" />
         <g:javascript src="progressBar.js" />
         <style type="text/css">
@@ -63,7 +63,7 @@
             </div>
           </div>
         </div>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+		<asset:stylesheet href="css/progressbar.css" />
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
             function onDataBound() {

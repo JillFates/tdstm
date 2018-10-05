@@ -258,9 +258,9 @@
 										</td>
 										<td valign="middle" style="vertical-align:middle" >
 											<span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-												<img  src="${resource(dir:'images',file:'right-arrow.png')}" style="float: left; border: none;"/>
+												<asset:image src="images/right-arrow.png" style="float: left; border: none;"/>
 											</a></span><br/><br/><br/><br/>
-											<span style="white-space: nowrap;"> <a href="#" id="remove"><img  src="${resource(dir:'images',file:'left-arrow.png')}" style="float: left; border: none;"/>
+											<span style="white-space: nowrap;"> <a href="#" id="remove"><asset:image src="images/left-arrow.png" style="float: left; border: none;"/>
 											</a></span>
 										</td>
 										<td valign="top" class="name">

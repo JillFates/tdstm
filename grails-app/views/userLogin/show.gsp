@@ -10,11 +10,11 @@
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/ui.accordion.css"  />
+		<asset:stylesheet href="css/ui.resizable.css"  />
+		<asset:stylesheet href="css/ui.slider.css"  />
+		<asset:stylesheet href="css/ui.tabs.css"  />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<jqgrid:resources />
 		<g:javascript src="admin.js" />
 		<g:javascript src="projectStaff.js" />

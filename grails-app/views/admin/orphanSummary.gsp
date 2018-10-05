@@ -59,7 +59,7 @@ a:hover {
 
 	<table id="orphanDetailsTableId">
 	<tr>
-		<td><img src="${resource(dir:'images',file:'processing.gif')}"/></td>
+		<td><asset:image src="images/processing.gif"/></td>
 	</tr>
 	</table>
 </div>
@@ -82,7 +82,7 @@ a:hover {
    		$("#tableName").html(table)
    		$("#columnName").html(column)
    		$("#queryText").html("")
-   		$("#orphanDetailsTableId").html("<tr><td><img src='${resource(dir:'images',file:'processing.gif')}'/></td></tr>")
+   		$("#orphanDetailsTableId").html("<tr><td><asset:image src="images/processing.gif'/></td></tr>")
 		$("#tableName").html(table);
 		$("#columnName").html(column);
 		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(XMLHttpRequest, table )')}

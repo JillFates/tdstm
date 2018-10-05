@@ -4,8 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="topNav" />
-	<link type="text/css" rel="stylesheet"
-		href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+   	<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
 	<title>Edit Project</title>
 	<script src="${resource(dir:'js',file:'project.js')}"></script>
 </head>

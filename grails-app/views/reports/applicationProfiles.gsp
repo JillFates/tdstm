@@ -3,19 +3,19 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+		<asset:stylesheet href="css/rackLayout.css" />
+		<asset:stylesheet href="css/spinner.css" />
 		<title>Application Profiles</title>
 		<g:javascript src="report.js"/>
 	</head>
 	<body>
 		<tds:subHeader title="Application Profiles" crumbs="['Reports', 'Profiles']"/>
 		<div class="body">
-			
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			
+
 			<g:form action="generateApplicationProfiles" name="applicationProfiles" method="post" onsubmit="return disableGenerateButton(this.name)">
 				<table>
 					<tbody>
@@ -77,7 +77,7 @@
 				$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")
 				.prepend("<option value='useForPlanning' id='planningBundlesId'>Planning Bundles</option>");
 				$("#applicationProfilesButton").removeAttr('disabled');
-				
+
 				$("#applicationProfilesButton").click(function(){
 					$("#overlay").css('display', 'inline')
 					$("#applicationProfilesButton").attr('disabled', true)

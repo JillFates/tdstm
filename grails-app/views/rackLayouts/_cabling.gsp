@@ -7,11 +7,11 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.statues = ['Cabled','Unknown','Empty'];
 
 	 $scope.colors = ['White','Grey','Green','Yellow','Orange','Red','Blue','Purple','Black'];
-	
+
 	 $scope.cables = ${assetCablingMap};
 	 // which is used to reassign the cable value if user cancel without updating
 	 $scope.backUpCables = ${assetCablingMap};
-	 $scope.assets = {}; 
+	 $scope.assets = {};
 	 $scope.cableColor = {};
 	 $scope.connectors = {};
 	 $scope.row = ${assetRows};
@@ -23,7 +23,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
   	  	}
   	 	$scope.cables[id]['connectorId'] = 'null';
     }
-	
+
 	$scope.showRow = function(id) {
 		return $scope.row[id] == 's';
 	}
@@ -106,7 +106,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     	var isValid = true
     	var statusVal = $scope.cables[cableId]['status']
     	if(actionId == "assignId"){
-    		
+
     		if($("#connectType_"+cableId).val() != 'Power'){
 
     			var assetFrom = $("#assetFromId_"+cableId).val();
@@ -115,9 +115,9 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     				if( assetFrom!='null' && modelConnectorId=='null' ){
     					isValid = false
     					alert("Please enter the target connector details")
-    				} 
+    				}
     			}
-    		} 
+    		}
     	}
     	var actionType=''
     	switch(statusVal){
@@ -195,7 +195,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     	if(!type && defRoomType=='0'){
     		type = 'T'
     	}
-    	
+
     	if(!type){
     		type='S'
     	}
@@ -218,7 +218,7 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 	$("#cablingDialogId").dialog( "option", "title", "${assetCablingDetails[0]?.title}");
 	$('div.connector_Left').each(function(index) {
 		$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
-	}); 
+	});
 
 </script>
 <div id="roomTypeDiv" style="float:right;">
@@ -300,7 +300,7 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 					<input type="radio" name="staticConnector" id="staticConnector_C_{{cable.cableId}}" value="C">C</input>
 					<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value='{{cable.rackUposition}}'/>
 				</span>
-				
+
 				<span class="nonPowerDiv" style="display:none;">
 				     <select ui-select2  id="assetFromId_{{cable.cableId}}" ng-model="cables[cable.cableId]['fromAssetId']"
 				     	ng-change="demoChange(cable.cableId,cable.type);changeCableStatus(cable.cableId);" style="width:100px;">
@@ -321,8 +321,8 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
       </td>
       <td ng-show="showRow(cable.cableId)">
       	<tds:hasPermission permission="${Permission.ModelEdit}">
-	     	<img src="${resource(dir:'icons',file:'cancel.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;" title="Cancel Changes"/>
-			<img src="${resource(dir:'icons',file:'accept.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;" title="Save Changes"/>
+	     	<asset:image src="icons/cancel.png" id="cancelButton_${cable.cableId}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;" title="Cancel Changes"/>
+			<asset:image src="icons/accept.png" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;" title="Save Changes"/>
 		</tds:hasPermission>
       </td>
     </tr>

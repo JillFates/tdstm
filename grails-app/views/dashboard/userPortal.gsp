@@ -3,10 +3,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="layout" content="topNav"/>
     <title>User Dashboard For ${loggedInPerson}</title>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'dashboard.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'tabcontent.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'userPortal.css')}"/>
-    <link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'ui.datepicker.css')}"/>
+
+    <asset:stylesheet src="css/dashboard.css" />
+    <asset:stylesheet src="css/tabcontent.css" />
+    <asset:stylesheet src="css/userPortal.css" />
+    <asset:stylesheet src="css/ui.datepicker.css" />
 
     <g:javascript src="asset.comment.js"/>
     <g:javascript src="asset.tranman.js"/>
@@ -173,7 +174,7 @@
     </div>
     <script type="text/javascript">
 
-        var image = "<tr><td><div><img src=\"${resource(dir:'images',file:'processing.gif')}\"></div></td></tr>";
+        var image = '<tr><td><div><asset:image src="images/processing.gif" /></div></td></tr>';
         currentMenuId = "#teamMenuId";
 
         function changeDropSummary(e) {
@@ -308,7 +309,7 @@
             }
 
             $("#gridEvents").kendoGrid({
-                toolbar: kendo.template('<strong><img src="${resource(dir: 'icons', file: 'calendar.png')}" /> Events</strong> - Your assigned events and your team <div onclick="loadEventTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+                toolbar: kendo.template('<strong><asset:image src="icons/calendar.png" /> Events</strong> - Your assigned events and your team <div onclick="loadEventTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
                 dataSource: {
                     type: "json",
                     transport: {
@@ -374,7 +375,7 @@
             }
 
             $("#gridEventsNews").kendoGrid({
-                toolbar: kendo.template('<strong> <img src="${resource(dir: 'icons', file: 'newspaper.png')}" /> Event News</strong> - Active news for your events <div onclick="loadEventNewsTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+                toolbar: kendo.template('<strong> <asset:image src="icons/newspaper.png" /> Event News</strong> - Active news for your events <div onclick="loadEventNewsTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
                 dataSource: {
                     type: "json",
                     transport: {
@@ -471,7 +472,7 @@
             });
 
             $("#gridTaskSummary").kendoGrid({
-                toolbar: kendo.template('<strong><img src="${resource(dir: 'icons', file: 'table.png')}" /> Task Summary</strong> - Active tasks assigned to you <div onclick="loadTasksTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+                toolbar: kendo.template('<strong><asset:image src="icons/table.png" /> Task Summary</strong> - Active tasks assigned to you <div onclick="loadTasksTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
                 dataSource: dataSource,
                 columns: [
                     {
@@ -604,7 +605,7 @@
             var projectId = id ? id : $("#userProjectId").val();
 
             $("#gridActivePeople").kendoGrid({
-                toolbar: kendo.template('<strong><img src="${resource(dir: 'icons', file: 'group.png')}" /> Active People</strong> - Currently active people on this project <div onclick="loadActivepplTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
+                toolbar: kendo.template('<strong><asset:image src="icons/group.png" /> Active People</strong> - Currently active people on this project <div onclick="loadActivepplTable()" class="btn-refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
                 dataSource: {
                     type: "json",
                     transport: {

@@ -181,33 +181,33 @@
 				<tr class="layoutControl" title="Sets the amount of force between each node">
 					<td style="padding: 0px;width: 30px;">Force</td>
 					<td style="padding-left :5px;">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','forceId')"/>
+						<asset:image src="images/minus.gif" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','forceId')"/>
 						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${defaults.force}" disabled="disabled" />
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','forceId')"/>
+						<asset:image src="images/plus.gif" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','forceId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the desired length for the links">
 					<td style="padding: 0px;width: 30px;">Links</td>
 					<td style="padding-left :5px">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','linkSizeId')"/>
+						<asset:image src="images/minus.gif" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','linkSizeId')"/>
 						<input type="text" id="linkSizeId" class="controlPanelprop" name="linkSize" value="${defaults.linkSize}" disabled="disabled" />
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer plusMinusIcon plus" onclick="modifyParameter('add','linkSizeId')"/>
+						<asset:image src="images/plus.gif" height="18"  class="pointer plusMinusIcon plus" onclick="modifyParameter('add','linkSizeId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the decay-rate of the nodes' velocity">
 					<td style="padding: 0px;width: 30px;">Friction</td>
 					<td style="padding-left :5px">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','frictionId')"/>
+						<asset:image src="images/minus.gif" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','frictionId')"/>
 						<input type="text" id="frictionId" class="controlPanelprop" name="friction" value="${defaults.friction}" disabled="disabled" />
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus"  onclick="modifyParameter('add','frictionId')"/>
+						<asset:image src="images/plus.gif" height="18" class="pointer plusMinusIcon plus"  onclick="modifyParameter('add','frictionId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the accuracy of the forces (lower numbers will be slower, but more accurate)">
 					<td style="padding: 0px;width: 30px;">Theta</td>
 					<td style="padding-left :5px">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','thetaId')"/>
+						<asset:image src="images/minus.gif" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','thetaId')"/>
 						<input type="text" id="thetaId" class="controlPanelprop" name="theta" value="${defaults.theta}" disabled="disabled" />
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','thetaId')"/>
+						<asset:image src="images/plus.gif" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','thetaId')"/>
 					</td>
 				</tr>
 			</table>
@@ -320,7 +320,7 @@
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
 	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref]}" />
-	
+
 </div>
 
 <!-- Include the graph itself -->

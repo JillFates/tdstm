@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+<asset:stylesheet href="css/rackLayout.css" />
+<asset:stylesheet href="css/spinner.css" />
 <title>Application Conflicts</title>
 <g:javascript src="report.js"/>
 </head>
@@ -12,11 +12,11 @@
 	<tds:subHeader title="Application Conflicts" crumbs="['Reports', 'Application']"/>
 	<div class="body">
 		<div class="message" id="preMoveErrorId" style="display: none">Please select the bundle to start the report.</div>
-		
+
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
-		
+
 		<g:form action="generateApplicationConflicts" name="applicationConflicts" method="post" onsubmit="return disableGenerateButton(this.name)">
 			<table>
 				<tbody>
@@ -83,11 +83,11 @@
 
 
 	<script type="text/javascript">
-	
+
 	currentMenuId = "#reportsMenu"
 	$('.menu-reports-application-conflicts').addClass('active');
 	$('.menu-parent-reports').addClass('active');
-	
+
 	$(document).ready(function() {
 		$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")
 				.prepend("<option value='useForPlanning' id='planningBundlesId'>Planning Bundles</option>");
@@ -117,7 +117,7 @@
 			return true
 		}
 	}
-	
+
 	function verifyBundle(){
 		if( $('#moveBundleId').val() == null ) {
 			$('#preMoveErrorId').css('display','block')
@@ -126,7 +126,7 @@
 			return true
 		}
 	}
-	
+
 	</script>
 </body>
 </html>

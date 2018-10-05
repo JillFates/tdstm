@@ -26,7 +26,7 @@
                     <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}">
                         <td>
                             <tds:hasPermission permission="${Permission.TaskEdit}">
-                                <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" ><img src="${resource(dir:'icons',file:'table_edit.png')}" border="0"></a>
+                                <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" ><asset:image src="icons/table_edit.png" border="0" /></a>
                             </tds:hasPermission>
                         </td>
                         <td id="comment_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.comment)}}</td>
@@ -41,7 +41,7 @@
         <div class="buttons">
             <tds:hasPermission permission="${Permission.TaskCreate}">
                 <a ng-click="createTask()" class="comment-create-button">
-                    <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+                    <asset:image src="icons/table_add.png" border="0px" style="margin-bottom: -4px;" /> &nbsp;&nbsp;Add Task
                 </a>
             </tds:hasPermission>
         </div>

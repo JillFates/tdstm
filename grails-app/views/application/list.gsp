@@ -21,13 +21,13 @@
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<script type="text/javascript">
 
             $(document).on('entityAssetUpdated',function (e,obj) {
@@ -121,8 +121,8 @@
 					);
 				});
 				<g:each var="key" in="['1','2','3','4','5']">
-					var appPref= '${appPref[key]}';
-					$("#applicationIdGrid_"+appPref).append('<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
+					var appPref = '${appPref[key]}';
+					$("#applicationIdGrid_"+appPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${appPref}\',\'application\',\'${key}\')" />');
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 
@@ -134,20 +134,21 @@
 			function myCustomFormatter (cellVal, options, rowObject) {
 				var actionButton = '';
 				if (${hasPerm}) { // Valid what? what does it means hasPerm, perm on what?
-                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'+
-					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+                    actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'
+						+ "<asset:image src="icons/database_edit.png" border="0px" /></a>&nbsp;&nbsp;';
 				}
                 actionButton += "<grid-buttons asset-id='" + options.rowId
 					+ "' asset-type='" + rowObject[8] +
 					"' tasks='" + rowObject[7] + "' comments='" + rowObject[10] +
                     "' can-view-tasks='" + ${canViewTasks} + "' can-view-comments='" + ${canViewComments} +
                     "' can-create-tasks='" + ${canCreateTasks} + "' can-create-comments='" + ${canCreateComments} + "'>" +
-					"</grid-buttons>"
+					"</grid-buttons>";
 
 				<tds:hasPermission permission="${Permission.AssetCreate}">
 					var value = rowObject[1] ? _.escape(rowObject[1]) : '';
-					actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
-						"<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+					actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \''
+						+ value + '\', '+options.rowId+');" title=\'Clone Asset\'>'
+						+ '<asset:image src="icons/database_copy.png" border="0px" /></a>';
                 </tds:hasPermission>
 
 				return actionButton;

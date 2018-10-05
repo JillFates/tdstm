@@ -9,7 +9,7 @@
         <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
         <meta http-equiv="pragma" content="no-cache" />
         <meta name="layout" content="header"/>
-        <title>Transition Manager</title>
+        <title>TransitionManager</title>
 
         <style>
         /*TODO: REMOVE ON COMPLETE MIGRATION */

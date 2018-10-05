@@ -235,7 +235,7 @@ a:hover {
 	<div id="flushOldBatchId" class="personShow" style="display: none;" title="Flush import data">
 	<div id="respMsgId" style="display: none" class="message"></div>
 	<div id="processDivId" style="display: none">
-		<img src="${resource(dir:'images',file:'processing.gif')}" />
+		<asset:image src="images/processing.gif" />
 	</div>
 	<input type="radio" name="deleteHistory" id="doNothing" value="doNothing" checked="checked"> <label for="doNothing">Do Nothing </label><br>
 	<input type="radio" name="deleteHistory" id="overTwoMonths" value="overTwoMonths" > <label for="overTwoMonths">Over Two Months</label><br>
@@ -249,14 +249,14 @@ a:hover {
 </div>
 <div id="showOrCleanTypeId" title="Purge Unused Asset Types">
 	<div id="cleanProcessId" style="display: none; " >
-		Processing...<img src="${resource(dir:'images',file:'processing.gif')}" />
+		Processing...<asset:image src="images/processing.gif" />
 	</div>
 	<div id="cleanProcessDivId" class="cleanProcessDiv">
 		<p>
 		The following list will display existing Asset Types that are created by Device Import Process. Those that
 		have no references to models or devices will be indicated with a checkmark and can be safely purged.
 		</p>
-		<b>Loading List</b> <img src="${resource(dir:'images',file:'processing.gif')}" />
+		<b>Loading List</b> <asset:image src="images/processing.gif" />
 	</div>
 	<div class="buttons">
 		<input type="button" id="cleanTypes" class="save" value="Purge" onclick="cleanTypes()"/>

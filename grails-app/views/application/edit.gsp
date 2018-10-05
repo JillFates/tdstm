@@ -114,7 +114,7 @@
 								<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 								<tds:tooltipSpan field="${standardFieldSpecs.sme2}">
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+								 <asset:image src="images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value, this.id)"
@@ -145,7 +145,7 @@
 								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 								<tds:tooltipSpan field="${standardFieldSpecs.appOwner}">
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+								 <asset:image src="images/swapicon.png" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value, this.id)"
@@ -323,7 +323,7 @@
 
 		<%-- Dependency Edit Block --%>
 		<tr id="applicationDependentId" class="assetDependent">
-			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
+			<td class="depSpin"><span><asset:image src="images/processing.gif"/></span></td>
 		</tr>
 
 		<%-- Action Buttons --%>

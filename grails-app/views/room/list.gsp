@@ -19,16 +19,15 @@
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="css/rackLayout.css" />
 		<g:javascript src="drag_drop.js" />
 		<g:javascript src="room.rack.combined.js"/>
 		<g:javascript src="cabling.js"/>
@@ -51,7 +50,7 @@
 			</g:if>
 
 			<div id="processDiv" style="display: none;">
-				<img src="${resource(dir:'images',file:'processing.gif')}" /> Merging In Progress...
+				<asset:image src="images/processing.gif" /> Merging In Progress...
 			</div>
 			<div id="roomListView" style="width:500px;">
 				<g:if test="${roomId && viewType != 'list'}">

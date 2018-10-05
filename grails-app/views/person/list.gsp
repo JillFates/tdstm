@@ -6,14 +6,14 @@
 		<meta name="layout" content="topNav" />
 		<title>Staff List</title>
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		<asset:stylesheet href="css/ui.accordion.css"  />
+		<asset:stylesheet href="css/ui.resizable.css"  />
+		<asset:stylesheet href="css/ui.slider.css"  />
+		<asset:stylesheet href="css/ui.tabs.css"  />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="components/comment/comment.css" />
 
 		<jqgrid:resources />
 		<g:javascript src="projectStaff.js" />
@@ -140,7 +140,7 @@
 			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 		<div id="messageId" class="message nodisplay"></div>
-		<span id="spinnerId" class="nodisplay">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
+		<span id="spinnerId" class="nodisplay">Merging ...<asset:image src="images/spinner.gif"/></span>
 		<div>
 			<g:form name="personForm" id="formId" url="[action:'list', controller:'person', params:'[companyId:${companyId}]']">
 				<g:select id="filterSelect" name="companyId" from="${partyGroupList}" value="${companyId}"  optionKey="id" optionValue="name" noSelection="['All':'All']" />

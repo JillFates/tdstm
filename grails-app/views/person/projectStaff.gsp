@@ -6,10 +6,10 @@
 <meta name="layout" content="projectHeader" />
 <title>Project Staff List</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}"  />
+	<asset:stylesheet href="css/ui.accordion.css"  />
+    <asset:stylesheet href="css/ui.resizable.css"  />
+    <asset:stylesheet href="css/ui.slider.css"  />
+    <asset:stylesheet href="css/ui.tabs.css"  />
     <g:javascript src="tds-common.js" />
 
     <script type="text/javascript">
@@ -17,7 +17,7 @@
 		        $("#editPerson").dialog({ autoOpen: false });
 		        $("#showPerson").dialog({ autoOpen: false });
 	      	});
-	    
+
 	    $(document).ready(function(){
 	    		if('${submit}'){
 				    $("#addProjectStaff").dialog({ autoOpen: true });
@@ -30,7 +30,7 @@
 	    $(document).ready(function(){
 		        $("#createPerson").dialog({ autoOpen: false });
 	      	});
-	      	
+
 	    </script>
 	    <script type="text/javascript">
 
@@ -46,16 +46,16 @@
 		      	document.editForm.email.value = person.email
 		      	document.editForm.active.value = person.active
 		      	document.editForm.roleType.value = person.role
-		      
+
 		      	$("#editPerson").dialog('option', 'width', 350);
                 $("#editPerson").dialog('option', 'modal', 'true');
 				$("#editPerson").dialog( "open" );
-		
+
 		 	}
 	      	function showPersonDialog( e ){
 	      		var person = eval('(' + e.responseText + ')')
-	      		
-                $("#showCompanyId").html( person.companyName )      		
+
+                $("#showCompanyId").html( person.companyName )
 				$("#showFirstName").html( person.firstName )
 				$("#showMiddleName").html( person.middleName )
 				$("#showLastName").html( person.lastName )
@@ -64,39 +64,39 @@
 				$("#showEmail").html( person.email )
 				$("#showActive").html( person.active )
 				$("#showRole").html( person.role )
-				
+
 				$("#showPerson").dialog('option', 'width', 350);
                 $("#showPerson").dialog('option', 'modal', 'true');
 				$("#showPerson").dialog( "open" );
 		    }
-		 	
+
 		 	// function for add staff form dialog
 		 	function showAddProjectStaff(){
 		 		$("#addProjectStaff").dialog('option', 'width', 650);
                 $("#addProjectStaff").dialog('option', 'modal', 'true');
-				$("#addProjectStaff").dialog( "open" );	
+				$("#addProjectStaff").dialog( "open" );
 		 	}
 		 	// function for create staff form dialog
 		 	function createProjectStaff(){
 		 		$("#createPerson").dialog('option', 'width', 350);
                 $("#createPerson").dialog('option', 'modal', 'true');
-				$("#createPerson").dialog( "open" );	
+				$("#createPerson").dialog( "open" );
 		 	}
-		 	
+
 		 	// function to submit the Add staff form
 		 	function addProjectStaff(i){
-		 		
+
 		 		var roleType = document.getElementById("roleType_"+i).value;
 				if( roleType == "" ){
 					alert("Please Select Team");
 					return false;
 				}else{
-					return true;					
+					return true;
 				}
 		 	}
 		 	// function to validate CreateForm
 		 	function validateCreateForm(){
-		 		
+
 		 		var firstName = document.createForm.firstName.value;
 		 		var roleType = document.createForm.roleType.value;
 		 		var companyVal = document.createForm.company.value;
@@ -112,7 +112,7 @@
 					}
 				} else {
 					alert("First Name can not be Blank");
-					return false;					
+					return false;
 				}
 		 	}
 		 	// function to validate CreateForm
@@ -150,7 +150,7 @@
 <div class="buttons">
  <g:if test="${personHasPermission }">
 	<span class="button"><input type="button" class="create" value="Add" onclick="showAddProjectStaff()"/></span>
- </g:if> 
+ </g:if>
 </div>
 <div class="list">
 <table>
@@ -198,15 +198,15 @@
                                     <label><b>Company:<span style="color: red">*</span></b></label>
                                 </td>
                                 <td valign="top" class="value ">
-                               
+
 								<select name="company" id="companyId">
 	                                <g:each in="${projectCompanies}" status="i" var="company">
 	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
 	                                </g:each>
                                 </select>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="firstName"><b>First Name:<span style="color: red">*</span></b> </label>
@@ -214,8 +214,8 @@
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="middleName">Middle Name:</label>
@@ -223,8 +223,8 @@
                                 <td valign="top" class="value">
                                     <input type="text" maxlength="64" id="middleName" name="middleName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="lastName">Last Name:</label>
@@ -232,8 +232,8 @@
                                 <td valign="top" class="value">
                                     <input type="text" maxlength="64" id="lastName" name="lastName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="nickName">Nick Name:</label>
@@ -241,7 +241,7 @@
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="nickName" name="nickName" value=""/>
                                 </td>
-                            </tr> 
+                            </tr>
                         	 <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="title">Title:</label>
@@ -277,8 +277,8 @@
                                 <td valign="top" class="value ">
                                <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -303,8 +303,8 @@
                                 <td valign="top" class="value ">
 								<span name="company" id="showCompanyId"></span>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="firstName"><b>First Name </b></label>
@@ -312,8 +312,8 @@
                                 <td valign="top" class="value ">
                                     <span id="showFirstName" name="firstName" value=""></span>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="middleName"><b>Middle Name:</b></label>
@@ -321,8 +321,8 @@
                                 <td valign="top" class="name">
                                     <span id="showMiddleName" name="middleName" value=""></span>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="lastName"><b>Last Name:</b></label>
@@ -330,8 +330,8 @@
                                 <td valign="top" class="name">
                                     <span id="showLastName" name="lastName" value=""></span>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="nickName"><b>Nick Name:</b></label>
@@ -339,7 +339,7 @@
                                 <td valign="top" class="value ">
                                     <span id="showNickName" name="nickName" value=""></span>
                                 </td>
-                            </tr> 
+                            </tr>
                         	 <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="title"><b>Title:</b></label>
@@ -372,13 +372,13 @@
 	                                <td valign="top" class="value ">
 	                                <span name="active" id="showRole" ></span>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
-                
-                
+
+
 </div>
 <div class="body" id="addProjectStaff" style="display: none;" title="Add staff to project" >
 <div >
@@ -400,17 +400,17 @@
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 				<input type="hidden" name="projectId" value="${projectId}"/>
 				<td>${companiesStaff?.company[0]}</td>
-				
+
 				<td><input type="hidden" name="person" value="${companiesStaff?.staff.id}" />${companiesStaff?.name}</td>
-				
+
 				<td>${companiesStaff?.staff.title}</td>
-				
+
 				<td><tds:personRoleSelect name="roleType" id="roleType_$i" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect> </td>
-				
+
 				<td><input value="Add" type="submit" name="submit"/> </td>
-				
+
 			</tr>
-			
+
 		</g:formRemote>
 		</g:each>
 	</tbody>
@@ -437,14 +437,14 @@
                                     <label for="firstName">Company:</label>
                                 </td>
                                 <td valign="top" class="value ">
-                                
+
 								<select name="company" id="companyId">
 	                                <g:each in="${projectCompanies}" status="i" var="company">
 	                                	<option value="${company?.partyIdTo.id}">${company?.partyIdTo}</option>
 	                                </g:each>
                                 </select>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="firstName"><b>First Name:<span style="color: red">*</span></b></label>
@@ -452,8 +452,8 @@
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="firstName" name="firstName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="middleName">Middle Name:</label>
@@ -461,8 +461,8 @@
                                 <td valign="top" class="value">
                                     <input type="text" maxlength="64" id="middleName" name="middleName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="lastName">Last Name:</label>
@@ -470,8 +470,8 @@
                                 <td valign="top" class="value">
                                     <input type="text" maxlength="64" id="lastName" name="lastName" value=""/>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="nickName">Nick Name:</label>
@@ -479,7 +479,7 @@
                                 <td valign="top" class="value ">
                                     <input type="text" maxlength="64" id="nickName" name="nickName" value=""/>
                                 </td>
-                            </tr> 
+                            </tr>
                         	 <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="title">Title:</label>
@@ -499,7 +499,7 @@
                                 </g:each>
                                 </select>
                                 </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td valign="top" class="name">
                                     <label for="active"><b>Team:&nbsp;<span style="color: red">*</span></b></label>
@@ -507,8 +507,8 @@
                                 <td valign="top" class="value ">
                                <tds:personRoleSelect name="roleType" id="roleType" optionKey="id" from="${RoleType.list()}" value="${roleType?.id}" isNew="true" ></tds:personRoleSelect>
                                 </td>
-                            </tr> 
-                        
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>

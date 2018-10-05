@@ -20,9 +20,9 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
-	<link rel="stylesheet" href="${resource(dir:'css',file:'tds-style.css')}">
+	<asset:stylesheet href="css/tds-style.css" />
 
-	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 	<g:javascript src="tds-common.js" />
@@ -34,7 +34,7 @@
 	<script src="${resource(dir:'dist/js/vendors/respond/dest',file:'respond.min.js')}"></script>
 	<![endif]-->
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+	<asset:stylesheet href="css/spinner.css" />
 
 </head>
 <body class="hold-transition login-page">
@@ -43,14 +43,14 @@
 	<div class="login-box-body">
 		<div class="login-logo">
 			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+				<asset:image src="images/TMLoginLogo.gif" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
 
 		<g:if test="${success}">
 			<h2 class="emailStatus">Check Your Email</h2>
-			<p class="instructions">Thank you for requesting a password reset. If your account is currently active, 
-			you will receive an email with a reset link. If you do not receive this email, 
+			<p class="instructions">Thank you for requesting a password reset. If your account is currently active,
+			you will receive an email with a reset link. If you do not receive this email,
 			please check your spam filter or contact your system administrator to confirm your account is still active.
 			</p>
 			<br>

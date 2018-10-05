@@ -4,9 +4,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 		<title>Model List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-			
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+
 		<g:javascript src="model.manufacturer.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="drag_drop.js" />
@@ -46,12 +46,12 @@
 					<jqgrid:refreshButton id="modelId" />
 				</jqgrid:grid>
 				TDS.jqGridFilterToolbar('modelId');
-				
+
 				<g:each var="key" in="['1','2','3','4']">
 					var modelPref= '${modelPref[key]}';
-					$("#modelIdGrid_"+modelPref).append('<img src=\'${resource(dir:'images',file:'select2Arrow.png')}\' class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')">');
+					$("#modelIdGrid_"+modelPref).append('<asset:image src="images/select2Arrow.png\' class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+modelPref+'\',\'model\',\''+${key}+'\')" />');
 				</g:each>
-				
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
@@ -97,18 +97,18 @@
 				<div id="messageId" class="message" style="display:none">
 				</div>
 			</div>
-			
+
 			<jqgrid:wrapper id="modelId" />
-			
+
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${modelPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv">
 						<input type="hidden" id="previousValue_${key}" value="${modelPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${modelPref[key]}" id="coloumnSelector_${modelPref[key]}" value="${attribute}" 
-								${modelPref[key]== attribute? 'checked' :'' } style="margin-left:11px;" 
+							<label><input type="radio" name="coloumnSelector_${modelPref[key]}" id="coloumnSelector_${modelPref[key]}" value="${attribute}"
+								${modelPref[key]== attribute? 'checked' :'' } style="margin-left:11px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Model_Columns}')"
-								/> 
+								/>
 								${attribute}
 							</label>
 							<br>
@@ -116,12 +116,12 @@
 					</div>
 				</div>
 			</g:each>
-			<span id="spinnerId" style="display: none">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
+			<span id="spinnerId" style="display: none">Merging ...<asset:image src="images/spinner.gif" /></span>
 			<div id="createModelView" style="display: none;" ></div>
 			<div id="showModelView" style="display: none;"></div>
 			<div id="showOrMergeId" style="display: none;" title="Compare/Merge Models"></div>
 		</div>
-		
+
 		<div id="fixedTest" style="position:fixed"></div>
 		<script>
 			$('.menu-list-models').addClass('active');

@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
+		<asset:stylesheet href="components/comment/comment.css" />
+		<asset:stylesheet href="css/force.css" />
 
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="d3/d3.js"/>
@@ -395,7 +395,7 @@
 						</span>
 					</div>
 				</div>
-				<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
+				<span id="spinnerId" style="display: none"><asset:image src="images/spinner.gif"/></span>
 			</div>
 		</div>
 		<g:render template="../layouts/error"/>

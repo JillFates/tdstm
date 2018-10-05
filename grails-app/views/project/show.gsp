@@ -6,11 +6,11 @@
 		<meta name="layout" content="topNav" />
 		<title>Project Details</title>
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
 
 	</head>
 	<body>

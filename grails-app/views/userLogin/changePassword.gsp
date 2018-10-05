@@ -16,9 +16,8 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
-	<link rel="stylesheet" href="${resource(dir:'css',file:'tds-style.css')}">
-
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<asset:stylesheet href="css/tds-style.css" />
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 
@@ -29,7 +28,7 @@
 	<script src="${resource(dir:'dist/js/vendors/respond/dest',file:'respond.min.js')}"></script>
 	<![endif]-->
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+	<asset:stylesheet href="css/spinner.css" />
 
 	<g:javascript src="PasswordValidation.js" />
 </head>
@@ -38,7 +37,7 @@
 	<div class="login-box-body">
 		<div class="login-logo">
 			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+				<asset:image src="images/TMLoginLogo.gif" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
 		<p class="login-box-msg">Change Password</p>

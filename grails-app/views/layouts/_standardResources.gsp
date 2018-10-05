@@ -1,8 +1,8 @@
-<%-- 
+<%--
   -- This is the standard include of CSS and Javascript files necessary throughout the TM application
 --%>
 
-<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
+<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 <!-- LEGACY CODE START -->
 <asset:stylesheet src="resources" />
@@ -18,7 +18,7 @@ def showCrawler = false
 if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 	if((moveEvent.newsBarMode != 'off') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
 		showCrawler = true
-	}	
+	}
 }
 */
 %>
@@ -38,5 +38,5 @@ if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 	var currentMenuId = "";
 	var taskManagerTimePref = "60"
 	var contextPath = "${request.contextPath}"
-	var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false  
+	var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false
 </script>

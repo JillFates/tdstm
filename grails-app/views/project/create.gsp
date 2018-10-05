@@ -4,7 +4,7 @@
 	<meta name="layout" content="topNav" />
 	<title>Create Project</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+	<asset:stylesheet href="css/ui.datepicker.css" />
 	<script src="${resource(dir:'js',file:'project.js')}"></script>
 
 	<script type="text/javascript">

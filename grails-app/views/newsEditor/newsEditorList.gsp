@@ -4,12 +4,12 @@
 <meta name="layout" content="topNav" />
 <title>Event News</title>
 
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+<asset:stylesheet href="css/jquery.autocomplete.css" />
+<asset:stylesheet href="css/ui.accordion.css" />
+<asset:stylesheet href="css/ui.resizable.css" />
+<asset:stylesheet href="css/ui.slider.css" />
+<asset:stylesheet href="css/ui.tabs.css" />
+<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 <jqgrid:resources />
 
 	<style>

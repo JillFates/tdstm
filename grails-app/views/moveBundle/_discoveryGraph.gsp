@@ -26,7 +26,7 @@
 			${validate} to validate
 		</g:link>
 	</td>
-</g:if> 
+</g:if>
 <g:else>
-	<td class="dashboard_stat_graph_td"><img src="${resource(dir:'images',file:'checked-icon.png')}" /></td>
+	<td class="dashboard_stat_graph_td"><asset:image src="images/checked-icon.png" /></td>
 </g:else>

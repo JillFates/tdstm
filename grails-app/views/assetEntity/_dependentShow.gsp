@@ -1,4 +1,4 @@
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <td valign="top">
 			<div>
@@ -79,14 +79,14 @@
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
 									<td style="background-color: lightpink;position:relative;" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
-										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${assetPath('icons/error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
 									<td class="dep-${dependent.status}" style="position:relative;" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										<b>
 											<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
-											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
+											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${assetPath('icons/error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 										</b>
 									</td>
 								 </g:elseif>

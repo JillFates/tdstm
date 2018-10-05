@@ -7,7 +7,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Model - Edit</title>
 	<g:javascript src="model.manufacturer.js" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+	<asset:stylesheet href="css/rackLayout.css" />
 	<g:javascript src="drag_drop.js" />
 	<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 </head>
@@ -325,7 +325,7 @@
 						 <script>
 							 $(document).ready(function(){
                                  $(document).on('submit','#modelForm',function(e){
-									
+
 									return false;
 								 });
 							 });

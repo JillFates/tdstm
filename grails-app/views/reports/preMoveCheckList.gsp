@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+<asset:stylesheet href="css/rackLayout.css" />
 <title>Pre-Event Checklist</title>
 </head>
 <body>

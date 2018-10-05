@@ -12,14 +12,14 @@
 
 	<g:javascript src="asset.comment.js" />
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+	<asset:stylesheet href="css/ui.datepicker.css" />
 	<g:javascript src="d3/d3.js" />
 	<g:javascript src="lodash/lodash.min.js" />
 	<g:javascript src="svg.js"/>
 	<g:javascript src="load.shapes.js"/>
 	<g:javascript src="keyevent_constants.js" />
 	<g:javascript src="graph.js" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
+	<asset:stylesheet href="css/force.css" />
 </head>
 <body>
 	<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/>
@@ -53,17 +53,17 @@
 						</tr>
 						<tr title="Sets the max number of links to follow up">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
+								<asset:image src="images/minus.gif" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
 							--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
-							--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
+							--><asset:image src="images/plus.gif" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
 							--><label for="levelsUpId">&nbsp;Tiers Above</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow down">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
+								<asset:image src="images/minus.gif" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
 							--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
-							--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
+							--><asset:image src="images/plus.gif" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
 							--><label for="assetSelectId">&nbsp;Tiers Below</label>
 							</td>
 						</tr>
@@ -133,8 +133,8 @@
 
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
-							--><img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
+								<asset:image src="icons/arrow_in.png" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
+							--><asset:image src="icons/arrow_out.png" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
 							-->Spacing
 							</td>
 						</tr>

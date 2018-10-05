@@ -4,8 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
 <title>Activity Metrics Report</title>
-<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+<asset:stylesheet href="css/ui.datepicker.css" />
+<asset:stylesheet href="components/comment/comment.css" />
 </head>
 <body>
 <tds:subHeader title="Activity Metrics Report" crumbs="['Reports','Activity','Metrics']"/>

@@ -41,7 +41,7 @@
 							</td>
 							<td rowspan="2">
 								<g:if test="${person.personImageURL==null}">
-									<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60" />
+									<asset:image src="images/blankPerson.jpg" alt="Smiley face" height="60" width="60" />
 								</g:if>
 								<g:else>
 									<img src="${person.personImageURL}" height="60" width="60" />

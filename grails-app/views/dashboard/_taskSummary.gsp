@@ -1,7 +1,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
-		<%-- 
-			This code will animate all of the bargraphs in the Task Summary Section on load and refresh of section 
+		<%--
+			This code will animate all of the bargraphs in the Task Summary Section on load and refresh of section
 		--%>
 		$("#tasksReadyBar").animate({width: "${percTaskReady}%" }, 1000);
 		$("#tasksStartBar").animate({width: "${percTaskStarted}%" }, 1000);
@@ -9,7 +9,7 @@ $(document).ready(function() {
 		$("#effortReadyBar").animate({width: "${percDurationReady}%" }, 1000);
 		$("#effortStartBar").animate({width: "${percDurationStarted}%" }, 1000);
 		$("#effortDoneBar").animate({width: "${percDurationDone}%" }, 1000);
-		
+
 		<g:each var="r" in="${teamTaskMap}">
 			<g:set var="teamData" value="${r.getValue()}"/>
 			<g:if test="${teamData.percDone > 0}">$("#team_${teamData.role.id}").animate({width: "${teamData.percDone}%" }, 1000);</g:if>
@@ -47,7 +47,7 @@ function scrollTeams(){
 	</div>
 </div>
 
-<%-- 
+<%--
 	If there are no tasks that are on hold, the legend for Hold will not be displayed
 --%>
 <g:set var="legendWidth" value="20%"/>
@@ -109,7 +109,7 @@ function scrollTeams(){
 			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: ${legendWidth};" align="center">Ready<br />${effortRemainReady}</div>
 			<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: ${legendHoldWidth};" align="center">Hold<br />${effortRemainHold}</div>
 			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: ${legendWidth};" align="center">Pending<br />${effortRemainPending}</div>
-			
+
 		</td>
 		</tr>
 	</table>
@@ -128,8 +128,8 @@ function scrollTeams(){
 </g:else>
 
 	<table style="border:none;">
-		<%-- 	
-			This section is going to iterate over the Team Task matrix of data to create the table of the team 
+		<%--
+			This section is going to iterate over the Team Task matrix of data to create the table of the team
 			summary information. It will be sorted in a newspaper serpentine columns
 		--%>
 		<g:each var="r" in="${teamTaskMatrix}">
@@ -139,7 +139,7 @@ function scrollTeams(){
 					<td class="teamcol" nowrap>
 						<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[role:team.role.id])}" style="display:block">${team.role.description}</a>
 					</td>
-				
+
 				<td class="teamcountcolumn">
 					<a href="${createLink(controller:'assetEntity', action:'listTasks', params:[role:team.role.id])}" style="display:block">${team.teamTaskCount}</a>
 				</td>
@@ -152,7 +152,7 @@ function scrollTeams(){
 						<span class="small_text"><b>${remainingTeamTask} to go</b></span>
 					</g:if>
 					<g:else>
-						<img src="${resource(dir:'images',file:'checked-icon.png')}" />
+						<asset:image src="images/checked-icon.png" />
 					</g:else>
 				</td>
 			</g:each>
@@ -164,10 +164,10 @@ function scrollTeams(){
 <g:if test="${teamMatrixSize > 18}" >
     <div id="scrollTeamsIcon" class="text-right toprightcontent teamScrollButton">
          <a id="scrollTeamsLeftIcon" href="javascript:void(0);" onclick="scrollTeams();">
-            <img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+            <asset:image src="images/right_arrow.png" alt="back" border="0" width="16" height="23" align="right" />
           </a>
           <a id="scrollTeamsRightIcon" href="javascript:void(0);" onclick="scrollTeams();" style="display: none;">
-            <img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+            <asset:image src="images/left_arrow.png" alt="back" border="0" width="16" height="23" align="right" />
           </a>
      </div>
 </g:if>

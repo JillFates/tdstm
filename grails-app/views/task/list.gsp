@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
 		<title>Teams List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
+		<asset:stylesheet href="css/tds.css" />
+		<asset:stylesheet href="css/qvga.css" />
 	</head>
 	<body>
 		<g:form action="home" name="loginForm">

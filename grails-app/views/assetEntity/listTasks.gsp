@@ -51,9 +51,9 @@
 
 	<g:render template="../layouts/responsiveAngularResources" />
 
-	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+	<asset:stylesheet href="css/ui.datepicker.css" />
+	<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+	<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 
 	<script type="text/javascript">
 
@@ -160,8 +160,7 @@
 
 			<g:each var="key" in="['1','2','3','4','5']">
 				var taskPref= '${taskPref[key]}';
-
-				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
+				$("#taskListIdGrid_"+taskPref).append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\'${taskPref}\',\'taskList\',\'${key}\')" />');
 			</g:each>
 		});
 
@@ -185,9 +184,9 @@
 
 		function myCustomFormatter (cellVal, options, rowObject) {
 			var value = rowObject && rowObject[TASK_NUM] ? _.escape(rowObject[TASK_NUM]) : '';
-			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task ' + value + '">'+
-				"<img src='${resource(dir:'icons',file:'table_edit.png')}' border='0px'/>"+"</a>"
-			return editButton
+			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')" title="Edit Task ' + value + '">' +
+				'<asset:image src="icons/table_edit.png" border="0px" /></a>';
+			return editButton;
 		}
 
 		function isPublishedFormatter(cellVal,options,rowObject) {

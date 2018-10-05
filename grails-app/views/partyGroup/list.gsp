@@ -3,11 +3,11 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="topNav" />
 		<title>Company List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		
+
 		<script type="text/javascript">
 		function onInvokeAction(id) {
 			setExportToLimit(id, '');
@@ -31,7 +31,7 @@
 			</jqgrid:grid>
 			TDS.jqGridFilterToolbar('companyId');
 
-			$.jgrid.formatter.integer.thousandsSeparator='';			
+			$.jgrid.formatter.integer.thousandsSeparator='';
 		});
 		</script>
 	</head>

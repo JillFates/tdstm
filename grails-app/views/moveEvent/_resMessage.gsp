@@ -3,9 +3,9 @@ ${message.status}
 <h2>Exceptions:</h2>
 ${message.exceptions}
 <h2 class='assetImage' onclick='javascript:toogleGenDetails()'>
-	Generation details... 
-	<img id="rightTriangle" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
-	<img id="downTriangle" style="display: none;" src="${resource(dir:'images',file:'triangle_down.png')}" />
+	Generation details...
+	<asset:image src="images/triangle_right.png" />
+	<asset:image src="images/triangle_down.png" />
 </h2>
 <br />
 <span style="display: none;" id='generateDetailsSpan'>

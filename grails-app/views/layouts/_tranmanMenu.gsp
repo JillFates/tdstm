@@ -193,18 +193,18 @@
                             <li class="menu-parent-item">Assets</li>
                             <li class="menu-child-item menu-parent-assets-summary-table">
                                 <g:link class="mmlink" controller="assetEntity" action="assetSummary">
-                                    <g:img uri="${resource(dir:'icons',file:'application_view_columns.png')}" width="16" height="16" alt="Summary Table" /> Summary Table
+                                    <asset:image src="icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
                                 <g:link class="mmlink" controller="module" action="asset" id="views">
-                                    <g:img uri="${resource(dir:'icons',file:'cat.png')}" width="16" height="16" alt="Dependencies" /> View Manager
+                                    <asset:image src="icons/cat.png" width="16" height="16" alt="Dependencies" /> View Manager
                                 </g:link>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer">
                                 <g:link class="mmlink" mapping="assetViewShow" id="1">
-	                                <g:img uri="${resource(dir:'icons',file:'magnifier.png')}" width="16" height="16" /> All Assets
+	                                <asset:image src="icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
@@ -271,26 +271,26 @@
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
                                 <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <g:img uri="${resource(dir:'icons',file:'bricks.png')}" width="16" height="16" alt="Dependencies" /> Dependencies
+                                    <asset:image src="icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-comments-list">
                                 <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                    <g:img uri="${resource(dir:'icons',file:'comments.png')}" width="16" height="16" alt="Comments" /> Comments
+                                    <asset:image src="icons/comments.png" width="16" height="16" alt="Comments" /> Comments
                                 </g:link>
                             </li>
                             <li class="divider"></li>
                             <tds:hasPermission permission="${Permission.DepAnalyzerView}">
                                 <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                     <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <g:img uri="${resource(dir:'icons',file:'brick_magnify.png')}" width="16" height="16" alt="Dependency Analyzer" /> Dependency Analyzer
+                                        <asset:image src="icons/brick_magnify.png" width="16" height="16" alt="Dependency Analyzer" /> Dependency Analyzer
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
                                 <li class="menu-child-item menu-parent-assets-architecture-graph">
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <g:img uri="${resource(dir:'icons',file:'chart_organisation.png')}" width="16" height="16" alt="Architecture Graph" /> Architecture Graph
+                                        <asset:image src="icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph" /> Architecture Graph
                                     </g:link>
                                 </li>
                             </tds:hasPermission>

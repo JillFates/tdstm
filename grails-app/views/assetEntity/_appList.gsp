@@ -1,7 +1,7 @@
 <%--
     This is used by the dependency Console
 --%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tds.asset.Application" %>
 
@@ -43,14 +43,14 @@
 								<g:checkBox name="checkBox" id="checkId_${app.asset?.id}"></g:checkBox>
 								<g:if test="${haveAssetEditPerm}">
 								<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${app.asset?.id})" title="Edit Asset">
-									<img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px" />
+									<asset:image src="icons/database_edit.png" border="0px" />
 								</a>
 								</g:if>
 								<grid-buttons asset-id="${app.asset?.id}" asset-type="${app.asset?.assetType}" tasks="${app.tasksStatus}" comments="${app.commentsStatus}" can-edit-tasks="true" can-edit-comments="${haveAssetEditPerm}"></grid-buttons>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${app.asset?.id});">${app.asset?.assetName}</span>
-							</td> 
+							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${app.asset?.id});">${app.asset?.sme}</span>
 							</td>

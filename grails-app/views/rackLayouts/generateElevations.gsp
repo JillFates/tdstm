@@ -7,10 +7,10 @@
 
 		<title>Rack Elevation Report</title>
 		<g:if test="${printView}">
-			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-			<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+			<asset:stylesheet href="css/rackLayout.css" />
+			<asset:stylesheet href="css/jquery.autocomplete.css" />
+			<asset:stylesheet href="css/ui.datepicker.css" />
+			<asset:stylesheet href="components/comment/comment.css" />
 		</g:if>
 	</head>
 	<body>
@@ -28,7 +28,7 @@
 					<g:if test="${generateView}">
 						<td class="rack_elevation_td">
 					</g:if>
-						
+
 					<table cellpadding=2 class="rack_elevation front">
 						<tr>
 							<td colspan="4" style="border:0px;text-align:center; white-space: nowrap;">
@@ -61,16 +61,16 @@
 								<g:if test="${generateView}">
 									<tds:hasPermission permission="${Permission.AssetEdit}">
 										<g:if test="${showIconPref == 'true'}">
-											<span id="span_${rackLayoutIt?.rackId}" onclick="disableCreateIcon(${rackLayoutIt?.rackId})"> 
-												<img src="${resource(dir:'images',file:'plus_disabled.gif')}" />
+											<span id="span_${rackLayoutIt?.rackId}" onclick="disableCreateIcon(${rackLayoutIt?.rackId})">
+												<asset:image src="images/plus_disabled.gif" />
 											</span>
 										</g:if>
 										<g:else>
-											<span id="span_${rackLayoutIt?.rackId}" onclick="enableCreateIcon(${rackLayoutIt?.rackId})"> 
-												<img src="${resource(dir:'images',file:'plus.gif')}" />
+											<span id="span_${rackLayoutIt?.rackId}" onclick="enableCreateIcon(${rackLayoutIt?.rackId})">
+												<asset:image src="images/plus.gif" />
 											</span>
 										</g:else>
-										<span id="anchor_${rackLayoutIt?.rackId}" onclick="assignPowers(${rackLayoutIt?.rackId})"> 
+										<span id="anchor_${rackLayoutIt?.rackId}" onclick="assignPowers(${rackLayoutIt?.rackId})">
 										</span>
 									</tds:hasPermission>
 								</g:if>

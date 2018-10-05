@@ -5,8 +5,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="layout" content="topNav" />
 	<title>Event Dashboard</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
+	<asset:stylesheet href="css/dashboard.css" />
+	<asset:stylesheet href="css/tabcontent.css" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="yahoo.ui.dashboard.js" />
 	<g:render template="../layouts/responsiveAngularResources" />
@@ -100,11 +100,11 @@
 									<div id="summary_gauge_div" align="center">
 										<g:if test="${EventDashboardDialOverridePerm}">
 											<a href="#manualSummary" onclick="javascript:$('#manualSumStatusSpan').show();">
-												<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+												<asset:image src="i/dials/dial-50.png" style="border: 0px;" />
 											</a>
 										</g:if>
 										<g:else>
-											<img id="summary_gauge" alt="Event Summary" src="${resource(dir:'i/dials',file:'dial-50.png')}" style="border: 0px;">
+											<asset:image src="i/dials/dial-50.png" style="border: 0px;" />
 										</g:else>
 									</div>
 									Event Status vs. Plan <br />
@@ -215,7 +215,7 @@
 					</div>
 					<div id="leftarrow">
 						<a href="#" id="move-left">
-							<img src="${resource(dir:'images',file:'left_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+							<asset:image src="images/left_arrow.png" alt="back" border="0" width="16" height="23" align="right" />
 						</a>
 					</div>
 					<div class="mod" style="overflow: hidden;">
@@ -264,7 +264,7 @@
 					</div>
 					<div id="rightarrow">
 						<a href="#" id="move-right">
-							<img src="${resource(dir:'images',file:'right_arrow.png')}" alt="back" border="0" width="16" height="23" align="right">
+							<asset:image src="images/right_arrow.png" alt="back" border="0" width="16" height="23" align="right" />
 						</a>
 					</div>
 				</div>

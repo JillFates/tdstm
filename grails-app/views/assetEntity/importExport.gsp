@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
     <title>Import Assets (TM Excel)</title>
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+    <asset:stylesheet href="css/progressbar.css" />
     <g:javascript src="jquery/ui.progressbar.js"/>
     <g:javascript src="import.export.js"/>
     <style>

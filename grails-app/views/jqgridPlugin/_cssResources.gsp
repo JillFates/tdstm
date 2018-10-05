@@ -1,1 +1,1 @@
-<asset:stylesheet src="jqgrid" />
+<asset:stylesheet src="css/jqgrid" />

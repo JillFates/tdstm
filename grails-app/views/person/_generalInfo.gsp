@@ -31,7 +31,7 @@
 								${company}
 							</span>
 						</td>
-					</tr> 
+					</tr>
 
 
 					<tr class="prop">
@@ -43,7 +43,7 @@
 						</td>
 						<td rowspan="2">
 							<g:if test="${person.personImageURL==null}">
-								<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60">
+								<asset:image src="images/blankPerson.jpg" alt="Smiley face" height="60" width="60" />
 							</g:if>
 							<g:else>
 								<img src="${person.personImageURL}" height="60" width="60">
@@ -194,7 +194,7 @@
 								size="15" style="width: 138px;"
 								name="availability" id="availabilityId_${i}"
 								value='<tds:convertDate date="${blackOutDay.exceptionDay}" />' />
-								
+
 								<a href="javascript:deleteFuncsRow('dateTrId_${i}')">&nbsp;&nbsp;
 									<span class='clear_filter'>X</span>
 								</a>
@@ -203,7 +203,7 @@
 					</g:each>
 				</tbody>
 			</table>
-			<br /> 
+			<br />
 			<span id="" onclick="addBlackOutDay()" style="cursor: pointer;"><b> Add Date </b></span>
 			<input type="hidden" id="availableId" value="1">
 

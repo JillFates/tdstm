@@ -20,26 +20,25 @@
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<g:javascript src="projectStaff.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+		<asset:stylesheet href="css/tds.css" />
+		<asset:stylesheet href="css/qvga.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<title>Project Staff</title>
 
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
-		
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="components/comment/comment.css" />
+		<asset:stylesheet href="css/spinner.css" />
+
 	</head>
 	<body>
 		<tds:subHeader title="Project Staff" crumbs="['Project', 'Staff']"/><br />
@@ -51,7 +50,7 @@
 						<td>
 							<span><b id="teamLabel">Team</b></span><br/>
 							<label for="role">
-								<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" 
+								<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}"
 									onChange="loadFilteredStaff('lastName','staff')"
 									noSelection="${['0':'All']}">
 								</g:select>
@@ -60,7 +59,7 @@
 						<td>
 							<span><b id="onlyClientStaffLabel">Only Client Staff</b></span>
 							<br/>
-							<input type="checkbox" name="clientStaff" id="clientStaffId" 
+							<input type="checkbox" name="clientStaff" id="clientStaffId"
 								onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
 								${onlyClientStaff=='1'? 'checked="checked" value=1'  : 'value=0'}
 							/>
@@ -68,7 +67,7 @@
 						<td>
 							<span><b id="onlyAssignedLabel">Only Assigned</b></span>
 							<br/>
-								<input type="checkbox" name="assigned" id="assignedId"  
+								<input type="checkbox" name="assigned" id="assignedId"
 									onChange="this.value = this.checked ? 1 : 0; loadFilteredStaff('lastName','staff');"
 									${assigned=='1'? 'checked="checked" value=1' : 'value=0'}
 								/>
@@ -92,9 +91,9 @@
 								<option value="X">All</option>
 								<option value="C">Completed</option>
 							</select>
-							
+
 							<span id="spinner" class="spinner" style="margin-left:10px; position:inherit;">
-								<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+								<asset:image src="images/spinner.gif" alt="Spinner" />
 							</span>
 						</td>
 					</tr>
@@ -110,7 +109,7 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				loadFilteredStaff('lastName','staff');
-				
+
 				// handle the scrolling header
 				$(window).scroll( function() {
 					handleHeader();
@@ -135,9 +134,9 @@
 				$("#unselectDialog").dialog({
       				autoOpen: false
 				});
-				
+
 			});
-			
+
 			function handleHeader (eventType) {
 
 				if($('#staffingTable').length > 0) {
@@ -163,11 +162,11 @@
 				}
 
 			}
-			
+
 	 	</script>
 
 	 	<div id="unselectDialog" title="Confirm before proceeding">
-	
+
 		</div>
 
 

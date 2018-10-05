@@ -69,14 +69,14 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <g:if test="${isLicenseManagerEnabled}">
-                        <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogoManager.png')}" alt="Transition Manager project" border="0" />
+                        <asset:image id="logo-header" src="images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />
                     </g:if>
                     <g:else>
                         <g:if test="${setImage}">
                             <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
                         </g:if>
                         <g:else>
-                            <img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
+                            <asset:image id="logo-header" src="images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
                         </g:else>
                     </g:else>
                 </div>
@@ -112,7 +112,7 @@
                                 <!-- Menu Toggle Button -->
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <!-- The user image in the navbar-->
-                                    <img src="${resource(dir:'images',file:'personIcon.png')}" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }">
+                                    <asset:image src="images/personIcon.png" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }" />
                                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                     <span class="hidden-xs user-name">${tds.currentPersonName()}</span>
                                 </a>

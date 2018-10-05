@@ -9,7 +9,7 @@
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 	<!-- Bootstrap 3.3.5 -->
 	<link rel="stylesheet" href="${resource(dir: 'dist/js/vendors/bootstrap/dist/css', file: 'bootstrap.min.css')}">
@@ -21,10 +21,10 @@
 	<link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
 	<g:if test="${isLicenseManagerEnabled}">
-		<link rel="stylesheet" href="${resource(dir: 'css', file: 'managerStyle.css')}">
+		<asset:stylesheet href="css/managerStyle.css" />
 	</g:if>
 	<g:else>
-		<link rel="stylesheet" href="${resource(dir: 'css', file: 'tds-style.css')}">
+		<asset:stylesheet href="css/tds-style.css" />
 	</g:else>
 
 	<!-- Blue Skin -->
@@ -51,10 +51,10 @@
 						<i class="fa fa-bars"></i>
 					</button>
 					<g:if test="${isLicenseManagerEnabled}">
-						<img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogoManager.png')}" alt="Transition Manager project" border="0" />
+						<asset:image id="logo-header" src="images/TMHeaderLogoManager.png" alt="TransitionManager" border="0" />
 					</g:if>
 					<g:else>
-						<img id="logo-header" src="${resource(dir:'images',file:'TMHeaderLogo.png')}" alt="Transition Manager project" border="0" />
+						<asset:image id="logo-header" src="images/TMHeaderLogo.png" alt="TransitionManager" border="0" />
 					</g:else>
 				</div>
 			</div><!-- /.container-fluid -->

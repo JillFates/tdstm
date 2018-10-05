@@ -22,15 +22,14 @@
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/resources/ui.datetimepicker.css"/>
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<script type="text/javascript">
 			// TODO : move this code to JS once verified in tmdev
 			$(document).on('entityAssetUpdated',function (e,obj) {
@@ -53,7 +52,7 @@
 						EntityCrud.showAssetDetailView('DEVICE', id);
 					}
 				});
-				
+
 				$("#createEntityView").dialog({ autoOpen: false });
 				$("#showEntityView").dialog({ autoOpen: false });
 				$("#editEntityView").dialog({ autoOpen: false });
@@ -116,7 +115,7 @@
 						{name:'sourceLocationName', formatter:tdsCommon.jqgridTextCellFormatter, hidden: true},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['4']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['5']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'planStatus', formatter:tdsCommon.jqgridTextCellFormatter},
@@ -148,11 +147,10 @@
 						{afterSubmit:deleteMessage});
 				});
 
-				<g:each var="key" in="['1','2','3','4','5']">
-					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_" + assetPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+assetPref+"','assetList','"+${key}+"')\">");
+				<g:each var="key" in="${assetPref.keySet().toList()}">
+					$("#assetListIdGrid_${assetPref[key]}").append('<asset:image src="images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_${key}" onclick="showSelect(\\\'${assetPref[key]}\\\',\\\'assetList\\\',\\\'${key}\\\')" />');
 				</g:each>
-			
+
 				$.jgrid.formatter.integer.thousandsSeparator = '';
 				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? _.escape(cellvalue) : '';
@@ -163,7 +161,7 @@
 					var actionButton = ''
 					if (${hasPerm}) {
                         actionButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\',' + options.rowId + ');" title=\'Edit Asset\'>' +
-							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+							'<asset:image src="icons/database_edit.png" border="0px" /></a>&nbsp;&nbsp;';
 					}
                     actionButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] +
                         "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] +
@@ -173,8 +171,8 @@
 
 					<tds:hasPermission permission="${Permission.AssetCreate}">
 						var value = rowObject[1] ? _.escape(rowObject[1]) : ''
-						actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>'+
-							"<img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/>"+"</a>";
+						actionButton += '&nbsp;&nbsp;<a href="javascript:EntityCrud.cloneAssetView(\'${assetClass}\', \'' + value + '\', '+options.rowId+');" title=\'Clone Asset\'>' +
+							'<asset:image src="icons/database_copy.png" border="0px" /></a>';
                     </tds:hasPermission>
 					return actionButton;
 				}
@@ -202,11 +200,11 @@
 					} else if (plannedStatus){
 						$("#gs_planStatus").val(plannedStatus)
 					}
-					
+
 					$("#gs_moveBundle").val('${moveBundle}')
 					$("#gs_assetTag").val('${assetTag}')
 				}
-				
+
 			})
 		</script>
 	</head>
@@ -221,7 +219,7 @@
 						%{--<g:each var="attribute" in="${attributesList}">--}%
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}"
-								${assetPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:2px;" 
+								${assetPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:2px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${prefType}')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>

@@ -4,13 +4,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="topNav" />
         <title>Dependencies List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="asset.tranman.js" />
-		
+
 		<g:render template="../layouts/responsiveAngularResources" />
-		
+
 		<g:javascript src="asset.comment.js" />
 
 		<jqgrid:resources />
@@ -18,7 +18,7 @@
 		<g:javascript src="jqgrid-support.js" />
 
 		<script type="text/javascript">
-		
+
 			$(document).ready(function() {
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
@@ -56,7 +56,7 @@
 				<g:each var="key" in="['1','2']">
 					var depPref= '${depPref[key]}';
 
-				$("#dependencyGridIdGrid_"+depPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage editSelectimage_"+${key}+"\" style=\"position:relative;float:right;margin-top: -15px;\" onclick=\"showSelect('"+depPref+"','dependencyGrid','"+${key}+"')\">");
+				$("#dependencyGridIdGrid_"+depPref).append('<asset:image src="images/select2Arrow.png" class="selectImage editSelectimage_${key}" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\'${depPref}\',\'dependencyGrid\',\'${key}\')"/>');
 
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -90,11 +90,11 @@
 					<div class="columnDiv_${key} customScroll" style="background-color: #F8F8F8 ;height: 133px;position: fixed; top: 148px;width:8%;;z-index: 2147483647; overflow-y: scroll;text-align: left;">
 						<input type="hidden" id="previousValue_${key}" value="${depPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${depPref[key]}" id="coloumnSelector_${depPref[key]}" value="${attribute}" 
-								${depPref[key]==attribute?'checked':'' } style="margin-left:11px;" 
+							<label><input type="radio" name="coloumnSelector_${depPref[key]}" id="coloumnSelector_${depPref[key]}" value="${attribute}"
+								${depPref[key]==attribute?'checked':'' } style="margin-left:11px;"
 								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Dep_Columns}')"
-								/> 
-								${attribute}	
+								/>
+								${attribute}
 							</label>
 							<br>
 						</g:each>

@@ -3,7 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 		<meta name="layout" content="projectHeader" />
 		<title>Transition Planning Dashboard</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+		<asset:stylesheet href="css/bootstrap.css" />
 	</head>
 	<body>
 		<h1>Planning Dashboard</h1>

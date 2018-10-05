@@ -34,7 +34,7 @@
 </g:form>
 </div>
 <div id="processDiv" style="display: none;">
-	<img src="${resource(dir:'images',file:'processing.gif')}" />
+	<asset:image src="images/processing.gif" />
 </div>
 <br></br>
 <div id="projectReportDiv" style="display:none;min-width: 1000px;"></div>
@@ -55,7 +55,7 @@
 				$("#processDiv").hide();
 				$("#projectReportDiv").show();
 				$("#projectReportDiv").html(data);
-			}, 
+			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				alert("An unexpected error occurred while generating Project report Summary.")
 			}

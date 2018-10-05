@@ -16,17 +16,13 @@
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- General Template Style -->
-	<link rel="stylesheet" href="${resource(dir:'css',file:'tds-style.css')}">
-
-	<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
-
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
-
+	<asset:stylesheet href="css/tds-style.css" />
+	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+	<asset:stylesheet href="css/spinner.css" />
 
 	<!-- jQuery -->
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'ui.dialog.css')}"/>
-	<link rel="stylesheet" type="text/css" href="${resource(dir: 'css', file: 'jquery-ui-smoothness.css')}"/>
-
+	<asset:stylesheet href="css/ui.dialog.css" />
+	<asset:stylesheet href="css/jquery-ui-smoothness.css" />
 
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 	<g:javascript src="jquery-1.9.1.js"/>
@@ -159,7 +155,7 @@
 	<div class="login-box-body">
 		<div class="login-logo">
 			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+				<asset:image src="images/TMLoginLogo.gif" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
 		<g:if test="${preLoginList && preLoginList.size() > 0}">
@@ -178,7 +174,7 @@
 		<g:else>
 			<h1 class="login-box-msg">Sign in to start your session</h1>
 		</g:else>
-		<div id="spinner" class="spinner" style="display: none;"><img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+		<div id="spinner" class="spinner" style="display: none;"><asset:image src="images/spinner.gif" alt="Spinner" />
 		</div>
 		<g:form action="signIn" name="loginForm" class="loginPageFormWrapper">
 			<input type="hidden" name="targetUri" value="${targetUri}" />
@@ -242,19 +238,19 @@
 		<p>It is recommended to upgrade your browser or switch to another supported browser.</p>
 		<div class="row" style="margin-top: 28px; margin-left: 0px; font-size: 14px;">
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'internet_explorer.png')}" border="0" alt="Internet Explorer Browser" /><br />
+				<asset:image src="icons/png/internet_explorer.png" border="0" alt="Internet Explorer Browser" /><br />
 				<span style="font-size: 13px;">Internet Explorer 9+</span>
 			</div>
 			<div class="col-xs-3">
-				<img src="${resource(dir:'icons/png',file:'firefox.png')}" border="0" alt="Fire Fox Browser" /><br />
+				<asset:image src="icons/png/firefox.png" border="0" alt="Fire Fox Browser" /><br />
 				<span style="font-size: 13px;">FireFox 42+</span>
 			</div>
 			<div class="col-xs-3" >
-				<img src="${resource(dir:'icons/png',file:'chrome.png')}" border="0" alt="Chrome Browser" /><br />
+				<asset:image src="icons/png/chrome.png" border="0" alt="Chrome Browser" /><br />
 				<span style="font-size: 13px;">Chrome 44+</span>
 			</div>
 			<div class="col-xs-3" >
-				<img src="${resource(dir:'icons/png',file:'safari.png')}" border="0" alt="Safari Browser" /><br />
+				<asset:image src="icons/png/safari.png" border="0" alt="Safari Browser" /><br />
 				<span style="font-size: 13px;">Safari 8+ <br /> (Only Mac)</span>
 			</div>
 			<br />

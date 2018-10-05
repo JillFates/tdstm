@@ -146,7 +146,7 @@
 
 
 	<tr id="databaseDependentId" class="assetDependent">
-		<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
+		<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
 	</tr>
 	<tr>
 		<td colspan="2">

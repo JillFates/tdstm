@@ -25,8 +25,8 @@
     <div class="modal-footer" style="margin-top: 25px;">
         <div style="float: left;">
             <tds:hasPermission permission="${Permission.AssetCreate}">
-                <button type="button" class="btn btn-default clone-action-btn" action="edit"><img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/> Clone & Edit</button>
-                <button type="button" class="btn btn-default clone-action-btn" action="clone"><img src='${resource(dir:'icons',file:'database_copy.png')}' border='0px'/> Clone</button>
+                <button type="button" class="btn btn-default clone-action-btn" action="edit"><asset:image src="icons/database_edit.png" border="0px"/> Clone & Edit</button>
+                <button type="button" class="btn btn-default clone-action-btn" action="clone"><asset:image src="icons/database_copy.png" border="0px"/> Clone</button>
             </tds:hasPermission>
             <button type="button" class="btn btn-default close-clone-entity"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
         </div>

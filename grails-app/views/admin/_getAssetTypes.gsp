@@ -14,7 +14,7 @@
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>
 						<g:if test="${assets[5]}">
-							<img src="${resource(dir:'icons',file:'tick.png')}" alt="Will be purged" />
+							<asset:image src="icons/tick.png" alt="Will be purged" />
 						</g:if>
 					</td>
 					<td>

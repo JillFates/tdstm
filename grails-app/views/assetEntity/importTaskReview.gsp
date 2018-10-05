@@ -4,7 +4,7 @@
 	<meta name="layout" content="topNav" />
 	<title>Import Tasks</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+	<asset:stylesheet href="css/spinner.css" />
 
 	<script>
 		// watch out, this code detect when the screen has just finished his resize event.
@@ -104,7 +104,7 @@
 			var hasErrVal  = model.hasOwnProperty(errorPropName);
 
 			var str = '';
-			
+
 			if (propertyName == '')
 				console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
 
@@ -129,7 +129,7 @@
 					str += '<br><span class="change">' + model[propertyName] + '</span>';
 				}
 			} else if(hasOrigVal) {
-				str = '<span class="change">' + model[propertyName] + '</span>' + 
+				str = '<span class="change">' + model[propertyName] + '</span>' +
 					(model[originalPropName] ? '<br><span class="original">' + model[originalPropName] + '</span>' : '');
 			} else {
 				str = '<span class="unchanged">' + model[propertyName] + '</span>';

@@ -7,15 +7,14 @@
 		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+		<asset:stylesheet href="css/jquery.autocomplete.css" />
+		<asset:stylesheet href="css/ui.accordion.css" />
+		<asset:stylesheet href="css/ui.resizable.css" />
+		<asset:stylesheet href="css/ui.slider.css" />
+		<asset:stylesheet href="css/ui.tabs.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/resources/ui.datetimepicker.css" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<g:javascript src="tds-common.js" />
 		<g:javascript src="model.manufacturer.js" />
 		<script type="text/javascript">
@@ -31,7 +30,7 @@
 					{name:'corporateName',width:'100'},
 					{name:'corporateLocation',width:'100'},
 					{name:'website',width:'100'},
-					{name:'models', width:'40',search:false,sortable:false}, 
+					{name:'models', width:'40',search:false,sortable:false},
 					{name:'assetCount',width:'50',search:false,sortable:false}"
 				sortname="'name'"
 				caption="listCaption"

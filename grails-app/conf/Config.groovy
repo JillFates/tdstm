@@ -109,6 +109,7 @@ grails {
 			json:          ['application/json', 'text/json'],
 			multipartForm:  'multipart/form-data',
 			rss:            'application/rss+xml',
+			svg:			'image/svg+xml',
 			text:           'text/plain',
 			xls :           'application/vnd.ms-excel',
 			xlsx:           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

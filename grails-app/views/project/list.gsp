@@ -4,11 +4,11 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 		<title>Project List - ${active=='active' ? 'Active' : 'Completed'} Projects</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		
+
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption ="Projects: \
@@ -19,7 +19,7 @@
 				<input type='button' value='Show Active Projects'/></a></span>\
 				<span class='capBtn' style='${active=='completed' ? 'display:none':'' }'><a href=\'"+contextPath+"/project/list?active=completed\'> \
 				<input type='button' value='Show Completed Projects'/></a></span>"
-				
+
 				var isActive = '${active}'
 				<jqgrid:grid id="projectGridId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Project Code','Name', 'Start Date','Completion Date', 'Comment'"
@@ -65,7 +65,7 @@
 			<div>
 				<div id="messageId" class="message" style="display: none"></div>
 			</div>
-			
+
 			<div id="gridDivId" style="width: 50% !important;">
 				<jqgrid:wrapper id="projectGridId" />
 			</div>

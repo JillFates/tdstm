@@ -1,7 +1,7 @@
 <%--
     This is used by the dependency Console
 --%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 <%@page import="com.tds.asset.AssetComment"%>
 <%@page import="com.tds.asset.AssetEntity" %>
 <%@page import="net.transitionmanager.security.Permission"%>
@@ -46,8 +46,8 @@
 								<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
 								<g:if test="${haveAssetEditPerm}">
 								<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${asset.asset.id})" title="Edit Asset">
-									<img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px" />
-								</a> 
+									<asset:image src="icons/database_edit.png" border="0px" />
+								</a>
 								</g:if>
 								<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}" can-edit-tasks="true" can-edit-comments="${haveAssetEditPerm}"></grid-buttons>
 							</td>

@@ -4,15 +4,15 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="topNav" />
 	<title>Cookbook</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/dialog.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/fullscreen.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+	<asset:stylesheet href="css/tds-bootstrap.css" />
+	<asset:stylesheet href="css/ng-grid.css" />
+	<asset:stylesheet href="css/codemirror/codemirror.css" />
+	<asset:stylesheet href="css/codemirror/addon/dialog.css" />
+	<asset:stylesheet href="css/codemirror/addon/show-hint.css" />
+	<asset:stylesheet href="css/codemirror/addon/fullscreen.css" />
+	<asset:stylesheet href="css/mergely/mergely.css" />
+	<asset:stylesheet href="css/cookbook.css" />
+	<asset:stylesheet href="components/comment/comment.css" />
 
 	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="codemirror/codemirror.js" />

@@ -2,7 +2,7 @@
 -- This is the standard include of CSS and Javascript files necessary throughout the TM application
 --%>
 
-<link rel="shortcut icon" type="image/x-icon" href="${assetPath(src: 'images/favicon.ico')}"/>
+<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 <!-- Bootstrap 3.3.5 -->
 <link rel="stylesheet" href="${resource(dir: 'dist/js/vendors/bootstrap/dist/css', file: 'bootstrap.min.css')}">
@@ -14,10 +14,10 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/css', file: 'TDSTMLayout.min.css')}">
 <!-- General Template Style -->
 <g:if test="${isLicenseManagerEnabled}">
-    <link rel="stylesheet" href="${resource(dir: 'css', file: 'managerStyle.css')}">
+    <asset:stylesheet href="css/managerStyle.css" />
 </g:if>
 <g:else>
-    <link rel="stylesheet" href="${resource(dir: 'css', file: 'tds-style.css')}">
+    <asset:stylesheet href="css/tds-style.css" />
 </g:else>
 <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">

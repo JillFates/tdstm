@@ -1,5 +1,5 @@
 <%@page import="com.tds.asset.AssetComment"%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <html>
 	<head>
@@ -14,10 +14,10 @@
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-        
+		<asset:stylesheet href="css/jqgrid/ui.jqgrid.css" />
+		<asset:stylesheet href="css/ui.datepicker.css" />
+		<asset:stylesheet href="css/tds.css" />
+
 		<script type="text/javascript">
 			function onInvokeAction(id) {
 				setExportToLimit(id, '');
@@ -43,7 +43,7 @@
 				$(".span_planned").parent().addClass("task_planned")
 				$(".span_completed").parent().addClass("task_completed")
 				$(".span_na").parent().addClass("task_na")
-				
+
 				<jqgrid:grid id="listCommentGridId" url="'${createLink(action: 'listCommentJson')}'"
 					colNames="'Action', 'Description','Updated', 'Type', 'Asset', 'AssetType','category'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:40, fixed:true},
@@ -73,12 +73,12 @@
 					var editButton = '';
 					if (${canEditComments})
 						editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
-							"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>"
+							"<asset:image src="icons/comment_edit.png' border='0px'/>"+"</a>"
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject) {
-					return cellVal ? '<span class="Arrowcursor" onclick="EntityCrud.showAssetDetailView(\''+rowObject[8]+'\', '+rowObject[7]+ ')">' + _.escape(cellVal) + '</span>' : "" 
-				} 
+					return cellVal ? '<span class="Arrowcursor" onclick="EntityCrud.showAssetDetailView(\''+rowObject[8]+'\', '+rowObject[7]+ ')">' + _.escape(cellVal) + '</span>' : ""
+				}
 			});
 		</script>
 	</head>
