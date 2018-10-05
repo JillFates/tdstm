@@ -341,7 +341,7 @@
                                     <td valign="top">
                                         <kendo-grid
                                                 *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
-                                                class="successor-predecessor-table has-duplicated-predecessors"
+                                                class="successor-predecessor-table create-table has-duplicated-predecessors"
                                                 [data]="dataGridTaskPredecessorsHelper.gridData"
                                                 [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                 [sortable]="{mode:'single'}"
@@ -388,7 +388,7 @@
                                     <td valign="top">
                                         <kendo-grid
                                                 *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
-                                                class="successor-predecessor-table has-duplicated-successors"
+                                                class="successor-predecessor-table create-table has-duplicated-successors"
                                                 [data]="dataGridTaskSuccessorsHelper.gridData"
                                                 [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                 [sortable]="{mode:'single'}"
