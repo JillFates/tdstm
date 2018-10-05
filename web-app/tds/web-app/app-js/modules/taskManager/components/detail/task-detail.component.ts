@@ -74,7 +74,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.taskDetailModel.detail = res;
 
 			this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
-			this.model = this.modelHelper.cleanAndSetModel(this.taskDetailModel);
+			this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
 			this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
 			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);

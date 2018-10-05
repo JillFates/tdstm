@@ -36,7 +36,7 @@ export class TaskEditCreateModelHelper {
 	 * @param {any} model Model to set
 	 * @returns {any}
 	 */
-	public setModel(model: any): any {
+	public getModelForEdit(model: any): any {
 		this.model = model;
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
@@ -66,7 +66,7 @@ export class TaskEditCreateModelHelper {
 	 * Get an empty model, used for create task component
 	 * @returns {any}
 	 */
-	public getEmptyModel(detailModel: TaskDetailModel): any {
+	public getModelForCreate(detailModel: TaskDetailModel): any {
 		const [yes, no] = YesNoList;
 		const defaultDurationScale = 'M';
 
@@ -138,7 +138,7 @@ export class TaskEditCreateModelHelper {
 	 * @param {any} task Holds the detail object coming from the service, this will be extracted and cleaned
 	 * @returns {any}
 	 */
-	public cleanAndSetModel(task: any): any {
+	public getModelForDetails(task: any): any {
 		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
