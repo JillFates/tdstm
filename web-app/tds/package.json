@@ -47,7 +47,7 @@
     "zone.js": "0.8.26"
   },
   "devDependencies": {
-    "@progress/kendo-theme-default": "2.56.0",
+    "@progress/kendo-theme-default": "2.57.0",
     "@types/jasmine": "2.8.8",
     "@types/node": "10.9.4",
     "@types/ramda": "0.25.38",

@@ -69,7 +69,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}

@@ -66,7 +66,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			}
 			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};

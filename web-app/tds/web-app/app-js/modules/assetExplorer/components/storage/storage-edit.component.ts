@@ -47,7 +47,7 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		private initModel(): void {
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
