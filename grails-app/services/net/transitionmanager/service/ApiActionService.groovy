@@ -693,35 +693,45 @@ class ApiActionService implements ServiceMethods {
 		if (apiActions && !apiActions.isEmpty()) {
 
 			apiActions.each { ApiAction sourceApiAction ->
-				Provider targetProvider = providerService.cloneProvider(sourceApiAction.provider, targetProject)
-				ApiCatalog targetApiCatalog = GormUtil.cloneDomainAndSave(sourceApiAction.apiCatalog, [
-				        project: targetProject,
-						provider: targetProvider
-				], false)
+				// provider and api catalogs should have already been cloned at this point
+				// look at projectService.cloneDefaultSettings(...)
+				Provider targetProvider = Provider.where {
+					name == sourceApiAction.provider.name
+					project == targetProject
+				}.get()
+
+				ApiCatalog targetApiCatalog = ApiCatalog.where {
+					name == sourceApiAction.apiCatalog.name
+					project == targetProject
+					provider == targetProvider
+				}.get()
+
 				DataScript targetDataScript = null
 				if (sourceApiAction.defaultDataScript) {
-					targetDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceApiAction.defaultDataScript, [
+					targetDataScript = (DataScript)GormUtil.cloneDomain(sourceApiAction.defaultDataScript, [
 							project : targetProject,
 							provider: targetProvider
-					], false)
+					])
+					targetDataScript.save()
 				}
 				Credential targetCredential = null
 				if (sourceApiAction.credential) {
-					credential = (Credential)GormUtil.cloneDomainAndSave(sourceApiAction.credential, [
+					targetCredential = (Credential)GormUtil.cloneDomain(sourceApiAction.credential, [
 							project : targetProject,
 							provider: targetProvider,
 							username: 'Must Be Changed',
 							password: RandomStringUtils.randomAlphanumeric(10)
-					], false)
+					])
+					targetCredential.save()
 				}
-				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomainAndSave(sourceApiAction, [
+				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomain(sourceApiAction, [
 						project: targetProject,
 						provider: targetProvider,
 						apiCatalog: targetApiCatalog,
 						defaultDataScript: targetDataScript,
 						credential: targetCredential
-
-				], false)
+				])
+				newApiAction.save()
 				log.debug "Cloned api action ${newApiAction.name} for project ${targetProject.toString()}"
 			}
 		}
