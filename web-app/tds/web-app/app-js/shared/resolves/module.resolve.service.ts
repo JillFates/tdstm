@@ -2,12 +2,12 @@
 import {ComponentFactoryResolver, Injectable} from '@angular/core';
 import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 // Services
-import {ComponentCreatorService} from '../../../shared/services/component-creator.service';
+import {ComponentCreatorService} from '../services/component-creator.service';
 // Others
 import {Observable} from 'rxjs';
 
 @Injectable()
-export class ModuleResolverService implements CanActivate {
+export class ModuleResolveService implements CanActivate {
 
 	constructor(private moduleResolver: ComponentFactoryResolver, private componentCreatorService: ComponentCreatorService) {
 	}

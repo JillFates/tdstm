@@ -1,21 +1,23 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
+import {ReportResolveService} from './resolve/report-resolve.service';
+import {ReportsResolveService} from './resolve/reports-resolve.service';
+import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
-import {ModuleResolverService} from './service/module.resolver.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {AssetExplorerService} from './service/asset-explorer.service';
 import {PreferenceService} from '../../shared/services/preference.service';
 import {TagService} from '../assetTags/service/tag.service';
-import {FieldsResolveService} from './service/fields-resolve.service';
 // Components
 import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
 import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
 // Models
 import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
-import {ReportsResolveService} from './service/reports-resolve.service';
-import {ReportResolveService} from './service/report-resolve.service';
 
 /**
  * Asset Explorer Route States
@@ -87,7 +89,7 @@ export const AssetExplorerRoute: Routes = [
 				resolveFn: (service: AssetExplorerService) => service.getReports()
 			}
 		],
-		canActivate: [AuthGuardService, ModuleResolverService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_CREATE.url,
@@ -118,7 +120,7 @@ export const AssetExplorerRoute: Routes = [
 		// 	resolveTagList
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolverService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_EDIT.url,
@@ -151,7 +153,7 @@ export const AssetExplorerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolverService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	},
 	{
 		path: AssetExplorerStates.REPORT_SHOW.url,
@@ -172,7 +174,7 @@ export const AssetExplorerRoute: Routes = [
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolverService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
 ];
 

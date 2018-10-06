@@ -23,18 +23,6 @@ import { LAST_VISITED_PAGE } from '../shared/model/constants';
 	component: TDSAppComponent,
 	resolve: [
 		{
-			token: 'taskCount',
-			policy: { async: 'RXWAIT' },
-			deps: [TaskService],
-			resolveFn: (service: TaskService) => service.retrieveUserToDoCount()
-		},
-		{
-			token: 'permissions',
-			policy: { async: 'RXWAIT', when: 'EAGER' },
-			deps: [PermissionService],
-			resolveFn: (service: PermissionService) => service.getPermissions()
-		},
-		{
 			token: 'preferences',
 			policy: { async: 'RXWAIT', when: 'EAGER' },
 			deps: [PreferenceService],
@@ -46,28 +34,6 @@ import { LAST_VISITED_PAGE } from '../shared/model/constants';
 		}
 	]
 };
-
-function requiresAuthHook(transitionService: TransitionService) {
-	// HookMatchCriteria
-	const requiresAuthCriteria = {
-		to: (state) => state.data && state.data.requiresAuth
-	};
-
-	const redirectToLogin = (transition) => {
-		const authService: AuthService = transition.injector().get(AuthService);
-		const $state = transition.router.stateService;
-		if (!authService.isAuthenticated()) {
-			return $state.target('login', undefined, { location: false });
-		}
-	};
-
-	transitionService.onBefore(requiresAuthCriteria, redirectToLogin, { priority: 10 });
-}
-
-export function AuthConfig(router: UIRouter) {
-	const transitionService = router.transitionService;
-	requiresAuthHook(transitionService);
-}
 
 export function MiscConfig(router: UIRouter) {
 	router.stateService.defaultErrorHandler((error) => {
@@ -111,9 +77,6 @@ export function MiscConfig(router: UIRouter) {
 		return false;
 	}, { priority: 10 });
 }
-export const TdsAppRoute = [
-	tdsRoot
-];
 */
 
 // Angular

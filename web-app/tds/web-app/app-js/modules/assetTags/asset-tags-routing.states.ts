@@ -1,8 +1,9 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
-import {ModuleResolverService} from './service/module.resolver.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {TagListComponent} from './components/tag-list/tag-list.component';
@@ -37,7 +38,7 @@ export const AssetTagsRoute: Routes = [
 			requiresPermissions: [Permission.TagView],
 		},
 		component: TagListComponent,
-		canActivate: [AuthGuardService, ModuleResolverService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

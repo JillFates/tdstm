@@ -1,6 +1,8 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {FieldSettingsService} from './service/field-settings.service';
@@ -12,7 +14,6 @@ import {TagListComponent} from '../assetTags/components/tag-list/tag-list.compon
 import {AssetTagsRoute} from '../assetTags/asset-tags-routing.states';
 
 export class FieldSettingsStates {
-	public static readonly PARENT = 'fieldsettings';
 	public static readonly LIST = {
 		url: 'list'
 	};
@@ -44,7 +45,8 @@ export const FieldSettingsRoute: Routes = [
 				deps: [FieldSettingsService],
 				resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
 			}
-		]
+		],
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

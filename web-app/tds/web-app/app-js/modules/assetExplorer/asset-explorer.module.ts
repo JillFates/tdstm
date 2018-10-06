@@ -13,8 +13,12 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 // Route Module
 import {AssetExplorerRouteModule} from './asset-explorer-routing.states';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {FieldsResolveService} from './resolve/fields-resolve.service';
+import {ReportsResolveService} from './resolve/reports-resolve.service';
+import {ReportResolveService} from './resolve/report-resolve.service';
 // Services
-import {ModuleResolverService} from './service/module.resolver.service';
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
 import { DependecyService } from './service/dependecy.service';
@@ -24,9 +28,6 @@ import { BulkCheckboxService } from './service/bulk-checkbox.service';
 import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
-import {FieldsResolveService} from './service/fields-resolve.service';
-import {ReportsResolveService} from './service/reports-resolve.service';
-import {ReportResolveService} from './service/report-resolve.service';
 // Components
 import {AssetExplorerViewSelectorComponent} from './components/view-selector/asset-explorer-view-selector.component';
 import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
@@ -95,7 +96,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 	],
 	providers: [
 		// Resolve
-		ModuleResolverService,
+		ModuleResolveService,
 		FieldsResolveService,
 		ReportResolveService,
 		ReportsResolveService,

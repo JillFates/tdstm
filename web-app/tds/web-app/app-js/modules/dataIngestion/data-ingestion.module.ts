@@ -32,8 +32,9 @@ import {PopupSessionAuthenticationNameComponent} from './components/popups/popup
 import {CredentialListComponent} from './components/credential-list/credential-list.component';
 import {CredentialViewEditComponent} from './components/credential-view-edit/credential-view-edit.component';
 import {PopupValidateExpressionComponent} from './components/popups/popup-validate-expression.component';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
-import {ModuleResolverService} from './service/module.resolver.service';
 import {DataIngestionService} from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
@@ -79,7 +80,7 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		CredentialViewEditComponent
 	],
 	providers: [
-		ModuleResolverService,
+		ModuleResolveService,
 		DataIngestionService,
 		ImportAssetsService, {
 		provide: HTTP_INTERCEPTORS,

@@ -27,7 +27,8 @@ export class PreferenceService {
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
 
-	preferences: any = {};
+	// TODO: Refactor to be an Observable rather than a public map
+	public preferences: any = {};
 
 	constructor(private http: HttpInterceptor) {
 	}

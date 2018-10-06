@@ -1,6 +1,8 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -12,7 +14,6 @@ import {Permission} from '../../shared/model/permission.model';
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
 export class ImportBatchStates {
-	public static readonly PARENT = 'importbatch';
 	public static readonly IMPORT_BATCH_LIST = {
 		url: 'list'
 	};
@@ -35,7 +36,7 @@ export const ImportBatchRoute: Routes = [
 			requiresPermission: Permission.DataTransferBatchView
 		},
 		component: ImportBatchListComponent,
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	},
 	{
 		path: ImportBatchStates.IMPORT_ASSETS.url,
@@ -51,7 +52,7 @@ export const ImportBatchRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: ImportAssetsComponent,
-		canActivate: [AuthGuardService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

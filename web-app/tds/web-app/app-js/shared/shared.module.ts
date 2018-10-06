@@ -51,6 +51,7 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
+import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 
 @NgModule({
 	imports: [
@@ -136,15 +137,20 @@ export class SharedModule {
 		return {
 			ngModule: SharedModule,
 			providers: [
-				PermissionService,
-				PersonService,
+				// Preferences
+				PreferencesResolveService,
 				PreferenceService,
-				NotifierService,
-				UILoaderService,
-				HttpServiceProvider,
+				// Permissions
+				PermissionService,
+				// Dialogs
 				ComponentCreatorService,
+				UILoaderService,
 				UIDialogService,
 				UIActiveDialogService,
+				// Services
+				PersonService,
+				NotifierService,
+				HttpServiceProvider,
 				UIPromptService,
 				UISVGIconDirectiveDirective,
 				UIFloatingHeaderKGridDirective,

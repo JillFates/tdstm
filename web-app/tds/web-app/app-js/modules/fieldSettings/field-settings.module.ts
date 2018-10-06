@@ -18,9 +18,9 @@ import {FieldSettingsGridComponent} from './components/grid/field-settings-grid.
 import {MinMaxConfigurationPopupComponent} from './components/min-max/min-max-configuration-popup.component';
 import {SelectListConfigurationPopupComponent} from './components/select-list/selectlist-configuration-popup.component';
 import {FieldSettingsImportanceComponent} from './components/imp/field-settings-imp.component';
-
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
-import {ModuleResolverService} from './service/module.resolver.service';
 import {FieldSettingsService} from './service/field-settings.service';
 import {CustomDomainService} from './service/custom-domain.service';
 
@@ -47,7 +47,7 @@ import {CustomDomainService} from './service/custom-domain.service';
 		MinMaxConfigurationPopupComponent
 	],
 	providers: [
-		ModuleResolverService,
+		ModuleResolveService,
 		FieldSettingsService,
 		CustomDomainService],
 	exports: [
