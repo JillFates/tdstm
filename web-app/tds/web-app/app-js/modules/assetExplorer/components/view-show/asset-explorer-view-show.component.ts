@@ -1,7 +1,6 @@
-import { Component, Inject, ViewChild, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
+import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 import { Observable } from 'rxjs';
-import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -25,32 +24,80 @@ declare var jQuery: any;
 	selector: 'asset-explorer-view-show',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
 })
-export class AssetExplorerViewShowComponent implements OnInit {
+export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 
+	private lastSnapshot;
+	private currentId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	protected model: ViewModel = new ViewModel();
 	protected domains: DomainModel[] = [];
 	protected metadata: any = {};
+	protected navigationSubscription;
 
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	constructor(
 		private route: ActivatedRoute,
+		private router: Router,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private notifier: NotifierService) {
-			// @Inject('tagList') tagList: Observable<Array<TagModel>>
-			// tagList.subscribe( result => this.metadata.tagList = result);
+
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = this.route.snapshot.data['report'];
 		this.dataSignature = JSON.stringify(this.model);
+		this.reloadStrategy();
 	}
 
 	ngOnInit(): void {
+		this.initialiseComponent();
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
+	}
+
+	/**
+	 * Reload Strategy keep listen To change to the route so we can reload whatever is inside the component
+	 * Increase dramatically the Performance
+	 */
+	private reloadStrategy(): void {
+		// The following code Listen to any change made on the rout to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event.snapshot && event.snapshot.data && event.snapshot.data.fields) {
+				console.log(event.snapshot);
+				this.lastSnapshot = event.snapshot;
+			}
+			// If it is a NavigationEnd event re-initalise the component
+			if (event instanceof NavigationEnd) {
+				console.log(event);
+				if (this.currentId != this.lastSnapshot.params.id) {
+					this.metadata.tagList = this.lastSnapshot.data['tagList'];
+					this.fields = this.lastSnapshot.data['fields'];
+					this.domains = this.lastSnapshot.data['fields'];
+					this.model = this.lastSnapshot.data['report'];
+					this.dataSignature = JSON.stringify(this.model);
+					this.initialiseComponent();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Calls every time the Component is recreated by calling same URL
+	 */
+	private initialiseComponent(): void {
+		this.currentId = this.model.id;
 		this.notifier.broadcast({
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
@@ -88,8 +135,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected onEdit(): void {
 		if (this.isEditAvailable()) {
-			// TODO: STATE SERVICE GO
-			// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 		}
 	}
 
@@ -111,8 +157,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				this.model = result;
 				this.dataSignature = JSON.stringify(this.model);
 				setTimeout(() => {
-					// TODO: STATE SERVICE GO
-					// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 				});
 			}).catch(result => {
 				console.log('error');

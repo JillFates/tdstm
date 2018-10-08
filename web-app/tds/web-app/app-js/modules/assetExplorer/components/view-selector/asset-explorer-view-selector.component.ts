@@ -8,7 +8,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 
 import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {AssetExplorerStates} from '../../asset-explorer-routing.states';
+import {Router} from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-view-selector',
@@ -39,6 +39,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	public selectedItem = '';
 
 	constructor(
+		private router: Router,
 		private service: AssetExplorerService,
 		private permissionService: PermissionService) {
 		service.getReports().subscribe((result) => {

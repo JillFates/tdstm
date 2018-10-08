@@ -18,6 +18,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 import {ReportsResolveService} from './resolve/reports-resolve.service';
 import {ReportResolveService} from './resolve/report-resolve.service';
+import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
@@ -102,6 +103,7 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		FieldsResolveService,
 		ReportResolveService,
 		ReportsResolveService,
+		TagsResolveService,
 		// Services
 		CustomDomainService,
 		AssetExplorerService,

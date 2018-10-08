@@ -7,6 +7,7 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 import {ReportResolveService} from './resolve/report-resolve.service';
 import {ReportsResolveService} from './resolve/reports-resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
+import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {AssetExplorerService} from './service/asset-explorer.service';
@@ -25,7 +26,6 @@ import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
  * @classdesc To use externally to reference possible state of the Asset Explorer Module
  */
 export class AssetExplorerStates {
-	public static readonly PARENT = 'asset';
 	public static readonly REPORT_SELECTOR = {
 		url: 'views'
 	};
@@ -46,25 +46,8 @@ export class AssetExplorerStates {
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
-const assetsListSizeResolve = {
-	token: 'preferences',
-	policy: { async: 'RXWAIT', when: 'EAGER' },
-	deps: [PreferenceService],
-	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
-};
-
-const resolveTagList = {
-	token: 'tagList',
-	policy: { async: 'RXWAIT' },
-	deps: [TagService],
-	resolveFn: (tagService: TagService) => tagService.getTags().map( (result: ApiResponseModel) => {
-		return result.status === ApiResponseModel.API_SUCCESS && result.data ? result.data : [];
-	})
-};
-
 /**
  * This state displays the field settings list.
- * It also provides a nested ui-view (viewport) for child states to fill in.
  * The field settings are fetched using a resolve.
  */
 export const AssetExplorerRoute: Routes = [
@@ -89,7 +72,8 @@ export const AssetExplorerRoute: Routes = [
 				resolveFn: (service: AssetExplorerService) => service.getReports()
 			}
 		],
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always',
 	},
 	{
 		path: AssetExplorerStates.REPORT_CREATE.url,
@@ -105,22 +89,11 @@ export const AssetExplorerRoute: Routes = [
 		},
 		component: AssetExplorerViewConfigComponent,
 		resolve: {
-		// 	assetsListSizeResolve,
-		// 	{
-		// 		token: 'report',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [Transition],
-		// 		resolveFn: (trans: Transition) => Observable.of(trans.targetState().params())
-		// 	}, {
-		// 		token: 'reports',
-		// 		policy: { async: 'RXWAIT' },
-		// 		deps: [AssetExplorerService],
-		// 		resolveFn: (service: AssetExplorerService) => service.getReports()
-		// 	},
-		// 	resolveTagList
+			tagList: TagsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always',
 	},
 	{
 		path: AssetExplorerStates.REPORT_EDIT.url,
@@ -136,24 +109,13 @@ export const AssetExplorerRoute: Routes = [
 		},
 		component: AssetExplorerViewConfigComponent,
 		resolve: {
-			// 	assetsListSizeResolve,
-			// 	{
-			// 		token: 'report',
-			// 		policy: { async: 'RXWAIT' },
-			// 		deps: [AssetExplorerService, Transition],
-			// 		resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
-			// 	}, {
-			// 		token: 'reports',
-			// 		policy: { async: 'RXWAIT' },
-			// 		deps: [AssetExplorerService],
-			// 		resolveFn: (service: AssetExplorerService) => service.getReports()
-			// 	},
-			// 	resolveTagList
+			tagList: TagsResolveService,
 			report: ReportResolveService,
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always',
 	},
 	{
 		path: AssetExplorerStates.REPORT_SHOW.url,
@@ -168,13 +130,13 @@ export const AssetExplorerRoute: Routes = [
 		},
 		component: AssetExplorerViewShowComponent,
 		resolve: {
-			// assetsListSizeResolve,
-			// resolveTagList
+			tagList: TagsResolveService,
 			report: ReportResolveService,
 			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
+		runGuardsAndResolvers: 'always',
 	}
 ];
 

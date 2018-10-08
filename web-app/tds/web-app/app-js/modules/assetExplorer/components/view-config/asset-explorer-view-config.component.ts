@@ -22,6 +22,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {ActivatedRoute, Router} from '@angular/router';
 
 declare var jQuery: any;
 @Component({
@@ -57,39 +58,40 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
+	allFields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	currentTab = 0;
 	previewButtonClicked = false;
 	protected metadata: any = {};
 
 	constructor(
-		@Inject('report') report: Observable<ViewModel>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
-		private dictionary: DictionaryService,
-		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
-			tagList.subscribe( result => this.metadata.tagList = result);
-			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-				this.domains = result[0];
-				this.model = { ...result[1] };
-				this.dataSignature = JSON.stringify(this.model);
-				if (this.model.id) {
-					this.updateFilterbyModel();
-					this.currentTab = 1;
-					// TODO: STATE SERVICE TITLE ?
-					// this.state.$current.data.page.title = this.model.name;
-					document.title = this.model.name;
-					this.draggableColumns = this.model.schema.columns.slice();
-				}
-			}, (err) => console.log(err));
+		private dictionary: DictionaryService) {
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
+		this.allFields = this.route.snapshot.data['fields'];
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = {...this.route.snapshot.data['report']};
+		this.dataSignature = JSON.stringify(this.model);
+		if (this.model.id) {
+			this.updateFilterbyModel();
+			this.currentTab = 1;
+			this.draggableColumns = this.model.schema.columns.slice();
+		}
 	}
 
 	ngOnInit(): void {
 		if (this.model.id) {
+			this.notifier.broadcast({
+				name: 'notificationHeaderTitleChange',
+				title: this.model.name
+			});
 			this.previewButtonClicked = true;
 			this.onPreview();
 		}
@@ -222,8 +224,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
 			setTimeout(() => {
-				// TODO: STATE SERVICE GO
-				// this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 			});
 		}).catch(result => {
 			console.log('error');
