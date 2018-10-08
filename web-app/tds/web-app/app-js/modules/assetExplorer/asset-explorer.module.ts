@@ -20,9 +20,6 @@ import { SharedModule } from '../../shared/shared.module';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
-import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
-import { TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
-import { TaskCreateComponent } from '../taskManager/components/create/task-create.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -49,11 +46,13 @@ import { ModelService } from  './service/model.service';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
+import {TaskManagerModule} from '../taskManager/task-manager.module';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SharedModule,
+		TaskManagerModule,
 		FormsModule,
 		DropDownListModule,
 		GridModule,
@@ -77,9 +76,6 @@ import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
-		TaskCreateComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -110,9 +106,6 @@ import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-
 		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
-		TaskCreateComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,

@@ -90,7 +90,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned:  no,
 			sendNotification:  no,
 			durationScale: defaultDurationScale,
-			durationParts: '',
+			durationParts: {days: 0, hours: 0, minutes: 0},
 			locked: false,
 			actualStart:  '',
 			actualFinish:  '',

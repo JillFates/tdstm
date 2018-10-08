@@ -101,6 +101,8 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 				if (assetClasses) {
 					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
 				}
+				// TODO remove it
+				this.model.categoriesList = ["general"];
 
 				jQuery('[data-toggle="popover"]').popover();
 			});
@@ -257,8 +259,19 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 		});
 	}
 
+	/**
+	 * Save the changes on the task
+	 */
 	protected onSave(): void {
 		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
+			.subscribe((result) => this.close(result));
+	}
+
+	/**
+	 * Create the t ask
+	*/
+	protected onCreate(): void {
+		this.taskManagerService.createTask(this.modelHelper.getPayloadForUpdate())
 			.subscribe((result) => this.close(result));
 	}
 

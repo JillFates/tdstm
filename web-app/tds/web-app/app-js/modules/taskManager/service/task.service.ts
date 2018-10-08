@@ -248,4 +248,16 @@ export class TaskService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Create a task
+	 * @param payload model to create
+	 * @returns {Observable<any>}
+	 */
+	createTask(payload: any): Observable<any> {
+		const url = `${this.baseURL}/assetEntity/saveComment`;
+		return this.http.post(url, JSON.stringify(payload))
+			.map(res =>  res && res.json())
+			.catch((error: any) => error);
+	}
+
 }
