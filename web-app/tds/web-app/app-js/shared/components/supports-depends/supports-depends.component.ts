@@ -49,8 +49,7 @@ export class SupportsDependsComponent implements OnInit {
 		this.dataFlowFreqList = R.clone(this.model.dataFlowFreq);
 		this.typeList = R.clone(this.model.dependencyMap.dependencyType);
 		this.statusList = R.clone(this.model.dependencyMap.dependencyStatus);
-		if ((!this.model.moveBundleList && this.model.dependencyMap && this.model.dependencyMap.moveBundleList) ||
-			this.model.moveBundleList && this.model.moveBundleList.length === 0) {
+		if (!this.model.moveBundleList && this.model.dependencyMap && this.model.dependencyMap.moveBundleList) {
 			this.model.moveBundleList = this.model.dependencyMap.moveBundleList;
 		}
 		this.model.moveBundleList.forEach((moveBundle) => {
