@@ -36,6 +36,7 @@ import {AssetExplorerViewExportComponent} from './components/view-export/asset-e
 import {AssetExplorerViewGridComponent} from './components/view-grid/asset-explorer-view-grid.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
 import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
+import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
 import {TaskCommentComponent} from './components/task-comment/task-comment.component';
@@ -51,7 +52,6 @@ import {ManufacturerShowComponent} from './components/device/manufacturer/compon
 import {ManufacturerEditComponent} from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import {ModelDeviceShowComponent} from './components/device/model-device/components/model-device-show/model-device-show.component';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
-import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 
 @NgModule({
