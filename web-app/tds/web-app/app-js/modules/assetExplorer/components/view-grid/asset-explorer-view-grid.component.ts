@@ -30,6 +30,8 @@ import {SingleCommentModel} from '../single-comment/model/single-comment.model';
 import {SingleCommentComponent} from '../single-comment/single-comment.component';
 import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetEditComponent} from '../asset/asset-edit.component';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -377,6 +379,29 @@ export class AssetExplorerViewGridComponent {
 		];
 
 		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+	}
+
+	/**
+	 * Allows to display the clone asset modal
+	 */
+	protected showAssetCloneView(dataItem: any) {
+		const cloneModalModel: AssetModalModel = {
+			assetType: dataItem.common_assetClass,
+			assetId: dataItem.common_id
+		}
+		this.dialog.extra(AssetCloneComponent, [
+			{provide: AssetModalModel, useValue: cloneModalModel}
+		], false, false).then( (result: CloneCLoseModel)  => {
+
+			if (result.clonedAsset && result.showEditView) {
+				const componentParameters = [
+					{ provide: 'ID', useValue: result.assetId },
+					{ provide: 'ASSET', useValue: dataItem.common_assetClass }
+				];
+
+				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+			}
+		}).catch( error => console.log('error', error));
 	}
 
 	/**

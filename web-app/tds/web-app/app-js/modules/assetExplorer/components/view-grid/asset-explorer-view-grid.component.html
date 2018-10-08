@@ -6,6 +6,7 @@
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 		<div class="col-sm-6 bulkchange-section">
+
 			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
 					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_APPLICATIONS"
 					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
@@ -71,7 +72,7 @@
 	</kendo-grid-column>
 
 	<!-- Action -->
-	<kendo-grid-command-column [width]="150">
+	<kendo-grid-command-column [width]="200" [locked]="true">
 		<ng-template kendoGridHeaderTemplate>
 			<div class="text-center">
 				<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -93,6 +94,11 @@
 						title="Create Comment or Show Comments"
 						(click)="createComment(dataItem)">
 					<span class="fa fa-fw fa-comments"></span>
+				</button>
+				<button class="btn btn-action btn-default"
+						title="Clone Asset"
+						(click)="showAssetCloneView(dataItem)">
+					<span class="fa fa-fw fa-clone"></span>
 				</button>
 			</div>
 		</ng-template>
