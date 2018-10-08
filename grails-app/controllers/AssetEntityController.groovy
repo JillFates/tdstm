@@ -2905,7 +2905,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def assetName
 		if (params.assetId) {
-			assetName = AssetEntityHelper.getAssetById(project, null, params.assetId).assetName
+			assetName = fetchDomain(AssetEntity, [id: params.assetId]).assetName
 		}
 
 		Map<String, String> defaultPrefs = [levelsUp: '0', levelsDown: '3', showCycles: true,
