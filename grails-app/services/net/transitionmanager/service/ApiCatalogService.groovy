@@ -98,10 +98,13 @@ class ApiCatalogService implements ServiceMethods {
 	 * @param id - the api catalog id
 	 */
 	void deleteById(Long id) {
-		ApiCatalog.where {
+		ApiCatalog foundApiCatalog = ApiCatalog.where {
 			project == securityService.userCurrentProject
 			id == id
-		}.deleteAll()
+		}.get()
+		if (foundApiCatalog) {
+			foundApiCatalog.delete(flush: true)
+		}
 	}
 
 	/**
