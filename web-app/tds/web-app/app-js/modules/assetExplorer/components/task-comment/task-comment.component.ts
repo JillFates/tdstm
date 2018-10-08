@@ -78,7 +78,7 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.resolvedBy === null);
+		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.dateResolved === null);
 		if (this.showAllComments) {
 			filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment');
 		}
