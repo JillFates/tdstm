@@ -23,13 +23,13 @@ class LoginPage extends Page {
     }
 
     def login(userIndex = 0, passIndex = 1) {
-        def userCredencials = getCredentials(userIndex, passIndex)
+        def userCredentials = getCredentials(userIndex, passIndex)
         /**
-         * The following two lines will use the credentials in te testData.txt file unless
+         * The following two lines will use the credentials in the testData.txt file unless
          * different credentials are provided when executing.
          */
-        username = System.properties['tm.creds.username']?: userCredencials.user
-        password =  System.properties['tm.creds.password'] ?: userCredencials.pass
+        username = System.properties['tm.creds.username']?: userCredentials.user
+        password =  System.properties['tm.creds.password'] ?: userCredentials.pass
         submitButton.click()
     }
 }

@@ -14,12 +14,18 @@ import { ModelDeviceShowComponent } from './model-device/components/model-device
 import { ManufacturerShowComponent } from './manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ModelService} from '../../service/model.service';
 import {ManufacturerService} from '../../service/manufacturer.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {CloneModalModel} from '../../model/clone-modal.model';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
 
 declare var jQuery: any;
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
-		selector: `device-show`,
+		selector: `tds-device-show`,
 		template: template
 	}) class DeviceShowComponent implements OnInit {
 		mainAsset = modelId;
@@ -31,7 +37,10 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			private dialogService: UIDialogService,
 			private assetService: DependecyService,
 			private modelService: ModelService,
-			private manufacturerService: ManufacturerService) {
+			private manufacturerService: ManufacturerService,
+			private prompt: UIPromptService,
+			private assetsExplorerService: AssetExplorerService,
+			private notifierService: NotifierService) {
 			this.manufacturerName = null;
 		}
 
@@ -63,7 +72,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
@@ -80,7 +89,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.XLG);
+				DIALOG_SIZE.LG);
 		}
 
 		showModel(id: string): void {
@@ -116,6 +125,59 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							}
 						}).catch((error) => console.log(error));
 				});
+		}
+
+		/**
+		 allows to delete the application assets
+		 */
+		onDeleteAsset() {
+
+			this.prompt.open('Confirmation Required',
+				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'OK', 'Cancel')
+				.then( success => {
+					if (success) {
+						this.assetsExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
+							if (res) {
+								this.notifierService.broadcast({
+									name: 'reloadCurrentAssetList'
+								});
+								this.activeDialog.dismiss();
+							}
+						}, (error) => console.log(error));
+					}
+				})
+				.catch((error) => console.log(error));
+		}
+
+		/**
+		 * Allows to clone an application asset
+		 */
+		onCloneAsset(): void {
+
+			const cloneModalModel: CloneModalModel = {
+				assetType: DOMAIN.DEVICE,
+				assetId: this.mainAsset
+			}
+			this.dialogService.extra(AssetCloneComponent, [
+				{provide: CloneModalModel, useValue: cloneModalModel}
+			], false, false).then( (result: CloneCLoseModel)  => {
+
+				if (result.clonedAsset && result.showEditView) {
+					const componentParameters = [
+						{ provide: 'ID', useValue: result.assetId },
+						{ provide: 'ASSET', useValue: DOMAIN.DEVICE }
+					];
+
+					this.dialogService
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				}
+			})
+				.catch( error => console.log('error', error));
+		}
+
+		getGraphUrl(): string {
+			return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 		}
 
 	}

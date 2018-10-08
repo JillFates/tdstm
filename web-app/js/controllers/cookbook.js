@@ -615,6 +615,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 					});
 					scope.editor.selectedRVersion.context.tag = result.data;
 					scope.contexts.checkValidSelection();
+					if (!scope.$$phase) scope.$digest();
 				}
 			});
 		}

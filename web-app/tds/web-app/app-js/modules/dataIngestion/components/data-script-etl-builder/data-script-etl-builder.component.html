@@ -1,4 +1,10 @@
-<div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog()" tabindex="-1" role="dialog">
+<style>
+    i.field-info-icon {
+        cursor: pointer;
+        font-size: 17px;
+    }
+</style>
+<div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div #resizableForm class="modal-content resizable"
              tds-ui-modal-decorator=""
@@ -107,6 +113,7 @@
                     <hr>
                     <!-- Sample Preview Panels -->
                     <div class="data-preview">
+                        <!-- Sample Data -->
                         <div class="row">
                             <div class="col-md-12 sample-preview" >
                                 <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
@@ -143,6 +150,7 @@
                             </div>
                         </div>
                         <hr>
+                        <!-- Transformed Test Data -->
                         <div class="row" *ngIf="scriptTestResult.domains.length > 0">
                             <label class="col-md-12">
                                 <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
@@ -158,6 +166,17 @@
                                     <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
+                                                <!-- Fields Info Popup -->
+                                                <field-reference-popup *ngIf="fieldReferencePopupHelper.popup.show"
+                                                                       [mouseEvent]="fieldReferencePopupHelper.popup.mouseEvent"
+                                                                       [type]="fieldReferencePopupHelper.popup.type"
+                                                                       [domain]="fieldReferencePopupHelper.popup.domain"
+                                                                       [results]="fieldReferencePopupHelper.popup.results"
+                                                                       [gridData]="fieldReferencePopupHelper.popup.gridData"
+                                                                       [gridGroups]="fieldReferencePopupHelper.popup.gridGroups"
+                                                                       [offset]="fieldReferencePopupHelper.popup.offset"
+                                                                       (onClose)="fieldReferencePopupHelper.closePopup($event)">
+                                                </field-reference-popup>
                                                <kendo-grid *ngIf="transformedDataGrids[i]"
                                                            [data]="transformedDataGrids[i].gridData"
                                                            [height]="'300'"
@@ -166,17 +185,33 @@
                                                            [skip]="transformedDataGrids[i].state.skip"
                                                            [pageable]="true"
                                                            (pageChange)="transformedDataGrids[i].pageChange($event)">
-                                                                <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames"
-                                                                                   title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
-                                                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                                                        <div *ngIf="dataItem.fields && dataItem.fields[column]"
-                                                                             [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
-                                                                            {{getInitOrValue(dataItem.fields[column])}}
-                                                                            <i *ngIf="!dataItem.fields[column].value && dataItem.fields[column].init"
-                                                                               [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
-                                                                        </div>
-                                                                    </ng-template>
-                                                                </kendo-grid-column>
+
+                                                   <!-- Field Columns -->
+                                                   <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames"
+                                                                      title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
+                                                       <ng-template kendoGridCellTemplate let-dataItem>
+                                                           <div *ngIf="dataItem.fields && dataItem.fields[column]"
+                                                                [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
+                                                               <div class="" style="width: 100%;">
+                                                                   {{getInitOrValue(dataItem.fields[column])}}
+                                                                   <i *ngIf="!dataItem.fields[column].value && dataItem.fields[column].init"
+                                                                      [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
+                                                               </div>
+
+                                                               <!-- Popup Reference Icons -->
+                                                               <div class="" style="width: 100%;">
+                                                                   <i *ngIf="dataItem.fields[column].create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                      title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
+                                                                   <i *ngIf="dataItem.fields[column].update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                      title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
+                                                                   <i *ngIf="dataItem.fields[column].find && dataItem.fields[column].find.query.length > 0"
+                                                                      (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column], domain.fieldLabelMap)"
+                                                                      title="View Find Results" class="field-info-icon fa fa-search"></i>
+                                                               </div>
+
+                                                           </div>
+                                                       </ng-template>
+                                                   </kendo-grid-column>
                                                 </kendo-grid>
                                             </div>
                                         </ng-template>

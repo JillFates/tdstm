@@ -51,7 +51,6 @@ class DeviceSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 	 */
 	@Override
 	protected void populateAsset(AssetEntity device) {
-
 		// Assign all of the standard properties to the device class
 		(AssetEntityService.ASSET_PROPERTIES + AssetEntityService.CUSTOM_PROPERTIES + AssetEntityService.DEVICE_PROPERTIES).each { p ->
 			if (command.asset.containsKey(p)) {
@@ -104,5 +103,9 @@ class DeviceSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 		assetEntityService.assignAssetToRoom(project, device, command.asset.roomTargetId, command.asset.locationTarget, command.asset.roomTarget, false)
 
 		assetEntityService.assignDeviceToChassisOrRack(project, device, command.asset)
+
+        if (!device.moveBundle) {
+            assetEntityService.assignAssetToBundle(project, device, command.asset['moveBundleId'].toString())
+        }
 	}
 }

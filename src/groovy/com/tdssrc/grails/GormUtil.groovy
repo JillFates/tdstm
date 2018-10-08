@@ -9,31 +9,25 @@ import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
+import org.codehaus.groovy.grails.orm.hibernate.cfg.CompositeIdentity
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
+import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.hibernate.transform.Transformers
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
-
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-import org.codehaus.groovy.grails.orm.hibernate.cfg.CompositeIdentity
-import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
-import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
-import org.codehaus.groovy.grails.validation.ConstrainedProperty
-import org.codehaus.groovy.grails.validation.Constraint
-import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
-import grails.validation.Validateable
-
 
 @Slf4j(value='logger')
 class GormUtil {
@@ -472,7 +466,7 @@ class GormUtil {
 
 	/**
 	 * Used to retrieve an instance of the specified Domain class. This will work differently
-	 * in Unit tests than in Integration or production. In the latter two, there is an instance of the
+	 * in Unit tests than in Integration or Production. In the latter two, there is an instance of the
 	 * domain class loaded as a bean so that is used but for Unit tests a new instance is created for each invocation.
 	 * @param domainClass
 	 * @return
@@ -484,8 +478,12 @@ class GormUtil {
 		}
 		def ctx = ApplicationContextHolder.getApplicationContext()
 		if (ctx) {
-			String name = domainClass.getName() + 'DomainClass'
-			return ctx.getBean(name)
+			try {
+				String name = domainClass.getName() + 'DomainClass'
+				return ctx.getBean(name)
+			} catch (e) {
+				throw new InvalidParamException("Invalid domain name (${domainClass.getName()}) specified for getDomainClass()")
+			}
 		}
 		return new DefaultGrailsDomainClass(domainClass)
 	}
@@ -1353,24 +1351,14 @@ class GormUtil {
 	 * 		have an alternate property name defined then the method will return NULL.
 	 */
 	static List findDomainByAlternateKey(
-			  Class domainClass, String searchValue, Project project=null,
-			  Map extraCriteria=null, List extraAlternate
+			  Class domainClass, String searchValue, Project project=null, Map extraCriteria=null
 	) {
-		List entities = null
+		List entities
 		String altKeyName = getAlternateKeyPropertyName(domainClass)
 		if (altKeyName) {
 			String domainName = domainShortName(domainClass)
 			Map params = [searchValue:searchValue]
-			StringBuilder hql = new StringBuilder("from ${domainName} as x where ")
-
-			List<String> orSearch = [altKeyName]
-			orSearch.addAll(extraAlternate ?: [])
-
-			orSearch = orSearch.collect { alt ->
-				"x.${alt} = :searchValue"
-			}
-
-			hql.append( orSearch.join(' or ') )
+			StringBuilder hql = new StringBuilder("from ${domainName} as x where x.${altKeyName} = :searchValue ")
 
 			// or
 			// Include project in the query if the domain references it
@@ -1389,6 +1377,7 @@ class GormUtil {
 			println "hql = ${hql.toString()}, params=$params"
 			// Try finding the entity or more...
 			entities = domainClass.findAll(hql.toString(), params)
+
 		}
 		return entities
 	}

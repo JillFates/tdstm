@@ -2,24 +2,22 @@ package net.transitionmanager.dataImport
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.FindCondition
+import com.tdsops.etl.QueryResult
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.ManufacturerAlias
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PersonService
-import com.tdsops.common.grails.ApplicationContextHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-import groovy.util.logging.Slf4j
 
 @Slf4j
 class SearchQueryHelper {
@@ -117,6 +115,10 @@ class SearchQueryHelper {
 		// This will be populated with the entity object or error message appropriately
 		Object entity
 
+		if (! fieldsInfo.containsKey(fieldName)) {
+			return null
+		}
+
 		if (context == null) {
 			context = [:]
 		}
@@ -131,7 +133,6 @@ class SearchQueryHelper {
 		if (fieldsInfo[fieldName]?.value == '!~! Go ahead, Make my day !~!') {
 			throw new InvalidRequestException('Do you feel lucky, punk?')
 		}
-
 		boolean foundInCache=false
 		boolean errorPreviouslyRecorded = false
 		boolean fieldIsId = fieldName == 'id'
@@ -139,23 +140,36 @@ class SearchQueryHelper {
 
 		// Flags that a search by ID failed which will result in an error so that duplicates are not created
 		boolean searchedById = false
+
+		Class domainClassOfProperty = (entityInstance ? entityInstance.getClass() : context.domainClass)
 		Class domainClass
-		(domainClass, entity) = classOfDomainProperty(fieldName, fieldsInfo, context.domainClass)
+		(domainClass, entity) = classOfDomainProperty(fieldName, fieldsInfo, domainClassOfProperty)
 		String domainShortName = domainClass ? GormUtil.domainShortName(domainClass) : null
 
-		while (domainShortName) {
-
-			if ( ! fieldIsInFieldsInfo && ! fieldIsId) {
-				// Shouldn't happen but just in case...
-				entity = "Reference property $fieldName is missing from ETL output"
+		switch (domainClass) {
+			case AssetDependency:
+				entity = fetchAssetDependencyByAssets(fieldsInfo, context)
 				break
-			}
 
-			//
-			// Now going to try up to 5+ different ways to find the domain entity
-			//
+			case Person:
+				// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
+				Person existingPerson = entityInstance ? entityInstance[fieldName] : null
+				String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
+				String errorMsg
+				(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
+				if (errorMsg) {
+					// If no entity was found then we want to capture the error message to save in the cache
+					entity = errorMsg
+					// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
+					recordError(context, errorMsg)
+				}
+				break
 
-			if (fieldIsInFieldsInfo) {
+			default:
+				//
+				// Now going to try up to 5+ different ways to find the domain entity
+				//
+
 				// 1. See if this property based on ID is in the cache already
 				if (context.cache) {
 					md5 = generateMd5OfFieldsInfoField(domainShortName, fieldName, fieldsInfo)
@@ -239,31 +253,7 @@ class SearchQueryHelper {
 						break
 					}
 				}
-			} // if (fieldIsInFieldsInfo) {
-
-			// 6. Attempt for certain domain classes (e.g. AssetDependency) that weren't found
-			switch (domainClass) {
-				case AssetDependency:
-					entity = fetchAssetDependencyByAssets(fieldsInfo, context)
-					break
-
-				case Person:
-					// When the Person is a reference in another domain then we can pass it into the fetchPerson logic
-					Person existingPerson = entityInstance ? entityInstance[fieldName] : null
-					String searchValue = getValueOrInitialize(fieldName, fieldsInfo)
-					String errorMsg
-					(entity, errorMsg) = fetchPerson(existingPerson,  searchValue, fieldName, fieldsInfo, context)
-					if (errorMsg) {
-						// If no entity was found then we want to capture the error message to save in the cache
-						entity = errorMsg
-						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
-						recordError(context, errorMsg)
-					}
-					break
-			}
-
-			break
-		}
+		} // switch (domainClass)
 
 		// Cache the entity or error message for the lookup (unless it was found in cache above)
 		if (! foundInCache && md5) {
@@ -301,7 +291,7 @@ class SearchQueryHelper {
 
 		if (! GormUtil.isDomainProperty(domainClass, propertyName)) {
 			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
-			log.debug 'classOfDomainProperty() {}', errorMsg
+			log.debug 'classOfDomainProperty() {} for domain {}', errorMsg, domainClass.getName()
 		} else {
 			while ( true ) {
 				if (propertyName == 'id') {
@@ -309,11 +299,11 @@ class SearchQueryHelper {
 					break
 				}
 
-				if (! fieldsInfo.containsKey(propertyName)) {
-					errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
-					log.debug 'classOfDomainProperty() {}', errorMsg
-					break
-				}
+				// if (! fieldsInfo.containsKey(propertyName)) {
+				// 	errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
+				// 	log.debug 'classOfDomainProperty() {}', errorMsg
+				// 	break
+				// }
 
 				Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(domainClass, propertyName)
 				Boolean isReferenceProperty = GormUtil.isReferenceProperty(domainClass, propertyName)
@@ -342,7 +332,7 @@ class SearchQueryHelper {
 					//be precisely what that DataScript developer intended to be created.
 
 					String classShortName = GormUtil.domainShortName(domainClassToCreate)
-					if (classShortName in ['AssetEntity']) {
+					if (classShortName == 'AssetEntity') {
 						// Try looking for the exact class type in the find.query
 						List query = fieldsInfo[propertyName].find?.query
 						if (query?.size() > 0) {
@@ -417,35 +407,41 @@ class SearchQueryHelper {
 	 * @test Integration
 	 */
 	private static Object fetchEntityById(Class domainClass, String fieldName, Map fieldsInfo, Map context) {
+		Object searchValue = fieldsInfo[fieldName]?.value ?: null
+		log.debug 'fetchEntityById() {}.{} with {}', domainClass.getName(), fieldName, searchValue
 		Object entity
 		Boolean searchedById = false
-		Boolean valueIsString = (fieldsInfo[fieldName].value instanceof CharSequence)
-		Long id = NumberUtil.toPositiveLong(fieldsInfo[fieldName].value)
-		// log.debug 'fetchEntityById() isaNumber={}, isaString={}, idValue={}', isaNumber, isaString, idValue
-		if (id) {
-			searchedById = true
-			entity = GormUtil.findInProject(context.project, domainClass, id)
-		}
-		log.debug 'fetchEntityById() domainClass={}, fieldName={}, id={}, entity={}', domainClass.getName(), fieldName, id, entity
+		if (fieldsInfo.containsKey(fieldName)) {
+			Boolean valueIsString = (searchValue instanceof CharSequence)
+			Long id = NumberUtil.toPositiveLong(searchValue)
+			// log.debug 'fetchEntityById() isaNumber={}, isaString={}, idValue={}', isaNumber, isaString, idValue
+			if (id) {
+				searchedById = true
+				entity = GormUtil.findInProject(context.project, domainClass, id)
+			}
+			log.debug 'fetchEntityById() domainClass={}, fieldName={}, id={}, entity={}', domainClass.getName(), fieldName, id, entity
 
-		if (searchedById && ! entity) {
-			return valueIsString ? null : NOT_FOUND_BY_ID
-		} else {
-			return entity
+			if (searchedById && ! entity) {
+				entity = (valueIsString ? null : NOT_FOUND_BY_ID)
+			}
 		}
+		return entity
 	}
 
 	/**
-	 * Called by fetchEntityByFieldMetaData.
 	 * Used to determine if the fieldsInfo for a property has a single result.
+	 * Called by fetchEntityByFieldMetaData.
 	 * @param fieldsInfo - the Map with the ETL meta data for all of the fields for the row
 	 * @param context - the context map that the process uses to cart crap around
 	 * @return true if there is a single result otherwise false
 	 * @test Integration
 	 */
-	private static Boolean hasSingleFindResult(String propertyName, Map fieldsInfo) {
-		Boolean hasSingleResult = fieldsInfo[propertyName].find?.results?.size() == 1
-		log.debug 'hasSingleFindResult() for field {} has single result? {}', propertyName, hasSingleResult
+	private static Boolean hasSingleFindResult(String fieldName, Map fieldsInfo) {
+		Boolean hasSingleResult = null
+		if (fieldsInfo.containsKey(fieldName)) {
+			hasSingleResult = fieldsInfo[fieldName].find?.results?.size() == 1
+			log.debug 'hasSingleFindResult() for field {} has single result? {}', fieldName, hasSingleResult
+		}
 		return hasSingleResult
 	}
 
@@ -456,9 +452,12 @@ class SearchQueryHelper {
 	 * @return true if there is one or more queries defined
 	 * @test Integration
 	 */
-	private static Boolean hasFindQuery(String propertyName, Map fieldsInfo) {
-		Boolean hasFindQuery = fieldsInfo[propertyName].find?.query?.size() > 0
-		log.debug 'hasFindQuery() for field {} has find query? {}', propertyName, hasFindQuery
+	private static Boolean hasFindQuery(String fieldName, Map fieldsInfo) {
+		Boolean hasFindQuery=null
+		if (fieldsInfo.containsKey(fieldName)) {
+			hasFindQuery = fieldsInfo[fieldName].find?.query?.size() > 0
+			log.debug 'hasFindQuery() for field {} has find query? {}', fieldName, hasFindQuery
+		}
 		return hasFindQuery
 	}
 
@@ -493,7 +492,9 @@ class SearchQueryHelper {
 
 				// Use the ETL find logic to try searching for the domain entities
 				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
-				if(query.containsKey('criteria')){
+
+				// Support the new find query language using criterias
+				if(query.getClass().isAssignableFrom(QueryResult) || query.containsKey('criteria')){
 					List<FindCondition> conditions = FindCondition.buildCriteria(query.criteria)
 					entities = DomainClassQueryHelper.where(whereDomain, context.project, conditions, false)
 				} else {
@@ -540,7 +541,7 @@ class SearchQueryHelper {
 	private static Object fetchEntityByFindResults(String propertyName, Map fieldsInfo, Map context) {
 		Object entity=null
 		if (hasSingleFindResult(propertyName, fieldsInfo)) {
-			Map find = fieldsInfo[propertyName].find ?: null
+			def find = fieldsInfo[propertyName].find ?: null
 			Long entityId = find.results[0]
 			String domainName = find.query[0].domain
 			// Get the class of the domain specified in find of the ETL script
@@ -612,28 +613,30 @@ class SearchQueryHelper {
 				case 'Room':
 					// Get the Location field
 					extraCriteria.put('source', (referenceFieldName == 'roomSource' ? 1 : 0))
+					List parts = searchValue.split('/')
+					if (parts.size() != 2) {
+						result.error = 'Room must be formatted as Location/Name'
+					} else {
+						searchValue = parts[1].trim()
+						extraCriteria.put( 'location', parts[0].trim() )
+					}
 					break
 
 				case 'Rack':
 					// Resolve the Room first
 					boolean isSource = referenceFieldName == 'rackSource'
+					extraCriteria.put('source', (isSource ? 1 : 0))
 					String roomFieldName = isSource ? 'roomSource' : 'roomTarget'
 					if (fieldsInfo.containsKey(roomFieldName)) {
 						Room room = findEntityByMetaData(roomFieldName, fieldsInfo, context)
 						if (! room) {
-							result.error = 'Unable to resolve room'
+							result.error = 'Unable to find Room'
 						} else {
 							extraCriteria.put('room.id', room.id)
 						}
 					} else {
 						result.error = 'Room must be included to set rack'
 					}
-
-					extraCriteria.put('source', (isSource ? 1 : 0))
-					break
-
-				case 'Manufacturer':
-					extraAlternate << 'description'
 					break
 
 				case 'Model':
@@ -653,28 +656,206 @@ class SearchQueryHelper {
 			}
 
 			if (! result.error) {
-				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria, extraAlternate)
+				List entities = GormUtil.findDomainByAlternateKey(domainClass, searchValue, context.project, extraCriteria)
 
-				if (!entities && refDomainName == 'Model') {
-					Model model = ModelAlias.where { name == searchValue && manufacturer == mfg }.find()?.model
-					if (model) {
-						entities = [model]
+				// For Manufacturer and Model this will try searching via their Aliases tables
+				if ( !entities && refDomainName in ['Manufacturer', 'Model']) {
+					Object entity
+					if ( refDomainName == 'Model' ) {
+						entity = Model.lookupFirstAlias(searchValue, mfg)
+					} else if ( refDomainName == 'Manufacturer' ) {
+						entity = Manufacturer.lookupFirstAlias(searchValue)
+					}
+					if (entity) {
+						entities = [entity]
+					} else {
+						entities = []
 					}
 				}
 
-				int numFound = entities ? entities.size() : 0
-				log.debug 'fetchEntityByAlternateKey() domainClass={}, searchValue={}, extraCriteria={}, found={}',
+				int numFound = entities.size()
+
+				log.debug 'fetchEntityByAlternateKey() RESULTS: domainClass={}, searchValue={}, extraCriteria={}, found={}',
 					domainClass.getName(), searchValue, extraCriteria, numFound
 
 				if (numFound > 0) {
 					result.entities = entities
-				} else {
-					// what to do here?
 				}
 			}
 		}
 
 		return result
+	}
+
+	/**
+	 * Used to fetch a reference entity that is a field within an existing entity instance. For Model and Room and other types it will
+	 * perform more extensive searches with additional fields and aliases (mfg/model).
+	 *
+	 * @param entity - the entity instance that the field reference will resides in
+	 * @param fieldName - the field name that is the reference to fetch
+	 * @param fieldsValueMap - a map consistenting of the values that each of the fields will be set to
+	 * @param context - the map that contains the holy grail of the Import Batch processing
+	 * @return a map containing the following:
+	 *		entities: List of reference domain entities that were found
+	 * 		error: A String set if an error was encountered
+	 */
+	private static List fetchReferenceOfEntityField(Object entity, String fieldName, Map fieldsValueMap, Map context) {
+		List<Object> entities = []
+		String searchValue = fieldsValueMap[fieldName]
+		Manufacturer mfg
+		String errorMsg
+
+		log.debug 'fetchReferenceOfEntityField() Fetching {}.{} with value {}', entity.getClass().getName(), fieldName, searchValue
+
+		if (! fieldsValueMap.containsKey(fieldName)) {
+			errorMsg = "Field $fieldName must be defined"
+		}
+
+		if (! errorMsg && searchValue?.size() > 0) {
+			Class refDomainClass = GormUtil.getDomainPropertyType(entity, fieldName)
+			String refDomainName = GormUtil.domainShortName(refDomainClass)
+
+			// This map will get populated with extra criteria that will be used for the alternate key lookup appropriately
+			Map extraCriteria = [:]
+
+			switch (refDomainName) {
+				case 'Model':
+					// If the entity doesn't have the Manufacturer set yet or the Manufacturer.name doesn't match then
+					// this will recursively call this method to get the room object
+					if ( ! entity.manufacturer || entity.manufacturer.name != fieldsValueMap['manufacturer'] ) {
+						List<Object> mfgEntities
+						String mfgError
+						(mfgEntities, mfgError) = fetchReferenceOfEntityField(entity, 'manufacturer', fieldsValueMap, context)
+						if ( mfgError ) {
+							errorMsg = mfgError
+						} else {
+							switch ( mfgEntities.size() ) {
+								case 1:
+									// Perfect - the Room was found so we can add it to the criteria
+									mfg = mfgEntities[0]
+									break
+								case 0:
+									errorMsg = "Manufacturer '${fieldsValueMap.manufacturer}' was not found"
+									break
+								default:
+									errorMsg = "Found multiple Manufacturers with name '${fieldsValueMap.manufacturer}'"
+							}
+						}
+					} else {
+						mfg = entity.manufacturer
+					}
+
+					if (!errorMsg) {
+						if (mfg) {
+							extraCriteria.put('manufacturer', mfg)
+
+							// Setting the assetType but then there could be a mismatch so this should be thought through...
+							// TODO : JPM 9/2018 : Need to determine if the assetType should be a criteria
+							// if (entity.assetType) {
+							// 	extraCriteria.put('assetType', entity.assetType)
+							// }
+
+						} else {
+							errorMsg = 'Manufacturer must be specified in order to set Model'
+						}
+					}
+					break
+
+				case 'Room':
+					// Add criteria to indicate source or target Room
+					boolean isSource = (fieldName == 'roomSource')
+					extraCriteria.put('source', (isSource ? 1 : 0))
+
+					// String locationFieldName = (isSource ? 'locationSource' : 'locationTarget')
+					// if (fieldsValueMap[locationFieldName]) {
+					// 	extraCriteria.put('location', fieldsValueMap[locationFieldName])
+					// } else {
+					// 	errorMsg = 'Location is require for Room lookup'
+					// }
+					break
+
+				case 'Rack':
+					boolean isSource = (fieldName == 'rackSource')
+
+					// Add criteria to indicate source or target Room
+					extraCriteria.put('source', (isSource ? 1 : 0))
+
+					// Determine the room object that is necessary for finding the rack
+					String roomFieldName = ( isSource ? 'roomSource' : 'roomTarget' )
+					if ( ! fieldsValueMap[roomFieldName] ) {
+						errorMsg = 'Room is required for Rack lookup'
+					} else {
+						// If the entity doesn't have the room set yet or the room name doesn't match then
+						// this will recursively call this method to get the room object
+
+
+						if ( ! entity[roomFieldName] || entity[roomFieldName].roomName != fieldsValueMap[roomFieldName] ) {
+							List<Object> roomEntities
+							String roomErrorMsg
+							(roomEntities, roomErrorMsg) = fetchReferenceOfEntityField(entity, roomFieldName, fieldsValueMap, context)
+							if ( roomErrorMsg) {
+								errorMsg = roomErrorMsg
+							} else {
+								switch (roomEntities) {
+									case 1:
+										// Perfect - the Room was found so we can add it to the criteria
+										extraCriteria.put('room', roomEntities[0])
+										break
+									case 0:
+										errorMsg = "Specified Room '${fieldsValueMap[roomFieldName]}' was not found"
+										break
+									default:
+										errorMsg = "Found multiple Rooms with name '${fieldsValueMap[roomFieldName]}'"
+								}
+							}
+						}
+					}
+					break
+
+				case 'Person':
+					// Person is a special case which we will create the person if not found unless the name is ambiguous.
+					Map resultMap = personService.findOrCreatePerson(searchValue, context.project, context.staffList)
+					if (resultMap) {
+						if (resultMap.isAmbiguous) {
+							errorMsg = 'Multiple references found for value'
+						} else if (resultMap.person) {
+							return [ [resultMap.person], null]
+						}
+					}
+					break
+			}
+
+			if (! errorMsg) {
+				// Make sure that the domain has an alternateLookup defined on the class
+				if (! GormUtil.getAlternateKeyPropertyName(refDomainClass)) {
+					errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
+					return [entities, errorMsg]
+				}
+
+				entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
+
+				// If not found and the domain has an alias (mfg/model) then try looking up that way
+				if ( ! entities ) {
+					log.debug 'fetchReferenceOfEntityField() Searching by alias'
+					switch (refDomainName) {
+						case 'Model':
+							if (mfg) {
+								entities = [ Model.lookupFirstAlias(searchValue, mfg) ]
+							}
+							break
+
+						case 'Manufacturer':
+							entities = [ Manufacturer.lookupFirstAlias(searchValue) ]
+							break
+					}
+				}
+
+				log.debug 'fetchReferenceOfEntityField() {}.{} == {}, extraCriteria: {}, found: {}',
+					refDomainName, fieldName, searchValue, extraCriteria, entities.size()
+			}
+		}
+
+		return [entities, errorMsg]
 	}
 
 	/**
@@ -702,7 +883,6 @@ class SearchQueryHelper {
 		String errorMsg
 		Boolean isEmail = searchValue.contains('@')
 
-		// println "*** fetchPerson() Existing Person ${existingPerson ? existingPerson.toString() + ' ' + existingPerson.email : 'null'}, searchBy $searchValue"
 		// If the pre-existing person check if searchValue matches the person
 		if (existingPerson) {
 			if ( (isEmail && existingPerson.email.equalsIgnoreCase(searchValue) ) ||
@@ -741,6 +921,55 @@ class SearchQueryHelper {
 	}
 
 	/**
+	 * Used to determine the proper domain class that a reference field is in a domain. When the class is AssetEntity then
+	 * the logic needs to dig into the initial 'find' statement to know precisely which asset class should be be used.
+	 * @param
+	 */
+	 /*
+		static List determineClassOfReferenceField(String referenceFieldName, Map fieldsInfo, Map context) {
+			Class domainClassToCreate
+			String errMsg
+
+			while(true) {
+				// Determine the class to be created (AssetEntity can be tricking due to the inheritance)
+				(domainClassToCreate, errMsg) = SearchQueryHelper.classOfDomainProperty(referenceFieldName, fieldsInfo, context.domainClass)
+				if (errMsg) {
+					break
+				}
+				if (domainClassToCreate in AssetEntity) {
+					// For Asset classes due to inheritence we need to determine which class that the user intended by looking
+					// at the initial find statement, which we will assume is the class that they really want. If they specified
+					// Asset then that will be an issue since that is ambiguous and will error
+					if (
+						! referenceField.containsKey('find') ||
+						! referenceField.find.containsKey('query') ||
+						! referenceField.find.query.size() > 0)
+					) {
+						errMsg = 'A find command must preceed a whenNotFound create statement'
+						break
+					}
+
+					String intendedDomainName = referenceField.find.query[0].domain
+					log.debug "createReferenceEntityFromWhenNotFound() intended domain is {}", intendedDomainName
+					if (intendedDomainName == 'Asset') {
+						errMsg ="The <i>whenNotFound '$referenceFieldName' create</i> requires the find command to specify an absolute asset domain name"
+						break
+					}
+					// Get the class of the domain specified in find of the ETL script
+					domainClassToCreate = ETLDomain.lookup(intendedDomainName)?.getClazz()
+				}
+
+				if ( ! domainClassToCreate ) {
+					errMsg = "Unable to determine class for property $referenceFieldName"
+				}
+
+				break
+			}
+			return [domainClassToCreate, errMsg]
+		}
+	*/
+
+	/**
 	 * Used to generate the MD5 value of the Map that is used to query for a domain of a particular
 	 * fieldName. This will toString the Map of fieldName query names/values in order to create an unique key
 	 * that can be used to cache the results afterward.
@@ -755,6 +984,7 @@ class SearchQueryHelper {
 	 * @return the MD5 32 character String of the query element
 	 */
 	static String generateMd5OfFieldsInfoField(String domainShortName, String fieldName, Map fieldsInfo) {
+		log.debug 'generateMd5OfFieldsInfoField() domainShortName={}, fieldName={}', domainShortName, fieldName
 		StringUtil.md5Hex(
 			"${domainShortName}:${fieldName}" +
 			":value=${fieldsInfo[fieldName].value}:query=" +
@@ -769,14 +999,17 @@ class SearchQueryHelper {
 	 * @return List containing [value, initialValue]
 	 */
 	static List getValueAndInitialize(String fieldName, Map fieldsInfo) {
-		def value = fieldsInfo[fieldName]['value']
-		def init = fieldsInfo[fieldName]['init']
+		Object value, init
+		if (fieldsInfo.containsKey(fieldName)) {
+			value = fieldsInfo[fieldName]['value']
+			init = fieldsInfo[fieldName]['init']
 
-		// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
-		// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
-		// extra test.  See ticket TM-10981.
-		value = (value instanceof groovy.json.internal.LazyMap) ? null : value
-		init = (init instanceof groovy.json.internal.LazyMap) ? null : init
+			// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
+			// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
+			// extra test.  See ticket TM-10981.
+			value = (value instanceof groovy.json.internal.LazyMap) ? null : value
+			init = (init instanceof groovy.json.internal.LazyMap) ? null : init
+		}
 		return [value, init]
 	}
 

@@ -10,6 +10,7 @@ import getl.data.Field
 import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
+import grails.transaction.Transactional
 import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
@@ -48,6 +49,7 @@ class DataScriptService implements ServiceMethods{
      * @param dataScriptId
      * @return
      */
+	@Transactional
     DataScript saveOrUpdateDataScript(JSONObject dataScriptJson, Long dataScriptId = null) {
 
         // Get the current project
@@ -104,6 +106,7 @@ class DataScriptService implements ServiceMethods{
      * @param scriptContent - the new ETL Script content to be saved in DataScript instance
      * @return the DataScript instance with the etlSourceCode already updated in database
      */
+	@Transactional
     DataScript saveScript (Long id, String scriptContent) {
         Project project = securityService.userCurrentProject
         DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
@@ -120,6 +123,7 @@ class DataScriptService implements ServiceMethods{
      * @param dataScriptId
      * @return
      */
+	@Transactional
     DataScript getDataScript(Long id, Project project = null) {
         if (!project) {
             project = securityService.userCurrentProject
@@ -220,6 +224,7 @@ class DataScriptService implements ServiceMethods{
      *
      * @param dataScriptId
      */
+	@Transactional
     void deleteDataScript(Long dataScriptId) {
         // Fetch the DataScript, validating it belogns to the user's project.
         DataScript foundDataScript = getDataScript(dataScriptId)
@@ -228,13 +233,13 @@ class DataScriptService implements ServiceMethods{
 			// check api action references
 			int countApiActions = ApiAction.where { defaultDataScript == foundDataScript }.count()
 			if (countApiActions > 0) {
-				throw new InvalidParamException("The DataScript is being referenced by one or more Api Actions.")
+				throw new InvalidParamException("The ETL Script is being referenced by one or more Api Actions.")
 			}
 
 			// check import batch references
 			int countImportBatches = ImportBatch.where { dataScript == foundDataScript }.count()
 			if (countImportBatches > 0) {
-				throw new InvalidParamException("The DataScript is being referenced by one or more Import Batches.")
+				throw new InvalidParamException("The ETL Script is being referenced by one or more Import Batches.")
 			}
 
 			// if no references to foundDataScript then delete
@@ -527,6 +532,7 @@ class DataScriptService implements ServiceMethods{
 	 * @param id DataScript identifier
 	 * @param tmpFileName filename to store
 	 */
+	@Transactional
 	private void saveSampleFile(Long id, String originalFileName, String tmpFileName) {
 		DataScript ds = DataScript.get(id)
 

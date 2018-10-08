@@ -227,7 +227,7 @@
 												</tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-											<td class="tm-input-control">
+											<td class="tm-input-control duration-container">
 												<input type="text" id="shutdownDuration" name="shutdownDuration"
 													   class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 													   [(ngModel)]="model.asset.shutdownDuration" tabindex="48" size="7"/>
@@ -258,7 +258,7 @@
                                                 </tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-											<td class="tm-input-control">
+											<td class="tm-input-control duration-container">
 												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
 												duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="49"  size="7"/>
 												<label>m</label>
@@ -285,7 +285,7 @@
 	<div class="modal-footer form-group-center">
 		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger component-action-delete" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
 		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
