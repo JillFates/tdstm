@@ -10,7 +10,7 @@
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
                 aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Storage Edit</h4>
+        <h4 class="modal-title">Storage Create</h4>
     </div>
     <div class="modal-body">
         <div>
@@ -19,7 +19,7 @@
                     <tr>
                         <td colspan="2" class="dialog-container">
                             <div class="dialog">
-                                <table class="asset-edit-view">
+                                <table class="asset-create-view">
                                     <tbody>
                                     <tr>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>

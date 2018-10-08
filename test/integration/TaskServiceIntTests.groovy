@@ -19,20 +19,24 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import test.helper.ApiCatalogTestHelper
+import test.helper.AssetCommentTestHelper
+import test.helper.MoveEventTestHelper
 
 import java.util.concurrent.Future
 
 class TaskServiceIntTests extends IntegrationSpec {
 
     TaskService taskService
+
+    ApiCatalogTestHelper apiCatalogTestHelper
     AssetTestHelper assetTestHelper
     PersonTestHelper personTestHelper
     ProjectTestHelper projectTestHelper
     ProviderTestHelper providerTestHelper
-    ApiCatalogTestHelper apiCatalogTestHelper
     MoveBundleTestHelper moveBundleTestHelper
-    GrailsApplication grailsApplication
+
     SessionFactory sessionFactory
+    GrailsApplication grailsApplication
 
     /* Test SetUp */
     void setup() {

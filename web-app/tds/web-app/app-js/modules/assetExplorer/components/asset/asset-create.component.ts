@@ -42,7 +42,7 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/createTemplate/${this.asset}`),
-				this.http.get(`../ws/asset/defaultCreateModel`))
+				this.http.get(`../ws/asset/defaultCreateModel/${this.asset}`))
 				.subscribe(res => {
 					let template = res[0].text();
 					let model = res[1].json();

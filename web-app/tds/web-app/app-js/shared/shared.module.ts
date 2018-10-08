@@ -5,6 +5,9 @@ import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { IntlModule } from '@progress/kendo-angular-intl';
+
 // TODO: REFACTOR TO USE NEW ANGULAR 6 INTERCEPTORS
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
@@ -44,6 +47,7 @@ import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 import { AddPersonComponent } from './components/add-person/add-person.component';
+import { DateRangeSelectorComponent } from './components/date-range-selector/date-range-selector.component';
 import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset-tag-selector.component';
 import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
@@ -60,6 +64,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PopupModule,
 		DropDownsModule,
 		GridModule,
+		DateInputsModule,
+		IntlModule,
 		InputsModule
 	],
 	declarations: [
@@ -88,6 +94,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
+		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
@@ -119,6 +126,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DependentCommentComponent,
 		UIModalDecoratorDirective,
 		AddPersonComponent,
+		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
 		AkaComponent,
@@ -129,7 +137,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 	entryComponents: [
 		DynamicComponent,
 		DependentCommentComponent,
-		AddPersonComponent
+		AddPersonComponent,
+		DateRangeSelectorComponent
 	]
 })
 export class SharedModule {

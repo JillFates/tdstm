@@ -50,7 +50,7 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.TaskBatch
-import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.search.AssetCommentQueryBuilder
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -5555,4 +5555,5 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		return newMethodParams
 	}
+
 }

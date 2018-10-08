@@ -11,7 +11,8 @@ class Login {
      */
     String readCredentials() {
         String credentials=''
-        File dataFile = new File("testDataFile.txt")
+        ClassLoader classLoader = getClass().getClassLoader()
+        File dataFile = new File(classLoader.getResource("testDataFile.txt").getFile())
 
         def stream = dataFile.withInputStream {
            credentials=dataFile.text.toString()

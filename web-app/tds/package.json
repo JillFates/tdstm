@@ -2,7 +2,7 @@
   "name": "TDS-ANGULAR",
   "private": true,
   "version": "2.0.0",
-  "description": "TDS has upgraded its base code to use Angular 6,",
+  "description": "TDS has upgraded its base code to use Angular 5 Latest,",
   "author": "TransitionManager",
   "scripts": {
     "build-prod": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../web-app/tds/gulpfile.js sass-compiler --PROD & node ./node_modules/webpack/bin/webpack --profile --config ../../web-app/tds/webpack.config.js --env=prod",

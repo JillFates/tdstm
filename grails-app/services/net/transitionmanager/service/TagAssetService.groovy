@@ -65,7 +65,6 @@ class TagAssetService implements ServiceMethods {
 			Tag tag = get(Tag, tagId, currentProject)
 
 			TagAsset tagAsset = new TagAsset(tag: tag, asset: asset)
-			asset.refresh()
 			return tagAsset.save(failOnError: true)
 		}
 

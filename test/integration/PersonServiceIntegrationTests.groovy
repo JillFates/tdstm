@@ -1,3 +1,6 @@
+import net.transitionmanager.command.PersonCO
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.*
 import com.tds.asset.Application
 import net.transitionmanager.domain.MoveEvent
@@ -5,6 +8,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.RoleType
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PersonService
@@ -703,15 +707,30 @@ class PersonServiceIntegrationTests extends Specification {
 			personService.isAssignedToProject(project, newPerson)
 	}
 
+	def "18. Merge Person using ProcessMergePersonRequest"() {
+		when: 'Setup the initial data for the test'
+		MockHttpServletRequest mockRequest = new MockHttpServletRequest()
 
+		// Setup the From Person with a UserLogin
+		Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
+		fromPerson.firstName = "John"
+		fromPerson.middleName = "Jeffrey"
+		fromPerson.lastName = "Doe"
+		String[] fromIDs = [Long.toString(fromPerson.id)]
 
+		// Setup the To Person
+		Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
+		UserLogin toUser = personHelper.createUserLogin(toPerson)
+		toPerson.firstName = "Jane"
+		toPerson.middleName = "Mary"
+		toPerson.lastName = "Doe"
+		mockRequest.addParameter("fromId[]", fromIDs)
+		mockRequest.addParameter("toId", Long.toString(toPerson.id))
 
-	// Used to convert a person object into a map used by the PersonService
-	private Map personToNameMap(Person p) {
-		[first:p.firstName, middle:p.middleName, last:p.lastName]
+		def params = new GrailsParameterMap(mockRequest)
+		// Perform the merge of the accounts
+		def test = personService.processMergePersonRequest(toUser, new PersonCO(), params)
+		then: 'the From UserLogin should be switched to the To Person'
+        test == "John Jeffrey Doe was merged to Jane Mary Doe"
 	}
-	private Map emptyNameMap() {
-		[first:'', middle:'', last:'']
-	}
-
 }

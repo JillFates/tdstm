@@ -51,4 +51,34 @@ export class ValidationUtils {
 	public static isEmptyObject(object: any): boolean {
 		return Object.keys(object).length === 0 && object.constructor === Object;
 	}
+
+	/**
+	 *  Determine if a string has the format URL or label|URL
+	 * @param labelURL {string}
+	 * @returns {boolean}
+	 */
+	public static isValidLabelURL(labelURL = ''): boolean {
+		const [label, url, extra] = labelURL
+			.split('|')
+			.map((part: string) => part.trim());
+
+		return extra ? false :  ValidationUtils.isValidURL(url || label);
+	}
+
+	/**
+	 *  Determine if a string is an URL
+	 * @param url {string}
+	 * @returns {boolean}
+	 */
+	public static isValidURL(url: string): boolean {
+		let pattern = new RegExp('^(https?:\\/\\/)?' +
+			'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+			'((\\d{1,3}\\.){3}\\d{1,3}))' +
+			'(\\:\\d+)?' +
+			'(\\/[-a-z\\d%@_.~+&:]*)*' +
+			'(\\?[;&a-z\\d%@_.,~+&:=-]*)?' +
+			'(\\#[-a-z\\d_]*)?$', 'i');
+		return pattern.test(url);
+	}
+
 }
