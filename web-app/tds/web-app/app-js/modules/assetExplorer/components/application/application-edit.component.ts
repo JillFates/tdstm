@@ -63,15 +63,14 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
+			this.model.asset.shutdownBy = {id : this.model.asset.shutdownBy || null };
+			this.model.asset.startupBy = {id: this.model.asset.startupBy || null };
+			this.model.asset.testingBy = {id: this.model.asset.testingBy || null };
 			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: { value: '', text: ''}
 				};
-			}
-			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
-			if (this.model.asset.startUpBySelectedValue) {
-				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
 			}
 			this.updatePersonReferences();
 		}
@@ -105,7 +104,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			delete modelRequest.asset.moveBundle;
 
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.name && modelRequest.asset.scale.name.value || '');
+			modelRequest.asset.shutdownBy = modelRequest.asset.shutdownBy && modelRequest.asset.shutdownBy.id || '';
+			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
+			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
 
 			// Custom Fields
 			this.model.customs.forEach((custom: any) => {
