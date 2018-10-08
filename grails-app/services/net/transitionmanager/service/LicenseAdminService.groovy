@@ -681,7 +681,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @param license License Object
 	 * @return true if the mail was sent, false otherwise
 	 */
-	private boolean sendMailRequest(DomainLicense license){
+	boolean sendMailRequest(DomainLicense license){
 		log.debug("SEND License Request")
 		EmailHolder emailData = emailRequestData(license)
 
