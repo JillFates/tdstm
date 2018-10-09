@@ -27,8 +27,8 @@ class BulkChangeCommand {
 		userParams cascade: true, nullable:true
 		dataViewId nullable: true
 		edits cascade: true
-		ids nullable: true, validator: { assetIds, command ->
-			if (!assetIds && !(command.allIds && command.dataViewId && command.userParams)) {
+		ids nullable: true, validator: { ids, command ->
+			if (!ids && !(command.allIds && command.dataViewId && command.userParams)) {
 				return 'code for assets need to be specified or all assets'
 			}
 		}
