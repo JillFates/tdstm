@@ -15,7 +15,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-index',
@@ -28,30 +28,31 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 	private gridColumns: GridColumnModel[];
+	private report;
 
 	constructor(
+		private route: ActivatedRoute,
 		private router: Router,
-		@Inject('reports') private report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
 		private dictionary: DictionaryService,
 		private preferenceService: PreferenceService) {
+		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
 	}
 	ngOnInit() {
 		this.gridColumns = ViewManagerColumnsHelper.createColumns();
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
-		Observable.zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
-			.subscribe(this.setupDefaultSettings.bind(this), (err) => console.log(err.message || err));
+		this.preferenceService.getPreferences(preferencesCodes).subscribe((preferences) => {
+			this.setupDefaultSettings(preferences);
+		});
 	}
 
-	private setupDefaultSettings(defaultSettings: any[]) {
-		const [reportResult, preferences] = defaultSettings;
-
+	private setupDefaultSettings(preferences: any[]) {
 		const userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(userDateFormat);
-		this.reportGroupModels = reportResult;
+		this.reportGroupModels = this.report;
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 		this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
