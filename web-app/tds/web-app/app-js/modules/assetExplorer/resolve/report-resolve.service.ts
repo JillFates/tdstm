@@ -17,12 +17,26 @@ export class ReportResolveService implements Resolve<any> {
 	 */
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {
 		const reportId = route.params['id'];
-		return this.assetExplorerService.getReport(reportId).map(reports => {
-			return reports;
-		}).catch((err) => {
-			console.error('ReportResolveService:', 'An Error Occurred trying to fetch Single Report ' + reportId);
-			this.router.navigate(['/security/error']);
-			return Observable.of(false);
-		});
+		if (!reportId) {
+			// We are on a Create Model, we inject a empty Object
+			return Observable.of({
+				isFavorite: false,
+				isOwner: true,
+				isShared: false,
+				isSystem: false,
+				schema: {
+					columns: [],
+					domains: []
+				}
+			});
+		} else {
+			return this.assetExplorerService.getReport(reportId).map(reports => {
+				return reports;
+			}).catch((err) => {
+				console.error('ReportResolveService:', 'An Error Occurred trying to fetch Single Report ' + reportId);
+				this.router.navigate(['/security/error']);
+				return Observable.of(false);
+			});
+		}
 	}
 }

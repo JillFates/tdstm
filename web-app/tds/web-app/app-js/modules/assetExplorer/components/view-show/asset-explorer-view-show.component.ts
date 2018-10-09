@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel } from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
@@ -81,7 +81,7 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
 				console.log(event);
-				if (this.currentId != this.lastSnapshot.params.id) {
+				if (this.currentId !== this.lastSnapshot.params.id) {
 					this.metadata.tagList = this.lastSnapshot.data['tagList'];
 					this.fields = this.lastSnapshot.data['fields'];
 					this.domains = this.lastSnapshot.data['fields'];
@@ -149,10 +149,11 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	protected onSaveAs(): void {
+		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		if (this.isSaveAsAvailable()) {
 			this.dialogService.open(AssetExplorerViewSaveComponent, [
 				{ provide: ViewModel, useValue: this.model },
-				{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
+				{ provide: ViewGroupModel, useValue: selectedData }
 			]).then(result => {
 				this.model = result;
 				this.dataSignature = JSON.stringify(this.model);

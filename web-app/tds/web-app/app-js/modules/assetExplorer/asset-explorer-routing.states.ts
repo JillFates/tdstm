@@ -10,15 +10,10 @@ import {FieldsResolveService} from './resolve/fields-resolve.service';
 import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
-import {AssetExplorerService} from './service/asset-explorer.service';
-import {PreferenceService} from '../../shared/services/preference.service';
-import {TagService} from '../assetTags/service/tag.service';
 // Components
 import {AssetExplorerIndexComponent} from './components/index/asset-explorer-index.component';
 import {AssetExplorerViewConfigComponent} from './components/view-config/asset-explorer-view-config.component';
 import {AssetExplorerViewShowComponent} from './components/view-show/asset-explorer-view-show.component';
-// Models
-import {ApiResponseModel} from '../../shared/model/ApiResponseModel';
 
 /**
  * Asset Explorer Route States
@@ -64,14 +59,9 @@ export const AssetExplorerRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: AssetExplorerIndexComponent,
-		resolve: [
-			{
-				token: 'reports',
-				policy: { async: 'RXWAIT' },
-				deps: [AssetExplorerService],
-				resolveFn: (service: AssetExplorerService) => service.getReports()
-			}
-		],
+		resolve: {
+			reports: ReportsResolveService
+		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
 		runGuardsAndResolvers: 'always',
 	},
@@ -90,6 +80,8 @@ export const AssetExplorerRoute: Routes = [
 		component: AssetExplorerViewConfigComponent,
 		resolve: {
 			tagList: TagsResolveService,
+			report: ReportResolveService,
+			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],

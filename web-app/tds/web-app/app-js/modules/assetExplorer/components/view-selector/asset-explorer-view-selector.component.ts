@@ -91,6 +91,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 			// TODO: STATE SERVICE GO
 			// this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
 			// 	{system: item.type === ViewType.SYSTEM_VIEWS});
+			this.router.navigate(['asset', 'views', 'create']);
 		}
 	}
 

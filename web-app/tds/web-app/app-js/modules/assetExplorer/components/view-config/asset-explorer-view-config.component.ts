@@ -6,7 +6,7 @@ import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ViewModel } from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
@@ -94,6 +94,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			});
 			this.previewButtonClicked = true;
 			this.onPreview();
+		} else {
+			this.grid.gridData = {
+				data: [],
+				total: 0
+			};
 		}
 	}
 
@@ -217,9 +222,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected openSaveDialog(): void {
+		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetExplorerViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
+			{ provide: ViewGroupModel, useValue: selectedData }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
@@ -234,7 +240,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		return this.model.schema.domains.filter(x => x !== 'common').length > 0;
+		return this.model && this.model.schema && this.model.schema.domains.filter(x => x !== 'common').length > 0;
 	}
 
 	protected isColumnSelected(): boolean {
@@ -247,7 +253,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		// TODO: STATE SERVICE GO
+		// TODO: hasPendingChanges
 		// if (this.state && this.state.$current && this.state.$current.data) {
 		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
 		// }
@@ -302,13 +308,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected onCancel() {
-		const routeState = this.dictionary.get(LAST_VISITED_PAGE);
-		// TODO: STATE SERVICE GO
-		// if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
-		// 	this.state.go(routeState, { id: this.model.id });
-		// } else {
-		// 	this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
-		// }
+		if (this.model && this.model.id) {
+			this.router.navigate(['asset', 'views', this.model.id, 'show']);
+		} else {
+			this.router.navigate(['asset', 'views']);
+		}
 	}
 
 	protected onSave() {

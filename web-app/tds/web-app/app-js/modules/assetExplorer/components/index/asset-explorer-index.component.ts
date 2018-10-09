@@ -15,6 +15,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
+import {Router} from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-index',
@@ -29,6 +30,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private gridColumns: GridColumnModel[];
 
 	constructor(
+		private router: Router,
 		@Inject('reports') private report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
@@ -73,28 +75,18 @@ export class AssetExplorerIndexComponent implements OnInit {
 
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
-			const selectedFolderType: ViewType = this.selectedFolder.type;
-			const params: ViewModel = Object.assign(new ViewModel(),
-				{
-					isSystem: selectedFolderType === this.viewType.SYSTEM_VIEWS,
-					isShared: selectedFolderType === this.viewType.SHARED_VIEWS,
-					isFavorite: selectedFolderType === this.viewType.FAVORITES
-				});
-			// TODO: STATE SERVICE GO
-			// this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, params);
+			this.router.navigate(['asset', 'views', 'create']);
 		}
 	}
 
 	protected onEditReport(report: ViewModel): void {
 		if (this.isEditAvailable(report)) {
-			// TODO: STATE SERVICE GO
-			// this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: report.id });
+			this.router.navigate(['asset', 'views', report.id, 'edit']);
 		}
 	}
 
 	protected onShowReport(report: ViewModel): void {
-		// TODO: STATE SERVICE GO
-		// this.stateService.go(AssetExplorerStates.REPORT_SHOW.name, { id: report.id });
+		this.router.navigate(['asset', 'views', report.id, 'show']);
 	}
 
 	protected onDeleteReport(report: ViewModel): void {
