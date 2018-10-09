@@ -653,9 +653,6 @@ class TimeUtil {
 			case FORMAT_DATE_TIME_ISO8601_2:
 				format = formatterType
 				break
-			case FORMAT_DATE_TIME_ISO8601:
-				format = FORMAT_DATE_TIME_ISO8601
-				break
 		}
 
 		if (!format) {
