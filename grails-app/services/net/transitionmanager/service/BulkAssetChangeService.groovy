@@ -79,7 +79,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		(Integer.class.name) : BulkChangeNumber,
 		(Person.class.name)  : BulkChangePerson,
 		'YesNo'              : BulkChangeYesNo
-	]
+	].asImmutable()
 
 	/**
 	 * Handles the bulk change json, and delegates the bulk change to the appropriate service.
@@ -90,7 +90,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	void bulkChange(Project currentProject, BulkChangeCommand bulkChange) {
 		List ids = []
 		Map queryFilter = [:]
-		Map<String, Map> filedMapping
+		Map<String, Map> fieledMapping
 		String action
 		List<String> actions
 		def service
@@ -104,7 +104,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			case AssetClass.domainClassFor(AssetClass.DEVICE):
 			case AssetClass.domainClassFor(AssetClass.STORAGE):
 				//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
-				filedMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
+				fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
 
 				if (bulkChange.allIds) {
 					queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
@@ -113,7 +113,7 @@ class BulkAssetChangeService implements ServiceMethods {
 					int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
 
 					if (validAssetCount != ids.size()) {
-						throw new InvalidParamException('Some asset ids, are not part of your project, and may have been deleted.')
+						throw new InvalidParamException("Only $validAssetCount of the ${ids.size()} records specified were found so the changes were not applied. Please repeat the bulk change process accordingly.")
 					}
 				}
 
@@ -124,10 +124,10 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Looks up and runs all the edits for a bulk change call.
 		bulkChange.edits.each { EditCommand edit ->
-			service = getService(type, edit.fieldName, filedMapping, bulkServiceMapping)
+			service = getService(type, edit.fieldName, fieledMapping, bulkServiceMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
 			action = edit.action
-			actions = filedMapping[edit.fieldName].bulkChangeActions ?: []
+			actions = fieledMapping[edit.fieldName].bulkChangeActions ?: []
 
 			if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
 				throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
