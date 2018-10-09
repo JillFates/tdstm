@@ -103,7 +103,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
 				}
 				if (categories) {
-					this.model.categoriesList = [""].concat(categories);
+					this.model.categoriesList = [''].concat(categories);
 				}
 
 				if (events) {

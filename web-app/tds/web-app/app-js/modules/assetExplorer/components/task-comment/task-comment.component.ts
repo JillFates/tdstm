@@ -28,6 +28,8 @@ export class TaskCommentComponent implements OnInit {
 	@Input('asset-type') assetType: string;
 	@Input('show-task') showTask: boolean;
 	@Input('show-comment') showComment: boolean;
+	@Input('asset-class') assetClass: string;
+	@Input('user-id') currentUserId: string;
 
 	// Grid Configuration for Task and Comment
 	private dataGridTaskHelper: DataGridOperationsHelper;
@@ -181,6 +183,12 @@ export class TaskCommentComponent implements OnInit {
 			modal: {
 				title: 'Create Task',
 				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: this.assetClass,
+				assetEntity: this.id,
+				assetName: this.assetName,
+				currentUserId: this.currentUserId
 			}
 		};
 
