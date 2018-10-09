@@ -330,8 +330,8 @@ export class AssetExplorerViewGridComponent {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
-	protected showComment(dataItem: any) {
-
+	protected showComment(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
 		const assetModalModel: AssetModalModel = {
 			assetId: dataItem.common_id,
 			assetName: dataItem.common_assetName,
@@ -345,11 +345,12 @@ export class AssetExplorerViewGridComponent {
 				console.log('Show Comment Result',  result);
 			}
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			console.log(result);
 		});
 	}
 
-	protected createComment(dataItem: any) {
+	protected createComment(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
 				title: 'Create Comment',
@@ -372,12 +373,12 @@ export class AssetExplorerViewGridComponent {
 		], true, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			console.log(result);
 		});
-		console.log('createComment', dataItem);
 	}
 
-	protected showAssetEditView(dataItem: any) {
+	protected showAssetEditView(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
 		const componentParameters = [
 			{ provide: 'ID', useValue: dataItem.common_id },
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
@@ -389,7 +390,9 @@ export class AssetExplorerViewGridComponent {
 	/**
 	 * Allows to display the clone asset modal
 	 */
-	protected showAssetCloneView(dataItem: any) {
+	protected showAssetCloneView(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+
 		const cloneModalModel: AssetModalModel = {
 			assetType: dataItem.common_assetClass,
 			assetId: dataItem.common_id
@@ -466,12 +469,19 @@ export class AssetExplorerViewGridComponent {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private cellClick(e): void {
+	private  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			jQuery('tr.k-state-selected').removeClass('k-state-selected');
-			jQuery(`tr[data-kendo-grid-item-index=${e.rowIndex}]`).addClass('k-state-selected');
+			this.highlightGridRow(e.rowIndex);
 			this.onShow(e.dataItem);
 		}
+	}
+
+	/**
+	 * Allow to highlight the row grid
+	 */
+	private highlightGridRow(rowIndex) {
+		jQuery('tr.k-state-selected').removeClass('k-state-selected');
+		jQuery(`tr[data-kendo-grid-item-index=${rowIndex}]`).addClass('k-state-selected');
 	}
 
 	/**

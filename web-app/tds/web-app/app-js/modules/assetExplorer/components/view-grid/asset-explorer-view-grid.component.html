@@ -91,32 +91,32 @@
 	</kendo-grid-column>
 
 	<!-- Action -->
-	<kendo-grid-command-column [width]="200" [locked]="true">
+	<kendo-grid-command-column [width]="200" [locked]="true" >
 		<ng-template kendoGridHeaderTemplate>
 			<div class="text-center">
 				<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
 			</div>
 		</ng-template>
-		<ng-template kendoGridCellTemplate let-dataItem>
+		<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
 			<div class="text-center">
 				<button class="btn btn-action btn-default"
 						title="Edit Asset"
-						(click)="showAssetEditView(dataItem)">
+						(click)="showAssetEditView(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-edit"></span>
 				</button>
 				<button class="btn btn-action btn-default"
 						title="Create Comment or Show Comments"
-						(click)="showComment(dataItem)">
+						(click)="showComment(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-comment"></span>
 				</button>
 				<button class="btn btn-action btn-default"
 						title="Create Comment or Show Comments"
-						(click)="createComment(dataItem)">
+						(click)="createComment(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-comments"></span>
 				</button>
 				<button class="btn btn-action btn-default"
 						title="Clone Asset"
-						(click)="showAssetCloneView(dataItem)">
+						(click)="showAssetCloneView(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-clone"></span>
 				</button>
 			</div>
