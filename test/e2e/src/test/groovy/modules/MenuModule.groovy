@@ -43,4 +43,8 @@ class MenuModule extends Module {
     def assertProjectName(name){
         projectName.text().contains(name)
     }
+
+    def assertBundleName(bdlName){
+        projectName.text().contains(bdlName)
+    }
 }

@@ -80,4 +80,8 @@ class PlanningModule extends Module {
     def verifyBundlesTitle(){
         planningBundlesTitle.isDisplayed()
     }
+
+    def vaildateDisplayedBundleName(bdlName){
+        $("li.menu-parent-planning-selected-bundle").text().contains(bdlName)
+    }
 }
