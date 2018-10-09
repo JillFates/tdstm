@@ -21,7 +21,7 @@ class BulkChangeCommand {
 	List<EditCommand>         edits
 	List<Long>                ids
 	Boolean                   allIds = false
-	String                    type   = AssetClass.APPLICATION.toString()
+	String                    type
 
 	static constraints = {
 		userParams cascade: true, nullable:true

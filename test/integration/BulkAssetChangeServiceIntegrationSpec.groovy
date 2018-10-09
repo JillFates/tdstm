@@ -231,7 +231,8 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		bulkChangeCommand = new BulkChangeCommand(
 			userParams: dataviewUserParamsCommand,
 			dataViewId: 1,
-			ids: [device.id, device2.id]
+			ids: [device.id, device2.id],
+			type: 'APPLICATION'
 		)
 
 		person = personHelper.createPerson(null, project.client, project)
