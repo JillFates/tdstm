@@ -225,11 +225,11 @@ export class TaskCommentComponent implements OnInit {
 			.then(result => {
 				if (result) {
 					if (result.isDeleted) {
-						this.deleteTaskComment(dataItem);
+						this.deleteTaskComment(dataItem)
+							.then(() => this.createDataGrids())
 					} else if (result.commentInstance) {
 						this.openTaskDetail(result, ModalType.VIEW);
 					}
-					this.createDataGrids();
 				}
 
 			}).catch(result => {
