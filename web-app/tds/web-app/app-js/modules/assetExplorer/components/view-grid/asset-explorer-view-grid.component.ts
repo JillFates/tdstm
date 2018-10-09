@@ -55,6 +55,7 @@ export class AssetExplorerViewGridComponent {
 		this._viewId = viewId;
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
+		this.setActionCreateButton(viewId);
 	}
 
 	fields = [];
@@ -83,6 +84,7 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
+	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -287,6 +289,9 @@ export class AssetExplorerViewGridComponent {
 	 *
 	 */
 	protected onCreateAsset(assetEntityType: string): void {
+		if (!assetEntityType) {
+			return;
+		}
 		this.dialog.open(AssetCreateComponent, [
 				{ provide: 'ASSET', useValue: assetEntityType }],
 			DIALOG_SIZE.LG, false).then(x => {
@@ -402,6 +407,48 @@ export class AssetExplorerViewGridComponent {
 				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
 			}
 		}).catch( error => console.log('error', error));
+	}
+
+	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
+		this.createButtonState = state;
+	}
+
+	/**
+	 * set the asset type depends on the view that is display in order to set
+	 * by default the behavior of the create button
+	 * @param viewId
+	 */
+	protected setActionCreateButton(viewId) {
+		switch (viewId) {
+			case this.ASSET_ENTITY_MENU.All_APPLICATIONS:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.APPLICATION;
+				break;
+			case this.ASSET_ENTITY_MENU.All_DATABASES:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.DATABASE;
+				break;
+			case this.ASSET_ENTITY_MENU.All_DEVICE:
+			case this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL:
+			case this.ASSET_ENTITY_MENU.All_SERVERS:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.DEVICE;
+				break;
+			case this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.STORAGE;
+				break;
+		}
+	}
+
+	/**
+	 * Validates if should display the create button, depends on the view
+	 * that is trying to show.
+	 */
+	protected displayCreateButton() {
+		return this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_APPLICATIONS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_DATABASES ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_DEVICE ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_SERVERS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL;
 	}
 
 	/**

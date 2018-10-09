@@ -6,24 +6,43 @@
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 		<div class="col-sm-6 bulkchange-section">
-
-			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
-					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_APPLICATIONS"
-					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
-				{{'ASSET_EXPLORER.CREATE_APPLICATION' | translate}}</button>
-			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
-					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DATABASES"
-					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
-				{{'ASSET_EXPLORER.CREATE_DATABASE' | translate}}</button>
-			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
-					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DEVICE ||
+			<div class="btn-group btn-between-space-5"
+				 *ngIf="displayCreateButton()">
+				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+						data-toggle="dropdown"
+						*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS">
+					{{ 'GLOBAL.CREATE' | translate }}
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+						*ngIf="_viewId !== ASSET_ENTITY_MENU.All_ASSETS"
+						(click)="onCreateAsset(createButtonState)">
+					{{ 'GLOBAL.CREATE' | translate }}
+				</button>
+				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_APPLICATIONS"
+						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
+						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
+					</li>
+					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DATABASES"
+						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
+						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
+					</li>
+					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DEVICE ||
 					       _viewId === ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL || _viewId === ASSET_ENTITY_MENU.All_SERVERS"
-					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
-				{{'ASSET_EXPLORER.CREATE_DEVICE' | translate}}</button>
-			<button type="button" class="btn btn-default btn-between-space-5" [disabled]="!canCreateAssets()"
-					*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL"
-					(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
-				{{'ASSET_EXPLORER.CREATE_STORAGE' | translate}}</button>
+						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
+						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
+					</li>
+					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL"
+						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
+						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
+					</li>
+				</ul>
+			</div>
 			<tds-bulk-change-button [bulkItems]="bulkItems"
 			                        [enabled]="hasSelectedItems()"
 									(clickBulk)="onClickBulkButton()"
@@ -110,7 +129,7 @@
 		<ng-template kendoGridHeaderTemplate>
 			<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 				<div [ngClass]="{'field-not-found': column?.notFound }">
-					<label class="text-delimited" for=""> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+					<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 				</div>
 			</div>
 		</ng-template>
