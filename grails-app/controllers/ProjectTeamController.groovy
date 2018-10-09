@@ -1,32 +1,28 @@
+import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
-import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectTeamService
 
-@Secured('isAuthenticated()')
-// TODO BB need more fine-grained rules here
+import grails.plugin.springsecurity.annotation.Secured
+@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectTeamController implements ControllerMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
 	PartyRelationshipService partyRelationshipService
-	ProjectTeamService projectTeamService
 
 	@HasPermission(Permission.ProjectTeamView)
 	def list(Long bundleId) {
 		MoveBundle moveBundle = bundleId ?
 			MoveBundle.get(bundleId) :
 			MoveBundle.findByProject(securityService.userCurrentProject)
-		[
-			projectTeamInstanceList: partyRelationshipService.getBundleTeamInstanceList(moveBundle),
-			bundleInstance         : moveBundle
-		]
+		[projectTeamInstanceList: partyRelationshipService.getBundleTeamInstanceList(moveBundle),
+		 bundleInstance: moveBundle]
 	}
 
 	@HasPermission(Permission.ProjectTeamView)
@@ -34,10 +30,8 @@ class ProjectTeamController implements ControllerMethods {
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
 
-		[
-			projectTeamInstance: projectTeam, bundleInstance: MoveBundle.get(bundleId),
-			teamMembers        : partyRelationshipService.getBundleTeamMembers(projectTeam)
-		]
+		[projectTeamInstance: projectTeam, bundleInstance: MoveBundle.get(bundleId),
+		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
 	}
 
 	@HasPermission(Permission.ProjectTeamDelete)
@@ -65,59 +59,61 @@ class ProjectTeamController implements ControllerMethods {
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
 
-		MoveBundle moveBundle = fetchDomain(MoveBundle, [id: bundleId])
+		MoveBundle moveBundle = MoveBundle.get(bundleId)
 
-		[
-			projectTeamInstance: projectTeam,
-			bundleInstance     : moveBundle,
-			availableStaff     : partyRelationshipService.getAvailableTeamMembers(moveBundle.projectId, projectTeam),
-			teamMembers        : partyRelationshipService.getBundleTeamMembers(projectTeam)
-		]
+		[projectTeamInstance : projectTeam, bundleInstance: moveBundle,
+		 availableStaff: partyRelationshipService.getAvailableTeamMembers(moveBundle.projectId, projectTeam),
+		 teamMembers: partyRelationshipService.getBundleTeamMembers(projectTeam)]
 	}
 
 	@HasPermission(Permission.ProjectTeamEdit)
 	def update(Long bundleId, Long id) {
 
 		// TODO : Security : Need to check to see if the person is associated to the project and has permissions.
+
 		ProjectTeam projectTeam = projectTeamFromParams()
 		if (!projectTeam) return
 
-		projectTeam.properties = params
 		List teamMemberIds = params.list('teamMembers')
 
-		if (!projectTeam.hasErrors()) {
-			projectTeam = projectTeamService.updateWithPartyRelationship(projectTeam, teamMemberIds)
+		projectTeam.properties = params
+		if (!projectTeam.hasErrors() && projectTeam.save(flush: true)) {
 
+			PartyRelationship.executeUpdate('''\
+				delete from PartyRelationship
+				where partyRelationshipType.id = 'PROJ_TEAM'
+				  and partyIdFrom.id = : projectTeamId
+				  and roleTypeCodeFrom.id = 'TEAM'
+			''', [projectTeamId: projectTeam.id])
+
+			partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
 			flash.message = "ProjectTeam $projectTeam updated"
 			redirect(action: 'show', id: projectTeam.id, params: [bundleId: bundleId])
-		} else {
-			MoveBundle moveBundle = fetchDomain(MoveBundle, [id: bundleId])
-			render view: 'edit', model: modelForCreateOrEdit(projectTeam, moveBundle, teamMemberIds)
+		}
+		else {
+			render view: 'edit', model: modelForCreateOrEdit(projectTeam, MoveBundle.get(bundleId), teamMemberIds)
 		}
 	}
 
 	@HasPermission(Permission.ProjectTeamCreate)
 	def create() {
-		MoveBundle moveBundle = fetchDomain(MoveBundle, [id: params.bundleId])
-		[
-			projectTeamInstance: new ProjectTeam(params), bundleInstance: moveBundle,
-			availableStaff     : partyRelationshipService.getProjectStaff(moveBundle.projectId)
-		]
+		MoveBundle moveBundle = MoveBundle.get(params.bundleId)
+		[projectTeamInstance: new ProjectTeam(params), bundleInstance: moveBundle,
+		 availableStaff: partyRelationshipService.getProjectStaff(moveBundle.projectId)]
 	}
 
 	@HasPermission(Permission.ProjectTeamCreate)
 	def save(Long bundleId) {
+		MoveBundle moveBundle = MoveBundle.get(bundleId)
 		ProjectTeam projectTeam = new ProjectTeam(params)
 		List teamMemberIds = params.list('teamMembers')
 
-		if (projectTeam.hasErrors()) {
-			MoveBundle moveBundle = fetchDomain(MoveBundle, [id: bundleId])
+		if (projectTeam.hasErrors() || !projectTeam.save()) {
 			render view: 'create', model: modelForCreateOrEdit(projectTeam, moveBundle, teamMemberIds)
 			return
 		}
 
-		projectTeamService.createWithPartyRelationship(projectTeam, teamMemberIds)
-
+		partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
 		flash.message = "ProjectTeam $projectTeam created"
 		redirect(action: 'show', id: projectTeam.id, params: [bundleId: bundleId])
 	}
@@ -126,7 +122,8 @@ class ProjectTeamController implements ControllerMethods {
 		ProjectTeam projectTeam = ProjectTeam.get(params.id)
 		if (projectTeam) {
 			projectTeam
-		} else {
+		}
+		else {
 			flash.message = "ProjectTeam not found with id $params.id"
 			redirect action: 'list', params: [bundleId: params.bundleId]
 			null
@@ -135,7 +132,7 @@ class ProjectTeamController implements ControllerMethods {
 
 	private Map modelForCreateOrEdit(ProjectTeam projectTeam, MoveBundle moveBundle, List teamMemberIds) {
 		[projectTeamInstance: projectTeam, bundleInstance: moveBundle,
-		 availableStaff     : partyRelationshipService.getAvailableProjectStaff(moveBundle.project, teamMemberIds),
-		 teamMembers        : partyRelationshipService.getProjectTeamStaff(moveBundle.project, teamMemberIds)]
+		 availableStaff: partyRelationshipService.getAvailableProjectStaff(moveBundle.project, teamMemberIds),
+		 teamMembers: partyRelationshipService.getProjectTeamStaff(moveBundle.project, teamMemberIds)]
 	}
 }
