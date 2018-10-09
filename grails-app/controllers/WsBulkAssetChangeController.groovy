@@ -15,7 +15,6 @@ class WsBulkAssetChangeController implements ControllerMethods {
 	 * @return a success JSON
 	 */
 	@HasPermission(Permission.AssetEdit)
-	@HasPermission(Permission.TagDelete)
 	def change() {
 		BulkChangeCommand bulkChange = populateCommandObject(BulkChangeCommand)
 		validateCommandObject(bulkChange)
