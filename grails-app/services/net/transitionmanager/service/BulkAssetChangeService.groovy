@@ -72,7 +72,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	]
 
 	//Maps field control types to services.
-	static Map bulkServiceMapping = [
+	static Map bulkClassMapping = [
 		(TagAsset.class.name): BulkChangeTag,
 		(Date.class.name)    : BulkChangeDate,
 		'String'             : BulkChangeString,
@@ -124,7 +124,7 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		//Looks up and runs all the edits for a bulk change call.
 		bulkChange.edits.each { EditCommand edit ->
-			service = getService(type, edit.fieldName, fieledMapping, bulkServiceMapping)
+			service = getBulkClass(type, edit.fieldName, fieledMapping, bulkClassMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
 			action = edit.action
 			actions = fieledMapping[edit.fieldName].bulkChangeActions ?: []
@@ -138,17 +138,17 @@ class BulkAssetChangeService implements ServiceMethods {
 	}
 
 	/**
-	 * Looks up the bulkChangeService, for a field, based on the bulkServiceMapping mappings.
+	 * Looks up the bulkChange Class, for a field, based on the bulkClassMapping mappings.
 	 * If no service is found, an InvalidParamException is thrown.
 	 *
 	 * @param type the class to use to look up what bulk service to use.
 	 * @param fieldName The name to get the service for.
 	 * @param fieldMapping the field mapping settings.
-	 * @param bulkServiceMapping the mapping of the name of the service to the wired instance
+	 * @param bulkClassMapping the mapping of the name of the service to the wired instance
 	 *
-	 * @return The wired instance of the bulkChangeService, for the field.
+	 * @return the class to use for bulk changes
 	 */
-	private def getService(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkServiceMapping) {
+	private def getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
 		def property = type.declaredFields.find{it.name == fieldName} ?: type.superclass.declaredFields.find{it.name == fieldName}
 
 		if (!property) {
@@ -163,7 +163,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			dataType = TagAsset.class.name
 		}
 
-		def service = bulkServiceMapping[dataType]
+		def service = bulkClassMapping[dataType]
 
 		if (!service) {
 			throw new InvalidParamException("Bulk update is not configured for $fieldName")
