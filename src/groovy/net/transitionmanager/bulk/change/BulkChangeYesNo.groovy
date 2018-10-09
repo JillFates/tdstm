@@ -92,6 +92,6 @@ class BulkChangeYesNo {
 			WHERE id IN ($queryForIds)
 		"""
 
-		AssetEntity.executeUpdate(query, params)
+		type.executeUpdate(query, params)
 	}
 }
