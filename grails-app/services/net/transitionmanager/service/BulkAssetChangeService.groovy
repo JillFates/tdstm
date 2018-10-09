@@ -122,18 +122,23 @@ class BulkAssetChangeService implements ServiceMethods {
 				throw new InvalidParamException("Bulk change is not setup for $bulkChange.type")
 		}
 
-		//Looks up and runs all the edits for a bulk change call.
-		bulkChange.edits.each { EditCommand edit ->
-			service = getBulkClass(type, edit.fieldName, fieledMapping, bulkClassMapping)
-			value = service.coerceBulkValue(currentProject, edit.value)
-			action = edit.action
-			actions = fieledMapping[edit.fieldName].bulkChangeActions ?: []
+		try {
+			//Looks up and runs all the edits for a bulk change call.
+			bulkChange.edits.each { EditCommand edit ->
+				service = getBulkClass(type, edit.fieldName, fieledMapping, bulkClassMapping)
+				value = service.coerceBulkValue(currentProject, edit.value)
+				action = edit.action
+				actions = fieledMapping[edit.fieldName].bulkChangeActions ?: []
 
-			if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
-				throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
+				if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
+					throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
+				}
+
+				service."$action"(type, value, edit.fieldName, ids, queryFilter)
 			}
-
-			service."$action"(type, value, edit.fieldName, ids, queryFilter)
+		}catch(Exception e){
+			log.error('An unexpected error occurred while invoking the bulk change action', e)
+			throw new DomainUpdateException('An unexpected error occurred while invoking the bulk change action', e)
 		}
 	}
 
