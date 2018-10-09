@@ -19,16 +19,16 @@ class BulkChangeYesNo {
 	 * @param type the class to use in the query.
 	 * @param value - new field value
 	 * @param fieldName - field name
-	 * @param assetIds - list of assets to update
-	 * @param assetIdsFilterQuery - additional assets query filter
+	 * @param ids - list of assets to update
+	 * @param idsFilterQuery - additional assets query filter
 	 */
-	static void replace(Class type, String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
+	static void replace(Class type, String value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
 
 		if (!value) {
 			throw new InvalidParamException('New value cannot be null')
 		}
 
-		bulkUpdate(type, value, fieldName, assetIds, assetIdsFilterQuery)
+		bulkUpdate(type, value, fieldName, ids, idsFilterQuery)
 	}
 
 	/**
@@ -37,11 +37,11 @@ class BulkChangeYesNo {
 	 * @param type the class to use in the query.
 	 * @param value the value is not used, just here for interface consistency.
 	 * @param fieldName - field name
-	 * @param assetIds - list of assets to update
-	 * @param assetIdsFilterQuery - additional assets query filter
+	 * @param ids - list of assets to update
+	 * @param idsFilterQuery - additional assets query filter
 	 */
-	static void clear(Class type, String value, String fieldName, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		bulkUpdate(type, null, fieldName, assetIds, assetIdsFilterQuery)
+	static void clear(Class type, String value, String fieldName, List<Long> ids = [], Map idsFilterQuery = null) {
+		bulkUpdate(type, null, fieldName, ids, idsFilterQuery)
 	}
 
 	/**
