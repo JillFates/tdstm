@@ -86,12 +86,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
+			commonCalls.push(this.taskManagerService.getCategories());
+			commonCalls.push(this.taskManagerService.getEvents());
 		}
-
 
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, assetClasses] = results;
+				const [status, personList, staffRoles, dateFormat, assetClasses, categories, events] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
@@ -101,8 +102,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 				if (assetClasses) {
 					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
 				}
-				// TODO remove it
-				this.model.categoriesList = ["general"];
+				if (categories) {
+					this.model.categoriesList = [""].concat(categories);
+				}
+
+				if (events) {
+					this.model.eventList = events.map((item) => ({id: item.id, text: item.name}));
+				}
 
 				jQuery('[data-toggle="popover"]').popover();
 			});
@@ -271,7 +277,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Create the t ask
 	*/
 	protected onCreate(): void {
-		this.taskManagerService.createTask(this.modelHelper.getPayloadForUpdate())
+		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
 			.subscribe((result) => this.close(result));
 	}
 

@@ -10,9 +10,6 @@ import {FormsModule} from '@angular/forms';
 import {SharedModule} from '../../shared/shared.module';
 // Services
 import {TaskService} from './service/task.service';
-import {TaskCreateComponent} from './components/create/task-create.component';
-import {TaskEditComponent} from './components/edit/task-edit.component';
-import {TaskDetailComponent} from './components/detail/task-detail.component';
 
 @NgModule({
 	imports: [
@@ -21,16 +18,9 @@ import {TaskDetailComponent} from './components/detail/task-detail.component';
 		FormsModule,
 	],
 	declarations: [
-		TaskCreateComponent,
-		TaskEditComponent,
-		TaskDetailComponent
 	],
 	providers: [TaskService],
-	entryComponents: [
-		TaskCreateComponent,
-		TaskEditComponent,
-		TaskDetailComponent
-	]
+	entryComponents: []
 })
 
 export class TaskManagerModule {

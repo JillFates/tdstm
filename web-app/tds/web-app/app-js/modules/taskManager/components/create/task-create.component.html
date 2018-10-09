@@ -73,7 +73,7 @@
                                                         [data]="model.eventList"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
-                                                        [(ngModel)]="model.event" readonly="true">
+                                                        [(ngModel)]="model.event">
                                                 </kendo-dropdownlist>
                                             </td>
                                         </tr>
@@ -303,17 +303,7 @@
                                                         [(ngModel)]="model.status">
                                                 </kendo-dropdownlist>
                                             </td>
-
-
-
-                                            <td class="label U edge-cell vertical-note-status" nowrap="nowrap">
-                                                <label><span>Note</span></label>
-                                            </td>
-                                            <td class="valueNW.note" colspan="4">
-                                                        <textarea name="note"
-                                                                  class="note"
-                                                                  placeholder="Enter a new note"
-                                                                  id="note" rows="4" [(ngModel)]="model.note"></textarea>
+                                            <td colspan="5">
                                             </td>
                                         </tr>
                                         </tbody>
