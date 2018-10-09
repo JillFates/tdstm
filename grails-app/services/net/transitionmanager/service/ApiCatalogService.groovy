@@ -98,10 +98,14 @@ class ApiCatalogService implements ServiceMethods {
 	 * @param id - the api catalog id
 	 */
 	void deleteById(Long id) {
-		ApiCatalog.where {
+      // TODO : JPM 10/2018 : Revert commit to commit where{...}.deleteAll() post the Grails Upgrade (TM-12575)
+		ApiCatalog foundApiCatalog = ApiCatalog.where {
 			project == securityService.userCurrentProject
 			id == id
-		}.deleteAll()
+		}.get()
+		if (foundApiCatalog) {
+			foundApiCatalog.delete(flush: true)
+		}
 	}
 
 	/**
