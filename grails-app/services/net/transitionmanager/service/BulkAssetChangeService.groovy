@@ -136,7 +136,9 @@ class BulkAssetChangeService implements ServiceMethods {
 
 				service."$action"(type, value, edit.fieldName, ids, queryFilter)
 			}
-		}catch(Exception e){
+		} catch (InvalidParamException e) {
+			throw e
+		} catch (Exception e) {
 			log.error('An unexpected error occurred while invoking the bulk change action', e)
 			throw new DomainUpdateException('An unexpected error occurred while invoking the bulk change action', e)
 		}
