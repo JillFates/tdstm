@@ -91,7 +91,7 @@
 	</kendo-grid-column>
 
 	<!-- Action -->
-	<kendo-grid-command-column [width]="200" [locked]="true" >
+	<kendo-grid-command-column [width]="150" [locked]="true" >
 		<ng-template kendoGridHeaderTemplate>
 			<div class="text-center">
 				<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -104,15 +104,15 @@
 						(click)="showAssetEditView(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-edit"></span>
 				</button>
-				<button class="btn btn-action btn-default"
+				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
 						title="Create Comment or Show Comments"
 						(click)="showComment(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-comment"></span>
+					<span class="fa fa-fw fa-comments"></span>
 				</button>
-				<button class="btn btn-action btn-default"
+				<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.comment"
 						title="Create Comment or Show Comments"
 						(click)="createComment(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-comments"></span>
+					<span class="fa fa-fw fa-comment"></span>
 				</button>
 				<button class="btn btn-action btn-default"
 						title="Clone Asset"
