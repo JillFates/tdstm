@@ -3,6 +3,7 @@
  */
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -422,6 +423,54 @@ class DataviewService implements ServiceMethods {
 					transformer(queryResults, field, fieldInfo)
 				}
 			}
+		}
+
+		// Add the flags signaling whether or not each asset has comments and/or tasks associated.
+		appendTasksAndComments(queryResults)
+
+	}
+
+	/**
+	 * After querying for the assets we need to determine if the returned assets
+	 * have comments and/or tasks associated.
+	 *
+	 * @param queryResults - the result of the assets query.
+	 */
+	private void appendTasksAndComments(Map queryResults) {
+		// Build a list with the asset ids and initialize tasks and comments flags.
+		List<Long> assetIds = []
+		// List with the assets found by the preview method.
+		List<Map> assetResults = queryResults['assets']
+		// This map will contain, for each asset, the flags for each comment type.
+		Map<Long, Map<String, Boolean>> commentsAndTasksMap = [:]
+		// Iterate over the assets keeping their id and initializing the map for its flags.
+		assetResults.each { Map assetMap ->
+			Long assetId = NumberUtil.toLong(assetMap['common_id'])
+			assetIds << assetId
+			commentsAndTasksMap[assetId] = [issue: false, comment: false]
+		}
+
+		// Query for assets and the comment types associated with them.
+		String tasksAndCommentsQuery = """
+			SELECT assetEntity.id, commentType FROM AssetComment 
+			WHERE assetEntity.id IN (:assetIds) AND isPublished = true
+			GROUP BY assetEntity.id, commentType
+		"""
+
+		// Execute the query.
+		List tasksAndComments = AssetComment.executeQuery(tasksAndCommentsQuery, [assetIds: assetIds])
+
+		// Iterate over the results from the database updating the flags map.
+		for (taskOrComment in tasksAndComments) {
+			Long assetId = taskOrComment[0]
+			String commentType = taskOrComment[1]
+			commentsAndTasksMap[assetId][commentType] = true
+		}
+
+		// Iterate over the preview assets setting the flags map as an attribute.
+		assetResults.each { Map assetMap ->
+			Long assetId = NumberUtil.toLong(assetMap['common_id'])
+			assetMap['taskAndCommentFlags'] = commentsAndTasksMap[assetId]
 		}
 	}
 
