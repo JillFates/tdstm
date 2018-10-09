@@ -9,7 +9,7 @@ import net.transitionmanager.service.DatabaseMigrationService
 databaseChangeLog = {
 
 	changeSet(author: "tpelletier", id: "20180917 TM-12359") {
-		comment("Update field specs to have bulk service and actions.")
+		comment("Update field specs to have bulk actions.")
 
 		grailsChange {
 			change {
@@ -18,7 +18,7 @@ databaseChangeLog = {
 					type == SettingType.CUSTOM_DOMAIN_FIELD_SPEC
 				}.list()
 
-				// This closure adds default service and actions to each field, and the actions/service for tags.
+				// This closure adds an empty list of actions to each field, and the actions for tags.
 				Closure changeScript = { settingsJson ->
 
 					// Add the default actions of [:] and the default service of null.
