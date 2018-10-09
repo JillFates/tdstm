@@ -141,11 +141,6 @@ class BulkChangeTagIntegrationSpec extends IntegrationSpec {
 		tagEvent2 = new TagEvent(tag: tag1, event: event2).save(flush: true, failOnError: true)
 		tagEvent3 = new TagEvent(tag: tag2, event: event2).save(flush: true, failOnError: true)
 
-//		tagService.securityService = [
-//			getUserCurrentProject  : { -> project },
-//			getUserCurrentProjectId: { -> "$project.id".toString() }
-//		] as SecurityService
-
 		tagAssetService.securityService = [
 			getUserCurrentProject  : { -> project },
 			getUserCurrentProjectId: { -> "$project.id".toString() }
