@@ -1,148 +1,152 @@
 <div class="task-comment-component dialog-container">
-    <h1>Tasks:</h1>
-    <kendo-grid
-        *ngIf="dataGridTaskHelper"
-        class="task-comment-grid"
-        [data]="dataGridTaskHelper.gridData"
-        [sort]="dataGridTaskHelper.state.sort"
-        [sortable]="{mode:'single'}"
-        [resizable]="true"
-        (sortChange)="dataGridTaskHelper.sortChange($event)">
+    <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
+        <h1>Tasks:</h1>
+        <kendo-grid
+                *ngIf="dataGridTaskHelper"
+                class="task-comment-grid"
+                [data]="dataGridTaskHelper.gridData"
+                [sort]="dataGridTaskHelper.state.sort"
+                [sortable]="{mode:'single'}"
+                [resizable]="true"
+                (sortChange)="dataGridTaskHelper.sortChange($event)">
 
-        <!-- Toolbar Template -->
-        <ng-template kendoGridToolbarTemplate [position]="'top'">
-            <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks ({{dataGridTaskHelper.gridData.data.length}})</label>
+            <!-- Toolbar Template -->
+            <ng-template kendoGridToolbarTemplate [position]="'top'">
+                <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks ({{dataGridTaskHelper.gridData.data.length}})</label>
 
-            <label class="form-check-label aligned-label" for="showAllTasks">
-                <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
-                View All Tasks
-            </label>
+                <label class="form-check-label aligned-label" for="showAllTasks">
+                    <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
+                    View All Tasks
+                </label>
 
-            <label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
-                <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadTasksGrid()">
-                View Unpublished Tasks
-            </label>
-            <!-- we do not support yet Task Creation
-            <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
-                <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
-            </button>
-            -->
-        </ng-template>
-
-        <!-- Columns -->
-        <kendo-grid-column *ngFor="let column of taskColumnModel.columns"
-                           field="{{column.property}}"
-                           [headerClass]="column.headerClass ? column.headerClass : ''"
-                           [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                           [class]="column.cellClass ? column.cellClass : ''"
-                           [style]="column.cellStyle ? column.cellStyle : ''"
-                           [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
-            <!-- Header Template -->
-            <ng-template kendoGridHeaderTemplate>
-                <label>{{column.label}}</label>
+                <label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
+                    <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadTasksGrid()">
+                    View Unpublished Tasks
+                </label>
+                <!-- we do not support yet Task Creation
+                <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
+                    <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
+                </button>
+                -->
             </ng-template>
 
-            <!-- Action -->
-            <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-                <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
-                    <!-- not yet supported -->
-                    <button [hidden]="true"
-                            (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                    <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
-                        <i class="fa fa-fw fa-trash"></i>
-                    </button>
-                </div>
+            <!-- Columns -->
+            <kendo-grid-column *ngFor="let column of taskColumnModel.columns"
+                               field="{{column.property}}"
+                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                               [class]="column.cellClass ? column.cellClass : ''"
+                               [style]="column.cellStyle ? column.cellStyle : ''"
+                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                <!-- Header Template -->
+                <ng-template kendoGridHeaderTemplate>
+                    <label>{{column.label}}</label>
+                </ng-template>
+
+                <!-- Action -->
+                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+                    <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
+                        <!-- not yet supported -->
+                        <button [hidden]="true"
+                                (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </button>
+                    </div>
+                </ng-template>
+
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.taskNumber'" let-dataItem let-rowIndex="rowIndex">
+                    <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.taskNumber}}</label>
+                </ng-template>
+
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
+                    <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
+                </ng-template>
+
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assignedTo'" let-dataItem let-rowIndex="rowIndex">
+                    <label class="font-normal pad-left-7 pad-top-8">{{getAssignedTo(dataItem)}}</label>
+                </ng-template>
+
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.status}}</div>
+                </ng-template>
+
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                </ng-template>
+
+            </kendo-grid-column>
+            <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+        </kendo-grid>
+    </div>
+    <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
+        <h1>Comments:</h1>
+        <kendo-grid
+                *ngIf="dataGridCommentHelper"
+                class="task-comment-grid"
+                [data]="dataGridCommentHelper.gridData"
+                [sort]="dataGridCommentHelper.state.sort"
+                [sortable]="{mode:'single'}"
+                [resizable]="true"
+                (sortChange)="dataGridCommentHelper.sortChange($event)">
+
+            <!-- Toolbar Template -->
+            <ng-template kendoGridToolbarTemplate [position]="'top'">
+                <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Comments ({{dataGridCommentHelper.gridData.data.length}})</label>
+
+                <label class="form-check-label aligned-label" for="showAllComments">
+                    <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadCommentsGrid()">
+                    View All Comments
+                </label>
+
+                <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
+                    <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
+                </button>
             </ng-template>
 
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.taskNumber'" let-dataItem let-rowIndex="rowIndex">
-                <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.taskNumber}}</label>
-            </ng-template>
+            <!-- Columns -->
+            <kendo-grid-column *ngFor="let column of commentColumnModel.columns"
+                               field="{{column.property}}"
+                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                               [class]="column.cellClass ? column.cellClass : ''"
+                               [style]="column.cellStyle ? column.cellStyle : ''"
+                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-                <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
-            </ng-template>
+                <!-- Header Template -->
+                <ng-template kendoGridHeaderTemplate>
+                    <label>{{column.label}}</label>
+                </ng-template>
 
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'assignedTo'" let-dataItem let-rowIndex="rowIndex">
-                <label class="font-normal pad-left-7 pad-top-8">{{getAssignedTo(dataItem)}}</label>
-            </ng-template>
+                <!-- Action -->
+                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+                    <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
+                        <button (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                        <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </button>
+                    </div>
+                </ng-template>
 
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
-                <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.status}}</div>
-            </ng-template>
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
+                    <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
+                </ng-template>
 
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
-            </ng-template>
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.status}}</div>
+                </ng-template>
 
-        </kendo-grid-column>
-        <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
-    </kendo-grid>
-    <h1>Comments:</h1>
-    <kendo-grid
-        *ngIf="dataGridCommentHelper"
-        class="task-comment-grid"
-        [data]="dataGridCommentHelper.gridData"
-        [sort]="dataGridCommentHelper.state.sort"
-        [sortable]="{mode:'single'}"
-        [resizable]="true"
-        (sortChange)="dataGridCommentHelper.sortChange($event)">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
+                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                </ng-template>
 
-        <!-- Toolbar Template -->
-        <ng-template kendoGridToolbarTemplate [position]="'top'">
-            <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Comments ({{dataGridCommentHelper.gridData.data.length}})</label>
-
-            <label class="form-check-label aligned-label" for="showAllComments">
-                <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllComments" id="showAllComments" name="showAllComments" type="checkbox" (change)="reloadCommentsGrid()">
-                View All Comments
-            </label>
-
-            <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
-                <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
-            </button>
-        </ng-template>
-
-        <!-- Columns -->
-        <kendo-grid-column *ngFor="let column of commentColumnModel.columns"
-                           field="{{column.property}}"
-                           [headerClass]="column.headerClass ? column.headerClass : ''"
-                           [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                           [class]="column.cellClass ? column.cellClass : ''"
-                           [style]="column.cellStyle ? column.cellStyle : ''"
-                           [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
-            <!-- Header Template -->
-            <ng-template kendoGridHeaderTemplate>
-                <label>{{column.label}}</label>
-            </ng-template>
-
-            <!-- Action -->
-            <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-                <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
-                    <button (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                    <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">
-                        <i class="fa fa-fw fa-trash"></i>
-                    </button>
-                </div>
-            </ng-template>
-
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-                <label class="pointer pad-left-7 pad-top-8" (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</label>
-            </ng-template>
-
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
-                <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.status}}</div>
-            </ng-template>
-
-            <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
-            </ng-template>
-
-        </kendo-grid-column>
-        <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
-    </kendo-grid>
+            </kendo-grid-column>
+            <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
+        </kendo-grid>
+    </div>
 </div>

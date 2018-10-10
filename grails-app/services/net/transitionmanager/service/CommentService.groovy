@@ -801,6 +801,7 @@ class CommentService implements ServiceMethods {
 			assetEntity = asset
 			if(!isResolved() && command.isResolved) {
 				dateResolved = TimeUtil.nowGMT()
+				resolvedBy = currentPerson
 			} else if (!command.isResolved) {
 				dateResolved = null
 			}

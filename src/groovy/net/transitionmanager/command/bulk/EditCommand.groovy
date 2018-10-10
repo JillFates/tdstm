@@ -1,7 +1,6 @@
 package net.transitionmanager.command.bulk
 
 import grails.validation.Validateable
-import net.transitionmanager.service.BulkAssetChangeService
 
 /**
  * Represents an individual bulk change edit.
@@ -20,6 +19,5 @@ class EditCommand {
 
 	static constraints = {
 		value nullable: true, blank:true
-		fieldName inList: BulkAssetChangeService.fields
 	}
 }

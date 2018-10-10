@@ -25,6 +25,8 @@ export class TaskCommentComponent implements OnInit {
 	@Input('can-edit-tasks') canEditTasks ? = false;
 	@Input('asset-name') assetName: string;
 	@Input('asset-type') assetType: string;
+	@Input('show-task') showTask: boolean;
+	@Input('show-comment') showComment: boolean;
 
 	// Grid Configuration for Task and Comment
 	private dataGridTaskHelper: DataGridOperationsHelper;
@@ -78,7 +80,7 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.resolvedBy === null);
+		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.dateResolved === null);
 		if (this.showAllComments) {
 			filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment');
 		}
