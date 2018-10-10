@@ -15,11 +15,13 @@ class PermissionsService {
 	 * @return a list of {@code Permissions}
 	 */
 	List<Permissions> findAll(){
-		return Permissions.withCriteria {
-			and {
-				order('permissionItem','asc')
-			}
-		}
+		return Permissions.list(
+			sort: 'permissionItem',
+			order: 'asc',
+			fetch: [
+				rolePermissions: 'join'
+			]
+		)
 	}
 
 	/**
@@ -47,7 +49,7 @@ class PermissionsService {
 			Permissions permissions = Permissions.get(id)
 			if(permissions){
 				permissions.description = params["description_"+id]
-				if(!permissions.save(flush:true)){
+				if(!permissions.save()){
 					permissions.errors.allErrors.each {
 						println it
 					}
