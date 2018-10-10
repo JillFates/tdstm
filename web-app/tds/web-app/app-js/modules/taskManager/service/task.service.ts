@@ -175,6 +175,19 @@ export class TaskService {
 	}
 
 	/**
+	 * Get the asset classes list
+	 * @returns {Observable<any>}
+	 */
+	getAssetClasses(): Observable<any> {
+		return this.http.get(`${this.baseURL}/assetEntity/assetClasses`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 *
 	 * Returns a set of filtered tasks
 	 * @param searchParams
@@ -233,6 +246,48 @@ export class TaskService {
 		return this.http.post(url, JSON.stringify(payload))
 			.map(res =>  res && res.json())
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * Create a task
+	 * @param payload model to create
+	 * @returns {Observable<any>}
+	 */
+	createTask(payload: any): Observable<any> {
+		const url = `${this.baseURL}/assetEntity/saveComment`;
+		return this.http.post(url, JSON.stringify(payload))
+			.map(res =>  res && res.json())
+			.catch((error: any) => error);
+	}
+
+	/**
+	 *
+	 * Get categories
+	 * @returns {Observable<any>}
+	 */
+	getCategories(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
+			.map((res: Response) => {
+				let response = res.json();
+				return response && response.data || [];
+
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * Get events list
+	 * @returns {Observable<any>}
+	 */
+	getEvents(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/moveEvent/list`)
+			.map((res: Response) => {
+				let response = res.json();
+				return response && response.data || [];
+
+			})
+			.catch((error: any) => error.json());
 	}
 
 }

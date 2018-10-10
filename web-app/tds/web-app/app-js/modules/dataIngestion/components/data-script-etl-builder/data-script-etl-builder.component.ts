@@ -206,7 +206,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected cancelCloseDialog($event): void {
-		if ($event.target && $event.target.classList.contains(FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS)) {
+		if ($event && $event.target && $event.target.classList.contains(FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS)) {
 			return;
 		}
 		if (this.isScriptDirty()) {
