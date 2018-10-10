@@ -9,7 +9,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.command.DataviewApiParamsCommand
 import grails.transaction.Transactional
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -308,6 +308,21 @@ class DataviewService implements ServiceMethods {
         DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
         return previewQuery(project, dataviewSpec)
     }
+
+	/**
+	 * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 *
+	 * @param project - the project that the data should be isolated to
+	 * @param dataview - the specifications for the view/query
+	 * @param apiParamsCommand - parameters from the user for filtering and sort order
+	 * @return a Map with data as a List of Map values and pagination
+	 */
+	// TODO : Annotate READONLY
+	Map query(Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand) {
+
+		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview)
+		return previewQuery(project, dataviewSpec)
+	}
 
 	/**
 	 * Gets the hql for filtering by asset ids, based of the filters from the all asset views.
