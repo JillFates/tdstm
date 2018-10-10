@@ -1,10 +1,12 @@
-package net.transitionmanager.service
+package net.transitionmanager.bulk.change
 
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.InvalidParamException
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -12,8 +14,7 @@ import test.helper.MoveBundleTestHelper
 import test.helper.PersonTestHelper
 import test.helper.ProjectTestHelper
 
-class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
-	BulkChangePersonService bulkChangePersonService
+class BulkChangePersonIntegrationSpec extends IntegrationSpec {
 
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
@@ -75,7 +76,7 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
-		bulkChangePersonService.bulkClear('modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangePerson.clear(Application.class, null, 'modifiedBy', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
 		[device, device2, device3].each {
@@ -90,7 +91,7 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 			def modifiedBy = personTestHelper.createPerson()
 
 		when: 'replace is called with a list of assets'
-			bulkChangePersonService.bulkReplace(modifiedBy, 'modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangePerson.replace(Application.class, modifiedBy, 'modifiedBy', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkReplace function is invoked and specified field and assets will be updated'
 			[device, device2, device3].each {
@@ -99,7 +100,7 @@ class BulkChangePersonServiceIntegrationSpec extends IntegrationSpec {
 			}
 
 		when: 'replace is called with a null replacement value'
-			bulkChangePersonService.bulkReplace(null, 'modifiedBy', [device.id, device2.id, device3.id], null)
+			BulkChangePerson.replace(Application.class, null, 'modifiedBy', [device.id, device2.id, device3.id], null)
 
 		then: 'an InvalidParamException is thrown'
 			thrown InvalidParamException
