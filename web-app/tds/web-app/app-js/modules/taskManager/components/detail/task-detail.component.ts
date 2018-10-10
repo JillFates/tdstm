@@ -16,6 +16,7 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {TaskActionsOptions} from '../task-actions/task-actions.component';
 
 @Component({
 	selector: `task-detail`,
@@ -28,6 +29,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public dateFormat: string;
 	public dateFormatTime: string;
 	public userTimeZone: string;
+	public currentUserId: number;
 	public modelHelper: TaskEditCreateModelHelper;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
@@ -39,6 +41,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public hasEditTaskPermission = false;
 	public hasDeleteTaskPermission = false;
 	public modalOptions: DecoratorOptions;
+	public taskActionsOptions: TaskActionsOptions;
 	public model: any = {};
 	private hasChanges: boolean;
 
@@ -56,12 +59,44 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
+		this.taskActionsOptions = {showDone: false, showStart: false, showAssignToMe: false, showNeighborhood: false};
 		this.hasChanges = false;
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+	}
+
+	/**
+	 * Based upon current task status determines which options to show
+	 */
+	getShowTaskActionsOptions(): TaskActionsOptions {
+		const options = {
+			showDone: false,
+			showStart: false,
+			showAssignToMe: false,
+			showNeighborhood: false
+		};
+
+		if (!this.model) {
+			return options;
+		}
+
+		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
+		const predecessorList = this.model && this.model.predecessorList || [];
+		const successorList = this.model && this.model.successorList || [];
+
+		options.showDone = this.model.status && ['ready', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
+		options.showStart = this.model.status && ['ready'].indexOf(this.model.status.toLowerCase()) >= 0;
+		options.showAssignToMe = this.currentUserId !== assignedTo && this.model.status && ['ready', 'pending', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;;
+		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
+
+		console.log(options);
+
+		return options;
 	}
 
 	/**

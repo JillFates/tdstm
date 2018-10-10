@@ -30,6 +30,7 @@ import { ModelDeviceShowComponent } from './components/device/model-device/compo
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
+import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
 
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
@@ -91,7 +92,8 @@ import {TaskManagerModule} from '../taskManager/task-manager.module';
 		TaskCommentDialogComponent,
 		TaskCreateComponent,
 		TaskEditComponent,
-		TaskDetailComponent
+		TaskDetailComponent,
+		TaskActionsComponent
 	],
 	providers: [
 		AssetExplorerService,

@@ -216,6 +216,9 @@ export class TaskCommentComponent implements OnInit {
 			modal: {
 				title: 'Task Detail',
 				type: modalType
+			},
+			detail: {
+				currentUserId: this.currentUserId
 			}
 		};
 

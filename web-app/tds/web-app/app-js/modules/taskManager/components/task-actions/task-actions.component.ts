@@ -1,7 +1,14 @@
 /**
  * Created by Jorge Morayta on 3/15/2017.
  */
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
+
+export interface TaskActionsOptions {
+	showDone: boolean;
+	showStart: boolean;
+	showAssignToMe: boolean;
+	showNeighborhood: boolean;
+}
 
 @Component({
 	selector: 'tds-task-actions',
@@ -9,8 +16,7 @@ import {Component, OnInit} from '@angular/core';
 })
 
 export class TaskActionsComponent implements OnInit {
-	constructor() {}
-
+	@Input() options: TaskActionsOptions;
 	/**
 	 * Initiates the Notice Module
 	 */
