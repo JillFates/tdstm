@@ -157,6 +157,30 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Return a map with the field specs for the asset export. This include all fields marked to
+     * be displayed plus all the field settings.
+     * @param project - user's current project
+     * @param domain - used to filter the fields for a particular domain.
+     * @return a map with the field settings.
+     */
+    Map getFieldSpecsForAssetExport(Project project, String domain) {
+        Map fieldSpec = [:]
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
+
+        for (String assetClassType : assetClassTypes) {
+            Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
+            if (fieldSpecMap) {
+                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1})
+                fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
+            } else {
+                throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
+            }
+        }
+
+        return fieldSpec
+    }
+
+    /**
      * Save single or all custom field specs
      * @param domain
      * @param fieldSpec
