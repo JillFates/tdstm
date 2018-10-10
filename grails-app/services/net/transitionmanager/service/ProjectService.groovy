@@ -500,6 +500,7 @@ class ProjectService implements ServiceMethods {
 	 * including fieldSpecs and default Tags.
 	 * @param project - the project to update with default settings
 	 */
+	@Transactional
 	void cloneDefaultSettings(Project project) {
 
 		// Make sure someone isn't trying to clone the default project onto itself

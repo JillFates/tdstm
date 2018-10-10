@@ -466,7 +466,7 @@ class GormUtil {
 
 	/**
 	 * Used to retrieve an instance of the specified Domain class. This will work differently
-	 * in Unit tests than in Integration or production. In the latter two, there is an instance of the
+	 * in Unit tests than in Integration or Production. In the latter two, there is an instance of the
 	 * domain class loaded as a bean so that is used but for Unit tests a new instance is created for each invocation.
 	 * @param domainClass
 	 * @return
@@ -478,8 +478,12 @@ class GormUtil {
 		}
 		def ctx = ApplicationContextHolder.getApplicationContext()
 		if (ctx) {
-			String name = domainClass.getName() + 'DomainClass'
-			return ctx.getBean(name)
+			try {
+				String name = domainClass.getName() + 'DomainClass'
+				return ctx.getBean(name)
+			} catch (e) {
+				throw new InvalidParamException("Invalid domain name (${domainClass.getName()}) specified for getDomainClass()")
+			}
 		}
 		return new DefaultGrailsDomainClass(domainClass)
 	}
@@ -778,13 +782,13 @@ class GormUtil {
 	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
 	 * @return the cloned object
 	 */
-	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false) {
+	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false, boolean flush = true) {
 		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
-		newDomain.save(flush:true)
+		newDomain.save(flush: flush)
 
 		if (deleteOriginal) {
-			originalDomain.delete(flush:true)
+			originalDomain.delete(flush: flush)
 		}
 
 		return newDomain
@@ -1349,7 +1353,7 @@ class GormUtil {
 	static List findDomainByAlternateKey(
 			  Class domainClass, String searchValue, Project project=null, Map extraCriteria=null
 	) {
-		List entities = null
+		List entities
 		String altKeyName = getAlternateKeyPropertyName(domainClass)
 		if (altKeyName) {
 			String domainName = domainShortName(domainClass)

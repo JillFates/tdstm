@@ -1,0 +1,30 @@
+<div tds-autofocus class="modal-content tds-angular-component-content">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}: {{assetModalModel.assetType}}/{{assetModalModel.assetName}}</h4>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow: auto;">
+        <div class="modal-body-container">
+            <!-- -->
+            <td colspan="2">
+                <task-comment
+                        [asset-id]="assetModalModel.assetId"
+                        [has-publish-permission]="true"
+                        [can-edit-comments]="true"
+                        [can-edit-tasks]="true"
+                        [asset-name]="assetModalModel.assetName"
+                        [asset-type]="assetModalModel.assetType"
+                        [show-comment]="true">
+                </task-comment>
+            </td>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button (click)="cancelCloseDialog()"
+                type="button" class="btn btn-default text-center">
+            <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
+        </button>
+    </div>
+</div>

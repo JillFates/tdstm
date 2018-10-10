@@ -1,6 +1,18 @@
 import {INTERVAL} from '../model/constants';
-
 import * as moment from 'moment-timezone';
+
+export interface DurationParts {
+	days: number;
+	hours: number;
+	minutes: number;
+}
+
+export type DatePartUnit = 'days' | 'hours' | 'months' | 'minutes';
+
+export interface IncrementDateArgument {
+	value: number;
+	unit: DatePartUnit
+}
 
 export class DateUtils {
 
@@ -206,4 +218,91 @@ export class DateUtils {
 
 		return durationResult;
 	}
+
+	/**
+	 * Having a duration returns the parts which that duration is made
+	 * @param duration (number)
+	 * @param scale (string val)
+	 * @returns {DurationParts}
+	 */
+	public static getDurationParts(duration: number, scale = 'M' ): DurationParts  {
+		const result = {days: null, hours: null, minutes: null};
+
+		if (duration || duration === 0) {
+			const startDate = moment().startOf('day');
+			const endDate = moment().startOf('day');
+			endDate.add(scale.toLowerCase(), duration);
+
+			const parts = moment.duration(endDate.diff(startDate));
+			result.days = parseInt(parts.asDays(), 10);
+			result.hours =  parseInt(parts.hours(), 10);
+			result.minutes = parseInt(parts.minutes(), 10)
+		}
+
+		return result;
+	}
+
+	/**
+	 * Calculate duration parts among two dates
+	 * @param start (date)
+	 * @param end (date)
+	 * @returns {DurationParts}
+	 */
+	public static getDurationPartsAmongDates(start: any, end: any): DurationParts  {
+		const result = {days: null, hours: null, minutes: null};
+
+		if (!start || !end) {
+			return result;
+		}
+		const begin = moment(start);
+		const finish = moment(end);
+
+		const duration = moment.duration(finish.diff(begin));
+
+		if (duration) {
+			result.days = parseInt(duration.asDays(), 10);
+			result.hours =  parseInt(duration.hours(), 10);
+			result.minutes = parseInt(duration.minutes(), 10)
+		}
+
+		return result;
+	}
+
+	/**
+	 * Apply an array of Increment/decrement operations to the date provided
+	 * @param date (date)
+	 * @param incrementArguments (object[])
+	 * @returns {Date}
+	 */
+	public static increment(date: any, incrementArguments: IncrementDateArgument[]): any {
+		let resultingDate = date;
+
+		incrementArguments.forEach(
+			(argument: IncrementDateArgument) =>
+				resultingDate =  new Date(moment(resultingDate).add(argument.value, argument.unit))
+		);
+
+		return resultingDate;
+	}
+
+	/**
+	 * Convert a datepart object to the equivalent minutes
+	 * @param durationParts (DurationParts)
+	 * @returns {number}
+	 */
+	public static convertDurationPartsToMinutes(durationParts: DurationParts): number {
+		return (durationParts.days * 24 * 60) + (durationParts.hours * 60) + durationParts.minutes;
+	}
+
+	/**
+	 * Return the provided dated formated using moment
+	 * @param date (Object)
+	 * @param format (String)
+	 * @returns {string}
+	 */
+	public static formatDate(date: any, format: string): string {
+		return moment(date)
+			.format(format);
+	}
+
 }

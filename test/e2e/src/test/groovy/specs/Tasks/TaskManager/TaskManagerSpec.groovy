@@ -29,13 +29,12 @@ class TaskManagerSpec extends GebReportingSpec {
     }
 
     def "1. Going To The Task Manager Section"() {
-        testKey = "TM-XXXX"
         given: 'The User is at the Menu Page'
             at MenuPage
         when: 'User Goes to the Tasks > Task Manager Section'
-            menuModule.goToTasksManager()
+            tasksModule.goToTasksManager()
 
         then: 'Task Creation Pop-Up should be displayed'
-        at TaskManagerPage
+            at TaskManagerPage
     }
 }

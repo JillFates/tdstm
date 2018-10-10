@@ -6,6 +6,7 @@ import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -22,7 +23,7 @@ import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
 
-class MoveBundleServiceIntegrationSpec extends Specification {
+class MoveBundleServiceIntegrationSpec extends IntegrationSpec {
 
 	MoveBundleService moveBundleService
 	MoveEventService  moveEventService
@@ -170,6 +171,12 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 
 	@Shared
 	TagAsset tagAsset4
+
+	@Shared
+	String connectionTypes = "'Unknown', 'Runs On', 'Hosts', 'DB', 'Web', 'Backup', 'File', 'FTP/SCP', 'Replacement', 'Network', 'Power', 'Virtual Desktop'"
+
+	@Shared
+	String statusTypes = "'Unknown', 'Validated', 'Questioned', 'Future'"
 
 
 	void setup() {
@@ -325,16 +332,14 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 	@See('TM-10261')
 	void '05. Test Dependency Analyzer grouping'() {
 		when: 'the dependency groups are generated'
-			String connectionTypes = "'Unknown', 'Runs On', 'Hosts', 'DB', 'Web', 'Backup', 'File', 'FTP/SCP', 'Replacement', 'Network', 'Power', 'Virtual Desktop'"
-			String statusTypes = "'Unknown', 'Validated', 'Questioned', 'Future'"
 			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
-		then: 'test that there is a group 0 composed of assets 1, 2, 3 and 4'
+		then: 'test that there is a group 1 composed of assets 1, 2, 3 and 4'
 			List groupOne = AssetDependencyBundle.findAllByDependencyBundleAndProject(1, project)
 			assert [asset1.id, asset2.id, asset3.id, asset4.id].sort() == groupOne.collect { it.asset.id }.sort()
-		and: 'test that there is a group 1 composed of assets 5 and 6'
+		and: 'test that there is a group 2 composed of assets 9 and 10'
 			List groupTwo = AssetDependencyBundle.findAllByDependencyBundleAndProject(2, project)
 			assert [asset9.id, asset10.id].sort() == groupTwo.collect { it.asset.id }.sort()
-		and: 'test that there is a group 2 composed of assets 9 and 10'
+		and: 'test that there is a group 3 composed of assets 5 and 6'
 			List groupThree = AssetDependencyBundle.findAllByDependencyBundleAndProject(3, project)
 			assert [asset5.id, asset6.id].sort() == groupThree.collect { it.asset.id }.sort()
 		and: 'test that the Straggler group contains assets 7 and 8'
@@ -345,101 +350,95 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 
 	void '06. Test Dependency Console Map'() {
 		when: ''
+			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, null, null, null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-				[dependencyBundle: 1, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 2, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 3, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 4, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 5, appCount: 0, serverCount: 1, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 6, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 1, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 7, appCount: 0, serverCount: 0, vmCount: 1, dbCount: 0, storageCount: 0, statusClass: 'depGroupReady'],
-				[dependencyBundle: 8, appCount: 0, serverCount: 0, vmCount: 1, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 9, appCount: 0, serverCount: 0, vmCount: 1, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 10, appCount: 0, serverCount: 0, vmCount: 1, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
+				[dependencyBundle: 0, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [1, 1],
-				vm     : [4, 4],
-				storage: [1, 1]
+				server : [10, 8],
+				vm     : [0, 0],
+				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 10
+			dependencyConsole.dependencyBundleCount == 4
 
 	}
 
 
 	void '07. Test Dependency Console Map Filtered by tags ANY tag1'() {
 		when: ''
+			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-				[dependencyBundle: 2, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 3, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
+					[dependencyBundle: 1, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [0, 0],
+				server : [2, 2],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 10
+			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '08. Test Dependency Console Map Filtered by tags ALL tag1'() {
 		when: ''
+			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ALL', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-				[dependencyBundle: 2, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 3, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
+					[dependencyBundle: 1, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [0, 0],
+				server : [2, 2],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 10
+			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '09. Test Dependency Console Map Filtered by tags ANY tag1 + tag2'() {
 		when: ''
+			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-				[dependencyBundle: 2, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 3, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
-				[dependencyBundle: 4, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
+					[dependencyBundle: 1, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [0, 0],
+				server : [3, 3],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 10
+			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '10. Test Dependency Console Map Filtered by tags ALL tag1 + tag2'() {
 		when: ''
+			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ALL', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == []
@@ -452,6 +451,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 10
+			dependencyConsole.dependencyBundleCount == 4
 	}
 }

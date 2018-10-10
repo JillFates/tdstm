@@ -19,7 +19,7 @@ class RecipeCreationSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        menuModule.goToTasksCookbook()
+        tasksModule.goToTasksCookbook()
     }
 
     def setup() {
@@ -32,7 +32,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "1. Opening The Create Recipe page"() {
-        testKey = "TM-7180"
         given: 'The User is on the Cookbook Section'
             at CookbookPage
             commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
@@ -44,7 +43,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "2. Check 'Create Recipe' page active elements"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Create Recipe Section'
             at CreateRecipePage
 
@@ -55,7 +53,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "3. Adding a recipe name"() {
-        testKey = "TM-7181"
         given: 'The User is on the Create Recipe Section'
             at CreateRecipePage
         when: 'The User adds a Name'
@@ -68,7 +65,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "4. Adding some description contents"() {
-        testKey = "TM-XXXX"
         given: 'The User is on the Create Recipe Section'
             at CreateRecipePage
         when: 'The User adds some description'
@@ -79,7 +75,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "5. Saving recipe"() {
-        testKey = "TM-7184"
         def selectedRow = 0
         given: 'The User is on the Create Recipe Section'
             at CreateRecipePage
@@ -91,7 +86,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "6. Checking the saved recipe description"() {
-        testKey = "TM-7184"
         def selectedRow = 0
         when: 'The User is on the Cookbook Section'
             at CookbookPage
@@ -108,7 +102,6 @@ class RecipeCreationSpec extends GebReportingSpec {
     }
 
     def "7. Check 'Editor' tab selected after recipe is created"() {
-        testKey = "TM-XXXX"
         when: 'The User is on the Cookbook Section'
             at CookbookPage
 

@@ -74,7 +74,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.subscribe((result: any[]) => {
 				const [actions, fields, tagAssets] = result;
 
-				this.actions = Object.keys(actions.data['asset-tag-selector'] )
+				this.actions = Object.keys(actions.data['tagAssetService'] )
 					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
 
 				this.commonFieldSpecs = fields;

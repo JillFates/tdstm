@@ -5,6 +5,7 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.licensor.LicenseCreator
 import net.transitionmanager.domain.License
@@ -35,6 +36,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	LicensedClient delete(String id) {
 		LicensedClient lic = fetch(id)
 
@@ -45,6 +47,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	LicensedClient revoke(String id) {
 		LicensedClient lic = fetch(id)
 
@@ -56,6 +59,7 @@ class LicenseManagerService extends LicenseCommonService {
 		return lic
 	}
 
+	@Transactional
 	def loadRequest(String body) {
 		body = StringUtil.openEnvelop(License.BEGIN_REQ_TAG, License.END_REQ_TAG, body)
 		String decodedString = Smaz.decompress(Base64.decodeBase64(body))
@@ -161,6 +165,7 @@ class LicenseManagerService extends LicenseCommonService {
 	 * @return
 	 * @throws InvalidLicenseException
 	 */
+	@Transactional
 	String activate(String id) throws InvalidLicenseException{
 		LicensedClient lic = fetch(id)
 		if (lic) {

@@ -10,7 +10,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import {
 	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
-	DIALOG_SIZE
+	DIALOG_SIZE, ModalType, DOMAIN
 } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
@@ -18,11 +18,20 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
+import {AssetCreateComponent} from '../asset/asset-create.component';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
+import {TaskCommentDialogComponent} from '../task-comment/dialog/task-comment-dialog.component';
+import {SingleCommentModel} from '../single-comment/model/single-comment.model';
+import {SingleCommentComponent} from '../single-comment/single-comment.component';
+import {AssetModalModel} from '../../model/asset-modal.model';
+import {AssetEditComponent} from '../asset/asset-edit.component';
+import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
+import {CloneCLoseModel} from '../../model/clone-close.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -46,6 +55,7 @@ export class AssetExplorerViewGridComponent {
 		this._viewId = viewId;
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
+		this.setActionCreateButton(viewId);
 	}
 
 	fields = [];
@@ -55,6 +65,7 @@ export class AssetExplorerViewGridComponent {
 	showMessage = true;
 	typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
+	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 	public userTimeZone: string;
 
 	// Pagination Configuration
@@ -74,6 +85,7 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
+	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -257,6 +269,10 @@ export class AssetExplorerViewGridComponent {
 		}, 500);
 	}
 
+	/**
+	 * On Show the Dialog for the current selected Asset
+	 * @param data
+	 */
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
@@ -268,6 +284,24 @@ export class AssetExplorerViewGridComponent {
 			}).catch(x => {
 				console.log(x);
 			});
+	}
+
+	/**
+	 *
+	 */
+	protected onCreateAsset(assetEntityType: string): void {
+		if (!assetEntityType) {
+			return;
+		}
+		this.dialog.open(AssetCreateComponent, [
+				{ provide: 'ASSET', useValue: assetEntityType }],
+			DIALOG_SIZE.LG, false).then(x => {
+			if (x) {
+				this.createDependencyPromise(x.assetClass, 0);
+			}
+		}).catch(x => {
+			console.log(x);
+		});
 	}
 
 	onWidthChange(data: any) {
@@ -293,8 +327,132 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
-	canCreateAssets(): boolean {
+	protected canCreateAssets(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
+	protected showComment(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+		const assetModalModel: AssetModalModel = {
+			assetId: dataItem.common_id,
+			assetName: dataItem.common_assetName,
+			assetType: dataItem.common_assetClass
+		}
+
+		this.dialog.open(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel}
+		], DIALOG_SIZE.LG).then(result => {
+			if (result) {
+				console.log('Show Comment Result',  result);
+			}
+		}).catch(result => {
+			console.log(result);
+		});
+	}
+
+	protected createComment(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+		let singleCommentModel: SingleCommentModel = {
+			modal: {
+				title: 'Create Comment',
+				type: ModalType.CREATE
+			},
+			archive: false,
+			comment: '',
+			category: '',
+			assetClass: {
+				text: dataItem.common_assetClass
+			},
+			asset: {
+				id: dataItem.common_id,
+				text: dataItem.common_assetName
+			}
+		};
+
+		this.dialog.extra(SingleCommentComponent, [
+			{provide: SingleCommentModel, useValue: singleCommentModel}
+		], true, false).then(result => {
+			console.log('RESULT SINGLE COMMENT', result);
+		}).catch(result => {
+			console.log(result);
+		});
+	}
+
+	protected showAssetEditView(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+		const componentParameters = [
+			{ provide: 'ID', useValue: dataItem.common_id },
+			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
+		];
+
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+	}
+
+	/**
+	 * Allows to display the clone asset modal
+	 */
+	protected showAssetCloneView(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+
+		const cloneModalModel: AssetModalModel = {
+			assetType: dataItem.common_assetClass,
+			assetId: dataItem.common_id
+		}
+		this.dialog.extra(AssetCloneComponent, [
+			{provide: AssetModalModel, useValue: cloneModalModel}
+		], false, false).then( (result: CloneCLoseModel)  => {
+
+			if (result.clonedAsset && result.showEditView) {
+				const componentParameters = [
+					{ provide: 'ID', useValue: result.assetId },
+					{ provide: 'ASSET', useValue: dataItem.common_assetClass }
+				];
+
+				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+			}
+		}).catch( error => console.log('error', error));
+	}
+
+	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
+		this.createButtonState = state;
+	}
+
+	/**
+	 * set the asset type depends on the view that is display in order to set
+	 * by default the behavior of the create button
+	 * @param viewId
+	 */
+	protected setActionCreateButton(viewId) {
+		switch (viewId) {
+			case this.ASSET_ENTITY_MENU.All_APPLICATIONS:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.APPLICATION;
+				break;
+			case this.ASSET_ENTITY_MENU.All_DATABASES:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.DATABASE;
+				break;
+			case this.ASSET_ENTITY_MENU.All_DEVICE:
+			case this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL:
+			case this.ASSET_ENTITY_MENU.All_SERVERS:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.DEVICE;
+				break;
+			case this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL:
+				this.createButtonState = this.ASSET_ENTITY_DIALOG_TYPES.STORAGE;
+				break;
+		}
+	}
+
+	/**
+	 * Validates if should display the create button, depends on the view
+	 * that is trying to show.
+	 */
+	protected displayCreateButton() {
+		return this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_APPLICATIONS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_DATABASES ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_DEVICE ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_SERVERS ||
+			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL;
 	}
 
 	/**
@@ -312,12 +470,19 @@ export class AssetExplorerViewGridComponent {
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
 	 * @param e
 	 */
-	private cellClick(e): void {
+	private  cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
-			jQuery('tr.k-state-selected').removeClass('k-state-selected');
-			jQuery(`tr[data-kendo-grid-item-index=${e.rowIndex}]`).addClass('k-state-selected');
+			this.highlightGridRow(e.rowIndex);
 			this.onShow(e.dataItem);
 		}
+	}
+
+	/**
+	 * Allow to highlight the row grid
+	 */
+	private highlightGridRow(rowIndex) {
+		jQuery('tr.k-state-selected').removeClass('k-state-selected');
+		jQuery(`tr[data-kendo-grid-item-index=${rowIndex}]`).addClass('k-state-selected');
 	}
 
 	/**

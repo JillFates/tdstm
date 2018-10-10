@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import grails.transaction.Transactional
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -130,6 +131,9 @@ class DatabaseMigrationService implements ServiceMethods {
 	 * @param domainObjects - list of domain objects
 	 * @param jsonField - name of the field to be updated.
 	 * @param changeScript - the script to be executed.
+     *
+     * Adding transactional here seems to cause problems in the database migration scripts, which
+     * already have an implicit transaction.
 	 */
 	void updateJsonObjects(List domainObjects, String jsonField, Closure changeScript) {
 		for (domainObject in domainObjects) {
