@@ -290,4 +290,17 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Update a task
+	 * @returns {Observable<any>}
+	 */
+	updateTaskStatus(payload: any): Observable<any> {
+		return this.http.post(`${this.baseURL}/task/update`, JSON.stringify(payload))
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
 }
