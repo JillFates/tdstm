@@ -25,6 +25,8 @@ export class TaskCommentComponent implements OnInit {
 	@Input('can-edit-tasks') canEditTasks ? = false;
 	@Input('asset-name') assetName: string;
 	@Input('asset-type') assetType: string;
+	@Input('show-task') showTask: boolean;
+	@Input('show-comment') showComment: boolean;
 
 	// Grid Configuration for Task and Comment
 	private dataGridTaskHelper: DataGridOperationsHelper;
