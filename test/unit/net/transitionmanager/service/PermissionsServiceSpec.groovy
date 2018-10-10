@@ -26,7 +26,6 @@ class PermissionsServiceSpec extends Specification {
 			new Permissions(permissionItem: 'AssetExplorerDelete', description: 'AssetExplorerDelete UNIT TEST').save(failOnError: true, flush: true)
 
 		when:
-			//Hibernate: select this_.id as id1_58_0_, this_.description as descript2_58_0_, this_.permission_item as permissi3_58_0_ from permissions this_ where 1=1 order by this_.permission_item asc
 			List<Permissions> permissions = service.findAll()
 
 		then:
