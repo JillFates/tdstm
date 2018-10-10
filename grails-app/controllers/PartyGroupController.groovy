@@ -2,15 +2,14 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.partygroup.ListCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.PartyType
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyGroupService
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.ProjectService
+
 import net.transitionmanager.service.UserPreferenceService
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
  * This Controller handles CRUD operations for PartyGroups(Companies).
@@ -21,12 +20,8 @@ class PartyGroupController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction  = 'list'
 
-	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	PartyRelationshipService   partyRelationshipService
-	ProjectService             projectService
-	UserPreferenceService      userPreferenceService
-
-	PartyGroupService partyGroupService
+	UserPreferenceService userPreferenceService
+	PartyGroupService     partyGroupService
 
 	/**
 	 * Used to render the Company List view which will call back to the listJson for the actual data
@@ -42,20 +37,20 @@ class PartyGroupController implements ControllerMethods {
 	@HasPermission(Permission.CompanyView)
 	def listJson() {
 
-		String sortIndex = params.sidx ?: 'companyName'
-		String sortOrder = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
-		Map filterParams = [companyName: params.companyName, dateCreated: params.dateCreated,
-							lastUpdated: params.lastUpdated, partner: params.partner]
+		ListCommand list = populateCommandObject(ListCommand)
+		int rowOffset = (list.page - 1) * list.rows
+
+		Map filterParams = [
+			companyName: list.companyName,
+			dateCreated: list.dateCreated,
+			lastUpdated: list.lastUpdated,
+			partner    : list.partner
+		]
 
 		// Validate that the user is sorting by a valid column
-		if (!sortIndex in filterParams) {
-			sortIndex = 'companyName'
-		}
+		String sortIndex = list.sidx in filterParams ? list.sidx : 'companyName'
 
-		renderAsJson(partyGroupService.list(filterParams, sortIndex, sortOrder, maxRows, currentPage, rowOffset))
+		renderAsJson(partyGroupService.list(filterParams, sortIndex, list.sord, list.rows, list.page, rowOffset))
 	}
 
 	/**
