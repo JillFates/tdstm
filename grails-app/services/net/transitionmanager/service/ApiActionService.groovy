@@ -708,30 +708,27 @@ class ApiActionService implements ServiceMethods {
 
 				DataScript targetDataScript = null
 				if (sourceApiAction.defaultDataScript) {
-					targetDataScript = (DataScript)GormUtil.cloneDomain(sourceApiAction.defaultDataScript, [
+					targetDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceApiAction.defaultDataScript, [
 							project : targetProject,
 							provider: targetProvider
-					])
-					targetDataScript.save()
+					], false, false)
 				}
 				Credential targetCredential = null
 				if (sourceApiAction.credential) {
-					targetCredential = (Credential)GormUtil.cloneDomain(sourceApiAction.credential, [
+					targetCredential = (Credential)GormUtil.cloneDomainAndSave(sourceApiAction.credential, [
 							project : targetProject,
 							provider: targetProvider,
 							username: 'Must Be Changed',
 							password: RandomStringUtils.randomAlphanumeric(10)
-					])
-					targetCredential.save()
+					], false, false)
 				}
-				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomain(sourceApiAction, [
+				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomainAndSave(sourceApiAction, [
 						project: targetProject,
 						provider: targetProvider,
 						apiCatalog: targetApiCatalog,
 						defaultDataScript: targetDataScript,
 						credential: targetCredential
-				])
-				newApiAction.save()
+				], false, false)
 				log.debug "Cloned api action ${newApiAction.name} for project ${targetProject.toString()}"
 			}
 		}
