@@ -29,7 +29,7 @@ class BulkChangeCommand {
 		edits cascade: true
 		ids nullable: true, validator: { ids, command ->
 			if (!ids && !(command.allIds && command.dataViewId && command.userParams)) {
-				return 'code for assets need to be specified or all assets'
+				return 'default.empty.ids.list.message'
 			}
 		}
 	}
