@@ -3,6 +3,7 @@ package specs.LandingPages
 import geb.spock.GebReportingSpec
 import pages.Login.LoginPage
 import pages.Login.MenuPage
+import pages.Planning.Bundle.ListBundlesPage
 import pages.Planning.*
 import spock.lang.Stepwise
 
