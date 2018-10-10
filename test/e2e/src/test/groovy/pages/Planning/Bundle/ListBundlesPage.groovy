@@ -1,4 +1,4 @@
-package pages.Planning
+package pages.Planning.Bundle
 
 import geb.Page
 import modules.PlanningModule
@@ -32,6 +32,8 @@ class ListBundlesPage extends Page {
 
     def filterByName(name){
         nameFilter=name
+        //This tab is necessary for the filter will not be applied until the focus is moved away
+        //from the field
         nameFilter<< Keys.chord(Keys.TAB)
     }
     /**
@@ -64,7 +66,7 @@ class ListBundlesPage extends Page {
      * returns false if the parameter value and the presence of the tick do not match     *
      */
     def validatePlanningTick(value){
-        !(value==true ^ tickIcon.displayed)
+        !(value=="on" ^ tickIcon.displayed)
     }
 
 }

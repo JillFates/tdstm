@@ -1,4 +1,4 @@
-package pages.Planning
+package pages.Planning.Bundle
 
 import geb.Page
 

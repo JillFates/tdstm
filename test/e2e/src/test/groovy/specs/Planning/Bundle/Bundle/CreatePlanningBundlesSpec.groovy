@@ -1,4 +1,4 @@
-package specs.Planning
+package specs.Planning.Bundle
 
 /**
  * This Spec tests the creation of a bundle and the validation of the creation form fields
@@ -7,9 +7,9 @@ package specs.Planning
 
 import pages.Login.LoginPage
 import pages.Login.MenuPage
-import pages.Planning.ListBundlesPage
-import pages.Planning.CreateBundlePage
-import pages.Planning.BundleDetailPage
+import pages.Planning.Bundle.ListBundlesPage
+import pages.Planning.Bundle.CreateBundlePage
+import pages.Planning.Bundle.BundleDetailPage
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
@@ -22,7 +22,7 @@ class CreatePlanningBundlesSpec extends GebReportingSpec {
     static baseName = "QAE2E"
     static randStr = CommonActions.getRandomString()
     static bundleData = [baseName+" "+randStr+" Planning", baseName+" bundle created by automated test",
-                         "STD_PROCESS",true]
+                         "STD_PROCESS","on"]
 
     def setupSpec() {
         testCount = 0

@@ -1,4 +1,4 @@
-package pages.Planning
+package pages.Planning.Bundle
 
 import geb.Page
 import modules.PlanningModule
@@ -35,12 +35,13 @@ class BundleDetailPage extends Page {
     def validateDataDisplayed(data){
         def allFieldsAsExpected=true
         def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
-        if(!isPlanning()){
+        if(isPlanning()!=data[3]){
             allFieldsAsExpected=false
         }else{
-            dispData.each {
-                if(!data.contains(it)){
-                  allFieldsAsExpected=false
+            for (it in dispData) {
+                if (!data.contains(it)) {
+                    allFieldsAsExpected=false
+                    break
                 }
             }
         }
