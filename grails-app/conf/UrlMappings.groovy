@@ -189,6 +189,11 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/moveEvent/list" {
+			controller = "wsEvent"
+			action = [GET: "listEvents"]
+		}
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
