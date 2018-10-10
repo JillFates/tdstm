@@ -1370,7 +1370,7 @@ class AssetExportService {
 	 * @return
 	 */
 	private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass, Project project) {
-		Map fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString(), true)
+		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString())
 		return fieldSpecs[assetClass.toString()]["fields"]
 	}
 
