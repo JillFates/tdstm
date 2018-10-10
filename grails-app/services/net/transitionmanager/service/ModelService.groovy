@@ -532,4 +532,31 @@ class ModelService implements ServiceMethods {
 		alias
 	}
 
+    /**
+     * Validates a {@code Model).
+     * Sets the modelStatus property to "valid" and validatedBy to the current Person.
+     * If the model is not found, throws a {@code ServiceException).
+     * If saving the Model instance generates errors, they will be returned
+     * in the Model instance.
+     * @param modelId  The id of the model to validate
+     * @return  The Model instance
+     */
+	@Transactional
+	Model validateModel(Long modelId) {
+		def modelInstance = Model.get(modelId)
+		if (!modelInstance) {
+			throw new ServiceException("ModelService - Not Model found with id $modelId")
+		}
+        if (securityService.loggedIn) {
+            modelInstance.validatedBy = securityService.loadCurrentPerson()
+            modelInstance.modelStatus = "valid"
+            if (!modelInstance.save(flush:true)) {
+                modelInstance.errors.allErrors.each { println it }
+            }
+        }
+        return modelInstance
+	}
+
+
+
 }

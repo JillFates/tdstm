@@ -1069,18 +1069,22 @@ class ModelController implements ControllerMethods {
 						powerDesign : powerDesign]
 		render modelMap as JSON
 	}
-	
+
+	/**
+	 * Validates a Model instance.
+	 */
 	@HasPermission(Permission.ModelValidate)
 	def validateModel() {
-		def modelInstance = Model.get(params.id)
-		if (securityService.loggedIn) {
-			modelInstance.validatedBy = securityService.loadCurrentPerson()
-			modelInstance.modelStatus = "valid"
-			if (!modelInstance.save(flush:true)) {
-				modelInstance.errors.allErrors.each { println it }
-			}
+		if (!params.id) {
+			throw new InvalidParamException("ModelController.validateModel() - id cannot be null.")
 		}
-		flash.message = "$modelInstance.modelName Validated"
+		Model modelInstance = modelService.validateModel(params.id)
+		if (modelInstance.errors.isEmpty()) {
+			flash.message = "$modelInstance.modelName Validated"
+		}
+		else {
+			flash.message = "There was an error validating $modelInstance.modelName: ${modelInstance.errors.allErrors.each { println it }}"
+		}
 		render (view: "show",model:[id: modelInstance.id,modelInstance:modelInstance])
 	}
 	
