@@ -42,7 +42,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public hasEditTaskPermission = false;
 	public hasDeleteTaskPermission = false;
 	public modalOptions: DecoratorOptions;
-	public taskActionsOptions: TaskActionsOptions;
 	public model: any = {};
 	private hasChanges: boolean;
 
@@ -61,7 +60,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.taskActionsOptions = {showDone: false, showStart: false, showAssignToMe: false, showNeighborhood: false};
 		this.hasChanges = false;
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
@@ -80,7 +78,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			showDone: false,
 			showStart: false,
 			showAssignToMe: false,
-			showNeighborhood: false
+			showNeighborhood: false,
+			invoke: false
 		};
 
 		if (!this.model) {
@@ -95,7 +94,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		options.showStart = this.model.status && ['ready'].indexOf(this.model.status.toLowerCase()) >= 0;
 		options.showAssignToMe = this.currentUserId !== assignedTo && this.model.status && ['ready', 'pending', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
 		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
-
+		options.invoke =
+			this.model.apiAction &&
+			!this.model.apiActionInvokedAt &&
+			this.model.status && ['ready', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
 		return options;
 	}
 
@@ -237,6 +239,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		};
 
 		this.taskManagerService.assignToMe(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+
+	/**
+	 * Invoke an api action
+	 */
+	onInvoke(): void {
+		this.taskManagerService.invokeAction(this.model.id)
 			.subscribe((result) => {
 				this.hasChanges = true;
 				this.loadTaskDetail();

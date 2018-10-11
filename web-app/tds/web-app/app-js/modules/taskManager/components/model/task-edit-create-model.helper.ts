@@ -150,6 +150,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
+			apiActionInvokedAt: assetComment.apiActionInvokedAt,
+			apiActionCompletedAt: assetComment.apiActionCompletedAt,
 			title: task.modal.title,
 			workflow: detail.workflow || '',
 			workflowTransitionName: assetComment.workflowTransition && assetComment.workflowTransition.name || '',

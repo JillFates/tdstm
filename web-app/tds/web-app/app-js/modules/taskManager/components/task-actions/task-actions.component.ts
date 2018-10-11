@@ -8,6 +8,7 @@ export interface TaskActionsOptions {
 	showStart: boolean;
 	showAssignToMe: boolean;
 	showNeighborhood: boolean;
+	invoke: boolean;
 }
 
 @Component({
@@ -19,6 +20,7 @@ export class TaskActionsComponent implements OnInit {
 	@Input() options: TaskActionsOptions;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
 	@Output() done: EventEmitter<void> = new EventEmitter<void>();
+	@Output() invoke: EventEmitter<void> = new EventEmitter<void>();
 	@Output() assignToMe: EventEmitter<void> = new EventEmitter<void>();
 	@Output() neighborhood: EventEmitter<void>  = new EventEmitter<void>();
 	ngOnInit(): void {
@@ -52,4 +54,12 @@ export class TaskActionsComponent implements OnInit {
 	onAssignToMe(): void {
 		this.assignToMe.emit();
 	}
+
+	/**
+	 * Emit the invoke event
+	 */
+	onInvoke(): void {
+		this.invoke.emit();
+	}
+
 }

@@ -316,4 +316,17 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Invoke an api action
+	 * @returns {Observable<any>}
+	 */
+	invokeAction(taskId: string): Observable<any> {
+		return this.http.post(`${this.baseURL}/ws/task/${taskId}/invokeAction`, '')
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
 }
