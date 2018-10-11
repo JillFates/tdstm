@@ -141,7 +141,14 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
-		def task = AssetComment.get(params.id)
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
+
+		def task = AssetComment.get(requestParams.id)
 		Project project = securityService.userCurrentProject
 		String errorMsg = ''
 		String assignedTo = ''
@@ -154,8 +161,8 @@ class TaskController implements ControllerMethods {
 			else {
 
 				// Double check to see if the status changed while the user was reassigning so that they
-				if (! errorMsg && params.status) {
-					if (task.status != params.status) {
+				if (! errorMsg && requestParams.status) {
+					if (task.status != requestParams.status) {
 						log.warn "assignToMe - Task(#:$task.taskNumber id:$task.id) status changed around when $securityService.currentUsername was assigning to self"
 						def whoDidIt = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
 						switch (task.status) {
@@ -183,7 +190,7 @@ class TaskController implements ControllerMethods {
 			}
 		}
 		else {
-			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - $params.id"
+			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - $requestParams.id"
 		}
 
 		def map = [assignedToName: assignedTo, errorMsg: errorMsg]

@@ -227,4 +227,20 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.windowService.getWindow().open(`../task/taskGraph?neighborhoodTaskId=${this.model.id}`, '_blank')
 	}
 
+	/**
+	 * Assign the task to the current user
+	 */
+	onAssignToMe(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: this.model.status
+		};
+
+		this.taskManagerService.assignToMe(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+
 }

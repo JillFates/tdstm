@@ -303,4 +303,17 @@ export class TaskService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Assign the task to the current user
+	 * @returns {Observable<any>}
+	 */
+	assignToMe(payload: any): Observable<any> {
+		return this.http.post(`${this.baseURL}/task/assignToMe`, JSON.stringify(payload))
+			.map((res: Response) => {
+				let result = res.json();
+				return result;
+			})
+			.catch((error: any) => error.json());
+	}
+
 }
