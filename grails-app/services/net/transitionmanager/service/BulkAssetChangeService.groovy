@@ -96,6 +96,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		List<String> actions
 		def service
 		def value
+		Class type = getType(bulkChange.type)
 
 		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
 		fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
@@ -114,7 +115,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		try {
 			//Looks up and runs all the edits for a bulk change call.
 			bulkChange.edits.each { EditCommand edit ->
-				Class type = getType(edit.type)
+
 				service = getBulkClass(type, edit.fieldName, fieledMapping, bulkClassMapping)
 				value = service.coerceBulkValue(currentProject, edit.value)
 				action = edit.action

@@ -1,6 +1,5 @@
 package net.transitionmanager.command.bulk
 
-import com.tdsops.tm.enums.domain.AssetClass
 import grails.validation.Validateable
 
 /**
@@ -17,10 +16,8 @@ class EditCommand {
 	String fieldName
 	String action
 	String value
-	String type
 
 	static constraints = {
 		value nullable: true, blank:true
-		type inList: AssetClass.values()*.name()
 	}
 }

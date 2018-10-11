@@ -21,11 +21,13 @@ class BulkChangeCommand {
 	List<EditCommand>         edits
 	List<Long>                ids
 	Boolean                   allIds = false
+	String                    type
 
 	static constraints = {
 		userParams cascade: true, nullable:true
 		dataViewId nullable: true
 		edits cascade: true
+		type inList: AssetClass.values()*.name()
 		ids nullable: true, validator: { ids, command ->
 			if (!ids && !(command.allIds && command.dataViewId && command.userParams)) {
 				return 'default.empty.ids.list.message'
