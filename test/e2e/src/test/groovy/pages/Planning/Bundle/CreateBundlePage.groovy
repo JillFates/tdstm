@@ -51,6 +51,10 @@ class CreateBundlePage extends Page {
         workFlowDropDown=dataList[2]
     }
 
+    def clickPlanning(){
+        usePlanningCheck.click()
+    }
+
     /**
      * For each of the fields in the list validates it is displayed.
      * If any of the fields is not displayed then the method wil return FALSE

@@ -1,7 +1,9 @@
 package pages.Planning.Bundle
 
 import geb.Page
+import geb.error.RequiredPageContentNotPresent
 import modules.PlanningModule
+import modules.CommonsModule
 import org.openqa.selenium.Keys
 
 class ListBundlesPage extends Page {
@@ -19,7 +21,9 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
-        tickIcon {$("span.glyphicon-ok")}
+        tickIcon (required: false){$("span.glyphicon-ok")}
+
+        commonsModule {module CommonsModule}
 
         //filters section
         filterRow {$("tr.k-filter-row")}
@@ -66,8 +70,13 @@ class ListBundlesPage extends Page {
      * returns false if the parameter value and the presence of the tick do not match     *
      */
     def validatePlanningTick(value){
-        !(value=="on" ^ tickIcon.displayed)
+        if(value=="on"){
+            return commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        } else {
+            return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        }
     }
+
 
 }
 
