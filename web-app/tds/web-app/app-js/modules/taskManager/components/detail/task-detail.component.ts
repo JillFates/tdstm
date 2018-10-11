@@ -202,4 +202,20 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.loadTaskDetail();
 			});
 	}
+	/**
+	 * Change the task status to done
+	 */
+	onDoneTask(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: 'Completed',
+			currentStatus: this.model.status
+		};
+
+		this.taskManagerService.updateTaskStatus(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
 }

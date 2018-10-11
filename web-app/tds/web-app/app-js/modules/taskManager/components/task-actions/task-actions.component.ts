@@ -18,15 +18,22 @@ export interface TaskActionsOptions {
 export class TaskActionsComponent implements OnInit {
 	@Input() options: TaskActionsOptions;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
+	@Output() done: EventEmitter<void> = new EventEmitter<void>();
 	ngOnInit(): void {
 		console.log('Init');
 	}
-
 
 	/**
 	 * Emit the start status change event
 	 */
 	onStart(): void {
 		this.start.emit();
+	}
+
+	/**
+	 * Emit the done status change event
+	 */
+	onDone(): void {
+		this.done.emit();
 	}
 }
