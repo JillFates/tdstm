@@ -19,6 +19,9 @@
     .successor-predecessor-table
       max-height: 200px
       height: 200px
+  .modal-content.task-create-component
+    min-height: 720px
+    min-width: 769px
   .modal-content
     min-height: 760px
     min-width: 769px
@@ -27,6 +30,11 @@
       min-height: 890px
     .modal-body
       height: 86%
+      form.create-form
+        td.description-container
+          max-width: 100%
+          input
+            width: 100%
       form
         .note
           resize: none
@@ -39,6 +47,9 @@
           td
             label
               visibility: hidden
+        tr.dependency-error-section
+          table
+            width: 100%
 
         table.has-duplicated-successors
           tr.dependency-error-section.has-duplicated
@@ -80,11 +91,11 @@
         .error-message
           display: none
         .validated-field
-          .ng-invalid
+          .ng-invalid:not(.ng-pristine)
             border-color: $color-message-error--red
-          .ng-invalid + .error-message
+          .ng-invalid:not(.ng-pristine) + .error-message
             display: block
-        .validated-field > .ng-invalid
+        .validated-field > .ng-invalid:not(.ng-pristine)
           & ~ .error-message
             display: block
         .required-field::after
@@ -188,6 +199,10 @@
       .grow-container
         display: flex
         flex: 1
+        table.create-task
+          height: 100%
+          td
+            height: 100%
         td
           flex: 1
           position: relative
