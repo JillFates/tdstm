@@ -1,7 +1,6 @@
 package pages.Planning.Bundle
 
 import geb.Page
-import geb.error.RequiredPageContentNotPresent
 import modules.PlanningModule
 import modules.CommonsModule
 import org.openqa.selenium.Keys
@@ -21,7 +20,6 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
-        tickIcon (required: false){$("span.glyphicon-ok")}
 
         commonsModule {module CommonsModule}
 
