@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeNumber
@@ -140,6 +141,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the domain class for the name passed in
 	 */
+	@NotTransactional
 	Class getType(String name) {
 		AssetClass assetClass = AssetClass.safeValueOf(name)
 		Class type = AssetClass.domainClassFor(assetClass)
@@ -166,6 +168,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the class to use for bulk changes
 	 */
+	@NotTransactional
 	private Class getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
 		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
 
