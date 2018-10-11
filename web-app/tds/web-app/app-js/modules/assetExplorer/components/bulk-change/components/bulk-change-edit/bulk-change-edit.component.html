@@ -61,21 +61,39 @@
 								<!--(selectionChange)="onDomainChange($event, rowIndex)"-->
 								<!--[(ngModel)]="editRows.selectedValues[rowIndex].domain"-->
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'domain'" let-dataItem let-rowIndex="rowIndex">
-									<kendo-dropdownlist
+                                    <kendo-dropdownlist
+                                            name="domain" class="form-control domain"
+                                            [data]="domains"
+                                            [value]="editRows.selectedValues[rowIndex].domain"
+                                            (valueChange)="onDomainValueChange($event, rowIndex)"
+                                            [valueField]="'id'"
+                                            [textField]="'text'">
+                                    </kendo-dropdownlist>
+									<!--<kendo-dropdownlist
 											name="domain" class="form-control domain"
 											[data]="editRows.actions[rowIndex].domains"
 											[value]="editRows.selectedValues[rowIndex].domain"
 											(valueChange)="onDomainValueChange($event, rowIndex)"
 									        [valueField]="'id'"
 									        [textField]="'text'">
-									</kendo-dropdownlist>
+									</kendo-dropdownlist>-->
 								</ng-template>
 
 								<!--[defaultItem]="editRows.selectedValues[rowIndex].field"-->
-								<ng-template kendoGridCellTemplate *ngIf="column.property === 'field'" let-dataItem let-rowIndex="rowIndex">
+								<!--<ng-template kendoGridCellTemplate *ngIf="column.property === 'field'" let-dataItem let-rowIndex="rowIndex">
 									<kendo-dropdownlist
 											name="field" class="form-control field"
 									        [data]="editRows.actions[rowIndex].fields"
+									        [value]="editRows.selectedValues[rowIndex].field"
+											(valueChange)="onFieldValueChange($event, rowIndex)"
+									        [valueField]="'id'"
+									        [textField]="'text'">
+									</kendo-dropdownlist>
+								</ng-template>-->
+                                <ng-template kendoGridCellTemplate *ngIf="column.property === 'field'" let-dataItem let-rowIndex="rowIndex">
+									<kendo-dropdownlist
+											name="field" class="form-control field"
+									        [data]="editRows.options[rowIndex].fields"
 									        [value]="editRows.selectedValues[rowIndex].field"
 											(valueChange)="onFieldValueChange($event, rowIndex)"
 									        [valueField]="'id'"
@@ -88,7 +106,7 @@
 								<ng-template kendoGridCellTemplate *ngIf="column.property === 'action'" let-dataItem let-rowIndex="rowIndex">
 									<kendo-dropdownlist
 											name="action" class="form-control action"
-											[data]="editRows.actions[rowIndex].actions"
+											[data]="editRows.options[rowIndex].actions"
 											[value]="editRows.selectedValues[rowIndex].action"
 											(valueChange)="onActionValueChange($event, rowIndex)"
 											[valueField]="'id'"

@@ -20,7 +20,7 @@ export interface BulkActionResult {
 }
 
 export interface BulkEditAction {
-	domains: IdTextItem[];
+	// domains: IdTextItem[];
 	fields: IdTextItem[];
 	actions: IdTextItem[];
 }
