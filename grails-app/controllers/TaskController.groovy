@@ -95,30 +95,35 @@ class TaskController implements ControllerMethods {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
 		// Deal with legacy view parameters.
-		if (request.format != 'json') {
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
 			params.taskDependency = params.list('taskDependency[]')
 			params.taskSuccessor = params.list('taskSuccessor[]')
-		}
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
-
-		if (params.printers) {
-			userPreferenceService.setPreference(PREF.PRINTER_NAME, params.printers)
-			userPreferenceService.setPreference(PREF.PRINT_LABEL_QUANTITY, params.printTimes)
+			requestParams = params
 		}
 
-		if (params.view == 'myTask') {
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
+
+		if (requestParams.printers) {
+			userPreferenceService.setPreference(PREF.PRINTER_NAME, requestParams.printers)
+			userPreferenceService.setPreference(PREF.PRINT_LABEL_QUANTITY, requestParams.printTimes)
+		}
+
+		if (requestParams.view == 'myTask') {
 			if (map.error) {
 				flash.message = map.error
 			}
 
-			def redirParams = [view: params.view]
-			if (params.containsKey('tab') && params.tab) {
-				redirParams.tab = params.tab
+			def redirParams = [view: requestParams.view]
+			if (requestParams.containsKey('tab') && requestParams.tab) {
+				redirParams.tab = requestParams.tab
 			}
-			if (params.containsKey('sort') && params.sort) {
-				redirParams.sort = params.sort
+			if (requestParams.containsKey('sort') && requestParams.sort) {
+				redirParams.sort = requestParams.sort
 			}
-			if (params.status == COMPLETED) {
+			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
 			forward(controller: 'task', action: 'listUserTasks', params: redirParams)
