@@ -17,6 +17,7 @@ import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
+import {WindowService} from '../../../../shared/services/window.service';
 
 @Component({
 	selector: `task-detail`,
@@ -52,7 +53,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		public promptService: UIPromptService,
 		public userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private windowService: WindowService) {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -218,4 +220,11 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.loadTaskDetail();
 			});
 	}
+	/**
+	 * Open the neighborhood window
+	 */
+	onNeighborhood(): void {
+		this.windowService.getWindow().open(`../task/taskGraph?neighborhoodTaskId=${this.model.id}`, '_blank')
+	}
+
 }

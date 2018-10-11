@@ -19,6 +19,7 @@ export class TaskActionsComponent implements OnInit {
 	@Input() options: TaskActionsOptions;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
 	@Output() done: EventEmitter<void> = new EventEmitter<void>();
+	@Output() neighborhood: EventEmitter<void>  = new EventEmitter<void>();
 	ngOnInit(): void {
 		console.log('Init');
 	}
@@ -35,5 +36,12 @@ export class TaskActionsComponent implements OnInit {
 	 */
 	onDone(): void {
 		this.done.emit();
+	}
+
+	/**
+	 * Emit the Neighborhood event
+	 */
+	onNeighborhood(): void {
+		this.neighborhood.emit();
 	}
 }
