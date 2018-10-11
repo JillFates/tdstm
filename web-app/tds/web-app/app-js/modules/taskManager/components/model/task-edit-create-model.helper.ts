@@ -1,6 +1,8 @@
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
+import {TaskDetailModel} from './task-detail.model';
 export const YesNoList = ['Yes', 'No'];
+export const PriorityList = [1, 2, 3, 4, 5];
 
 export interface ITask {
 	id: string | number;
@@ -35,7 +37,7 @@ export class TaskEditCreateModelHelper {
 	 * @param {any} model Model to set
 	 * @returns {any}
 	 */
-	public setModel(model: any): any {
+	public getModelForEdit(model: any): any {
 		this.model = model;
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
@@ -62,11 +64,82 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
+	 * Get an empty model, used for create task component
+	 * @returns {any}
+	 */
+	public getModelForCreate(detailModel: TaskDetailModel): any {
+		const [yes, no] = YesNoList;
+		const defaultDurationScale = 'M';
+
+		this.model = {
+			title: detailModel.modal.title ,
+			workflow: '' ,
+			workflowTransitionName: '' ,
+			durationDelta: '' ,
+			recipe: '' ,
+			id: detailModel.id,
+			personCreateObj:  '',
+			note: '',
+			duration: 0,
+			durationText: '',
+			actualDuration:  '',
+			dateCreated: '',
+			taskSpec: '',
+			lastUpdated: '',
+			taskSpecId: '',
+			taskNumber: '',
+			hardAssigned:  no,
+			sendNotification:  yes,
+			durationScale: defaultDurationScale,
+			durationParts: {days: 0, hours: 0, minutes: 0},
+			locked: false,
+			actualStart:  '',
+			actualFinish:  '',
+			dueDate:  '',
+			estimatedStart:  '',
+			estimatedFinish:  '',
+			instructionLink: '',
+			instructionsLinkLabel: '',
+			instructionsLinkURL:  '',
+			priority: 3,
+			assetName: '',
+			comment:  '',
+			assetClass: {id: detailModel.detail.assetClass, text: ''},
+			assetClasses: [{id: '', text: ''}],
+			status: 'Ready',
+			statusList: [],
+			personList: [],
+			teamList: [],
+			originalPredecessorList: [],
+			originalSuccessorList: [],
+			notesList: [],
+			predecessorList: [],
+			successorList: [],
+			apiActionList: [{id: '', text: ''}],
+			categoriesList: [],
+			eventList: [{id: '', text: ''}],
+			priorityList: PriorityList,
+			asset: {id: detailModel.detail.assetEntity, text: detailModel.detail.assetName},
+			assignedTo: {id : parseInt(detailModel.detail.currentUserId, 10), text: ''},
+			assignedTeam: {id: '', text: ''},
+			event: {id: '', text: ''},
+			category: 'general',
+			apiAction: {id: '', text: ''},
+			deletedPredecessorList: [],
+			deletedSuccessorList: []
+		};
+
+		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
+
+		return this.model;
+	}
+
+	/**
 	 * Set the model passing the all detail object
 	 * @param {any} task Holds the detail object coming from the service, this will be extracted and cleaned
 	 * @returns {any}
 	 */
-	public cleanAndSetModel(task: any): any {
+	public getModelForDetails(task: any): any {
 		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
 		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
@@ -123,7 +196,7 @@ export class TaskEditCreateModelHelper {
 			apiActionList: (detail.apiActionList || []).map((action) => ({id: action.id, text: action.name})),
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
-			priorityList: detail.priorityList,
+			priorityList: PriorityList,
 			asset: {id: detail.assetId, text: detail.assetName},
 			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
@@ -240,6 +313,69 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
+	 * Get and clean the object that will send to the service update the task
+	 */
+	public getPayloadForCreate(): any {
+		const [Yes, No] = YesNoList;
+		const {
+			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
+			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
+			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
+			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+
+		const deletedItems = this.model.deletedPredecessorList
+			.concat(this.model.deletedSuccessorList)
+			.join(',');
+
+		return  {
+			assetClass: assetClass.id,
+			assetEntity: this.getEmptyStringIfNull(asset && asset.id).toString(),
+			assetType: assetClass.text,
+			assignedTo: this.getEmptyStringIfNull(assignedTo && assignedTo.id).toString(),
+			category: category,
+			apiAction: this.getEmptyStringIfNull(apiAction && apiAction.id),
+			apiActionId: this.getEmptyStringIfNull(apiAction && apiAction.id).toString() || '0',
+			actionInvocable: '',
+			actionMode: '',
+			comment: comment,
+			commentFromId: '',
+			commentId: this.getEmptyStringIfNull(id).toString(),
+			commentType: 'issue',
+			deletePredId: '',  /* ? */
+			dueDate: dueDate ? DateUtils.formatDate(dueDate, this.userCurrentDateFormat) : '',
+			duration: DateUtils.convertDurationPartsToMinutes(durationParts).toString(),
+			durationScale: durationScale,
+			estFinish: estimatedFinish ? DateUtils.formatDate(estimatedFinish, this.userCurrentDateTimeFormat) : '',
+			estStart: estimatedStart ? DateUtils.formatDate(estimatedStart, this.userCurrentDateTimeFormat) : '',
+			forWhom: '',
+			hardAssigned: hardAssigned === No ? '0' : '1',
+			sendNotification: sendNotification ===  No ? '0' : '1',
+			isResolved: '0', /* ? */
+			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
+			mustVerify: '0',
+			override: '0',
+			predCount: '-1',
+			predecessorCategory: '',
+			prevAsset: '',
+			priority: priority.toString(),
+			resolution: '',
+			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
+			status: status,
+			manageDependency: '1',
+			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
+				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
+			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
+				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
+			deletedPreds: deletedItems,
+			workflowTransition: '',
+			canEdit: true, /* ? */
+			durationLocked: locked ? '1' : '0',
+			id: ''
+		};
+	}
+
+	/**
 	 * Returns empty string whenever value is null, undefined or false
 	 * @param {any} value to validate
 	 */
@@ -288,7 +424,7 @@ export class TaskEditCreateModelHelper {
 	private extractDistinctIds(array): string[] {
 		const ids = [];
 
-		array.forEach((item) => {
+		(array || []).forEach((item) => {
 			let idField = 'id';
 
 			if (item.taskId) {

@@ -20,8 +20,6 @@ import { SharedModule } from '../../shared/shared.module';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
 import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 import { SingleCommentComponent } from './components/single-comment/single-comment.component';
-import { TaskDetailComponent } from '../taskManager/components/detail/task-detail.component';
-import { TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -29,6 +27,10 @@ import { TDSCheckboxComponent} from './components/tds-checkbox/tds-checkbox.comp
 import { ManufacturerShowComponent } from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import { ManufacturerEditComponent } from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import { ModelDeviceShowComponent } from './components/device/model-device/components/model-device-show/model-device-show.component';
+import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
+import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
+import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
+
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -47,6 +49,8 @@ import { ManufacturerService } from './service/manufacturer.service';
 import { ModelService } from  './service/model.service';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
+import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
+import {TaskManagerModule} from '../taskManager/task-manager.module';
 
 @NgModule({
 	imports: [
@@ -75,8 +79,6 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -85,7 +87,11 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		AssetCloneComponent,
-		PopupAssetMessageComponent
+		PopupAssetMessageComponent,
+		TaskCommentDialogComponent,
+		TaskCreateComponent,
+		TaskEditComponent,
+		TaskDetailComponent
 	],
 	providers: [
 		AssetExplorerService,
@@ -106,8 +112,6 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -115,7 +119,11 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent
+		AssetCloneComponent,
+		TaskCommentDialogComponent,
+		TaskCreateComponent,
+		TaskEditComponent,
+		TaskDetailComponent
 	],
 })
 

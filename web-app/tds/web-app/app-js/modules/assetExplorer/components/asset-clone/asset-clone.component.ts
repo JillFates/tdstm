@@ -9,7 +9,7 @@ import {AssetShowComponent} from '../asset/asset-show.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {CloneCLoseModel} from '../../model/clone-close.model';
-import {CloneModalModel} from '../../model/clone-modal.model';
+import {AssetModalModel} from '../../model/asset-modal.model';
 
 @Component({
 	selector: `tds-asset-clone-modal`,
@@ -26,7 +26,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	@ViewChild('includeDependencies') includeDependencies: ElementRef;
 
 	constructor(
-		public cloneModalModel: CloneModalModel,
+		public cloneModalModel: AssetModalModel,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private notifierService: NotifierService,
