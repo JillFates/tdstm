@@ -176,13 +176,8 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	private def getBulkClass(Class type, AssetClass assetClass, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
-		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
-
-		if (!property) {
-			throw new InvalidParamException("Bulk update for invalid field name: $fieldName")
-		}
-
-		String dataType = property.type.name
+		def property = GormUtil.getConstrainedProperty(type, fieldName)
+		String dataType = property.propertyType.name
 
 		if (dataType == String.class.name) {
 			dataType = fieldMapping[assetClass.name()][fieldName]?.control

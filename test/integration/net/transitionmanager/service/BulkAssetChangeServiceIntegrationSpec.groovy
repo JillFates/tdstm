@@ -393,7 +393,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
 		then: 'an InvalidParameter Exception is thrown'
-			thrown InvalidParamException
+			thrown MissingPropertyException
 	}
 
 	void 'Test bulkChange invalid action'() {
