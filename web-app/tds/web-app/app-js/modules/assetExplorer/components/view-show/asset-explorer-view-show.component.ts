@@ -26,13 +26,13 @@ declare var jQuery: any;
 })
 export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 
-	private lastSnapshot;
 	private currentId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	protected model: ViewModel = new ViewModel();
 	protected domains: DomainModel[] = [];
 	protected metadata: any = {};
+	private lastSnapshot;
 	protected navigationSubscription;
 
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
@@ -75,7 +75,6 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 		// The following code Listen to any change made on the rout to reload the page
 		this.navigationSubscription = this.router.events.subscribe((event: any) => {
 			if (event.snapshot && event.snapshot.data && event.snapshot.data.fields) {
-				console.log(event.snapshot);
 				this.lastSnapshot = event.snapshot;
 			}
 			// If it is a NavigationEnd event re-initalise the component

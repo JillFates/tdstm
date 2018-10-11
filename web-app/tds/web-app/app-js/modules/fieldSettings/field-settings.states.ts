@@ -3,6 +3,8 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
+import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 import {FieldSettingsService} from './service/field-settings.service';
@@ -10,8 +12,6 @@ import {FieldSettingsService} from './service/field-settings.service';
 import {FieldSettingsListComponent} from './components/list/field-settings-list.component';
 // Models
 import {Permission} from '../../shared/model/permission.model';
-import {TagListComponent} from '../assetTags/components/tag-list/tag-list.component';
-import {AssetTagsRoute} from '../assetTags/asset-tags-routing.states';
 
 export class FieldSettingsStates {
 	public static readonly LIST = {
@@ -19,12 +19,8 @@ export class FieldSettingsStates {
 	};
 }
 
-/**
- * This state displays the field settings list.
- * It also provides a nested ui-view (viewport) for child states to fill in.
- * The field settings are fetched using a resolve.
- */
 export const FieldSettingsRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: FieldSettingsStates.LIST.url},
 	{
 		path: FieldSettingsStates.LIST.url,
 		data: {
@@ -38,15 +34,10 @@ export const FieldSettingsRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: FieldSettingsListComponent,
-		resolve: [
-			{
-				token: 'fields',
-				policy: { async: 'RXWAIT' },
-				deps: [FieldSettingsService],
-				resolveFn: (service: FieldSettingsService) => service.getFieldSettingsByDomain()
-			}
-		],
-		canActivate: [AuthGuardService, ModuleResolveService]
+		resolve: {
+			fields: FieldsResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
 ];
 
@@ -56,4 +47,4 @@ export const FieldSettingsRoute: Routes = [
 })
 
 export class FieldSettingsRouteModule {
-};
+}

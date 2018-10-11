@@ -41,10 +41,6 @@ export class AssetExplorerStates {
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
-/**
- * This state displays the field settings list.
- * The field settings are fetched using a resolve.
- */
 export const AssetExplorerRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: AssetExplorerStates.REPORT_SELECTOR.url},
 	{
