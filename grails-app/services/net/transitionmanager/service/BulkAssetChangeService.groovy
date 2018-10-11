@@ -95,36 +95,25 @@ class BulkAssetChangeService implements ServiceMethods {
 		List<String> actions
 		def service
 		def value
-		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
-		def type = AssetClass.domainClassFor(assetClass)
 
-		switch (type) {
-			case AssetClass.domainClassFor(AssetClass.APPLICATION):
-			case AssetClass.domainClassFor(AssetClass.DATABASE):
-			case AssetClass.domainClassFor(AssetClass.DEVICE):
-			case AssetClass.domainClassFor(AssetClass.STORAGE):
-				//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
-				fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
+		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
+		fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
 
-				if (bulkChange.allIds) {
-					queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
-				} else {
-					ids = bulkChange.ids
-					int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
+		if (bulkChange.allIds) {
+			queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
+		} else {
+			ids = bulkChange.ids
+			int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
 
-					if (validAssetCount != ids.size()) {
-						throw new InvalidParamException("Only $validAssetCount of the ${ids.size()} records specified were found so the changes were not applied. Please repeat the bulk change process accordingly.")
-					}
-				}
-
-				break
-			default:
-				throw new InvalidParamException("Bulk change is not setup for $bulkChange.type")
+			if (validAssetCount != ids.size()) {
+				throw new InvalidParamException("Only $validAssetCount of the ${ids.size()} records specified were found so the changes were not applied. Please repeat the bulk change process accordingly.")
+			}
 		}
 
 		try {
 			//Looks up and runs all the edits for a bulk change call.
 			bulkChange.edits.each { EditCommand edit ->
+				Class type = getType(edit.type)
 				service = getBulkClass(type, edit.fieldName, fieledMapping, bulkClassMapping)
 				value = service.coerceBulkValue(currentProject, edit.value)
 				action = edit.action
@@ -145,6 +134,28 @@ class BulkAssetChangeService implements ServiceMethods {
 	}
 
 	/**
+	 * Looks up the AssetClass domain, based on a string type
+	 *
+	 * @param name the name of the assetClass to look up the domain for.
+	 *
+	 * @return the domain class for the name passed in
+	 */
+	def getType(String name) {
+		AssetClass assetClass = AssetClass.safeValueOf(name)
+		def type = AssetClass.domainClassFor(assetClass)
+
+		switch (type) {
+			case AssetClass.domainClassFor(AssetClass.APPLICATION):
+			case AssetClass.domainClassFor(AssetClass.DATABASE):
+			case AssetClass.domainClassFor(AssetClass.DEVICE):
+			case AssetClass.domainClassFor(AssetClass.STORAGE):
+				return type
+			default:
+				throw new InvalidParamException("Bulk change is not setup for $name")
+		}
+	}
+
+	/**
 	 * Looks up the bulkChange Class, for a field, based on the bulkClassMapping mappings.
 	 * If no service is found, an InvalidParamException is thrown.
 	 *
@@ -156,7 +167,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	private def getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
-		def property = type.declaredFields.find{it.name == fieldName} ?: type.superclass.declaredFields.find{it.name == fieldName}
+		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
 
 		if (!property) {
 			throw new InvalidParamException("Bulk update for invalid field name: $fieldName")
@@ -166,7 +177,7 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		if (dataType == String.class.name) {
 			dataType = fieldMapping[fieldName]?.control
-		}else if(dataType == Collection.class.name && fieldName == 'tagAssets'){
+		} else if (dataType == Collection.class.name && fieldName == 'tagAssets') {
 			dataType = TagAsset.class.name
 		}
 
