@@ -94,6 +94,11 @@ class TaskController implements ControllerMethods {
 	def update() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
+		// Deal with legacy view parameters.
+		if (request.format != 'json') {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+		}
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
 
 		if (params.printers) {

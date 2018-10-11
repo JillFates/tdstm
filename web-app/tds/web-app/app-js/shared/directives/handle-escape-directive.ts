@@ -3,7 +3,7 @@ import {KEYSTROKE} from '../model/constants';
 
 @Directive({ selector: '[tds-handle-escape]' })
 export class UIHandleEscapeDirective {
-	@Output() escPressed: EventEmitter<void> = new EventEmitter();
+	@Output() escPressed: EventEmitter<any> = new EventEmitter();
 	@HostListener('keyup', ['$event']) handleKeyboardEventUp(event: KeyboardEvent) {
 		if (event) {
 			const isEscPressed = event.code === KEYSTROKE.ESCAPE;
@@ -12,7 +12,7 @@ export class UIHandleEscapeDirective {
 			const isConfirmationDialog = event.target['id'] === 'tdsUiPrompt';
 
 			if (!isFileDialog &&  !isConfirmationDialog && isEscPressed) {
-				this.escPressed.emit();
+				this.escPressed.emit(event);
 			}
 		}
 	}

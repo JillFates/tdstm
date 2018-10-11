@@ -558,6 +558,7 @@ class PersonService implements ServiceMethods {
 	 * Called from the Person Merge form which will update all of the properties for the person referenced by
 	 * the toId parameter and then will merge each of the persons referenced in the fromId List parameter.
 	 */
+	@Transactional
 	String processMergePersonRequest(UserLogin byWhom, PersonCO cmdObj, params) {
 		Person toPerson = Person.get(params.long('toId'))
 
@@ -1131,6 +1132,7 @@ class PersonService implements ServiceMethods {
 	 * @param team - if supplied will delete just the team (optional)
 	 * @return count of how many were deleted
 	 */
+	@Transactional
 	private int deleteFromEvent(Project project, MoveEvent event = null, Person person, RoleType team = null) {
 		int c = 0
 

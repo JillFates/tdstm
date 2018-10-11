@@ -46,16 +46,6 @@ form .error-msg{
 	margin:0.5em 0 0 0;
 	color: #CD3333;
 }
-/**
- * Fix bootstrap and jquery collision issue.
- */
-.ui-dialog-titlebar .ui-dialog-titlebar-close {
-	width: 16px;
-	height: 16px;
-	background-position: -97px -129px;
-	background-image: url(../../images/ui-icons_ef8c08_256x240.png);
-	border-width: 1px;
-}
 
 .alert {
 	padding: 15px;

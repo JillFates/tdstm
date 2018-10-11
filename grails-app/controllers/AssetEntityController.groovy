@@ -12,6 +12,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -48,6 +49,7 @@ import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -119,6 +121,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	AssetEntityService assetEntityService
 	CommentService commentService
 	ControllerService controllerService
+	ApiActionService apiActionService
 	DeviceService deviceService
 	def filterService
 	JdbcTemplate jdbcTemplate
@@ -464,6 +467,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		AssetComment assetComment = AssetComment.get(params.id)
 		if (assetComment) {
+			Project project = controllerService.getProjectForPage(this)
+			List eventList = MoveEvent.findAllByProject(project)
+			def apiActionList = apiActionService.list(project, true,[producesData:0] )
+
 			if (assetComment.createdBy) {
 				personCreateObj = assetComment.createdBy.toString()
 				dtCreated = TimeUtil.formatDateTime(assetComment.dateCreated)
@@ -581,7 +588,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 			commentList << [
 				assetComment:assetComment,
+				apiActionList:apiActionList,
+				priorityList: assetEntityService.getAssetPriorityOptions(),
 				durationScale:assetComment.durationScale.value(),
+				durationLocked: assetComment.durationLocked,
 				personCreateObj:personCreateObj,
 				personResolvedObj:personResolvedObj,
 				dtCreated:dtCreated ?: "",
@@ -620,7 +630,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				action: assetComment.apiAction?.name,
 				recipe: recipeMap,
 				actualDuration: TimeUtil.formatDuration(actualDuration),
-				durationDelta: TimeUtil.formatDuration(durationDelta)
+				durationDelta: TimeUtil.formatDuration(durationDelta),
+				eventList: eventList,
+				categories: AssetCommentCategory.list,
+				assetClasses: assetEntityService.getAssetClasses()
 				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
@@ -636,6 +649,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
+		// Deal with legacy view parameters.
+		if (request.format != 'json') {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+		}
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, true, flash)
 		if (params.forWhom == "update") {
 			def assetEntity = AssetEntity.get(params.prevAsset)
@@ -650,7 +668,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+			requestParams = params
+
+		}
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {
 			if (map.error) {
 				flash.message = map.error
@@ -1162,251 +1189,25 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
-		def today = new Date().clearTime()
-		def moveEvent
-		if (params.moveEvent) {
-			// zero (0) = All events
-			// log.info "listCommentsOrTasks: Handling MoveEvent based on params $params.moveEvent"
-			if (params.moveEvent != '0') {
-				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
-				if (!moveEvent) {
-					log.warn "listCommentsOrTasks: $securityService.currentUsername tried to access moveEvent $params.moveEvent that was not found in project $project.id"
-				}
-			}
-		} else {
-			// Try getting the move Event from the user's session
-			def moveEventId = userPreferenceService.moveEventId
-			// log.info "listCommentsOrTasks: getting MOVE_EVENT preference $moveEventId for $securityService.currentUsername"
-			if (moveEventId) {
-				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
-			}
-		}
-		if (moveEvent) {
-			userPreferenceService.setMoveEventId moveEvent.id
-		}
 
-		def assetType = params.filter ? ApplicationConstants.assetFilters[params.filter ] : []
-
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%$params.moveBundle%", project) : []
-		def models = params.model ? Model.findAllByModelNameIlike("%$params.model%") : []
-
-		def taskNumbers = params.taskNumber ? AssetComment.findAll("from AssetComment where project =:project \
-			and taskNumber like '%$params.taskNumber%'",[project:project])?.taskNumber : []
-
-		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
-			and duration like '%$params.duration%'",[project:project])?.duration : []
-
+		// Determine if only unpublished tasks need to be fetched.
 		boolean viewUnpublished = securityService.viewUnpublished()
 
-		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
-		/*
-		 oluna 170921 (for the developer of the future) : the use of "DATE like param" in the queries is interpolated due to the fact that we are comparing against the
-		 	String "Date" representation of the field ("2017-05-13 17:35:24") and if we try to use "named-params" it will fail the type-check (comparing Strings to Dates)
-		 	so leave this implementation alone unless you find a better way :)
-		*/
-		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%$params.dueDate%' ",[project:project])?.dueDate : []
-		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%$params.estStart%' ",[project:project])?.estStart : []
-		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%$params.actStart%' ",[project:project])?.actStart : []
-		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
-		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
-		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
-		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
+		// Fetch the tasks and the total count.
+		Map filterResults = commentService.filterTasks(project, params, viewUnpublished, sortIndex, sortOrder, maxRows, rowOffset)
 
-		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
-		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
-		def createdBy = params.createdBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.createdBy%","%$params.createdBy%") : []
-		def resolvedBy = params.resolvedBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.resolvedBy%","%$params.resolvedBy%") : []
+		List<AssetComment> tasks = filterResults.tasks
+		Date today = new Date().clearTime()
+		Integer totalRows = filterResults.totalCount
 
-		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
-			eq("project", project)
-			eq("commentType", AssetCommentType.TASK)
-			createAlias('assetEntity', 'assetEntity', CriteriaSpecification.LEFT_JOIN)
-			createAlias("moveEvent", "moveEvent", CriteriaSpecification.LEFT_JOIN)
-			createAlias("assetEntity.moveBundle", "moveBundle", CriteriaSpecification.LEFT_JOIN)
-			if (params.step) {
-				createAlias("workflowTransition", "workflowTransition", CriteriaSpecification.LEFT_JOIN)
-				eq("workflowTransition.id", params.step.toLong())
-			}
-			if (!viewUnpublished) {
-				eq("isPublished", true)
-			}
-			if (params.assetType) {
-				ilike('assetEntity.assetType', "%$params.assetType%")
-			}
-			if (params.assetName) {
-				ilike('assetEntity.assetName', "%$params.assetName%")
-			}
-			if (params.comment) {
-				ilike('comment', "%$params.comment%")
-			}
-			if (params.resolution) {
-				ilike('resolution', "%$params.resolution%")
-			}
-			if (params.instructionsLink) {
-				ilike('instructionsLink', "%$params.instructionsLink%")
-			}
-			if (params.status) {
-				ilike('status', "%$params.status%")
-			}
-			if (params.role) {
-				ilike('role', "%$params.role%")
-			}
-			if (params.commentType) {
-				ilike('commentType', "%$params.commentType%")
-			}
-			if (params.displayOption) {
-				ilike('displayOption', "%$params.displayOption%")
-			}
-			if (durations) {
-				'in'('duration', durations)
-			}
-			if (params.durationScale) {+
-				ilike('durationScale', "%$params.durationScale%")
-			}
-			if (params.category) {
-				ilike('category', "%$params.category%")
-			}
-			if (params.attribute) {
-				ilike('attribute', "%$params.attribute%")
-			}
-			if (params.autoGenerated) {
-				eq('autoGenerated', params.autoGenerated)
-			}
-			if (params.event) {
-				ilike("moveEvent.name", "%$params.event%")
-			}
-			if (params.bundle) {
-				ilike("moveBundle.name", "%$params.bundle%")
-			}
-			if (taskNumbers) {
-				'in'('taskNumber', taskNumbers)
-			}
-			if (params.isResolved) {
-				if (params.isResolved == 0) {
-					eq('dateResolved', null)
-				} else {
-					ne('dateResolved', null)
-				}
-			}
-			if (params.priority?.isNumber()) {
-				eq('priority', params.int('priority'))
-			}
-			if (StringUtil.isLike(params.isPublished, 'true')) {
-				eq('isPublished', true)
-			} else if (StringUtil.isLike(params.isPublished, 'false')) {
-					eq('isPublished', false)
-			}
-			if (StringUtil.isLike(params.sendNotification, 'true')) {
-				eq('sendNotification', true)
-			} else if (StringUtil.isLike(params.sendNotification, 'false')) {
-					eq('sendNotification', false)
-			}
-			if (params.hardAssigned?.isNumber()) {
-				eq('hardAssigned', params.int('hardAssigned'))
-			}
-
-			if (dates) {
-				and {
-					or {
-						'in'('dueDate', dates)
-						'in'('estFinish', dates)
-					}
-				}
-			}
-
-			if (estStartdates) {
-				'in'('estStart',estStartdates)
-			}
-			if (actStartdates) {
-				'in'('actStart',actStartdates)
-			}
-			if (estFinishdates) {
-				'in'('estFinish',estFinishdates)
-			}
-			if (statusUpdated) {
-				'in'('statusUpdated',statusUpdated)
-			}
-			if (dateCreateddates) {
-				'in'('dateCreated',dateCreateddates)
-			}
-			if (dateResolveddates) {
-				'in'('dateResolved',dateResolveddates)
-			}
-			if (createdBy) {
-				'in'('createdBy', createdBy)
-			}
-			if (resolvedBy) {
-				'in'('resolvedBy', resolvedBy)
-			}
-			if (assigned) {
-				'in'('assignedTo', assigned)
-			}
-			if (sortIndex && sortOrder) {
-				String sortIdx
-				switch(sortIndex) {
-					case "assetName":
-					case "assetType":
-						sortIdx = "assetEntity." + sortIndex
-						break
-					case "bundle":
-						sortIdx = "moveBundle.name"
-						break
-					case "event":
-						sortIdx = "moveEvent.name"
-						break
-					default:
-						sortIdx = sortIndex
-						break
-				}
-				order(sortIdx, sortOrder)
-
-			} else {
-				and {
-					order('score','desc')
-					order('taskNumber','asc')
-					order('dueDate','asc')
-					order('dateCreated','desc')
-				}
-			}
-			if (moveEvent) {
-				eq("moveEvent", moveEvent)
-			}
-			if (params.justRemaining == "1") {
-				ne("status", AssetCommentStatus.COMPLETED)
-			}
-			if (params.justMyTasks == "1") {
-				eq("assignedTo", securityService.loadCurrentPerson())
-			}
-			switch(params.filter) {
-				case "openIssue" :
-					'in'('category', AssetComment.discoveryCategories)
-					break
-				case "dueOpenIssue":
-					'in'('category', AssetComment.discoveryCategories)
-					lt('dueDate',today)
-					break
-				case "analysisIssue" :
-					eq("status", AssetCommentStatus.READY)
-					'in'('category', AssetComment.planningCategories)
-					break
-				case "generalOverDue" :
-					'in'('category', AssetComment.planningCategories)
-					lt('dueDate',today)
-					break
-			}
-		}
-
-		def createJsonTime = new Date()
-
-		def totalRows = tasks.totalCount
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-		def updatedTime
-		def dueClass
-		def estStartClass
-		def estFinishClass
-		def updatedClass
-		def nowGMT = TimeUtil.nowGMT()
-		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
+		Integer numberOfPages = Math.ceil(totalRows / maxRows)
+		Date updatedTime
+		String dueClass
+		String estStartClass
+		String estFinishClass
+		String updatedClass
+		Date nowGMT = TimeUtil.nowGMT()
+		Map taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
 
 		def results = tasks?.collect {
@@ -2495,7 +2296,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
+			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber, status: it.status]
 		}
 
 		tasksData.list = list
@@ -3104,7 +2905,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def assetName
 		if (params.assetId) {
-			assetName = AssetEntityHelper.getAssetById(project, null, params.assetId).assetName
+			assetName = fetchDomain(AssetEntity, [id: params.assetId]).assetName
 		}
 
 		Map<String, String> defaultPrefs = [levelsUp: '0', levelsDown: '3', showCycles: true,

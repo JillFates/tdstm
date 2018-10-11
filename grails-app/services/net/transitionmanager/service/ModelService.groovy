@@ -272,6 +272,7 @@ class ModelService implements ServiceMethods {
 	 * @param modelName, if given, the alias will validated using this name instead of the given model's current name
 	 * @return true if the alias is valid for the given parameters
 	 */
+	@Transactional
 	boolean isValidAlias (String newAlias, Model model, boolean allowLocalDuplicates = false, Manufacturer manufacturer = null, String modelName = null) {
 
 		// if there wasn't enough information supplied
@@ -315,6 +316,7 @@ class ModelService implements ServiceMethods {
 		return true
 	}
 
+	@Transactional
 	boolean save(Model model, GrailsParameterMap params) {
 		if (isValidName(model.modelName, model.id, model.manufacturerId) && model.save(flush: true)) {
 			int connectorCount = params.int("connectorCount", 0)
@@ -478,6 +480,7 @@ class ModelService implements ServiceMethods {
 		}
 	}
 
+	@Transactional
 	boolean delete(Model model) {
 		AssetEntity modelRef = AssetEntity.findByModel(model)
 		if (!modelRef) {

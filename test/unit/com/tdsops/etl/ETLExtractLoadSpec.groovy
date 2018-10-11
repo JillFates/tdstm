@@ -603,7 +603,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can load a field using DOMAINproperty'() {
+	void 'test can load a field using DOMAIN property'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -2779,4 +2779,208 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
+	@See('TM-11590')
+	void 'test can use use when populated qualifier command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description,nothingThere,retire date
+				xraysrv01,2,,,2018-06-25
+				zuludb01,,Some description,,
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName'
+				   extract 'cpu' load 'custom1' when populated
+				   extract 'description' set descVar
+				   load 'description' with descVar when populated
+				   extract 'nothingThere' load 'custom2' when populated
+				   extract 'retire date' transform with toDate() load 'Retire Date' when populated
+				}
+				""".stripIndent())
+
+		then: 'Results should contain correctly set full name'
+			with (etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						with(fields){
+							with(it.assetName, FieldResult) {
+								originalValue == 'xraysrv01'
+								value == 'xraysrv01'
+							}
+							with(it.custom1, FieldResult) {
+								originalValue == '2'
+								value == '2'
+							}
+
+							with(it.retireDate, FieldResult) {
+								value == new Date(2018 - 1900, 6 - 1, 25)
+								init == null
+								errors == []
+							}
+							it.description == null
+							it.custom2 == null
+						}
+					}
+
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						with(fields){
+							with(it.assetName, FieldResult) {
+								originalValue == 'zuludb01'
+								value == 'zuludb01'
+							}
+							it.custom1 == null
+
+							with(it.description, FieldResult) {
+								originalValue == 'Some description'
+								value == 'Some description'
+							}
+							it.custom2 == null
+							it.retireDate == null
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11590')
+	void 'test can use use when populated qualifier with a closure definition'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description,nothingThere
+				xraysrv01,100,,
+				zuludb01,10,Some description,
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName'
+				   extract 'cpu' transform with toInteger() load 'custom1' when { it > 50 }
+				}
+				""".stripIndent())
+
+		then: 'Results should contain correctly set full name'
+			with (etlProcessor.finalResult()) {
+				domains.size() == 1
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+
+					with(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						with(fields){
+							with(it.assetName, FieldResult) {
+								originalValue == 'xraysrv01'
+								value == 'xraysrv01'
+							}
+							with(it.custom1, FieldResult) {
+								originalValue == '100'
+								value == 100
+							}
+						}
+					}
+
+					with(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						with(fields){
+							with(it.assetName, FieldResult) {
+								originalValue == 'zuludb01'
+								value == 'zuludb01'
+							}
+							!it.custom1
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11590')
+	void 'test can throw an Exception when populated qualifier is configured incorrectly'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description,nothingThere
+				xraysrv01,100,,
+				zuludb01,10,Some description,
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName' when off
+				}
+				""".stripIndent())
+
+		then: 'It throws an Exception because command is incorrect was not defined'
+			ETLProcessorException e = thrown ETLProcessorException
+			with (ETLProcessor.getErrorMessage(e)) {
+				message == "${ETLProcessorException.incorrectWhenCommandStructure().message} at line 5"
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
 }

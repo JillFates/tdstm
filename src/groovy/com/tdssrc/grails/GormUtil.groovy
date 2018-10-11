@@ -782,13 +782,13 @@ class GormUtil {
 	 * @param deleteOriginal - a flag if the original domain should be deleted (default:false)
 	 * @return the cloned object
 	 */
-	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false) {
+	static Object cloneDomainAndSave(Object originalDomain, Map replaceKeys = [:], boolean deleteOriginal = false, boolean flush = true) {
 		Object newDomain = cloneDomain(originalDomain, replaceKeys)
 
-		newDomain.save(flush:true)
+		newDomain.save(flush: flush)
 
 		if (deleteOriginal) {
-			originalDomain.delete(flush:true)
+			originalDomain.delete(flush: flush)
 		}
 
 		return newDomain

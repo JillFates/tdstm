@@ -31,6 +31,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.Manufacturer
@@ -51,7 +52,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.hibernate.Criteria
-import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -1421,19 +1421,23 @@ class AssetEntityService implements ServiceMethods {
 
 		// Required lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
-			map << [
-					railTypeOption: getAssetRailTypeOptions(),
-					sourceRoomSelect: getRoomSelectOptions(project, true, true),
-					targetRoomSelect: getRoomSelectOptions(project, false, true),
-					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
-					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
-                    sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
-                    targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
-			]
+			map << getCommontDeviceMapForCreateEdit(project, asset)
 		}
 
 		map
 	}
+
+    Map getCommontDeviceMapForCreateEdit(Project project, Object asset) {
+        return [
+                railTypeOption: getAssetRailTypeOptions(),
+                sourceRoomSelect: getRoomSelectOptions(project, true, true),
+                targetRoomSelect: getRoomSelectOptions(project, false, true),
+                sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+                targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
+                sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
+                targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
+        ]
+    }
 
 	/**
 	 * The default/common properties shared between all of the Asset Show views
@@ -3099,66 +3103,53 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Used to clone an asset and optionally the dependencies associated with the asset
-	 * @param assetId - the id of the asset to be cloned
-	 * @param name - the name to set the new asset name to
-	 * @param dependencies - a flag to control if dependencies should be cloned
+	 * @param command - command object with the parameters for the clone operation (id, name and dependencies flag).
 	 * @param errors - an initialize List object that will be populated with one or more error messages if the method fails
 	 * @return the id number of the newly created asset
 	 */
-	Long clone(Long assetId, String name, Boolean cloneDependencies, List<String> errors) {
+	Long clone(Project project, CloneAssetCommand command, List<String> errors) {
 		AssetEntity clonedAsset
 		if(!errors) {
-
 			//  params son assetId
-			AssetEntity assetToClone = AssetEntity.get(assetId)
+			AssetEntity assetToClone = GormUtil.findInProject(project, AssetEntity, command.assetId)
 			if (!assetToClone) {
 				errors << "The asset specified to clone was not found"
-			} else {
-				//check that the asset is part of the project
-				if (!securityService.isCurrentProjectId(assetToClone.projectId)) {
-					log.error(
-							"Security Violation, user {} attempted to access an asset not associated to the project",
-							securityService.getCurrentUsername()
-					)
-					errors << "Asset not found in current project"
+			} else{
+				Map defaultValues = [
+					assetName : command.name,
+					validation: ValidationType.DIS,
+					environment: ''
+				]
+				if (assetToClone.isaDevice()) {
+					defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
 				}
-				if (!errors) {
-					Map defaultValues = [
-						assetName : name,
-						validation: ValidationType.DIS,
-						environment: ''
-					]
-					if (assetToClone.isaDevice()) {
-						defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
-					}
-					clonedAsset = assetToClone.clone(defaultValues)
+				clonedAsset = assetToClone.clone(defaultValues)
 
-					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && cloneDependencies) {
-						for (dependency in assetToClone.supportedDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									dependent: clonedAsset,
-									status   : AssetDependencyStatus.QUESTIONED
-							])
+				// Cloning assets dependencies if requested
+				if (clonedAsset.save() && command.cloneDependencies) {
+					for (dependency in assetToClone.supportedDependencies()) {
+						AssetDependency clonedDependency = dependency.clone([
+								dependent: clonedAsset,
+								status   : AssetDependencyStatus.QUESTIONED
+						])
 
-							clonedDependency.save()
-						}
-						for (dependency in assetToClone.requiredDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									asset : clonedAsset,
-									status: AssetDependencyStatus.QUESTIONED
-							])
-							clonedDependency.save()
-						}
+						clonedDependency.save()
 					}
-					// copy asset Tags
-					List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
-					if (sourceTagIds) {
-						tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+					for (dependency in assetToClone.requiredDependencies()) {
+						AssetDependency clonedDependency = dependency.clone([
+								asset : clonedAsset,
+								status: AssetDependencyStatus.QUESTIONED
+						])
+						clonedDependency.save()
 					}
-
-					return clonedAsset.id
 				}
+				// copy asset Tags
+				List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
+				if (sourceTagIds) {
+					tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+				}
+
+				return clonedAsset.id
 			}
 		}
 	}

@@ -1,66 +1,52 @@
+@import 'taskstatus-mixins.sass';
+
 .task-hold
-  background-color: $color-task-hold-bg--yellow !important
-  color: $color--black
-  font-weight: bold
+  @include task-hold
 
 .task-hold_overtime
-  background-color: $color-task-hold-bg-overtime--red !important
-  color: $color--black
-  font-weight: bold
+  @include task-hold_overtime
 
 .task-planned
-  background-color: $color-task-planned-bg--white !important
-  color: $color--grey
-  font-weight: bold
+  @include task-planned
 
 .task-pending
-  background-color: $color-task-pending-bg--white !important
-  color: $color--black
-  font-weight: bold
+  @include task-pending
 
 .task-ready
-  background-color: $color-task-ready-bg--green !important
-  color: $color--white
-  font-weight: bold
+  @include task-ready
 
 .task-started
-  background-color: $color-task-started-bg--darkturquoise !important
-  color: $color--white
-  font-weight: bold
+  @include task-started
 
 .task-completed2
-  background-color: $color-task-completed2-bg--turquoise !important
+  @include task-completed2
 
 .task-completed5
-  background-color: $color-task-completed5-bg--blue !important
+  @include task-completed5
 
 .task-completed
-  background-color: $color-task-completed-bg--blue2 !important
-  color: $color--white
-  font-weight: bold
+  @include task-completed
 
 .task-done2
-  background-color: $color-task-done2-bg--blue3 !important
+  @include task-done2
 
 .task-done5
-  background-color: $color-task-done5-bg--blue4 !important
+  @include task-done5
 
 .task-done
-  background-color: $color-task-done-bg--darkblue !important
-  color: $color--white
-  font-weight: bold
+  @include task-done
 
 .task-na
-  background-color: $color-task-na-bg--lightgray  !important
+  @include task-na
 
 .task-term
-  background-color: $color-task-term-bg--black  !important
+  @include task-term
 
 .task-tardy
-  background-color: $color-task-tardy-bg--mustard  !important
+  @include task-tardy
 
 .task-late
-  background-color: $color-task-late-bg--orange  !important
+  @include task-late
 
 .task-overdue
-  color: $color-task-overdue-bg--red  !important
+  @include task-overdue

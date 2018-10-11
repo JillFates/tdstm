@@ -102,36 +102,25 @@ class BulkAssetChangeService implements ServiceMethods {
 		def service
 		def value
 		String field
-		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
-		def type = AssetClass.domainClassFor(assetClass)
 
-		switch (type) {
-			case AssetClass.domainClassFor(AssetClass.APPLICATION):
-			case AssetClass.domainClassFor(AssetClass.DATABASE):
-			case AssetClass.domainClassFor(AssetClass.DEVICE):
-			case AssetClass.domainClassFor(AssetClass.STORAGE):
-				//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
-				fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
+		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
+		fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
 
-				if (bulkChange.allIds) {
-					queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
-				} else {
-					ids = bulkChange.ids
-					int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
+		if (bulkChange.allIds) {
+			queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
+		} else {
+			ids = bulkChange.ids
+			int validAssetCount = AssetEntity.where { id in ids && project == currentProject }.count()
 
-					if (validAssetCount != ids.size()) {
-						throw new InvalidParamException("Only $validAssetCount of the ${ids.size()} records specified were found so the changes were not applied. Please repeat the bulk change process accordingly.")
-					}
-				}
-
-				break
-			default:
-				throw new InvalidParamException("Bulk change is not setup for $bulkChange.type")
+			if (validAssetCount != ids.size()) {
+				throw new InvalidParamException("Only $validAssetCount of the ${ids.size()} records specified were found so the changes were not applied. Please repeat the bulk change process accordingly.")
+			}
 		}
 
 		try {
 			//Looks up and runs all the edits for a bulk change call.
 			bulkChange.edits.each { EditCommand edit ->
+				Class type = getType(edit.type)
 				field = edit.fieldName
 				service = getBulkClass(type, assetClass, field, fieledMapping, bulkClassMapping)
 				value = service.coerceBulkValue(currentProject, field, edit.value, fieledMapping[assetClass.name()][field])
@@ -149,6 +138,28 @@ class BulkAssetChangeService implements ServiceMethods {
 		} catch (Exception e) {
 			log.error('An unexpected error occurred while invoking the bulk change action', e)
 			throw new DomainUpdateException('An unexpected error occurred while invoking the bulk change action', e)
+		}
+	}
+
+	/**
+	 * Looks up the AssetClass domain, based on a string type
+	 *
+	 * @param name the name of the assetClass to look up the domain for.
+	 *
+	 * @return the domain class for the name passed in
+	 */
+	def getType(String name) {
+		AssetClass assetClass = AssetClass.safeValueOf(name)
+		def type = AssetClass.domainClassFor(assetClass)
+
+		switch (type) {
+			case AssetClass.domainClassFor(AssetClass.APPLICATION):
+			case AssetClass.domainClassFor(AssetClass.DATABASE):
+			case AssetClass.domainClassFor(AssetClass.DEVICE):
+			case AssetClass.domainClassFor(AssetClass.STORAGE):
+				return type
+			default:
+				throw new InvalidParamException("Bulk change is not setup for $name")
 		}
 	}
 

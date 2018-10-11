@@ -125,6 +125,15 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Removes an element instance value current results
+	 * @param element ans instance of {@code Element}
+	 */
+	void removeElement(Element element){
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.removeElement(element.fieldDefinition.name)
+	}
+
+	/**
 	 * Add a FoundElement in the result based on its property
 	 * <pre>
 	 *		whenFound asset create {
@@ -533,6 +542,16 @@ class RowResult {
 		errors.add(findElement.warnMessage)
 		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElementWarnMessage(findElement)
+	}
+
+	/**
+	 * Removes an element instance value current results
+	 * @param fieldName a field name used in {@code RowResul#fields}
+	 */
+	void removeElement(String fieldName){
+		if(fields.containsKey(fieldName)){
+			fields.remove(fieldName)
+		}
 	}
 
 	/**
