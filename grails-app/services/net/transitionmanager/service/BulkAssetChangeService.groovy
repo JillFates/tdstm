@@ -2,6 +2,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -76,15 +78,15 @@ class BulkAssetChangeService implements ServiceMethods {
 
 	//Maps field control types to services.
 	static Map bulkClassMapping = [
-		(TagAsset.class.name)  : BulkChangeTag,
-		(Date.class.name)      : BulkChangeDate,
-		'String'               : BulkChangeString,
-		(Integer.class.name)   : BulkChangeNumber,
-		(Person.class.name)    : BulkChangePerson,
-		'YesNo'                : BulkChangeYesNo,
-		'List'                 : BulkChangeList,
-		'InList'               : BulkChangeList,
-		(MoveBundle.class.name): BulkChangeMoveBundle
+		(TagAsset.class.name)  : BulkChangeTag.class,
+		(Date.class.name)      : BulkChangeDate.class,
+		'String'               : BulkChangeString.class,
+		(Integer.class.name)   : BulkChangeNumber.class,
+		(Person.class.name)    : BulkChangePerson.class,
+		'YesNo'                : BulkChangeYesNo.class,
+		'List'                 : BulkChangeList.class,
+		'InList'               : BulkChangeList.class,
+		(MoveBundle.class.name): BulkChangeMoveBundle.class
 	].asImmutable()
 
 	/**
@@ -102,6 +104,8 @@ class BulkAssetChangeService implements ServiceMethods {
 		def service
 		def value
 		String field
+		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
+		Class type = getType(assetClass)
 
 		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
 		fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
@@ -120,8 +124,6 @@ class BulkAssetChangeService implements ServiceMethods {
 		try {
 			//Looks up and runs all the edits for a bulk change call.
 			bulkChange.edits.each { EditCommand edit ->
-				AssetClass assetClass = AssetClass.safeValueOf(edit.type)
-				Class type = getType(assetClass)
 				field = edit.fieldName
 				service = getBulkClass(type, assetClass, field, fieledMapping, bulkClassMapping)
 				value = service.coerceBulkValue(currentProject, field, edit.value, fieledMapping[assetClass.name()][field])
@@ -149,8 +151,9 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the domain class for the name passed in
 	 */
-	def getType(AssetClass assetClass) {
-		def type = AssetClass.domainClassFor(assetClass)
+	@NotTransactional
+	Class getType(AssetClass assetClass) {
+		Class type = AssetClass.domainClassFor(assetClass)
 
 		switch (type) {
 			case AssetClass.domainClassFor(AssetClass.APPLICATION):
@@ -175,7 +178,8 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the class to use for bulk changes
 	 */
-	private def getBulkClass(Class type, AssetClass assetClass, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
+	@NotTransactional
+	private Class getBulkClass(Class type, AssetClass assetClass, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
 		def property = GormUtil.getConstrainedProperty(type, fieldName)
 		String dataType = property.propertyType.name
 
@@ -185,7 +189,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			dataType = TagAsset.class.name
 		}
 
-		def service = bulkClassMapping[dataType]
+		Class service = bulkClassMapping[dataType]
 
 		if (!service) {
 			throw new InvalidParamException("Bulk update is not configured for $fieldName")
