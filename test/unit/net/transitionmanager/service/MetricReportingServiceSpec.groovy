@@ -472,6 +472,7 @@ class MetricReportingServiceSpec extends Specification {
 
 		setup: 'Given a MetricDefinitionsCommand object with a SQL definition.'
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -506,6 +507,7 @@ class MetricReportingServiceSpec extends Specification {
 
 		setup: 'Given a MetricDefinitionsCommand object with a function definition.'
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -540,6 +542,7 @@ class MetricReportingServiceSpec extends Specification {
 
 		setup: 'Given a MetricDefinitionsCommand object with a query definition'
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -599,6 +602,7 @@ class MetricReportingServiceSpec extends Specification {
 
 		setup: 'Given a function definition is saved to the DB'
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -637,6 +641,7 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a function definition is saved to the database.'
 			service.metaClass.projectIdsForMetrics = { -> [1, 2, 3] }
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
@@ -668,6 +673,7 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a function metric definition.'
 			service.metaClass.projectIdsForMetrics = { -> [1] }
 			service.settingService = new SettingService()
+			service.settingService.transactionManager = getTransactionManager()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
 
