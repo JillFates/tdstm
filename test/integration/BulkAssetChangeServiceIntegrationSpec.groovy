@@ -196,12 +196,12 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		] as DataviewService
 
 		bulkAssetChangeService.bulkClassMapping = [
-			(TagAsset.class.name): GroovySpy(BulkChangeTag, global: true),
-			(Date.class.name)    : GroovySpy(BulkChangeDate, global: true),
-			'String'             : GroovySpy(BulkChangeString, global: true),
-			(Integer.class.name) : GroovySpy(BulkChangeNumber, global: true),
-			(Person.class.name)  : GroovySpy(BulkChangePerson, global: true),
-			'YesNo'              : GroovySpy(BulkChangeYesNo, global: true),
+			(TagAsset.class.name): GroovySpy(BulkChangeTag, global: true).class,
+			(Date.class.name)    : GroovySpy(BulkChangeDate, global: true).class,
+			'String'             : GroovySpy(BulkChangeString, global: true).class,
+			(Integer.class.name) : GroovySpy(BulkChangeNumber, global: true).class,
+			(Person.class.name)  : GroovySpy(BulkChangePerson, global: true).class,
+			'YesNo'              : GroovySpy(BulkChangeYesNo, global: true).class,
 		]
 
 		moveBundle = moveBundleTestHelper.createBundle(project, null)

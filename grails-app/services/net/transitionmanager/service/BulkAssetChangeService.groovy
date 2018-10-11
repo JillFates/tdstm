@@ -73,12 +73,12 @@ class BulkAssetChangeService implements ServiceMethods {
 
 	//Maps field control types to services.
 	static Map bulkClassMapping = [
-		(TagAsset.class.name): BulkChangeTag,
-		(Date.class.name)    : BulkChangeDate,
-		'String'             : BulkChangeString,
-		(Integer.class.name) : BulkChangeNumber,
-		(Person.class.name)  : BulkChangePerson,
-		'YesNo'              : BulkChangeYesNo
+		(TagAsset.class.name): BulkChangeTag.class,
+		(Date.class.name)    : BulkChangeDate.class,
+		'String'             : BulkChangeString.class,
+		(Integer.class.name) : BulkChangeNumber.class,
+		(Person.class.name)  : BulkChangePerson.class,
+		'YesNo'              : BulkChangeYesNo.class
 	].asImmutable()
 
 	/**
@@ -140,9 +140,9 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the domain class for the name passed in
 	 */
-	def getType(String name) {
+	Class getType(String name) {
 		AssetClass assetClass = AssetClass.safeValueOf(name)
-		def type = AssetClass.domainClassFor(assetClass)
+		Class type = AssetClass.domainClassFor(assetClass)
 
 		switch (type) {
 			case AssetClass.domainClassFor(AssetClass.APPLICATION):
@@ -166,7 +166,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return the class to use for bulk changes
 	 */
-	private def getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
+	private Class getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
 		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
 
 		if (!property) {
@@ -181,7 +181,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			dataType = TagAsset.class.name
 		}
 
-		def service = bulkClassMapping[dataType]
+		Class service = bulkClassMapping[dataType]
 
 		if (!service) {
 			throw new InvalidParamException("Bulk update is not configured for $fieldName")
