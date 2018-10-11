@@ -120,7 +120,8 @@ class BulkAssetChangeService implements ServiceMethods {
 		try {
 			//Looks up and runs all the edits for a bulk change call.
 			bulkChange.edits.each { EditCommand edit ->
-				Class type = getType(edit.type)
+				AssetClass assetClass = AssetClass.safeValueOf(edit.type)
+				Class type = getType(assetClass)
 				field = edit.fieldName
 				service = getBulkClass(type, assetClass, field, fieledMapping, bulkClassMapping)
 				value = service.coerceBulkValue(currentProject, field, edit.value, fieledMapping[assetClass.name()][field])
@@ -144,12 +145,11 @@ class BulkAssetChangeService implements ServiceMethods {
 	/**
 	 * Looks up the AssetClass domain, based on a string type
 	 *
-	 * @param name the name of the assetClass to look up the domain for.
+	 * @param assetClass to look up the domain for.
 	 *
 	 * @return the domain class for the name passed in
 	 */
-	def getType(String name) {
-		AssetClass assetClass = AssetClass.safeValueOf(name)
+	def getType(AssetClass assetClass) {
 		def type = AssetClass.domainClassFor(assetClass)
 
 		switch (type) {
@@ -176,7 +176,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	private def getBulkClass(Class type, AssetClass assetClass, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
-		def property = type.declaredFields.find{it.name == fieldName} ?: type.superclass.declaredFields.find{it.name == fieldName}
+		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
 
 		if (!property) {
 			throw new InvalidParamException("Bulk update for invalid field name: $fieldName")
