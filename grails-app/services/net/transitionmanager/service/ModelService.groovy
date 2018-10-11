@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Manufacturer
@@ -36,7 +37,7 @@ class ModelService implements ServiceMethods {
 	 * @return : updated assetCount
 	 */
 	@Transactional
-	def mergeModel(Model fromModel, Model toModel){
+	def merge(Model fromModel, Model toModel){
 		//	Revise Asset, and any other records that may point to this model
 		int assetUpdated = 0 // assetUpdated flag to count the assets updated by merging models .
 
@@ -533,19 +534,19 @@ class ModelService implements ServiceMethods {
 	}
 
     /**
-     * Validates a {@code Model).
+     * Validates a {@code Model}.
      * Sets the modelStatus property to "valid" and validatedBy to the current Person.
-     * If the model is not found, throws a {@code ServiceException).
+     * If the model is not found, throws a {@code ServiceException}.
      * If saving the Model instance generates errors, they will be returned
      * in the Model instance.
      * @param modelId  The id of the model to validate
-     * @return  The Model instance
+     * @return  The Model instance (it can contain errors if something went wrong)
      */
 	@Transactional
 	Model validateModel(Long modelId) {
 		def modelInstance = Model.get(modelId)
 		if (!modelInstance) {
-			throw new ServiceException("ModelService - Not Model found with id $modelId")
+			throw new ServiceException("ModelService.validateModel() - No Model found with id $modelId")
 		}
         if (securityService.loggedIn) {
             modelInstance.validatedBy = securityService.loadCurrentPerson()
@@ -556,6 +557,45 @@ class ModelService implements ServiceMethods {
         }
         return modelInstance
 	}
+
+    /**
+     * Merge a list of Models referenced by {@code fromIds} to the target Model referenced by {@code toId}.
+	 * It also receives a {@code toModelProperties} param, containing new property values entered by the user
+	 * in the merge process to be saved in the resulting Model (this may however have no new values to save).
+	 *
+     * @param fromIds  The list of Model ids of the Models to be merged in the target model.
+     * @param toId  The id of the target Model where everything will be merged into.
+     * @param toModelProperties  The list of modified properties to be saved into the target Model,
+     * in case the user wants to modify any values before merging.
+     * @return  A Map with the process result:
+	 * 				{@code toModel}  The resulting merged Model instance. If the process failed, this contains the validation errors
+	 * 				{@code mergedModels}  The list of Models that were merged into {@code toModel}
+	 * 				{@code assetsUpdated}  The number of assets that were updated in the process
+     */
+    def mergeModels(List fromIds, Long toId, toModelProperties) {
+        Model toModel = Model.get(toId)
+        if (!toModel) {
+            throw new ServiceException("ModelService.mergeModels() - No Model found with id $toId")
+        }
+        if (!fromIds) {
+            throw new ServiceException('ModelService.mergeModels() - fromIds list cannot be empty')
+        }
+        List mergedModels = []
+        String msg = ""
+        int assetsUpdated = 0
+        //Saving toModel before merge
+        toModel.properties = toModelProperties
+        if (!toModel.save(flush:true)) {
+            toModel.errors.allErrors.each {println it }
+        } else {
+			fromIds.each {
+				def fromModel = Model.get(it)
+				assetsUpdated += merge(fromModel, toModel)
+				mergedModels << fromModel
+			}
+		}
+        return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
+    }
 
 
 

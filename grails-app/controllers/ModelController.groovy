@@ -552,42 +552,41 @@ class ModelController implements ControllerMethods {
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
 
-		def assetUpdated = modelService.mergeModel(fromModel, toModel)
+		def assetUpdated = modelService.merge(fromModel, toModel)
 
 		flash.message = "Merge Completed, $assetUpdated assets updated"
 		redirect(action:"list")
 	}
 
 	/**
-	* @param : toId id of target model
-	* @param : fromId[] id of model that is being merged
-	* @return : message
-	*/
+	 * Merges a list of Models into a target Model.
+	 *
+	 * @param : toId  id of target Model
+	 * @param : fromId[]  ids of Models that will be merged into the target Model
+	 * @return : message
+	 */
 	@HasPermission(Permission.ModelMerge)
 	def mergeModels() {
-
-		Model toModel = Model.get(params.toId)
+		if (!params.toId) {
+			throw new InvalidParamException("ModelController.mergeModels() - id cannot be null.")
+		}
+		Long toId = NumberUtil.toLong(params.toId)
 		List fromModelsId = params.list("fromId[]")
-		List mergedModel = []
-		String msg = ""
-		int assetUpdated = 0
 		//Saving toModel before merge
 		if (params.endOfLifeDate) {
 			params.endOfLifeDate = TimeUtil.formatDate(params.endOfLifeDate)
 		} else {
 			params.endOfLifeDate=null
 		}
-		toModel.properties = params
-		if (!toModel.save(flush:true)) {
-			toModel.errors.allErrors.each {println it }
+		Map results = modelService.mergeModels(fromModelsId, toId, params)
+		if (results.mergedModels) {
+			render results.mergedModels.size() + " models were merged to $results.toModel.modelName. $results.assetsUpdated assets were updated. "
+		} else {
+			render "No models were merged. "
 		}
-		fromModelsId.each {
-			def fromModel = Model.get(it)
-			assetUpdated += modelService.mergeModel(fromModel, toModel)
-			mergedModel << fromModel
+		if (results.toModel.hasErrors()) {
+			render "There were errors saving $results.toModel.modelName : ${results.toModel.errors.allErrors.each { println it}}"
 		}
-
-		render msg + mergedModel.size() + " models were merged to $toModel.modelName . $assetUpdated assets were updated."
 	}
 
 	@HasPermission(Permission.ModelExport)
@@ -1078,8 +1077,9 @@ class ModelController implements ControllerMethods {
 		if (!params.id) {
 			throw new InvalidParamException("ModelController.validateModel() - id cannot be null.")
 		}
-		Model modelInstance = modelService.validateModel(params.id)
-		if (modelInstance.errors.isEmpty()) {
+		Long modelId = NumberUtil.toLong(params.id)
+		Model modelInstance = modelService.validateModel(modelId)
+		if (!modelInstance.hasErrors()) {
 			flash.message = "$modelInstance.modelName Validated"
 		}
 		else {
