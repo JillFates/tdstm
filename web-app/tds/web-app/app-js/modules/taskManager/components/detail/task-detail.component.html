@@ -311,13 +311,15 @@
                         <span  class="glyphicon glyphicon-pencil"></span>
                         <span>Edit</span>
                     </button>
-                    <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                        <span  class="glyphicon glyphicon-trash"></span>
-                        <span>Delete</span>
-                    </button>
-                    <tds-task-actions [options]="getShowTaskActionsOptions()"></tds-task-actions>
+                    <tds-task-actions
+                            (start)="onStartTask()"
+                            [options]="getShowTaskActionsOptions()"
+                    ></tds-task-actions>
                 </div>
-
+                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
+                    <span  class="glyphicon glyphicon-trash"></span>
+                    <span>Delete</span>
+                </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
                     <span class="glyphicon glyphicon-ban-circle"></span>
                     <span>Close</span>

@@ -91,10 +91,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 		options.showDone = this.model.status && ['ready', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
 		options.showStart = this.model.status && ['ready'].indexOf(this.model.status.toLowerCase()) >= 0;
-		options.showAssignToMe = this.currentUserId !== assignedTo && this.model.status && ['ready', 'pending', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;;
+		options.showAssignToMe = this.currentUserId !== assignedTo && this.model.status && ['ready', 'pending', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
 		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
-
-		console.log(options);
 
 		return options;
 	}
@@ -186,5 +184,22 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		}).catch(result => {
 			this.dismiss(this.hasChanges);
 		});
+	}
+
+	/**
+	 * Change the task status to started
+	 */
+	onStartTask(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: 'Started',
+			currentStatus: this.model.status
+		};
+
+		this.taskManagerService.updateTaskStatus(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * Created by Jorge Morayta on 3/15/2017.
  */
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 
 export interface TaskActionsOptions {
 	showDone: boolean;
@@ -17,10 +17,16 @@ export interface TaskActionsOptions {
 
 export class TaskActionsComponent implements OnInit {
 	@Input() options: TaskActionsOptions;
-	/**
-	 * Initiates the Notice Module
-	 */
+	@Output() start: EventEmitter<void> = new EventEmitter<void>();
 	ngOnInit(): void {
 		console.log('Init');
+	}
+
+
+	/**
+	 * Emit the start status change event
+	 */
+	onStart(): void {
+		this.start.emit();
 	}
 }
