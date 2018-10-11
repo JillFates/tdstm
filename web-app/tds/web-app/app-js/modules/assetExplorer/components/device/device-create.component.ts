@@ -28,6 +28,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		]
 	}) class DeviceCreateComponent extends DeviceCommonComponent {
 
+		nameValidation: boolean;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -73,6 +74,10 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		private onCreate(): void {
 			let modelRequest = R.clone(this.model);
 
+			if (!this.validateAssetRequiredValues(modelRequest)) {
+				this.nameValidation = true;
+				return;
+			}
 			this.prepareModelRequestToSave(modelRequest);
 
 			// MoveBundle

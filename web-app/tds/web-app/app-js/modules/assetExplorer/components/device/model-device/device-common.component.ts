@@ -96,6 +96,19 @@ export class DeviceCommonComponent extends AssetCommonEdit {
 	}
 
 	/**
+	 * Validates required values on asset create model
+	 * @param modelRequest
+	 */
+	protected validateAssetRequiredValues(modelRequest: any): boolean {
+
+		if (!this.model.asset.assetName) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Taken from entity.crud.js
 	 */
 	protected toggleAssetTypeFields(): void {
