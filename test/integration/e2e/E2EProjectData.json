@@ -1,0 +1,53 @@
+{
+  "e2eProjectData": {
+    "projectName": "E2E Project",
+    "projectCode": "E2E Project",
+    "projectDesc": "E2E Project for automation purposes",
+    "projectClient": "E2E Project Client",
+    "projectCompany": "E2E Project Company"
+  },
+  "e2eUserData1": {
+    "firstName": "Primary",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "Administrator"
+    ],
+    "email": "e2e_test_user@e2e.com"
+  },
+  "e2eUserData2": {
+    "firstName": "Secondary",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "Administrator"
+    ],
+    "email": "e2e_test_user2@e2e.com"
+  },
+  "e2eUserData3": {
+    "firstName": "Projects",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "Administrator"
+    ],
+    "email": "e2e_projects_user@e2e.com"
+  },
+  "e2eUserData4": {
+    "firstName": "Login",
+    "middleName": "Middle",
+    "lastName": "E2E Test User",
+    "password": "e2e_password",
+    "roles": [
+      "Administrator"
+    ],
+    "email": "login_e2e_test_user@e2e.com"
+  },
+  "e2eEventName1": "Buildout5",
+  "e2eEventName2": "M1-Physical5",
+  "e2eBundleName1": "Buildout5",
+  "e2eBundleName2": "M1-Phy15"
+}

@@ -11,7 +11,16 @@ class MoveEventTestHelper {
 				project: project,
 				name: 'Test MoveEvent - ' +  RandomStringUtils.randomAlphabetic(10),
 				calcMethod: MoveEvent.METHOD_LINEAR
-		).save(flush: true, failOnError: true)
+		).save(failOnError: true)
 		return moveEvent
+	}
+
+	MoveEvent createMoveEvent(Project project, String name) {
+		MoveEvent event = MoveEvent.findWhere([name: name, project: project])
+		if (!event) {
+			event = new MoveEvent([project: project, name: name, calcMethod: MoveEvent.METHOD_LINEAR])
+			event.save(flush: true)
+		}
+		return event
 	}
 }
