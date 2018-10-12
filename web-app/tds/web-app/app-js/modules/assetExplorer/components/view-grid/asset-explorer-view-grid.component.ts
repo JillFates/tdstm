@@ -66,6 +66,7 @@ export class AssetExplorerViewGridComponent {
 	typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
+	public userTimeZone: string;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -93,7 +94,7 @@ export class AssetExplorerViewGridComponent {
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
 		private permissionService: PermissionService) {
-
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
