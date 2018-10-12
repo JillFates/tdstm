@@ -18,6 +18,7 @@ import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-di
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { PersonService } from './services/person.service';
 import { PermissionService } from './services/permission.service';
+import { KendoFileUploadInterceptor } from './providers/kendo-file-upload.interceptor';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -28,7 +29,7 @@ import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prom
 import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
-import {UIAutoCenterDirective} from './directives/autocenter-directive';
+import { UIAutoCenterDirective } from './directives/autocenter-directive';
 // Shared Pipes
 import { UserDateTime } from './pipes/userDateTime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
@@ -56,6 +57,7 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 
 @NgModule({
 	imports: [
@@ -164,7 +166,15 @@ export class SharedModule {
 				UISVGIconDirectiveDirective,
 				UIFloatingHeaderKGridDirective,
 				DictionaryService,
-				{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
+				{
+					provide: 'localizedDictionary',
+					useValue: en_DICTIONARY
+				},
+				{
+					provide: HTTP_INTERCEPTORS,
+					useClass: KendoFileUploadInterceptor,
+					multi: true
+				}
 			]
 		};
 	}

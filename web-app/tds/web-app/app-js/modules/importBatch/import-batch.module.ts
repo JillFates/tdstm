@@ -18,13 +18,13 @@ import {ImportBatchRouteModule} from './import-batch-routing.states';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {ImportAssetsService} from './service/import-assets.service';
+import {DataIngestionService} from '../dataIngestion/service/data-ingestion.service';
 // Components
 import {ImportBatchRecordSummaryComponent} from './components/record/import-batch-record-summary.component';
 import {ImportBatchRecordFieldsComponent} from './components/record/import-batch-record-fields.component';
 import {ImportBatchListComponent} from './components/list/import-batch-list.component';
 import {ImportBatchDetailDialogComponent} from './components/detail/import-batch-detail-dialog.component';
 import {ImportBatchRecordDialogComponent} from './components/record/import-batch-record-dialog.component';
-import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 import {ImportAssetsComponent} from './components/import-assets/import-assets.component';
 
 @NgModule({
@@ -54,11 +54,7 @@ import {ImportAssetsComponent} from './components/import-assets/import-assets.co
 		ModuleResolveService,
 		ImportBatchService,
 		ImportAssetsService,
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: KendoFileUploadInterceptor,
-			multi: true
-		}
+		DataIngestionService
 	],
 	exports: [
 		ImportBatchListComponent,

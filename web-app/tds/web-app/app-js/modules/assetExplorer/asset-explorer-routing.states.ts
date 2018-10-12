@@ -59,7 +59,7 @@ export const AssetExplorerRoute: Routes = [
 			reports: ReportsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-		runGuardsAndResolvers: 'always',
+		runGuardsAndResolvers: 'always'
 	},
 	{
 		path: AssetExplorerStates.REPORT_CREATE.url,
@@ -81,7 +81,7 @@ export const AssetExplorerRoute: Routes = [
 			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-		runGuardsAndResolvers: 'always',
+		runGuardsAndResolvers: 'always'
 	},
 	{
 		path: AssetExplorerStates.REPORT_EDIT.url,
@@ -103,7 +103,7 @@ export const AssetExplorerRoute: Routes = [
 			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-		runGuardsAndResolvers: 'always',
+		runGuardsAndResolvers: 'always'
 	},
 	{
 		path: AssetExplorerStates.REPORT_SHOW.url,
@@ -124,7 +124,7 @@ export const AssetExplorerRoute: Routes = [
 			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService],
-		runGuardsAndResolvers: 'always',
+		runGuardsAndResolvers: 'always'
 	}
 ];
 

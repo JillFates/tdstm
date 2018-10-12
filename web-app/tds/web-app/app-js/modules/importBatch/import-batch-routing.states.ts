@@ -50,7 +50,6 @@ export const ImportBatchRoute: Routes = [
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-import-assets-etl'}
 			},
 			requiresAuth: true,
-			// requiresPermission: Permission.ProjectFieldSettingsView, TODO: add permissions.
 			hasPendingChanges: false
 		},
 		component: ImportAssetsComponent,

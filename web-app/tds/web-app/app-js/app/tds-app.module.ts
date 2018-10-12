@@ -4,12 +4,10 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
-import {HttpModule, Http} from '@angular/http';
+import {HttpModule} from '@angular/http';
 import {TDSAppComponent} from './tds-app.component';
 // Feature modules
-// import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 // import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
-// import {ImportBatchModule} from '../modules/importBatch/import-batch.module';
 // Router Logic
 // import { AuthConfig, MiscConfig } from './tds-app.route';
 // High level Services
@@ -30,9 +28,7 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		TaskManagerModule,
 		SharedModule.forRoot(),
 		// Feature Modules
-		// FieldSettingsModule,
 		// DataIngestionModule,
-		// ImportBatchModule,
 		// Routing Modules using UI Router
 		/* UIRouterModule.forRoot(<UIRouterModule>{
 			states: TdsAppRoute,
