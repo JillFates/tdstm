@@ -37,7 +37,13 @@ class JsonUtil {
      * @return a list after parsing the text
      */
     static List parseJsonList(String jsonText) {
-        return parseJsonObject(jsonText) as List
+        def parsedJson = parseJsonObject(jsonText)
+
+        if (!(parsedJson instanceof List)) {
+            //TODO return []? null? throw exception?
+        }
+
+        return parsedJson as List
     }
 
     static Object parseJsonObject(String jsonText) {
