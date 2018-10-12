@@ -102,7 +102,7 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue'() {
 		when: 'coercing a string value that contains a moveBundle id to a moveBundle'
-			def value = BulkChangeMoveBundle.coerceBulkValue(project, 'moveBundle', "${moveBundle.id}", [:])
+			def value = BulkChangeMoveBundle.coerceBulkValue(project, "${moveBundle.id}")
 
 		then: 'the moveBundle is returned'
 			value.id == moveBundle.id
@@ -110,7 +110,7 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue move bundle from another project'() {
 		when: 'coercing and '
-			BulkChangeMoveBundle.coerceBulkValue(project, 'moveBundle', "${moveBundle2.id}", [:])
+			BulkChangeMoveBundle.coerceBulkValue(project, "${moveBundle2.id}")
 
 		then: 'an EmptyResultException is returned'
 			thrown EmptyResultException

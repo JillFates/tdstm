@@ -84,7 +84,7 @@ class BulkChangeYesNoIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test replace'() {
 		setup:
-			def validation = BulkChangeYesNo.coerceBulkValue(project, 'validation', 'yes', [:])
+			def validation = BulkChangeYesNo.coerceBulkValue(project,'yes')
 
 		when: 'replace is called with a list of assets'
 			BulkChangeYesNo.replace(Application.class, validation, 'validation', [device.id, device2.id, device3.id], null)

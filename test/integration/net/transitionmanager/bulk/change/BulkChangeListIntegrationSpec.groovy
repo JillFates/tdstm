@@ -135,17 +135,9 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 
 	void 'test coerceBulkValue'() {
 		when: 'coercing a string value validating that it is in a list'
-			def value = BulkChangeList.coerceBulkValue(project, 'custom9', 'one potato', [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
+			def value = BulkChangeList.coerceBulkValue(project, 'one potato')
 
 		then: 'the list value is returned'
 			value == 'one potato'
-	}
-
-	void 'test coerceBulkValue value not is list of values'() {
-		when: 'coercing a string value validating that it is in a list '
-			BulkChangeList.coerceBulkValue(project, 'custom9', 'no potato', [control: 'List', bulkChangeActions:['clear', 'replace'], customValues:['one potato', 'two potato']])
-
-		then: 'an InvalidParamException is returned'
-			thrown InvalidParamException
 	}
 }
