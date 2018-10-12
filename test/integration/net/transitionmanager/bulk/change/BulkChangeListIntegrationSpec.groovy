@@ -37,13 +37,13 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle
+	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2
+	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -64,9 +64,6 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
-
 		device = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device2 = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device3 = applicationTestHelper.createApplication(AssetClass.DEVICE, otherProject, moveBundle2)
@@ -82,8 +79,8 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 			asset2.refresh().custom9 == 'new value'
 	}
 
-	void 'test replace filter query'() {
-		setup: 'given a new move bundle, not yet assigned to assets, and an AssetFilterQuery'
+	void 'test replace with filter query'() {
+		setup: 'given an AssetFilterQuery'
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
 				SELECT AE.id
@@ -109,35 +106,20 @@ class BulkChangeListIntegrationSpec extends IntegrationSpec {
 			asset2.refresh().custom9 == ''
 	}
 
-	void 'test clear with value'() {
-		when: 'bulk clear a list field, sending in a value'
-			BulkChangeList.clear(Application, 'one potato', 'custom9', [device.id, device2.id])
-		then: 'an InvalidParamException is thrown'
-			thrown InvalidParamException
-	}
-
-	void 'test clear filter query'() {
-		setup: 'given a new move bundle, not yet assigned to assets, and an AssetFilterQuery'
+	void 'test clear with filter query'() {
+		setup: 'bulk clear a list field with an AssetFilterQuery'
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
 				SELECT AE.id
 				FROM AssetEntity AE
 				WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
 			"""
-		when: 'bulk clearing a list filed using a query filter'
+		when: 'bulk clearing a list field using a query filter'
 			BulkChangeList.clear(Application, '', 'custom9', [], [query: query, params: params])
 			AssetEntity asset1 = AssetEntity.get(device.id)
 			AssetEntity asset2 = AssetEntity.get(device2.id)
 		then: 'the assets, list field is cleared'
 			asset1.refresh().custom9 == ''
 			asset2.refresh().custom9 == ''
-	}
-
-	void 'test coerceBulkValue'() {
-		when: 'coercing a string value validating that it is in a list'
-			def value = BulkChangeList.coerceBulkValue(project, 'one potato')
-
-		then: 'the list value is returned'
-			value == 'one potato'
 	}
 }

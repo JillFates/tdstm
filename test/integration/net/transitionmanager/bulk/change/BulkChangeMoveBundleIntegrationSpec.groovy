@@ -35,13 +35,19 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle
+	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2
+	MoveBundle moveBundle2= moveBundleTestHelper.createBundle(otherProject, null)
+
+	@Shared
+	MoveBundle moveBundle3 = moveBundleTestHelper.createBundle(project, null)
+
+	@Shared
+	MoveBundle moveBundle4 = moveBundleTestHelper.createBundle(project, null)
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -62,17 +68,12 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
-
 		device = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device2 = applicationTestHelper.createApplication(AssetClass.DEVICE, project, moveBundle)
 		device3 = applicationTestHelper.createApplication(AssetClass.DEVICE, otherProject, moveBundle2)
 	}
 
 	void 'test replace'() {
-		setup: 'given a new move bundle, not yet assigned to assets'
-			MoveBundle moveBundle3 = moveBundleTestHelper.createBundle(project, null)
 		when: 'bulk replacing tags on a list of devices, with the new tags'
 			BulkChangeMoveBundle.replace(AssetEntity, moveBundle3, 'moveBundle', [device.id, device2.id])
 			AssetEntity asset1 = AssetEntity.get(device.id)
@@ -84,7 +85,6 @@ class BulkChangeMoveBundleIntegrationSpec extends IntegrationSpec {
 
 	void 'test replace filter query'() {
 		setup: 'given a new move bundle, not yet assigned to assets, and an AssetFilterQuery'
-			MoveBundle moveBundle4 = moveBundleTestHelper.createBundle(project, null)
 			Map params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 			String query = """
 				SELECT AE.id
