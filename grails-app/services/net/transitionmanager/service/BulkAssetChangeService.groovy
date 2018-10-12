@@ -2,8 +2,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import grails.transaction.NotTransactional
+import com.tdssrc.grails.GormUtil
 import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -98,9 +98,9 @@ class BulkAssetChangeService implements ServiceMethods {
 	void bulkChange(Project currentProject, BulkChangeCommand bulkChange) {
 		List ids = []
 		Map queryFilter = [:]
-		Map<String, Map<String,Map>> fieledMapping
-		String action
-		List<String> actions
+		Map<String, Map<String,Map>> fieldMapping
+		//String action
+		List<String> validActions
 		def service
 		def value
 		String field
@@ -108,7 +108,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		Class type = getType(assetClass)
 
 		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
-		fieledMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
+		fieldMapping = dataviewService.projectService.customDomainService.fieldToBulkChangeMapping(currentProject)
 
 		if (bulkChange.allIds) {
 			queryFilter = dataviewService.getAssetIdsHql(currentProject, bulkChange.dataViewId, bulkChange.userParams)
@@ -122,19 +122,16 @@ class BulkAssetChangeService implements ServiceMethods {
 		}
 
 		try {
-			//Looks up and runs all the edits for a bulk change call.
-			bulkChange.edits.each { EditCommand edit ->
-				field = edit.fieldName
-				service = getBulkClass(type, assetClass, field, fieledMapping, bulkClassMapping)
-				value = service.coerceBulkValue(currentProject, field, edit.value, fieledMapping[assetClass.name()][field])
-				action = edit.action
-				actions = fieledMapping[assetClass.name()][field].bulkChangeActions ?: []
+			List<Map>  actions = generateActions(type, bulkChange.edits, assetClass, fieldMapping, currentProject)
 
-				if (!service.ALLOWED_ACTIONS.contains(action) && !actions.contains(action)) {
-					throw new InvalidParamException("Bulk update action $action, is not configured for $edit.fieldName")
+			actions.each{ Map action ->
+				validActions = fieldMapping[assetClass.name()][action.field].bulkChangeActions ?: []
+
+				if (!action.service.ALLOWED_ACTIONS.contains(action.action) && !actions.contains(action.action)) {
+					throw new InvalidParamException("Bulk update action $action, is not configured for $action.field")
 				}
 
-				service."$action"(type, value, field, ids, queryFilter)
+				action.service."$action.action"(type, action.value, action.field, ids, queryFilter)
 			}
 		} catch (InvalidParamException e) {
 			throw e
@@ -180,8 +177,8 @@ class BulkAssetChangeService implements ServiceMethods {
 	 */
 	@NotTransactional
 	private Class getBulkClass(Class type, AssetClass assetClass, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
-		def property = GormUtil.getConstrainedProperty(type, fieldName)
-		String dataType = property.propertyType.name
+		def property = GormUtil.getDomainPropertyType(type, fieldName)
+		String dataType = property.typeName
 
 		if (dataType == String.class.name) {
 			dataType = fieldMapping[assetClass.name()][fieldName]?.control
@@ -196,5 +193,33 @@ class BulkAssetChangeService implements ServiceMethods {
 		}
 
 		return service
+	}
+
+
+	private List<Map> generateActions(Class type, List<EditCommand> edits, AssetClass assetClass, Map<String, Map> fieldMapping, Project currentProject) {
+		def typeInstance = type.newInstance()
+		def service
+		def value
+		String field
+		List<Map> actions =[]
+
+		List<String> fields = edits.collect { EditCommand edit ->
+			field = edit.fieldName
+			service = getBulkClass(type, assetClass, edit.fieldName, fieldMapping, bulkClassMapping)
+			value = service.coerceBulkValue(currentProject, edit.value)
+			typeInstance."$edit.fieldName" = value
+			actions << [service:service, field: field, action: edit.action, value:value]
+			return edit.fieldName
+		}
+
+		fields << 'custom1'
+
+		if (!typeInstance.validate(fields)) {
+			throw new InvalidParamException(GormUtil.allErrorsString(typeInstance))
+		}
+
+		typeInstance.discard()
+
+		return actions
 	}
 }
