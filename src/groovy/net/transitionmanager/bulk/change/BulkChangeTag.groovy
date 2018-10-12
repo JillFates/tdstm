@@ -1,17 +1,14 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.JsonUtil
 import grails.transaction.Transactional
 import grails.util.Holders
-import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.ServiceMethods
 
 @Transactional
 class BulkChangeTag {
@@ -30,11 +27,10 @@ class BulkChangeTag {
 	 *
 	 * @return a List of longs, that represent tag ids.
 	 */
-	static List<Long> coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
-		JsonSlurper jsonSlurper = new JsonSlurper()
-		def parsedValue = jsonSlurper.parseText(value)
+	static List<Long> coerceBulkValue(Project currentProject, String value) {
+		List parsedValue = JsonUtil.parseJsonList(value)
 
-		if (!(parsedValue instanceof List)) {
+		if (!parsedValue) {
 			throw new InvalidParamException('Value is not a list of numbers')
 		}
 

@@ -54,11 +54,7 @@ class BulkChangeString {
 	 *
 	 * @return - same string if it is not blank
 	 */
-	static String coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
-		if (StringUtil.isBlank(value)) {
-			return null
-		}
-
+	static String coerceBulkValue(Project currentProject, String value) {
 		return value
 	}
 

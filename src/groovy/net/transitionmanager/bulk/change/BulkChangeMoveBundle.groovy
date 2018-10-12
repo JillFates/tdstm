@@ -30,7 +30,7 @@ class BulkChangeMoveBundle implements ServiceMethods {
 	 *
 	 * @return a moveBundle.
 	 */
-	static MoveBundle coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
+	static MoveBundle coerceBulkValue(Project currentProject, String value) {
 		Long id = NumberUtil.toPositiveLong(value)
 
 		if (!id) {

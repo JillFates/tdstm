@@ -53,7 +53,7 @@ class BulkChangeDate implements ServiceMethods {
 	 *
 	 * @return - parsed Date object
 	 */
-	static Date coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
+	static Date coerceBulkValue(Project currentProject, String value) {
 		if(!value){
 			return null
 		}

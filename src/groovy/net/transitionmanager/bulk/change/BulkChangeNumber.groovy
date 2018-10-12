@@ -54,12 +54,8 @@ class BulkChangeNumber {
 	 *
 	 * @return - same number if it is a number
 	 */
-	static Integer coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
-		if (NumberUtil.isNumber(value)) {
-			return NumberUtil.toPositiveInteger(value)
-		}
-
-		return null
+	static Integer coerceBulkValue(Project currentProject, String value) {
+		return NumberUtil.toInteger(value)
 	}
 
 	/**

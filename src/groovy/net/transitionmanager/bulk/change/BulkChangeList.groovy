@@ -32,13 +32,7 @@ class BulkChangeList implements ServiceMethods {
 	 *
 	 * @return a string, that is valid for a list.
 	 */
-	static String coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
-		List values = fieldMapping.customValues ?: getListValues(field)
-
-		if (value && !values.contains(value)) {
-			throw new InvalidParamException("Value $value is not valid bulk update of $field.")
-		}
-
+	static String coerceBulkValue(Project currentProject, String value) {
 		return value
 	}
 

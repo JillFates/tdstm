@@ -65,7 +65,7 @@ class BulkChangeYesNo {
 	 *
 	 * @return - the boolean value of the string, {@code false} if no match or the String is null
 	 */
-	static String coerceBulkValue(Project currentProject, String field, String value, Map fieldMapping) {
+	static String coerceBulkValue(Project currentProject, String value) {
 		if(!value){
 			return ''
 		}
