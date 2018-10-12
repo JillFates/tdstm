@@ -8,7 +8,7 @@ import grails.transaction.Transactional
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeList
 import net.transitionmanager.bulk.change.BulkChangeMoveBundle
-import net.transitionmanager.bulk.change.BulkChangeNumber
+import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeTag
@@ -81,7 +81,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		(TagAsset.class.name)  : BulkChangeTag.class,
 		(Date.class.name)      : BulkChangeDate.class,
 		'String'               : BulkChangeString.class,
-		(Integer.class.name)   : BulkChangeNumber.class,
+		(Integer.class.name)   : BulkChangeInteger.class,
 		(Person.class.name)    : BulkChangePerson.class,
 		'YesNo'                : BulkChangeYesNo.class,
 		'List'                 : BulkChangeList.class,
