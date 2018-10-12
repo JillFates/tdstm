@@ -124,7 +124,7 @@ class BulkAssetChangeService implements ServiceMethods {
 				validActions = fieldMapping[assetClass.name()][action.field].bulkChangeActions ?: []
 
 				if (!action.service.ALLOWED_ACTIONS.contains(action.action) && !validActions.contains(action.action)) {
-					throw new InvalidParamException("Bulk update action $action, is not configured for $action.field")
+					throw new InvalidParamException("Action $action is not supported for field $action.field")
 				}
 
 				action.service."$action.action"(type, action.value, action.field, ids, queryFilter)
