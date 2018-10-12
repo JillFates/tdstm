@@ -99,11 +99,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		List ids = []
 		Map queryFilter = [:]
 		Map<String, Map<String, Map>> fieldMapping
-		//String action
 		List<String> validActions
-		def service
-		def value
-		String field
 		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
 		Class type = getType(assetClass)
 
@@ -127,7 +123,7 @@ class BulkAssetChangeService implements ServiceMethods {
 			actions.each { Map action ->
 				validActions = fieldMapping[assetClass.name()][action.field].bulkChangeActions ?: []
 
-				if (!action.service.ALLOWED_ACTIONS.contains(action.action) && !actions.contains(action.action)) {
+				if (!action.service.ALLOWED_ACTIONS.contains(action.action) && !validActions.contains(action.action)) {
 					throw new InvalidParamException("Bulk update action $action, is not configured for $action.field")
 				}
 
@@ -195,7 +191,17 @@ class BulkAssetChangeService implements ServiceMethods {
 		return service
 	}
 
-
+	/**
+	 * Gets the actions to be run, and validates the values.
+	 *
+	 * @param type the domain class used to look up the service.
+	 * @param edits the edit commands to create actions for.
+	 * @param assetClass The assetClass used for looking up the service.
+	 * @param fieldMapping the field mapping used to look up the service.
+	 * @param currentProject the current project, used to coerse the bulk value.
+	 *
+	 * @return A list of actions as a map.
+	 */
 	private List<Map> generateActions(Class type, List<EditCommand> edits, AssetClass assetClass, Map<String, Map> fieldMapping, Project currentProject) {
 		def typeInstance = type.newInstance()
 		def service
@@ -206,9 +212,9 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		List<String> fields = edits.collect { EditCommand edit ->
 			field = edit.fieldName
-			service = getBulkClass(type, assetClass, edit.fieldName, fieldMapping, bulkClassMapping)
+			service = getBulkClass(type, assetClass, field, fieldMapping, bulkClassMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
-			typeInstance."$edit.fieldName" = value
+			typeInstance[field] = value
 
 			if (field.startsWith('custom')) {
 				hasCustomFields = true
@@ -216,7 +222,7 @@ class BulkAssetChangeService implements ServiceMethods {
 
 			actions << [service: service, field: field, action: edit.action, value: value]
 
-			return edit.fieldName
+			return field
 		}
 
 		if (hasCustomFields) {
