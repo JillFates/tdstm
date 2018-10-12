@@ -98,7 +98,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	void bulkChange(Project currentProject, BulkChangeCommand bulkChange) {
 		List ids = []
 		Map queryFilter = [:]
-		Map<String, Map<String,Map>> fieldMapping
+		Map<String, Map<String, Map>> fieldMapping
 		//String action
 		List<String> validActions
 		def service
@@ -122,9 +122,9 @@ class BulkAssetChangeService implements ServiceMethods {
 		}
 
 		try {
-			List<Map>  actions = generateActions(type, bulkChange.edits, assetClass, fieldMapping, currentProject)
+			List<Map> actions = generateActions(type, bulkChange.edits, assetClass, fieldMapping, currentProject)
 
-			actions.each{ Map action ->
+			actions.each { Map action ->
 				validActions = fieldMapping[assetClass.name()][action.field].bulkChangeActions ?: []
 
 				if (!action.service.ALLOWED_ACTIONS.contains(action.action) && !actions.contains(action.action)) {
@@ -201,18 +201,27 @@ class BulkAssetChangeService implements ServiceMethods {
 		def service
 		def value
 		String field
-		List<Map> actions =[]
+		List<Map> actions = []
+		boolean hasCustomFields = false
 
 		List<String> fields = edits.collect { EditCommand edit ->
 			field = edit.fieldName
 			service = getBulkClass(type, assetClass, edit.fieldName, fieldMapping, bulkClassMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
 			typeInstance."$edit.fieldName" = value
-			actions << [service:service, field: field, action: edit.action, value:value]
+
+			if (field.startsWith('custom')) {
+				hasCustomFields = true
+			}
+
+			actions << [service: service, field: field, action: edit.action, value: value]
+
 			return edit.fieldName
 		}
 
-		fields << 'custom1'
+		if (hasCustomFields) {
+			fields << 'custom1'
+		}
 
 		if (!typeInstance.validate(fields)) {
 			throw new InvalidParamException(GormUtil.allErrorsString(typeInstance))
