@@ -7,7 +7,6 @@ import {PreferencesResolveService} from '../../shared/resolves/preferences-resol
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
-import {FieldSettingsService} from './service/field-settings.service';
 // Components
 import {FieldSettingsListComponent} from './components/list/field-settings-list.component';
 // Models

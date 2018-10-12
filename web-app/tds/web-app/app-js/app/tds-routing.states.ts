@@ -17,24 +17,6 @@ import { TaskService } from '../modules/taskManager/service/task.service';
 import { DictionaryService } from '../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../shared/model/constants';
 
- export const tdsRoot = {
-	name: 'tds',
-	url: '',
-	component: TDSAppComponent,
-	resolve: [
-		{
-			token: 'preferences',
-			policy: { async: 'RXWAIT', when: 'EAGER' },
-			deps: [PreferenceService],
-
-			resolveFn: (service: PreferenceService) => service.getPreferences(
-				PREFERENCES_LIST.CURR_TZ,
-				PREFERENCES_LIST.CURRENT_DATE_FORMAT
-			)
-		}
-	]
-};
-
 export function MiscConfig(router: UIRouter) {
 	router.stateService.defaultErrorHandler((error) => {
 		console.log(error);
@@ -89,7 +71,8 @@ export const TDSAppRoute: Routes = [
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
 	{path: 'asset', loadChildren: '../modules/assetExplorer/asset-explorer.module#AssetExplorerModule'},
-	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'}
+	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
+	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'}
 ];
 
 @NgModule({

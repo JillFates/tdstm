@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -18,11 +19,12 @@ export class ImportBatchStates {
 		url: 'list'
 	};
 	public static readonly IMPORT_ASSETS = {
-		url: '/assets'
+		url: 'assets'
 	};
 }
 
 export const ImportBatchRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: ImportBatchStates.IMPORT_BATCH_LIST.url},
 	{
 		path: ImportBatchStates.IMPORT_BATCH_LIST.url,
 		data: {
@@ -36,7 +38,7 @@ export const ImportBatchRoute: Routes = [
 			requiresPermission: Permission.DataTransferBatchView
 		},
 		component: ImportBatchListComponent,
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	},
 	{
 		path: ImportBatchStates.IMPORT_ASSETS.url,
@@ -52,7 +54,7 @@ export const ImportBatchRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: ImportAssetsComponent,
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
 ];
 
