@@ -88,11 +88,12 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
 			commonCalls.push(this.taskManagerService.getCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
+			commonCalls.push(this.taskManagerService.getActionList());
 		}
 
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, assetClasses, categories, events] = results;
+				const [status, personList, staffRoles, dateFormat, assetClasses, categories, events, actions] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
@@ -108,6 +109,10 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 				if (events) {
 					this.model.eventList = events.map((item) => ({id: item.id, text: item.name}));
+				}
+
+				if (actions) {
+					this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
