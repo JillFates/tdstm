@@ -2,6 +2,8 @@
  * Created by Jorge Morayta on 3/15/2017.
  */
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 export interface TaskActionsOptions {
 	showDone: boolean;
@@ -15,7 +17,6 @@ export interface TaskActionsOptions {
 	selector: 'tds-task-actions',
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/task-actions/task-actions.component.html'
 })
-
 export class TaskActionsComponent implements OnInit {
 	@Input() options: TaskActionsOptions;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
@@ -23,6 +24,12 @@ export class TaskActionsComponent implements OnInit {
 	@Output() invoke: EventEmitter<void> = new EventEmitter<void>();
 	@Output() assignToMe: EventEmitter<void> = new EventEmitter<void>();
 	@Output() neighborhood: EventEmitter<void>  = new EventEmitter<void>();
+
+	hasInvokePermission = false;
+	constructor(private permissionService: PermissionService) {
+		this.hasInvokePermission = this.permissionService.hasPermission(Permission.ActionInvoke)
+	}
+
 	ngOnInit(): void {
 		console.log('Init');
 	}

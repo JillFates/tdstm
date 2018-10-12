@@ -81,24 +81,25 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			this.taskManagerService.getStatusList(this.model.id),
 			this.taskManagerService.getAssignedTeam(this.model.id),
 			this.taskManagerService.getStaffRoles(),
-			this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
+			this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
+			this.taskManagerService.getActionList()
 		];
 
 		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
 			commonCalls.push(this.taskManagerService.getCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
-			commonCalls.push(this.taskManagerService.getActionList());
 		}
 
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, assetClasses, categories, events, actions] = results;
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
 				this.model.teamList = staffRoles.map((item) => ({id: item.id, text: item.description }));
 				this.dateFormat = dateFormat;
+				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
 
 				if (assetClasses) {
 					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
@@ -109,10 +110,6 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 				if (events) {
 					this.model.eventList = events.map((item) => ({id: item.id, text: item.name}));
-				}
-
-				if (actions) {
-					this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
 				}
 
 				jQuery('[data-toggle="popover"]').popover();

@@ -16,7 +16,8 @@
 		<i class="fa fa-med fa-align-left"></i> <span>Neighborhood</span>
 	</button>
 
-	<button  *ngIf="options && options.invoke" (click)="onInvoke()" class="btn btn-default" type="button" title="Invoke">
+	<button  *ngIf="options && options.invoke" [disabled]="!hasInvokePermission"
+	         (click)="onInvoke()" class="btn btn-default" type="button" title="Invoke">
 		<i class="fa fa-med fa-cogs"></i> <span>Invoke</span>
 	</button>
 </div>

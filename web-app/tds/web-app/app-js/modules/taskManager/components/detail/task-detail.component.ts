@@ -102,11 +102,15 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				.indexOf(this.model.status) >= 0;
 
 		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
+
 		options.invoke =
 			this.model.apiAction &&
 			!this.model.apiActionInvokedAt &&
 			this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
+			[
+				this.modelHelper.STATUS.READY,
+				this.modelHelper.STATUS.STARTED,
+				this.modelHelper.STATUS.COMPLETED].indexOf(this.model.status) >= 0;
 		return options;
 	}
 
