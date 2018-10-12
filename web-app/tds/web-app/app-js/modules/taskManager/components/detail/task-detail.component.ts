@@ -105,6 +105,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 		options.invoke =
 			this.model.apiAction &&
+			this.model.apiAction.id &&
 			!this.model.apiActionInvokedAt &&
 			this.model.status &&
 			[
