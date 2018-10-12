@@ -292,6 +292,7 @@ export class TaskService {
 
 	/**
 	 * Update a task
+	 * @param payload model to update
 	 * @returns {Observable<any>}
 	 */
 	updateTaskStatus(payload: any): Observable<any> {
@@ -305,6 +306,7 @@ export class TaskService {
 
 	/**
 	 * Assign the task to the current user
+	 * @param payload
 	 * @returns {Observable<any>}
 	 */
 	assignToMe(payload: any): Observable<any> {
@@ -318,6 +320,7 @@ export class TaskService {
 
 	/**
 	 * Invoke an api action
+	 * @param taskId
 	 * @returns {Observable<any>}
 	 */
 	invokeAction(taskId: string): Observable<any> {
@@ -330,7 +333,7 @@ export class TaskService {
 	}
 
 	/**
-	 * Invoke an api action
+	 * Get the action list
 	 * @returns {Observable<any>}
 	 */
 	getActionList(): Observable<any> {
