@@ -68,10 +68,6 @@ class BulkChangeList implements ServiceMethods {
 	 * @param idsFilterQuery filtering query to use if ids are not present.
 	 */
 	static void clear(Class type, String value, String field, List<Long> ids = [], Map idsFilterQuery = null) {
-		if (value) {
-			throw new InvalidParamException("For bulk clear you can not specify a value.")
-		}
-
 		bulkReplace(type, '', field, ids, idsFilterQuery)
 	}
 

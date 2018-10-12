@@ -30,10 +30,6 @@ class BulkChangeTag {
 	static List<Long> coerceBulkValue(Project currentProject, String value) {
 		List parsedValue = JsonUtil.parseJsonList(value)
 
-		if (!parsedValue) {
-			throw new InvalidParamException('Value is not a list of numbers')
-		}
-
 		List<Long> tagIds = (parsedValue).collect { i -> i.toLong() }
 
 		if (tagIds) {
@@ -121,10 +117,6 @@ class BulkChangeTag {
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present
 	 */
 	static void clear(Class type, List<Long> tagIds = null, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		if (tagIds) {
-			throw new InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
-		}
-
 		bulkRemove(type, [], field, assetIds, assetIdsFilterQuery)
 	}
 
