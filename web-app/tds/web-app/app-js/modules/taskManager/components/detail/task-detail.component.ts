@@ -110,8 +110,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.model.status &&
 			[
 				this.modelHelper.STATUS.READY,
-				this.modelHelper.STATUS.STARTED,
-				this.modelHelper.STATUS.COMPLETED].indexOf(this.model.status) >= 0;
+				this.modelHelper.STATUS.STARTED
+			].indexOf(this.model.status) >= 0;
 		return options;
 	}
 
