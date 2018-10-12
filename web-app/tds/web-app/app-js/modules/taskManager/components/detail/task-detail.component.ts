@@ -1,20 +1,20 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from './../model/task-detail.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
+import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
+import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
-import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TaskEditCreateModelHelper} from '../../model/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
@@ -90,14 +90,23 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		const predecessorList = this.model && this.model.predecessorList || [];
 		const successorList = this.model && this.model.successorList || [];
 
-		options.showDone = this.model.status && ['ready', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
-		options.showStart = this.model.status && ['ready'].indexOf(this.model.status.toLowerCase()) >= 0;
-		options.showAssignToMe = this.currentUserId !== assignedTo && this.model.status && ['ready', 'pending', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
+		options.showDone = this.model.status &&
+			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
+
+		options.showStart = this.model.status &&
+			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
+
+		options.showAssignToMe = this.currentUserId !== assignedTo &&
+			this.model.status &&
+			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
+				.indexOf(this.model.status) >= 0;
+
 		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
 		options.invoke =
 			this.model.apiAction &&
 			!this.model.apiActionInvokedAt &&
-			this.model.status && ['ready', 'started'].indexOf(this.model.status.toLowerCase()) >= 0;
+			this.model.status &&
+			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
 		return options;
 	}
 
@@ -105,22 +114,27 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Load All Asset Class and Retrieve
 	 */
 	private loadTaskDetail(): void {
-		this.taskManagerService.getTaskDetails(this.taskDetailModel.id).subscribe((res) => {
-			this.dateFormat = this.userPreferenceService.getUserDateFormat();
-			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-			this.taskDetailModel.detail = res;
+		this.taskManagerService.getTaskDetails(this.taskDetailModel.id)
+			.subscribe((res) => {
+				if (!res) {
+					this.dismiss();
+					return;
+				}
+				this.dateFormat = this.userPreferenceService.getUserDateFormat();
+				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+				this.taskDetailModel.detail = res;
 
-			this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
-			this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
-			this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
+				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
+				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
-			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
-			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
-			// Notes are coming into an Array of Arrays...
-			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
-			// Convert the Duration into a Human Readable form
-			this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
-		});
+				this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
+				this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+				// Notes are coming into an Array of Arrays...
+				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
+				// Convert the Duration into a Human Readable form
+				this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
+			});
 	}
 
 	/**
@@ -196,7 +210,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	onStartTask(): void {
 		const payload = {
 			id: this.model.id.toString(),
-			status: 'Started',
+			status: this.modelHelper.STATUS.STARTED,
 			currentStatus: this.model.status
 		};
 
@@ -212,7 +226,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	onDoneTask(): void {
 		const payload = {
 			id: this.model.id.toString(),
-			status: 'Completed',
+			status: this.modelHelper.STATUS.COMPLETED,
 			currentStatus: this.model.status
 		};
 

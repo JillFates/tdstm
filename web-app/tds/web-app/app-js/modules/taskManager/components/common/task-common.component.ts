@@ -4,13 +4,13 @@ import {NgForm} from '@angular/forms';
 import {clone} from 'ramda';
 import {ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from './../model/task-detail.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
+import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -18,8 +18,8 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TaskNotesColumnsModel} from '../model/task-notes-columns.model';
-import {YesNoList, TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {YesNoList, TaskEditCreateModelHelper} from '../../model/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;

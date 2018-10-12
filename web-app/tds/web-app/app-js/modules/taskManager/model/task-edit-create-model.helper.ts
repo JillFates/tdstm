@@ -1,4 +1,4 @@
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import {DateUtils} from '../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TaskDetailModel} from './task-detail.model';
 export const YesNoList = ['Yes', 'No'];
@@ -23,6 +23,15 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateFormat: string;
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
+	public STATUS = {
+		HOLD: 	    'Hold',
+		PLANNED:    'Planned',
+		READY:      'Ready',
+		PENDING:    'Pending',
+		STARTED:    'Started',
+		COMPLETED:  'Completed',
+		TERMINATED: 'Terminated'
+	};
 
 	constructor(userTimeZone: string, userCurrentDateFormat: string) {
 		this.model = {};
@@ -106,7 +115,7 @@ export class TaskEditCreateModelHelper {
 			comment:  '',
 			assetClass: {id: detailModel.detail.assetClass, text: ''},
 			assetClasses: [{id: '', text: ''}],
-			status: 'Ready',
+			status: this.STATUS.READY,
 			statusList: [],
 			personList: [],
 			teamList: [],
