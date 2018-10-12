@@ -308,7 +308,7 @@
             <div class="modal-footer form-group-center">
                 <div class="pull-left" style="display: flex;">
                     <button class="btn btn-primary" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
-                        <span  class="glyphicon glyphicon-pencil"></span>
+                        <i class="glyphicon glyphicon-pencil action-button"></i>
                         <span>Edit</span>
                     </button>
                     <tds-task-actions
@@ -321,11 +321,11 @@
                     ></tds-task-actions>
                 </div>
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                    <span  class="glyphicon glyphicon-trash"></span>
+                    <i class="glyphicon glyphicon-trash action-button"></i>
                     <span>Delete</span>
                 </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
                     <span>Close</span>
                 </button>
 
