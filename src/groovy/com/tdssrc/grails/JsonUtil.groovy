@@ -40,7 +40,7 @@ class JsonUtil {
         def parsedJson = parseJsonObject(jsonText)
 
         if (!(parsedJson instanceof List)) {
-            //TODO return []? null? throw exception?
+            throw new InvalidParamException('Invalid JSON : expected list object')
         }
 
         return parsedJson as List
