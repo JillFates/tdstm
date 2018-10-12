@@ -185,7 +185,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		Class service = bulkClassMapping[dataType]
 
 		if (!service) {
-			throw new InvalidParamException("Bulk update is not configured for $fieldName")
+			throw new InvalidParamException("Bulk update does not support domain type $fieldName")
 		}
 
 		return service
