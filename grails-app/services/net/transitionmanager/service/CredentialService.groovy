@@ -20,6 +20,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -476,6 +477,27 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
+     * Find a credential instance with the given name, project and provider
+     * @param name - credential name
+     * @param project - credential project
+     * @param provider - credential provider
+     * @param throwException - whether to throw an exception if credential is not found
+     * @return
+     */
+    private Credential findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
+        Credential credential = Credential.where {
+            name == name
+            project == project
+            provider == provider
+        }.find()
+
+        if (! credential && throwException) {
+            throw new EmptyResultException("No Credential exists with name $name for the Project $project and Provider $provider.")
+        }
+        return credential
+    }
+
+    /**
      * Performs some additional checks before the save occurs that includes:
      *    - validate that the Provider is associated with the current project
      *    - validate that the name for the credential being created or updated doesn't already exist
@@ -514,4 +536,42 @@ class CredentialService implements ServiceMethods {
             throw new InvalidParamException('A Credential with the same name already exists')
         }
     }
+
+    /**
+     * Clone an existing credential. It overwrites username and password that need to be re-configured by end user.
+     * @param sourceCredential - source credential to clone
+     * @param targetProject - target credential project
+     * @param targetProvider - target credential provider
+     * @return
+     */
+    Credential cloneCredential(Credential sourceCredential, Project targetProject, Provider targetProvider) {
+        Credential newCredential = (Credential)GormUtil.cloneDomainAndSave(sourceCredential, [
+                project: targetProject,
+                provider: targetProvider,
+                username: 'Must Be Changed',
+                password: RandomStringUtils.randomAlphanumeric(10)
+        ], false, false)
+        log.debug "Cloned credential ${newCredential.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+        return newCredential
+    }
+
+    /**
+     * Clone a credential if it does not exist with given name, project and provider
+     * @param sourceCredential - source credential to clone
+     * @param targetProject - target credential project
+     * @param targetProvider - target credential provider
+     * @return a cloned instance of the given source credential or a existing one from database
+     */
+    Credential cloneCredentialIfNotExists(Credential sourceCredential, Project targetProject, Provider targetProvider) {
+        if (!sourceCredential) {
+            return null
+        }
+
+        Credential newCredential = findByProjectAndProvider(sourceCredential.name, targetProject, targetProvider, false)
+        if (!newCredential) {
+            return cloneCredential(sourceCredential, targetProject, targetProvider)
+        }
+        return newCredential
+    }
+
 }
