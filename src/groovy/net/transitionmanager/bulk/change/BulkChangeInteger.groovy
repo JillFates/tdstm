@@ -7,7 +7,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
 
 @Transactional
-class BulkChangeNumber {
+class BulkChangeInteger {
 	/**
 	 * Actions that are allowed to be dynamically called by the Bulk Services.
 	 */
@@ -46,17 +46,16 @@ class BulkChangeNumber {
 	/**
 	 * Parse the given value to determine if it is valid or not
 	 *
-	 * @param value - numeric value
+	 *
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param field  not used this class just here for the interface
+	 * @param value - numeric value
+	 * @param fieldMapping not used for this class just here for the interface.
 	 *
 	 * @return - same number if it is a number
 	 */
-	static Integer coerceBulkValue(Project currentProject, String value) {
-		if (NumberUtil.isNumber(value)) {
-			return NumberUtil.toPositiveInteger(value)
-		}
-
-		return null
+	static Integer coerceBulkValue(Project currentProject, Integer value) {
+		return value
 	}
 
 	/**

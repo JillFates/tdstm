@@ -35,13 +35,13 @@ class BulkChangeStringIntegrationSpec extends IntegrationSpec {
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle
+	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2
+	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -62,9 +62,6 @@ class BulkChangeStringIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
-
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)

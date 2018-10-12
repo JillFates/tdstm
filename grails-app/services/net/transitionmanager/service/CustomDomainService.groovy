@@ -458,14 +458,18 @@ class CustomDomainService implements ServiceMethods {
      * @return a map of field names to their service/actions.
      */
     Map<String, Map> fieldToBulkChangeMapping(Project currentProject) {
+        Map<String, Map> types = [:]
         Map<String, Map> fields = [:]
 
-        fieldSpecsWithCommon(currentProject).each { key, value ->
+        allFieldSpecs(currentProject, ALL_ASSET_CLASSES).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = [bulkChangeService: field.bulkChangeService, bulkChangeActions: field.bulkChangeActions]
+                fields[field.field] = [control: field.control, bulkChangeActions: field.bulkChangeActions, customValues: field?.constraints?.values ?: []]
             }
+
+            types[key]= fields
+            fields = [:]
         }
 
-        return fields
+        return types
     }
 }

@@ -3,12 +3,16 @@ package net.transitionmanager.bulk.change
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
+import grails.util.Holders
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ProjectService
 
 @Transactional
 class BulkChangePerson {
+	static ProjectService projectService
+
 	/**
 	 * Actions that are allowed to be dynamically called by the Bulk Services.
 	 */
@@ -47,8 +51,10 @@ class BulkChangePerson {
 	/**
 	 * Parse the given person id to determine if it belongs to current project or it has access to it
 	 *
-	 * @param personId - a person id
 	 * @param currentProject - current project
+	 * @param personId - a person id
+	 * @param field not used in this class just here for the interface.
+	 * @param fieldMapping not used for this class just here for the interface.
 	 * @return - person if found
 	 */
 	static Person coerceBulkValue(Project currentProject, String personId) {
@@ -60,18 +66,10 @@ class BulkChangePerson {
 		Long pId = NumberUtil.toPositiveLong(personId, 0)
 		Person person = Person.get(pId)
 
-		// person was found, see if it has a user login
-		if (person && person?.userLogin) {
-			// obtain found person current project
-			Project foundPersonProject = person.getUserLogin().getCurrentProject()
-			if (foundPersonProject) {
-				// if found person current project is the same
-				// as the current project passed by param, them return found person
-				if (currentProject.id == foundPersonProject.getId()) {
-					return person
-				}
-			}
+		if(projectService.getAssignableStaff(currentProject, person)){
+			return person
 		}
+
 		return null
 	}
 
@@ -102,5 +100,13 @@ class BulkChangePerson {
 		"""
 
 		type.executeUpdate(query, params)
+	}
+
+	static ProjectService getProjectService(){
+		if(!projectService) {
+			projectService = Holders.applicationContext.getBean('projectService')
+		}
+
+		projectService
 	}
 }
