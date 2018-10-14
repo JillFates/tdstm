@@ -24,21 +24,16 @@
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>
 				<ul class="dropdown-menu">
-					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_APPLICATIONS"
-						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
+					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
 						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
 					</li>
-					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DATABASES"
-						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
+					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
 						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
 					</li>
-					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_DEVICE ||
-					       _viewId === ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL || _viewId === ASSET_ENTITY_MENU.All_SERVERS"
-						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
+					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
 						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
 					</li>
-					<li *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS || _viewId === ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL"
-						(click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
+					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
 						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
 					</li>
 				</ul>

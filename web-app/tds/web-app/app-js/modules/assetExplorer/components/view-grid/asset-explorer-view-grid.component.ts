@@ -414,7 +414,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
-		this.createButtonState = state;
+		if (this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS) {
+			this.createButtonState = state;
+		}
 	}
 
 	/**
