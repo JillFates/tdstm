@@ -49,7 +49,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	private editAction(): void {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, affected: this.bulkChangeModel.affected };
+		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.bulkChangeModel.selectedAssets, affected: this.bulkChangeModel.affected };
 
 		this.dialogService.extra(BulkChangeEditComponent, [
 			UIDialogService,

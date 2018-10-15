@@ -14,17 +14,19 @@ export class BulkChangeButtonComponent {
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 	@Output() clickBulk = new EventEmitter<void>();
 	@Input()
-	set bulkItems(items: number[]) {
-		this.selectedItems = items;
+	set bulkData(data: any) {
+		this.selectedItems = data && data.bulkItems ? data.bulkItems : null;
 		if (this.selectedItems && this.selectedItems.length) {
 			this.showBulkActions();
 		}
 	}
 	private selectedItems: number[];
+	private selectedAssets: Array<any>;
 
 	constructor(private dialogService: UIDialogService) {
 		this.enabled = false;
 		this.selectedItems = [];
+		this.selectedAssets = [];
 	}
 
 	onClick() {
@@ -32,7 +34,7 @@ export class BulkChangeButtonComponent {
 	}
 
 	showBulkActions() {
-		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, affected: this.selectedItems.length };
+		const bulkChangeModel: BulkChangeModel = { selectedItems: this.selectedItems, selectedAssets: this.selectedAssets, affected: this.selectedItems.length };
 
 		this.dialogService.extra(BulkChangeActionsComponent, [
 			{provide: BulkChangeModel, useValue: bulkChangeModel}
