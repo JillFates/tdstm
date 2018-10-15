@@ -15,16 +15,14 @@ class ViewsModule extends Module {
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
         viewsListed       (required: false) {$("[uisref]")}
-        viewsContainer    { $( "div", class:"content body")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
 
         deleteButtons     {viewList.find("title": "Click to delete this view")}
         editButtons       {viewList.find("title": "Click to edit this view")}
-        createViewButton  {viewsContainer.find("button", text:containsWord("Create"))}
+        createViewButton  {viewModuleContainer.find(".box-tools-actions button", text:containsWord("Create"))}
         closeDeleteModal  {$("button.close")}
-        createViewButton  {viewsContainer.find("button", text:containsWord("Create"))}
 
         voidStars         (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star-o")}
         yellowStars       (required: false) {$("div.table-responsive i.fa.text-yellow.fa-star")}
@@ -41,7 +39,7 @@ class ViewsModule extends Module {
     }
 
     def clickCreateView(){
-        createViewButton.click()
+        waitFor{createViewButton.click()}
     }
 
     def moduleTitleIsCorrect(String title){
