@@ -29,7 +29,7 @@ class RoleType {
 		id blank: false, size: 1..32
 		description nullable: true
 		help nullable: true
-		type inList: [SECURITY, TEAM, PROJECT, PARTY, APP]
+		type nullable: false, inList: [SECURITY, TEAM, PROJECT, PARTY, APP]
 		level range: 0..100
 	}
 
