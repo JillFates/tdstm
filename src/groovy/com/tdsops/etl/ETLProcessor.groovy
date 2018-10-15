@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -25,8 +24,8 @@ import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
 import static org.codehaus.groovy.syntax.Types.KEYWORD_IN
 import static org.codehaus.groovy.syntax.Types.KEYWORD_INSTANCEOF
-import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -242,9 +241,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *  domain Application
 	 * </pre>
 	 * @param domain a domain String value
-	 * @return the current instance of {@code ETLProcessor} class
+	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
 	 */
-	ETLProcessor domain (ETLDomain domain) {
+	DependencyPopulator domain(ETLDomain domain) {
 		validateStack()
 		if (selectedDomain?.domain == domain) {
 			selectedDomain.addNewRow = true
@@ -254,17 +253,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		cleanUpBindingAndReleaseLookup()
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
-		return this
+
+		return new DependencyPopulator(this)
 	}
 
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param element an instance of {@code Element} class
-	 * @return the current instance of {@code ETLProcessor} class
-	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
+	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
 	 */
-	ETLProcessor domain(Element element) {
+	DependencyPopulator domain(Element element) {
 		return domain(element.value)
 	}
 
@@ -273,10 +272,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
 	 * @param domainName
-	 * @return the current instance of {@code ETLProcessor} class
+	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	ETLProcessor domain(String domainName) {
+	DependencyPopulator domain(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
 		if (domain) {
 			return domain(domain)

@@ -14,6 +14,7 @@ class DomainFacade {
 	DomainFacade(ETLProcessorResult result) {
 		this.result = result
 	}
+
 	/**
 	 * Return property value
 	 * @param name a property name
@@ -21,7 +22,6 @@ class DomainFacade {
 	 */
 	Object getProperty(String name) {
 		Object value = result.getFieldValue(name)
-		return new DomainField(value)
+		return value
 	}
-
 }

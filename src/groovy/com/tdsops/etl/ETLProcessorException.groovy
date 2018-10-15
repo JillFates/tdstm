@@ -237,5 +237,9 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException incorrectWhenCommandStructure() {
         new ETLProcessorException("Invalid 'when' syntax. Options are 'when populated' or 'when { boolean expression }'")
     }
+
+    static ETLProcessorException invalidDependentParamsCommand() {
+        new ETLProcessorException('dependent command can not have both parameters as null value')
+    }
 }
 
