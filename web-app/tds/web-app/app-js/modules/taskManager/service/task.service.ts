@@ -228,7 +228,7 @@ export class TaskService {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: (response.data && response.data.list || []),
-					total: response.data && response.total,
+					total: response.data && response.data.total,
 					page: response.page || currentPage
 				};
 				return comboBoxSearchResultModel;
