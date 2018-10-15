@@ -169,7 +169,7 @@ class EmailDispatchService implements ServiceMethods {
 	private String getTemplateView(ed) {
 		//TODO: here we should create a model for each. This should be changed to a OOP approach
 		switch (ed.bodyTemplate) {
-			case "passwordReset":      return "/auth/_resetPasswordEmail"
+			case "passwordReset":      return "/auth/_forgotPasswordEmail"
 			case "passwordResetNotif": return "/auth/_resetPasswordNotificationEmail"
 			case "accountActivation":  return "/auth/_accountActivationNotificationEmail"
 			case "adminResetPassword": return "/admin/_ResetPasswordNotificationEmail"

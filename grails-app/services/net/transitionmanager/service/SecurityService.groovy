@@ -545,7 +545,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			String bodyTemplate = "passwordReset"
 			String personFromEmail = grailsApplication.config.grails.mail.default.from
 			def createdBy = person
-			String subject = "Reset your password"
+			String subject = "Forgot your password"
 
 			switch(resetType) {
 				case PasswordResetType.WELCOME:
@@ -559,6 +559,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				case PasswordResetType.ADMIN_RESET:
 					createdBy = userLogin.person
 					bodyTemplate = "adminResetPassword"
+					subject = "Reset your password"
 					break
 
 			}
