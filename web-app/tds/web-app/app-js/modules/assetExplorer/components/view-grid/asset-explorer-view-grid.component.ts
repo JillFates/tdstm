@@ -339,9 +339,9 @@ export class AssetExplorerViewGridComponent {
 			assetType: dataItem.common_assetClass
 		}
 
-		this.dialog.open(TaskCommentDialogComponent, [
+		this.dialog.extra(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel}
-		], DIALOG_SIZE.LG).then(result => {
+		], true, false).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
