@@ -1,53 +1,64 @@
 {
-  "e2eProjectData": {
+  // Projects [project_code max size 20 chars and make sure does not exist]
+  "e2eProjectData": { // Main E2E project, must be first.
     "projectName": "E2E Project",
-    "projectCode": "E2E Project",
+    "projectCode": "e2eProject",
     "projectDesc": "E2E Project for automation purposes",
-    "projectClient": "E2E Project Client",
-    "projectCompany": "E2E Project Company"
+    "projectClient": "E2E Project",
+    "projectCompany": "E2E Project"
   },
-  "e2eUserData1": {
+  "e2eProjectToBeDeletedData": { // Used by ProjectListCleanUpSpec
+    "projectName": "QAE2E Project to be deleted",
+    "projectCode": "projToDelete",
+    "projectDesc": "E2E Project for automation purposes",
+    "projectClient": "E2E Project", // Make client main E2E project
+    "projectCompany": "E2E Project" // Make company main E2E project
+  },
+  // Person and User
+  "e2eUserData1": { // Main E2E user test execution
     "firstName": "Primary",
     "middleName": "Middle",
     "lastName": "E2E Test User",
     "password": "e2e_password",
     "roles": [
-      "Administrator"
+      "ADMIN"
     ],
     "email": "e2e_test_user@e2e.com"
   },
-  "e2eUserData2": {
+  "e2eUserData2": { // Main E2E user test execution
     "firstName": "Secondary",
     "middleName": "Middle",
     "lastName": "E2E Test User",
     "password": "e2e_password",
     "roles": [
-      "Administrator"
+      "ADMIN"
     ],
     "email": "e2e_test_user2@e2e.com"
   },
-  "e2eUserData3": {
+  "e2eUserData3": { // Main E2E user test execution for Projects specs
     "firstName": "Projects",
     "middleName": "Middle",
     "lastName": "E2E Test User",
     "password": "e2e_password",
     "roles": [
-      "Administrator"
+      "ADMIN"
     ],
     "email": "e2e_projects_user@e2e.com"
   },
-  "e2eUserData4": {
+  "e2eUserData4": { // Main E2E user test execution
     "firstName": "Login",
     "middleName": "Middle",
     "lastName": "E2E Test User",
     "password": "e2e_password",
     "roles": [
-      "Administrator"
+      "ADMIN"
     ],
     "email": "login_e2e_test_user@e2e.com"
   },
-  "e2eEventName1": "Buildout5",
-  "e2eEventName2": "M1-Physical5",
-  "e2eBundleName1": "Buildout5",
-  "e2eBundleName2": "M1-Phy15"
+  // Events
+  "e2eEventName1": "Buildout", // Used in several specs to create and edit
+  "e2eEventName2": "M1-Physical", // Used in several specs to create and edit
+  //Bundles
+  "e2eBundleName1": "Buildout", // Used in several specs to create and edit
+  "e2eBundleName2": "M1-Phy1" // Used in several specs to create and edit
 }

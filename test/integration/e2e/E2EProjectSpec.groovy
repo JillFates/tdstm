@@ -23,6 +23,7 @@ class E2EProjectSpec extends Specification {
 	private MoveEventTestHelper eventHelper = new MoveEventTestHelper()
 	private MoveBundleTestHelper bundleHelper = new MoveBundleTestHelper()
 	private Project project
+	private Project projectToBeDeleted
 	private UserLogin e2eUserLogin1
 	private UserLogin e2eUserLogin2
 	private UserLogin e2eUserLogin3
@@ -41,6 +42,7 @@ class E2EProjectSpec extends Specification {
 	void setup(){
 		dataFile = getJsonObjectFromFile()
 		project = projectHelper.createProject(dataFile.e2eProjectData)
+		projectToBeDeleted = projectHelper.createProject(dataFile.e2eProjectToBeDeletedData)
 		e2eUserLogin1 = personHelper.createPersonWithLoginAndRoles(dataFile.e2eUserData1, project)
 		e2eUserLogin2 = personHelper.createPersonWithLoginAndRoles(dataFile.e2eUserData2, project)
 		e2eUserLogin3 = personHelper.createPersonWithLoginAndRoles(dataFile.e2eUserData3, project)

@@ -229,8 +229,13 @@ class PersonTestHelper {
 		UserLogin user = UserLogin.findWhere([username: personData.email])
 		if (!user){
 			Person person = createPerson(personData.firstName, personData.middleName, personData.lastName, personData.email)
+			person.partyRelationshipService = partyRelationshipService
+			partyRelationshipService.addCompanyStaff(project.owner, person)
 			user = createUserLoginWithRoles(person, personData.roles, project, false, personData.password)
 		}
+		user.passwordNeverExpires = true
+		user.expiryDate = new Date() + 30
+		user.save(flush: true)
 
 		return user
 	}

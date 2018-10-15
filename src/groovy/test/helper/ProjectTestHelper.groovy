@@ -183,7 +183,9 @@ class ProjectTestHelper {
 	 */
 	PartyGroup createClient(PartyGroup company, String clientName) {
 		PartyGroup client = createCompany(null, clientName)
-		partyRelationshipService.assignClientToCompany(client, company)
+		if (client != company) {
+			partyRelationshipService.assignClientToCompany(client, company)
+		}
 		return client
 	}
 
