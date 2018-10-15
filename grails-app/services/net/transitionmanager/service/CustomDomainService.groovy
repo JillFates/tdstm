@@ -157,8 +157,9 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * Return a map with the field specs for the asset export. This include all fields marked to
-     * be displayed plus all the field settings.
+     * Return a map with the field specs for the asset export. This include all the standard fields marked
+     * to be displayed, plus all custom fields regardless of them being marked for display.
+     *
      * @param project - user's current project
      * @param domain - used to filter the fields for a particular domain.
      * @return a map with the field settings.
