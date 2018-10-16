@@ -153,8 +153,11 @@ class BulkAssetChangeService implements ServiceMethods {
 			case AssetClass.domainClassFor(AssetClass.DEVICE):
 			case AssetClass.domainClassFor(AssetClass.STORAGE):
 				return type
+			case 'COMMON':
+				// The DEVICE (aka AssetEntity) is the base class and can be used for the COMMON fields
+				return 'DEVICE'
 			default:
-				throw new InvalidParamException("Bulk change is not setup for $name")
+				throw new InvalidParamException("Bulk change does not support the domain $name")
 		}
 	}
 
