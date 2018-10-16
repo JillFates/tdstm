@@ -22,10 +22,8 @@ class ListBundlesPage extends Page {
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
 
-
         //filters section
         filterRow {$("tr.k-filter-row")}
-        namefilterKind {$("span.k-select")[2]}
         nameFilter {filterRow.find("[data-text-field='name']")}
     }
 
@@ -39,18 +37,6 @@ class ListBundlesPage extends Page {
         //from the field
         nameFilter<< Keys.chord(Keys.TAB)
     }
-
-    def selectFilter(){
-        namefilterKind.click()
-        $("li.k-item", text:"Contains").click()
-    }
-
-    def clickOnBundle(){
-        //firstBundleListed.click()
-        def bundleLocator = "('tbody.tr')"
-        $(".cell-url-element")[0].click()
-    }
-
     /**
      * This filter actually has different options to filter.
      * this method will validate the "equal to" option
