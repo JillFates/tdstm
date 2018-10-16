@@ -28,7 +28,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
 	CLEAR_ACTION = 'clear';
 	isLoaded: boolean;
-	private defaultDomain: IdTextItem = {id: 'common', text: 'Common Fields'};
+	private defaultDomain: IdTextItem = {id: 'COMMON', text: 'Common Fields'};
 	tagList: TagModel[] = [];
 	yesNoList: IdTextItem[] = [{ id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
 	protected domains: IdTextItem[];
@@ -154,16 +154,17 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		if (this.assetsDifferFromDomains()) {
 			domainList.push(this.defaultDomain);
 		} else {
-			const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass.toLowerCase();
+			const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass;
+			domainList.push({id: firstAssetClass, text: `${StringUtils.toCapitalCase(firstAssetClass, false)} Fields`});
 			domainList.push(this.defaultDomain);
-			domainList.push({id: firstAssetClass.toUpperCase(), text: `${StringUtils.toCapitalCase(firstAssetClass, false)} Fields`});
-			// 	domainList = fields
-			// 		.map((field) => field.domain.toLowerCase())
-			// 		.map((domain): IdTextItem => ( {id: domain.toUpperCase(), text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
 		}
 		return domainList;
 	}
 
+	/**
+	 * Determines if Assets selected belong to differents domain.
+	 * @returns {boolean}
+	 */
 	private assetsDifferFromDomains(): boolean {
 		if (this.bulkChangeModel.selectedAssets.length <= 1) {
 			return false;
@@ -221,7 +222,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				});
 
 			if (this.hasAssetEditPermission()) {
-				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits, this.bulkChangeModel.selectedAssets[0].common_assetClass)
+				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits, this.domains[0].id)
 					.subscribe((result) => {
 						resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
 					}, (err) => {
