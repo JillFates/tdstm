@@ -14,7 +14,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
-import {TaskEditCreateModelHelper} from '../../model/task-edit-create-model.helper';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';

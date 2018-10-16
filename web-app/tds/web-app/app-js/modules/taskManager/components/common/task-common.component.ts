@@ -19,8 +19,9 @@ import {DateRangeSelectorComponent} from '../../../../shared/components/date-ran
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
-import {YesNoList, TaskEditCreateModelHelper} from '../../model/task-edit-create-model.helper';
+import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {YesNoList} from '../../model/task-edit-create.model';
 
 declare var jQuery: any;
 

@@ -1,22 +1,7 @@
-import {DateUtils} from '../../../shared/utils/date.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
-import {TaskDetailModel} from './task-detail.model';
-export const YesNoList = ['Yes', 'No'];
-export const PriorityList = [1, 2, 3, 4, 5];
-
-export interface ITask {
-	id: string | number;
-	originalId: string | number;
-	taskId: string | number;
-	taskNumber: string | number ,
-	category: string;
-	status: string;
-	desc: string;
-	model: {
-		id: string | number;
-		text: string;
-	}
-}
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {YesNoList, PriorityList, ITask, TaskStatus} from '../../model/task-edit-create.model';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -24,15 +9,7 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateFormat: string;
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
-	public STATUS = {
-		HOLD: 	    'Hold',
-		PLANNED:    'Planned',
-		READY:      'Ready',
-		PENDING:    'Pending',
-		STARTED:    'Started',
-		COMPLETED:  'Completed',
-		TERMINATED: 'Terminated'
-	};
+	public STATUS = TaskStatus;
 
 	constructor(userTimeZone: string, userCurrentDateFormat: string) {
 		this.model = {};
