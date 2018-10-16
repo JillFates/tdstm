@@ -19,10 +19,20 @@ class DataScriptTestHelper {
      * @param createdBy
      * @return
      */
-    DataScript createDataScript(Project project, Provider provider, Person createdBy, String etlSourceCode = '') {
+    DataScript createDataScript(Project project, Provider provider, Person createdBy, String etlSourceCode = '', Map etlData = null) {
+        DataScript existingDs
+        // Because E2E project use to insert or update at database and BE integrations just rollback
+        // first from E2E we need to check if it exists to avoid a broken integration test on creation
+        if (etlData) {
+            existingDs = DataScript.findWhere([name: etlData.name, project: project])
+            if (existingDs) {
+                return existingDs
+            }
+        }
+
         DataScript dataScript = new DataScript(
-                name: 'Test DataScript-' + RandomStringUtils.randomAlphabetic(10), 
-                description: 'Test description',
+                name: etlData.name ? etlData.name : 'Test DataScript-' + RandomStringUtils.randomAlphabetic(10),
+                description: etlData.description ? etlData.description :'Test description',
                 target: 'Test target', 
                 etlSourceCode: etlSourceCode.trim(),
                 project: project,

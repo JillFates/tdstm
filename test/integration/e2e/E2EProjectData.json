@@ -7,7 +7,7 @@
     "projectClient": "E2E Project",
     "projectCompany": "E2E Project"
   },
-  "e2eProjectToBeDeletedData": { // Used by ProjectListCleanUpSpec
+  "projectToBeDeletedData": { // Used by ProjectListCleanUpSpec
     "projectName": "QAE2E Project to be deleted",
     "projectCode": "projToDelete",
     "projectDesc": "E2E Project for automation purposes",
@@ -15,7 +15,7 @@
     "projectCompany": "E2E Project" // Make company main E2E project
   },
   // Person and User
-  "e2eUserData1": { // Main E2E user test execution
+  "userData1": { // Main E2E user test execution
     "firstName": "Primary",
     "middleName": "Middle",
     "lastName": "E2E Test User",
@@ -25,7 +25,7 @@
     ],
     "email": "e2e_test_user@e2e.com"
   },
-  "e2eUserData2": { // Main E2E user test execution
+  "userData2": { // Main E2E user test execution
     "firstName": "Secondary",
     "middleName": "Middle",
     "lastName": "E2E Test User",
@@ -35,7 +35,7 @@
     ],
     "email": "e2e_test_user2@e2e.com"
   },
-  "e2eUserData3": { // Main E2E user test execution for Projects specs
+  "userData3": { // Main E2E user test execution for Projects specs
     "firstName": "Projects",
     "middleName": "Middle",
     "lastName": "E2E Test User",
@@ -45,7 +45,7 @@
     ],
     "email": "e2e_projects_user@e2e.com"
   },
-  "e2eUserData4": { // Main E2E user test execution
+  "userData4": { // Main E2E user test execution
     "firstName": "Login",
     "middleName": "Middle",
     "lastName": "E2E Test User",
@@ -56,9 +56,32 @@
     "email": "login_e2e_test_user@e2e.com"
   },
   // Events
-  "e2eEventName1": "Buildout", // Used in several specs to create and edit
-  "e2eEventName2": "M1-Physical", // Used in several specs to create and edit
+  "eventName1": "Buildout", // Used in several specs to create and edit
+  "eventName2": "M1-Physical", // Used in several specs to create and edit
   //Bundles
-  "e2eBundleName1": "Buildout", // Used in several specs to create and edit
-  "e2eBundleName2": "M1-Phy1" // Used in several specs to create and edit
+  "bundleName1": "Buildout", // Used in several specs to create and edit
+  "bundleName2": "M1-Phy1", // Used in several specs to create and edit
+  // Providers, only name is required
+  "projectProvider": { // Used in several specs to create and edit
+    "name": "E2E Project Provider"
+  },
+  "providerToBeDeleted1": { // Used by ProviderDeletionSpec
+    "name": "E2E Provider1 to be deleted"
+  },
+  "providerToBeDeleted2": { // Used by ProviderDeletionSpec
+    "name": "E2E Provider2 to be deleted"
+  },
+  "providerToBeEdited": { // Used by ProviderEditionSpec
+    "name": "E2E Provider to be edited"
+  },
+  // ETL Scripts, only name is required
+  "etlToBeTransformedWithPastedData": { // Used by ETLScriptsDesignerTransformWithPastedDataSpec
+    "name": "E2E ETL Script to transform with pasted data"
+  },
+  "etlToBeEdited": { // Used by ETLScriptsEditionSpec
+    "name": "E2E ETL Script to be edited"
+  },
+  "etlToBeSearched": { // Used by ETLScriptsListSpec
+    "name": "E2E ETL Script to be searched"
+  }
 }
