@@ -700,316 +700,33 @@ class ModelController implements ControllerMethods {
 	*/
 	@HasPermission(Permission.ModelImport)
 	def upload() {
-		DataTransferBatch.withTransaction { status ->
-			UserLogin userLogin = securityService.userLogin
-			MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request
-			CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
-			def date = new Date()
-			def modelSyncBatch = new ModelSyncBatch(changesSince:date,createdBy:userLogin,source:"TDS")
-			if (modelSyncBatch.hasErrors() || !modelSyncBatch.save()) {
-				log.error "Unable to create ModelSyncBatch for $modelSyncBatch : ${GormUtil.allErrorsString(modelSyncBatch)}"
+		UserLogin userLogin = securityService.userLogin
+		MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request
+		CommonsMultipartFile file = (CommonsMultipartFile) mpr.getFile("file")
+		try {
+			Map results = modelService.upload(file, userLogin, params.importCheckbox)
+			if (results.error) {
+				flash.message = results.error
+				redirect(action:"importExport", params:[message:flash.message])
 			}
-			// create workbook
-			def workbook
-			def sheetNameMap = [:]
-			//get column name and sheets
-			sheetNameMap.manufacturer = ["manufacturer_id", "name", "aka", "description"]
-			sheetNameMap.model = ["model_id", "name","aka", "description", "manufacturer_id", "manufacturer_name",
-			                      "asset_type", "blade_count", "blade_label_count", "blade_rows", "sourcetds",
-			                      "power_nameplate", "power_design", "power_use", "sourcetdsversion", "use_image",
-			                      "usize", "height", "weight", "depth", "width", "layout_style", "product_line",
-			                      "model_family", "end_of_life_date", "end_of_life_status", "created_by", "updated_by",
-			                      "validated_by", "sourceurl", "model_status", "model_scope"]
-			sheetNameMap.connector = ["model_connector_id", "connector", "connector_posx", "connector_posy", "label",
-			                          "label_position", "model_id", "model_name", "connector_option", "status", "type"]
-			try {
-				workbook = new HSSFWorkbook(file.inputStream)
-				def sheetNames = WorkbookUtil.getSheetNames(workbook)
-				def sheets = sheetNameMap.keySet()
-				def missingSheets = []
-				def flag = 1
-				def sheetsLength = sheets.size()
-
-				sheets.each {
-					if (!sheetNames.contains(it)) {
-						flag = 0
-						missingSheets<< it
-					}
-				}
-				if (flag == 0) {
-					flash.message = "$missingSheets sheets not found, Please check it."
-					redirect(action:"importExport", params:[message:flash.message])
-					return
+			else {
+				if (results.manuSkipped.size() > 0 || results.modelSkipped.size() > 0 || results.connectorSkipped.size() > 0) {
+					flash.message = " File Uploaded Successfully with Manufactures:$results.manuAdded,Model:$results.modelAdded,Connectors:$results.connectorAdded records. and Manufactures:$results.manuSkipped,Model:$results.modelSkipped,Connectors:$results.connectorSkipped Records skipped Please click the Manage Batches to review and post these changes."
 				} else {
-					def manuAdded = 0
-					def manuSkipped = []
-					def sheetColumnNames = [:]
-					//check for column
-					def manuSheet = workbook.getSheet("manufacturer")
-					def manuCol = WorkbookUtil.getColumnsCount(manuSheet)
-					for (int c = 0; c < manuCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(manuSheet, c, 0)
-						sheetColumnNames.put(cellContent, c)
-					}
-					def missingHeader = checkHeader(sheetNameMap.get("manufacturer"), sheetColumnNames)
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action: "importExport", params:[message:flash.message])
-						return
-					} else {
-						def sheetrows = manuSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuilder("(")
-							for(int cols = 0; cols < manuCol; cols++) {
-								valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r, "").replace("'","\\'")+"',")
-							}
-							try{
-								jdbcTemplate.update("insert into manufacturer_sync(manufacturer_temp_id, name,aka, description, batch_id) values " +
-									valueList + modelSyncBatch.id + ')')
-								manuAdded = r
-							} catch (e) {
-								log.error "Can't insert into manufacturer_sync: $e.message"
-								manuSkipped += r + 1
-							}
-						}
-					}
-
-					/*
-					 * Import Model Information
-					 */
-					def modelSheetColumnNames = [:]
-					def modelAdded = 0
-					def modelSkipped = []
-					//check for column
-					def modelSheet = workbook.getSheet("model")
-					def modelCol = WorkbookUtil.getColumnsCount(modelSheet)
-					//def colContain = modelCol.
-					for (int c = 0; c < modelCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(modelSheet, c, 0)
-						modelSheetColumnNames.put(cellContent, c)
-					}
-					missingHeader = checkHeader(sheetNameMap.get("model"), modelSheetColumnNames)
-					def onlyTds
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action:"importExport", params:[ message:flash.message])
-						return
-					} else {
-						def sheetrows = modelSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							onlyTds = false
-							def valueList = new StringBuilder("(")
-							def manuId
-							def createdPersonId
-							def updatedPersonId
-							def validatedPersonId
-							def projectId
-							for(int cols = 0; cols < modelCol; cols++) {
-								switch(WorkbookUtil.getStringCellValue(modelSheet, cols, 0)) {
-								case "manufacturer_name" :
-									def manuName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								case "blade_count" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "blade_label_count" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "blade_rows" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "use_image" :
-									int useImage = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() != "no") {
-										useImage = 1
-									}
-									valueList.append(useImage+",")
-									break
-								case "power_nameplate" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "power_design" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "power_use" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "usize" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "sourcetds" :
-									int isTDS = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() == "tds") {
-										isTDS = 1
-										onlyTds = true
-									}
-									valueList.append(isTDS+",")
-									break
-								case "sourcetdsversion" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "height" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "weight" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "depth" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "width" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "model_scope" :
-									def modelScope = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									projectId = Project.findByProjectCode(modelScope)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "end_of_life_date" :
-									def endOfLifeDate = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									if (endOfLifeDate) {
-									valueList.append("'"+(WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+"',")
-									}else{
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									}
-									break
-								/*case "end_of_life_status" :
-									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break;*/
-								case "created_by" :
-									def createdByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									createdPersonId = Person.findByFirstName(createdByName)?.id
-									break
-								case "updated_by" :
-									def updatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									updatedPersonId = Person.findByFirstName(updatedByName)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "validated_by" :
-									def validatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r)
-									validatedPersonId = Person.findByFirstName(validatedByName)?.id
-									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r) : null)+",")
-									break
-								case "room_object" :
-									int roomObject = 0
-									if (WorkbookUtil.getStringCellValue(modelSheet, cols, r).toLowerCase() != "False") {
-										roomObject = 1
-									}
-									valueList.append(roomObject+",")
-									break
-								case "date_created":
-								case "last_modified":
-									break
-								default :
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								}
-
-							}
-							try{
-								if (manuId) {
-									if (params.importCheckbox) {
-										if (onlyTds == true) {
-											jdbcTemplate.update("insert into model_sync(model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id) values " + valueList + "$modelSyncBatch.id, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
-											modelAdded = r
-										} else {
-										// TODO : getting ArrayIndexOutOfbound exception, need to fix
-											//modelSkipped += r + 1
-										}
-									} else {
-										jdbcTemplate.update("insert into model_sync(model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id) values " + valueList + "$modelSyncBatch.id, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
-										modelAdded = r
-									}
-								} else {
-									//modelSkipped += r + 1
-								}
-							} catch (Exception e) {
-								log.error "Can't insert into model_sync: $e.message"
-								e.printStackTrace()
-								modelSkipped += r + 1
-							}
-						}
-					}
-					/*
-					 * Import Model Information
-					 */
-					def connectorSheetColumnNames = [:]
-					def connectorAdded = 0
-					def connectorSkipped = []
-					//check for column
-					def connectorSheet = workbook.getSheet("connector")
-					def connectorCol = WorkbookUtil.getColumnsCount(connectorSheet)
-					for (int c = 0; c < connectorCol; c++) {
-						def cellContent = WorkbookUtil.getStringCellValue(connectorSheet, c, 0)
-						connectorSheetColumnNames.put(cellContent, c)
-					}
-					missingHeader = checkHeader(sheetNameMap.get("connector"), connectorSheetColumnNames)
-					// Statement to check Headers if header are not found it will return Error message
-					if (missingHeader != "") {
-						flash.message = " Column Headers : $missingHeader not found, Please check it."
-						redirect(action:"importExport", params:[message:flash.message])
-						return
-					} else {
-						def sheetrows = connectorSheet.getLastRowNum()
-						for (int r = 1; r < sheetrows ; r++) {
-							def valueList = new StringBuilder("(")
-							def modelId
-							for(int cols = 0; cols < connectorCol; cols++) {
-								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0)) {
-								case "model_name" :
-									def modelName = WorkbookUtil.getStringCellValue(connectorSheet, cols, r)
-									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								case "connector_posx" :
-									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r) : null)+",")
-									break
-								case "connector_posy" :
-									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r) : null)+",")
-									break
-								default :
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
-									break
-								}
-
-							}
-							try{
-								if (modelId) {
-									jdbcTemplate.update("insert into model_connector_sync(connector_temp_id,connector,connector_posx,connector_posy,label,label_position,model_temp_id,model_name,connector_option,status,type,batch_id,model_id) values " + valueList + "$modelSyncBatch.id, $modelId)")
-									connectorAdded = r
-								} else {
-									connectorSkipped += r + 1
-								}
-							} catch (Exception e) {
-								log.error "Can't insert into model_connector_sync: $e.message"
-								connectorSkipped += r + 1
-							}
-						}
-					}
-					if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
-						flash.message = " File Uploaded Successfully with Manufactures:$manuAdded,Model:$modelAdded,Connectors:$connectorAdded records. and Manufactures:$manuSkipped,Model:$modelSkipped,Connectors:$connectorSkipped Records skipped Please click the Manage Batches to review and post these changes."
-					} else {
-						flash.message = " File uploaded successfully with Manufactures:$manuAdded,Model:$modelAdded,Connectors:$connectorAdded records. Please click the Manage Batches to review and post these changes."
-					}
-					redirect(action:"importExport", params:[message:flash.message])
-					return
+					flash.message = " File uploaded successfully with Manufactures:$results.manuAdded,Model:$results.modelAdded,Connectors:$results.connectorAdded records. Please click the Manage Batches to review and post these changes."
 				}
-			} catch(NumberFormatException ex) {
-				flash.message = ex
-				status.setRollbackOnly()
-				redirect(action:"importExport", params:[message:flash.message])
-				return
-			} catch(Exception ex) {
-				ex.printStackTrace()
-				status.setRollbackOnly()
-				flash.message = ex
 				redirect(action:"importExport", params:[message:flash.message])
 				return
 			}
+		} catch(NumberFormatException ex) {
+				flash.message = ex
+				redirect(action:"importExport", params:[message:flash.message])
+				return
+		} catch(Exception ex) {
+				ex.printStackTrace()
+				flash.message = ex
+				redirect(action:"importExport", params:[message:flash.message])
+				return
 		}
 	}
 
