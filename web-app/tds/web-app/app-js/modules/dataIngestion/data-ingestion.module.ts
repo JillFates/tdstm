@@ -2,6 +2,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Route Module
@@ -38,7 +39,6 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {DataIngestionService} from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ImportAssetsService} from '../importBatch/service/import-assets.service';
 
 @NgModule({
@@ -47,6 +47,8 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		CommonModule,
 		SharedModule,
 		FormsModule,
+		// TODO: Only for Kendo Upload at this point
+		HttpClientModule,
 		// Kendo
 		DropDownsModule,
 		GridModule,
@@ -82,11 +84,13 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 	providers: [
 		ModuleResolveService,
 		DataIngestionService,
-		ImportAssetsService, {
-		provide: HTTP_INTERCEPTORS,
-		useClass: KendoFileUploadInterceptor,
-		multi: true
-	}],
+		ImportAssetsService,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: KendoFileUploadInterceptor,
+			multi: true
+		}
+	],
 	exports: [
 		DataScriptListComponent,
 		DataScriptViewEditComponent,
