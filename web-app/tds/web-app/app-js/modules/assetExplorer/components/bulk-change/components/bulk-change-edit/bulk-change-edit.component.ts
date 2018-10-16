@@ -150,11 +150,33 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	private getDomainList(fields: any[]): IdTextItem[] {
-		const domainList = fields
-			.map((field) => field.domain.toLowerCase())
-			.map((domain): IdTextItem => ( {id: domain.toUpperCase(), text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
-
+		let domainList = [];
+		if (this.assetsDifferFromDomains()) {
+			domainList.push(this.defaultDomain);
+		} else {
+			const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass.toLowerCase();
+			domainList.push(this.defaultDomain);
+			domainList.push({id: firstAssetClass.toUpperCase(), text: `${StringUtils.toCapitalCase(firstAssetClass, false)} Fields`});
+			// 	domainList = fields
+			// 		.map((field) => field.domain.toLowerCase())
+			// 		.map((domain): IdTextItem => ( {id: domain.toUpperCase(), text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
+		}
 		return domainList;
+	}
+
+	private assetsDifferFromDomains(): boolean {
+		if (this.bulkChangeModel.selectedAssets.length <= 1) {
+			return false;
+		}
+		const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass;
+		let areDifferent = false;
+		this.bulkChangeModel.selectedAssets.forEach(asset => {
+			if (firstAssetClass !== asset.common_assetClass) {
+				areDifferent = true;
+				return;
+			}
+		});
+		return areDifferent;
 	}
 
 	private confirmUpdate(): Promise<boolean> {
@@ -189,10 +211,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 	private update(): Promise<BulkActionResult>  {
 		return new Promise((resolve, reject) =>  {
-			const edits = this.editRows.selectedValues
-				.map((row) => {
+			const edits = this.editRows.selectedValues.map((row) => {
 					const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
-
 					return {
 						fieldName: row.field.id,
 						action: row.action.id,
@@ -201,7 +221,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				});
 
 			if (this.hasAssetEditPermission()) {
-				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits)
+				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits, this.bulkChangeModel.selectedAssets[0].common_assetClass)
 					.subscribe((result) => {
 						resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
 					}, (err) => {

@@ -28,12 +28,11 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		private assetExplorerService: AssetExplorerService,
 		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
-		private translatePipe: TranslatePipe
-	) {
-		super('#bulk-change-action-component');
-		this.selectedItems = this.bulkChangeModel.selectedItems || [];
-		this.affected = this.bulkChangeModel.affected;
-		this.selectedAction = this.ACTION.Edit;
+		private translatePipe: TranslatePipe) {
+			super('#bulk-change-action-component');
+			this.selectedItems = this.bulkChangeModel.selectedItems || [];
+			this.affected = this.bulkChangeModel.affected;
+			this.selectedAction = this.ACTION.Edit;
 	}
 
 	cancelCloseDialog(bulkOperationResult: BulkActionResult): void {

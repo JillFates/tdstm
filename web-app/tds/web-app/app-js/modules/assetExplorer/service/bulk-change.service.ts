@@ -37,15 +37,14 @@ export class BulkChangeService {
 	 * @param {edits[]} edits
 	 * @returns {Observable<any>}
 	 */
-	bulkUpdate(assetIds: any[], edits: any[]): Observable<any> {
+	bulkUpdate(assetIds: any[], edits: any[], type: string): Observable<any> {
 		const defaultUserParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: []}};
-		// const defaultParams = { userParams: defaultUserParams, dataViewId: null, assetIds: [], edits: []};
-		// const payload = Object.assign({}, defaultParams, {assetIds, edits});
 		const payload = {
 			ids: assetIds,
 			dataViewId: null,
 			edits: edits,
-			userParams: defaultUserParams
+			userParams: defaultUserParams,
+			type: type
 		}
 
 		return this.http.put(this.getURL(), JSON.stringify(payload))

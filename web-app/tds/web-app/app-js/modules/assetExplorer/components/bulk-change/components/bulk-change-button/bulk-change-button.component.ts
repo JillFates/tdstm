@@ -16,6 +16,7 @@ export class BulkChangeButtonComponent {
 	@Input()
 	set bulkData(data: any) {
 		this.selectedItems = data && data.bulkItems ? data.bulkItems : null;
+		this.selectedAssets = data && data.assetsSelectedForBulk ? data.assetsSelectedForBulk : null;
 		if (this.selectedItems && this.selectedItems.length) {
 			this.showBulkActions();
 		}
