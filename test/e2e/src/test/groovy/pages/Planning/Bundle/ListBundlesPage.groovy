@@ -2,6 +2,7 @@ package pages.Planning.Bundle
 
 import geb.Page
 import modules.PlanningModule
+import modules.CommonsModule
 import org.openqa.selenium.Keys
 
 class ListBundlesPage extends Page {
@@ -19,6 +20,7 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
+        commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
 
@@ -67,6 +69,11 @@ class ListBundlesPage extends Page {
      * returns false if the parameter value and the presence of the tick do not match     *
      */
     def validatePlanningTick(value){
+        if(value=="on"){
+            return commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        } else {
+            return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
+        }
         !(value=="on" ^ tickIcon.displayed)
     }
 
