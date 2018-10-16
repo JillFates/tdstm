@@ -74,7 +74,6 @@ class ListBundlesPage extends Page {
         } else {
             return !commonsModule.verifyElementDisplayed($("span.glyphicon-ok"))
         }
-        !(value=="on" ^ tickIcon.displayed)
     }
 
 }
