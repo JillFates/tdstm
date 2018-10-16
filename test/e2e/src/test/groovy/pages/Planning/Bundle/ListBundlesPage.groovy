@@ -22,6 +22,7 @@ class ListBundlesPage extends Page {
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
 
+
         //filters section
         filterRow {$("tr.k-filter-row")}
         namefilterKind {$("span.k-select")[2]}
