@@ -1059,10 +1059,10 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: "", mode:"where"],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
 		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
-		'lastUpdated': [property: "str(AE.lastUpdated)", type: Date, namedParameter: 'lastUpdated', join: ''],
-		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
-		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
-		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
+		'lastUpdated': [property: "AE.lastUpdated", type: Date, namedParameter: 'lastUpdated', join: ''],
+		'maintExpDate': [property: "AE.maintExpDate", type: Date, namedParameter: 'maintExpDate', join: ''],
+		'purchaseDate': [property: "AE.purchaseDate", type: Date, namedParameter: 'purchaseDate', join: ''],
+		'retireDate': [property: "AE.retireDate", type: Date, namedParameter: 'retireDate', join: ''],
 		'tagAssets': [
 			property: """
 				CONCAT(

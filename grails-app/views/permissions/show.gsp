@@ -41,7 +41,7 @@
 								${permission.permissionItem}
 							</td>
 							<g:each in="${Permissions.Roles.values()}" var='role'>
-								<g:if test="${RolePermissions.findByRoleAndPermission(role.toString(), permission)}">
+								<g:if test="${permission.rolePermissions.find {it.role == role?.name()}}">
 									<td style="text-align: center;background-color:lightGreen;">Yes</td>
 								</g:if>
 								<g:else>

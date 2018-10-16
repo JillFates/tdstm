@@ -66,6 +66,7 @@ export class AssetExplorerViewGridComponent {
 	typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
+	public userTimeZone: string;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -86,6 +87,7 @@ export class AssetExplorerViewGridComponent {
 	public bulkItems: number[] = [];
 	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
+	private bulkData: any;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -95,8 +97,8 @@ export class AssetExplorerViewGridComponent {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService) {
 
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.selectedAssetsForBulk = [];
-
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
@@ -341,9 +343,9 @@ export class AssetExplorerViewGridComponent {
 			assetType: dataItem.common_assetClass
 		}
 
-		this.dialog.open(TaskCommentDialogComponent, [
+		this.dialog.extra(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel}
-		], DIALOG_SIZE.LG).then(result => {
+		], true, false).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -521,7 +523,6 @@ export class AssetExplorerViewGridComponent {
 		this.onFilter();
 	}
 
-	private bulkData: any;
 	onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
 			.then((results: any) => {

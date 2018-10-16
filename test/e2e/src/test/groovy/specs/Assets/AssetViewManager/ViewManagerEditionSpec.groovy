@@ -27,19 +27,20 @@ class ViewManagerEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor { assetsModule.goToAssetViewManager() }
+        assetsModule.goToAssetViewManager()
         at AssetViewsPage
         //Creates a view to use in validations
-        waitFor{allViewsModule.clickCreateView()}
-        waitFor{createViewModule.selectApplication()}
-        waitFor{createViewModule.clickNext()}
-        waitFor{createViewModule.clickSpecificCheckbox("Name")}
-        waitFor{createViewModule.firstSave()}
+        allViewsModule.clickCreateView()
+        createViewModule.selectApplication()
+        createViewModule.clickNext()
+        createViewModule.clickSpecificCheckbox("Name")
+        createViewModule.firstSave()
         at SaveViewPage
-        waitFor{enterName(randStr)}
-        waitFor{clickSave()}
+        enterName(randStr)
+        clickSave()
+        createViewModule.verifyButtonIsDefaultWithNoChanges()
         at ViewPage
-        waitFor{clickViewManagerBreadCrumb()}
+        clickViewManagerBreadCrumb()
     }
 
     def "1. validates user can reach'my views' "() {

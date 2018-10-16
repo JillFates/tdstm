@@ -1,3 +1,5 @@
+package net.transitionmanager.service
+
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
@@ -5,6 +7,8 @@ import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.bulk.change.BulkChangeList
+import net.transitionmanager.bulk.change.BulkChangeMoveBundle
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
@@ -14,20 +18,15 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
-import net.transitionmanager.service.BulkAssetChangeService
 import net.transitionmanager.bulk.change.BulkChangeDate
-import net.transitionmanager.bulk.change.BulkChangeNumber
+import net.transitionmanager.bulk.change.BulkChangeInteger
 import net.transitionmanager.bulk.change.BulkChangePerson
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeYesNo
-import net.transitionmanager.service.CustomDomainService
-import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.FileSystemService
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.TagAssetService
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
+import test.helper.PersonTestHelper
 
 class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	BulkAssetChangeService bulkAssetChangeService
@@ -126,63 +125,6 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 	Person person
 
 	void setup() {
-		bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
-			Project p ->
-				[
-					'tagAssets'  : [
-						control          : 'Tag',
-						bulkChangeActions: [
-							'add',
-							'clear',
-							'replace',
-							'remove '
-						]
-					],
-					retireDate   : [
-						control          : 'Date',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					externalRefId: [
-						control          : 'String',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					size         : [
-						control          : 'Number',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					appOwner     : [
-						control          : 'Date',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					validation   : [
-						control          : 'String',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-					latency      : [
-						control          : 'YesNo',
-						bulkChangeActions: [
-							'clear',
-							'replace'
-						]
-					],
-				]
-		}] as CustomDomainService
-
 		params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
 		query = """
 			SELECT AE.id
@@ -196,12 +138,14 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		] as DataviewService
 
 		bulkAssetChangeService.bulkClassMapping = [
-			(TagAsset.class.name): GroovySpy(BulkChangeTag, global: true).class,
-			(Date.class.name)    : GroovySpy(BulkChangeDate, global: true).class,
-			'String'             : GroovySpy(BulkChangeString, global: true).class,
-			(Integer.class.name) : GroovySpy(BulkChangeNumber, global: true).class,
-			(Person.class.name)  : GroovySpy(BulkChangePerson, global: true).class,
-			'YesNo'              : GroovySpy(BulkChangeYesNo, global: true).class,
+			(TagAsset.class.name)  : GroovySpy(BulkChangeTag, global: true).class,
+			(Date.class.name)      : GroovySpy(BulkChangeDate, global: true).class,
+			'String'               : GroovySpy(BulkChangeString, global: true).class,
+			(Integer.class.name)   : GroovySpy(BulkChangeInteger, global: true).class,
+			(Person.class.name)    : GroovySpy(BulkChangePerson, global: true).class,
+			'YesNo'                : GroovySpy(BulkChangeYesNo, global: true).class,
+			'List'                 : GroovySpy(BulkChangeList, global: true).class,
+			(MoveBundle.class.name): GroovySpy(BulkChangeMoveBundle, global: true).class
 		]
 
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
@@ -370,7 +314,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
 
 		then: 'an InvalidParameter Exception is thrown'
-			thrown InvalidParamException
+			thrown MissingPropertyException
 	}
 
 	void 'Test bulkChange invalid action'() {
@@ -444,13 +388,29 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping['String'].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping['String'].clear(Application.class, null, 'externalRefId', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping['String'].clear(Application.class, '', 'externalRefId', [device.id, device2.id], [:])
 	}
 
 	@See('TM-12334')
 	void 'Test numeric field bulkChange replace'() {
 		setup: 'given an edit command for replacing numeric field, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'replace', value: '1')
+			CustomDomainService backUp = bulkAssetChangeService.dataviewService.projectService.customDomainService
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+				Project p ->
+					[
+						(AssetClass.APPLICATION.name()): [
+							size: [
+								control          : 'Number',
+								bulkChangeActions: [
+									'clear',
+									'replace'
+								]
+							]
+						]
+					]
+			}] as CustomDomainService
+
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'replace', value: 1)
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -460,12 +420,30 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping[(Integer.class.name)].coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkClassMapping[(Integer.class.name)].replace(Application.class, 1, 'size', [device.id, device2.id], [:])
+		cleanup:
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = backUp
 	}
 
 	@See('TM-12334')
 	void 'Test numeric field bulkChange clear'() {
 		setup: 'given an edit command for clearing a standard field, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'clear', value: '')
+			CustomDomainService backUp = bulkAssetChangeService.dataviewService.projectService.customDomainService
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+				Project p ->
+					[
+						(AssetClass.APPLICATION.name()): [
+							size: [
+								control          : 'Number',
+								bulkChangeActions: [
+									'clear',
+									'replace'
+								]
+							]
+						]
+					]
+			}] as CustomDomainService
+
+			EditCommand editCommand = new EditCommand(fieldName: 'size', action: 'clear', value: null)
 			bulkChangeCommand.edits = [editCommand]
 
 		when: 'bulk change is called with the bulk change command'
@@ -475,6 +453,9 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping[(Integer.class.name)].coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkClassMapping[(Integer.class.name)].clear(Application.class, null, 'size', [device.id, device2.id], [:])
+
+		cleanup:
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = backUp
 	}
 
 	@See('TM-12334')
@@ -534,6 +515,154 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 		then: 'the bulkClear function is invoked, with no tags specified'
 			bulkChangeCommand.validate()
 			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].clear(Application, 'N', 'latency', [device.id, device2.id], [:])
+			1 * bulkAssetChangeService.bulkClassMapping['YesNo'].clear(Application, '', 'latency', [device.id, device2.id], [:])
 	}
+
+	void 'Test bulkChange replace moveBundle'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'moveBundle', action: 'replace', value: "${moveBundle.id}")
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping[MoveBundle.class.name].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping[MoveBundle.class.name].replace(Application, moveBundle, 'moveBundle', [device.id, device2.id], [:])
+	}
+
+	void 'Test bulkChange replace list'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			CustomDomainService backUp = bulkAssetChangeService.dataviewService.projectService.customDomainService
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+				Project p ->
+					[
+						(AssetClass.APPLICATION.name()): [
+							'custom9': [
+								control          : 'List',
+								bulkChangeActions: [
+									'clear',
+									'replace'
+								],
+								customValues     : ['one potato', 'two potato']
+							]
+						]
+					]
+			}] as CustomDomainService
+
+			EditCommand editCommand = new EditCommand(fieldName: 'custom9', action: 'replace', value: "one potato")
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping['List'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping['List'].replace(Application, editCommand.value, 'custom9', [device.id, device2.id], [:])
+		cleanup:
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = backUp
+	}
+
+
+	void 'Test bulkChange replace list invalid value'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			CustomDomainService backUp = bulkAssetChangeService.dataviewService.projectService.customDomainService
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+				Project p ->
+					[
+						(AssetClass.APPLICATION.name()): [
+							'custom9': [
+								control          : 'List',
+								bulkChangeActions: [
+									'clear',
+									'replace'
+								],
+								customValues     : ['one potato', 'two potato']
+							]
+						]
+					]
+			}] as CustomDomainService
+
+			EditCommand editCommand = new EditCommand(fieldName: 'custom9', action: 'replace', value: "one potatoes")
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping['List'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping['List'].replace(Application, editCommand.value, 'custom9', [device.id, device2.id], [:])
+		cleanup:
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = backUp
+	}
+
+
+	void 'Test bulkChange clear list'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			CustomDomainService backUp = bulkAssetChangeService.dataviewService.projectService.customDomainService
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = [fieldToBulkChangeMapping: {
+				Project p ->
+					[
+						(AssetClass.APPLICATION.name()): [
+							'custom9': [
+								control          : 'List',
+								bulkChangeActions: [
+									'clear',
+									'replace'
+								],
+								customValues     : ['one potato', 'two potato']
+							]
+						]
+					]
+			}] as CustomDomainService
+
+			EditCommand editCommand = new EditCommand(fieldName: 'custom9', action: 'clear', value: null)
+			bulkChangeCommand.edits = [editCommand]
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping['List'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping['List'].clear(Application, editCommand.value, 'custom9', [device.id, device2.id], [:])
+		cleanup:
+			bulkAssetChangeService.dataviewService.projectService.customDomainService = backUp
+	}
+
+	void 'Test bulkChange replace inList'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Discovery")
+			bulkChangeCommand.edits = [editCommand]
+			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping['InList'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping['InList'].replace(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
+	}
+
+
+	void 'Test bulkChange clear inList'() {
+		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: null)
+			bulkChangeCommand.edits = [editCommand]
+			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
+
+		when: 'bulk change is called with the bulk change command'
+			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
+
+		then: 'the bulkReplace function is invoked'
+			bulkChangeCommand.validate()
+			1 * bulkAssetChangeService.bulkClassMapping['InList'].coerceBulkValue(project, editCommand.value)
+			1 * bulkAssetChangeService.bulkClassMapping['InList'].clear(Application, editCommand.value, 'validation', [device.id, device2.id], [:])
+	}
+
+
 }
