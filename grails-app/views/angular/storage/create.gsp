@@ -10,7 +10,7 @@
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
                 aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Storage Edit</h4>
+        <h4 class="modal-title">Storage Create</h4>
     </div>
     <div class="modal-body">
         <div>
@@ -19,23 +19,23 @@
                     <tr>
                         <td colspan="2" class="dialog-container">
                             <div class="dialog">
-                                <table class="asset-edit-view">
+                                <table class="asset-create-view">
                                     <tbody>
                                     <tr>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
                                         <td colspan="3">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${asset.assetName}" ngmodel="model.asset.assetName" />
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${assetInstance.assetName}" ngmodel="model.asset.assetName" />
                                         </td>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
                                         <td colspan="3">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${asset.description}" ngmodel="model.asset.description" />
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${assetInstance.description}" ngmodel="model.asset.description" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" ngmodel="model.asset.fileFormat" tabindex="12"/>
-                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${asset.LUN}" ngmodel="model.asset.LUN" tabindex="22"/>
-                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}"  ngmodel="model.asset.supportType" tabindex="32"/>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${assetInstance.fileFormat}" ngmodel="model.asset.fileFormat" tabindex="12"/>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${assetInstance.LUN}" ngmodel="model.asset.LUN" tabindex="22"/>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}"  ngmodel="model.asset.supportType" tabindex="32"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle}"/>
                                         <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                             <kendo-dropdownlist
                                                     class="tm-input-control"
@@ -54,10 +54,10 @@
                                             </label>
                                         </td>
                                         <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${assetInstance.size}" ngmodel="model.asset.size"/>&nbsp;
                                         </td>
-                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="23" ngmodel="model.asset.externalRefId"/>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" tabindex="23" ngmodel="model.asset.externalRefId"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${assetInstance.environment}"/>
                                         <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
                                             <kendo-dropdownlist
                                                     class="tm-input-control"
@@ -67,7 +67,7 @@
                                                     [data]="model.environmentOptions">
                                             </kendo-dropdownlist>
                                         </td>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
                                         <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                             <kendo-dropdownlist
                                                     class="tm-input-control"
@@ -78,7 +78,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-
                                         <td class="label ${standardFieldSpecs.size.imp ?: ''}">Scale</td>
                                         <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                             <kendo-dropdownlist
@@ -92,22 +91,23 @@
                                             </kendo-dropdownlist>
                                         </td>
 
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${assetInstance.rateOfChange}"/>
                                         <td>
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${asset.rateOfChange}" tabindex="14" ngmodel="model.asset.rateOfChange"/>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${assetInstance.rateOfChange}" tabindex="14" ngmodel="model.asset.rateOfChange"/>
                                         </td>
                                         <td colspan="2"></td>
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"/>
                                         <td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                             <kendo-dropdownlist
+                                                    [defaultItem]="${assetInstance.constraints.validation.inList as JSON}[0]"
                                                     class="tm-input-control"
                                                     name="modelAssetValidation"
-                                                    [data]="${asset.constraints.validation.inList as JSON}"
+                                                    [data]="${assetInstance.constraints.validation.inList as JSON}"
                                                     [(ngModel)]="model.asset.validation">
                                             </kendo-dropdownlist>
                                         </td>
                                     </tr>
-                                    <g:render template="/angular/common/customEdit" model="[assetEntityInstance: filesInstance]"></g:render>
+                                    <g:render template="/angular/common/customEdit" model="[assetEntityInstance: assetInstance]"></g:render>
                                     <g:render template="/angular/common/assetTagsEdit"></g:render>
                                 </table>
                             </div>

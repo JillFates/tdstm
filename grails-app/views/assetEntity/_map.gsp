@@ -5,7 +5,7 @@
 		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
 		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)"><h4>Dependencies</h4></div>
 		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div>
-		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders showMenu" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
 				<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
@@ -307,7 +307,7 @@
 				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 					<tr>
 						<td style="width: 134px;"><span > ${dependencyStatusInst}</span></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
+						<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this);" value="${dependencyStatusInst}"/></td>
 						<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyStatusControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
 					</tr>
 				</g:each>

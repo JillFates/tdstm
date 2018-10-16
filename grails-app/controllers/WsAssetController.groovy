@@ -11,6 +11,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.BundleChangeCommand
+import net.transitionmanager.command.CloneAssetCommand
+import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
@@ -49,8 +51,8 @@ class WsAssetController implements ControllerMethods {
 	 * 	@param assetId <asset to filter the class from>
 	 */
 	@HasPermission(Permission.AssetView)
-	def checkForUniqueName(String name, Long assetId){
-
+	def checkForUniqueName(){
+		UniqueNameCommand command = populateCommandObject(UniqueNameCommand)
 		boolean unique = true
 		AssetClass assetClassSample
 		Long foundAssetId
@@ -58,8 +60,8 @@ class WsAssetController implements ControllerMethods {
 
 		List<String> errors = []
 
-		if(assetId){
-			AssetEntity sampleAssetEntity = AssetEntity.get(assetId)
+		if(command.assetId){
+			AssetEntity sampleAssetEntity = fetchDomain(AssetEntity, [id: command.assetId])
 			//check that the asset is part of the project
 			if(!securityService.isCurrentProjectId(sampleAssetEntity?.projectId)){
 				securityService.reportViolation(
@@ -76,7 +78,7 @@ class WsAssetController implements ControllerMethods {
 		} else {
 			AssetEntity assetEntity = AssetEntity.createCriteria().get {
 				and {
-					eq('assetName', name, [ignoreCase: true])
+					eq('assetName', command.name, [ignoreCase: true])
 					if(assetClassSample){
 						eq('assetClass', assetClassSample)
 					}
@@ -112,22 +114,17 @@ class WsAssetController implements ControllerMethods {
 		log.debug("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
 
 		List<String> errors = []
-		if(!assetId){
-			errors << "The asset id was missing"
-		}
-		if(!name){
-			errors << "The new asset name is missing"
-		}
-		if(dependencies &&
-				!securityService.hasPermission(Permission.AssetCloneDependencies)
-		){
+		CloneAssetCommand command = populateCommandObject(CloneAssetCommand)
+		Project project = getProjectForWs()
+
+		if (command.cloneDependencies && !securityService.hasPermission(Permission.AssetCloneDependencies)) {
 			securityService.reportViolation(
 					"Security Violation, user {} doesn't have the correct permission to Clone Asset Dependencies"
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
 		// cloning asset
-		Long clonedAssetId = assetEntityService.clone(assetId, name, dependencies, errors)
+		Long clonedAssetId = assetEntityService.clone(project, command, errors)
 		if(errors){
 			renderFailureJson(errors)
 		}else{
@@ -396,14 +393,17 @@ class WsAssetController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.AssetView)
-	def getDefaultCreateModel() {
+	def getDefaultCreateModel(String assetClass) {
 		Project project = securityService.getUserCurrentProject()
-		Map model = [:]
-		// Required for Supports On and Depends On
-		model.dependencyMap = assetEntityService.dependencyCreateMap(project)
-		model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
-		model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
-		model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
+        Map model = [:]
+        // Required for Supports On and Depends On
+        model.dependencyMap = assetEntityService.dependencyCreateMap(project)
+        model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
+        model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
+        model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
+        if (assetClass == AssetClass.DEVICE.toString()) {
+            model << assetEntityService.getCommontDeviceMapForCreateEdit(project, null)
+        }
 		renderAsJson(model)
 	}
 
@@ -485,8 +485,8 @@ class WsAssetController implements ControllerMethods {
 		// Populate the command with the data coming from the request.
 		AssetCommand command = populateCommandObject(AssetCommand)
 		// Save the new asset.
-		assetEntityService.saveOrUpdateAsset(command)
-		renderSuccessJson('Success!')
+		AssetEntity asset = assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson(['id': asset.id])
 	}
 
 	/**

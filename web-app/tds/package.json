@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "5.2.10",
     "@angular/router": "5.2.10",
     "@progress/kendo-angular-buttons": "4.0.0",
-    "@progress/kendo-angular-dateinputs": "3.0.0",
+    "@progress/kendo-angular-dateinputs": "3.4.0",
     "@progress/kendo-angular-dialog": "3.4.0",
     "@progress/kendo-angular-dropdowns": "2.1.0",
     "@progress/kendo-angular-excel-export": "1.0.7",

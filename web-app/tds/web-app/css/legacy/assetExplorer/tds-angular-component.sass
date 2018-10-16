@@ -9,6 +9,8 @@
   .dialog-container
     border: 1px solid transparent
     padding: 0
+    .required-field
+      color: $color-message-error--red
   .prop
     padding: 5px
   .prop .name
@@ -48,7 +50,6 @@
     border-collapse: separate
     border-spacing: 2px
     padding: 0
-    width: 100%
     th
       background: #CCCCCC
       color: #000
@@ -79,8 +80,7 @@
     td .label_sm
       background: none repeat scroll 0% 0% #f3f4f6
     td .tm-input-control
-      min-width: 160px
-      max-width: 160px
+      max-width: 133px
     div
       .highField
         label
@@ -103,10 +103,15 @@
       input#assetName, input#description
         width: 100%
         max-width: 100%
-      input.duration
-        width: 90%
-      input.duration + label
-        font-weight: normal
+      td.tm-input-control.duration-container
+        display: flex;
+        justify-content: space-between;
+        padding-right: 0
+        input.duration
+          width: 80%
+        input.duration + label
+          font-weight: normal
+          align-self: center
     td[data-for].Y,
     td[data-for].G,
     td[data-for].B,

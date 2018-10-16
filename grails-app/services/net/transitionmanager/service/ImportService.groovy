@@ -43,7 +43,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.transaction.annotation.Transactional
+import grails.transaction.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -1943,6 +1943,7 @@ class ImportService implements ServiceMethods {
 	 * @param params - http parameters received in the controller
 	 * @return
 	 */
+	@Transactional
 	def validateAndProcessWorkbookSheets(Project project, CommonsMultipartFile file, Map<String, String> params) {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
@@ -2775,6 +2776,7 @@ class ImportService implements ServiceMethods {
 	 * @param exportTime - The datetime that the spreadsheet was originally exported
 	 * @return The DataTransferBatch object if successfully created otherwise null
 	 */
+	@Transactional
 	private DataTransferBatch createTransferBatch(
 		Project project,
 		DataTransferSet dataTransferSet,

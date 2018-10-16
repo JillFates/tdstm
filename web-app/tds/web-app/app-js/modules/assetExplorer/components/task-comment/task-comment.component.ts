@@ -10,7 +10,8 @@ import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-column
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
-import {TaskDetailModel} from '../../../taskManager/components/detail/model/task-detail.model';
+import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
@@ -25,6 +26,10 @@ export class TaskCommentComponent implements OnInit {
 	@Input('can-edit-tasks') canEditTasks ? = false;
 	@Input('asset-name') assetName: string;
 	@Input('asset-type') assetType: string;
+	@Input('show-task') showTask: boolean;
+	@Input('show-comment') showComment: boolean;
+	@Input('asset-class') assetClass: string;
+	@Input('user-id') currentUserId: string;
 
 	// Grid Configuration for Task and Comment
 	private dataGridTaskHelper: DataGridOperationsHelper;
@@ -78,7 +83,7 @@ export class TaskCommentComponent implements OnInit {
 	 * @returns {any}
 	 */
 	public getCommentsWithFilter(): any {
-		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.resolvedBy === null);
+		let filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment' && comment.commentInstance.dateResolved === null);
 		if (this.showAllComments) {
 			filteredList = this.taskCommentsList.filter(comment => comment.commentInstance.commentType === 'comment');
 		}
@@ -91,13 +96,13 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	/**
-	 * Create a new comment
+	 * Create a task
 	 * @param comment
 	 */
 	public createComment(comment: any): void {
 		let singleCommentModel: SingleCommentModel = {
 			modal: {
-				title: 'Create Comment',
+				title: 'Create Task',
 				type: ModalType.CREATE
 			},
 			archive: false,
@@ -168,6 +173,40 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	/**
+	 * Open the Task Create
+	 * @param dataItem
+	 */
+	public openTaskCreate(): void {
+
+		let taskCreateModel: TaskDetailModel = {
+			id: this.id.toString(),
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: this.assetClass,
+				assetEntity: this.id,
+				assetName: this.assetName,
+				currentUserId: this.currentUserId
+			}
+		};
+
+		this.dialogService.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					this.createDataGrids();
+				}
+
+			}).catch(result => {
+				console.log('Cancel:', result);
+			});
+
+	}
+
+	/**
 	 * Open the Task Detail
 	 * @param dataItem
 	 */
@@ -182,18 +221,22 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], false, false).then(result => {
-			if (result) {
-				if (result.isDeleted) {
-					this.deleteTaskComment(dataItem);
-				} else if (result.commentInstance) {
-					this.openTaskDetail(result, ModalType.VIEW);
+		], false, false)
+			.then(result => {
+				if (result) {
+					if (result.isDeleted) {
+						this.deleteTaskComment(dataItem)
+							.then(() => this.createDataGrids())
+					} else if (result.commentInstance) {
+						this.openTaskDetail(result, ModalType.VIEW);
+					}
 				}
-			}
 
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+			}).catch(result => {
+				if (result) {
+					this.createDataGrids();
+				}
+			});
 	}
 
 	public reloadTasksGrid(): void {

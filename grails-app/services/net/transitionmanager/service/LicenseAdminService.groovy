@@ -5,6 +5,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 
 import net.nicholaswilliams.java.licensing.License
@@ -209,6 +210,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @return true if there is a valid license
 	 * 	 // alternative idea -- boolean isValid(projectGuid, featureName)
 	 */
+	@Transactional
 	Map getLicenseStateMap(Project project = null){
 
 		Map defaultValidState = [
@@ -417,6 +419,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @param license
 	 * @return
 	 */
+	@Transactional
 	private boolean checkLicense(DomainLicense license){
 		String id = license.id
 		String hash = license.hash
@@ -534,6 +537,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
      * @param requestNote - The note attached to the License Request
      *
      */
+	@Transactional
     DomainLicense generateRequest(String uuid, PartyGroup owner, String email, String environment, def projectId, String requestNote ){
 		DomainLicense lic
 
@@ -575,7 +579,6 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 		}
 
         if (lic.save(flush:true)) {
-			sendMailRequest(lic)
         	return lic
         } else {
         	if (lic.hasErrors()) {
@@ -678,7 +681,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @param license License Object
 	 * @return true if the mail was sent, false otherwise
 	 */
-	private boolean sendMailRequest(DomainLicense license){
+	boolean sendMailRequest(DomainLicense license){
 		log.debug("SEND License Request")
 		EmailHolder emailData = emailRequestData(license)
 
@@ -704,6 +707,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
      * @return true if the license was successfully deleted. false if the license does not exist.
      *
      */
+	@Transactional
     boolean deleteLicense(String uuid){
 		//Clear catched licenses forcing to recheck them
 		clearCachedLicenses()

@@ -59,6 +59,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'SHOW_COMMENTS': 'Show Comments',
 		'GRID': {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
@@ -209,7 +210,15 @@ export const en_DICTIONARY: Object = {
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',
 		'TASK': 'Task',
-		'TASK_MANAGER': 'Task Manager'
+		'TASK_MANAGER': 'Task Manager',
+		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
+		'EDIT': {
+			'REQUIRED_FIELD': 'Field is required',
+			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',
+			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
+			'SELECT_START_DATE': 'Select a start date',
+			'SELECT_END_DATE': 'Select an end date'
+		}
 	},
 	'NOTICE_MANAGER': {
 		'ADMIN': 'Admin',
