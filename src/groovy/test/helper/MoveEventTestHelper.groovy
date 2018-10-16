@@ -11,7 +11,7 @@ class MoveEventTestHelper {
 				project: project,
 				name: 'Test MoveEvent - ' +  RandomStringUtils.randomAlphabetic(10),
 				calcMethod: MoveEvent.METHOD_LINEAR
-		).save(failOnError: true)
+		).save(flush: true, failOnError: true)
 		return moveEvent
 	}
 
