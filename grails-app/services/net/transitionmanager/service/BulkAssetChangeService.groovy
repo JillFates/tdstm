@@ -170,7 +170,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	@NotTransactional
-	private Class getBulkClass(Class type, String fieldName, Map<String, Map> fieldMapping, Map bulkClassMapping) {
+	private Class getBulkClass(Class type, String fieldName, Map fieldMapping, Map bulkClassMapping) {
 		def property = type.declaredFields.find { it.name == fieldName } ?: type.superclass.declaredFields.find { it.name == fieldName }
 
 		if (!property) {
