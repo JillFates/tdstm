@@ -76,12 +76,14 @@ class BundleDetailPage extends Page {
      * @param origData     *
      */
     def dataIsEdited(origData){
-        def allFieldsAsExpected=true
         def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
-        allFieldsAsExpected= isPlanning()!=origData[3] && origData[0]+" Edited"== dispData[0] &&
-                origData[1]+" Edited"== dispData[1] && origData[2]== dispData[2] &&
-                startTime.text().compareTo(origData[4])== 0 &&
-                completionTime.text().compareTo(origData[5])== 0
+        assert(isPlanning()!=origData[3])
+        assert(origData[0]+" Edited"== dispData[0])
+        assert(origData[1]+" Edited"== dispData[1])
+        assert(origData[2]== dispData[2])
+        assert (startTime.text().compareTo(origData[4])== 0 )
+        assert(completionTime.text().compareTo(origData[5])==0)
+        return true
     }
 
     def validateUpdateMesage(name){

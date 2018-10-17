@@ -51,15 +51,11 @@ class EditBundlePage extends Page {
      * Adds today's date as start date and tomorrow's date as completion Date
      */
     def editDates(){
-        Date dt = new Date();
-        Calendar c = Calendar.getInstance();
-        def today =c.getTime();
-        c.add(Calendar.DATE, 1);
-        def tomorrow = c.getTime();
-        def sdf = new SimpleDateFormat("MM/dd/YYYY hh:mm aaa")
-        startTime=sdf.format(today)
-        completionTime=sdf.format(tomorrow)
-        def dateSet= [sdf.format(today),sdf.format(tomorrow)]
+        def today = new Date()
+        def tomorrow = today + 1
+        startTime = today.format("MM/dd/YYYY hh:mm aaa")
+        completionTime = tomorrow.format("MM/dd/YYYY hh:mm aaa")
+        def dateSet= [today.format("MM/dd/YYYY hh:mm aaa"),tomorrow.format("MM/dd/YYYY hh:mm aaa")]
         dateSet
     }
 }
