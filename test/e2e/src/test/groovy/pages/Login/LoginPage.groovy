@@ -40,8 +40,11 @@ class LoginPage extends Page {
     @param: numAttempts  set the number of attempts, after the 3rd one the user gets locked so we use 2 by default
      */
     def loginWrongPass(Integer numAttempts = 2) {
-        username = 'login_e2e_test_user@dev.com'
+        def log=new Login()
+        def credentials=log.readCredentials()
 
+        //On the testDataFile.txt the 6th value is the login_e2e_test_user
+        username = credentials.split(",")[6]
         while (numAttempts != 0) {
             password = CommonActions.getRandomString(8)
             submitButton.click()
