@@ -9,7 +9,6 @@ import {AssetExplorerService} from '../../../../service/asset-explorer.service';
 import {CustomDomainService} from '../../../../../fieldSettings/service/custom-domain.service';
 import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
-import {BulkChangeEditColumnsModel} from '../../model/bulk-change-edit-columns.model';
 import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
 import {BulkEditAction, IdTextItem} from '../../model/bulk-change.model';
 import {SortUtils} from '../../../../../../shared/utils/sort.utils';
@@ -34,7 +33,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	protected domains: IdTextItem[];
 	selectedItems: string[] = [];
 	commonFieldSpecs: any[] = [];
-	gridColumns: BulkChangeEditColumnsModel;
 	gridSettings: DataGridOperationsHelper;
 	affectedAssets: number;
 	editRows: {options: Array<BulkEditAction>, actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
@@ -52,7 +50,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			this.affectedAssets = this.bulkChangeModel.affected;
 			this.domains = [];
 			this.editRows = {options: [], actions: [], selectedValues: [] };
-			this.gridColumns = new BulkChangeEditColumnsModel();
 	}
 
 	ngOnInit() {

@@ -98,9 +98,13 @@ class BulkAssetChangeService implements ServiceMethods {
 	void bulkChange(Project currentProject, BulkChangeCommand bulkChange) {
 		List ids = []
 		Map queryFilter = [:]
-		Map<String, Map<String, Map>> fieldMapping
+		Map<String, Map> fieldMapping
 		List<String> validActions
 		AssetClass assetClass = AssetClass.safeValueOf(bulkChange.type)
+		// COMMON should default to DEVICE
+		if (assetClass == null) {
+			assetClass = AssetClass.safeValueOf(AssetClass.DEVICE.name())
+		}
 		Class type = getType(assetClass)
 
 		//For some reason adding the customDomainService causes a dependency loop, and crashed the app so I'm accessing it through the dataviewService
@@ -146,9 +150,6 @@ class BulkAssetChangeService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Class getType(AssetClass assetClass) {
-		if (!assetClass) {
-			assetClass = AssetClass.DEVICE
-		}
 		Class type = AssetClass.domainClassFor(assetClass)
 
 		switch (type) {
@@ -175,12 +176,12 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	@NotTransactional
-	private Class getBulkClass(Class type, AssetClass assetClass, String fieldName, Map fieldMapping, Map bulkClassMapping) {
+	private Class getBulkClass(Class type, String assetClassName, String fieldName, Map fieldMapping, Map bulkClassMapping) {
 		def property = GormUtil.getDomainPropertyType(type, fieldName)
 		String dataType = property.typeName
 
 		if (dataType == String.class.name) {
-			dataType = fieldMapping[assetClass.name()][fieldName]?.control
+			dataType = fieldMapping[assetClassName][fieldName]?.control
 		} else if (dataType == Collection.class.name && fieldName == 'tagAssets') {
 			dataType = TagAsset.class.name
 		}
@@ -205,7 +206,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 *
 	 * @return A list of actions as a map.
 	 */
-	private List<Map> generateActions(Class type, List<EditCommand> edits, AssetClass assetClass, Map<String, Map> fieldMapping, Project currentProject) {
+	private List<Map> generateActions(Class type, List<EditCommand> edits, AssetClass assetClass, Map fieldMapping, Project currentProject) {
 		def typeInstance = type.newInstance()
 		def service
 		def value
@@ -215,7 +216,7 @@ class BulkAssetChangeService implements ServiceMethods {
 
 		List<String> fields = edits.collect { EditCommand edit ->
 			field = edit.fieldName
-			service = getBulkClass(type, assetClass, field, fieldMapping, bulkClassMapping)
+			service = getBulkClass(type, assetClass.name(), field, fieldMapping, bulkClassMapping)
 			value = service.coerceBulkValue(currentProject, edit.value)
 			typeInstance[field] = value
 
