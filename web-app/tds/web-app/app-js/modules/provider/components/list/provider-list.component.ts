@@ -1,22 +1,23 @@
 import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
 import {Observable} from 'rxjs';
-import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
+import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {ProviderService} from '../../service/provider.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../model/data-script.model';
+import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../../dataIngestion/model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
+import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'provider-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/provider-list/provider-list.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/provider/components/list/provider-list.component.html',
 	styles: [`
         #btnCreateProvider { margin-left: 16px; }
 	`]
@@ -46,21 +47,18 @@ export class ProviderListComponent implements OnInit {
 
 	constructor(
 		private dialogService: UIDialogService,
-		@Inject('providers') providers: Observable<ProviderModel[]>,
 		private permissionService: PermissionService,
-		private dataIngestionService: DataIngestionService,
+		private providerService: ProviderService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
+		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private renderer: Renderer2) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
-		providers.subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-			},
-			(err) => console.log(err));
+		this.resultSet = this.route.snapshot.data['providers'];
+		this.gridData = process(this.resultSet, this.state);
+
 	}
 
 	ngOnInit() {
@@ -82,12 +80,12 @@ export class ProviderListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.dataIngestionService.filterColumn(column, this.state);
+		const root = this.providerService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		this.dataIngestionService.clearFilter(column, this.state);
+		this.providerService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
@@ -116,7 +114,7 @@ export class ProviderListComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteProvider(dataItem.id).subscribe(
+					this.providerService.deleteProvider(dataItem.id).subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -137,7 +135,7 @@ export class ProviderListComponent implements OnInit {
 	}
 
 	protected reloadData(): void {
-		this.dataIngestionService.getProviders().subscribe(
+		this.providerService.getProviders().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);

@@ -9,7 +9,7 @@ import 'rxjs/add/operator/mergeMap';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
-import { ProviderModel } from '../../model/provider.model';
+import { ProviderModel } from '../../../provider/model/provider.model';
 import { DataIngestionService } from '../../service/data-ingestion.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';

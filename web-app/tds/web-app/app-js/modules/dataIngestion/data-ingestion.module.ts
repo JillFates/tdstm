@@ -19,8 +19,6 @@ import {NumericTextBoxModule} from '@progress/kendo-angular-inputs';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
 import {DataScriptViewEditComponent} from './components/data-script-view-edit/data-script-view-edit.component';
-import {ProviderListComponent} from './components/provider-list/provider-list.component';
-import {ProviderViewEditComponent} from './components/provider-view-edit/provider-view-edit.component';
 import {DataScriptConsoleComponent} from './components/data-script-console/data-script-console.component';
 import {DataScriptEtlBuilderComponent} from './components/data-script-etl-builder/data-script-etl-builder.component';
 import {DataScriptSampleDataComponent} from './components/data-script-sample-data/data-script-sample-data.component';
@@ -67,8 +65,6 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 	declarations: [
 		DataScriptListComponent,
 		DataScriptViewEditComponent,
-		ProviderListComponent,
-		ProviderViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,
@@ -94,13 +90,10 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 	exports: [
 		DataScriptListComponent,
 		DataScriptViewEditComponent,
-		ProviderListComponent,
-		ProviderViewEditComponent,
 		CredentialViewEditComponent
 	],
 	entryComponents: [
 		DataScriptViewEditComponent,
-		ProviderViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,

@@ -8,16 +8,12 @@ import {DataIngestionService} from './service/data-ingestion.service';
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
-import {ProviderListComponent} from './components/provider-list/provider-list.component';
 import {APIActionListComponent} from './components/api-action-list/api-action-list.component';
 import {CredentialListComponent} from './components/credential-list/credential-list.component';
 
 export class DataIngestionStates {
 	public static readonly DATA_SCRIPT_LIST = {
 		url: '/datascript/list'
-	};
-	public static readonly PROVIDER_LIST = {
-		url: '/provider/list'
 	};
 	public static readonly API_ACTION_LIST = {
 		url: '/action/list'
@@ -46,28 +42,6 @@ export const DataIngestionRoute: Routes = [
 				policy: {async: 'RXWAIT'},
 				deps: [DataIngestionService],
 				resolveFn: (service: DataIngestionService) => service.getDataScripts()
-			}
-		],
-		canActivate: [AuthGuardService, ModuleResolveService]
-	},
-	// TODO: SPLIT INTO PROVIDER MODULE ONE
-	{
-		path: DataIngestionStates.PROVIDER_LIST.url,
-		data: {
-			page: {
-				title: 'DATA_INGESTION.PROVIDERS',
-				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.PROVIDERS']
-			},
-			requiresAuth: true,
-		},
-		component: ProviderListComponent,
-		resolve: [
-			{
-				token: 'providers',
-				policy: {async: 'RXWAIT'},
-				deps: [DataIngestionService],
-				resolveFn: (service: DataIngestionService) => service.getProviders()
 			}
 		],
 		canActivate: [AuthGuardService, ModuleResolveService]

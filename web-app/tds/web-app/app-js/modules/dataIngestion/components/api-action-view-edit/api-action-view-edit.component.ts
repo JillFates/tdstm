@@ -9,7 +9,7 @@ import {
 	EventReactionType,
 	EVENT_BEFORE_CALL_TEXT
 } from '../../model/api-action.model';
-import {ProviderModel} from '../../model/provider.model';
+import {ProviderModel} from '../../../provider/model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';

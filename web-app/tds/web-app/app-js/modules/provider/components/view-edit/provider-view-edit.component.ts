@@ -1,15 +1,15 @@
 import {ElementRef, Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ActionType} from '../../model/data-script.model';
+import {ActionType} from '../../../dataIngestion/model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {DataIngestionService} from '../../../dataIngestion/service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'provider-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/provider-view-edit/provider-view-edit.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/provider/components/view-edit/provider-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;

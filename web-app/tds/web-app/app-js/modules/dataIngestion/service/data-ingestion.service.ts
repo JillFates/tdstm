@@ -5,7 +5,7 @@ import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
-import {ProviderModel} from '../model/provider.model';
+import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';

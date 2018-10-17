@@ -2,7 +2,7 @@ import {Component, ViewChild, ViewChildren, HostListener, QueryList, Renderer2, 
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
-import {ProviderModel} from '../../model/provider.model';
+import {ProviderModel} from '../../../provider/model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType} from '../../../../shared/model/data-list-grid.model';
