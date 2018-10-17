@@ -1,4 +1,4 @@
-import {ModalType} from '../../../../shared/model/constants';
+import {ModalType} from '../../../shared/model/constants';
 
 export class TaskDetailModel {
 	public id?: string;

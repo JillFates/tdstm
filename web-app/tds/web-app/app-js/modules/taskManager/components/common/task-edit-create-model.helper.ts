@@ -1,21 +1,7 @@
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
-import {TaskDetailModel} from './task-detail.model';
-export const YesNoList = ['Yes', 'No'];
-export const PriorityList = [1, 2, 3, 4, 5];
-
-export interface ITask {
-	id: string | number;
-	taskId: string | number;
-	taskNumber: string | number ,
-	category: string;
-	status: string;
-	desc: string;
-	model: {
-		id: string | number;
-		text: string;
-	}
-}
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {YesNoList, PriorityList, ITask, TaskStatus} from '../../model/task-edit-create.model';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -23,6 +9,7 @@ export class TaskEditCreateModelHelper {
 	private userCurrentDateFormat: string;
 	private userCurrentDateTimeFormat: string;
 	private dataSignatureDependencyTasks: string;
+	public STATUS = TaskStatus;
 
 	constructor(userTimeZone: string, userCurrentDateFormat: string) {
 		this.model = {};
@@ -106,7 +93,7 @@ export class TaskEditCreateModelHelper {
 			comment:  '',
 			assetClass: {id: detailModel.detail.assetClass, text: ''},
 			assetClasses: [{id: '', text: ''}],
-			status: 'Ready',
+			status: this.STATUS.READY,
 			statusList: [],
 			personList: [],
 			teamList: [],
@@ -150,6 +137,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
+			apiActionInvokedAt: assetComment.apiActionInvokedAt,
+			apiActionCompletedAt: assetComment.apiActionCompletedAt,
 			title: task.modal.title,
 			workflow: detail.workflow || '',
 			workflowTransitionName: assetComment.workflowTransition && assetComment.workflowTransition.name || '',
@@ -230,8 +219,22 @@ export class TaskEditCreateModelHelper {
 	 */
 	private getTaskAdded(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
-			.filter(task => !originalTasks.find(original => original.id === task.id))
+			.filter(task => !Boolean(task.originalId))
 			.map((task, index) => (`-${index + 1}_${task.id}`));
+	}
+
+	/**
+	 * Extract only the task added by the user
+	 * @param {any[]} tasks Current task array manipulated by the user
+	 * @param {any[]} originalTasks Original task array not touched
+	 * @returns {string[]}
+	 */
+	private getTaskEdited(tasks: any[], originalTasks: any[]): string[] {
+		return tasks
+			.filter(task => Boolean(task.originalId))
+			.map((task, index) => {
+				return (`${task.originalId}_${task.id === task.originalId ? task.taskId : task.id}`)
+			});
 	}
 
 	/**
@@ -242,7 +245,7 @@ export class TaskEditCreateModelHelper {
 	 */
 	private getTaskPrevious(tasks: any[], originalTasks: any[]): string[] {
 		return tasks
-			.filter(task => originalTasks.find(original => original.id === task.id))
+			.filter(task => originalTasks.find(original => original.taskId === task.id))
 			.map((task, index) => (`${task.id}_${task.taskNumber}`));
 	}
 
@@ -298,9 +301,9 @@ export class TaskEditCreateModelHelper {
 			status: status,
 			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorList, originalPredecessorList)
-				.concat(this.getTaskPrevious(predecessorList, originalPredecessorList)),
+				.concat(this.getTaskEdited(predecessorList, originalPredecessorList)),
 			taskSuccessor: this.getTaskAdded(successorList, originalSuccessorList)
-				.concat(this.getTaskPrevious(successorList, originalSuccessorList)),
+				.concat(this.getTaskEdited(successorList, originalSuccessorList)),
 			deletedPreds: deletedItems,
 			workflowTransition: '',
 			canEdit: true, /* ? */
@@ -511,7 +514,16 @@ export class TaskEditCreateModelHelper {
 	 * @returns {ITask}
 	 */
 	addPredecessor(index: number, task: any): ITask {
-		return this.model.predecessorList[index] = this.makeTaskItem(task) ;
+		let originalId = null;
+		if (this.model.predecessorList[index]) {
+			originalId = this.model.predecessorList[index].originalId;
+		}
+
+		task = this.makeTaskItem(task);
+		task.originalId = originalId;
+
+		return this.model.predecessorList[index] = task;
+
 	}
 
 	/**
@@ -521,7 +533,15 @@ export class TaskEditCreateModelHelper {
 	 * @returns {ITask}
 	 */
 	addSuccessor(index: number, task: any): ITask {
-		return this.model.successorList[index] = this.makeTaskItem(task);
+		let originalId = null;
+		if (this.model.successorList[index]) {
+			originalId = this.model.successorList[index].originalId;
+		}
+
+		task = this.makeTaskItem(task);
+		task.originalId = originalId;
+
+		return this.model.successorList[index] = task;
 	}
 
 	/**
@@ -589,13 +609,14 @@ export class TaskEditCreateModelHelper {
 
 		return {
 			id,
+			originalId: id,
 			taskId,
 			category,
 			status,
 			taskNumber,
 			desc: description,
 			model: {
-				id,
+				id: taskId || id,
 				text: description
 			}
 		}

@@ -18,6 +18,7 @@ import { ComponentCreatorService } from '../shared/services/component-creator.se
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { PersonService } from './services/person.service';
+import { WindowService } from './services/window.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -125,6 +126,7 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 		UIPromptService,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
+		WindowService,
 		DictionaryService,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],

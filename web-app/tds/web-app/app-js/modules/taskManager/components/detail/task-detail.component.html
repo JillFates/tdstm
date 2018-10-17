@@ -306,18 +306,29 @@
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <button class="btn btn-primary pull-left" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
-                    <span  class="glyphicon glyphicon-pencil"></span>
-                    <span>Edit</span>
-                </button>
-                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
-                    <span>Close</span>
-                </button>
+                <div class="pull-left" style="display: flex;">
+                    <button class="btn btn-primary" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
+                        <i class="glyphicon glyphicon-pencil action-button"></i>
+                        <span>Edit</span>
+                    </button>
+                    <tds-task-actions
+                            (start)="onStartTask()"
+                            (done)="onDoneTask()"
+                            (invoke)="onInvoke()"
+                            (assignToMe)="onAssignToMe()"
+                            (neighborhood)="onNeighborhood()"
+                            [options]="getShowTaskActionsOptions()"
+                    ></tds-task-actions>
+                </div>
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                    <span  class="glyphicon glyphicon-trash"></span>
+                    <i class="glyphicon glyphicon-trash action-button"></i>
                     <span>Delete</span>
                 </button>
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
+                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
+                    <span>Close</span>
+                </button>
+
             </div>
         </div>
     </div>

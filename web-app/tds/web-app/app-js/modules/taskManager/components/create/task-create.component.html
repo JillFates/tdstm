@@ -10,7 +10,7 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">{{model.title}}</h4>
+                <h4 class="modal-title">Task Create</h4>
             </div>
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height create-form">
@@ -47,6 +47,7 @@
                                                         [data]="model.personList"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
+                                                        [popupSettings]="{width: 300}"
                                                         [(ngModel)]="model.assignedTo">
                                                 </kendo-dropdownlist>
                                             </td>
@@ -448,11 +449,11 @@
             <div class="modal-footer form-group-center">
                 <button class="btn btn-primary pull-left"
                         [disabled]="isFormInvalid() || !hasEditTaskPermission" (click)="onCreate()" type="button">
-                    <span  class="fa fa-fw fa-floppy-o"></span>
+                    <i  class="fa fa-fw fa-floppy-o"></i>
                     <span>Update</span>
                 </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
                     <span>Cancel</span>
                 </button>
             </div>

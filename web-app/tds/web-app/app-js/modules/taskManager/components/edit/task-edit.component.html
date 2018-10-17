@@ -10,7 +10,7 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Edit: {{model.title}}</h4>
+                <h4 class="modal-title">Task Edit</h4>
             </div>
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height">
@@ -50,6 +50,7 @@
                                                                 [data]="model.personList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
+                                                                [popupSettings]="{width: 300}"
                                                                 [(ngModel)]="model.assignedTo">
                                                         </kendo-dropdownlist>
                                                     </td>
@@ -344,7 +345,7 @@
                                         <td valign="top">
                                             <kendo-grid
                                                     *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
-                                                    class="successor-predecessor-table has-duplicated-predecessors"
+                                                    class="successor-predecessor-table has-duplicated-predecessors dependency-tasks"
                                                     [data]="dataGridTaskPredecessorsHelper.gridData"
                                                     [sort]="dataGridTaskPredecessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
@@ -391,7 +392,7 @@
                                         <td valign="top">
                                             <kendo-grid
                                                     *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
-                                                    class="successor-predecessor-table has-duplicated-successors"
+                                                    class="successor-predecessor-table has-duplicated-successors dependency-tasks"
                                                     [data]="dataGridTaskSuccessorsHelper.gridData"
                                                     [sort]="dataGridTaskSuccessorsHelper.state.sort"
                                                     [sortable]="{mode:'single'}"
@@ -493,15 +494,15 @@
             <div class="modal-footer form-group-center">
 	            <button class="btn btn-primary pull-left"
                         [disabled]="isFormInvalid() || !hasEditTaskPermission" (click)="onSave()" type="button">
-		            <span  class="fa fa-fw fa-floppy-o"></span>
+		            <i  class="fa fa-fw fa-floppy-o"></i>
 		            <span>Update</span>
 	            </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
                     <span>Cancel</span>
                 </button>
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                    <span  class="glyphicon glyphicon-trash"></span>
+                    <i  class="glyphicon glyphicon-trash action-button"></i>
                     <span>Delete</span>
                 </button>
             </div>

@@ -4,13 +4,13 @@ import {NgForm} from '@angular/forms';
 import {clone} from 'ramda';
 import {ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from './../model/task-detail.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
+import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
@@ -18,9 +18,10 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TaskNotesColumnsModel} from '../model/task-notes-columns.model';
-import {YesNoList, TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
+import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {YesNoList} from '../../model/task-edit-create.model';
 
 declare var jQuery: any;
 
@@ -81,7 +82,8 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			this.taskManagerService.getStatusList(this.model.id),
 			this.taskManagerService.getAssignedTeam(this.model.id),
 			this.taskManagerService.getStaffRoles(),
-			this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
+			this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
+			this.taskManagerService.getActionList()
 		];
 
 		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
@@ -92,12 +94,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, assetClasses, categories, events] = results;
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
 				this.model.teamList = staffRoles.map((item) => ({id: item.id, text: item.description }));
 				this.dateFormat = dateFormat;
+				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
 
 				if (assetClasses) {
 					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
