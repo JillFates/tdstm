@@ -207,9 +207,9 @@ class ETLProcessorResult {
 	 *
 	 * @return and instance of RowResult
 	 */
-	private RowResult findOrCreateCurrentRow() {
+	RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
-			reference.data.add(new RowResult(rowNum: processor.iterateIndex.pos))
+			reference.data.add(new RowResult(rowNum: processor.iterateIndex.pos, domain: reference.domain))
 			resultIndex = reference.data.size() - 1
 		}
 		return reference.data[resultIndex]
@@ -464,13 +464,15 @@ class RowResult {
 	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
+	@DoNotMarshall
+	String domain
 
 	/**
 	 * Add element to the current row data
 	 * @param element
 	 */
 	void addLoadElement(Element element){
-		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
 		this.errorCount = fieldData.errors.size()
 	}
@@ -480,7 +482,7 @@ class RowResult {
 	 * @param element
 	 */
 	void addInitElement(Element element){
-		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.init = element.init
 	}
 	/**
@@ -501,7 +503,7 @@ class RowResult {
 	 * @param findElement the find element with the warn message
 	 */
 	void addFindElement(ETLFindElement findElement){
-		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData(findElement.currentFind.fieldDefinition)
 		fieldData.addFindElement(findElement)
 
 		if (fieldData.find.results.isEmpty()) {
@@ -516,7 +518,7 @@ class RowResult {
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition)
 		fieldData.addFoundElement(foundElement)
 	}
 
@@ -540,7 +542,7 @@ class RowResult {
 	void addFindElementWarnMessage(ETLFindElement findElement) {
 		warn = true
 		errors.add(findElement.warnMessage)
-		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData(findElement.currentFind.fieldDefinition)
 		fieldData.addFindElementWarnMessage(findElement)
 	}
 
@@ -559,11 +561,11 @@ class RowResult {
 	 * @param element
 	 * @return
 	 */
-	FieldResult findOrCreateFieldData(String fieldName){
-		if(!fields.containsKey(fieldName)){
-			fields[fieldName] = new FieldResult()
+	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition){
+		if(!fields.containsKey(fieldDefinition.name)){
+			fields[fieldDefinition.name] = new FieldResult(fieldDefinition: fieldDefinition)
 		}
-		return fields[fieldName]
+		return fields[fieldDefinition.name]
 	}
 }
 
@@ -594,6 +596,8 @@ class RowResult {
 @ConfigureMarshalling
 class FieldResult {
 
+	@DoNotMarshall
+	ETLFieldDefinition fieldDefinition
 	Object originalValue
 	Object value
 	Object init

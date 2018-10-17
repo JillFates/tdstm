@@ -1169,12 +1169,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	/**
 	 * Adds a loaded element with the current domain in results.
 	 * It also removes CE (currentElement) from script context.
-	 * @param domain
 	 * @param element
 	 */
-	void addElementLoaded (ETLDomain domain, Element element) {
+	void addElementLoaded (Element element) {
 		result.loadElement(element)
-		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
+		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${selectedDomain.domain} results"
 	}
 
 	/**

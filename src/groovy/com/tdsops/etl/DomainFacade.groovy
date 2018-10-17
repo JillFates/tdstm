@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import groovy.transform.CompileStatic
+
 /**
  * A facade object to be used in ETL script using the following syntax:
  * <pre>
@@ -7,6 +9,7 @@ package com.tdsops.etl
  * </pre>
  * Where id property is the value in the current row data for the column 'id'
  */
+@CompileStatic
 class DomainFacade {
 
 	private ETLProcessorResult result
@@ -24,4 +27,9 @@ class DomainFacade {
 		Object value = result.getFieldValue(name)
 		return value
 	}
+
+	RowResult currentRowMap(){
+		return this.result.currentRow()
+	}
 }
+

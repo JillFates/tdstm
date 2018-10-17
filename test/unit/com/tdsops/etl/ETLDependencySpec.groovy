@@ -16,6 +16,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETL Current Element (CE):
@@ -59,9 +60,9 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
+				GMDEMO,
 				dataSet,
-				GroovyMock(DebugConsole),
+				debugConsole,
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -76,7 +77,6 @@ class ETLDependencySpec extends ETLBaseSpec {
 				
 					set assetResultVar with DOMAIN
 					
-					log(assetResultVar.'assetName')
 					assert assetResultVar.'assetName' == 'xraysrv01'
 					assert assetResultVar.'manufacturer' == 'Dell'
 					assert assetResultVar.'model' == 'PE2950'
@@ -88,7 +88,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 				originalValue == 'PE2950'
 				value == 'PE2950'
 				init == null
-				with (fieldDefinition, ETLFieldDefinition){
+				with(fieldDefinition, ETLFieldDefinition) {
 					name == 'model'
 					label == 'Model'
 				}
@@ -120,9 +120,9 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
+				GMDEMO,
 				dataSet,
-				GroovyMock(DebugConsole),
+				debugConsole,
 				validator)
 
 		when: 'The ETL script is evaluated'
@@ -137,7 +137,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			with (ETLProcessor.getErrorMessage(e)) {
+			with(ETLProcessor.getErrorMessage(e)) {
 				message == "${ETLProcessorException.invalidDependentParamsCommand().message} at line 6"
 				startLine == 6
 				endLine == 6
@@ -152,6 +152,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			}
 	}
 
+	@ConfineMetaClassChanges([AssetEntity, Application])
 	void 'test can create an asset for Dependency using domain command'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -161,10 +162,20 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
+				GMDEMO,
 				dataSet,
-				GroovyMock(DebugConsole),
+				debugConsole,
 				validator)
+
+		and:
+			mockDomain(Application)
+			Application.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -172,10 +183,15 @@ class ETLDependencySpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
-					extract 'name' load 'Name'
-					extract 'mfg' load 'Manufacturer'
-					extract 'model' load 'Model'
-				
+					extract 'name' load 'Name' set nameVar
+					extract 'mfg' load 'Manufacturer' set mfgVar
+					extract 'model' load 'Model' set modelVar
+					
+					find Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar and 'Model' eq modelVar into 'id'
+					elseFind Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar into 'id'
+					elseFind Device by 'Name' eq nameVar and 'Model' eq modelVar into 'id'
+					elseFind Device by 'Name' eq nameVar into 'id'
+					
 					set assetResultVar with DOMAIN
 					
 					domain Dependency with assetResultVar
@@ -185,11 +201,63 @@ class ETLDependencySpec extends ETLBaseSpec {
 		then: 'Results contains the following values'
 			with(etlProcessor.finalResult()) {
 				ETLInfo.originalFilename == fileName
-				domains.size() == 1
+				domains.size() == 2
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					fieldNames == ['assetName', 'manufacturer', 'model'] as Set
+					fieldNames == ['assetName', 'manufacturer', 'model', 'id'] as Set
 					data.size() == 1
+
+					with(data[0], RowResult) {
+						fields.size() == 4
+						assertFieldResult(fields['assetName'], 'xraysrv01', 'xraysrv01')
+						assertFieldResult(fields['manufacturer'], 'Dell', 'Dell')
+						assertFieldResult(fields['model'], 'PE2950', 'PE2950')
+						assertFieldResult(fields['id'], null, null)
+
+						with(fields['id'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Device,
+								[
+									['assetName', FindOperator.eq.name(), 'xraysrv01'],
+									['manufacturer', FindOperator.eq.name(), 'Dell'],
+									['model', FindOperator.eq.name(), 'PE2950']
+								]
+							)
+						}
+					}
+
+					with(domains[1], DomainResult) {
+						domain == ETLDomain.Dependency.name()
+						fieldNames == ['asset'] as Set
+						data.size() == 1
+						with(data[0], RowResult) {
+							fields.size() == 1
+							assertFieldResult(fields['asset'])
+
+							with(fields['asset'].find, FindResult) {
+								query.size() == 4
+								assertQueryResult(
+									query[0],
+									ETLDomain.Device,
+									[
+										['assetName', FindOperator.eq.name(), 'xraysrv01'],
+										['manufacturer', FindOperator.eq.name(), 'Dell'],
+										['model', FindOperator.eq.name(), 'PE2950']
+									]
+								)
+
+								with(fields['asset'].create){
+									it.'assetName' == 'xraysrv01'
+									it.'manufacturer' == 'Dell'
+									it.'model' == 'PE2950'
+								}
+							}
+
+						}
+
+					}
 				}
 			}
 

@@ -35,11 +35,14 @@ class ETLValueHelper {
 		Object fieldValue
 
 		switch(value){
-			case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
+			case DomainField: //DOMAIN.name // Label name or property name from fieldSpecs
 				fieldValue = ((DomainField)value).value
 				break
-			case Element:            // LocalVariable
+			case Element:      // LocalVariable
 				fieldValue = ((Element)value).value
+				break
+			case DomainFacade: // set myVar with DOMAIN.
+				fieldValue = ((DomainFacade)value).currentRowMap()
 				break
 			case SourceField:
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'
