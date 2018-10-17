@@ -42,6 +42,8 @@
 											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
 										</tdsAngular:tooltipSpan>
 									</td>
+
+                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
                                     <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
                                         <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
                                     </td>
