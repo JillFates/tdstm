@@ -12,7 +12,7 @@
 <p>It is important that you activate your account ASAP as the activation period will expire in 60 minutes from when this email was generated.
 Once the password is changed you can access the TransitionManager website with your username: ${username}</p>
 
-<p>If you have any technical problems, please contact ${supportEmail}</p>
+<p>If you have any technical problems, please contact your system administrator.</p>
 
 Regards, <br>
 TransitionManager Team
