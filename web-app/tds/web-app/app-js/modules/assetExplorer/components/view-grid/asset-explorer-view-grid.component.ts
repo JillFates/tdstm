@@ -32,6 +32,8 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetEditComponent} from '../asset/asset-edit.component';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
+import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
+import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -331,12 +333,34 @@ export class AssetExplorerViewGridComponent {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
+	protected showTask(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+		const assetModalModel: AssetModalModel = {
+			assetId: dataItem.common_id,
+			assetName: dataItem.common_assetName,
+			assetType: dataItem.common_assetClass,
+			modalType: 'TASK'
+		}
+
+		this.dialog.extra(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel}
+		], true, false).then(result => {
+			if (result) {
+				console.log('Show Task Result',  result);
+			}
+		}).catch(result => {
+			console.log(result);
+		});
+
+	}
+
 	protected showComment(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
 		const assetModalModel: AssetModalModel = {
 			assetId: dataItem.common_id,
 			assetName: dataItem.common_assetName,
-			assetType: dataItem.common_assetClass
+			assetType: dataItem.common_assetClass,
+			modalType: 'COMMENT'
 		}
 
 		this.dialog.extra(TaskCommentDialogComponent, [

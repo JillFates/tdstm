@@ -6,4 +6,5 @@ export class AssetModalModel {
 	assetType: string;
 	assetId: number;
 	assetName?: string;
+	modalType?: string;
 }
