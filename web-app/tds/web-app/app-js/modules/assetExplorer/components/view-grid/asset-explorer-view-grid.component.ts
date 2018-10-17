@@ -85,7 +85,9 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
+	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
+	private bulkData: any;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -94,7 +96,9 @@ export class AssetExplorerViewGridComponent {
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
 		private permissionService: PermissionService) {
+
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
@@ -213,7 +217,7 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 
-		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+		this.bulkCheckboxService.initializeKeysBulkItems(data.assets);
 
 		this.gridData = {
 			data: data.assets,
@@ -523,8 +527,10 @@ export class AssetExplorerViewGridComponent {
 
 	onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: number[]) => {
-				this.bulkItems = [...results];
+			.then((results: any) => {
+				this.bulkItems = [...results.selectedAssetsIds];
+				this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
 			})
 			.catch ((err) => console.log('Error:', err))
 	}
