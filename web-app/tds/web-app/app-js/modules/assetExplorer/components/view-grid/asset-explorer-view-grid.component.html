@@ -110,7 +110,8 @@
 					<span class="fa fa-fw fa-list-alt"></span>
 				</button>
 				<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
-						title="Create Task or Show Tasks">
+						title="Create Task or Show Tasks"
+						(click)="createTask(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-file-text-o"></span>
 				</button>
 				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"

@@ -34,6 +34,7 @@ import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {UserService} from '../../../../shared/services/user.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -88,6 +89,7 @@ export class AssetExplorerViewGridComponent {
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
+	private currentUser: any;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -95,7 +97,8 @@ export class AssetExplorerViewGridComponent {
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private userService: UserService) {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
@@ -115,6 +118,7 @@ export class AssetExplorerViewGridComponent {
 		}, (err) => console.log(err));
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
+		this.getCurrentUser();
 	}
 
 	private getPreferences(): Observable<any> {
@@ -289,7 +293,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	/**
-	 *
+	 * display the create asset modal
 	 */
 	protected onCreateAsset(assetEntityType: string): void {
 		if (!assetEntityType) {
@@ -354,6 +358,40 @@ export class AssetExplorerViewGridComponent {
 
 	}
 
+	/**
+	 * Open the Task Create
+	 * @param dataItem
+	 */
+	public createTask(dataItem: any, rowIndex: number): void {
+		this.highlightGridRow(rowIndex);
+		let taskCreateModel: TaskDetailModel = {
+			id: dataItem.common_id,
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: dataItem.common_assetClass,
+				assetEntity: dataItem.common_id,
+				assetName: dataItem.common_assetName,
+				currentUserId: this.currentUser.id
+			}
+		};
+
+		this.dialog.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					this.onReload();
+				}
+
+			}).catch(result => {
+			console.log('Cancel:', result);
+		});
+
+	}
+
 	protected showComment(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
 		const assetModalModel: AssetModalModel = {
@@ -397,6 +435,7 @@ export class AssetExplorerViewGridComponent {
 			{provide: SingleCommentModel, useValue: singleCommentModel}
 		], true, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
+			this.onReload();
 		}).catch(result => {
 			console.log(result);
 		});
@@ -558,5 +597,12 @@ export class AssetExplorerViewGridComponent {
 	getSelectedItemsCount(): number {
 		const allCounter = (this.gridData && this.gridData.total) || 0;
 		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
+	}
+
+	private getCurrentUser() {
+		this.userService.getUserInfo()
+			.subscribe( (user: any) => {
+				this.currentUser = user;
+			}, (error: any) => console.log(error));
 	}
 }

@@ -16,7 +16,7 @@
                 <div class="modal-body-container">
                     <!-- -->
                     <td colspan="2">
-                        <task-comment
+                        <task-comment *ngIf="assetModalModel.modalType == 'COMMENT'"
                                 [asset-id]="assetModalModel.assetId"
                                 [has-publish-permission]="true"
                                 [can-edit-comments]="true"
@@ -25,13 +25,22 @@
                                 [asset-type]="assetModalModel.assetType"
                                 [show-comment]="true">
                         </task-comment>
+                        <task-comment *ngIf="assetModalModel.modalType == 'TASK'"
+                                [asset-id]="assetModalModel.assetId"
+                                [has-publish-permission]="true"
+                                [can-edit-comments]="true"
+                                [can-edit-tasks]="true"
+                                [asset-name]="assetModalModel.assetName"
+                                [asset-type]="assetModalModel.assetType"
+                                [show-task]="true">
+                        </task-comment>
                     </td>
                 </div>
             </div>
             <div class="modal-footer form-group-center">
                 <button (click)="cancelCloseDialog()"
                         type="button" class="btn btn-default pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
+                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}
                 </button>
             </div>
         </div>
