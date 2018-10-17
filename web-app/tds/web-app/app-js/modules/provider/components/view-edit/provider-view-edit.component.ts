@@ -3,9 +3,9 @@ import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../../dataIngestion/model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
-import {DataIngestionService} from '../../../dataIngestion/service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {ProviderService} from '../../service/provider.service';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -33,7 +33,7 @@ export class ProviderViewEditComponent implements OnInit {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService) {
+		private providerService: ProviderService) {
 
 		this.providerModel = Object.assign({}, this.originalModel);
 		this.modalTitle = this.getModalTitle(this.modalType);
@@ -45,7 +45,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 * Create Edit a Provider
 	 */
 	protected onSaveProvider(): void {
-		this.dataIngestionService.saveProvider(this.providerModel).subscribe(
+		this.providerService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
 			},
@@ -62,7 +62,7 @@ export class ProviderViewEditComponent implements OnInit {
 				}
 				if (term && term !== '') {
 					this.providerModel.name = this.providerModel.name.trim();
-					this.dataIngestionService.validateUniquenessProviderByName(this.providerModel).subscribe(
+					this.providerService.validateUniquenessProviderByName(this.providerModel).subscribe(
 						(result: any) => {
 							this.isUnique = result.isUnique;
 						},
@@ -127,7 +127,7 @@ export class ProviderViewEditComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteProvider(this.providerModel.id).subscribe(
+					this.providerService.deleteProvider(this.providerModel.id).subscribe(
 						(result) => {
 							this.activeDialog.close(result);
 						},

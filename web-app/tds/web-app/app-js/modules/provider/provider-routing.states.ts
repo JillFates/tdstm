@@ -21,9 +21,9 @@ export const DataIngestionRoute: Routes = [
 		path: ProviderStates.PROVIDER_LIST.url,
 		data: {
 			page: {
-				title: 'DATA_INGESTION.PROVIDERS',
+				title: 'PROVIDERS.PROVIDERS',
 				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.PROVIDERS']
+				menu: ['GLOBAL.PROJECT', 'PROVIDERS.PROVIDERS']
 			},
 			requiresAuth: true,
 		},

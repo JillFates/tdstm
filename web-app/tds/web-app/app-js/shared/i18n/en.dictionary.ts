@@ -30,6 +30,7 @@ export const en_DICTIONARY: Object = {
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
+		'PROJECT': 'Project',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
@@ -106,6 +107,11 @@ export const en_DICTIONARY: Object = {
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
 	},
+	'PROVIDERS': {
+		'CREATE_PROVIDER': 'Create Provider',
+		'PROVIDER': 'Provider',
+		'PROVIDERS': 'Providers',
+	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
 		'API_ACTIONS': 'API Actions',
@@ -114,11 +120,9 @@ export const en_DICTIONARY: Object = {
 		'ETL_SCRIPTS': 'ETL Scripts',
 		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
-		'PROVIDERS': 'Providers',
 		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREATE_DATA_SCRIPT': 'Create DataScript',
 		'CREATE_ETL_SCRIPT': 'Create ETL Script',
-		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
 		'CREDENTIALS': 'Credentials',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
