@@ -84,4 +84,12 @@ class CommonActions {
     }
 
     static randomCharNumbers = 5
+
+    /*Given an integer with the biggest possible number you might want, this method
+      returns a random number in between. It will NEVER return 0.
+      @params: maxNumber    int with the upper limit of the random number you want
+    */
+    static getRandomNumber(maxNumber){
+        Math.abs(new Random().nextInt() % maxNumber) + 1
+    }
 }
