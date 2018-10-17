@@ -417,6 +417,11 @@ class UrlMappings {
 			action = [GET:"demoFailed"]
 		}
 
+		"/ws/user" {
+			controller = "wsUser"
+			action = [GET: "getUser"]
+		}
+
 		"/ws/user/preferences/$id" {
 			controller = "wsUser"
 			action = [GET:"preferences"]
