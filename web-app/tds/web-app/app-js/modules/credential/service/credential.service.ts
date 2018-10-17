@@ -1,56 +1,28 @@
 import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Headers, Http, RequestOptions, Response} from '@angular/http';
+import {Headers, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
-import {DataScriptModel, DataScriptMode, SampleDataModel} from '../../dataIngestion/model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
-import {APIActionModel, APIActionParameterModel} from '../../dataIngestion/model/api-action.model';
-import {AgentModel, AgentMethodModel} from '../../dataIngestion/model/agent.model';
+import {APIActionModel} from '../../dataIngestion/model/api-action.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
-import {DOMAIN} from '../../../shared/model/constants';
-import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
-import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
 export class CredentialService {
 
-	private dataDefaultUrl = '../ws';
-	private jobProgressUrl = '../ws/progress';
-	private dataApiActionUrl = '../ws/apiAction';
 	private readonly dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
-	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
-	private ETLScriptUploadTextURL = '../ws/fileSystem/uploadTextETLDesigner';
-	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
-	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}&rootNode={3}');
-	private readonly GET_ETL_SCRIPT_BY_ID_URL = this.dataIngestionUrl.concat('/datascript/{0}');
 
 	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
-	}
-
-	getDataScripts(): Observable<DataScriptModel[]> {
-		return this.http.get(`${this.dataIngestionUrl}/datascript/list`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
-				dataScriptModels.forEach((r) => {
-					r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT);
-					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
-				});
-				return dataScriptModels;
-			})
-			.catch((error: any) => error.json());
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
@@ -63,30 +35,6 @@ export class CredentialService {
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getAPIActions(): Observable<APIActionModel[]> {
-		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
-			.map((res: Response) => {
-				let result = res.json();
-				let dataScriptModels = result && result.status === 'success' && result.data;
-				dataScriptModels.forEach((model) => {
-					this.transformApiActionModel(model);
-				});
-				return dataScriptModels;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getAPIAction(id: number): Observable<APIActionModel> {
-		return this.http.get(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
-				this.transformApiActionModel(model);
-				return model;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -116,14 +64,6 @@ export class CredentialService {
 		} else {
 			APIActionModel.createBasicReactions(model);
 		}
-	}
-
-	getAPIActionEnums(): Observable<any> {
-		return this.http.get(`${this.dataApiActionUrl}/enums`)
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
 	}
 
 	getCredentials(): Observable<CredentialModel[]> {
@@ -179,247 +119,6 @@ export class CredentialService {
 			.catch((error: any) => error.json());
 	}
 
-	/**
-	 * Validate and wrap the content of the Parameters inside the Model and creates and observable from it.
-	 * @param {APIActionModel} model
-	 * @returns {Observable<APIActionParameterModel[]>}
-	 */
-	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
-		return new Observable(observer => {
-			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
-				let parameterList = JSON.parse(model.methodParams);
-				parameterList.forEach( (param) => {
-					if (param.property && param.property.field) {
-						param.property = param.property.field;
-					}
-					if (param.context === 'ASSET') {
-						param.context = DOMAIN.COMMON;
-					}
-					delete param.sourceFieldList;
-					delete param.currentFieldList;
-				});
-
-				observer.next(parameterList);
-			}
-			observer.complete();
-		});
-	}
-
-	/**
-	 * Get Sample Data of a File by passing the FileName to the server
-	 * @param {number} id
-	 * @param {string} fileName
-	 * @param {string} originalFileName
-	 * @returns {Observable<SampleDataModel>}
-	 */
-	getSampleData(id: number, fileName: string, originalFileName = '', rootNode: string): Observable<SampleDataModel> {
-		return this.http.get(this.GET_SAMPLE_DATA_URL
-			.replace('{0}', id.toString())
-			.replace('{1}', fileName)
-			.replace('{2}', originalFileName)
-			.replace('{3}', rootNode))
-			.map((res: Response) => {
-				let result = res.json();
-				let data: any = (result && result.status === 'success' && result.data);
-				let columns: any = [];
-				let sampleDataModel: SampleDataModel;
-				if (result.status === ApiResponseModel.API_ERROR && result.errors) {
-					sampleDataModel = {
-						errors: result.errors
-					};
-					return sampleDataModel;
-				}
-				if (data.config) {
-					for (let property in data.config) {
-						if (data.config.hasOwnProperty(property)) {
-							const label = data.config[property].property;
-							let column = {
-								label,
-								property: label,
-								type: data.config[property].type,
-								width: 140
-							};
-							columns.push(column);
-						}
-					}
-					sampleDataModel = new SampleDataModel(columns, data.rows);
-					sampleDataModel.gridHeight = 300;
-				}
-				return sampleDataModel;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
-		return this.http.get(`${this.dataApiActionUrl}/connector/${agentId}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let agentMethodModel = new Array<AgentMethodModel>();
-				for (let property in result) {
-					if (result.hasOwnProperty(property)) {
-						agentMethodModel.push({
-							id: result[property].apiMethod,
-							name: result[property].name,
-							description: result[property].description,
-							endpointUrl: result[property].endpointUrl,
-							docUrl: result[property].docUrl,
-							producesData: (result[property].producesData === 1),
-							polling: {
-								frequency: {
-									value: ((result[property].pollingInterval) ? result[property].pollingInterval : 0),
-									interval: INTERVAL.SECONDS
-								},
-								lapsedAfter: {
-									value: DateUtils.convertInterval({
-										value: ((result[property].pollingLapsedAfter) ? result[property].pollingLapsedAfter : 0),
-										interval: INTERVAL.SECONDS
-									}, INTERVAL.MINUTES),
-									interval: INTERVAL.MINUTES
-								},
-								stalledAfter: {
-									value: DateUtils.convertInterval({
-										value: ((result[property].pollingStalledAfter) ? result[property].pollingStalledAfter : 0),
-										interval: INTERVAL.SECONDS
-									}, INTERVAL.MINUTES),
-									interval: INTERVAL.MINUTES
-								}
-							},
-							methodParams: result[property].params,
-							script: result[property].script,
-							httpMethod: result[property].httpMethod
-						});
-					}
-				}
-				result = agentMethodModel;
-				return result;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
-		let postRequest = {
-			name: model.name,
-			description: model.description,
-			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
-			providerId: model.provider.id,
-			etlSourceCode: model.etlSourceCode
-		};
-		if (!model.id) {
-			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
-					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
-					return dataItem;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
-	}
-
-	saveProvider(model: ProviderModel): Observable<ProviderModel> {
-		let postRequest = {
-			name: model.name,
-			description: model.description,
-			comment: model.comment
-		};
-		if (!model.id) {
-			return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			return this.http.put(`${this.dataIngestionUrl}/provider/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
-	}
-
-	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
-		let postRequest: any = {
-			name: model.name,
-			description: model.description,
-			provider: { id: model.provider.id },
-			apiCatalog: { id: model.agentClass.id },
-			connectorMethod: model.agentMethod.id,
-			httpMethod: model.httpMethod,
-			endpointUrl: model.endpointUrl,
-			docUrl: model.docUrl,
-			producesData: (model.producesData) ? 1 : 0,
-			isPolling: (model.isPolling) ? 1 : 0,
-			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
-			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
-			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
-		};
-
-		let reaction = {
-			'STATUS': model.eventReactions[0].value,
-			'SUCCESS': model.eventReactions[1].value,
-			'DEFAULT': model.eventReactions[2].value,
-			'ERROR': model.eventReactions[3].value,
-			'FAILED': model.eventReactions[4].value,
-			'LAPSED': model.eventReactions[5].value,
-			'STALLED': model.eventReactions[6].value,
-			'PRE': model.eventReactions[7].value,
-			'FINAL': model.eventReactions[8].value
-		};
-
-		postRequest['reactionScripts'] = JSON.stringify(reaction);
-
-		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
-
-		if (parameterList && parameterList.length > 0) {
-			let requestParameterListData = R.clone(parameterList);
-			requestParameterListData.forEach( (param) => {
-				if (param.fieldName && param.fieldName.field) {
-					param.fieldName = param.fieldName.field;
-				}
-				if (param.context && param.context.assetClass) {
-					param.context = param.context.assetClass;
-				}
-				if (param.context === DOMAIN.COMMON) {
-					param.context = 'ASSET';
-				}
-				delete param.sourceFieldList;
-				delete param.currentFieldList;
-			});
-			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
-		}
-
-		if (model.credential && model.credential.id && model.credential.id !== 0) {
-			postRequest.credential = { id: model.credential.id };
-		}
-
-		if (!model.id) {
-			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
-					return dataItem;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			postRequest.version = model.version;
-			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
-	}
-
 	saveCredential(model: CredentialModel): Observable<CredentialModel> {
 
 		let postRequest: any = {
@@ -469,44 +168,6 @@ export class CredentialService {
 		}
 	}
 
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
-		let postRequest = {
-			providerId: model.provider.id,
-			name: model.name
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.isUnique;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
-		let postRequest = {};
-		if (model.id) {
-			postRequest['providerId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateCode(scripts: any): Observable<any> {
-		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	/**
 	 * Validate if the Authentication meets the requirements
 	 * @param {number} credentialId
@@ -548,92 +209,11 @@ export class CredentialService {
 			.catch((error: any) => error.json());
 	}
 
-	/**
-	 * Validate if the current DataScript is being or not used somewhere
-	 * @param {number} id
-	 * @returns {Observable<string>}
-	 */
-	validateDeleteScript(id: number): Observable<string> {
-		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteDataScript(id: number): Observable<string> {
-		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteProvider(id: number): Observable<string> {
-		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteAPIAction(id: number): Observable<string> {
-		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	deleteCredential(id: number): Observable<string> {
 		return this.http.delete(`${this.credentialUrl}/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	saveScript(id: number, script: string): Observable<any> {
-		let postRequest = {
-			id: id,
-			script: script
-		};
-		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success';
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getETLScript(id: number): Observable<ApiResponseModel> {
-		return this.http.get(this.GET_ETL_SCRIPT_BY_ID_URL.replace('{0}', id.toString()) )
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
-	/**
-	 * POST - this will create a progress job for the test script process.
-	 * @param {string} script
-	 * @param {string} filename
-	 * @returns {Observable<any>}
-	 */
-	testScript(script: string, filename: string): Observable<ApiResponseModel> {
-		let postRequest = {
-			script: script,
-			filename: filename
-		};
-		return this.http.post(`${this.dataScriptUrl}/initiateTestScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let response = res.json();
-				return response;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -650,56 +230,10 @@ export class CredentialService {
 			.catch((error: any) => error.json());
 	}
 
-	uploadText(content: string, extension: string): Observable<any> {
-		let postRequest = {
-			content: content,
-			extension: extension
-		};
-		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
-	uploadETLScriptFileText(content: string, extension: string): Observable<any> {
-		let postRequest = {
-			content: content,
-			extension: extension
-		};
-		return this.http.post(this.ETLScriptUploadTextURL, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
 		const headers = new Headers({});
 		const options = new RequestOptions({ headers: headers });
 		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
-			})
-			.catch((error: any) => error.json());
-	}
-
-	uploadETLScriptFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.ETLScriptUploadURL, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
-			})
-			.catch((error: any) => error.json());
-	}
-
-	uploadAssetImportFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.assetImportUploadURL, formdata, options)
 			.map((res: Response) => {
 				let response = res.json().data;
 				return new HttpResponse({status: 200, body: { data : response } });
@@ -811,15 +345,4 @@ export class CredentialService {
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
 	}
 
-	/**
-	 * GET - Gets any job current progresss based on progressKey used as a unique job identifier.
-	 * @param {string} progressKey
-	 * @returns {Observable<ApiResponseModel>}
-	 */
-	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
-		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
-	}
 }

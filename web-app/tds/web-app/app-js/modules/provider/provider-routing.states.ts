@@ -21,9 +21,9 @@ export const ProviderRoute: Routes = [
 		path: ProviderStates.PROVIDER_LIST.url,
 		data: {
 			page: {
-				title: 'PROVIDERS.PROVIDERS',
+				title: 'PROVIDER.PROVIDERS',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'PROVIDERS.PROVIDERS']
+				menu: ['GLOBAL.PROJECT', 'PROVIDER.PROVIDERS']
 			},
 			requiresAuth: true,
 		},

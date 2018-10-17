@@ -21,9 +21,9 @@ export const CredentialRoute: Routes = [
 		path: CredentialStates.CREDENTIAL_LIST.url,
 		data: {
 			page: {
-				title: 'DATA_INGESTION.CREDENTIALS',
+				title: 'CREDENTIAL.CREDENTIALS',
 				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.CREDENTIALS']
+				menu: ['GLOBAL.PROJECT', 'CREDENTIAL.CREDENTIALS']
 			},
 			requiresAuth: true,
 		},

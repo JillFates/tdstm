@@ -107,7 +107,12 @@ export const en_DICTIONARY: Object = {
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
 	},
-	'PROVIDERS': {
+	'CREDENTIAL': {
+		'CREATE_CREDENTIAL': 'Create Credential',
+		'CREDENTIAL': 'Credential',
+		'CREDENTIALS': 'Credentials',
+	},
+	'PROVIDER': {
 		'CREATE_PROVIDER': 'Create Provider',
 		'PROVIDER': 'Provider',
 		'PROVIDERS': 'Providers',
@@ -120,7 +125,6 @@ export const en_DICTIONARY: Object = {
 		'ETL_SCRIPTS': 'ETL Scripts',
 		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
-		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREATE_DATA_SCRIPT': 'Create DataScript',
 		'CREATE_ETL_SCRIPT': 'Create ETL Script',
 		'CREATE_ACTION': 'Create Action',
