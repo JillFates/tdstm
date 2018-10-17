@@ -1,14 +1,14 @@
-import {CredentialModel} from '../../credential/model/credential.model';
+import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
-import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
+import {DataScriptModel, DataScriptMode, SampleDataModel} from '../../dataIngestion/model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
-import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
-import {AgentModel, AgentMethodModel} from '../model/agent.model';
-import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../../credential/model/credential.model';
+import {APIActionModel, APIActionParameterModel} from '../../dataIngestion/model/api-action.model';
+import {AgentModel, AgentMethodModel} from '../../dataIngestion/model/agent.model';
+import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
@@ -19,11 +19,8 @@ import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
-export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
-export const PROGRESSBAR_FAIL_STATUS = 'Failed';
-
 @Injectable()
-export class DataIngestionService {
+export class CredentialService {
 
 	private dataDefaultUrl = '../ws';
 	private jobProgressUrl = '../ws/progress';

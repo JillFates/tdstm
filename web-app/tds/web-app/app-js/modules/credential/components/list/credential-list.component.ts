@@ -1,9 +1,9 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
-import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {CredentialService} from '../../service/credential.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -11,19 +11,19 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
 import {
 	COLUMN_MIN_WIDTH,
-	Flatten,
 	ActionType,
 	BooleanFilterData,
 	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
-import {CredentialViewEditComponent} from '../credential-view-edit/credential-view-edit.component';
+import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'credential-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/credential-list/credential-list.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/credential/components/list/credential-list.component.html',
 	styles: [`
 		#btnCreate { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }
@@ -56,20 +56,16 @@ export class CredentialListComponent implements OnInit {
 	public dateFormat = '';
 
 	constructor(
+		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
-		@Inject('credentials') credentials: Observable<CredentialModel[]>,
 		private permissionService: PermissionService,
-		private dataIngestionService: DataIngestionService,
+		private credentialService: CredentialService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService) {
-			this.state.take = this.pageSize;
-			this.state.skip = this.skip;
-			credentials
-			.subscribe((result) => {
-					this.resultSet = result;
-					this.gridData = process(this.resultSet, this.state);
-				},
-				(err) => console.log(err));
+		this.state.take = this.pageSize;
+		this.state.skip = this.skip;
+		this.resultSet = this.route.snapshot.data['credentials'];
+		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
@@ -91,12 +87,12 @@ export class CredentialListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.dataIngestionService.filterColumn(column, this.state);
+		const root = this.credentialService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		this.dataIngestionService.clearFilter(column, this.state);
+		this.credentialService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
@@ -115,7 +111,7 @@ export class CredentialListComponent implements OnInit {
 	 */
 	protected onEdit(dataItem: any): void {
 		let credential: CredentialModel = dataItem;
-		this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+		this.credentialService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
 			this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
 		}, err => console.log(err));
 	}
@@ -128,7 +124,7 @@ export class CredentialListComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Confirm deletion of ' + dataItem.name + ' credential?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteCredential(dataItem.id).subscribe(
+					this.credentialService.deleteCredential(dataItem.id).subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -145,14 +141,14 @@ export class CredentialListComponent implements OnInit {
 		if (event.columnIndex > 0) {
 			let credential: CredentialModel = event['dataItem'] as CredentialModel;
 			this.selectRow(credential.id);
-			this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+			this.credentialService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
 				this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
 			}, err => console.log(err));
 		}
 	}
 
 	protected reloadData(): void {
-		this.dataIngestionService.getCredentials().subscribe(
+		this.credentialService.getCredentials().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -169,7 +165,7 @@ export class CredentialListComponent implements OnInit {
 	}
 
 	private reloadItem(originalModel: CredentialModel): void {
-		this.dataIngestionService.getCredential(originalModel.id).subscribe( (response: CredentialModel) => {
+		this.credentialService.getCredential(originalModel.id).subscribe( (response: CredentialModel) => {
 			Object.assign(originalModel, response);
 		}, err => console.log(err));
 	}

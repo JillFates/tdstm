@@ -9,7 +9,6 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
 import {APIActionListComponent} from './components/api-action-list/api-action-list.component';
-import {CredentialListComponent} from './components/credential-list/credential-list.component';
 
 export class DataIngestionStates {
 	public static readonly DATA_SCRIPT_LIST = {
@@ -17,9 +16,6 @@ export class DataIngestionStates {
 	};
 	public static readonly API_ACTION_LIST = {
 		url: '/action/list'
-	};
-	public static readonly CREDENTIAL_LIST = {
-		url: '/credential/list'
 	};
 }
 
@@ -67,29 +63,8 @@ export const DataIngestionRoute: Routes = [
 			}
 		],
 		canActivate: [AuthGuardService, ModuleResolveService]
-	},
-	// TODO: SPLIT INTO CREDENTIALS MODULE ONE
-	{
-		path: DataIngestionStates.CREDENTIAL_LIST.url,
-		data: {
-			page: {
-				title: 'DATA_INGESTION.CREDENTIALS',
-				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.CREDENTIALS']
-			},
-			requiresAuth: true,
-		},
-		component: CredentialListComponent,
-		resolve: [
-			{
-				token: 'credentials',
-				policy: {async: 'RXWAIT'},
-				deps: [DataIngestionService],
-				resolveFn: (service: DataIngestionService) => service.getCredentials()
-			}
-		],
-		canActivate: [AuthGuardService, ModuleResolveService]
 	}
+
 ];
 
 @NgModule({

@@ -105,20 +105,20 @@ export enum AUTH_METHODS {
 	COOKIE = 'Cookie Session',
 	HEADER = 'Header Session',
 	JWT = 'JSON Web Tokens'
-};
+}
 
 export enum ENVIRONMENT {
 	DEVELOPMENT = 'Development',
 	OTHER = 'Other',
 	PRODUCTION = 'Production',
 	SANDBOX = 'Sandbox'
-};
+}
 
 export enum HTTP_METHOD {
 	POST = 'POST',
 	GET = 'GET',
 	PUT = 'PUT'
-};
+}
 
 export enum CREDENTIAL_STATUS {
 	ACTIVE = 'Active',

@@ -3,7 +3,7 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {CredentialService} from '../../service/credential.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType} from '../../../../shared/model/data-list-grid.model';
 import {KEYSTROKE} from '../../../../shared/model/constants';
@@ -18,7 +18,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'credential-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/credential-view-edit/credential-view-edit.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/credential/components/view-edit/credential-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -82,7 +82,7 @@ export class CredentialViewEditComponent {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService,
+		private credentialService: CredentialService,
 		private renderer: Renderer2) {
 
 		// Sub Objects are not being created, just copy
@@ -104,7 +104,7 @@ export class CredentialViewEditComponent {
 	 * Get the List of Providers
 	 */
 	private getProviders(): void {
-		this.dataIngestionService.getProviders().subscribe(
+		this.credentialService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.providerList.push({ id: 0, name: 'Select...' });
@@ -120,7 +120,7 @@ export class CredentialViewEditComponent {
 	 * Get from the Server all Enums and do the Mapping by converting the Enums into Arrays of Native (String) Values
 	 */
 	private getCredentialEnumsConfig(): void {
-		this.dataIngestionService.getCredentialEnumsConfig().subscribe(
+		this.credentialService.getCredentialEnumsConfig().subscribe(
 			(result: any) => {
 				this.environmentList = Object.keys(result['environment']).map(type => {
 					return result['environment'][type];
@@ -191,7 +191,7 @@ export class CredentialViewEditComponent {
 	 * Createm Save or Update the Credential forom the model
 	 */
 	private saveCredential(): void {
-		this.dataIngestionService.saveCredential(this.credentialModel).subscribe(
+		this.credentialService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
 				if (result && result.id) {
 					this.activeDialog.close(result);
@@ -256,7 +256,7 @@ export class CredentialViewEditComponent {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteCredential(this.credentialModel.id).subscribe(
+					this.credentialService.deleteCredential(this.credentialModel.id).subscribe(
 						(result) => {
 							this.activeDialog.dismiss(result);
 						},
@@ -266,7 +266,7 @@ export class CredentialViewEditComponent {
 	}
 
 	protected verifyCode(operationStatusModel: OperationStatusModel): void {
-		this.dataIngestionService.validateAuthentication(this.credentialModel.id).subscribe(
+		this.credentialService.validateAuthentication(this.credentialModel.id).subscribe(
 			(result: any) => {
 				if (!result) {
 					operationStatusModel.state = this.checkActionModel.INVALID;
@@ -290,7 +290,7 @@ export class CredentialViewEditComponent {
 	 */
 	private validateExpressionCheck(): Observable<any> {
 		return new Observable(observer => {
-			this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
+			this.credentialService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
 				(result: any) => {
 					this.validExpressionResult = result;
 					observer.next(result);

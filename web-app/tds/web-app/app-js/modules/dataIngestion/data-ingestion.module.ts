@@ -27,10 +27,6 @@ import {APIActionViewEditComponent} from './components/api-action-view-edit/api-
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 import {PopupPollingComponent} from './components/popups/popup-polling.component';
 import {PopupProvidesDataComponent} from './components/popups/popup-provides-data.component';
-import {PopupSessionAuthenticationNameComponent} from './components/popups/popup-session-authentication-name.component';
-import {CredentialListComponent} from './components/credential-list/credential-list.component';
-import {CredentialViewEditComponent} from './components/credential-view-edit/credential-view-edit.component';
-import {PopupValidateExpressionComponent} from './components/popups/popup-validate-expression.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -71,11 +67,7 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		APIActionListComponent,
 		APIActionViewEditComponent,
 		PopupPollingComponent,
-		PopupProvidesDataComponent,
-		PopupValidateExpressionComponent,
-		PopupSessionAuthenticationNameComponent,
-		CredentialListComponent,
-		CredentialViewEditComponent
+		PopupProvidesDataComponent
 	],
 	providers: [
 		ModuleResolveService,
@@ -89,16 +81,14 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 	],
 	exports: [
 		DataScriptListComponent,
-		DataScriptViewEditComponent,
-		CredentialViewEditComponent
+		DataScriptViewEditComponent
 	],
 	entryComponents: [
 		DataScriptViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,
-		APIActionViewEditComponent,
-		CredentialViewEditComponent
+		APIActionViewEditComponent
 	]
 })
 

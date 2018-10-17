@@ -15,7 +15,7 @@ export class ProviderStates {
 	};
 }
 
-export const DataIngestionRoute: Routes = [
+export const ProviderRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: ProviderStates.PROVIDER_LIST.url},
 	{
 		path: ProviderStates.PROVIDER_LIST.url,
@@ -37,7 +37,7 @@ export const DataIngestionRoute: Routes = [
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(DataIngestionRoute)]
+	imports: [RouterModule.forChild(ProviderRoute)]
 })
 
 export class ProviderRouteModule {
