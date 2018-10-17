@@ -177,8 +177,22 @@ class ProviderService implements ServiceMethods {
      * @param targetProject  The project to which the new tags will be associated.
      */
     Provider cloneProvider(Provider sourceProvider, Project targetProject) {
-        Provider newProvider = (Provider)GormUtil.cloneDomainAndSave(sourceProvider, [project: targetProject], false)
+        Provider newProvider = (Provider)GormUtil.cloneDomainAndSave(sourceProvider, [project: targetProject], false, false)
         log.debug "Cloned provider ${newProvider.name} for project ${targetProject.toString()}"
         return newProvider
+    }
+
+    /**
+     * Clone a provider if it does not exist with given name and project
+     * @param sourceProvider - source provider to clone
+     * @param targetProject - target provider project
+     * @return - a cloned instance of the given source provider or a existing one from database
+     */
+    Provider cloneProviderIfNotExists(Provider sourceProvider, Project targetProject) {
+        Provider newProvider = getProvider(sourceProvider.name, targetProject, false)
+        if (newProvider) {
+            return newProvider
+        }
+        return cloneProvider(sourceProvider, targetProject)
     }
 }

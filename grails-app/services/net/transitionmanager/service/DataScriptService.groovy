@@ -269,6 +269,28 @@ class DataScriptService implements ServiceMethods{
         return dataScript
     }
 
+	/**
+	 * Find a DataScript with the given name, project and provider
+	 *
+	 * @param name - datascript name
+	 * @param project - datascript project
+	 * @param provider - datascript provider
+	 * @param throwException - whether to throw an exception if datascript is not found
+	 * @return
+	 */
+	DataScript findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
+		DataScript dataScript = DataScript.where {
+			name == name
+			project == project
+			provider == provider
+		}.find()
+
+		if (! dataScript && throwException) {
+			throw new EmptyResultException("No DataScript exists with name $name for the Project $project and Provider $provider.")
+		}
+		return dataScript
+	}
+
     /**
      * Find a given DataScript with the given ID and Project.
      * @param dataScriptId
@@ -551,5 +573,40 @@ class DataScriptService implements ServiceMethods{
 			ds.sampleFilename = tmpFileName
 			ds.save()
 		}
+	}
+
+	/**
+	 * Clone a datascript
+	 *
+	 * @param sourceDataScript
+	 * @param targetProject
+	 * @param targetProvider
+	 * @return
+	 */
+	DataScript cloneDataScript(DataScript sourceDataScript, Project targetProject, Provider targetProvider) {
+		DataScript newDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceDataScript, [
+				project: targetProject, provider: targetProvider], false, false)
+		log.debug "Cloned data script ${newDataScript.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+		return newDataScript
+	}
+
+	/**
+	 * Clone a datascript if it does not exist with given name, project and provider
+	 *
+	 * @param sourceDataScript - source datascript to clone
+	 * @param targetProject - target datascript project
+	 * @param targetProvider - target datascript provider
+	 * @return a cloned instance of the given source datascript or a existing one from database
+	 */
+	DataScript cloneDataScriptIfNotExists(DataScript sourceDataScript, Project targetProject, Provider targetProvider) {
+		if (!sourceDataScript) {
+			return null
+		}
+
+		DataScript newDataScript = findByProjectAndProvider(sourceDataScript.name, targetProject, targetProvider, false)
+		if (newDataScript) {
+			return newDataScript
+		}
+		return cloneDataScript(sourceDataScript, targetProject, targetProvider)
 	}
 }

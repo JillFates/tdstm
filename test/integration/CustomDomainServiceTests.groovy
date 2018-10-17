@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
@@ -27,8 +28,9 @@ class CustomDomainServiceTests extends Specification {
     private static final String fieldSpecDefinitionJson = 'CustomDomainServiceTests_FieldSpec.json'
     private static JSONObject fieldSpecJson
 
-    private ProjectTestHelper projectHelper = new ProjectTestHelper()
     private AssetTestHelper assetHelper = new AssetTestHelper()
+    private CustomDomainTestHelper customDomainTestHelper = new CustomDomainTestHelper()
+    private ProjectTestHelper projectHelper = new ProjectTestHelper()
 
     private static final String CUSTOM1_LABEL = 'Description'
 
@@ -36,7 +38,7 @@ class CustomDomainServiceTests extends Specification {
      * This will load the JSON file that accompanies this test suite and will return
      * it as a JSONObject.
      */
-    private JSONObject loadFieldSpecJson() {
+        private JSONObject loadFieldSpecJson() {
         // Determine where we can write the resource file for testing
         // this.class.classLoader.rootLoader.URLs.each{ println it }
         // We'll only load it the first time and cache it into fieldSpecJson
@@ -220,6 +222,43 @@ class CustomDomainServiceTests extends Specification {
 
 				assert ! found, "Field '${found?.field}' found in domain '${CustomDomainService.COMMON}'"
 			}
+
+    }
+
+    void '9. Test the getFieldSpecsForAssetExport method for different scenarios'() {
+        setup: 'Create a project'
+            Project project = projectHelper.createProject()
+            String domain = AssetClass.APPLICATION.toString()
+        when: 'retrieving the fields to be exported and all available fields for the project'
+            Map exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            Map allFields = customDomainService.allFieldSpecs(project, domain)
+            Map assetClassField = allFields[domain].fields.find {it.field == 'assetClass'}
+            Map custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
+        then: 'the export fields do not contain the assetClass, as it is not to be displayed'
+            exportFields[domain].fields.find {it.field == 'assetClass'} == null
+        and: 'the assetClass field is included in the all fields map'
+            assetClassField != null
+        and: 'assetClass is not included in the fields to be exported as it is a standard field not visible'
+            exportFields[domain].fields.find {it.field == 'assetClass'} == null
+        and: 'the field is not user defined'
+            assetClassField.udf == 0
+        and: 'the field is marked as not displayed'
+            assetClassField.show == 0
+        and: 'the custom1 field is included for export'
+            custom1Field != null
+        and: 'the field is user defined'
+            custom1Field.udf == 1
+        and: 'the field is to be displayed'
+            custom1Field.show == 1
+        when: 'setting the custom1 field as not to be displayed'
+            Closure updateClosure = { JSONObject fieldSpecJson ->
+                (fieldSpecJson.fields.find{it.field == 'custom1'}).show = 0
+            }
+            customDomainTestHelper.updateFieldSpec(project, domain, updateClosure)
+            exportFields = customDomainService.getFieldSpecsForAssetExport(project, domain)
+            custom1Field = exportFields[domain].fields.find {it.field == 'custom1'}
+        then: 'the custom field is present in the fields to be exported even though is not marked as displayed'
+            custom1Field != null
 
     }
 

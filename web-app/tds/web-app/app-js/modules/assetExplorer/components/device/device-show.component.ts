@@ -17,7 +17,7 @@ import {ManufacturerService} from '../../service/manufacturer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {CloneModalModel} from '../../model/clone-modal.model';
+import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 
@@ -155,12 +155,12 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		 */
 		onCloneAsset(): void {
 
-			const cloneModalModel: CloneModalModel = {
+			const cloneModalModel: AssetModalModel = {
 				assetType: DOMAIN.DEVICE,
 				assetId: this.mainAsset
 			}
 			this.dialogService.extra(AssetCloneComponent, [
-				{provide: CloneModalModel, useValue: cloneModalModel}
+				{provide: AssetModalModel, useValue: cloneModalModel}
 			], false, false).then( (result: CloneCLoseModel)  => {
 
 				if (result.clonedAsset && result.showEditView) {

@@ -1,10 +1,12 @@
+import net.transitionmanager.command.RoleTypeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.RoleType
 import com.tdsops.common.security.spring.HasPermission
 
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.security.Permission
-import org.grails.datastore.mapping.query.api.Criteria
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.RoleTypeService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoleTypeController implements ControllerMethods {
@@ -12,45 +14,29 @@ class RoleTypeController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
+	RoleTypeService roleTypeService
+
     @HasPermission(Permission.RoleTypeView)
     def list() {
-
-		Criteria query = RoleType.where {
-            type == RoleType.TEAM
-        }
-
-        query.order('type', 'asc')
-                .order('level', 'desc')
-                .order('id', 'asc')
-
-        [roleTypeInstanceList: query.list()]
+        [roleTypeInstanceList: roleTypeService.list()]
     }
 
 	@HasPermission(Permission.RoleTypeView)
-	def show() {
-		RoleType roleType = RoleType.get(params.id)
-		if (!roleType) {
-			flash.message = "RoleType not found with id $params.id"
+	def show(String id) {
+		try {
+			[roleTypeInstance: roleTypeService.getById(id, true)]
+		} catch (e) {
+			flash.message = e.message
 			redirect(action: 'list')
-			return
 		}
-
-		[roleTypeInstance: roleType]
 	}
 
 	@HasPermission(Permission.RoleTypeDelete)
-	def delete() {
+	def delete(String id) {
 		try{
-			RoleType roleType = RoleType.get(params.id)
-			if (roleType) {
-				roleType.delete(flush: true)
-				flash.message = "RoleType $params.id deleted"
-			}
-			else {
-				flash.message = "RoleType not found with id $params.id"
-			}
-		}
-		catch (e) {
+			roleTypeService.delete(id)
+			flash.message = "Role type $id deleted"
+		} catch (e) {
 			flash.message = e.message
 		}
 
@@ -58,32 +44,28 @@ class RoleTypeController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.RoleTypeEdit)
-	def edit() {
-		RoleType roleType = RoleType.get(params.id)
-		if (!roleType) {
-			flash.message = "RoleType not found with id $params.id"
+	def edit(String id) {
+		try {
+			[roleTypeInstance: roleTypeService.getById(id)]
+		} catch (e) {
+			flash.message = e.message
 			redirect(action: 'list')
-			return
 		}
-
-		[roleTypeInstance : roleType]
 	}
 
 	@HasPermission(Permission.RoleTypeEdit)
 	def update() {
-		RoleType roleType = RoleType.get(params.roleTypeId)
-		if (roleType) {
-			roleType.properties = params
-			if (!roleType.hasErrors() && roleType.save()) {
-				flash.message = "RoleType $params.description updated"
-				redirect(action: 'show', id: roleType.id)
-			}
-			else {
-				render(view: 'edit', model: [roleTypeInstance: roleType])
-			}
-		}
-		else {
-			flash.message = "RoleType not found with id $params.id"
+		RoleTypeCommand command = populateCommandObject(RoleTypeCommand.class)
+
+		try {
+			RoleType roleTypeInstance = roleTypeService.update(command)
+			flash.message = "Role type $command.description updated"
+			redirect(action: 'show', id: roleTypeInstance.id)
+		} catch (InvalidParamException e) {
+			flash.message = e.message
+			render(view: 'edit', model: [roleTypeInstance: command])
+		} catch (e) {
+			flash.message = e.message
 			redirect(action: 'edit', id: params.id)
 		}
 	}
@@ -95,20 +77,21 @@ class RoleTypeController implements ControllerMethods {
 
 	@HasPermission(Permission.RoleTypeCreate)
 	def save() {
-		boolean idCheck = false
-		if (RoleType.exists(params.id)) {
-			flash.message = "Role Type $params.id already exists"
-			idCheck = true
-		}
+		RoleTypeCommand command = populateCommandObject(RoleTypeCommand.class)
 
-		RoleType roleType = new RoleType(params)
-		roleType.id = params.id
-		if (!idCheck && !roleType.hasErrors() && roleType.save()) {
-			flash.message = "RoleType $roleType.id created"
-			redirect(action: 'list')
+		if (roleTypeService.roleTypeExists(command.id)) {
+			flash.message = "Role Type $command.id already exists"
+			render(view: 'create', model: [roleTypeInstance: command])
 			return
 		}
 
-		render(view: 'create', model: [roleTypeInstance: roleType])
+		try {
+			RoleType roleTypeInstance = roleTypeService.save(command)
+			flash.message = "Role type $roleTypeInstance.id created"
+			redirect(action: 'list')
+		} catch (e) {
+			flash.message = e.message
+			render(view: 'create', model: [roleTypeInstance: command])
+		}
 	}
 }

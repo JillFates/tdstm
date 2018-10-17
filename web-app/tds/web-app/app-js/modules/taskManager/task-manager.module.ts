@@ -17,7 +17,10 @@ import {TaskService} from './service/task.service';
 		SharedModule,
 		FormsModule,
 	],
+	declarations: [
+	],
 	providers: [TaskService],
+	entryComponents: []
 })
 
 export class TaskManagerModule {
