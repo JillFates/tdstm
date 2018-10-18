@@ -25,7 +25,7 @@
                                     <table>
                                         <tbody>
                                         <tr class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span class="required-field">Task # {{model.taskNumber}}</span></label>
                                             </td>
                                             <td class="valueNW description-container" colspan="5">
@@ -37,7 +37,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Person</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -51,7 +51,7 @@
                                                         [(ngModel)]="model.assignedTo">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Team</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -64,7 +64,7 @@
                                                         [(ngModel)]="model.assignedTeam">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Event</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -80,7 +80,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Fixed Assignment</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -90,7 +90,7 @@
                                                         [data]="yesNoList">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Send Notification</span></label>
                                             </td>
                                             <td  class="valueNW">
@@ -100,7 +100,7 @@
                                                         [data]="yesNoList">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Action</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -115,7 +115,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span class="required-field">Category</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -129,7 +129,7 @@
                                                     <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                 </div>
                                             </td>
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Asset Class</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -143,7 +143,7 @@
                                                         [(ngModel)]="model.assetClass">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Asset</span></label>
                                             </td>
                                             <td class="valueNW asset-entity">
@@ -158,7 +158,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Instruction Link</span></label>
                                             </td>
                                             <td class="valueNW instructions-link">
@@ -172,7 +172,7 @@
                                                 </div>
 
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Priority</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -183,7 +183,7 @@
                                                         [(ngModel)]="model.priority">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Due Date</span></label>
                                             </td>
 
@@ -197,7 +197,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Duration</span></label>
                                             </td>
                                             <td class="valueNW duration-container">
@@ -233,7 +233,7 @@
                                                     </label>
                                                 </div>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Start</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -246,7 +246,7 @@
                                                 </kendo-dateinput>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Finish</span></label>
                                             </td>
 
@@ -268,7 +268,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Actual Start</span></label>
                                             </td>
 
@@ -276,7 +276,7 @@
                                                 <span class="read-only-dates">{{model.actualStart}}</span>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Actual Finish</span></label>
                                             </td>
 
@@ -284,7 +284,7 @@
                                                 <span class="read-only-dates">{{model.actualFinish}}</span>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>TaskSpec ID</span></label>
                                             </td>
 
@@ -293,7 +293,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U status-cell" nowrap="nowrap">
+                                            <td class="label N status-cell" nowrap="nowrap">
                                                 <label><span>Status</span></label>
                                             </td>
                                             <td class="valueNW task-status vertical-note-status">
