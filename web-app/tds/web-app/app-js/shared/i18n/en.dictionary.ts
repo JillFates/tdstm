@@ -98,8 +98,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
-		'API_ACTION': 'API Actions',
-		'API_ACTIONS': 'Credentials',
+		'API_ACTION': 'API Action',
+		'API_ACTIONS': 'API Actions',
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
