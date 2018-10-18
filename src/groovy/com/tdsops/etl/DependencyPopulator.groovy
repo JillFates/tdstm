@@ -29,6 +29,7 @@ class DependencyPopulator {
 	private RowResult asset
 	private RowResult dependent
 
+	static final String ID_FIELD_NAME = 'id'
 	static final String ASSET_FIELD_NAME = 'asset'
 	static final String DEPENDENT_FIELD_NAME = 'dependent'
 
@@ -81,34 +82,51 @@ class DependencyPopulator {
 	 * @param fieldName Dependency field name
 	 * @return an instance of {@code ETLFieldDefinition}
 	 */
-	private ETLFieldDefinition createFieldDefinition(String fieldName){
+	private ETLFieldDefinition createFieldDefinition(String fieldName) {
 		GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(ETLDomain.Dependency.clazz, fieldName)
 		return new ETLFieldDefinition(domainProperty)
 	}
 
+	/**
+	 * Process {@code Dependency#asset} field
+	 */
 	private void processAsset() {
 		if (this.asset) {
-
-			processor.load(ASSET_FIELD_NAME).with(null)
-			RowResult currentRow = processor.result.findOrCreateCurrentRow()
-			FieldResult fieldResult = currentRow.findOrCreateFieldData(createFieldDefinition(ASSET_FIELD_NAME))
-
-			// add find/elseFind results
-			if(this.asset.fields.containsKey('id')){
-				fieldResult.find = this.asset.fields['id'].find
-			}
-
-			fieldResult.create = [:]
-			this.asset.fields.each { String fieldName, FieldResult field ->
-				if(field.originalValue){
-					fieldResult.create[fieldName] = field.originalValue
-				}
-			}
+			process(ASSET_FIELD_NAME, this.asset)
 		}
 	}
 
+	/**
+	 * Process {@code Dependency#dependent} field
+	 */
 	private void processDependent() {
 		validateParams()
+		if(this.dependent){
+			process(DEPENDENT_FIELD_NAME, this.dependent)
+		}
+	}
+
+	/**
+	 *
+	 * @param field
+	 * @param rowResult
+	 */
+	private void process(String field, RowResult rowResult){
+		processor.load(field).with(null)
+		RowResult currentRow = processor.result.findOrCreateCurrentRow()
+		FieldResult fieldResult = currentRow.findOrCreateFieldData(createFieldDefinition(field))
+
+		// add find/elseFind results
+		if (rowResult.fields.containsKey(ID_FIELD_NAME)) {
+			fieldResult.find = rowResult.fields[ID_FIELD_NAME].find
+		}
+
+		fieldResult.create = [:]
+		rowResult.fields.each { String fieldName, FieldResult results ->
+			if (results.originalValue) {
+				fieldResult.create[fieldName] = results.originalValue
+			}
+		}
 	}
 
 	/**
@@ -119,6 +137,4 @@ class DependencyPopulator {
 			throw ETLProcessorException.invalidDependentParamsCommand()
 		}
 	}
-
-
 }

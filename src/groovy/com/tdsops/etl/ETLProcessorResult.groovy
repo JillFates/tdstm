@@ -4,6 +4,7 @@ import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import groovy.transform.CompileStatic
 
@@ -567,6 +568,24 @@ class RowResult {
 		}
 		return fields[fieldDefinition.name]
 	}
+
+	/**
+	 * Return property value
+	 * @param name a property name
+	 * @return
+	 */
+//	Object getProperty(String name) {
+//
+//		if(RowResult.metaClass.hasProperty(this, name) != null){
+//			return RowResult.metaClass.getProperty(this, name)
+//		} else {
+//			FieldResult fieldResult = fields.values().find {
+//				it?.fieldDefinition.name == name ||
+//					it?.fieldDefinition.label == name
+//			}
+//			return fieldResult?.value
+//		}
+//	}
 }
 
 /**

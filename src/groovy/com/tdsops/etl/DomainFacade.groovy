@@ -28,6 +28,10 @@ class DomainFacade {
 		return value
 	}
 
+	/**
+	 * Returns a {@code ETLProcessorResult#currentRow} to be used in {@code DependencyPopulator}
+	 * @return
+	 */
 	RowResult currentRowMap(){
 		return this.result.currentRow()
 	}

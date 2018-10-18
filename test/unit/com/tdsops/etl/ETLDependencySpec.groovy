@@ -78,8 +78,11 @@ class ETLDependencySpec extends ETLBaseSpec {
 					set assetResultVar with DOMAIN
 					
 					assert assetResultVar.'assetName' == 'xraysrv01'
+					assert assetResultVar.'Name' == 'xraysrv01'
 					assert assetResultVar.'manufacturer' == 'Dell'
+					assert assetResultVar.'Manufacturer' == 'Dell'
 					assert assetResultVar.'model' == 'PE2950'
+					assert assetResultVar.'Model' == 'PE2950'
 				}
 			""".stripIndent())
 
@@ -152,7 +155,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			}
 	}
 
-	@ConfineMetaClassChanges([AssetEntity, Application])
+	@ConfineMetaClassChanges([AssetEntity])
 	void 'test can create an asset for Dependency using domain command'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -168,10 +171,6 @@ class ETLDependencySpec extends ETLBaseSpec {
 				validator)
 
 		and:
-			mockDomain(Application)
-			Application.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
-				[]
-			}
 			mockDomain(AssetEntity)
 			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
 				[]
@@ -227,37 +226,318 @@ class ETLDependencySpec extends ETLBaseSpec {
 							)
 						}
 					}
+				}
 
-					with(domains[1], DomainResult) {
-						domain == ETLDomain.Dependency.name()
-						fieldNames == ['asset'] as Set
-						data.size() == 1
-						with(data[0], RowResult) {
-							fields.size() == 1
-							assertFieldResult(fields['asset'])
+				with(domains[1], DomainResult) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset'] as Set
+					data.size() == 1
+					with(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['asset'])
 
-							with(fields['asset'].find, FindResult) {
-								query.size() == 4
-								assertQueryResult(
-									query[0],
-									ETLDomain.Device,
-									[
-										['assetName', FindOperator.eq.name(), 'xraysrv01'],
-										['manufacturer', FindOperator.eq.name(), 'Dell'],
-										['model', FindOperator.eq.name(), 'PE2950']
-									]
-								)
+						with(fields['asset'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Device,
+								[
+									['assetName', FindOperator.eq.name(), 'xraysrv01'],
+									['manufacturer', FindOperator.eq.name(), 'Dell'],
+									['model', FindOperator.eq.name(), 'PE2950']
+								]
+							)
 
-								with(fields['asset'].create){
-									it.'assetName' == 'xraysrv01'
-									it.'manufacturer' == 'Dell'
-									it.'model' == 'PE2950'
-								}
+							with(fields['asset'].create) {
+								it.'assetName' == 'xraysrv01'
+								it.'manufacturer' == 'Dell'
+								it.'model' == 'PE2950'
 							}
-
 						}
 
 					}
+
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@ConfineMetaClassChanges([Application])
+	void 'test can create a dependent for Dependency using domain command'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				application id,vendor name,technology,url
+				152254,Microsoft,(xlsx updated),www.microsoft.com
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'Vendor' set vendorVar
+					extract 'technology' load 'Technology' set appTechVar
+					extract 'url' load 'URL' set urlVar
+					
+					find Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar and 'URL' eq urlVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar and 'URL' eq urlVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar into 'id'
+					
+					set applicationResultVar with DOMAIN
+					
+					domain Dependency with null and applicationResultVar
+				}
+			""".stripIndent())
+
+		then: 'Results contains the following values'
+			with(etlProcessor.finalResult()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 2
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'appTech', 'url', 'id'] as Set
+					data.size() == 1
+					with(data[0], RowResult) {
+						fields.size() == 4
+						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
+						assertFieldResult(fields['appTech'], '(xlsx updated)', '(xlsx updated)')
+						assertFieldResult(fields['url'], 'www.microsoft.com', 'www.microsoft.com')
+						assertFieldResult(fields['id'], null, null)
+
+						with(fields['id'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Application,
+								[
+									['appVendor', FindOperator.eq.name(), 'Microsoft'],
+									['appTech', FindOperator.eq.name(), '(xlsx updated)'],
+									['url', FindOperator.eq.name(), 'www.microsoft.com']
+								]
+							)
+						}
+					}
+				}
+
+				with(domains[1], DomainResult) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['dependent'] as Set
+					data.size() == 1
+					with(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['dependent'])
+
+						with(fields['dependent'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Application,
+								[
+									['appVendor', FindOperator.eq.name(), 'Microsoft'],
+									['appTech', FindOperator.eq.name(), '(xlsx updated)'],
+									['url', FindOperator.eq.name(), 'www.microsoft.com']
+								]
+							)
+
+							with(fields['dependent'].create) {
+								it.'appVendor' == 'Microsoft'
+								it.'appTech' == '(xlsx updated)'
+								it.'url' == 'www.microsoft.com'
+							}
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can create an asset and dependent for Dependency using domain command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+				name,mfg,model,application id,vendor name,technology,url
+				xraysrv01,Dell,PE2950,152254,Microsoft,(xlsx updated),www.microsoft.com
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[]
+			}
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				
+				iterate {
+				
+					domain Device
+					extract 'name' load 'Name' set nameVar
+					extract 'mfg' load 'Manufacturer' set mfgVar
+					extract 'model' load 'Model' set modelVar
+					
+					find Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar and 'Model' eq modelVar into 'id'
+					elseFind Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar into 'id'
+					elseFind Device by 'Name' eq nameVar and 'Model' eq modelVar into 'id'
+					elseFind Device by 'Name' eq nameVar into 'id'
+					
+					set assetVar with DOMAIN
+					
+					domain Application
+					extract 'vendor name' load 'Vendor' set vendorVar
+					extract 'technology' load 'Technology' set appTechVar
+					extract 'url' load 'URL' set urlVar
+					
+					find Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar and 'URL' eq urlVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar and 'URL' eq urlVar into 'id'
+					elseFind Application by 'Vendor' eq vendorVar into 'id'
+					
+					set dependentVar with DOMAIN
+					
+					
+					domain Dependency with assetVar and dependentVar
+				}
+			""".stripIndent())
+
+		then: 'Results contains the following values'
+			with(etlProcessor.finalResult()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 3
+
+				with(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'manufacturer', 'model', 'id'] as Set
+					data.size() == 1
+
+					with(data[0], RowResult) {
+						fields.size() == 4
+						assertFieldResult(fields['assetName'], 'xraysrv01', 'xraysrv01')
+						assertFieldResult(fields['manufacturer'], 'Dell', 'Dell')
+						assertFieldResult(fields['model'], 'PE2950', 'PE2950')
+						assertFieldResult(fields['id'], null, null)
+						with(fields['id'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Device,
+								[
+									['assetName', FindOperator.eq.name(), 'xraysrv01'],
+									['manufacturer', FindOperator.eq.name(), 'Dell'],
+									['model', FindOperator.eq.name(), 'PE2950']
+								]
+							)
+						}
+					}
+				}
+
+				with(domains[1], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'appTech', 'url', 'id'] as Set
+					data.size() == 1
+
+					with(data[0], RowResult) {
+						fields.size() == 4
+						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
+						assertFieldResult(fields['appTech'], '(xlsx updated)', '(xlsx updated)')
+						assertFieldResult(fields['url'], 'www.microsoft.com', 'www.microsoft.com')
+						assertFieldResult(fields['id'], null, null)
+
+						with(fields['id'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Application,
+								[
+									['appVendor', FindOperator.eq.name(), 'Microsoft'],
+									['appTech', FindOperator.eq.name(), '(xlsx updated)'],
+									['url', FindOperator.eq.name(), 'www.microsoft.com']
+								]
+							)
+						}
+					}
+				}
+
+				with(domains[2], DomainResult) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset', 'dependent'] as Set
+					data.size() == 1
+					with(data[0], RowResult) {
+						fields.size() == 2
+
+						assertFieldResult(fields['asset'])
+						with(fields['asset'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Device,
+								[
+									['assetName', FindOperator.eq.name(), 'xraysrv01'],
+									['manufacturer', FindOperator.eq.name(), 'Dell'],
+									['model', FindOperator.eq.name(), 'PE2950']
+								]
+							)
+
+							with(fields['asset'].create) {
+								it.'assetName' == 'xraysrv01'
+								it.'manufacturer' == 'Dell'
+								it.'model' == 'PE2950'
+							}
+						}
+
+						assertFieldResult(fields['dependent'])
+						with(fields['dependent'].find, FindResult) {
+							query.size() == 4
+							assertQueryResult(
+								query[0],
+								ETLDomain.Application,
+								[
+									['appVendor', FindOperator.eq.name(), 'Microsoft'],
+									['appTech', FindOperator.eq.name(), '(xlsx updated)'],
+									['url', FindOperator.eq.name(), 'www.microsoft.com']
+								]
+							)
+
+							with(fields['dependent'].create) {
+								it.'appVendor' == 'Microsoft'
+								it.'appTech' == '(xlsx updated)'
+								it.'url' == 'www.microsoft.com'
+							}
+						}
+					}
+
 				}
 			}
 
