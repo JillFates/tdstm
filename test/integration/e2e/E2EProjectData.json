@@ -83,5 +83,100 @@
   },
   "etlToBeSearched": { // Used by ETLScriptsListSpec
     "name": "E2E ETL Script to be searched"
+  },
+  // Views
+  "customView1":{
+    "name": "QAE2E Custom View 1",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView2":{
+    "name": "QAE2E Custom View 2",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView3":{
+    "name": "QAE2E Custom View 3",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView4":{
+    "name": "QAE2E Custom View 4",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView5":{
+    "name": "QAE2E Custom View 5",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView6":{
+    "name": "QAE2E Custom View 6",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView7":{
+    "name": "QAE2E Custom View 7",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView8":{
+    "name": "QAE2E Custom View 8",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView9":{
+    "name": "QAE2E Custom View 9",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView10":{
+    "name": "QAE2E Custom View 10",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "customView11":{
+    "name": "QAE2E Custom View 11",
+    "isShared": false,
+    "isSystem": false,
+    "schema": null
+  },
+  "commonViewSchema": {
+      "columns": [{
+        "domain": "common",
+        "edit": false,
+        "filter": "",
+        "label": "Name",
+        "locked": false,
+        "property": "assetName",
+        "width": 200
+      }],
+      "domains": ["common", "application"],
+      "sort": {
+        "domain": "common",
+        "order": "a",
+        "property": "assetName"
+      }
+  },
+  // Tags
+  "tagToBeEdited": {
+    "name": "QAE2E Tag to be edited",
+    "description": "",
+    "color": "White"
+  },
+  "tagToBeDeleted": {
+    "name": "QAE2E Tag to be deleted",
+    "description": "",
+    "color": "White"
   }
 }
