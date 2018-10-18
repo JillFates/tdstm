@@ -10,7 +10,8 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}: {{assetModalModel.assetType}}/{{assetModalModel.assetName}}</h4>
+                <h4 *ngIf="assetModalModel.modalType == 'COMMENT'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}</h4>
+                <h4 *ngIf="assetModalModel.modalType == 'TASK'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_TASKS' | translate}}</h4>
             </div>
             <div class="modal-body">
                 <div class="modal-body-container">
