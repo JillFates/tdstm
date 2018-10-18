@@ -34,7 +34,7 @@ import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
-import {TaskDetailModel} from "../../../taskManager/model/task-detail.model";
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
