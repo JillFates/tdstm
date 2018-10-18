@@ -41,7 +41,8 @@ import java.security.cert.X509Certificate
 @Transactional
 @Slf4j
 class CredentialService implements ServiceMethods {
-    ProjectService projectService
+//    ProjectService projectService
+    ProviderService providerService
 
     /**
      * Creates a new credential
@@ -463,7 +464,7 @@ class CredentialService implements ServiceMethods {
      * @param throwException
      * @return
      */
-    private Credential findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
+    Credential findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
         Credential credential = Credential.where {
             id == id
             project == project
@@ -484,7 +485,7 @@ class CredentialService implements ServiceMethods {
      * @param throwException - whether to throw an exception if credential is not found
      * @return
      */
-    private Credential findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
+    Credential findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
         Credential credential = Credential.where {
             name == name
             project == project
@@ -538,40 +539,29 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Clone an existing credential. It overwrites username and password that need to be re-configured by end user.
-     * @param sourceCredential - source credential to clone
-     * @param targetProject - target credential project
-     * @param targetProvider - target credential provider
-     * @return
+     * Clone any existing credentials associated to sourceProject (if any),
+     * then associate those newly created credentials to targetProject.
+     *
+     * @param sourceProject  The project from which the existing credentials will be cloned.
+     * @param targetProject  The project to which the new credentials will be associated.
      */
-    Credential cloneCredential(Credential sourceCredential, Project targetProject, Provider targetProvider) {
-        Credential newCredential = (Credential)GormUtil.cloneDomainAndSave(sourceCredential, [
-                project: targetProject,
-                provider: targetProvider,
-                username: 'Must Be Changed',
-                password: RandomStringUtils.randomAlphanumeric(10)
-        ], false, false)
-        log.debug "Cloned credential ${newCredential.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
-        return newCredential
-    }
+    void cloneProjectCredentials(Project sourceProject, Project targetProject) {
+        List<Credential> credentials = Credential.where {
+            project == sourceProject
+        }.list()
 
-    /**
-     * Clone a credential if it does not exist with given name, project and provider
-     * @param sourceCredential - source credential to clone
-     * @param targetProject - target credential project
-     * @param targetProvider - target credential provider
-     * @return a cloned instance of the given source credential or a existing one from database
-     */
-    Credential cloneCredentialIfNotExists(Credential sourceCredential, Project targetProject, Provider targetProvider) {
-        if (!sourceCredential) {
-            return null
+        if (!credentials.isEmpty()) {
+            credentials.each { Credential sourceCredential ->
+                Provider targetProvider = providerService.getProvider(sourceCredential.provider.name, targetProject, false)
+                Credential newCredential = (Credential)GormUtil.cloneDomainAndSave(sourceCredential,
+                        [
+                                project: targetProject,
+                                provider: targetProvider,
+                                username: 'Must Be Changed',
+                                password: RandomStringUtils.randomAlphanumeric(10)
+                        ], false, false);
+                log.debug "Cloned credential ${newCredential.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+            }
         }
-
-        Credential newCredential = findByProjectAndProvider(sourceCredential.name, targetProject, targetProvider, false)
-        if (!newCredential) {
-            return cloneCredential(sourceCredential, targetProject, targetProvider)
-        }
-        return newCredential
     }
-
 }
