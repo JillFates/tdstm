@@ -171,6 +171,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 					this.dialogService
 						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				} else if (!result.clonedAsset && result.showView) {
+					this.showAssetDetailView(DOMAIN.DEVICE, result.assetId);
 				}
 			})
 				.catch( error => console.log('error', error));
