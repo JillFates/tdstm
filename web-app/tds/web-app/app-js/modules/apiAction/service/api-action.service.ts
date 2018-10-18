@@ -3,12 +3,11 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {PreferenceService} from '../../../shared/services/preference.service';
-import {DataScriptModel, DataScriptMode, SampleDataModel} from '../../dataScript/model/data-script.model';
+import {DataScriptModel, DataScriptMode} from '../../dataScript/model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
-import {AgentModel, AgentMethodModel} from '../model/agent.model';
-import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../../credential/model/credential.model';
+import {AgentMethodModel} from '../model/agent.model';
+import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS} from '../../credential/model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
@@ -17,25 +16,18 @@ import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
-import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
 export class APIActionService {
 
 	private dataDefaultUrl = '../ws';
-	private jobProgressUrl = '../ws/progress';
 	private dataApiActionUrl = '../ws/apiAction';
 	private readonly dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
-	private ETLScriptUploadURL = '../ws/fileSystem/uploadFileETLDesigner';
-	private ETLScriptUploadTextURL = '../ws/fileSystem/uploadTextETLDesigner';
-	private assetImportUploadURL = '../ws/fileSystem/uploadFileETLAssetImport';
-	private readonly GET_SAMPLE_DATA_URL = this.dataIngestionUrl.concat('/datascript/{0}/sampleData/{1}?originalFileName={2}&rootNode={3}');
-	private readonly GET_ETL_SCRIPT_BY_ID_URL = this.dataIngestionUrl.concat('/datascript/{0}');
 
-	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
+	constructor(private http: HttpInterceptor) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {

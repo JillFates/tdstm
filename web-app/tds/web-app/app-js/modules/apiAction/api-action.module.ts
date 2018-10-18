@@ -22,6 +22,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {APIActionResolveService} from './resolve/api-action-resolve.service';
 // Services
 import {APIActionService} from './service/api-action.service';
+import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 
 @NgModule({
 	imports: [
@@ -49,7 +50,8 @@ import {APIActionService} from './service/api-action.service';
 		ModuleResolveService,
 		APIActionResolveService,
 		// Service
-		APIActionService
+		APIActionService,
+		CustomDomainService
 	],
 	exports: [],
 	entryComponents: [

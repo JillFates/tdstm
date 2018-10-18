@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, QueryList, Renderer2, ElementRef} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, QueryList, ElementRef} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
@@ -82,8 +82,7 @@ export class CredentialViewEditComponent {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private credentialService: CredentialService,
-		private renderer: Renderer2) {
+		private credentialService: CredentialService) {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);

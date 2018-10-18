@@ -60,7 +60,6 @@ export class APIActionListComponent implements OnInit {
 	constructor(
 		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
-		@Inject('apiActions') apiActions: Observable<APIActionModel[]>,
 		private permissionService: PermissionService,
 		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
