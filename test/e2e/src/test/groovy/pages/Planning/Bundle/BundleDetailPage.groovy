@@ -26,6 +26,19 @@ class BundleDetailPage extends Page {
         planningModule {module PlanningModule }
         menuModule {module MenuModule }
         planningCheck {$("input#useForPlanning")}
+        listbundles {$("a.list")}
+        editButton {$("input.edit")[0]}
+        message {$("div.message")}
+        startTime {$(".name", text:"Start Time:")next()}
+        completionTime {$(".name", text: "Completion Time:").next()}
+    }
+
+    def goToListbundles(){
+        listbundles.click()
+    }
+
+    def clickEdit(){
+        editButton.click()
     }
 
     def isPlanning(){
@@ -51,6 +64,30 @@ class BundleDetailPage extends Page {
     def bundleCreatedMsgIsDisplayed(data){
         creationMessage.text()== "MoveBundle "+data[0]+" created"
     }
+    /**
+     * Returns bundle data displayed
+     */
+    def getDataDisplayed(){
+        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text(),isPlanning()]
+        dispData
+    }
+    /**
+     * Validates that the original bundle data has been edited and the changes were saved
+     * @param origData     *
+     */
+    def dataIsEdited(origData){
+        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
+        assert(isPlanning()!=origData[3])
+        assert(origData[0]+" Edited"== dispData[0])
+        assert(origData[1]+" Edited"== dispData[1])
+        assert(origData[2]== dispData[2])
+        assert (startTime.text().compareTo(origData[4])== 0 )
+        assert(completionTime.text().compareTo(origData[5])==0)
+        return true
+    }
 
+    def validateUpdateMesage(name){
+       message.text()=="MoveBundle "+name+" updated"
+    }
 }
 
