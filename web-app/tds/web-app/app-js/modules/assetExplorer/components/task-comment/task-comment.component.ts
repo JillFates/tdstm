@@ -11,7 +11,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TaskService} from '../../../taskManager/service/task.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
-import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
@@ -216,6 +216,9 @@ export class TaskCommentComponent implements OnInit {
 			modal: {
 				title: 'Task Detail',
 				type: modalType
+			},
+			detail: {
+				currentUserId: this.currentUserId
 			}
 		};
 

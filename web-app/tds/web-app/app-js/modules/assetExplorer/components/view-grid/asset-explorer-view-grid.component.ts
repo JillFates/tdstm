@@ -32,9 +32,9 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetEditComponent} from '../asset/asset-edit.component';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
-import {TaskDetailModel} from '../../../taskManager/components/model/task-detail.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
 import {UserService} from '../../../../shared/services/user.service';
+import {TaskDetailModel} from "../../../taskManager/model/task-detail.model";
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -88,7 +88,9 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
+	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
+	private bulkData: any;
 	private currentUser: any;
 
 	constructor(
@@ -99,7 +101,9 @@ export class AssetExplorerViewGridComponent {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
 		private userService: UserService) {
+
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
@@ -219,7 +223,7 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 
-		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+		this.bulkCheckboxService.initializeKeysBulkItems(data.assets);
 
 		this.gridData = {
 			data: data.assets,
@@ -477,7 +481,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
-		this.createButtonState = state;
+		if (this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS) {
+			this.createButtonState = state;
+		}
 	}
 
 	/**
@@ -584,8 +590,10 @@ export class AssetExplorerViewGridComponent {
 
 	onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: number[]) => {
-				this.bulkItems = [...results];
+			.then((results: any) => {
+				this.bulkItems = [...results.selectedAssetsIds];
+				this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
 			})
 			.catch ((err) => console.log('Error:', err))
 	}
