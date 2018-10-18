@@ -8,7 +8,7 @@ const DIALOG_ID = '#viewConsole';
 
 @Component({
 	selector: 'data-script-console',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-console/data-script-console.component.html'
+	templateUrl: '../../components/data-script-console/data-script-console.component.html'
 })
 export class DataScriptConsoleComponent extends UIExtraDialog implements AfterViewInit {
 	public isWindowMaximized = false;

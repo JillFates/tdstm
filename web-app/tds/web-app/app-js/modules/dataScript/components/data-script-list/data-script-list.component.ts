@@ -14,7 +14,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 
 @Component({
 	selector: 'data-script-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
+	templateUrl: '../../components/data-script-list/data-script-list.component.html',
 	styles: [`
 		#btnCreateDataScript { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }

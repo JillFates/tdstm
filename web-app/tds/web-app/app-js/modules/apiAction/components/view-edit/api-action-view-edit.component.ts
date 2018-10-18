@@ -10,12 +10,12 @@ import {
 	EVENT_BEFORE_CALL_TEXT
 } from '../../model/api-action.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {APIActionService} from '../../service/api-action.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
 import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
-import {DataScriptModel} from '../../model/data-script.model';
+import {DataScriptModel} from '../../../dataScript/model/data-script.model';
 import {NgForm} from '@angular/forms';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
@@ -30,7 +30,7 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'api-action-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/api-action-view-edit/api-action-view-edit.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/apiAction/components/view-edit/api-action-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
@@ -145,7 +145,7 @@ export class APIActionViewEditComponent implements OnInit {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService,
+		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService) {
 
 		// Sub Objects are not being created, just copy
@@ -191,7 +191,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the List of Providers
 	 */
 	getProviders(): void {
-		this.dataIngestionService.getProviders().subscribe(
+		this.apiActionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.providerList.push({ id: 0, name: 'Select...' });
@@ -209,7 +209,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of possible Agents
 	 */
 	getAgents(): void {
-		this.dataIngestionService.getAPIActionEnums().subscribe(
+		this.apiActionService.getAPIActionEnums().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentList.push({ id: 0, name: 'Select...' });
@@ -237,7 +237,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of Credentials
 	 */
 	getCredentials(): void {
-		this.dataIngestionService.getCredentials().subscribe(
+		this.apiActionService.getCredentials().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
 					this.agentCredentialList.push({ id: 0, name: 'Select...' });
@@ -254,7 +254,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of DataScript
 	 */
 	getDataScripts(): void {
-		this.dataIngestionService.getDataScripts().subscribe(
+		this.apiActionService.getDataScripts().subscribe(
 			(result: any) => {
 				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
 				if (this.modalType === ActionType.CREATE) {
@@ -274,7 +274,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of existing parameters for the API Action
 	 */
 	getParameters(): void {
-		this.dataIngestionService.getParameters(this.apiActionModel).subscribe(
+		this.apiActionService.getParameters(this.apiActionModel).subscribe(
 			(result: any) => {
 				this.parameterList = result;
 				this.parameterList.forEach((parameter) => {
@@ -305,7 +305,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
+		this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
 					this.savedApiAction = true;
@@ -386,7 +386,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteAPIAction(this.apiActionModel.id).subscribe(
+					this.apiActionService.deleteAPIAction(this.apiActionModel.id).subscribe(
 						(result) => {
 							this.activeDialog.dismiss(result);
 						},
@@ -467,7 +467,7 @@ export class APIActionViewEditComponent implements OnInit {
 	private loadAgentModel(agentModel: AgentModel, changeAgent: boolean): void {
 		if (changeAgent) {
 			if (agentModel.id !== 0) {
-				this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
+				this.apiActionService.getActionMethodById(agentModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
 						this.agentMethodList.push({id: '0', name: 'Select...'});
@@ -796,7 +796,7 @@ export class APIActionViewEditComponent implements OnInit {
 					}
 				});
 			}
-			this.dataIngestionService.validateCode(scripts).subscribe(
+			this.apiActionService.validateCode(scripts).subscribe(
 				(result: any) => {
 					this.invalidScriptSyntax = false;
 					result.forEach((eventResult: any) => {

@@ -1,29 +1,29 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
-import {process, CompositeFilterDescriptor, SortDescriptor, State} from '@progress/kendo-data-query';
-import {CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {APIActionService} from '../../service/api-action.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
+import {APIActionColumnModel, APIActionModel} from '../../model/api-action.model';
 import {
 	COLUMN_MIN_WIDTH,
-	Flatten,
 	ActionType,
 	BooleanFilterData,
 	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
-import {APIActionViewEditComponent} from '../api-action-view-edit/api-action-view-edit.component';
+import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'api-action-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/api-action-list/api-action-list.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/apiAction/components/list/api-action-list.component.html',
 	styles: [`
 		#btnCreate { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }
@@ -58,20 +58,17 @@ export class APIActionListComponent implements OnInit {
 	public dateFormat = '';
 
 	constructor(
+		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
 		@Inject('apiActions') apiActions: Observable<APIActionModel[]>,
 		private permissionService: PermissionService,
-		private dataIngestionService: DataIngestionService,
+		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
-		apiActions
-			.subscribe((result) => {
-					this.resultSet = result;
-					this.gridData = process(this.resultSet, this.state);
-				},
-				(err) => console.log(err));
+		this.resultSet = this.route.snapshot.data['apiActions'];
+		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
@@ -93,12 +90,12 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.dataIngestionService.filterColumn(column, this.state);
+		const root = this.apiActionService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		this.dataIngestionService.clearFilter(column, this.state);
+		this.apiActionService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
@@ -117,7 +114,7 @@ export class APIActionListComponent implements OnInit {
 	 */
 	protected onEdit(dataItem: any): void {
 		let apiAction: APIActionModel = dataItem as APIActionModel;
-		this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+		this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
 			this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
 		}, error => console.log(error));
 	}
@@ -130,7 +127,7 @@ export class APIActionListComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteAPIAction(dataItem.id).subscribe(
+					this.apiActionService.deleteAPIAction(dataItem.id).subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -147,14 +144,14 @@ export class APIActionListComponent implements OnInit {
 		if (event.columnIndex > 0) {
 			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
 			this.selectRow(apiAction.id);
-			this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+			this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
 				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
 			}, error => console.log(error));
 		}
 	}
 
 	protected reloadData(): void {
-		this.dataIngestionService.getAPIActions().subscribe(
+		this.apiActionService.getAPIActions().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -172,7 +169,7 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	private reloadItem(originalModel: APIActionModel): void {
-		this.dataIngestionService.getAPIAction(originalModel.id).subscribe((response: APIActionModel) => {
+		this.apiActionService.getAPIAction(originalModel.id).subscribe((response: APIActionModel) => {
 			Object.assign(originalModel, response);
 		}, error => console.log(error));
 	}

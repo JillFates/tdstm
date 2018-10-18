@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 
 @Component({
-	selector: 'popup-provides-data',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/popups/popup-provides-data.component.html',
+	selector: 'popup-polling',
+	templateUrl: '../../components/popups/popup-polling.component.html',
 	styles: [`
 		div { width: 320px; padding: 10px; }
     `]
 })
 
-export class PopupProvidesDataComponent {
+export class PopupPollingComponent {
 	private show = false;
 
 	public onToggle(): void {

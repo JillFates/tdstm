@@ -21,7 +21,7 @@ import {DataScriptModel} from '../../model/data-script.model';
 
 @Component({
 	selector: 'data-script-sample-data',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-sample-data/data-script-sample-data.component.html',
+	templateUrl: '../../components/data-script-sample-data/data-script-sample-data.component.html',
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 

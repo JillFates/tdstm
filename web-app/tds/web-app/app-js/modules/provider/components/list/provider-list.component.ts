@@ -6,7 +6,7 @@ import {ProviderService} from '../../service/provider.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../../dataIngestion/model/data-script.model';
+import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';

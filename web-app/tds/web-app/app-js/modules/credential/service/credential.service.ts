@@ -5,7 +5,7 @@ import {Headers, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
 import {ProviderModel} from '../../provider/model/provider.model';
-import {APIActionModel} from '../../dataIngestion/model/api-action.model';
+import {APIActionModel} from '../../apiAction/model/api-action.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';

@@ -6,11 +6,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader} from '@angular/core';
 import {HttpModule} from '@angular/http';
 import {TDSAppComponent} from './tds-app.component';
-// Feature modules
-// import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
-// Router Logic
-// import { AuthConfig, MiscConfig } from './tds-app.route';
-// High level Services
+// Service
 import {AuthGuardService} from '../modules/security/services/auth.guard.service';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
@@ -27,9 +23,6 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		TDSAppRouteModule,
 		TaskManagerModule,
 		SharedModule.forRoot(),
-		// Feature Modules
-		// DataIngestionModule,
-		// Routing Modules using UI Router
 		/* UIRouterModule.forRoot(<UIRouterModule>{
 			states: TdsAppRoute,
 			otherwise: '/pages/notfound',

@@ -12,7 +12,7 @@ export class CredentialResolveService implements Resolve<any> {
 	}
 
 	/**
-	 * Get the List of Providers
+	 * Get the List of Credentials
 	 * @param route
 	 */
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {

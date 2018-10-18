@@ -18,7 +18,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 const DEBOUNCE_MILLISECONDS = 800;
 @Component({
 	selector: 'data-script-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-view-edit/data-script-view-edit.component.html',
+	templateUrl: '../../components/data-script-view-edit/data-script-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;

@@ -1,10 +1,10 @@
 import {CredentialModel} from '../../credential/model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Headers, Http, RequestOptions, Response} from '@angular/http';
+import {Headers, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {PreferenceService} from '../../../shared/services/preference.service';
-import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
+import {DataScriptModel, DataScriptMode, SampleDataModel} from '../../dataScript/model/data-script.model';
 import {ProviderModel} from '../../provider/model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
@@ -19,11 +19,8 @@ import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
-export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
-export const PROGRESSBAR_FAIL_STATUS = 'Failed';
-
 @Injectable()
-export class DataIngestionService {
+export class APIActionService {
 
 	private dataDefaultUrl = '../ws';
 	private jobProgressUrl = '../ws/progress';
@@ -147,39 +144,11 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	/**
-	 * GET Credential by id.
-	 * @returns {Observable<CredentialModel[]>}
-	 */
-	getCredential(id: number): Observable<CredentialModel> {
-		return this.http.get(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				let model = result && result.status === 'success' && result.data;
-				this.processCredentialModel(model);
-				return model;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	private processCredentialModel(model): void {
 		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
 		model.environment = ENVIRONMENT[model.environment];
 		model.authMethod = AUTH_METHODS[model.authenticationMethod];
 		model.status = CREDENTIAL_STATUS[model.status];
-	}
-
-	/**
-	 * Get the List of Elements we need to populate in the UI - dropdownlist
-	 * @returns {Observable<any>}
-	 */
-	getCredentialEnumsConfig(): Observable<any> {
-		return this.http.get(`${this.credentialUrl}/enums`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
 	}
 
 	/**
@@ -206,51 +175,6 @@ export class DataIngestionService {
 			}
 			observer.complete();
 		});
-	}
-
-	/**
-	 * Get Sample Data of a File by passing the FileName to the server
-	 * @param {number} id
-	 * @param {string} fileName
-	 * @param {string} originalFileName
-	 * @returns {Observable<SampleDataModel>}
-	 */
-	getSampleData(id: number, fileName: string, originalFileName = '', rootNode: string): Observable<SampleDataModel> {
-		return this.http.get(this.GET_SAMPLE_DATA_URL
-			.replace('{0}', id.toString())
-			.replace('{1}', fileName)
-			.replace('{2}', originalFileName)
-			.replace('{3}', rootNode))
-			.map((res: Response) => {
-				let result = res.json();
-				let data: any = (result && result.status === 'success' && result.data);
-				let columns: any = [];
-				let sampleDataModel: SampleDataModel;
-				if (result.status === ApiResponseModel.API_ERROR && result.errors) {
-					sampleDataModel = {
-						errors: result.errors
-					};
-					return sampleDataModel;
-				}
-				if (data.config) {
-					for (let property in data.config) {
-						if (data.config.hasOwnProperty(property)) {
-							const label = data.config[property].property;
-							let column = {
-								label,
-								property: label,
-								type: data.config[property].type,
-								width: 140
-							};
-							columns.push(column);
-						}
-					}
-					sampleDataModel = new SampleDataModel(columns, data.rows);
-					sampleDataModel.gridHeight = 300;
-				}
-				return sampleDataModel;
-			})
-			.catch((error: any) => error.json());
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
@@ -297,56 +221,6 @@ export class DataIngestionService {
 				return result;
 			})
 			.catch((error: any) => error.json());
-	}
-
-	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
-		let postRequest = {
-			name: model.name,
-			description: model.description,
-			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
-			providerId: model.provider.id,
-			etlSourceCode: model.etlSourceCode
-		};
-		if (!model.id) {
-			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
-					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
-					return dataItem;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
-	}
-
-	saveProvider(model: ProviderModel): Observable<ProviderModel> {
-		let postRequest = {
-			name: model.name,
-			description: model.description,
-			comment: model.comment
-		};
-		if (!model.id) {
-			return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			return this.http.put(`${this.dataIngestionUrl}/provider/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
 	}
 
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
@@ -423,84 +297,6 @@ export class DataIngestionService {
 		}
 	}
 
-	saveCredential(model: CredentialModel): Observable<CredentialModel> {
-
-		let postRequest: any = {
-			name: model.name,
-			description: model.description,
-			environment: Object.keys(ENVIRONMENT).find((type) => ENVIRONMENT[type] === model.environment),
-			provider: {id: model.provider.id},
-			status: model.status.toUpperCase(),
-			authenticationMethod: Object.keys(AUTH_METHODS).find((type) => AUTH_METHODS[type] === model.authMethod),
-			username: model.username,
-			authenticationUrl: (model.authenticationUrl) ? model.authenticationUrl : '',
-			terminateUrl: (model.terminateUrl) ? model.terminateUrl : '',
-			renewTokenUrl: (model.renewTokenUrl) ? model.renewTokenUrl : '',
-			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
-			httpMethod: model.httpMethod.toUpperCase()
-		};
-
-		// Properties only required on this methods.
-		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER || model.authMethod === AUTH_METHODS.BASIC_AUTH) {
-			if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER ) {
-				postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
-			}
-			postRequest.validationExpression = (model.validationExpression) ? model.validationExpression  : '';
-		}
-
-		// The UI validates if the Password exists however, on edition is not required unless you want to change it
-		if (model.password && model.password.length > 0 && model.password !== '') {
-			postRequest.password = model.password;
-		}
-
-		if (!model.id) {
-			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					let dataItem = (result && result.status === 'success' && result.data);
-					return dataItem;
-				})
-				.catch((error: any) => error.json());
-		} else {
-			postRequest.version = model.version;
-			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
-				.map((res: Response) => {
-					let result = res.json();
-					return result && result.status === 'success' && result.data;
-				})
-				.catch((error: any) => error.json());
-		}
-	}
-
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
-		let postRequest = {
-			providerId: model.provider.id,
-			name: model.name
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.isUnique;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
-		let postRequest = {};
-		if (model.id) {
-			postRequest['providerId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
 			.map((res: Response) => {
@@ -551,92 +347,11 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	/**
-	 * Validate if the current DataScript is being or not used somewhere
-	 * @param {number} id
-	 * @returns {Observable<string>}
-	 */
-	validateDeleteScript(id: number): Observable<string> {
-		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteDataScript(id: number): Observable<string> {
-		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteProvider(id: number): Observable<string> {
-		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	deleteAPIAction(id: number): Observable<string> {
 		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteCredential(id: number): Observable<string> {
-		return this.http.delete(`${this.credentialUrl}/${id}`)
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	saveScript(id: number, script: string): Observable<any> {
-		let postRequest = {
-			id: id,
-			script: script
-		};
-		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success';
-			})
-			.catch((error: any) => error.json());
-	}
-
-	getETLScript(id: number): Observable<ApiResponseModel> {
-		return this.http.get(this.GET_ETL_SCRIPT_BY_ID_URL.replace('{0}', id.toString()) )
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
-	/**
-	 * POST - this will create a progress job for the test script process.
-	 * @param {string} script
-	 * @param {string} filename
-	 * @returns {Observable<any>}
-	 */
-	testScript(script: string, filename: string): Observable<ApiResponseModel> {
-		let postRequest = {
-			script: script,
-			filename: filename
-		};
-		return this.http.post(`${this.dataScriptUrl}/initiateTestScript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let response = res.json();
-				return response;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -653,30 +368,6 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	uploadText(content: string, extension: string): Observable<any> {
-		let postRequest = {
-			content: content,
-			extension: extension
-		};
-		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
-	uploadETLScriptFileText(content: string, extension: string): Observable<any> {
-		let postRequest = {
-			content: content,
-			extension: extension
-		};
-		return this.http.post(this.ETLScriptUploadTextURL, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				return res.json();
-			})
-			.catch((error: any) => error.json());
-	}
-
 	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
 		const headers = new Headers({});
 		const options = new RequestOptions({ headers: headers });
@@ -686,47 +377,6 @@ export class DataIngestionService {
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());
-	}
-
-	uploadETLScriptFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.ETLScriptUploadURL, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
-			})
-			.catch((error: any) => error.json());
-	}
-
-	uploadAssetImportFile(formdata: any): Observable<any | HttpResponse<any>> {
-		const headers = new Headers({});
-		const options = new RequestOptions({ headers: headers });
-		return this.http.post(this.assetImportUploadURL, formdata, options)
-			.map((res: Response) => {
-				let response = res.json().data;
-				return new HttpResponse({status: 200, body: { data : response } });
-			})
-			.catch((error: any) => error.json());
-	}
-
-	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
-		let body = JSON.stringify({filename: filename} );
-		let headers = new Headers({ 'Content-Type': 'application/json' });
-		let options = new RequestOptions({
-			headers: headers,
-			body : body
-		});
-		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
-			.map((res: Response) => {
-				let response = res.json();
-				response.operation = 'delete';
-				return new HttpResponse({status: 200, body: { data : response } });
-			})
-			.catch((error: any) => error.json());
-	}
-	private getUserPreference(preferenceName: string): Observable<any> {
-		return this.preferenceService.getPreference(preferenceName);
 	}
 
 	/**
@@ -812,17 +462,5 @@ export class DataIngestionService {
 	getFiltersExcluding(excludeFilterName: string, state: any): any {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
-	}
-
-	/**
-	 * GET - Gets any job current progresss based on progressKey used as a unique job identifier.
-	 * @param {string} progressKey
-	 * @returns {Observable<ApiResponseModel>}
-	 */
-	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
-		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
-			.map((res: Response) => {
-				return res.json();
-			}).catch((error: any) => error.json());
 	}
 }

@@ -3,7 +3,7 @@ import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpProgressEven
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
-import {DataIngestionService} from '../../modules/dataIngestion/service/data-ingestion.service';
+import {DataIngestionService} from '../../modules/dataScript/service/data-ingestion.service';
 import {FileRestrictions} from '@progress/kendo-angular-upload';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,

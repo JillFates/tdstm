@@ -74,7 +74,9 @@ export const TDSAppRoute: Routes = [
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},
 	{path: 'provider', loadChildren: '../modules/provider/provider.module#ProviderModule'},
-	{path: 'credential', loadChildren: '../modules/credential/credential.module#CredentialModule'}
+	{path: 'credential', loadChildren: '../modules/credential/credential.module#CredentialModule'},
+	{path: 'action', loadChildren: '../modules/apiAction/api-action.module#APIActionModule'},
+	{path: 'datascript', loadChildren: '../modules/dataScript/data-script.module#DataScriptModule'}
 ];
 
 @NgModule({

@@ -27,7 +27,7 @@ import {FieldReferencePopupComponent} from '../../../../shared/components/field-
 
 @Component({
 	selector: 'data-script-etl-builder',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-etl-builder/data-script-etl-builder.component.html'
+	templateUrl: '../../components/data-script-etl-builder/data-script-etl-builder.component.html'
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;

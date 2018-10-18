@@ -9,7 +9,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {
 	DataIngestionService,
 	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
-} from '../../../dataIngestion/service/data-ingestion.service';
+} from '../../../dataScript/service/data-ingestion.service';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
 	ETL_SCRIPT_FILE_UPLOAD_TYPE,

@@ -1,7 +1,7 @@
 import {ElementRef, Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ActionType} from '../../../dataIngestion/model/data-script.model';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {KEYSTROKE} from '../../../../shared/model/constants';

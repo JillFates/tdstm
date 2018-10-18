@@ -1,6 +1,6 @@
 import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
 import {ProviderModel} from '../../provider/model/provider.model';
-import {DataScriptModel} from '../../dataIngestion/model/data-script.model';
+import {DataScriptModel} from '../../dataScript/model/data-script.model';
 import {ProjectModel} from '../../../shared/model/project.model';
 import {EnumModel} from '../../../shared/model/enum.model';
 
