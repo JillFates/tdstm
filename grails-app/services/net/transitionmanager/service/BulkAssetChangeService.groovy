@@ -176,7 +176,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	@NotTransactional
-	private Class getBulkClass(Class type, String assetClassName, String fieldName, Map fieldMapping, Map bulkClassMapping) {
+	private Class getBulkClass(Class type, String assetClassName, String fieldName, def fieldMapping, Map bulkClassMapping) {
 		def property = GormUtil.getDomainPropertyType(type, fieldName)
 		String dataType = property.typeName
 
