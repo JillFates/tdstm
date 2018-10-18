@@ -5,7 +5,7 @@
 
 <p>The TransitionManager administrator has sent you a Reset Password request.</p>
 
-<p>Please click on the following link or copy it into your browser.  You will be presented with a secure web page where you be prompted for your email address and you can set your new password.</p>
+<p>Please click on the following link or copy it into your browser.  You will be presented with a secure web page where you will be prompted for your email address and you can set your new password.</p>
 
 <a href="${resetPasswordUrl}">Click here to reset your password</a><br>
 
