@@ -151,11 +151,11 @@ class EmailDispatchService implements ServiceMethods {
 					username: ed.toPerson.userLogin?.username]
 			case "adminResetPassword":
 				return [
-					person: ed.toPerson.firstName,
-					activationURL : serverURL + "/auth/resetPassword/" + emailParams.token,
-					ttl: emailParams.expiredTime,
-					username: ed.toPerson.userLogin?.username,
-					sysAdminEmail: emailParams.sysAdminEmail]
+                    person: ed.toPerson.firstName,
+                    resetPasswordUrl: serverURL + "/auth/resetPassword/" + emailParams.token,
+                    expiredTime: emailParams.expiredTime,
+                    supportEmail: "support@transitionaldata.com",
+                    username: ed.toPerson.userLogin?.username]
 		}
 	}
 
