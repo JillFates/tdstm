@@ -96,6 +96,11 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
+	'API_ACTION': {
+		'CREATE_ACTION': 'Create Action',
+		'API_ACTION': 'API Actions',
+		'API_ACTIONS': 'Credentials',
+	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
 		'MANAGE_TAGS': 'Manage Tags',
@@ -119,7 +124,6 @@ export const en_DICTIONARY: Object = {
 	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
-		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
 		'ETL_SCRIPTS': 'ETL Scripts',
@@ -127,7 +131,6 @@ export const en_DICTIONARY: Object = {
 		'DATA_SCRIPT': 'DataScript',
 		'CREATE_DATA_SCRIPT': 'Create DataScript',
 		'CREATE_ETL_SCRIPT': 'Create ETL Script',
-		'CREATE_ACTION': 'Create Action',
 		'CREDENTIALS': 'Credentials',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
 		'ETL_BUILDER_TITLE': 'DataScript Designer',

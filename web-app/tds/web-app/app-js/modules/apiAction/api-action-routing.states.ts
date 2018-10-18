@@ -21,9 +21,9 @@ export const APIActionRoute: Routes = [
 		path: APIActionStates.API_ACTION_LIST.url,
 		data: {
 			page: {
-				title: 'DATA_INGESTION.API_ACTIONS',
+				title: 'API_ACTION.API_ACTIONS',
 				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.API_ACTIONS']
+				menu: ['GLOBAL.PROJECT', 'API_ACTION.API_ACTIONS']
 			},
 			requiresAuth: true,
 		},
