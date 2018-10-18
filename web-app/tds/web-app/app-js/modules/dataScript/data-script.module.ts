@@ -23,8 +23,6 @@ import {DataScriptConsoleComponent} from './components/data-script-console/data-
 import {DataScriptEtlBuilderComponent} from './components/data-script-etl-builder/data-script-etl-builder.component';
 import {DataScriptSampleDataComponent} from './components/data-script-sample-data/data-script-sample-data.component';
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
-import {PopupPollingComponent} from './components/popups/popup-polling.component';
-import {PopupProvidesDataComponent} from './components/popups/popup-provides-data.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
@@ -61,9 +59,7 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		DataScriptViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
-		DataScriptSampleDataComponent,
-		PopupPollingComponent,
-		PopupProvidesDataComponent
+		DataScriptSampleDataComponent
 	],
 	providers: [
 		ModuleResolveService,

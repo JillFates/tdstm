@@ -15,6 +15,8 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {APIActionListComponent} from './components/list/api-action-list.component';
 import {APIActionViewEditComponent} from './components/view-edit/api-action-view-edit.component';
+import {PopupPollingComponent} from './popups/popup-polling.component';
+import {PopupProvidesDataComponent} from './popups/popup-provides-data.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {APIActionResolveService} from './resolve/api-action-resolve.service';
@@ -38,7 +40,9 @@ import {APIActionService} from './service/api-action.service';
 	],
 	declarations: [
 		APIActionListComponent,
-		APIActionViewEditComponent
+		APIActionViewEditComponent,
+		PopupPollingComponent,
+		PopupProvidesDataComponent
 	],
 	providers: [
 		// Resolve
