@@ -81,7 +81,7 @@ class EditBundlesSpec extends GebReportingSpec {
             validateDataDisplayed(originalBundleData)
     }
 
-    def "3. The user Edits the  bundle"(){
+    def "4. The user Edits the  bundle"(){
         given: 'The user edits the bundle data'
             clickEdit()
             at EditBundlePage
