@@ -19,6 +19,7 @@ import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-di
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { PersonService } from './services/person.service';
 import { WindowService } from './services/window.service';
+import {UserService} from './services/user.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -128,7 +129,8 @@ import {FieldReferencePopupComponent} from './components/field-reference-popup/f
 		UIFloatingHeaderKGridDirective,
 		WindowService,
 		DictionaryService,
-		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
+		{ provide: 'localizedDictionary', useValue: en_DICTIONARY },
+		UserService
 	],
 	exports: [UILoaderDirective,
 		UIAutofocusDirective,

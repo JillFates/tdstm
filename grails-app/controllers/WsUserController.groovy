@@ -2,6 +2,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
@@ -43,5 +44,11 @@ class WsUserController implements ControllerMethods {
 	def savePreference() {
 		userPreferenceService.setPreference(params.code?.toString() ?: '', params.value ?: '')
 		renderSuccessJson()
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
+	def getUser() {
+		UserLogin userLogin = securityService.getUserLogin()
+		renderSuccessJson([id: userLogin.id, username: userLogin.username])
 	}
 }
