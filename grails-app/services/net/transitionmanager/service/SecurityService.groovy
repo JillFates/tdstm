@@ -26,6 +26,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
+import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Permissions
 import net.transitionmanager.domain.Person
@@ -386,6 +387,51 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
 
 		logger.info('Cleanup Password Reset: Finished.')
+	}
+
+	@Transactional
+	void updatePassword(UserLogin userLogin, UserUpdatePasswordCommand command) throws ServiceException{
+		String msg
+		try {
+			if (!userLogin) {
+				msg = 'Failed to load your user account'
+
+			} else {
+
+				// See if the user account is properly configured to a state that they're allowed to change their password
+				securityService.validateAllowedToChangePassword(userLogin)
+
+
+				//
+				// Made it throught the guantlet of password requirements so lets update the password
+				//
+				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
+
+				if (!userLogin.save(failOnError: false)) {
+					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
+					throw new DomainUpdateException('An error occured while trying to save your password')
+
+				} else {
+					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged())
+
+				}
+
+			}
+
+		} catch (InvalidParamException | DomainUpdateException e) {
+			msg = e.message
+
+		} catch (ServiceException e) {
+			msg = "You are not allowed to change your password at this time."
+
+		} catch (e) {
+			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			msg = 'An error occurred during the update process'
+		}
+
+		if ( msg ) {
+			throw new ServiceException(msg)
+		}
 	}
 
 	/**
