@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate
 @Transactional
 @Slf4j
 class CredentialService implements ServiceMethods {
-//    ProjectService projectService
     ProviderService providerService
 
     /**
