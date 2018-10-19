@@ -149,6 +149,7 @@ class WsLicenseAdminController implements ControllerMethods {
 		String requestNote = json.requestNote
 
 		License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environment, projectId, requestNote)
+		licenseAdminService.sendMailRequest(lic)
 		renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
     }
 

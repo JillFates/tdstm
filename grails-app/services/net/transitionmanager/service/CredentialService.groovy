@@ -20,6 +20,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -40,7 +41,7 @@ import java.security.cert.X509Certificate
 @Transactional
 @Slf4j
 class CredentialService implements ServiceMethods {
-    ProjectService projectService
+    ProviderService providerService
 
     /**
      * Creates a new credential
@@ -462,7 +463,7 @@ class CredentialService implements ServiceMethods {
      * @param throwException
      * @return
      */
-    private Credential findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
+    Credential findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
         Credential credential = Credential.where {
             id == id
             project == project
@@ -471,6 +472,27 @@ class CredentialService implements ServiceMethods {
 
         if (! credential && throwException) {
             throw new EmptyResultException("No Credential exists with the ID $id for the Project $project and Provider $provider.")
+        }
+        return credential
+    }
+
+    /**
+     * Find a credential instance with the given name, project and provider
+     * @param name - credential name
+     * @param project - credential project
+     * @param provider - credential provider
+     * @param throwException - whether to throw an exception if credential is not found
+     * @return
+     */
+    Credential findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
+        Credential credential = Credential.where {
+            name == name
+            project == project
+            provider == provider
+        }.find()
+
+        if (! credential && throwException) {
+            throw new EmptyResultException("No Credential exists with name $name for the Project $project and Provider $provider.")
         }
         return credential
     }
@@ -512,6 +534,33 @@ class CredentialService implements ServiceMethods {
 
         if (count > 0) {
             throw new InvalidParamException('A Credential with the same name already exists')
+        }
+    }
+
+    /**
+     * Clone any existing credentials associated to sourceProject (if any),
+     * then associate those newly created credentials to targetProject.
+     *
+     * @param sourceProject  The project from which the existing credentials will be cloned.
+     * @param targetProject  The project to which the new credentials will be associated.
+     */
+    void cloneProjectCredentials(Project sourceProject, Project targetProject) {
+        List<Credential> credentials = Credential.where {
+            project == sourceProject
+        }.list()
+
+        if (!credentials.isEmpty()) {
+            credentials.each { Credential sourceCredential ->
+                Provider targetProvider = providerService.getProvider(sourceCredential.provider.name, targetProject, false)
+                Credential newCredential = (Credential)GormUtil.cloneDomainAndSave(sourceCredential,
+                        [
+                                project: targetProject,
+                                provider: targetProvider,
+                                username: 'Must Be Changed',
+                                password: RandomStringUtils.randomAlphanumeric(10)
+                        ], false, false);
+                log.debug "Cloned credential ${newCredential.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+            }
         }
     }
 }

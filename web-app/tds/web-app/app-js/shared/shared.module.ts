@@ -19,6 +19,8 @@ import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-di
 import { UILoaderService } from '../shared/services/ui-loader.service';
 import { PersonService } from './services/person.service';
 import { PermissionService } from './services/permission.service';
+import { WindowService } from './services/window.service';
+import {UserService} from './services/user.service';
 // Shared Directives
 import { UIAutofocusDirective } from './directives/autofocus-directive';
 import { UIHandleEscapeDirective } from './directives/handle-escape-directive';
@@ -166,6 +168,8 @@ export class SharedModule {
 				UISVGIconDirectiveDirective,
 				UIFloatingHeaderKGridDirective,
 				DictionaryService,
+				WindowService,
+				UserService,
 				{
 					provide: 'localizedDictionary',
 					useValue: en_DICTIONARY

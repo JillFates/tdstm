@@ -54,6 +54,9 @@ import {ManufacturerEditComponent} from './components/device/manufacturer/compon
 import {ModelDeviceShowComponent} from './components/device/model-device/components/model-device-show/model-device-show.component';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
+import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
+import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
+import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
 
 @NgModule({
 	imports: [
@@ -85,8 +88,6 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		TaskCommentComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -95,7 +96,12 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		AssetCloneComponent,
-		PopupAssetMessageComponent
+		PopupAssetMessageComponent,
+		TaskCommentDialogComponent,
+		TaskCreateComponent,
+		TaskEditComponent,
+		TaskDetailComponent,
+		TaskActionsComponent
 	],
 	providers: [
 		// Resolve
@@ -124,8 +130,6 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		AssetCreateComponent,
 		AssetDependencyComponent,
 		SingleCommentComponent,
-		TaskDetailComponent,
-		TaskEditComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -133,7 +137,11 @@ import {PopupAssetMessageComponent} from './components/popups/popup-asset-messag
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent
+		AssetCloneComponent,
+		TaskCommentDialogComponent,
+		TaskCreateComponent,
+		TaskEditComponent,
+		TaskDetailComponent
 	],
 })
 

@@ -650,13 +650,18 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
 		// Deal with legacy view parameters.
-		if (request.format != 'json') {
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
 			params.taskDependency = params.list('taskDependency[]')
 			params.taskSuccessor = params.list('taskSuccessor[]')
+			requestParams = params
 		}
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, true, flash)
-		if (params.forWhom == "update") {
-			def assetEntity = AssetEntity.get(params.prevAsset)
+
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, true, flash)
+		if (requestParams.forWhom == "update") {
+			def assetEntity = AssetEntity.get(requestParams.prevAsset)
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
 			render(template: "commentList", model: [assetCommentList: assetCommentList])
 		} else {
@@ -2905,7 +2910,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def assetName
 		if (params.assetId) {
-			assetName = AssetEntityHelper.getAssetById(project, null, params.assetId).assetName
+			assetName = fetchDomain(AssetEntity, [id: params.assetId]).assetName
 		}
 
 		Map<String, String> defaultPrefs = [levelsUp: '0', levelsDown: '3', showCycles: true,

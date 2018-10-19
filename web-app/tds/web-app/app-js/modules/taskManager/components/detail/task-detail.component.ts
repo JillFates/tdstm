@@ -1,21 +1,23 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {TaskDetailModel} from './../model/task-detail.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {TaskSuccessorPredecessorColumnsModel} from './../model/task-successor-predecessor-columns.model';
-import {TaskNotesColumnsModel} from './../model/task-notes-columns.model';
+import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
+import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
-import {TaskEditCreateModelHelper} from '../model/task-edit-create-model.helper';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {TaskActionsOptions} from '../task-actions/task-actions.component';
+import {WindowService} from '../../../../shared/services/window.service';
 
 @Component({
 	selector: `task-detail`,
@@ -28,6 +30,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public dateFormat: string;
 	public dateFormatTime: string;
 	public userTimeZone: string;
+	public currentUserId: number;
 	public modelHelper: TaskEditCreateModelHelper;
 	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
 	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
@@ -49,7 +52,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		public promptService: UIPromptService,
 		public userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private windowService: WindowService) {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -58,6 +62,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	ngOnInit() {
 		this.hasChanges = false;
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
@@ -65,25 +71,75 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
+	 * Based upon current task status determines which options to show
+	 */
+	getShowTaskActionsOptions(): TaskActionsOptions {
+		const options = {
+			showDone: false,
+			showStart: false,
+			showAssignToMe: false,
+			showNeighborhood: false,
+			invoke: false
+		};
+
+		if (!this.model) {
+			return options;
+		}
+
+		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
+		const predecessorList = this.model && this.model.predecessorList || [];
+		const successorList = this.model && this.model.successorList || [];
+
+		options.showDone = this.model.status &&
+			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
+
+		options.showStart = this.model.status &&
+			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
+
+		options.showAssignToMe = this.currentUserId !== assignedTo &&
+			this.model.status &&
+			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
+				.indexOf(this.model.status) >= 0;
+
+		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
+
+		options.invoke =
+			this.model.apiAction &&
+			this.model.apiAction.id &&
+			!this.model.apiActionInvokedAt &&
+			this.model.status &&
+			[
+				this.modelHelper.STATUS.READY,
+				this.modelHelper.STATUS.STARTED
+			].indexOf(this.model.status) >= 0;
+		return options;
+	}
+
+	/**
 	 * Load All Asset Class and Retrieve
 	 */
 	private loadTaskDetail(): void {
-		this.taskManagerService.getTaskDetails(this.taskDetailModel.id).subscribe((res) => {
-			this.dateFormat = this.userPreferenceService.getUserDateFormat();
-			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-			this.taskDetailModel.detail = res;
+		this.taskManagerService.getTaskDetails(this.taskDetailModel.id)
+			.subscribe((res) => {
+				if (!res) {
+					this.dismiss();
+					return;
+				}
+				this.dateFormat = this.userPreferenceService.getUserDateFormat();
+				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+				this.taskDetailModel.detail = res;
 
-			this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
-			this.model = this.modelHelper.cleanAndSetModel(this.taskDetailModel);
-			this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
+				this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
+				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
+				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
-			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
-			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
-			// Notes are coming into an Array of Arrays...
-			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
-			// Convert the Duration into a Human Readable form
-			this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
-		});
+				this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
+				this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+				// Notes are coming into an Array of Arrays...
+				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
+				// Convert the Duration into a Human Readable form
+				this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
+			});
 	}
 
 	/**
@@ -124,6 +180,11 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Open view to edit task details
 	 */
 	public editTaskDetail(): void {
+		this.model.modal = {
+			title: 'Edit Task',
+			type: ModalType.EDIT
+		};
+
 		this.dialogService.extra(TaskEditComponent,
 			[
 				{provide: UIDialogService, useValue: this.dialogService},
@@ -147,4 +208,71 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.dismiss(this.hasChanges);
 		});
 	}
+
+	/**
+	 * Change the task status to started
+	 */
+	onStartTask(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: this.modelHelper.STATUS.STARTED,
+			currentStatus: this.model.status
+		};
+
+		this.taskManagerService.updateTaskStatus(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+	/**
+	 * Change the task status to done
+	 */
+	onDoneTask(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: this.modelHelper.STATUS.COMPLETED,
+			currentStatus: this.model.status
+		};
+
+		this.taskManagerService.updateTaskStatus(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+	/**
+	 * Open the neighborhood window
+	 */
+	onNeighborhood(): void {
+		this.windowService.getWindow().open(`../task/taskGraph?neighborhoodTaskId=${this.model.id}`, '_blank')
+	}
+
+	/**
+	 * Assign the task to the current user
+	 */
+	onAssignToMe(): void {
+		const payload = {
+			id: this.model.id.toString(),
+			status: this.model.status
+		};
+
+		this.taskManagerService.assignToMe(payload)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+
+	/**
+	 * Invoke an api action
+	 */
+	onInvoke(): void {
+		this.taskManagerService.invokeAction(this.model.id)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+
 }

@@ -18,7 +18,7 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if> <g:form method="post">
-	<input type="hidden" name="roleTypeId" value="${roleTypeInstance?.id}" />
+	<input type="hidden" name="id" value="${roleTypeInstance?.id}" />
 	<div class="dialog">
 	<table>
 		<tbody>

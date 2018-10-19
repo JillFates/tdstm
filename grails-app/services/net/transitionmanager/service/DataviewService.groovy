@@ -3,13 +3,15 @@
  */
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.command.DataviewApiParamsCommand
+import grails.transaction.Transactional
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
@@ -112,6 +114,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
@@ -151,6 +154,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
 		validateDataviewCreateAccessOrException(dataviewJson)
 
@@ -181,6 +185,7 @@ class DataviewService implements ServiceMethods {
 	 * @param id Dataview id to delete
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
+	@Transactional
 	void delete(Long id) {
 		Dataview dataview = fetch(id)
 		validateDataviewDeleteAccessOrException(id, dataview)
@@ -306,6 +311,21 @@ class DataviewService implements ServiceMethods {
     }
 
 	/**
+	 * Perform a query against one or domains specified in the DataviewSpec passed into the method
+	 *
+	 * @param project - the project that the data should be isolated to
+	 * @param dataview - the specifications for the view/query
+	 * @param apiParamsCommand - parameters from the user for filtering and sort order
+	 * @return a Map with data as a List of Map values and pagination
+	 */
+	// TODO : Annotate READONLY
+	Map query(Project project, Dataview dataview, DataviewApiParamsCommand apiParamsCommand) {
+
+		DataviewSpec dataviewSpec = new DataviewSpec(apiParamsCommand, dataview)
+		return previewQuery(project, dataviewSpec)
+	}
+
+	/**
 	 * Gets the hql for filtering by asset ids, based of the filters from the all asset views.
 	 *
 	 * @param project The current project used to limit the query.
@@ -423,6 +443,54 @@ class DataviewService implements ServiceMethods {
 				}
 			}
 		}
+
+		// Add the flags signaling whether or not each asset has comments and/or tasks associated.
+		appendTasksAndComments(queryResults)
+
+	}
+
+	/**
+	 * After querying for the assets we need to determine if the returned assets
+	 * have comments and/or tasks associated.
+	 *
+	 * @param queryResults - the result of the assets query.
+	 */
+	private void appendTasksAndComments(Map queryResults) {
+		// Build a list with the asset ids and initialize tasks and comments flags.
+		List<Long> assetIds = []
+		// List with the assets found by the preview method.
+		List<Map> assetResults = queryResults['assets']
+		// This map will contain, for each asset, the flags for each comment type.
+		Map<Long, Map<String, Boolean>> commentsAndTasksMap = [:]
+		// Iterate over the assets keeping their id and initializing the map for its flags.
+		assetResults.each { Map assetMap ->
+			Long assetId = NumberUtil.toLong(assetMap['common_id'])
+			assetIds << assetId
+			commentsAndTasksMap[assetId] = [issue: false, comment: false]
+		}
+
+		// Query for assets and the comment types associated with them.
+		String tasksAndCommentsQuery = """
+			SELECT assetEntity.id, commentType FROM AssetComment 
+			WHERE assetEntity.id IN (:assetIds) AND isPublished = true
+			GROUP BY assetEntity.id, commentType
+		"""
+
+		// Execute the query.
+		List tasksAndComments = AssetComment.executeQuery(tasksAndCommentsQuery, [assetIds: assetIds])
+
+		// Iterate over the results from the database updating the flags map.
+		for (taskOrComment in tasksAndComments) {
+			Long assetId = taskOrComment[0]
+			String commentType = taskOrComment[1]
+			commentsAndTasksMap[assetId][commentType] = true
+		}
+
+		// Iterate over the preview assets setting the flags map as an attribute.
+		assetResults.each { Map assetMap ->
+			Long assetId = NumberUtil.toLong(assetMap['common_id'])
+			assetMap['taskAndCommentFlags'] = commentsAndTasksMap[assetId]
+		}
 	}
 
 	/**
@@ -469,6 +537,7 @@ class DataviewService implements ServiceMethods {
 	 * Add the given dataview to the current person's favorites.
 	 * @param dataviewId
 	 */
+	@Transactional
 	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
 		Dataview dataview = fetch(dataviewId)
 
@@ -990,10 +1059,10 @@ class DataviewService implements ServiceMethods {
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: "", mode:"where"],
 	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
 		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
-		'lastUpdated': [property: "str(AE.lastUpdated)", type: Date, namedParameter: 'lastUpdated', join: ''],
-		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
-		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
-		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
+		'lastUpdated': [property: "AE.lastUpdated", type: Date, namedParameter: 'lastUpdated', join: ''],
+		'maintExpDate': [property: "AE.maintExpDate", type: Date, namedParameter: 'maintExpDate', join: ''],
+		'purchaseDate': [property: "AE.purchaseDate", type: Date, namedParameter: 'purchaseDate', join: ''],
+		'retireDate': [property: "AE.retireDate", type: Date, namedParameter: 'retireDate', join: ''],
 		'tagAssets': [
 			property: """
 				CONCAT(
