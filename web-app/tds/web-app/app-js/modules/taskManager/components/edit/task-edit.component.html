@@ -77,7 +77,7 @@
                                                                 [data]="model.eventList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
-                                                                [(ngModel)]="model.event">
+                                                                [(ngModel)]="model.event" [disabled]="isEventLocked">
                                                         </kendo-dropdownlist>
                                                     </td>
                                                 </tr>

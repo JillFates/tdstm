@@ -21,7 +21,7 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {YesNoList} from '../../model/task-edit-create.model';
+import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
 
 declare var jQuery: any;
 
@@ -48,6 +48,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	public modelHelper: TaskEditCreateModelHelper;
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
+	public isEventLocked: boolean;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -67,6 +68,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+		this.isEventLocked = false;
 
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
 
@@ -77,6 +79,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
+		this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
 
 		const commonCalls = [
 			this.taskManagerService.getStatusList(this.model.id),
@@ -90,11 +93,12 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
 			commonCalls.push(this.taskManagerService.getCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
+			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams())
 		}
 
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events] = results;
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
@@ -110,7 +114,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 				}
 
 				if (events) {
-					this.model.eventList = events.map((item) => ({id: item.id, text: item.name}));
+					this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
+				}
+
+				if (taskDefaults && taskDefaults.preferences) {
+					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT']  || '', text: '' };
+					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
+					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
