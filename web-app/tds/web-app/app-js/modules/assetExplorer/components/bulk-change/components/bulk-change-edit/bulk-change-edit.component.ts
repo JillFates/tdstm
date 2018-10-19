@@ -35,8 +35,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	commonFieldSpecs: any[] = [];
 	gridSettings: DataGridOperationsHelper;
 	affectedAssets: number;
-	editRows: {options: Array<BulkEditAction>, actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
-
+	editRows: {options: Array<any>, fields: Array<BulkEditAction>, actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
+	private cachedOptions: any;
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
 		private promptService: UIPromptService,
@@ -49,7 +49,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			super('#bulk-change-edit-component');
 			this.affectedAssets = this.bulkChangeModel.affected;
 			this.domains = [];
-			this.editRows = {options: [], actions: [], selectedValues: [] };
+			this.editRows = {options: [], fields: [], actions: [], selectedValues: [] };
 	}
 
 	ngOnInit() {
@@ -63,14 +63,14 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				this.tagList = tags.data;
 			}
 			this.addRow();
-			this.gridSettings = new DataGridOperationsHelper(this.editRows.options);
+			this.gridSettings = new DataGridOperationsHelper(this.editRows.fields);
 			this.isLoaded = true;
 		});
 	}
 
 	private addRow(): any {
 		let fields = [...this.getFieldsByDomain(this.defaultDomain)];
-		this.editRows.options.push({fields: fields, actions: []});
+		this.editRows.fields.push({fields: fields, actions: []});
 		this.editRows.selectedValues.push({domain: this.defaultDomain, field: null, action: null, value: null});
 	}
 
@@ -78,8 +78,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		this.editRows.selectedValues[index].domain = domain;
 		this.editRows.selectedValues[index].field = null;
 		this.editRows.selectedValues[index].action = null;
-		this.editRows.options[index].fields = [...this.getFieldsByDomain(domain)];
-		this.editRows.options[index].actions = [];
+		this.editRows.fields[index].fields = [...this.getFieldsByDomain(domain)];
+		this.editRows.fields[index].actions = [];
 	}
 
 	addHandler({sender}): void {
@@ -88,7 +88,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	}
 
 	removeHandler({dataItem, rowIndex}): void {
-		this.editRows.options.splice(rowIndex, 1);
+		this.editRows.fields.splice(rowIndex, 1);
 		this.editRows.selectedValues.splice(rowIndex, 1);
 		this.gridSettings.loadPageData();
 	}
@@ -101,6 +101,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		this.dismiss(bulkActionResult || {action: null, success: false});
 	}
 
+	protected readonly TYPE_OPTIONS_CONTROL = 'Options';
 	// show control if this belongs to class and clear action is not selected
 	canShowControl(controlType: string, rowIndex): boolean {
 		const selectedValue = this.editRows.selectedValues[rowIndex];
@@ -108,7 +109,10 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			return;
 		}
 
-		const isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'] ===  controlType)
+		let isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'] ===  controlType);
+		if (!isTypeOfControl && controlType === this.TYPE_OPTIONS_CONTROL) {
+			isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'].startsWith(controlType));
+	}
 		const isClearAction = (selectedValue.action === null  || selectedValue.action.id === this.CLEAR_ACTION);
 
 		return isTypeOfControl && !isClearAction;
@@ -139,7 +143,15 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		let actions = field.actions.map( action => ({
 			id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`)
 		}));
-		this.editRows.options[index].actions = actions;
+		this.editRows.fields[index].actions = actions;
+		if (this.isFieldControlOptionsList(field)) {
+			// TODO: check if options are already cached and use it, if not go get them.
+			this.editRows.options[index] = [];
+		}
+	}
+
+	private isFieldControlOptionsList(field: any): boolean {
+		return field.control === this.TYPE_OPTIONS_CONTROL || field.control.startsWith(this.TYPE_OPTIONS_CONTROL);
 	}
 
 	onActionValueChange(action: IdTextItem, index: number): void {
