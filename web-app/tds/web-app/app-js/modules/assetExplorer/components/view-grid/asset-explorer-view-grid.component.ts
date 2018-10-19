@@ -476,6 +476,13 @@ export class AssetExplorerViewGridComponent {
 				];
 
 				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+			} else if (!result.clonedAsset && result.showView) {
+				const data: any = {
+					common_id: result.assetId,
+					common_assetClass: dataItem.common_assetClass
+				};
+				this.onShow(data);
+
 			}
 		}).catch( error => console.log('error', error));
 	}
