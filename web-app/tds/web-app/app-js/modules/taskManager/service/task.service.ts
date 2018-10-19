@@ -214,11 +214,17 @@ export class TaskService {
 	searchTasks(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		const {metaParam, currentPage, maxPage, query} = searchParams;
 		const params = [
-			{name: 'commentId', value: metaParam},
+			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
 			{name: 'filter[filters][0][value]', value: query }
 		];
+
+		if (metaParam.eventId) {
+			params.unshift({name: 'moveEvent', value: metaParam.eventId});
+
+		}
+
 		const queryString = params
 			.map((param) =>  `${param.name}=${param.value}`)
 			.join('&');

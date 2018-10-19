@@ -49,6 +49,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	public taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public dataGridTaskNotesHelper: DataGridOperationsHelper;
 	public isEventLocked: boolean;
+	public metaParam: any;
 
 	constructor(
 		public taskDetailModel: TaskDetailModel,
@@ -96,6 +97,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams())
 		}
 
+		this.metaParam = this.getMetaParam();
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
 				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults] = results;
@@ -121,6 +123,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT']  || '', text: '' };
 					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
+					this.metaParam = this.getMetaParam();
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
@@ -419,6 +422,24 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 */
 	onAssetClassChange(): void {
 		this.model.asset = null;
+	}
+
+	/**
+	 * Get the object required to query tasks, using the current commentId and eventId
+	 * @eventId Event id number if it is selected
+	 * @returns {any}
+	*/
+	getMetaParam(eventId = ''): any {
+		const commentId = this.taskDetailModel.modal.type === ModalType.CREATE ? '' : this.model.id;
+		return {commentId, eventId: eventId || this.model.event.id} ;
+	}
+
+	/**
+	 * Whenever a event is selected update the metaParam object
+	 * @returns {any}
+	 */
+	onSelectedEvent(event): void {
+		this.metaParam = this.getMetaParam(event.id) ;
 	}
 
 }
