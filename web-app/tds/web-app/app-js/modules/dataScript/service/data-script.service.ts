@@ -23,7 +23,7 @@ export const PROGRESSBAR_COMPLETED_STATUS = 'COMPLETED';
 export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 
 @Injectable()
-export class DataIngestionService {
+export class DataScriptService {
 
 	private dataDefaultUrl = '../ws';
 	private jobProgressUrl = '../ws/progress';

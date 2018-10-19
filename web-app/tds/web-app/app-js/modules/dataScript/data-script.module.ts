@@ -17,16 +17,17 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import {LayoutModule} from '@progress/kendo-angular-layout';
 import {NumericTextBoxModule} from '@progress/kendo-angular-inputs';
 // Components
-import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
-import {DataScriptViewEditComponent} from './components/data-script-view-edit/data-script-view-edit.component';
-import {DataScriptConsoleComponent} from './components/data-script-console/data-script-console.component';
-import {DataScriptEtlBuilderComponent} from './components/data-script-etl-builder/data-script-etl-builder.component';
-import {DataScriptSampleDataComponent} from './components/data-script-sample-data/data-script-sample-data.component';
+import {DataScriptListComponent} from './components/list/data-script-list.component';
+import {DataScriptViewEditComponent} from './components/view-edit/data-script-view-edit.component';
+import {DataScriptConsoleComponent} from './components/console/data-script-console.component';
+import {DataScriptEtlBuilderComponent} from './components/etl-builder/data-script-etl-builder.component';
+import {DataScriptSampleDataComponent} from './components/sample-data/data-script-sample-data.component';
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import {DataScriptResolveService} from './resolve/data-script-resolve.service';
 // Services
-import {DataIngestionService} from './service/data-ingestion.service';
+import {DataScriptService} from './service/data-script.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 import {ImportAssetsService} from '../importBatch/service/import-assets.service';
@@ -62,8 +63,11 @@ import {ImportAssetsService} from '../importBatch/service/import-assets.service'
 		DataScriptSampleDataComponent
 	],
 	providers: [
+		// Resolve
 		ModuleResolveService,
-		DataIngestionService,
+		DataScriptResolveService,
+		// Service
+		DataScriptService,
 		ImportAssetsService,
 		{
 			provide: HTTP_INTERCEPTORS,

@@ -18,7 +18,7 @@ import {ImportBatchRouteModule} from './import-batch-routing.states';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {ImportAssetsService} from './service/import-assets.service';
-import {DataIngestionService} from '../dataScript/service/data-ingestion.service';
+import {DataScriptService} from '../dataScript/service/data-script.service';
 // Components
 import {ImportBatchRecordSummaryComponent} from './components/record/import-batch-record-summary.component';
 import {ImportBatchRecordFieldsComponent} from './components/record/import-batch-record-fields.component';
@@ -57,7 +57,7 @@ import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-uplo
 		ModuleResolveService,
 		ImportBatchService,
 		ImportAssetsService,
-		DataIngestionService,
+		DataScriptService,
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: KendoFileUploadInterceptor,

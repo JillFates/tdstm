@@ -3,7 +3,7 @@ import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpProgressEven
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/observable/concat';
-import {DataIngestionService} from '../../modules/dataScript/service/data-ingestion.service';
+import {DataScriptService} from '../../modules/dataScript/service/data-script.service';
 import {FileRestrictions} from '@progress/kendo-angular-upload';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
@@ -20,7 +20,7 @@ import {
 @Injectable()
 export class KendoFileUploadInterceptor implements HttpInterceptor {
 
-	constructor(private dataIngestionService: DataIngestionService) {}
+	constructor(private dataIngestionService: DataScriptService) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		if (req.url === FILE_UPLOAD_SAVE_URL) {

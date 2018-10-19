@@ -7,9 +7,9 @@ import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-fil
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 import {
-	DataIngestionService,
+	DataScriptService,
 	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
-} from '../../../dataScript/service/data-ingestion.service';
+} from '../../../dataScript/service/data-script.service';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
 	ETL_SCRIPT_FILE_UPLOAD_TYPE,
@@ -58,7 +58,7 @@ export class ImportAssetsComponent implements OnInit {
 	constructor(
 		private importAssetsService: ImportAssetsService,
 		private notifier: NotifierService,
-		private dataIngestionService: DataIngestionService) {
+		private dataIngestionService: DataScriptService) {
 			this.file.fileUID = null;
 	}
 

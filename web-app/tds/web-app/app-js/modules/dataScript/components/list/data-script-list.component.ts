@@ -3,18 +3,19 @@ import { Observable } from 'rxjs';
 import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
 import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
 
-import { DataIngestionService } from '../../service/data-ingestion.service';
+import { DataScriptService } from '../../service/data-script.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
-import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
+import { DataScriptViewEditComponent } from '../view-edit/data-script-view-edit.component';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'data-script-list',
-	templateUrl: '../../components/data-script-list/data-script-list.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/list/data-script-list.component.html',
 	styles: [`
 		#btnCreateDataScript { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }
@@ -46,17 +47,15 @@ export class DataScriptListComponent implements OnInit {
 	public dateFormat = '';
 
 	constructor(
+		private route: ActivatedRoute,
 		private dialogService: UIDialogService,
-		@Inject('dataScripts') dataScripts: Observable<DataScriptModel[]>,
 		private permissionService: PermissionService,
-		private dataIngestionService: DataIngestionService,
+		private dataIngestionService: DataScriptService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
-		dataScripts.subscribe(
-			(result) => this.setDataGrid(result),
-			(err) => console.log(err));
+		this.setDataGrid(this.route.snapshot.data['dataScripts']);
 	}
 
 	/**

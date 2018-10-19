@@ -7,7 +7,7 @@ import {
 	UploadComponent,
 	UploadEvent
 } from '@progress/kendo-angular-upload';
-import {DataIngestionService} from '../../service/data-ingestion.service';
+import {DataScriptService} from '../../service/data-script.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
@@ -21,7 +21,7 @@ import {DataScriptModel} from '../../model/data-script.model';
 
 @Component({
 	selector: 'data-script-sample-data',
-	templateUrl: '../../components/data-script-sample-data/data-script-sample-data.component.html',
+	templateUrl: '../tds/web-app/app-js/modules/dataScript/components/sample-data/data-script-sample-data.component.html',
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
@@ -64,7 +64,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	constructor(
 		@Inject('etlScript') protected etlScriptModel: DataScriptModel,
-		private dataIngestionService: DataIngestionService,
+		private dataIngestionService: DataScriptService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
 			super('#loadSampleData');
