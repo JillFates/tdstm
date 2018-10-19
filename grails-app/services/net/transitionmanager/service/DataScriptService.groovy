@@ -27,15 +27,14 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
 
 class DataScriptService implements ServiceMethods{
 
-    ProviderService providerService
-	 FileSystemService fileSystemService
+	ProviderService providerService
+	FileSystemService fileSystemService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],
@@ -576,37 +575,24 @@ class DataScriptService implements ServiceMethods{
 	}
 
 	/**
-	 * Clone a datascript
+	 * Clone any existing data scripts associated to sourceProject (if any),
+	 * then associate those newly created data scripts to targetProject.
 	 *
-	 * @param sourceDataScript
-	 * @param targetProject
-	 * @param targetProvider
-	 * @return
+	 * @param sourceProject  The project from which the existing data scripts will be cloned.
+	 * @param targetProject  The project to which the new data scripts will be associated.
 	 */
-	DataScript cloneDataScript(DataScript sourceDataScript, Project targetProject, Provider targetProvider) {
-		DataScript newDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceDataScript, [
-				project: targetProject, provider: targetProvider], false, false)
-		log.debug "Cloned data script ${newDataScript.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
-		return newDataScript
-	}
+	void cloneProjectDataScripts(Project sourceProject, Project targetProject) {
+		List<DataScript> dataScripts = DataScript.where {
+			project == sourceProject
+		}.list()
 
-	/**
-	 * Clone a datascript if it does not exist with given name, project and provider
-	 *
-	 * @param sourceDataScript - source datascript to clone
-	 * @param targetProject - target datascript project
-	 * @param targetProvider - target datascript provider
-	 * @return a cloned instance of the given source datascript or a existing one from database
-	 */
-	DataScript cloneDataScriptIfNotExists(DataScript sourceDataScript, Project targetProject, Provider targetProvider) {
-		if (!sourceDataScript) {
-			return null
+		if (!dataScripts.isEmpty()) {
+			dataScripts.each { DataScript sourceDataScript ->
+				Provider targetProvider = providerService.getProvider(sourceDataScript.provider.name, targetProject, false)
+				DataScript newDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceDataScript,
+						[project: targetProject, provider: targetProvider], false, false);
+				log.debug "Cloned data script ${newDataScript.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+			}
 		}
-
-		DataScript newDataScript = findByProjectAndProvider(sourceDataScript.name, targetProject, targetProvider, false)
-		if (newDataScript) {
-			return newDataScript
-		}
-		return cloneDataScript(sourceDataScript, targetProject, targetProvider)
 	}
 }

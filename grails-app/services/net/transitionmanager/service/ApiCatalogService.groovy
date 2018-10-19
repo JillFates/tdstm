@@ -153,11 +153,34 @@ class ApiCatalogService implements ServiceMethods {
 	}
 
 	/**
+	 * Fetch a ApiCatalog from database by name, project and provider
+	 * @param name - api catalog name
+	 * @param project - project
+	 * @param provider - provider
+	 * @param throwException - whether to throw or not an exception if api catalog is not found
+	 * @return a api catalog instance
+	 */
+	ApiCatalog getApiCatalog(String name, Project project, Provider provider, boolean throwException = false) {
+		// Find an api catalog with the given name for this project and provider.
+		ApiCatalog apiCatalog = ApiCatalog.where {
+			name == name
+			project == project
+			provider == provider
+		}.get()
+
+		if (! apiCatalog && throwException) {
+			throw new EmptyResultException("No ApiCatalog exists with the name $name for the Project $project and Provider $provider.")
+		}
+
+		return apiCatalog
+	}
+
+	/**
 	 * Clone any existing api catalogs and providers associated to sourceProject (if any),
-	 * then associate those newly created tags to targetProject.
+	 * then associate those newly created api catalogs to targetProject.
 	 *
-	 * @param sourceProject  The project from which the existing tags will be cloned.
-	 * @param targetProject  The project to which the new tags will be associated.
+	 * @param sourceProject  The project from which the existing api catalogs will be cloned.
+	 * @param targetProject  The project to which the new api catalogs will be associated.
 	 */
 	void cloneProjectApiCatalogs(Project sourceProject, Project targetProject) {
 		List<ApiCatalog> apiCatalogs = ApiCatalog.where {
@@ -166,15 +189,12 @@ class ApiCatalogService implements ServiceMethods {
 
 		if (!apiCatalogs.isEmpty()) {
 			apiCatalogs.each { ApiCatalog sourceApiCatalog ->
-				Provider targetProvider = providerService.cloneProvider(sourceApiCatalog.provider, targetProject)
-				ApiCatalog newApiCatalog = new ApiCatalog(
-						project: targetProject,
-						provider: targetProvider,
-						name: sourceApiCatalog.name,
-						dictionary: sourceApiCatalog.dictionary,
-						dictionaryTransformed: sourceApiCatalog.dictionaryTransformed
-				)
-				newApiCatalog.save()
+				Provider targetProvider = providerService.getProvider(sourceApiCatalog.provider.name, targetProject, false)
+				ApiCatalog newApiCatalog = (ApiCatalog)GormUtil.cloneDomainAndSave(sourceApiCatalog,
+						[
+							project: targetProject,
+							provider: targetProvider
+						], false, false)
 				log.debug "Cloned api catalog ${newApiCatalog.name} for project ${targetProject.toString()}"
 			}
 		}

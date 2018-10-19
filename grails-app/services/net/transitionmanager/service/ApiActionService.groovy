@@ -51,6 +51,7 @@ class ApiActionService implements ServiceMethods {
 	DataScriptService dataScriptService
 	CustomDomainService customDomainService
 	ProviderService providerService
+	ApiCatalogService apiCatalogService
 
 	/**
 	 * Find an ApiAction by id
@@ -678,8 +679,8 @@ class ApiActionService implements ServiceMethods {
 	 * Clone any existing api actions associated to sourceProject (if any),
 	 * then associate those newly created tags to targetProject.
 	 *
-	 * @param sourceProject  The project from which the existing tags will be cloned.
-	 * @param targetProject  The project to which the new tags will be associated.
+	 * @param sourceProject  The project from which the existing api actions will be cloned.
+	 * @param targetProject  The project to which the new api actions will be associated.
 	 */
 	void cloneProjectApiActions(Project sourceProject, Project targetProject) {
 		List<ApiAction> apiActions = ApiAction.where {
@@ -689,16 +690,25 @@ class ApiActionService implements ServiceMethods {
 		if (apiActions && !apiActions.isEmpty()) {
 
 			apiActions.each { ApiAction sourceApiAction ->
-				Provider targetProvider = providerService.cloneProviderIfNotExists(sourceApiAction.provider, targetProject)
+				Provider targetProvider = providerService.getProvider(sourceApiAction.provider.name, targetProject, false)
 
-				ApiCatalog targetApiCatalog = ApiCatalog.where {
-					name == sourceApiAction.apiCatalog.name
-					project == targetProject
-				}.get()
+				ApiCatalog targetApiCatalog = null
+				if (sourceApiAction.apiCatalog) {
+					Provider apiCatalogProvider = providerService.getProvider(sourceApiAction.apiCatalog.provider.name, targetProject, false)
+					targetApiCatalog = apiCatalogService.getApiCatalog(sourceApiAction.apiCatalog.name, targetProject, apiCatalogProvider, false)
+				}
 
-				DataScript targetDataScript = dataScriptService.cloneDataScriptIfNotExists(sourceApiAction.defaultDataScript, targetProject, targetProvider)
+				DataScript targetDataScript = null
+				if (sourceApiAction.defaultDataScript) {
+					Provider dataScriptProvider = providerService.getProvider(sourceApiAction.defaultDataScript.provider.name, targetProject, false)
+					targetDataScript = dataScriptService.findByProjectAndProvider(sourceApiAction.defaultDataScript.name, targetProject, dataScriptProvider, false)
+				}
 
-				Credential targetCredential = credentialService.cloneCredentialIfNotExists(sourceApiAction.credential, targetProject, targetProvider)
+				Credential targetCredential = null
+				if (sourceApiAction.credential) {
+					Provider credentialProvider = providerService.getProvider(sourceApiAction.credential.provider.name, targetProject, false)
+					targetCredential = credentialService.findByProjectAndProvider(sourceApiAction.credential.name, targetProject, credentialProvider, false)
+				}
 
 				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomainAndSave(sourceApiAction, [
 						project: targetProject,
