@@ -176,7 +176,7 @@ class BulkAssetChangeService implements ServiceMethods {
 	 * @return the class to use for bulk changes
 	 */
 	@NotTransactional
-	private Class getBulkClass(Class type, String assetClassName, String fieldName, def fieldMapping, Map bulkClassMapping) {
+	private Class getBulkClass(Class type, String assetClassName, String fieldName, Map fieldMapping, Object bulkClassMapping) {
 		def property = GormUtil.getDomainPropertyType(type, fieldName)
 		String dataType = property.typeName
 
@@ -213,7 +213,6 @@ class BulkAssetChangeService implements ServiceMethods {
 		String field
 		List<Map> actions = []
 		boolean hasCustomFields = false
-
 		List<String> fields = edits.collect { EditCommand edit ->
 			field = edit.fieldName
 			service = getBulkClass(type, assetClass.name(), field, fieldMapping, bulkClassMapping)
