@@ -28,37 +28,37 @@ declare var jQuery: any;
 export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 
-	public modalType = ModalType;
-	public dateFormat: string;
-	public dateFormatTime: string;
-	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
-	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
-	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
-	public collapsedTaskDetail = false;
-	public hasCookbookPermission = false;
-	public modalOptions: DecoratorOptions;
-	public model: any = {};
-	public getAssetList: Function;
-	public yesNoList =  [...YesNoList];
-	public predecessorSuccessorColumns: any[];
-	public userTimeZone: string;
-	public hasModelChanges = false;
-	public hasDeleteTaskPermission = false;
-	public hasEditTaskPermission = false;
-	public modelHelper: TaskEditCreateModelHelper;
-	public taskNotesColumnsModel = new TaskNotesColumnsModel();
-	public dataGridTaskNotesHelper: DataGridOperationsHelper;
-	public isEventLocked: boolean;
-	public metaParam: any;
+	protected modalType = ModalType;
+	protected dateFormat: string;
+	protected dateFormatTime: string;
+	protected dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	protected dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
+	protected collapsedTaskDetail = false;
+	protected hasCookbookPermission = false;
+	protected modalOptions: DecoratorOptions;
+	protected model: any = {};
+	protected getAssetList: Function;
+	protected yesNoList =  [...YesNoList];
+	protected predecessorSuccessorColumns: any[];
+	protected userTimeZone: string;
+	protected hasModelChanges = false;
+	protected hasDeleteTaskPermission = false;
+	protected hasEditTaskPermission = false;
+	protected modelHelper: TaskEditCreateModelHelper;
+	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
+	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
+	protected isEventLocked: boolean;
+	protected metaParam: any;
 
 	constructor(
-		public taskDetailModel: TaskDetailModel,
-		public taskManagerService: TaskService,
-		public dialogService: UIDialogService,
-		public promptService: UIPromptService,
-		public userPreferenceService: PreferenceService,
-		public permissionService: PermissionService,
-		public translatePipe: TranslatePipe) {
+		protected taskDetailModel: TaskDetailModel,
+		protected taskManagerService: TaskService,
+		protected dialogService: UIDialogService,
+		protected promptService: UIPromptService,
+		protected userPreferenceService: PreferenceService,
+		protected permissionService: PermissionService,
+		protected translatePipe: TranslatePipe) {
 
 		super('#task-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
