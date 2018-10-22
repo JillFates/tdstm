@@ -80,6 +80,9 @@ class ProjectService implements ServiceMethods {
 	ApiCatalogService apiCatalogService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	ApiActionService apiActionService
+	ProviderService providerService
+	CredentialService credentialService
+	DataScriptService dataScriptService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -537,7 +540,16 @@ class ProjectService implements ServiceMethods {
 		// Clone the Default Project Tags (if it has any) and add them to the new project
 		tagService.cloneProjectTags(defProject, project)
 
-		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
+		// Clone the Default Project Providers (if it has any) and add them to the new project
+		providerService.cloneProjectProviders(defProject, project)
+
+		// Clone the Default Project Credentials (if it has any) and add them to the new project
+		credentialService.cloneProjectCredentials(defProject, project)
+
+		// Clone the Default Project Data Scripts (if it has any) and add them to the new project
+		dataScriptService.cloneProjectDataScripts(defProject, project)
+
+		// Clone the Default Project Api Catalogs (if it has any) and add them to the new project
 		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
 
 		// Clone the Default Project Api Actions (if it has any) and add them to the new project

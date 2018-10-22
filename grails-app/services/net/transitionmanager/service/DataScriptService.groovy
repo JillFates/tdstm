@@ -27,15 +27,14 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
 
 class DataScriptService implements ServiceMethods{
 
-    ProviderService providerService
-	 FileSystemService fileSystemService
+	ProviderService providerService
+	FileSystemService fileSystemService
 
 	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
 			   config: [],
@@ -268,6 +267,28 @@ class DataScriptService implements ServiceMethods{
         }
         return dataScript
     }
+
+	/**
+	 * Find a DataScript with the given name, project and provider
+	 *
+	 * @param name - datascript name
+	 * @param project - datascript project
+	 * @param provider - datascript provider
+	 * @param throwException - whether to throw an exception if datascript is not found
+	 * @return
+	 */
+	DataScript findByProjectAndProvider(String name, Project project, Provider provider, boolean throwException = false) {
+		DataScript dataScript = DataScript.where {
+			name == name
+			project == project
+			provider == provider
+		}.find()
+
+		if (! dataScript && throwException) {
+			throw new EmptyResultException("No DataScript exists with name $name for the Project $project and Provider $provider.")
+		}
+		return dataScript
+	}
 
     /**
      * Find a given DataScript with the given ID and Project.
@@ -550,6 +571,28 @@ class DataScriptService implements ServiceMethods{
 			ds.originalSampleFilename = originalFileName
 			ds.sampleFilename = tmpFileName
 			ds.save()
+		}
+	}
+
+	/**
+	 * Clone any existing data scripts associated to sourceProject (if any),
+	 * then associate those newly created data scripts to targetProject.
+	 *
+	 * @param sourceProject  The project from which the existing data scripts will be cloned.
+	 * @param targetProject  The project to which the new data scripts will be associated.
+	 */
+	void cloneProjectDataScripts(Project sourceProject, Project targetProject) {
+		List<DataScript> dataScripts = DataScript.where {
+			project == sourceProject
+		}.list()
+
+		if (!dataScripts.isEmpty()) {
+			dataScripts.each { DataScript sourceDataScript ->
+				Provider targetProvider = providerService.getProvider(sourceDataScript.provider.name, targetProject, false)
+				DataScript newDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceDataScript,
+						[project: targetProject, provider: targetProvider], false, false);
+				log.debug "Cloned data script ${newDataScript.name} for project ${targetProject.toString()} and provider ${targetProvider.name}"
+			}
 		}
 	}
 }

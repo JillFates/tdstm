@@ -11,7 +11,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
-import {CloneModalModel} from '../../model/clone-modal.model';
+import {AssetModalModel} from '../../model/asset-modal.model';
 
 declare var jQuery: any;
 
@@ -99,12 +99,12 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		 */
 		onCloneAsset(): void {
 
-			const cloneModalModel: CloneModalModel = {
+			const cloneModalModel: AssetModalModel = {
 				assetType: DOMAIN.APPLICATION,
 				assetId: this.mainAsset
 			}
 			this.dialogService.extra(AssetCloneComponent, [
-				{provide: CloneModalModel, useValue: cloneModalModel}
+				{provide: AssetModalModel, useValue: cloneModalModel}
 			], false, false).then( (result: CloneCLoseModel)  => {
 
 				if (result.clonedAsset && result.showEditView) {
@@ -115,6 +115,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 
 					this.dialogService
 						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				} else if (!result.clonedAsset && result.showView) {
+					this.showAssetDetailView(DOMAIN.APPLICATION, result.assetId);
 				}
 			})
 				.catch( error => console.log('error', error));

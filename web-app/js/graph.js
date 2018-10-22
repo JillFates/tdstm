@@ -1582,30 +1582,13 @@ var GraphUtil = (function ($) {
     };
 
     public.restoreDependencyPanel = function(type) {
-        if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
-            $('#dependency' + type + 'Control_show_all').prop('checked', true);
-            $('#dependency' + type + 'Control_show_all').attr('state', 1);
-            if (!GraphUtil.dependencyPanelConfig['dependency' + type].dirty) {
-                $('.dependency' + type + 'ControlsShow').prop('checked', true);
-            } else {
-                $('.dependency' + type + 'ControlsShow').each(function () {
-                    $(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-                });
-            }
-        } else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
-            $('#dependency' + type + 'Control_show_all').prop('checked', false);
-            $('#dependency' + type + 'Control_show_all').attr('state', 3);
-            $('.dependency' + type + 'ControlsShow').each(function () {
-                $(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-            });
-        } else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'indeterminate'){
-            $('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
-            $('#dependency' + type + 'Control_show_all').attr('state', 2);
-            $('.dependency' + type + 'ControlsShow').each(function(){
-                var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
-                $(this).prop('checked', selected);
-            });
-        }
+        GraphUtil.dependencyPanelConfig['dependency' + type].status = 'indeterminate';
+        $('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
+        $('#dependency' + type + 'Control_show_all').attr('state', 2);
+        $('.dependency' + type + 'ControlsShow').each(function(){
+            var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+            $(this).prop('checked', selected);
+        });
 
         if(GraphUtil.dependencyPanelConfig['dependency' + type].highlight.length > 0) {
             $('.dependency' + type + 'ControlsHighlight').each(function () {
@@ -1620,6 +1603,20 @@ var GraphUtil = (function ($) {
             }
         });
     };
+
+    public.modifyDependencySetting = function () {
+        var showTypeItems = $('.dependencyTypeControlsShow:checked').map(function() { return this.value; }).get();
+        var highlightTypeItems = $('.dependencyTypeControlsHighlight:checked').map(function() { return this.value; }).get();
+        var showStatusItems = $('.dependencyStatusControlsShow:checked').map(function() { return this.value; }).get();
+        var highlightStatusItems = $('.dependencyStatusControlsHighlight:checked').map(function() { return this.value; }).get();
+        currentSettings = showTypeItems.concat(highlightTypeItems, showStatusItems, highlightStatusItems);
+        appliedSettings = public.dependencyPanelConfig.dependencyType.show.concat(public.dependencyPanelConfig.dependencyType.highlight, public.dependencyPanelConfig.dependencyStatus.show, public.dependencyPanelConfig.dependencyStatus.highlight);
+        if(JSON.stringify(currentSettings)!=JSON.stringify(appliedSettings)) {
+            $('.fullButton.graphButton').addClass("hasChanges");
+        } else {
+            $('.fullButton.graphButton').removeClass("hasChanges");
+        }
+    }
 
     public.onSelectItemShowDependencyPanel = function(event){
         if(!$(event).is(":checked")) {
@@ -1639,12 +1636,16 @@ var GraphUtil = (function ($) {
             $('#' + parentId).prop('checked', false);
             $('#' + parentId).attr('state', 3);
         }
+
+        public.modifyDependencySetting();
     };
 
     public.onSelectItemHighlightDependencyPanel = function(event){
         if($(event).is(":checked")) {
             $($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', true);
         }
+
+        public.modifyDependencySetting();
     };
 
     public.onSelectAllDependencyPanel = function(checkboxSelectorClass, config, event) {
@@ -1678,6 +1679,7 @@ var GraphUtil = (function ($) {
             GraphUtil.dependencyPanelConfig[config].status = 'indeterminate';
         }
         $(event).attr('state', state);
+        public.modifyDependencySetting();
     };
 
     public.applyShowHideDependencies = function () {
@@ -1715,6 +1717,7 @@ var GraphUtil = (function ($) {
             public.createCutShadows(fill);
             public.createLineShadows(fill)
         });
+        $('.fullButton.graphButton').removeClass("hasChanges");
     };
 
     // removes the value in the source filter field and performs a new search

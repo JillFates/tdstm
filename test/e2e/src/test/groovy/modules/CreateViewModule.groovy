@@ -70,11 +70,11 @@ class CreateViewModule extends Module {
     }
 
     def selectApplication(){
-        applicationOption.click()
+        waitFor{applicationOption.click()}
     }
 
     def clickNext(){
-        nextBtn.click()
+        waitFor{nextBtn.click()}
     }
 
     def goToAssetsClasses(){
@@ -231,5 +231,9 @@ class CreateViewModule extends Module {
         previewRows.each{
             it.contains(txt)
         }
+    }
+
+    def verifyButtonIsDefaultWithNoChanges(){
+        waitFor{saveBtn.jquery.attr("class").contains("btn-default")}
     }
 }

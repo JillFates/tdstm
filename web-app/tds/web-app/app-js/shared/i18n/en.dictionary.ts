@@ -59,6 +59,8 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'SHOW_COMMENTS': 'Show Comments',
+		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
@@ -81,7 +83,7 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'EFFECTED_ASSETS': 'This action will effect {param1} Asset(s)',
+				'EFFECTED_ASSETS': 'This action will affect {param1} Asset(s)',
 				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
 			},
 			'DELETE': {

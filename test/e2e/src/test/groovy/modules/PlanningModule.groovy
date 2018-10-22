@@ -18,8 +18,8 @@ class PlanningModule extends Module {
         planningExportRunbook { planningMenu.find("li.menu-parent-planning-export-runbook")}
         planningBundlesTitle { planningMenu.find("li.menu-parent-item")[1]}
         planningListBundles { planningMenu.find("li.menu-parent-planning-list-bundles")}
+        bundleName (required:false) {$("li.menu-parent-planning-selected-bundle")}
     }
-
 
     def selectMenu(menuItem) {
         if (menuItem.present) {
@@ -79,5 +79,9 @@ class PlanningModule extends Module {
 
     def verifyBundlesTitle(){
         planningBundlesTitle.isDisplayed()
+    }
+
+    def vaildateDisplayedBundleName(bdlName){
+        bundleName.text().contains(bdlName)
     }
 }
