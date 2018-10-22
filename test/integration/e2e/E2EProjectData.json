@@ -84,6 +84,11 @@
   "etlToBeSearched": { // Used by ETLScriptsListSpec
     "name": "E2E ETL Script to be searched"
   },
+  // Assets
+  "application1": {
+    "name": "QAE2E App 1",
+    "assetClass": "APPLICATION" // taken from AssetClass.groovy enum
+  },
   // Views
   "customView1":{
     "name": "QAE2E Custom View 1",
