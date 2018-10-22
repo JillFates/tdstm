@@ -26,31 +26,31 @@ import {WindowService} from '../../../../shared/services/window.service';
 })
 export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
-	public modalType = ModalType;
-	public dateFormat: string;
-	public dateFormatTime: string;
-	public userTimeZone: string;
-	public currentUserId: number;
-	public modelHelper: TaskEditCreateModelHelper;
-	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
-	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
-	public dataGridTaskNotesHelper: DataGridOperationsHelper;
-	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
-	public taskNotesColumnsModel = new TaskNotesColumnsModel();
-	public collapsedTaskDetail = false;
-	public hasCookbookPermission = false;
-	public hasEditTaskPermission = false;
-	public hasDeleteTaskPermission = false;
-	public modalOptions: DecoratorOptions;
-	public model: any = {};
+	protected modalType = ModalType;
+	protected dateFormat: string;
+	protected dateFormatTime: string;
+	protected userTimeZone: string;
+	protected currentUserId: number;
+	protected modelHelper: TaskEditCreateModelHelper;
+	protected dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	protected dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
+	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
+	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
+	protected collapsedTaskDetail = false;
+	protected hasCookbookPermission = false;
+	protected hasEditTaskPermission = false;
+	protected hasDeleteTaskPermission = false;
+	protected modalOptions: DecoratorOptions;
+	protected model: any = {};
 	private hasChanges: boolean;
 
 	constructor(
-		public taskDetailModel: TaskDetailModel,
-		public taskManagerService: TaskService,
+		private taskDetailModel: TaskDetailModel,
+		private taskManagerService: TaskService,
 		private dialogService: UIDialogService,
-		public promptService: UIPromptService,
-		public userPreferenceService: PreferenceService,
+		private promptService: UIPromptService,
+		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private windowService: WindowService) {

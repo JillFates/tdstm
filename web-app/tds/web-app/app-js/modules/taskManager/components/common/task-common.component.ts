@@ -21,42 +21,44 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {YesNoList} from '../../model/task-edit-create.model';
+import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
 
 declare var jQuery: any;
 
 export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 
-	public modalType = ModalType;
-	public dateFormat: string;
-	public dateFormatTime: string;
-	public dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
-	public dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
-	public taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
-	public collapsedTaskDetail = false;
-	public hasCookbookPermission = false;
-	public modalOptions: DecoratorOptions;
-	public model: any = {};
-	public getAssetList: Function;
-	public yesNoList =  [...YesNoList];
-	public predecessorSuccessorColumns: any[];
-	public userTimeZone: string;
-	public hasModelChanges = false;
-	public hasDeleteTaskPermission = false;
-	public hasEditTaskPermission = false;
-	public modelHelper: TaskEditCreateModelHelper;
-	public taskNotesColumnsModel = new TaskNotesColumnsModel();
-	public dataGridTaskNotesHelper: DataGridOperationsHelper;
+	protected modalType = ModalType;
+	protected dateFormat: string;
+	protected dateFormatTime: string;
+	protected dataGridTaskPredecessorsHelper: DataGridOperationsHelper;
+	protected dataGridTaskSuccessorsHelper: DataGridOperationsHelper;
+	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
+	protected collapsedTaskDetail = false;
+	protected hasCookbookPermission = false;
+	protected modalOptions: DecoratorOptions;
+	protected model: any = {};
+	protected getAssetList: Function;
+	protected yesNoList =  [...YesNoList];
+	protected predecessorSuccessorColumns: any[];
+	protected userTimeZone: string;
+	protected hasModelChanges = false;
+	protected hasDeleteTaskPermission = false;
+	protected hasEditTaskPermission = false;
+	protected modelHelper: TaskEditCreateModelHelper;
+	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
+	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
+	protected isEventLocked: boolean;
+	protected metaParam: any;
 
 	constructor(
-		public taskDetailModel: TaskDetailModel,
-		public taskManagerService: TaskService,
-		public dialogService: UIDialogService,
-		public promptService: UIPromptService,
-		public userPreferenceService: PreferenceService,
-		public permissionService: PermissionService,
-		public translatePipe: TranslatePipe) {
+		private taskDetailModel: TaskDetailModel,
+		private taskManagerService: TaskService,
+		private dialogService: UIDialogService,
+		private promptService: UIPromptService,
+		private userPreferenceService: PreferenceService,
+		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -67,6 +69,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+		this.isEventLocked = false;
 
 		this.modelHelper = new TaskEditCreateModelHelper(this.userTimeZone, this.userPreferenceService.getUserCurrentDateFormatOrDefault());
 
@@ -77,6 +80,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
+		this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
 
 		const commonCalls = [
 			this.taskManagerService.getStatusList(this.model.id),
@@ -90,11 +94,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
 			commonCalls.push(this.taskManagerService.getCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
+			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams())
 		}
 
+		this.metaParam = this.getMetaParam();
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events] = results;
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
@@ -110,7 +116,14 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 				}
 
 				if (events) {
-					this.model.eventList = events.map((item) => ({id: item.id, text: item.name}));
+					this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
+				}
+
+				if (taskDefaults && taskDefaults.preferences) {
+					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT']  || '', text: '' };
+					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
+					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
+					this.metaParam = this.getMetaParam();
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
@@ -409,6 +422,24 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 */
 	onAssetClassChange(): void {
 		this.model.asset = null;
+	}
+
+	/**
+	 * Get the object required to query tasks, using the current commentId and eventId
+	 * @eventId Event id number if it is selected
+	 * @returns {any}
+	*/
+	getMetaParam(eventId = ''): any {
+		const commentId = this.taskDetailModel.modal.type === ModalType.CREATE ? '' : this.model.id;
+		return {commentId, eventId: eventId || this.model.event.id} ;
+	}
+
+	/**
+	 * Whenever a event is selected update the metaParam object
+	 * @returns {any}
+	 */
+	onSelectedEvent(event): void {
+		this.metaParam = this.getMetaParam(event.id) ;
 	}
 
 }

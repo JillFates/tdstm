@@ -72,6 +72,7 @@
                                                         name="event"
                                                         class="form-control"
                                                         [data]="model.eventList"
+                                                        (selectionChange)="onSelectedEvent($event)"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
                                                         [(ngModel)]="model.event">
@@ -364,7 +365,7 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [(metaParam)]="model.id"
+                                                            [(metaParam)]="metaParam"
                                                             (valueChange)="onModelChange($event)"
                                                             [serviceRequest]="getTasksForComboBox"
                                                             (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
@@ -406,7 +407,7 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [(metaParam)]="model.id"
+                                                            [(metaParam)]="metaParam"
                                                             (valueChange)="onModelChange($event)"
                                                             [serviceRequest]="getTasksForComboBox"
                                                             (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
