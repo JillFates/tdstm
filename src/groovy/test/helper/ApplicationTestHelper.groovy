@@ -25,4 +25,27 @@ class ApplicationTestHelper {
 		return application
 	}
 
+	/**
+	 * Create Assets by class from given Map containing required name and planStatus
+	 * @param: [REQUIRED] String name
+	 * @param: [REQUIRED] String planStatus if null then 'Unassigned'
+	 */
+	Application createApplication(Map assetData, Project project, MoveBundle moveBundle) {
+		Application existingApplication = Application.findWhere([assetName: assetData.name, project: project])
+		if(!existingApplication) {
+			Application application
+			Application.withTransaction {
+				application = new Application(
+						project: project,
+						moveBundle: moveBundle,
+						assetName: assetData.name,
+						planStatus: assetData.planStatus ? assetData.planStatus : 'Unassigned'
+				)
+				application.save(flush: true)
+			}
+			return application
+		} else {
+			return existingApplication
+		}
+	}
 }

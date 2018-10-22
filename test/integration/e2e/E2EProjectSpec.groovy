@@ -1,18 +1,19 @@
 package e2e
 
-import com.tds.asset.AssetEntity
+import com.tds.asset.Application
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.ProjectService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
-import test.helper.AssetEntityTestHelper
+import test.helper.ApplicationTestHelper
 import test.helper.DataScriptTestHelper
 import test.helper.DataviewTestHelper
 import test.helper.MoveBundleTestHelper
@@ -20,6 +21,7 @@ import test.helper.MoveEventTestHelper
 import test.helper.ProjectTestHelper
 import test.helper.PersonTestHelper
 import test.helper.ProviderTestHelper
+import test.helper.RecipeTestHelper
 import test.helper.TagTestHelper
 
 class E2EProjectSpec extends Specification {
@@ -36,7 +38,8 @@ class E2EProjectSpec extends Specification {
 	private DataScriptTestHelper etlScriptHelper = new DataScriptTestHelper()
 	private DataviewTestHelper dataviewHelper = new DataviewTestHelper()
 	private TagTestHelper tagHelper = new TagTestHelper()
-	private AssetEntityTestHelper assetHelper = new AssetEntityTestHelper()
+	private ApplicationTestHelper appHelper = new ApplicationTestHelper()
+	private RecipeTestHelper recipeHelper = new RecipeTestHelper()
 	private Project project
 	private Project projectToBeDeleted
 	private UserLogin userLogin1
@@ -67,7 +70,8 @@ class E2EProjectSpec extends Specification {
 	private Dataview customView11
 	private Tag tagToBeEdited
 	private Tag tagToBeDeleted
-	private AssetEntity application1
+	private Application application1
+	private Recipe recipe1
 	JSONObject dataFile
 
 	private JSONObject getJsonObjectFromFile(){
@@ -99,7 +103,7 @@ class E2EProjectSpec extends Specification {
 		etlToBeTransformedWithPastedData = etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", dataFile.etlToBeTransformedWithPastedData)
 		etlToBeEdited = etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", dataFile.etlToBeEdited)
 		etlToBeSearched = etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", dataFile.etlToBeSearched)
-		application1 = assetHelper.createAssetEntity(dataFile.application1, project,buildoutBundle)
+		application1 = appHelper.createApplication(dataFile.application1, project, buildoutBundle)
 		customView1 = dataviewHelper.createDataview(project, userLogin1.person, getSanitizedViewObject(dataFile.customView1, dataFile.commonViewSchema))
 		customView2 = dataviewHelper.createDataview(project, userLogin1.person, getSanitizedViewObject(dataFile.customView2, dataFile.commonViewSchema))
 		customView3 = dataviewHelper.createDataview(project, userLogin1.person, getSanitizedViewObject(dataFile.customView3, dataFile.commonViewSchema))
@@ -113,6 +117,7 @@ class E2EProjectSpec extends Specification {
 		customView11 = dataviewHelper.createDataview(project, userLogin1.person, getSanitizedViewObject(dataFile.customView11, dataFile.commonViewSchema))
 		tagToBeEdited = tagHelper.createTag(project, dataFile.tagToBeEdited)
 		tagToBeDeleted = tagHelper.createTag(project, dataFile.tagToBeDeleted)
+		recipe1 = recipeHelper.createRecipe(dataFile.recipe1, project, userLogin1.person, dataFile.commonRecipeSourceCode)
 	}
 
 	void "Setup E2E Project data"() {
@@ -134,6 +139,7 @@ class E2EProjectSpec extends Specification {
 			DataScript.findWhere([name: dataFile.etlToBeTransformedWithPastedData.name, project: project]) != null
 			DataScript.findWhere([name: dataFile.etlToBeEdited.name, project: project]) != null
 			DataScript.findWhere([name: dataFile.etlToBeSearched.name, project: project]) != null
+			Application.findWhere([assetName: dataFile.application1.name, project: project])
 			Dataview.findWhere([name: dataFile.customView1.name, project: project])
 			Dataview.findWhere([name: dataFile.customView2.name, project: project])
 			Dataview.findWhere([name: dataFile.customView3.name, project: project])
@@ -147,6 +153,6 @@ class E2EProjectSpec extends Specification {
 			Dataview.findWhere([name: dataFile.customView11.name, project: project])
 			Tag.findWhere([name: dataFile.tagToBeEdited.name, project: project])
 			Tag.findWhere([name: dataFile.tagToBeDeleted.name, project: project])
-			AssetEntity.findWhere([assetName: dataFile.application1.name, project: project])
+			Recipe.findWhere([name: dataFile.recipe1, project: project])
 	}
 }

@@ -25,22 +25,4 @@ class AssetEntityTestHelper {
         return assetEntity
     }
 
-    AssetEntity createAssetEntity(Map assetData, Project project, MoveBundle moveBundle) {
-        AssetEntity existingAssetEntity = AssetEntity.findWhere([assetName: assetData.name, project: project])
-        if(!existingAssetEntity) {
-            AssetEntity assetEntity
-            AssetEntity.withTransaction {
-                assetEntity = new AssetEntity(
-                    project: project,
-                    moveBundle: moveBundle,
-                    assetClass: assetData.assetClass,
-                    assetName: assetData.name
-                )
-                assetEntity.save(flush: true)
-            }
-            return assetEntity
-        } else {
-            return existingAssetEntity
-        }
-    }
 }

@@ -87,7 +87,7 @@
   // Assets
   "application1": {
     "name": "QAE2E App 1",
-    "assetClass": "APPLICATION" // taken from AssetClass.groovy enum
+    "planStatus": "Confirmed"
   },
   // Views
   "customView1":{
@@ -183,5 +183,9 @@
     "name": "QAE2E Tag to be deleted",
     "description": "",
     "color": "White"
-  }
+  },
+  // Recipes
+  "recipe1": "Recipe 4",
+  // Recipe SourceCode
+  "commonRecipeSourceCode": "groups: [[name: 'QAE2E', filter: [class: 'application', asset: [planStatus: 'Confirmed']]]], tasks: [[id: 1100, filter: [group: 'QAE2E']]]",
 }
