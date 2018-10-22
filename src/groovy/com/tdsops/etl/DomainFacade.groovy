@@ -29,7 +29,7 @@ class DomainFacade {
 	}
 
 	/**
-	 * Returns a {@code ETLProcessorResult#currentRow} to be used in {@code DependencyPopulator}
+	 * Returns a {@code ETLProcessorResult#currentRow} to be used in {@code DependencyBuilder}
 	 * @return
 	 */
 	RowResult currentRowMap(){

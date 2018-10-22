@@ -42,7 +42,7 @@ class ETLValueHelper {
 				fieldValue = ((Element)value).value
 				break
 			case DomainFacade: // set myVar with DOMAIN.
-				fieldValue = ((DomainFacade)value).currentRowMap()
+				fieldValue = new RowResultFacade(((DomainFacade)value).currentRowMap())
 				break
 			case SourceField:
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'

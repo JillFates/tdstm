@@ -238,8 +238,21 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Invalid 'when' syntax. Options are 'when populated' or 'when { boolean expression }'")
     }
 
-    static ETLProcessorException invalidDependentParamsCommand() {
-        new ETLProcessorException('dependent command can not have both parameters as null value')
+    static ETLProcessorException incorrectDomainVariableForDomainWithCommand() {
+        new ETLProcessorException("The with parameters for the 'domain ... with' command must be a DOMAIN type variable")
     }
+
+	static ETLProcessorException invalidDomainClassForDomainDependencyWithCommand() {
+		new ETLProcessorException("The 'domain Dependency with' command is only applicable for the Asset classes")
+	}
+
+	static ETLProcessorException invalidDependencyTypeInDomainDependencyWithCommand(String dependencyType) {
+		new ETLProcessorException("Invalid dependency type '${dependencyType}' specified in 'domain Dependency with' command")
+	}
+
+	static ETLProcessorException unrecognizedDomainCommandArguments(Object argument) {
+		new ETLProcessorException("Unrecognized argument '${argument}', was expecting 'with'")
+	}
+
 }
 

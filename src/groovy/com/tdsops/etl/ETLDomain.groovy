@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tds.asset.AssetEntity
 
 
 enum ETLDomain {
@@ -45,6 +46,20 @@ enum ETLDomain {
 		}
 
 		return isaAsset
+	}
+	/**
+	 * Check if a domain is in the {@code AssetEntity} hierarchy.
+	 * @param domain
+	 * @return true if domain belongs to {@code AssetEntity} hierarchy.
+	 * 			otherwise returns false
+	 */
+	static boolean isDomainAsset(String domain){
+		return lookup(domain) in [
+			ETLDomain.Application,
+			ETLDomain.Device,
+			ETLDomain.Database,
+			ETLDomain.Storage
+		]
 	}
 
 	/**

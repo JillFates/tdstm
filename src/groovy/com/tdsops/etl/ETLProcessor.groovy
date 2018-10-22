@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tds.asset.AssetOptions
+import com.tdsops.AssetDependencyTypesCache
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -153,6 +155,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	StopWatch stopWatch
 
 	/**
+	 * <p>This cache contains all the valid {@code AssetDependency} types that could be used in an Dependency ETL script</p>.
+	 * When an ETL Script contains a line like this:
+	 * <pre>
+	 *	domain Dependency with assetVar 'Runs On' dependentVar
+	 * </pre>
+	 * It is necessary to validate if 'Runs On' is a valid relation for an {@code AssetDepoendency}
+	 * AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
+	 */
+	AssetDependencyTypesCache assetDependencyTypesCache
+	
+	/**
 	 * List of command that needs to be completed.
 	 */
 	private Stack<ETLStackableCommand> commandStack = []
@@ -227,6 +240,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
+		this.assetDependencyTypesCache = new AssetDependencyTypesCache()
 		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
@@ -241,9 +255,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *  domain Application
 	 * </pre>
 	 * @param domain a domain String value
-	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
+	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
 	 */
-	DependencyPopulator domain(ETLDomain domain) {
+	DependencyBuilder domain(ETLDomain domain) {
 		validateStack()
 		if (selectedDomain?.domain == domain) {
 			selectedDomain.addNewRow = true
@@ -254,16 +268,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
 
-		return new DependencyPopulator(this)
+		return new DependencyBuilder(selectedDomain.domain, this)
 	}
 
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param element an instance of {@code Element} class
-	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
+	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
 	 */
-	DependencyPopulator domain(Element element) {
+	DependencyBuilder domain(Element element) {
 		return domain(element.value)
 	}
 
@@ -272,10 +286,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
 	 * @param domainName
-	 * @return an instance of {@code DependencyPopulator} to continue with methods chain
+	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	DependencyPopulator domain(String domainName) {
+	DependencyBuilder domain(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
 		if (domain) {
 			return domain(domain)

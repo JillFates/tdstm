@@ -7,6 +7,7 @@ class ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
 	Map<ETLDomain, Map<String, ETLFieldDefinition>> fieldsDefinitionCache = [:]
+	Map<String, Map<String, String>> fieldLabelMap = [:]
 
 	/**
 	 * Add fields specification for an ETLDomain instance
@@ -78,10 +79,12 @@ class ETLFieldsValidator {
 	private void saveInCache(ETLDomain domain, String field, ETLFieldDefinition fieldDefinition){
 		if(!fieldsDefinitionCache.containsKey(domain)){
 			fieldsDefinitionCache.put(domain, [:])
+			fieldLabelMap.put(domain.name(), [:])
 		}
 
 		if (! fieldsDefinitionCache[domain].containsKey(field)) {
 			fieldsDefinitionCache[domain].put(field, fieldDefinition)
+			fieldLabelMap[domain.name()].put(fieldDefinition.name, fieldDefinition.label)
 		}
 	}
 
@@ -115,13 +118,11 @@ class ETLFieldsValidator {
 	 * @return
 	 */
 	Map<String, Map<String, String>> fieldLabelMapForResults() {
-		return fieldsDefinitionCache.collectEntries { ETLDomain domain, Map<String, ETLFieldDefinition> definitions ->
-			[
-				(domain.name()): definitions.collectEntries { String field, ETLFieldDefinition definition ->
-					[(definition.name): definition.label]
-				}
-			]
-		}
+		return fieldLabelMap
+	}
+
+	Map<String, String> fieldLabelMapForDomain(String domain){
+		return fieldLabelMap[domain]
 	}
 
 }

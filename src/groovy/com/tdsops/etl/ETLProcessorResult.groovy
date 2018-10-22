@@ -210,7 +210,11 @@ class ETLProcessorResult {
 	 */
 	RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
-			reference.data.add(new RowResult(rowNum: processor.iterateIndex.pos, domain: reference.domain))
+			reference.data.add(new RowResult(
+				fieldLabelMap: reference.fieldLabelMap,
+				rowNum: processor.iterateIndex.pos,
+				domain: reference.domain)
+			)
 			resultIndex = reference.data.size() - 1
 		}
 		return reference.data[resultIndex]
@@ -395,10 +399,14 @@ class ETLProcessorResult {
  *  "domains": {
  *    "domain": "Device",
  *    "fieldNames": [
- *          "assetName",
- *          "externalRefId"
- *     ],
- *
+ *      "assetName",
+ *      "externalRefId"
+ *    ],
+ * 	  "fieldLabelMap": {
+ * 		"asset": "asset",
+ *      "dependent": "dependent",
+ *      "c1": "c1"
+ *    },
  *    "data": [ list of RowResult instances]
  * 	}
  * </pre>
@@ -407,9 +415,38 @@ class ETLProcessorResult {
 @ConfigureMarshalling
 class DomainResult {
 
+	/**
+	 * An instance of {@code DomainResult} is represented as list of {@RowResult}
+	 * that are defined by a {@code ETLDomain}. This field saves that value as String.
+	 */
 	String domain
+	/**
+	 * <p>Saves a list of fields used during a ETL script executions for this particular domain</p>
+	 * <pre>
+	 *  ...,
+	 *  "fieldNames": [
+	 *     "asset",
+	 *     "dependent",
+	 *     "c1"
+	 *  ],
+	 *  ....
+	 * </pre>
+	 */
 	Set fieldNames = [] as Set
+	/**
+	 * <p>This map is used to have a map between field label and field name used in an ETL processor results</p>
+	 * <pre>
+	 *  ....
+	 *  "fieldLabelMap": {
+	 *  	"asset": "asset",
+	 *      "dependent": "dependent",
+	 *      "c1": "c1"
+	 *  },
+	 *  ....
+	 * <pre>
+	 */
 	Map<String, String> fieldLabelMap = [:]
+
 	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
@@ -467,6 +504,23 @@ class RowResult {
 	Map<String, FieldResult> fields = [:]
 	@DoNotMarshall
 	String domain
+	/**
+	 * This field is going to have a reference back to the {@code DomainResult#fieldLabelMap}.
+	 * Use by the RowResultFacade missing property
+	 * <pre>
+	 * iterate {
+	 * 	extract 'name' load 'Name'
+	 *
+	 * 	set assetResultVar with DOMAIN
+	 *
+	 * 	assert assetResultVar.assetName == 'xraysrv01'
+	 * 	assert assetResultVar.Name == 'xraysrv01'
+	 * }
+	 * </pre>
+	 * @see DomainResult#fieldLabelMap
+	 */
+	@DoNotMarshall
+	Map<String, String> fieldLabelMap = [:]
 
 	/**
 	 * Add element to the current row data
@@ -498,7 +552,7 @@ class RowResult {
 	 * 		"warn":true,
 	 * 		"errors": ["found with wrong asset class"],
 	 * 		    ....
-	 * 	    }
+	 * 	   }
 	 * 	}
 	 * </pre>
 	 * @param findElement the find element with the warn message
@@ -568,24 +622,6 @@ class RowResult {
 		}
 		return fields[fieldDefinition.name]
 	}
-
-	/**
-	 * Return property value
-	 * @param name a property name
-	 * @return
-	 */
-//	Object getProperty(String name) {
-//
-//		if(RowResult.metaClass.hasProperty(this, name) != null){
-//			return RowResult.metaClass.getProperty(this, name)
-//		} else {
-//			FieldResult fieldResult = fields.values().find {
-//				it?.fieldDefinition.name == name ||
-//					it?.fieldDefinition.label == name
-//			}
-//			return fieldResult?.value
-//		}
-//	}
 }
 
 /**
