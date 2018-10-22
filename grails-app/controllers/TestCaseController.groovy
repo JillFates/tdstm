@@ -1,3 +1,4 @@
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -50,17 +51,12 @@ class TestCaseController implements ControllerMethods {
 	}
 		
 	def api() {
-
-		log.debug "=====================\nAbout to save ApiAction\n====================="
-		ApiAction aa = new ApiAction(params)
-		if (! aa.save() ) {
-			render 'save failed:' + GormUtil.allErrorsString(aa)
-			return
+		try {
+			ApiAction apis = apiActionService.saveAndGet(params)
+			render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
+		} catch (ServiceException se) {
+			render se.message
 		}
-
-		def apis = ApiAction.findAll()[0]
-
-		render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
 	}
 
 	@HasPermission('ViewAdminTools')

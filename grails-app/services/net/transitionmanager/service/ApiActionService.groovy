@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
@@ -720,5 +721,15 @@ class ApiActionService implements ServiceMethods {
 				log.debug "Cloned api action ${newApiAction.name} for project ${targetProject.toString()}"
 			}
 		}
+	}
+
+	ApiAction saveAndGet(params) throw ServiceException {
+		log.debug "=====================\nAbout to save ApiAction\n====================="
+		ApiAction aa = new ApiAction(params)
+		if (! aa.save() ) {
+			throw new ServiceException('save failed:' + GormUtil.allErrorsString(aa))
+		}
+
+		return ApiAction.findAll()[0]
 	}
 }

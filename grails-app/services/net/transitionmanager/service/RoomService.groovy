@@ -277,4 +277,23 @@ class RoomService implements ServiceMethods {
 
 		return skippedRooms
 	}
+
+	@Transactional
+	String save(def params) {
+		String retMessage
+		Room room = new Room(params)
+		if (room.save(flush: true)) {
+			retMessage = "Room : $room.roomName is created"
+		}
+		else {
+			log.error GormUtil.allErrorsString(room)
+			if (room.roomName) {
+				retMessage = "Room : $room.roomName is not created"
+			} else {
+				retMessage = "Room not created"
+			}
+		}
+
+		return retMessage
+	}
 }

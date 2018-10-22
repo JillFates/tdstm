@@ -1,4 +1,5 @@
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdsops.common.exceptions.ServiceException
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -78,31 +79,15 @@ class WsLicenseManagerController implements ControllerMethods {
 	}
 
 	def updateLicense(){
-		def id = params.id
-		LicensedClient lic
-		def json = request.JSON
-		if(id) {
-			json.id = id
-			lic = LicensedClient.fetch(json)
-		}
-
-		if(lic) {
-			lic.save()
-			if(lic.hasErrors()){
-				def errors = ""
-				log.debug("da Error {}", lic.errors)
-				lic.errors.each {err->
-					errors << "${err}/n"
-				}
-				response.status = 400
-				log.debug("Errors {}", errors)
-				render errors
-			}else{
-				renderSuccessJson("saved")
-			}
-		}else{
-			response.status = 404 //Not Found
-			render "${id} not found."
+		try {
+			licenseManagerService.updateLicense(params.id, request.JSON)
+			renderSuccessJson("saved")
+		} catch (ServiceException e) {
+			response.status = 400
+			render e.message
+		} catch (FileNotFoundException nfe) {
+			response.status = 404
+			render e.message
 		}
 	}
 

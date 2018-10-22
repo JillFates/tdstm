@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.github.icedrake.jsmaz.Smaz
 import com.tdsops.common.exceptions.InvalidLicenseException
+import com.tdsops.common.exceptions.ServiceException
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import grails.plugin.mail.MailService
@@ -234,6 +235,29 @@ class LicenseManagerService extends LicenseCommonService {
 		} else {
 			log.error("no email found for the client")
 			false
+		}
+	}
+
+	void updateLicense(id, json) throws Exception{
+		LicensedClient lic
+		if(id) {
+			json.id = id
+			lic = LicensedClient.fetch(json)
+		}
+
+		if(lic) {
+			lic.save()
+			if(lic.hasErrors()){
+				def errors = ""
+				log.debug("da Error {}", lic.errors)
+				lic.errors.each {err->
+					errors << "${err}/n"
+				}
+				log.debug("Errors {}", errors)
+				throw new ServiceException("${id} not found.")
+			}
+		}else{
+			throw new FileNotFoundException("${id} not found.")
 		}
 	}
 }

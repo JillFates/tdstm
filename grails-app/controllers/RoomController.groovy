@@ -83,18 +83,7 @@ class RoomController implements ControllerMethods {
 
 	@HasPermission(Permission.RoomCreate)
 	def save() {
-		Room room = new Room(params)
-		if (room.save(flush: true)) {
-			flash.message = "Room : $room.roomName is created"
-		}
-		else {
-			log.info GormUtil.allErrorsString(room)
-			if (room.roomName) {
-				flash.message = "Room : $room.roomName is not created"
-			} else {
-				flash.message = "Room not created"
-			}
-		}
+		flash.message = roomService.save(params)
 		redirect(action: "list", params: [viewType: "list"])
 	}
 
