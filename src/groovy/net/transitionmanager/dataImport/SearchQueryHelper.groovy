@@ -115,10 +115,6 @@ class SearchQueryHelper {
 		// This will be populated with the entity object or error message appropriately
 		Object entity
 
-		if (! fieldsInfo.containsKey(fieldName)) {
-			return null
-		}
-
 		if (context == null) {
 			context = [:]
 		}
