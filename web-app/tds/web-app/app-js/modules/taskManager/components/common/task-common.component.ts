@@ -52,13 +52,13 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	protected metaParam: any;
 
 	constructor(
-		protected taskDetailModel: TaskDetailModel,
-		protected taskManagerService: TaskService,
-		protected dialogService: UIDialogService,
-		protected promptService: UIPromptService,
-		protected userPreferenceService: PreferenceService,
-		protected permissionService: PermissionService,
-		protected translatePipe: TranslatePipe) {
+		private taskDetailModel: TaskDetailModel,
+		private taskManagerService: TaskService,
+		private dialogService: UIDialogService,
+		private promptService: UIPromptService,
+		private userPreferenceService: PreferenceService,
+		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
 		this.modalOptions = { isResizable: true, isCentered: true };

@@ -19,13 +19,13 @@ declare var jQuery: any;
 })
 export class TaskEditComponent extends TaskCommonComponent  implements OnInit {
 	constructor(
-		protected taskDetailModel: TaskDetailModel,
-		protected taskManagerService: TaskService,
-		protected dialogService: UIDialogService,
-		protected promptService: UIPromptService,
-		protected userPreferenceService: PreferenceService,
-		protected permissionService: PermissionService,
-		protected translatePipe: TranslatePipe) {
+		taskDetailModel: TaskDetailModel,
+		taskManagerService: TaskService,
+		dialogService: UIDialogService,
+		promptService: UIPromptService,
+		userPreferenceService: PreferenceService,
+		permissionService: PermissionService,
+		translatePipe: TranslatePipe) {
 
 		super(taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
 
