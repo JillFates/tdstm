@@ -84,7 +84,7 @@ class CustomValidators {
 
 				String control = fieldSpec.control
 
-				// TODO: don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
+				// don't use a default validator, throw an exception(Runtime) notifying that the validator is missing
 				Closure validator = validatorHandlers[control]
 
 				if(!validator) {
@@ -184,7 +184,8 @@ class CustomValidators {
 				try {
 					NumberFormat nf = NumberFormat.getInstance()
 					number = nf.parse(value)
-				} catch (ParseException e) {  // If it's not a number there is not much to do, so return
+				} catch (ParseException e) {
+					// If it's not a number there is not much to do, so return
 					addError ( 'field.invalid.NaN', [value, getLabel(), e.getMessage()])
 					return
 				}
@@ -208,8 +209,10 @@ class CustomValidators {
 					addError ('field.invalid.negativesNotAllowed', [value, getLabel()] )
 				}
 				if (useThousandSeparator) {
-					int integerPart = (int) number // remove fractional part, if exists
-					if (integerPart.toString().size() > 3 && !value.contains(',')) { // if bigger or equal than a thousand and don't have the separator
+					// remove fractional part, if exists
+					int integerPart = (int) number
+					// if bigger or equal than a thousand and it doesn't have the separator
+					if (integerPart.toString().size() > 3 && !value.contains(',')) {
 						addError ('field.invalid.thousandSeparatorRequired', [value, getLabel()] )
 					}
 				}
