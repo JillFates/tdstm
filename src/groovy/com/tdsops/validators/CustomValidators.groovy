@@ -4,6 +4,7 @@ import com.tds.asset.AssetOptions
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
@@ -156,6 +157,59 @@ class CustomValidators {
 
 				if( ! hasErrors() && StringUtils.isNotBlank(value) && ! optValues.contains(value) ) {
 					addError ( 'field.invalid.notInList', [value, getLabel(), optValues.join(', ')] )
+				}
+			}
+		}
+	}
+
+	/**
+	 * Number Validator that Checks the numeric type of the value and the
+	 * given constraints in the fieldSpec Map.
+	 * See TM-8447
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static controlNumberValidator ( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+			 // check that the value is not empty
+				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
+			 // check that the value is of a numeric type
+				if(!NumberUtil.isNumber(value)) {
+					addError ( 'field.invalid.NaN', [value, getLabel()])
+				}
+
+			 // finally, validate the constraints in the fieldSpec
+				def minRange = fieldSpec.constraints?.minRange ?: null
+				def maxRange = fieldSpec.constraints?.maxRange ?: null
+				def decimalPlaces = fieldSpec.constraints?.decimalPlaces ?: null
+				def useThousandSeparator = fieldSpec.constraints?.useThousandSeparator ?: false
+				def allowNegatives = fieldSpec.constraints?.allowNegatives
+
+				if ((minRange && value < minRange) || (maxRange && value > maxRange)) {
+					addError ('field.invalid.valueOutOfRange', [value, getLabel(), minRange, maxRange])
+				}
+				if (decimalPlaces && value.contains('.')){
+					def decimalPart = value.substring(value.indexOf('.') + 1, value.size())
+					if (!decimalPart.size() <= decimalPlaces) {
+						addError ('field.invalid.decimalPlacesExceeded', [value, getLabel(), decimalPlaces])
+					}
+				}
+				if (value < 0 && !allowNegatives) {
+					addError ('field.invalid.negativesNotAllowed', [value, getLabel()] )
+				}
+				if (useThousandSeparator) {
+					def integerPart = 0
+					if (value.contains('.')) {
+						integerPart = value.substring(0, value.indexOf('.'))
+					} else {
+						integerPart = value
+					}
+					if (integerPart > 3 && !value.contains(',')) {
+						addError ('field.invalid.thousandSeparatorRequired', [value, getLabel()] )
+					}
 				}
 			}
 		}
