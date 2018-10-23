@@ -1,8 +1,10 @@
+import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -401,8 +403,11 @@ class WsAssetController implements ControllerMethods {
         model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
         model.environmentOptions = assetEntityService.getAssetEnvironmentOptions()
         model.planStatusOptions = assetEntityService.getAssetPlanStatusOptions()
+        model.validationOptions = ValidationType.list
         if (assetClass == AssetClass.DEVICE.toString()) {
             model << assetEntityService.getCommontDeviceMapForCreateEdit(project, null)
+        } else if (assetClass == AssetClass.APPLICATION.toString()) {
+            model.criticalityOptions = Application.CRITICALITY
         }
 		renderAsJson(model)
 	}

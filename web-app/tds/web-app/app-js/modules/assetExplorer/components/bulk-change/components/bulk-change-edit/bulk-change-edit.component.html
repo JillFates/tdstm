@@ -63,7 +63,7 @@
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <kendo-dropdownlist
                                             name="field" class="form-control field"
-                                            [data]="editRows.field[rowIndex].fields"
+                                            [data]="editRows.fields[rowIndex].fields"
                                             [value]="editRows.selectedValues[rowIndex].field"
                                             (valueChange)="onFieldValueChange($event, rowIndex)"
                                             [valueField]="'id'"
@@ -89,7 +89,7 @@
                             <!-- Value -->
                             <kendo-grid-column title="Value" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-
+                                    {{editRows.selectedValues[rowIndex].value}}
                                     <!-- Text Fields -->
                                     <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                            type="text" name="actionValue" class="form-control"
@@ -121,7 +121,19 @@
                                             [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                             [valueField]="'id'"
                                             [textField]="'text'"
-                                            [data]="editRows.options[rowIndex]">
+                                            [data]="editRows.listOptions[rowIndex]"
+                                            (valueChange)="onListValueChange($event, rowIndex)">
+                                    </kendo-dropdownlist>
+
+                                    <!-- Custom Fields - List -->
+                                    <kendo-dropdownlist
+                                            *ngIf="canShowControl('List', rowIndex)"
+                                            name="optionList"
+                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [valueField]="'id'"
+                                            [textField]="'text'"
+                                            [data]="editRows.listOptions[rowIndex]"
+                                            (valueChange)="onListValueChange($event, rowIndex)">
                                     </kendo-dropdownlist>
 
                                     <!-- Asset Tag Fields -->
