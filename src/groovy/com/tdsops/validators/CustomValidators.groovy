@@ -137,7 +137,7 @@ class CustomValidators {
 				// value = StringUtils.defaultString(value)
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
 
-				if ( ! hasErrors() && ! yesNoList.contains(value) ) {
+				if ( ! hasErrors() && StringUtils.isNotBlank(value) && !yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -177,8 +177,6 @@ class CustomValidators {
 	static  controlNumberValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-			    // check that the value is not empty
-				addErrors( controlNotEmptyValidator(value, fieldSpec).apply() )
                 // try to convert to numeric
 				Long number
 				try {
