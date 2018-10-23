@@ -4,12 +4,14 @@ import com.tds.asset.AssetOptions
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
+
+import java.text.NumberFormat
+import java.text.ParseException
 
 @Slf4j
 class CustomValidators {
@@ -72,6 +74,7 @@ class CustomValidators {
 			Map<String, Closure> validatorHandlers = [:]
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
+			validatorHandlers[ControlType.NUMBER.toString()] = CustomValidators.&controlNumberValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
 
 			// check all the custom fields against the validators
@@ -134,7 +137,7 @@ class CustomValidators {
 				// value = StringUtils.defaultString(value)
 				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
 
-				if ( ! hasErrors() && StringUtils.isNotBlank(value) && ! yesNoList.contains(value) ) {
+				if ( ! hasErrors() && ! yesNoList.contains(value) ) {
 					addError ( 'field.invalid.notInListOrBlank', [value, getLabel(), yesNoList.join(', ')] )
 				}
 
@@ -171,43 +174,42 @@ class CustomValidators {
 	 * @param fieldSpec
 	 * @return
 	 */
-	static controlNumberValidator ( String value, Map fieldSpec ) {
+	static  controlNumberValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
 			void validate() {
-			 // check that the value is not empty
-				addErrors( controlNotEmptyValidator ( value, fieldSpec ).apply() )
-			 // check that the value is of a numeric type
-				if(!NumberUtil.isNumber(value)) {
-					addError ( 'field.invalid.NaN', [value, getLabel()])
+			    // check that the value is not empty
+				addErrors( controlNotEmptyValidator(value, fieldSpec).apply() )
+                // try to convert to numeric
+				Long number
+				try {
+					NumberFormat nf = NumberFormat.getInstance()
+					number = nf.parse(value)
+				} catch (ParseException e) {  // If it's not a number there is not much to do, so return
+					addError ( 'field.invalid.NaN', [value, getLabel(), e.getMessage()])
+					return
 				}
-
-			 // finally, validate the constraints in the fieldSpec
+			    // finally, validate the constraints in the fieldSpec
 				def minRange = fieldSpec.constraints?.minRange ?: null
 				def maxRange = fieldSpec.constraints?.maxRange ?: null
 				def decimalPlaces = fieldSpec.constraints?.decimalPlaces ?: null
 				def useThousandSeparator = fieldSpec.constraints?.useThousandSeparator ?: false
 				def allowNegatives = fieldSpec.constraints?.allowNegatives
 
-				if ((minRange && value < minRange) || (maxRange && value > maxRange)) {
+				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
 					addError ('field.invalid.valueOutOfRange', [value, getLabel(), minRange, maxRange])
 				}
 				if (decimalPlaces && value.contains('.')){
-					def decimalPart = value.substring(value.indexOf('.') + 1, value.size())
-					if (!decimalPart.size() <= decimalPlaces) {
+					def fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
+					if (!fractionalPart.size() > decimalPlaces) {
 						addError ('field.invalid.decimalPlacesExceeded', [value, getLabel(), decimalPlaces])
 					}
 				}
-				if (value < 0 && !allowNegatives) {
+				if (number < 0 && !allowNegatives) {
 					addError ('field.invalid.negativesNotAllowed', [value, getLabel()] )
 				}
 				if (useThousandSeparator) {
-					def integerPart = 0
-					if (value.contains('.')) {
-						integerPart = value.substring(0, value.indexOf('.'))
-					} else {
-						integerPart = value
-					}
-					if (integerPart > 3 && !value.contains(',')) {
+					int integerPart = (int) number // remove fractional part, if exists
+					if (integerPart.toString().size() > 3 && !value.contains(',')) { // if bigger or equal than a thousand and don't have the separator
 						addError ('field.invalid.thousandSeparatorRequired', [value, getLabel()] )
 					}
 				}
@@ -228,7 +230,7 @@ class CustomValidators {
 				def maxSize = fieldSpec?.constraints?.maxSize ?: Integer.MAX_VALUE
 
 				int size = value?.length() ?: 0
-				if (size < minSize && size > maxSize) {
+				if (size < minSize || size > maxSize) {
 					addError( 'field.invalid.sizeOutOfBounds', [value, getLabel(), minSize, maxSize] )
 				}
 			}
