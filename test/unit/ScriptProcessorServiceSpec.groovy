@@ -1,5 +1,6 @@
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.ETLBaseSpec
@@ -38,7 +39,7 @@ import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
 
 @TestFor (ScriptProcessorService)
 @TestMixin (ControllerUnitTestMixin)
-@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
+@Mock ([DataScript, Project, Database, AssetEntity, Setting, Application, Database, AssetOptions])
 class ScriptProcessorServiceSpec extends Specification {
 
 	String sixRowsDataSetFileName

@@ -4,8 +4,10 @@ package com.tdsops.etl
  * Class used to manage domain chain methods command.
  * <pre>
  *  read labels
- *  iterate {*      domain Application method 'arg'
- *}* </pre>
+ *  iterate {
+ *  	domain Application method 'arg'
+ *  }
+ * </pre>
  * <p>An instance or domain builder is in charged to manipulate all next methods
  * executed in an ETL Script.</p>
  * <p>Subclasses can extends this behaviour based on the domain definition</p>

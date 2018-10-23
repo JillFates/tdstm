@@ -17,7 +17,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
  * 	    set dependentResult with DOMAIN
  *
  * 		// Here's the cool stuff
- * 		domain Dependency with assetResultVar and dependentResult
+ * 		domain Dependency with assetResultVar 'Runs on' dependentResult
  * 		...
  *	}
  * </code>
