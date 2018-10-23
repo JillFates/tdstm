@@ -119,7 +119,7 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			this.createDataGrids();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
