@@ -89,7 +89,6 @@
                             <!-- Value -->
                             <kendo-grid-column title="Value" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    {{editRows.selectedValues[rowIndex].value}}
                                     <!-- Text Fields -->
                                     <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                            type="text" name="actionValue" class="form-control"
