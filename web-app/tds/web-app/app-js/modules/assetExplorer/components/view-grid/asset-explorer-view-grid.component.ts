@@ -354,7 +354,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 
 		this.dialog.extra(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
 			}
@@ -409,7 +409,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 
 		this.dialog.extra(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -439,7 +439,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 
 		this.dialog.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
 			this.onReload();
 		}).catch(result => {
