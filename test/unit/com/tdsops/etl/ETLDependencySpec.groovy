@@ -146,7 +146,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 		then: 'It throws an Exception because Dependency command is being incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.invalidDomainClassForDomainDependencyWithCommand().message} at line 8"
+				message == "${ETLProcessorException.invalidDomainForDomainDependencyWithCommand().message} at line 8"
 				startLine == 8
 				endLine == 8
 				startColumn == null
@@ -160,7 +160,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can throw an Exception if asset has null values'() {
+	void 'test can throw an Exception if asset is null values'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model
@@ -201,7 +201,49 @@ class ETLDependencySpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can throw an Exception if asset has not an AssetEntity parameter'() {
+	void 'test can throw an Exception if asset is not a DOMAIN'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model
+				xraysrv01,Dell,PE2950
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load 'Name' set nameVar
+					domain Dependency with nameVar
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception because Dependency command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == "${ETLProcessorException.incorrectDomainVariableForDomainWithCommand().message} at line 7"
+				startLine == 7
+				endLine == 7
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			if (fileName) {
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can throw an Exception if asset has not an AssetEntity domain'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model
@@ -231,7 +273,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.invalidDomainClassForDomainDependencyWithCommand().message} at line 9"
+				message == "${ETLProcessorException.invalidAssetEntityClassForDomainDependencyWithCommand().message} at line 9"
 				startLine == 9
 				endLine == 9
 				startColumn == null
@@ -275,9 +317,9 @@ class ETLDependencySpec extends ETLBaseSpec {
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message.startsWith(ETLProcessorException.unrecognizedDomainCommandArguments(etlProcessor.binding.getVariable('dependentVar')).message)
-				startLine == 8
-				endLine == 8
+				message.startsWith(ETLProcessorException.unrecognizedDomainCommandArguments('Runs On').message)
+				startLine == 9
+				endLine == 9
 				startColumn == null
 				endColumn == null
 				fatal == true
@@ -376,7 +418,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 		then: 'It throws an Exception because Dependency command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == "${ETLProcessorException.invalidDomainClassForDomainDependencyWithCommand().message} at line 13"
+				message == "${ETLProcessorException.invalidAssetEntityClassForDomainDependencyWithCommand().message} at line 13"
 				startLine == 13
 				endLine == 13
 				startColumn == null
@@ -618,7 +660,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 					extract 'model' load 'Model' set modelNameVar
 					extract 'server_guid' load 'externalRefId' set extRefIdVar
 				
-					find Device by 'externalRefId' eq extRefIdVar into 'id'
+					find Device by 'externalRefId' eq extRefIdVar into 'id' 
 					elseFind Device by 'Name' eq vmNameVar and 'Manufacturer' eq mfgNameVar and 'Model' eq modelNameVar into 'id'
 					elseFind Device by 'Name' eq vmNameVar and 'Manufacturer' eq mfgNameVar into 'id'
 					elseFind Device by 'Name' eq vmNameVar and 'Model' eq modelNameVar into 'id'

@@ -19,17 +19,17 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
  * 		// Here's the cool stuff
  * 		domain Dependency with assetResultVar and dependentResult
  * 		...
- *}* </code>
+ *	}
+ * </code>
  * @see TM-12031.
  *
  */
 @CompileStatic
-class DependencyBuilder {
+class DependencyBuilder extends DomainBuilder {
 
-	private ETLProcessor processor
+
 	private RowResultFacade asset
 	private RowResultFacade dependent
-	private ETLDomain domain
 	private boolean withProcessed
 
 	static final String ID_FIELD_NAME = 'id'
@@ -38,8 +38,8 @@ class DependencyBuilder {
 	static final String TYPE_FIELD_NAME = 'type'
 
 	DependencyBuilder(ETLDomain domain, ETLProcessor processor) {
-		this.domain = domain
-		this.processor = processor
+		super(domain, processor)
+		validateDependencyDomain()
 	}
 
 	/**
@@ -56,7 +56,6 @@ class DependencyBuilder {
 	 * @return
 	 */
 	DependencyBuilder with(RowResultFacade asset) {
-		validateDependency()
 		this.asset = validate(asset)
 		process(ASSET_FIELD_NAME, this.asset)
 		withProcessed = true
@@ -64,7 +63,15 @@ class DependencyBuilder {
 	}
 
 	/**
-	 *
+	 * <p>Overrides {@code DependencyBuilder # with} to detect invalid asset parameter type.</p>
+	 * If domain command is configured incorrectly with an incorrect parameter
+	 * <pre>
+	 * 	console on
+	 * 	read labels
+	 * 	domain Device
+	 * 	iterate {* 		extract 'name' load 'Name' set myVar
+	 * 		domain Dependency with myVar
+	 *}* </pre>
 	 * @param asset
 	 * @return
 	 */
@@ -78,7 +85,7 @@ class DependencyBuilder {
 	 * 	domain Dependency with assetVar 'Runs On' dependentVar
 	 * </pre>
 	 * <p>This method is in charged to detect the correct scenario for Dependency command
-	 * and also validate the {@code AssetDependency#type}</p>
+	 * and also validate the {@code AssetDependency # type}</p>
 	 * <p>Defines dependent parameter</p>
 	 * <code>
 	 *  // Load the asset side of the Dependency
@@ -91,21 +98,21 @@ class DependencyBuilder {
 	 * @param methodName a method name used in the
 	 * @param args an array with params for method missing
 	 */
-	def methodMissing (String methodName, Object args) {
-		if(!withProcessed || !args){
-			throw ETLProcessorException.unrecognizedDomainCommandArguments(args)
+	def methodMissing(String methodName, Object args) {
+		if (!withProcessed) {
+			throw ETLProcessorException.unrecognizedDomainCommandArguments(methodName)
 		}
 
 		List argsList = args as List
-		if(argsList.size() != 1 || argsList[0] in [RowResultFacade]){
+		if (argsList.size() != 1 || argsList[0] in [RowResultFacade]) {
 			throw ETLProcessorException.unrecognizedDomainCommandArguments(args)
 		}
 
-		if(!processor.assetDependencyTypesCache.isValidType(methodName)){
+		if (!processor.assetDependencyTypesCache.isValidType(methodName)) {
 			throw ETLProcessorException.invalidDependencyTypeInDomainDependencyWithCommand(methodName)
 		}
 
-		this.dependent = validate((RowResultFacade)argsList[0])
+		this.dependent = validate((RowResultFacade) argsList[0])
 		process(DEPENDENT_FIELD_NAME, this.dependent, methodName)
 		return this
 	}
@@ -152,9 +159,9 @@ class DependencyBuilder {
 		}
 
 		/**
-		 * Add {@code AssetDependency#type}
+		 * Add {@code AssetDependency # type}
 		 */
-		if(dependencyType){
+		if (dependencyType) {
 			processor.load(TYPE_FIELD_NAME).with(dependencyType)
 		}
 
@@ -163,34 +170,43 @@ class DependencyBuilder {
 		 */
 		fieldResult.create = [:]
 		fieldMap.each { String fieldName, FieldResult results ->
-			fieldResult.create[fieldName] = results.init ?:results.value
+			fieldResult.create[fieldName] = results.init ?: results.value
 		}
 	}
 
 	/**
 	 * Validates if parameter is an instance of {@code RowResultFacade} is not null
-	 * or if {@code RowResultFacade#rowResult} belongs to a domain in {@AssetEntity} hierarchy.
+	 * or if {@code RowResultFacade # rowResult} belongs to a domain in {@AssetEntity} hierarchy.
 	 *
 	 * @param dependencyFieldFacade
 	 */
-	private RowResultFacade validate(RowResultFacade rowResultFacade){
-		if(!rowResultFacade?.rowResult){
+	private RowResultFacade validate(RowResultFacade rowResultFacade) {
+		if (!rowResultFacade?.rowResult) {
 			throw ETLProcessorException.incorrectDomainVariableForDomainWithCommand()
 		}
 
-		if(!ETLDomain.isDomainAsset(rowResultFacade.rowResult.domain)){
-			throw ETLProcessorException.invalidDomainClassForDomainDependencyWithCommand()
+		if (!ETLDomain.isDomainAsset(rowResultFacade.rowResult.domain)) {
+			throw ETLProcessorException.invalidAssetEntityClassForDomainDependencyWithCommand()
 		}
 
 		return rowResultFacade
 	}
 
 	/**
-	 * Validates if {@code DependencyBuilder#domain} is {@code ETLDomain#Dependency}.
+	 * Validates if {@code DependencyBuilder # domain} is {@code ETLDomain # Dependency}.
+	 * <pre>
+	 * 	console on
+	 * 	read labels
+	 * 	domain Device
+	 * 	iterate {
+	 * 		extract 'name' load 'Name' set myVar
+	 * 		domain Application with myVar
+	 *	}
+	 * </pre>
 	 */
-	private void validateDependency(){
-		if(ETLDomain.Dependency != this.domain ){
-			throw ETLProcessorException.invalidDomainClassForDomainDependencyWithCommand()
+	private void validateDependencyDomain() {
+		if (ETLDomain.Dependency != this.domain) {
+			throw ETLProcessorException.invalidDomainForDomainDependencyWithCommand()
 		}
 	}
 }

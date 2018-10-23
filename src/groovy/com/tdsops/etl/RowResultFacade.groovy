@@ -1,15 +1,20 @@
 package com.tdsops.etl
 
 /**
+ * TODO: add docs.
  *
-
+ * 1) Content of {@code RowResultFacade}
+ * 2) Content of labelFieldMap parameter
+ *
  */
 class RowResultFacade {
 
 	private RowResult rowResult
+	private Map<String, String> labelFieldMap
 
-	RowResultFacade(RowResult rowResult) {
+	RowResultFacade(RowResult rowResult, Map<String, String> labelFieldMap) {
 		this.rowResult = rowResult
+		this.labelFieldMap = labelFieldMap
 	}
 
 	RowResult getRowResult() {
@@ -31,13 +36,9 @@ class RowResultFacade {
 	 * @param name a property name
 	 * @return an Object instance from from {code FieldResult#value}
 	 */
-	Object getProperty(String name) {
+	Object getProperty(String fieldNameOrLabel) {
 
-		String fieldName
-		if(rowResult.fieldLabelMap.containsKey(name)){
-			fieldName = rowResult.fieldLabelMap[name]
-		}
-
+		String fieldName = labelFieldMap.containsKey(fieldNameOrLabel)? labelFieldMap[fieldNameOrLabel]: fieldNameOrLabel
 		return rowResult.fields[fieldName]?.value
 	}
 

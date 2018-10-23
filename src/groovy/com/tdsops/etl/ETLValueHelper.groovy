@@ -28,9 +28,10 @@ class ETLValueHelper {
 	 * SourceField#value used as a wrapper over Dataset source field value
 	 * Element#value a dynamic variable bound in the ETLBinding context
 	 * @param value a instance to be used in value calculation
+	 * @param labelFieldMap a Map that contains relation between field name and labelsOkas.
 	 * @return the value depending on instance type
 	 */
-	static Object valueOf(def value) {
+	static Object valueOf(def value, Map labelFieldMap = null) {
 
 		Object fieldValue
 
@@ -42,7 +43,7 @@ class ETLValueHelper {
 				fieldValue = ((Element)value).value
 				break
 			case DomainFacade: // set myVar with DOMAIN.
-				fieldValue = new RowResultFacade(((DomainFacade)value).currentRowMap())
+				fieldValue = new RowResultFacade(((DomainFacade)value).currentRowMap(), labelFieldMap)
 				break
 			case SourceField:
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'

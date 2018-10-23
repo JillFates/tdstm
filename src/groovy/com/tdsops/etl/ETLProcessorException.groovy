@@ -242,17 +242,25 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("The with parameters for the 'domain ... with' command must be a DOMAIN type variable")
     }
 
-	static ETLProcessorException invalidDomainClassForDomainDependencyWithCommand() {
-		new ETLProcessorException("The 'domain Dependency with' command is only applicable for the Asset classes")
-	}
+    static ETLProcessorException invalidAssetEntityClassForDomainDependencyWithCommand() {
+        new ETLProcessorException("The 'domain Dependency with' command is only applicable for the Asset classes")
+    }
 
-	static ETLProcessorException invalidDependencyTypeInDomainDependencyWithCommand(String dependencyType) {
+    static ETLProcessorException invalidDomainForDomainDependencyWithCommand() {
+        new ETLProcessorException("The 'domain ... with' command is only applicable for the Dependency class")
+    }
+
+    static ETLProcessorException invalidDependencyTypeInDomainDependencyWithCommand(String dependencyType) {
 		new ETLProcessorException("Invalid dependency type '${dependencyType}' specified in 'domain Dependency with' command")
 	}
 
-	static ETLProcessorException unrecognizedDomainCommandArguments(Object argument) {
-		new ETLProcessorException("Unrecognized argument '${argument}', was expecting 'with'")
-	}
+    static ETLProcessorException unrecognizedDomainCommandArguments(Object argument) {
+        new ETLProcessorException("Unrecognized argument '${argument}', was expecting 'with'")
+    }
 
+
+    static ETLProcessorException unrecognizedArguments() {
+        new ETLProcessorException("unrecognized argument")
+    }
 }
 

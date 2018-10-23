@@ -255,9 +255,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 *  domain Application
 	 * </pre>
 	 * @param domain a domain String value
-	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 */
-	DependencyBuilder domain(ETLDomain domain) {
+	DomainBuilder domain(ETLDomain domain) {
 		validateStack()
 		if (selectedDomain?.domain == domain) {
 			selectedDomain.addNewRow = true
@@ -268,16 +268,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
 
-		return new DependencyBuilder(selectedDomain.domain, this)
+		return DomainBuilder.create(selectedDomain.domain, this)
 	}
 
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param element an instance of {@code Element} class
-	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 */
-	DependencyBuilder domain(Element element) {
+	DomainBuilder domain(Element element) {
 		return domain(element.value)
 	}
 
@@ -286,10 +286,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * If value is an invalid Domain class name, it throws an Exception.
 	 * @param domainName
-	 * @return an instance of {@code DependencyBuilder} to continue with methods chain
+	 * @return an instance of {@code DomainBuilder} to continue with methods chain
 	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
 	 */
-	DependencyBuilder domain(String domainName) {
+	DomainBuilder domain(String domainName) {
 		ETLDomain domain = ETLDomain.lookup(domainName)
 		if (domain) {
 			return domain(domain)
@@ -682,7 +682,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		return [
 			with: { value ->
-				Object localVariable = ETLValueHelper.valueOf(value)
+				Object localVariable = ETLValueHelper.valueOf(value, fieldsValidator.labelFieldMap[selectedDomain.domain.name()])
 				if (iterateIndex) {
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {

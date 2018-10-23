@@ -54,12 +54,7 @@ enum ETLDomain {
 	 * 			otherwise returns false
 	 */
 	static boolean isDomainAsset(String domain){
-		return lookup(domain) in [
-			ETLDomain.Application,
-			ETLDomain.Device,
-			ETLDomain.Database,
-			ETLDomain.Storage
-		]
+		return lookup(domain).clazz in AssetEntity
 	}
 
 	/**

@@ -211,7 +211,6 @@ class ETLProcessorResult {
 	RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
 			reference.data.add(new RowResult(
-				fieldLabelMap: reference.fieldLabelMap,
 				rowNum: processor.iterateIndex.pos,
 				domain: reference.domain)
 			)
@@ -504,23 +503,6 @@ class RowResult {
 	Map<String, FieldResult> fields = [:]
 	@DoNotMarshall
 	String domain
-	/**
-	 * This field is going to have a reference back to the {@code DomainResult#fieldLabelMap}.
-	 * Use by the RowResultFacade missing property
-	 * <pre>
-	 * iterate {
-	 * 	extract 'name' load 'Name'
-	 *
-	 * 	set assetResultVar with DOMAIN
-	 *
-	 * 	assert assetResultVar.assetName == 'xraysrv01'
-	 * 	assert assetResultVar.Name == 'xraysrv01'
-	 * }
-	 * </pre>
-	 * @see DomainResult#fieldLabelMap
-	 */
-	@DoNotMarshall
-	Map<String, String> fieldLabelMap = [:]
 
 	/**
 	 * Add element to the current row data

@@ -7,7 +7,15 @@ class ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
 	Map<ETLDomain, Map<String, ETLFieldDefinition>> fieldsDefinitionCache = [:]
+	/**
+	 * TODO Add docs
+	 */
 	Map<String, Map<String, String>> fieldLabelMap = [:]
+	/**
+	 * TODO Add docs
+	 */
+	Map<String, Map<String, String>> labelFieldMap = [:]
+
 
 	/**
 	 * Add fields specification for an ETLDomain instance
@@ -19,15 +27,18 @@ class ETLFieldsValidator {
 	}
 
 	/**
-	 * It looks a field specification up based on a ETLDomain
-	 * @param domain : a ETL Domain used for looking a field spec up
-	 * @param field : field name use to lookup
-	 * @return an instance of ETLFieldDefinition with field name, label and type
+	 * It looks a fieldNameOrLabel specification up based on a ETLDomain
+	 * // TODO: add an example
+	 *
+	 *
+	 * @param domain : a ETL Domain used for looking a fieldNameOrLabel spec up
+	 * @param fieldNameOrLabel : fieldNameOrLabel name use to lookup
+	 * @return an instance of ETLFieldDefinition with fieldNameOrLabel name, label and type
 	 */
-	ETLFieldDefinition lookup(ETLDomain domain, String field) {
+	ETLFieldDefinition lookup(ETLDomain domain, String fieldNameOrLabel) {
 
-		if (cacheContains(domain, field)) {
-			return getFromCache(domain, field)
+		if (cacheContains(domain, fieldNameOrLabel)) {
+			return getFromCache(domain, fieldNameOrLabel)
 		}
 
 		ETLFieldDefinition fieldDefinition
@@ -37,14 +48,16 @@ class ETLFieldsValidator {
 		// Try finding the fieldspec for asset classes
 		if (domain.isAsset()) {
 			fieldSpec = assetClassFieldsSpecMap[domain].find {
-				it.field == field || it.label == field
+				it.field == fieldNameOrLabel || it.label == fieldNameOrLabel
 			}
 
 			if (fieldSpec) {
-				fieldDefinition = new ETLFieldDefinition(fieldSpec){}
+				fieldDefinition = new ETLFieldDefinition(fieldSpec)
 			}
+
+
 		} else {
-			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, field)
+			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domain.clazz, fieldNameOrLabel)
 			if (domainProperty) {
 				fieldDefinition = new ETLFieldDefinition(domainProperty)
 			}
@@ -52,47 +65,50 @@ class ETLFieldsValidator {
 		}
 
 		if (! fieldDefinition) {
-			throw ETLProcessorException.unknownDomainFieldName(domain, field)
+			throw ETLProcessorException.unknownDomainFieldName(domain, fieldNameOrLabel)
 		}
 
-		saveInCache(domain, field, fieldDefinition)
+		saveInCache(domain, fieldNameOrLabel, fieldDefinition)
 		return fieldDefinition
 	}
 
 	/**
 	 * Check if the internal cache for fieldDefinitions contains an entry
-	 * for the ETLDomain instance and a field name/label
+	 * for the ETLDomain instance and a fieldNameOrLabel name/label
 	 * @param domain and instance of ETLDomain
-	 * @param field a String content with a field name or a field label
-	 * @return true if fieldsDefinitionCache contains the pair of ETLDomain + field name/label
+	 * @param field a String content with a fieldNameOrLabel name or a fieldNameOrLabel label
+	 * @return true if fieldsDefinitionCache contains the pair of ETLDomain + fieldNameOrLabel name/label
 	 */
 	private boolean cacheContains(ETLDomain domain, String field) {
 		return fieldsDefinitionCache.containsKey(domain) && fieldsDefinitionCache[domain].containsKey(field)
 	}
 
 	/**
-	 * Save in an internal cache a field definitions for a specific field in a particular domain
+	 * Save in an internal cache a fieldNameOrLabel definitions for a specific fieldNameOrLabel in a particular domain
 	 * @param domain an instance of ETLDomain
-	 * @param field field name or field label
-	 * @param fieldDefinition ETLFieldDefinition instance for the field parameter
+	 * @param field fieldNameOrLabel name or fieldNameOrLabel label
+	 * @param fieldDefinition ETLFieldDefinition instance for the fieldNameOrLabel parameter
 	 */
 	private void saveInCache(ETLDomain domain, String field, ETLFieldDefinition fieldDefinition){
 		if(!fieldsDefinitionCache.containsKey(domain)){
 			fieldsDefinitionCache.put(domain, [:])
 			fieldLabelMap.put(domain.name(), [:])
+			labelFieldMap.put(domain.name(), [:])
 		}
 
 		if (! fieldsDefinitionCache[domain].containsKey(field)) {
 			fieldsDefinitionCache[domain].put(field, fieldDefinition)
 			fieldLabelMap[domain.name()].put(fieldDefinition.name, fieldDefinition.label)
+			// Additionaly create label to fieldNameOrLabel map
+			labelFieldMap[domain.name()].put(fieldDefinition.label, fieldDefinition.name)
 		}
 	}
 
 	/**
 	 * Return from an internal cache an instance of ETLFieldDefinition
 	 * @param domain an instance of ETLDomain
-	 * @param field field name or field label
-	 * @return ETLFieldDefinition instance for the field parameter
+	 * @param field fieldNameOrLabel name or fieldNameOrLabel label
+	 * @return ETLFieldDefinition instance for the fieldNameOrLabel parameter
 	 */
 	private ETLFieldDefinition getFromCache(ETLDomain domain, String field){
 		return fieldsDefinitionCache[domain][field]
