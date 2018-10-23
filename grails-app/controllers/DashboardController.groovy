@@ -230,13 +230,13 @@ class DashboardController implements ControllerMethods {
 					status: task.item.status
 			])
 		}
-
+		
 		def totalDuration = TimeUtil.ago(taskSummary.totalDuration, TimeUtil.SHORT)
 		def dueTaskCount = taskSummary.dueTaskCount
 
 		def summaryDetail = 'No active tasks were found.'
 		if (taskSummary.taskList.size() > 0) {
-			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${taskSummary.taskList.size() - dueTaskCount} are overdue)"
+			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${dueTaskCount} ${(dueTaskCount == 1) ? ('is') : ('are')} overdue)"
 		}
 
 		Map data = [taskList: result, summaryDetail: summaryDetail]
