@@ -6,7 +6,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {NotifierService} from '../services/notifier.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 declare var jQuery: any;
 

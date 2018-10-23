@@ -42,7 +42,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
 			this.model.asset.scale = {
-				name: ''
+				name: { value: '', text: ''}
 			};
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];

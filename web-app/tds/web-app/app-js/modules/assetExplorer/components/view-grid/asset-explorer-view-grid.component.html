@@ -65,7 +65,7 @@
 	</ng-template>
 
     <!-- Select All column -->
-    <kendo-grid-column title="" [locked]="true" [width]="55" [filterable]="false">
+    <kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
 	    <ng-template kendoGridHeaderTemplate>
 		    <div class="row">
 			    <div class="col-md-12 text-center">

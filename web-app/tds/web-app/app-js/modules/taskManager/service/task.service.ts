@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Response, RequestOptions, Headers} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
 
 import 'rxjs/add/operator/map';

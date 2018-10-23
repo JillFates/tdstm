@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';

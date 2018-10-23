@@ -52,7 +52,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			this.model.asset = {}; // R.clone(editModel.asset);
 			if (!this.model.asset.scale || this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}

@@ -11,6 +11,9 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
+import {Observable} from 'rxjs';
+import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
@@ -55,7 +58,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}

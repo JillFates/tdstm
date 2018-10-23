@@ -4,11 +4,9 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
-import { StateService } from '@uirouter/angular';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
+import { Observable } from 'rxjs';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ViewModel } from '../../model/view.model';
+import {ViewGroupModel, ViewModel} from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
@@ -24,6 +22,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {ActivatedRoute, Router} from '@angular/router';
 
 declare var jQuery: any;
 @Component({
@@ -59,41 +58,47 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
+	allFields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	currentTab = 0;
 	previewButtonClicked = false;
 	protected metadata: any = {};
 
 	constructor(
-		@Inject('report') report: Observable<ViewModel>,
+		private route: ActivatedRoute,
+		private router: Router,
 		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private state: StateService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
-		private dictionary: DictionaryService,
-		@Inject('tagList') tagList: Observable<Array<TagModel>>) {
-			tagList.subscribe( result => this.metadata.tagList = result);
-			Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
-				this.domains = result[0];
-				this.model = { ...result[1] };
-				this.dataSignature = JSON.stringify(this.model);
-				if (this.model.id) {
-					this.updateFilterbyModel();
-					this.currentTab = 1;
-					this.state.$current.data.page.title = this.model.name;
-					document.title = this.model.name;
-					this.draggableColumns = this.model.schema.columns.slice();
-				}
-			}, (err) => console.log(err));
+		private dictionary: DictionaryService) {
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
+		this.allFields = this.route.snapshot.data['fields'];
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = {...this.route.snapshot.data['report']};
+		this.dataSignature = JSON.stringify(this.model);
+		if (this.model.id) {
+			this.updateFilterbyModel();
+			this.currentTab = 1;
+			this.draggableColumns = this.model.schema.columns.slice();
+		}
 	}
 
 	ngOnInit(): void {
 		if (this.model.id) {
+			this.notifier.broadcast({
+				name: 'notificationHeaderTitleChange',
+				title: this.model.name
+			});
 			this.previewButtonClicked = true;
 			this.onPreview();
+		} else {
+			this.grid.gridData = {
+				data: [],
+				total: 0
+			};
 		}
 	}
 
@@ -217,14 +222,15 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected openSaveDialog(): void {
+		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetExplorerViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
+			{ provide: ViewGroupModel, useValue: selectedData }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
 			setTimeout(() => {
-				this.state.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
+				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 			});
 		}).catch(result => {
 			console.log('error');
@@ -234,7 +240,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		return this.model.schema.domains.filter(x => x !== 'common').length > 0;
+		return this.model && this.model.schema && this.model.schema.domains.filter(x => x !== 'common').length > 0;
 	}
 
 	protected isColumnSelected(): boolean {
@@ -247,9 +253,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		}
+		// TODO: hasPendingChanges
+		// if (this.state && this.state.$current && this.state.$current.data) {
+		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
+		// }
 		return result;
 	}
 
@@ -301,11 +308,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected onCancel() {
-		const routeState = this.dictionary.get(LAST_VISITED_PAGE);
-		if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
-			this.state.go(routeState, { id: this.model.id });
+		if (this.model && this.model.id) {
+			this.router.navigate(['asset', 'views', this.model.id, 'show']);
 		} else {
-			this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
+			this.router.navigate(['asset', 'views']);
 		}
 	}
 
