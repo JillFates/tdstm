@@ -559,7 +559,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				case PasswordResetType.ADMIN_RESET:
 					createdBy = userLogin.person
 					bodyTemplate = "adminResetPassword"
-					subject = "Reset your password"
+					subject = "Reset Password Request"
 					break
 
 			}
