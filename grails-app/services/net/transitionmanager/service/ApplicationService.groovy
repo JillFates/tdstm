@@ -105,7 +105,7 @@ class ApplicationService implements ServiceMethods {
 	 */
 	Map getModelForCreate(Map params) {
 		Project project = securityService.getUserCurrentProject()
-		Application application = new Application()
+		Application application = new Application(project: project)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)

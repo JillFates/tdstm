@@ -334,6 +334,9 @@ class WsAssetController implements ControllerMethods {
 				break
 		}
 
+		// Set the default values on the custom properties
+		assetService.setCustomDefaultValues(model['assetInstance'])
+
 		domainName=domainName.toLowerCase()
 		try {
 			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/create", model: model)
