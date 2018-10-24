@@ -94,13 +94,14 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
 			commonCalls.push(this.taskManagerService.getCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
-			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams())
+			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
+			commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
 		}
 
 		this.metaParam = this.getMetaParam();
 		Observable.forkJoin(commonCalls)
 			.subscribe((results: any[]) => {
-				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults] = results;
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
 
 				this.model.statusList = status;
 				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
@@ -124,6 +125,10 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 					this.metaParam = this.getMetaParam();
+				}
+
+				if (classForAsset) {
+					this.model.assetClass = {id: classForAsset.assetClass, text: ''};
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
