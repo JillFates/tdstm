@@ -198,24 +198,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 		this.dialogService.extra(TaskEditComponent,
 			[
-				{provide: UIDialogService, useValue: this.dialogService},
-				{provide: TaskService, useValue:  this.taskManagerService},
-				{provide: UIPromptService, useValue: this.promptService},
-				{provide: PreferenceService, useValue: this.userPreferenceService} ,
-				{provide: PermissionService, useValue: this.permissionService},
-			{provide: TaskDetailModel, useValue: clone(this.model)}
-		], false, false)
-		.then(result => {
-			if (result) {
-				if (result.isDeleted) {
-					this.close({id: this.taskDetailModel, isDeleted: true})
-					return;
-				}
+				{provide: TaskDetailModel, useValue: clone(this.model)}
+			], false, false)
+			.then(result => {
+				if (result) {
+					if (result.isDeleted) {
+						this.close({id: this.taskDetailModel, isDeleted: true})
+						return;
+					}
 
-				this.hasChanges = true;
-				this.loadTaskDetail();
-			}
-		}).catch(result => {
+					this.hasChanges = true;
+					this.loadTaskDetail();
+				}
+			}).catch(result => {
 			this.dismiss(this.hasChanges);
 		});
 	}
