@@ -91,18 +91,6 @@ class ModelService implements ServiceMethods {
 			//toModel.findOrCreateAliasByName(fromModel.modelName, true)
 			findOrCreateAliasByName(toModel, fromModel.modelName, true)
 
-
-			String principal = securityService.currentUsername
-			if (principal) {
-				def user = UserLogin.findByUsername(principal)
-				def person = user.person
-				int bonusScore = person.modelScoreBonus ?: 0
-				if (user) {
-					person.modelScoreBonus = bonusScore+10
-					person.modelScore = person.modelScoreBonus + person.modelScore
-					person.save(flush:true)
-				}
-			}
 			/**/
 		} else {
 			//	Delete model record
@@ -500,14 +488,6 @@ class ModelService implements ServiceMethods {
 				AssetEntity.executeUpdate('update AssetEntity set model=null where model.id = :modelId', [modelId: model.id])
 				ModelAlias.executeUpdate('delete ModelAlias where model.id = :modelId', [modelId: model.id])
 				model.delete(flush: true)
-
-				// <SL> Could this be a function?
-				if (user) {
-					int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus : 0
-					person.modelScoreBonus = bonusScore + 1
-					int score = person.modelScore ?: 0
-					person.modelScore = score+bonusScore
-				}
 
 				if (!person.save(flush:true)) {
 					person.errors.allErrors.each { log.error it }

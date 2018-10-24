@@ -392,45 +392,6 @@ class ModelController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.ModelDelete)
-	def delete_old() {
-		def model = Model.get(params.id)
-		def modelRef = AssetEntity.findByModel(model)
-		if (!modelRef) {
-			UserLogin user = securityService.userLogin
-			Person person = user?.person
-			if (model) {
-				try {
-					model.delete(flush: true)
-					if (user) {
-						int bonusScore = person?.modelScoreBonus ? person?.modelScoreBonus:0
-						person.modelScoreBonus = bonusScore+1
-						int score = person.modelScore ?: 0
-						person.modelScore = score+bonusScore
-					}
-					if (!person.save(flush:true)) {
-						person.errors.allErrors.each {
-							println it
-							}
-					}
-
-					flash.message = "$model deleted"
-					redirect(action: "list")
-				} catch (DataIntegrityViolationException e) {
-					flash.message = "$model not deleted"
-					redirect(action: "show", id: params.id)
-				}
-			}
-			else {
-				flash.message = "Model not found with Id $params.id"
-				redirect(action: "list")
-			}
-		} else{
-			flash.message = "Model $model.modelName can not be deleted, it is referenced ."
-			redirect(action: "list")
-		}
-	}
-
-	@HasPermission(Permission.ModelDelete)
 	def delete() {
 		Model model = Model.get(params.id)
 		try {
