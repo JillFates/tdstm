@@ -105,7 +105,12 @@ var akaUtil = (function ($) {
         		});
         		// check if this AKA has previously been marked as invalid
 			} else if (akaRow.attr('js-is-unique') === 'false') {
-        		duplicateOf = 'other';
+        		if(parentName == "") {
+					duplicateOf = 'noParent';
+				}
+				else {
+                    duplicateOf = 'other';
+                }
         		// otherwise this AKA is not a duplicate
       		}
 			akaList.push(akaName);
@@ -159,6 +164,8 @@ var akaUtil = (function ($) {
 			akaMessage = 'AKA ' + akaName + ' already entered'
 		else if (duplicateOf == 'other')
 			akaMessage = 'AKA ' + akaName + ' already exists'
+		else if (duplicateOf == 'noParent')
+			akaMessage = 'Enter a model name before AKA'
 
 		var errorDiv = $('#' + errorId)
 		if (akaMessage) {
