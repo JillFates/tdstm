@@ -332,14 +332,4 @@ export class ImportAssetsComponent implements OnInit {
 			this.fetchResult = { status: 'error' };
 		}
 	}
-
-	/**
-	 * Redirects to Batch List view.
-	 * @param {number} id
-	 */
-	protected goToBatch(id: number): void {
-		// TODO: STATE SERVICE GO
-		// this.stateService.get(ImportBatchStates.IMPORT_BATCH_LIST.name).data.batchId = id;
-		// this.stateService.go(ImportBatchStates.IMPORT_BATCH_LIST.name);
-	}
 }
