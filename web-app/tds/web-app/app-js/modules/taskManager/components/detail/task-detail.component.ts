@@ -139,6 +139,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 				// Convert the Duration into a Human Readable form
 				this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
+
+				// get the class corresponding to this asset
+				this.taskManagerService.getClassForAsset(this.model.asset.id)
+					.subscribe((result: any) => {
+						if (result) {
+							const assetClass = this.model.assetClasses.find((asset: any) => asset.id === result.assetClass)
+							if (assetClass) {
+								this.model.assetClass = assetClass;
+							}
+						}
+					})
 			});
 	}
 
