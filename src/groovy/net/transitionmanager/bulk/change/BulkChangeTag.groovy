@@ -1,17 +1,14 @@
 package net.transitionmanager.bulk.change
 
-import com.tds.asset.AssetEntity
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.JsonUtil
 import grails.transaction.Transactional
 import grails.util.Holders
-import groovy.json.JsonSlurper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TagAsset
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
-import net.transitionmanager.service.ServiceMethods
 
 @Transactional
 class BulkChangeTag {
@@ -24,17 +21,14 @@ class BulkChangeTag {
 	 * Coerces the string value passed from the BulkChangeService to a List of longs, and validates them as tag ids.
 	 *
 	 * @param currentProject the current project passed from the controller for use in validating the tag ids.
+	 * @param field not used by this class, just here for the interface.
 	 * @param value The string value that need to be coerce.
+	 * @param fieldMapping not used in this class, just here for the interface.
 	 *
 	 * @return a List of longs, that represent tag ids.
 	 */
 	static List<Long> coerceBulkValue(Project currentProject, String value) {
-		JsonSlurper jsonSlurper = new JsonSlurper()
-		def parsedValue = jsonSlurper.parseText(value)
-
-		if (!(parsedValue instanceof List)) {
-			throw new InvalidParamException('Value is not a list of numbers')
-		}
+		List parsedValue = JsonUtil.parseJsonList(value)
 
 		List<Long> tagIds = (parsedValue).collect { i -> i.toLong() }
 
@@ -123,10 +117,6 @@ class BulkChangeTag {
 	 * @param assetIdsFilterQuery filtering query to use if assetIds are not present
 	 */
 	static void clear(Class type, List<Long> tagIds = null, String field, List<Long> assetIds = [], Map assetIdsFilterQuery = null) {
-		if (tagIds) {
-			throw new InvalidParamException("Specifying Tag IDs is invalid when clearing all tags")
-		}
-
 		bulkRemove(type, [], field, assetIds, assetIdsFilterQuery)
 	}
 

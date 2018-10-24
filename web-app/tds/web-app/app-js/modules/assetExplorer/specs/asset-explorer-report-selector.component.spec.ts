@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { UIRouterModule, RootModule } from '@uirouter/angular';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
@@ -24,14 +23,7 @@ describe('AssetExplorerViewSelectorComponent:', () => {
 				HttpModule,
 				FormsModule,
 				SharedModule,
-				DropDownListModule,
-				UIRouterModule.forRoot(<RootModule>{
-					useHash: true,
-					states: [{
-						name: 'tds',
-						url: ''
-					}]
-				})
+				DropDownListModule
 			],
 			declarations: [AssetExplorerViewSelectorComponent],
 			providers: [

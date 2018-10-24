@@ -47,15 +47,14 @@ class BulkChangeString {
 	/**
 	 * Parse the given value to determine if it is valid or not
 	 *
-	 * @param value - string value
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param field not used by this class but here for the interface
+	 * @param value - string value
+	 * @param fieldMapping, not used by this class, but here for the interface.
+	 *
 	 * @return - same string if it is not blank
 	 */
 	static String coerceBulkValue(Project currentProject, String value) {
-		if (StringUtil.isBlank(value)) {
-			return null
-		}
-
 		return value
 	}
 
@@ -77,7 +76,7 @@ class BulkChangeString {
 			params.value = value
 			setFieldQueryPart = "SET ${fieldName} = :value"
 		} else {
-			setFieldQueryPart = "SET ${fieldName} = NULL"
+			setFieldQueryPart = "SET ${fieldName} = ''"
 		}
 
 		String query = """

@@ -7,16 +7,15 @@ import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-fil
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 import {
-	DataIngestionService,
+	DataScriptService,
 	PROGRESSBAR_COMPLETED_STATUS, PROGRESSBAR_FAIL_STATUS
-} from '../../../dataIngestion/service/data-ingestion.service';
+} from '../../../dataScript/service/data-script.service';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
 	ETL_SCRIPT_FILE_UPLOAD_TYPE,
 	FILE_UPLOAD_TYPE_PARAM,
 	PROGRESSBAR_INTERVAL_TIME
 } from '../../../../shared/model/constants';
-import {StateService} from '@uirouter/angular';
 import {ImportBatchStates} from '../../import-batch-routing.states';
 
 declare var jQuery: any;
@@ -59,8 +58,7 @@ export class ImportAssetsComponent implements OnInit {
 	constructor(
 		private importAssetsService: ImportAssetsService,
 		private notifier: NotifierService,
-		private dataIngestionService: DataIngestionService,
-		private stateService: StateService) {
+		private dataIngestionService: DataScriptService) {
 			this.file.fileUID = null;
 	}
 
@@ -340,7 +338,8 @@ export class ImportAssetsComponent implements OnInit {
 	 * @param {number} id
 	 */
 	protected goToBatch(id: number): void {
-		this.stateService.get(ImportBatchStates.IMPORT_BATCH_LIST.name).data.batchId = id;
-		this.stateService.go(ImportBatchStates.IMPORT_BATCH_LIST.name);
+		// TODO: STATE SERVICE GO
+		// this.stateService.get(ImportBatchStates.IMPORT_BATCH_LIST.name).data.batchId = id;
+		// this.stateService.go(ImportBatchStates.IMPORT_BATCH_LIST.name);
 	}
 }

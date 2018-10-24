@@ -307,7 +307,7 @@
 				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 					<tr>
 						<td style="width: 134px;"><span > ${dependencyStatusInst}</span></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
+						<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this);" value="${dependencyStatusInst}"/></td>
 						<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyStatusControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
 					</tr>
 				</g:each>

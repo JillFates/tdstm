@@ -165,6 +165,7 @@
 		</div>
 		<asset-explorer-view-grid #grid="assetExplorerViewGrid"
                                   (modelChange)="onPreview()"
+								  [fields]="allFields"
                                   [edit]="true"
                                   [model]="model.schema"
 		                          [viewId]="model.id"

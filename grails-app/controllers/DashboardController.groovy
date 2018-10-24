@@ -11,7 +11,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectLogo
 import net.transitionmanager.security.Permission
@@ -100,20 +99,6 @@ class DashboardController implements ControllerMethods {
 
 			return model
 		}
-	}
-
-	@HasPermission(Permission.NewsCreate)
-	def saveNews() {
-		def moveEventNewsInstance = new MoveEventNews(params)
-		moveEventNewsInstance.createdBy = securityService.loadCurrentPerson()
-
-		if (params.isArchived == '1') {
-			moveEventNewsInstance.isArchived = 1
-			moveEventNewsInstance.archivedBy = securityService.loadCurrentPerson()
-			moveEventNewsInstance.dateArchived = TimeUtil.nowGMT()
-		}
-		moveEventNewsInstance.save(flush: true)
-		redirect(action: "index")
 	}
 
 	@HasPermission(Permission.DashboardMenuView)
@@ -245,13 +230,13 @@ class DashboardController implements ControllerMethods {
 					status: task.item.status
 			])
 		}
-
+		
 		def totalDuration = TimeUtil.ago(taskSummary.totalDuration, TimeUtil.SHORT)
 		def dueTaskCount = taskSummary.dueTaskCount
 
 		def summaryDetail = 'No active tasks were found.'
 		if (taskSummary.taskList.size() > 0) {
-			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${taskSummary.taskList.size() - dueTaskCount} are overdue)"
+			summaryDetail = "${taskSummary.taskList.size()} assigned tasks (${dueTaskCount} ${(dueTaskCount == 1) ? ('is') : ('are')} overdue)"
 		}
 
 		Map data = [taskList: result, summaryDetail: summaryDetail]

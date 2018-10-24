@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
+import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
@@ -142,6 +143,7 @@ class SettingService implements ServiceMethods {
      * @param json
      * @param version
      */
+    @Transactional
     protected void save(Setting setting, Project project, SettingType type, String key, String json, Integer version) {
         String jsonValidatedAndOptimized = validateAndOptimizeJSON(json)
 

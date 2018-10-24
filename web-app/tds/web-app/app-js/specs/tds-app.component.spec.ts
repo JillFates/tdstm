@@ -2,7 +2,7 @@ import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {DebugElement} from '@angular/core';
 
-import {TDSAppComponent} from '../config/tds-app.component';
+import {TDSAppComponent} from '../app/tds-app.component';
 import {SharedModule} from '../shared/shared.module';
 
 describe('TDSAppComponent:', () => {

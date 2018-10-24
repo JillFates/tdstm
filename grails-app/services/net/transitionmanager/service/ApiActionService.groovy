@@ -7,7 +7,6 @@ import com.tdssrc.grails.ApiCatalogUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
@@ -37,8 +36,6 @@ import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.apache.commons.lang3.RandomStringUtils
-import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -682,8 +679,8 @@ class ApiActionService implements ServiceMethods {
 	 * Clone any existing api actions associated to sourceProject (if any),
 	 * then associate those newly created tags to targetProject.
 	 *
-	 * @param sourceProject  The project from which the existing tags will be cloned.
-	 * @param targetProject  The project to which the new tags will be associated.
+	 * @param sourceProject  The project from which the existing api actions will be cloned.
+	 * @param targetProject  The project to which the new api actions will be associated.
 	 */
 	void cloneProjectApiActions(Project sourceProject, Project targetProject) {
 		List<ApiAction> apiActions = ApiAction.where {
@@ -693,35 +690,26 @@ class ApiActionService implements ServiceMethods {
 		if (apiActions && !apiActions.isEmpty()) {
 
 			apiActions.each { ApiAction sourceApiAction ->
-				// provider and api catalogs should have already been cloned at this point
-				// look at projectService.cloneDefaultSettings(...)
-				Provider targetProvider = Provider.where {
-					name == sourceApiAction.provider.name
-					project == targetProject
-				}.get()
+				Provider targetProvider = providerService.getProvider(sourceApiAction.provider.name, targetProject, false)
 
-				ApiCatalog targetApiCatalog = ApiCatalog.where {
-					name == sourceApiAction.apiCatalog.name
-					project == targetProject
-					provider == targetProvider
-				}.get()
+				ApiCatalog targetApiCatalog = null
+				if (sourceApiAction.apiCatalog) {
+					Provider apiCatalogProvider = providerService.getProvider(sourceApiAction.apiCatalog.provider.name, targetProject, false)
+					targetApiCatalog = apiCatalogService.getApiCatalog(sourceApiAction.apiCatalog.name, targetProject, apiCatalogProvider, false)
+				}
 
 				DataScript targetDataScript = null
 				if (sourceApiAction.defaultDataScript) {
-					targetDataScript = (DataScript)GormUtil.cloneDomainAndSave(sourceApiAction.defaultDataScript, [
-							project : targetProject,
-							provider: targetProvider
-					], false, false)
+					Provider dataScriptProvider = providerService.getProvider(sourceApiAction.defaultDataScript.provider.name, targetProject, false)
+					targetDataScript = dataScriptService.findByProjectAndProvider(sourceApiAction.defaultDataScript.name, targetProject, dataScriptProvider, false)
 				}
+
 				Credential targetCredential = null
 				if (sourceApiAction.credential) {
-					targetCredential = (Credential)GormUtil.cloneDomainAndSave(sourceApiAction.credential, [
-							project : targetProject,
-							provider: targetProvider,
-							username: 'Must Be Changed',
-							password: RandomStringUtils.randomAlphanumeric(10)
-					], false, false)
+					Provider credentialProvider = providerService.getProvider(sourceApiAction.credential.provider.name, targetProject, false)
+					targetCredential = credentialService.findByProjectAndProvider(sourceApiAction.credential.name, targetProject, credentialProvider, false)
 				}
+
 				ApiAction newApiAction = (ApiAction)GormUtil.cloneDomainAndSave(sourceApiAction, [
 						project: targetProject,
 						provider: targetProvider,

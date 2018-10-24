@@ -95,30 +95,35 @@ class TaskController implements ControllerMethods {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
 		// Deal with legacy view parameters.
-		if (request.format != 'json') {
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
 			params.taskDependency = params.list('taskDependency[]')
 			params.taskSuccessor = params.list('taskSuccessor[]')
-		}
-		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, params, false, flash)
-
-		if (params.printers) {
-			userPreferenceService.setPreference(PREF.PRINTER_NAME, params.printers)
-			userPreferenceService.setPreference(PREF.PRINT_LABEL_QUANTITY, params.printTimes)
+			requestParams = params
 		}
 
-		if (params.view == 'myTask') {
+		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
+
+		if (requestParams.printers) {
+			userPreferenceService.setPreference(PREF.PRINTER_NAME, requestParams.printers)
+			userPreferenceService.setPreference(PREF.PRINT_LABEL_QUANTITY, requestParams.printTimes)
+		}
+
+		if (requestParams.view == 'myTask') {
 			if (map.error) {
 				flash.message = map.error
 			}
 
-			def redirParams = [view: params.view]
-			if (params.containsKey('tab') && params.tab) {
-				redirParams.tab = params.tab
+			def redirParams = [view: requestParams.view]
+			if (requestParams.containsKey('tab') && requestParams.tab) {
+				redirParams.tab = requestParams.tab
 			}
-			if (params.containsKey('sort') && params.sort) {
-				redirParams.sort = params.sort
+			if (requestParams.containsKey('sort') && requestParams.sort) {
+				redirParams.sort = requestParams.sort
 			}
-			if (params.status == COMPLETED) {
+			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
 			forward(controller: 'task', action: 'listUserTasks', params: redirParams)
@@ -136,7 +141,14 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskEdit)
 	def assignToMe() {
-		def task = AssetComment.get(params.id)
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
+
+		def task = AssetComment.get(requestParams.id)
 		Project project = securityService.userCurrentProject
 		String errorMsg = ''
 		String assignedTo = ''
@@ -149,8 +161,8 @@ class TaskController implements ControllerMethods {
 			else {
 
 				// Double check to see if the status changed while the user was reassigning so that they
-				if (! errorMsg && params.status) {
-					if (task.status != params.status) {
+				if (! errorMsg && requestParams.status) {
+					if (task.status != requestParams.status) {
 						log.warn "assignToMe - Task(#:$task.taskNumber id:$task.id) status changed around when $securityService.currentUsername was assigning to self"
 						def whoDidIt = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
 						switch (task.status) {
@@ -178,7 +190,7 @@ class TaskController implements ControllerMethods {
 			}
 		}
 		else {
-			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - $params.id"
+			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - $requestParams.id"
 		}
 
 		def map = [assignedToName: assignedTo, errorMsg: errorMsg]

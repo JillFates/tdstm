@@ -46,7 +46,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
-					name: ''
+					name: { value: '', text: ''}
 				};
 			} else {
 				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
