@@ -191,7 +191,6 @@ class CustomValidators {
 				def minRange = fieldSpec.constraints?.minRange ?: null
 				def maxRange = fieldSpec.constraints?.maxRange ?: null
 				def decimalPlaces = fieldSpec.constraints?.decimalPlaces ?: null
-				def useThousandSeparator = fieldSpec.constraints?.useThousandSeparator ?: false
 				def allowNegatives = fieldSpec.constraints?.allowNegatives
 
 				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
@@ -205,14 +204,6 @@ class CustomValidators {
 				}
 				if (number < 0 && !allowNegatives) {
 					addError ('field.invalid.negativesNotAllowed', [value, getLabel()] )
-				}
-				if (useThousandSeparator) {
-					// remove fractional part, if exists
-					int integerPart = (int) number
-					// if bigger or equal than a thousand and it doesn't have the separator
-					if (integerPart.toString().size() > 3 && !value.contains(',')) {
-						addError ('field.invalid.thousandSeparatorRequired', [value, getLabel()] )
-					}
 				}
 			}
 		}

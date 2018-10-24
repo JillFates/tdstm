@@ -45,7 +45,6 @@ class CustomValidatorsSpec extends Specification{
 							maxRange : 100,
 							minRange : 1,
 							decimalPlaces:2,
-							useThousandSeparator: true,
 							allowNegatives: true
 					]
 
@@ -88,32 +87,19 @@ class CustomValidatorsSpec extends Specification{
 			'field.invalid.NaN' == errors[0].i18nMessageId
 	}
 
-	void '03. Test controlNumberValidator validator negatives, decimal places and thousand separator'() {
+	void '03. Test controlNumberValidator validator negatives and decimal places'() {
 		setup: 'setting the Field Specification Map'
 		Map<String, Object> fieldSpec = [
 				constraints: [
 						maxRange : 1500,
 						minRange : -20,
 						decimalPlaces:2,
-						useThousandSeparator: true,
 						allowNegatives: true
 				]
 
 		]
-		when: 'the value 1,000 is passed, using thousand separator'
-			def validator = CustomValidators.controlNumberValidator('1,000', fieldSpec)
-			validator.apply()
-		then: 'no error should be reported'
-			!validator.hasErrors()
-		when: 'the value 1,000 is passed, without thousand separator (mandatory accoring tho the given field spec)'
-			validator = CustomValidators.controlNumberValidator('1000', fieldSpec)
-			errors = validator.apply()
-		then: 'a thousandSeparatorRequired error should be reported'
-			validator.hasErrors()
-			1 == errors.size()
-			'field.invalid.thousandSeparatorRequired' == errors[0].i18nMessageId
 		when: 'the number is negative'
-			validator = CustomValidators.controlNumberValidator('-10', fieldSpec)
+			def validator = CustomValidators.controlNumberValidator('-10', fieldSpec)
 			validator.apply()
 		then: 'no error should be reported'
 			!validator.hasErrors()
