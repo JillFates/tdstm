@@ -28,9 +28,6 @@ class ETLFieldsValidator {
 
 	/**
 	 * It looks a fieldNameOrLabel specification up based on a ETLDomain
-	 * // TODO: add an example
-	 *
-	 *
 	 * @param domain : a ETL Domain used for looking a fieldNameOrLabel spec up
 	 * @param fieldNameOrLabel : fieldNameOrLabel name use to lookup
 	 * @return an instance of ETLFieldDefinition with fieldNameOrLabel name, label and type
