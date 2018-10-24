@@ -4,7 +4,7 @@ export class TaskDetailModel {
 	public id?: string;
 	public modal: {
 		title:  string;
-		type: ModalType
+		type?: ModalType
 	};
 	public detail?: any;
 }

@@ -8,7 +8,6 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../service/task.service';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 
 declare var jQuery: any;
 
