@@ -27,9 +27,6 @@ export const UserRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: UserListComponent,
-		resolve: {
-			user: UserResolveService
-		},
 		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
