@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetOptions
 import com.tdsops.AssetDependencyTypesCache
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
@@ -240,7 +239,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
 		this.stopWatch = new StopWatch()
-		this.assetDependencyTypesCache = new AssetDependencyTypesCache()
+
 		this.initializeDefaultGlobalVariables()
 		this.initializeDefaultGlobalTransformations()
 	}
@@ -268,6 +267,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
 
+		assetDependencyTypeCacheLazyLoading()
 		return DomainBuilder.create(selectedDomain.domain, this)
 	}
 
@@ -682,7 +682,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		return [
 			with: { value ->
-				Object localVariable = ETLValueHelper.valueOf(value, fieldsValidator.labelFieldMap[selectedDomain.domain.name()])
+
+				Object localVariable = calculateLocalVariable(value)
+
 				if (iterateIndex) {
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
@@ -1307,6 +1309,45 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 	 */
 	private void bindVariable(String name, Object value) {
 		binding.addDynamicVariable(name, value)
+	}
+
+	/**
+	 * <p>Local variable is calculated using {@code ETLValueHelper#valueOf}</p>
+	 * <p>To build these variables, It is necessary some parameters</p>
+	 * <ul>
+	 *	<li>
+	 *	    value: this parameter is taken from the command configuration.
+	 *	    <pre>
+	 *	        set myVar with 'FooBar'
+	 *	    </pre>
+	 *	</li>
+	 *  <li>
+	 *      labelFieldMap: this parameters contains {@code ETLFieldsValidator#labelFieldMap} Map content.
+	 *	    <pre>
+	 *	        set myVar with DOMAIN
+	 *	    </pre>
+	 *  </li>
+	 * </ul>
+	 * @param value
+	 * @return
+	 */
+	Object calculateLocalVariable(Object value){
+		if (selectedDomain?.domain) {
+			return ETLValueHelper.valueOf(value, fieldsValidator.labelFieldMap[selectedDomain.domain.name()])
+		} else {
+			return ETLValueHelper.valueOf(value)
+		}
+	}
+
+	/**
+	 * Initialize AssetDependency Type cache only when it is necessary.
+	 * It is necessary to populate {@code ETLProcessor#assetDependencyTypesCache}
+	 * when users use 'domain Dependency with ...' command
+	 */
+	private void assetDependencyTypeCacheLazyLoading() {
+		if (selectedDomain.domain == ETLDomain.Dependency && !this.assetDependencyTypesCache) {
+			this.assetDependencyTypesCache = new AssetDependencyTypesCache()
+		}
 	}
 
 	/**

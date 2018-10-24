@@ -42,7 +42,8 @@ class DomainBuilder {
 	 * <p>Factory method to create domain command instances.</p>
 	 * It is in charge to define the correct instance of {@code DomainBuilder} hierarchy
 	 * to be created in a domain command
-	 * @param domain
+	 *
+	 * @param domain an instance of {@code ETLDomain}
 	 * @param processor an instance of {@code ETLProcessor}
 	 * @return an instance of {@code DomainBuilder} hierarchy.
 	 */

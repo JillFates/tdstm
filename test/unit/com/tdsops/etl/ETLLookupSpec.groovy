@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdssrc.grails.StringUtil
@@ -26,7 +27,7 @@ import spock.lang.Issue
  * </ul>
  */
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
 class ETLLookupSpec extends ETLBaseSpec {
 
 
@@ -707,7 +708,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test setting a variable at ETLProcessor level'() {
 		setup:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
-
+			validator.labelFieldMap = []
 			ETLProcessor etlProcessor = new ETLProcessor(
 					  GMDEMO,
 					  dataSet,
