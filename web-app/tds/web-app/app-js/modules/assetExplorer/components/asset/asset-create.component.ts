@@ -47,6 +47,9 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 					let template = res[0].text();
 					let model = res[1].json();
 					model.asset = {};
+					if (!model.moveBundleList && model.dependencyMap && model.dependencyMap.moveBundleList) {
+						model.moveBundleList = model.dependencyMap.moveBundleList;
+					}
 					setTimeout( () => {
 						switch (this.asset) {
 							case 'APPLICATION':

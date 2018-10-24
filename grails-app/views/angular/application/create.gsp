@@ -109,12 +109,13 @@
 														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
+
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.id}"/>
 											<td data-for="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}">
 												<kendo-dropdownlist
 													class="tm-input-control"
 													name="modelAssetMoveBundle"
-													[data]="model.moveBundleList"
+													[data]="moveBundleList"
 													[(ngModel)]="model.asset.moveBundle"
 													[textField]="'name'"
 													[valueField]="'id'">
@@ -220,7 +221,7 @@
 											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
-														(modelChange)="model.asset.shutdownBy = $event"
+														(modelChange)="model.asset.shutdownBy.id = $event"
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${assetInstance.shutdownFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -240,7 +241,7 @@
 											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
-														(modelChange)="model.asset.startupBy = $event"
+														(modelChange)="model.asset.startupBy.id = $event"
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${assetInstance.startupFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -251,7 +252,7 @@
 											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
-														(modelChange)="model.asset.testingBy = $event"
+														(modelChange)="model.asset.testingBy.id = $event"
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${assetInstance.testingFixed}"
 														[namedStaff]="${personList as JSON}"

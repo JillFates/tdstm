@@ -110,6 +110,7 @@
                             <kendo-dropdownlist required name="color" class="form-control"
                                                 [data]="colorList"
                                                 [(ngModel)]="dataItem.color"
+                                                [textField]="'id'"
                                                 [valueField]="'id'"
                                                 [valuePrimitive]="true">
                                 <ng-template kendoDropDownListValueTemplate let-dataItem>

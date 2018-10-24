@@ -107,7 +107,8 @@ class DeviceService implements ServiceMethods {
 			assetEntity: assetEntity,
 			/*label: frontEndLabel,*/
 			canEdit: securityService.hasPermission(Permission.AssetEdit),
-			deleteChassisWarning: deleteChassisWarning
+			deleteChassisWarning: deleteChassisWarning,
+			currentUserId: securityService.currentPersonId
 		] + assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity)
 
 		model.roomSource = null

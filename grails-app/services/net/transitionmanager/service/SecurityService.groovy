@@ -545,7 +545,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			String bodyTemplate = "passwordReset"
 			String personFromEmail = grailsApplication.config.grails.mail.default.from
 			def createdBy = person
-			String subject = "Reset your password"
+			String subject = "Forgot your password"
 
 			switch(resetType) {
 				case PasswordResetType.WELCOME:
@@ -559,6 +559,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				case PasswordResetType.ADMIN_RESET:
 					createdBy = userLogin.person
 					bodyTemplate = "adminResetPassword"
+					subject = "Reset Password Request"
 					break
 
 			}
@@ -830,6 +831,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @param toPerson: instance of toPerson
 	 * @return
 	 */
+	@Transactional
 	void mergePersonsUserLogin(UserLogin byWhom, Person fromPerson, Person toPerson) {
 logger.debug "mergePersonsUserLogin() entered"
 		UserLogin toUserLogin = toPerson.userLogin
@@ -926,51 +928,6 @@ logger.debug "mergePersonsUserLogin() entered"
 		GormUtil.mergeDomainReferences(fromUser, toUser, true)
 	}
 
-	/**
-	 * Used to replace any user security roles from one user to another or deleting if preference already existed
-	 * @param byWhom - the user that is performing the replace
-	 * @param fromUser - the UserLogin that preferences are being replaced from
-	 * @param toUser - the UserLogin that any new preferences will be replaced into
-	 */
-	private void replaceUserSecurityRoles(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
-
-		Person fromPerson = fromUser.person
-		Person toPerson = toUser.person
-
-		List roles = PartyRole.findAllByParty(fromPerson)
-		roles.each { fromRole ->
-			PartyRole toRole = PartyRole.findByPartyAndRoleType(toPerson, fromRole.roleType)
-			if (! toRole) {
-				PartyRole newPR = new PartyRole(party: toPerson, roleType: fromRole.roleType)
-				newPR.save()
-				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} to $toUser"
-			} else {
-				log.debug "$byWhom replaced $fromUser role ${fromRole.roleType} pre-existed for $toUser"
-			}
-			fromRole.delete(flush:true)
-		}
-	}
-
-	/**
-	 * Used to replace any user preferences from one user to another or deleting if preference already existed
-	 * @param byWhom - the user that is performing the replace
-	 * @param fromUser - the UserLogin that preferences are being replaced from
-	 * @param toUser - the UserLogin that any new preferences will be replaced into
-	 */
-	private void replaceUserPreferences(UserLogin byWhom, UserLogin fromUser, UserLogin toUser) {
-		List prefs = UserPreference.findAllByUserLogin(fromUser)
-		prefs.each { fromUserPref ->
-			UserPreference toUserPref = UserPreference.findByUserLoginAndPreferenceCode(toUser, fromUserPref.preferenceCode)
-			if (! toUserPref) {
-				UserPreference newUP = new UserPreference(userLogin: toUser, preferenceCode:fromUserPref.preferenceCode, value: fromUserPref.value)
-				newUP.save()
-				log.debug "$byWhom replaced ${fromUser} preference ${fromUserPref.preferenceCode} to ${toUser}"
-			} else {
-				log.debug "$byWhom merging ${fromUser} preference ${fromUserPref.preferenceCode} pre-existed"
-			}
-			fromUserPref.delete(flush:true)
-		}
-	}
 	/**
 	 * Update the UserLogin and the associated permissions for the account.
 	 * @param params - request params

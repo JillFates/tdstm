@@ -9,7 +9,7 @@ import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
 import {DEPENDENCY_TYPE} from './model/support-depends.model';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {UIDialogService} from '../../services/ui-dialog.service';
 import {AssetComment} from '../dependent-comment/model/asset-coment.model';
 import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';

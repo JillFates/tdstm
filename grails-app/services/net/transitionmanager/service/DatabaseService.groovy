@@ -21,7 +21,7 @@ class DatabaseService implements ServiceMethods {
 	 */
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
-		[databaseInstance: db] + assetEntityService.getCommonModelForShows('Database', project, params)
+		[databaseInstance: db, currentUserId: securityService.currentPersonId] + assetEntityService.getCommonModelForShows('Database', project, params)
 	}
 
 	/**

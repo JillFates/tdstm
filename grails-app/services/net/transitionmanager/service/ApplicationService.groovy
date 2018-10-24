@@ -93,7 +93,7 @@ class ApplicationService implements ServiceMethods {
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
 				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: Person.constraints.staffType.inList,
-		        personList: personList] +
+		        personList: personList, currentUserId: securityService.currentPersonId] +
 		        assetEntityService.getCommonModelForShows('Application', project, params, app)
 	}
 

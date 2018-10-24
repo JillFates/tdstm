@@ -1,5 +1,5 @@
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchRecordModel} from '../model/import-batch-record.model';

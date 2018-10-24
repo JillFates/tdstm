@@ -43,7 +43,7 @@
 				<tr id="commentListId">
 					<g:render 
 						template="/angular/common/commentList" 
-						model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" >
+						model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, currentUserId: currentUserId]" >
 					</g:render>
 				</tr>
 			</table>

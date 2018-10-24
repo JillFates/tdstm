@@ -189,6 +189,11 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/moveEvent/list" {
+			controller = "wsEvent"
+			action = [GET: "listEvents"]
+		}
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
@@ -410,6 +415,11 @@ class UrlMappings {
 		"/ws/progress/demo/failed" {
 			controller = "wsProgress"
 			action = [GET:"demoFailed"]
+		}
+
+		"/ws/user" {
+			controller = "wsUser"
+			action = [GET: "getUser"]
 		}
 
 		"/ws/user/preferences/$id" {
@@ -1085,8 +1095,9 @@ class UrlMappings {
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
-		// Angular 2 and future latest version
+		// Angular 6 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
+		"/module/**" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
 		// Angular Single Page App Named mappings

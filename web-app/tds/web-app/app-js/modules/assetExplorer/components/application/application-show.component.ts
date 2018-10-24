@@ -115,6 +115,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 
 					this.dialogService
 						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				} else if (!result.clonedAsset && result.showView) {
+					this.showAssetDetailView(DOMAIN.APPLICATION, result.assetId);
 				}
 			})
 				.catch( error => console.log('error', error));

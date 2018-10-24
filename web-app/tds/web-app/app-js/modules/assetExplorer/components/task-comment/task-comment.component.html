@@ -23,11 +23,10 @@
                     <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadTasksGrid()">
                     View Unpublished Tasks
                 </label>
-                <!-- we do not support yet Task Creation
-                <button (click)="createComment()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button">
-                    <i class="fa fa-med fa-fw fa-comment-o"></i> <span>Add</span>
+
+                <button (click)="openTaskCreate()" class="btn btn-default float-right mar-right-15 pad-top-2 btn-add" type="button" title="Add task">
+                    <i class="fa fa-med fa-fw fa-list-alt"></i> <span>Add</span>
                 </button>
-                -->
             </ng-template>
 
             <!-- Columns -->
@@ -48,8 +47,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                     <div class="k-grid-ignore-click action-button-list" style="cursor: default;" [ngClass]="{'single-right-btn-action': dataItem.commentInstance.taskNumber && dataItem.commentInstance.taskNumber !== 'null'}">
                         <!-- not yet supported -->
-                        <button [hidden]="true"
-                                (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
+                        <button (click)="openTaskComment(dataItem, modalType.EDIT)" class="btn btn-action btn-default" title="Edit">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                         <button (click)="onDelete(dataItem)" class="btn btn-action btn-default btn-delete" title="Delete">

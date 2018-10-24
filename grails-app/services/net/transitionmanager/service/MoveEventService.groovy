@@ -232,25 +232,36 @@ class MoveEventService implements ServiceMethods {
 
 
 	/**
-		 * Update the lastUpdated field on a series of assets.
-		 *
-		 * This method helps to keep consistency, and update assets accordingly,
-		 * when performing bulk update operations on objects that have a relationship with assets,
-		 * such as TagAsset.
-		 *
-		 * @param project
-		 * @param assetQuery - query that should return a list of asset ids.
-		 * @param assetQueryParams - parameters for assetQuery
-		 */
-		void bulkBumpMoveEventLastUpdated(Project project, Set<Long>eventIds) {
-			if (project) {
-				String query = """
-					UPDATE MoveEvent SET lastUpdated = :lastUpdated
-					WHERE id IN (:eventIds) AND project = :project
-				"""
+	 * Update the lastUpdated field on a series of assets.
+	 *
+	 * This method helps to keep consistency, and update assets accordingly,
+	 * when performing bulk update operations on objects that have a relationship with assets,
+	 * such as TagAsset.
+	 *
+	 * @param project
+	 * @param assetQuery - query that should return a list of asset ids.
+	 * @param assetQueryParams - parameters for assetQuery
+	 */
+	void bulkBumpMoveEventLastUpdated(Project project, Set<Long>eventIds) {
+		if (project) {
+			String query = """
+				UPDATE MoveEvent SET lastUpdated = :lastUpdated
+				WHERE id IN (:eventIds) AND project = :project
+			"""
 
-				Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), eventIds:eventIds]
-				MoveEvent.executeUpdate(query, params)
-			}
+			Map params = [project: project, lastUpdated: TimeUtil.nowGMT(), eventIds:eventIds]
+			MoveEvent.executeUpdate(query, params)
 		}
+	}
+
+	/**
+	 * Return all MoveEvents for the current Project.
+	 * @param project - user's current project
+	 * @return a list with all the events for the project.
+	 */
+	List<MoveEvent> listMoveEvents(Project project) {
+		return MoveEvent.where {
+			project == project
+		}.list()
+	}
 }

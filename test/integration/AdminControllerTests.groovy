@@ -5,6 +5,8 @@ import net.transitionmanager.service.SecurityService
 import spock.lang.See
 import net.transitionmanager.domain.Project
 import grails.test.spock.IntegrationSpec
+import test.helper.PersonTestHelper
+
 
 /**
  * Unit test cases for the TimeUtil class
@@ -35,7 +37,7 @@ class AdminControllerTests extends IntegrationSpec {
     def 'Test the AccountImportExport controller methods for permissions'() {
         setup:
         project = projectHelper.createProject(adminPerson.company)
-        unPrivPerson = personHelper.createPerson(adminPerson, project.company, project, null, null, 'USER')
+        unPrivPerson = personHelper.createPerson(adminPerson, project.client, project, null, null, 'USER')
 
         when:
         def x = 1

@@ -6,6 +6,7 @@
   border: 0;
   display: inline-flex
   outline-style: none
+  max-height: 27px!important;
   span.k-dropdown-wrap
     background: inherit
     color: inherit
@@ -13,12 +14,17 @@
       border-left: 0
       background: inherit
       color: inherit
+      span.k-i-arrow-s
+        margin-left: -35px
 
 .task-detail-component
   .tds-angular-component-content
     .successor-predecessor-table
       max-height: 200px
       height: 200px
+  .modal-content.task-create-component
+    min-height: 720px
+    min-width: 769px
   .modal-content
     min-height: 760px
     min-width: 769px
@@ -27,6 +33,13 @@
       min-height: 890px
     .modal-body
       height: 86%
+      .k-grid-header.k-grid-dynamic-header
+        position: relative
+      form.create-form
+        td.description-container
+          max-width: 100%
+          input
+            width: 100%
       form
         .note
           resize: none
@@ -39,6 +52,9 @@
           td
             label
               visibility: hidden
+        tr.dependency-error-section
+          table
+            width: 100%
 
         table.has-duplicated-successors
           tr.dependency-error-section.has-duplicated
@@ -73,6 +89,13 @@
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
+            padding-top: 0!important
+            padding-bottom: 0!important
+        kendo-grid.successor-predecessor-table.dependency-tasks
+          .k-grid-content tr
+            td:nth-child(1),
+            td:nth-child(2)
+              padding-left: 12px
         .error-message,
         .error-missing-field
           color: $color-message-error--red
@@ -80,11 +103,11 @@
         .error-message
           display: none
         .validated-field
-          .ng-invalid
+          .ng-invalid:not(.ng-pristine)
             border-color: $color-message-error--red
-          .ng-invalid + .error-message
+          .ng-invalid:not(.ng-pristine) + .error-message
             display: block
-        .validated-field > .ng-invalid
+        .validated-field > .ng-invalid:not(.ng-pristine)
           & ~ .error-message
             display: block
         .required-field::after
@@ -108,6 +131,12 @@
           @include combo-status
           span input
             padding-top: 1px
+            padding-left: 5px
+          span.k-i-close
+            display: block
+            color: inherit
+            opacity: 1
+            right: 0
         td.label.edge-cell
           height: 35px
         td.label.status-cell
@@ -188,6 +217,10 @@
       .grow-container
         display: flex
         flex: 1
+        table.create-task
+          height: 100%
+          td
+            height: 100%
         td
           flex: 1
           position: relative
@@ -207,6 +240,8 @@
             padding-right: 6px
     .modal-footer
       padding: 15px 18px
+      .action-button
+        padding-right: 5px
 
   .successor-predecessor-table
     .k-grid-content

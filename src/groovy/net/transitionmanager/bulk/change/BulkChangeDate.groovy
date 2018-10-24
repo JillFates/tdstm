@@ -49,12 +49,27 @@ class BulkChangeDate implements ServiceMethods {
 	 *
 	 * @param value - date value
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param fieldMapping not used for this class just here for the interface.
+	 *
 	 * @return - parsed Date object
 	 */
 	static Date coerceBulkValue(Project currentProject, String value) {
-		def parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+		if(!value){
+			return null
+		}
+
+		Date parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+
 		if (!parsedValue) {
-			parsedValue = parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
+			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
+		}
+
+		if (!parsedValue) {
+			parsedValue = TimeUtil.parseDateTime(value, TimeUtil.FORMAT_DATE_TIME_6)
+		}
+
+		if (!parsedValue) {
+			throw new InvalidParamException("Date value $value is invalid for bulk update.")
 		}
 
 		return parsedValue

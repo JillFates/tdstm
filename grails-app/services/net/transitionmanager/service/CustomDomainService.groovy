@@ -157,6 +157,31 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
+     * Return a map with the field specs for the asset export. This include all the standard fields marked
+     * to be displayed, plus all custom fields regardless of them being marked for display.
+     *
+     * @param project - user's current project
+     * @param domain - used to filter the fields for a particular domain.
+     * @return a map with the field settings.
+     */
+    Map getFieldSpecsForAssetExport(Project project, String domain) {
+        Map fieldSpec = [:]
+        List<String> assetClassTypes = resolveAssetClassTypes(domain)
+
+        for (String assetClassType : assetClassTypes) {
+            Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
+            if (fieldSpecMap) {
+                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1})
+                fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
+            } else {
+                throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
+            }
+        }
+
+        return fieldSpec
+    }
+
+    /**
      * Save single or all custom field specs
      * @param domain
      * @param fieldSpec
@@ -458,14 +483,18 @@ class CustomDomainService implements ServiceMethods {
      * @return a map of field names to their service/actions.
      */
     Map<String, Map> fieldToBulkChangeMapping(Project currentProject) {
+        Map<String, Map> types = [:]
         Map<String, Map> fields = [:]
 
-        fieldSpecsWithCommon(currentProject).each { key, value ->
+        allFieldSpecs(currentProject, ALL_ASSET_CLASSES).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = [bulkChangeService: field.bulkChangeService, bulkChangeActions: field.bulkChangeActions]
+                fields[field.field] = [control: field.control, bulkChangeActions: field.bulkChangeActions, customValues: field?.constraints?.values ?: []]
             }
+
+            types[key]= fields
+            fields = [:]
         }
 
-        return fields
+        return types
     }
 }

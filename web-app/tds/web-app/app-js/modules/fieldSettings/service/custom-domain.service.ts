@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/bufferCount';

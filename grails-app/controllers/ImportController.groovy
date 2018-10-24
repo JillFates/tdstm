@@ -7,6 +7,7 @@ import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DataTransferBatchService
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
 import net.transitionmanager.service.UserPreferenceService
@@ -24,6 +25,7 @@ class ImportController implements ControllerMethods {
 	ProgressService progressService
 	Scheduler quartzScheduler
 	UserPreferenceService userPreferenceService
+	DataTransferBatchService dataTransferBatchService
 
 	@HasPermission(Permission.AssetImport)
 	def listJobs() {
@@ -65,7 +67,7 @@ class ImportController implements ControllerMethods {
 				// Update the batch status to POSTING and save the progress key
 				progressKey = "AssetImportReview-" + UUID.randomUUID()
 				dtb.progressKey = progressKey
-				if (!dtb.save(flush:true, failOnError:true)) {
+				if (!dataTransferBatchService.save(dtb)) {
 					log.error "$methodName error occurred while trying to update the DataTransferBatch $dtb.id ${GormUtil.allErrorsString(dtb)}"
 					errorMsg = "Unable to update batch record : ${GormUtil.allErrorsString(dtb)}"
 					break
@@ -167,7 +169,7 @@ class ImportController implements ControllerMethods {
 				// Update the batch and save the progress key
 				progressKey = "AssetImportProcess-" + UUID.randomUUID()
 				dtb.progressKey = progressKey
-				if (!dtb.save(flush:true, failOnError:true)) {
+				if (!dataTransferBatchService.save(dtb)) {
 					errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
 					break
 				}

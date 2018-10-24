@@ -15,7 +15,7 @@ class EditCommand {
 
 	String fieldName
 	String action
-	String value
+	def value
 
 	static constraints = {
 		value nullable: true, blank:true

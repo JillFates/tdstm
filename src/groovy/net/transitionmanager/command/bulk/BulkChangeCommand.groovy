@@ -27,6 +27,8 @@ class BulkChangeCommand {
 		userParams cascade: true, nullable:true
 		dataViewId nullable: true
 		edits cascade: true
+		// The type will be each of the Asset Class names + COMMON to allow supporting changing multiple class types in one request
+		type inList: AssetClass.values()*.name() + ['COMMON']
 		ids nullable: true, validator: { ids, command ->
 			if (!ids && !(command.allIds && command.dataViewId && command.userParams)) {
 				return 'default.empty.ids.list.message'

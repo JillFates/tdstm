@@ -7,7 +7,7 @@ import {DebugElement} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {HttpModule, Http} from '@angular/http';
 
 import {PopupModule} from '@progress/kendo-angular-popup';

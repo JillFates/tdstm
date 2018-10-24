@@ -5,8 +5,10 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.ProjectService
 import spock.lang.See
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
@@ -38,13 +40,13 @@ class BulkChangePersonIntegrationSpec extends IntegrationSpec {
 	 * A move bundle that is usedForPlanning = 1
 	 */
 	@Shared
-	MoveBundle moveBundle
+	MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
 
 	/**
 	 * A move bundle that is usedForPlanning = 0
 	 */
 	@Shared
-	MoveBundle moveBundle2
+	MoveBundle moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
 	/**
 	 * a device in moveBundle(usedForPlanning = 1)
@@ -65,9 +67,6 @@ class BulkChangePersonIntegrationSpec extends IntegrationSpec {
 	AssetEntity device3
 
 	void setup() {
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
-		moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
-
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
@@ -76,6 +75,7 @@ class BulkChangePersonIntegrationSpec extends IntegrationSpec {
 	@See('TM-12334')
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'
+			BulkChangePerson.projectService = [getAssignableStaff: { Project project, Person forWhom ->[[test:true]]}] as ProjectService
 			BulkChangePerson.clear(Application.class, null, 'modifiedBy', [device.id, device2.id, device3.id], null)
 
 		then: 'the bulkClear function is invoked and specified field on assets will be null out'
@@ -89,6 +89,7 @@ class BulkChangePersonIntegrationSpec extends IntegrationSpec {
 	void 'Test replace'() {
 		setup:
 			def modifiedBy = personTestHelper.createPerson()
+			BulkChangePerson.projectService = [getAssignableStaff: { Project project, Person forWhom ->[[test:true]]}] as ProjectService
 
 		when: 'replace is called with a list of assets'
 			BulkChangePerson.replace(Application.class, modifiedBy, 'modifiedBy', [device.id, device2.id, device3.id], null)

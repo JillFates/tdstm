@@ -58,11 +58,18 @@ class BulkChangeYesNo {
 	 *   BooleanUtils.toBoolean("x gti") = false
 	 * </pre>
 	 *
-	 * @param value - yes/no value
 	 * @param currentProject - current project, not used but passed by hierarchical service
+	 * @param field not used by this class, just here for the interface.
+	 * @param value - yes/no value
+	 * @param fieldMapping not used by this class, just here for the interface.
+	 *
 	 * @return - the boolean value of the string, {@code false} if no match or the String is null
 	 */
 	static String coerceBulkValue(Project currentProject, String value) {
+		if(!value){
+			return ''
+		}
+
 		return BooleanUtils.toBoolean(value) ? 'Y' : 'N'
 	}
 
@@ -84,7 +91,7 @@ class BulkChangeYesNo {
 			params.value = value
 			setFieldQueryPart = "SET ${fieldName} = :value"
 		} else {
-			setFieldQueryPart = "SET ${fieldName} = NULL"
+			setFieldQueryPart = "SET ${fieldName} = ''"
 		}
 
 		String query = """

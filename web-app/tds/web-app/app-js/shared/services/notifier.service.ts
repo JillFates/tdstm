@@ -5,8 +5,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
-import { AlertModel } from '../model/alert.model';
-
 @Injectable()
 export class NotifierService {
 
