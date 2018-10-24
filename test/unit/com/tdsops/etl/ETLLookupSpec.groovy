@@ -708,7 +708,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test setting a variable at ETLProcessor level'() {
 		setup:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
-			validator.labelFieldMap = []
 			ETLProcessor etlProcessor = new ETLProcessor(
 					  GMDEMO,
 					  dataSet,
