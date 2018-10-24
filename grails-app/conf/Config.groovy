@@ -447,3 +447,11 @@ xssSanitizer.enabled = true
 grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
 
 org.codehaus.groovy.grails.validation.ConstrainedProperty.registerNewConstraint(net.transitionmanager.domain.constraint.OfSameProjectConstraint.NAME, net.transitionmanager.domain.constraint.OfSameProjectConstraint.class)
+
+/**
+ * In ETL scripts we are binding JSON data that needs to preserve blank lines.
+ * This default behaviour from grails data binding is breaking that rule.
+ *
+ * https://grails.github.io/grails2-doc/2.5.4/guide/theWebLayer.html#dataBinding
+ */
+grails.databinding.trimStrings = false

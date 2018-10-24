@@ -128,8 +128,8 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      * @return
      */
     @HasPermission(Permission.ETLScriptUpdate)
-    def initiateTestScript(DataScriptValidateScriptCommand command) {
-
+    def initiateTestScript() {
+        DataScriptValidateScriptCommand command = populateCommandObject(DataScriptValidateScriptCommand.class)
         if (!command.validate()) {
             throw new InvalidParamException('Invalid parameters')
         }
