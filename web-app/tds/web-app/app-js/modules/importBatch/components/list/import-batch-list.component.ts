@@ -19,6 +19,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
 import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'import-batch-list',
@@ -60,7 +61,8 @@ export class ImportBatchListComponent implements OnDestroy {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private notifierService: NotifierService,
-		private userPreferenceService: PreferenceService) {
+		private userPreferenceService: PreferenceService,
+		private route: ActivatedRoute) {
 			this.onLoad();
 	}
 
@@ -89,15 +91,14 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Checks if batchId is given and should be open.
 	 */
 	private preSelectBatch(): void {
-		// TODO: STATE SERVICE GO
-		// if (this.stateService.$current.data && this.stateService.$current.data.batchId) {
-		// 	const batchId = this.stateService.$current.data.batchId;
-		// 	const match = this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
-		// 	if (match) {
-		// 		let cellClickEvent = { dataItem: match };
-		// 		this.openBatchDetail(cellClickEvent);
-		// 	}
-		// }
+		this.route.params.subscribe(params => {
+			const batchId = params['id'] ? parseInt(params['id'], 0) : null;
+			const match = !batchId ? null : this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
+			if (batchId && match) {
+				let cellClickEvent = { dataItem: match };
+				this.openBatchDetail(cellClickEvent);
+			}
+		});
 	}
 
 	/**
@@ -451,7 +452,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * check. (instead of queuing the API calls asynchronously).
 	 */
 	private runningLoop(): void {
-		console.log('Running batches: ', this.runningBatches.length);
+		// console.log('Running batches: ', this.runningBatches.length);
 		if (this.runningBatches.length === 0) {
 			this.batchRunningLoop = setTimeout(() => {
 				this.setRunningLoop();
@@ -510,7 +511,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * @param {Array<ImportBatchModel>} batchList
 	 */
 	private queuedLoop(batchList: Array<ImportBatchModel>): void {
-		console.log('Queued batches: ', batchList.length);
+		// console.log('Queued batches: ', batchList.length);
 		if (batchList.length === 0) {
 			this.batchQueuedLoop = setTimeout(() => {
 				this.setQueuedLoop();
