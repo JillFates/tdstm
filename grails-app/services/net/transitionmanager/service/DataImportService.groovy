@@ -824,6 +824,7 @@ class DataImportService implements ServiceMethods {
 							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
 							entity.discard()
 							entity = null
+							record.addError("An error occurred while trying to save the associated entity.")
 						}
 					} else {
 						// Discard the entity just incase something unexpected
