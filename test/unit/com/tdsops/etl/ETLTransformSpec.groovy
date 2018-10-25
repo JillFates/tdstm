@@ -1616,8 +1616,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(0, 3).value == '1977-02-18'
 	}
 
-	@See('TM-12289')
-	void 'test can transform a decimal field value using toInteger transformation'() {
+	void 'test can not transform a decimal field value using toInteger transformation'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -1662,7 +1661,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == null
 							init == null
 							errors == []
 						}
@@ -1677,7 +1676,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '1234.567'
-							value == 1234
+							value == null
 							init == null
 							errors == []
 						}
@@ -1722,8 +1721,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 	}
 
-	@See('TM-12289')
-	void 'test can transform a decimal field value using toLong transformation'() {
+	void 'test can not transform a decimal field value using toLong transformation'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -1768,7 +1766,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == null
 							init == null
 							errors == []
 						}
@@ -1783,7 +1781,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '1234.567'
-							value == 1234
+							value == null
 							init == null
 							errors == []
 						}
