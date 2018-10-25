@@ -1,5 +1,7 @@
 package pages.Assets.AssetViews
+
 import geb.Page
+import modules.CommonsModule
 
 /**
  * This class represents the new generic asset details
@@ -22,6 +24,10 @@ class AssetDetailsPage extends Page{
         adModalLastUpdated {$(".last-updated")}
         tags { assetDetailModal.find("span.tag")}
         commonsModule { module CommonsModule}
+        commentsContent { assetDetailModal.find('.comment-content')}
+        addCommentsButton { commentsContent.find('button.btn-add')}
+        commentsSectionTitle { commentsContent.find('label.task')}
+        commentRows { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
     }
 
     def validateDataIsPresent(List rowData, List dataDisplayed){
@@ -81,5 +87,37 @@ class AssetDetailsPage extends Page{
             assert found, "$tag was not found in the tags list"
         }
         true // assertion is inside iteration, just prevent this break
+    }
+
+    def clickOnAddComments(){
+        commonsModule.goToElement addCommentsButton
+        waitFor{addCommentsButton.click()}
+        commonsModule.waitForLoader(5)
+    }
+
+    def getCommentsCount(){
+        commonsModule.goToElement commentsSectionTitle
+        def text = commentsSectionTitle.text()
+        // text should be Comments ([number]) so substring and remove "(" and ")"
+        text.substring("Comments ".length(), text.length()).replace("(","").replace(")","").toInteger()
+    }
+
+    def clickOnAddedComment(index){
+        commonsModule.goToElement commentRows[index]
+        commentRows[index].find("td", "aria-colindex":"2").find("label").click()
+    }
+
+    def verifyAddedCommentText(comment, index){
+        commonsModule.goToElement commentRows[index]
+        commentRows[index].find("td", "aria-colindex":"2").find("label").text() == comment
+    }
+
+    def verifyAddedCommentCategory(category, index){
+        commonsModule.goToElement commentRows[index]
+        commentRows[index].find("td", "aria-colindex":"3").find("div").text() == category
+    }
+
+    def verifyCommentsCount(beforeCount){
+        getCommentsCount() == beforeCount + 1
     }
 }
