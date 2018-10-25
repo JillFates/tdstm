@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AccountImportExportService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AuditService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CoreService
@@ -48,6 +49,7 @@ class AdminController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	UserService userService
+	AssetOptionsService assetOptionsService
 
 	static final String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
@@ -1120,7 +1122,8 @@ class AdminController implements ControllerMethods {
 			return
 		}
 
-		List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+		//List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+		List<String> assetTypeOptions = assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 		List assetTypes = []
 		assetTypeOptions.remove('Blade') // TODO : temp fix to resolve the below issue
 
@@ -1151,14 +1154,14 @@ class AdminController implements ControllerMethods {
 		}
 
 		def deletedTypes = []
-		List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+		List<String> assetTypeOptions = assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 
 		assetTypeOptions.each { type ->
 			int assetCount = AssetEntity.countByAssetType(type)
 			int modelCount = Model.countByAssetType(type)
 
 			if (!assetCount && !modelCount) {
-				AssetOptions assetOption = AssetOptions.findByValue(type)
+				AssetOptions assetOption = assetOptionsService.findByValue(type)
 
 				if (assetOption) {
 					deletedTypes << type

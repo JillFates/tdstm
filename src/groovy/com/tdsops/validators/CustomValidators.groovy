@@ -1,10 +1,12 @@
 package com.tdsops.validators
 
 import com.tds.asset.AssetOptions
+import com.tds.asset.AssetOptions.AssetOptionsType
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.GormUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
@@ -51,9 +53,10 @@ class CustomValidators {
 	 * @param type - the AssetOptions type to lookup values for
 	 * @return the list closure
 	 */
-	static Closure optionsClosure(type) {
+	static Closure optionsClosure(AssetOptionsType type) {
 		return {
-			AssetOptions.findAllByType(type)*.value
+			AssetOptionsService assetOptionsService = ApplicationContextHolder.getBean('assetOptionsService', AssetOptionsService)
+			assetOptionsService.findAllValuesByType(type)
 		}
 	}
 
