@@ -1,8 +1,6 @@
 package com.tdssrc.grails
 
-import spock.lang.IgnoreRest
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class NumberUtilTests extends Specification {
 
@@ -153,22 +151,6 @@ class NumberUtilTests extends Specification {
 			'abc'		| false
 			3.142		| false
    }
-
-	def 'Test toLongNumber method'() {
-		expect:
-			NumberUtil.toLongNumber(object, defValue) == result
-		where:
-			object                  | defValue || result
-			0                       | null     || 0 as Long
-			5                       | null     || 5 as Long
-			5L                      | null     || 5 as Long
-			'abc'                   | null     || null
-			'abc'                   | 123456l  || 123456l
-			3                       | null     || 3 as Long
-			3.142                   | null     || 3 as Long
-			'3.142'                 | null     || 3 as Long
-			new BigDecimal('3.142') | null     || 3 as Long
-	}
 
 	def 'Test toDouble method'() {
 		expect:
