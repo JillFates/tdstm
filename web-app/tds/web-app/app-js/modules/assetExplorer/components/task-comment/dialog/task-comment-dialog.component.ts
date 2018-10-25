@@ -1,24 +1,19 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../../shared/services/ui-dialog.service';
+import {Component} from '@angular/core';
+import {UIActiveDialogService} from '../../../../../shared/services/ui-dialog.service';
 import {AssetModalModel} from '../../../model/asset-modal.model';
-import {DecoratorOptions} from '../../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: `tds-task-comment-dialog`,
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/dialog/task-comment-dialog.component.html'
 })
-export class TaskCommentDialogComponent extends UIExtraDialog {
+export class TaskCommentDialogComponent {
 
-	public modalOptions: DecoratorOptions;
-	constructor(protected assetModalModel: AssetModalModel) {
-		super('#task-comment-dialog-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
-	}
+	constructor(protected assetModalModel: AssetModalModel, public activeDialog: UIActiveDialogService) {}
 
 	/**
-	 * Close the Dialog but first it verify is not Dirty
+	 * Close the Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.dismiss(false);
+		this.activeDialog.dismiss();
 	}
 }

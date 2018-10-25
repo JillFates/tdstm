@@ -1,6 +1,5 @@
 <div class="task-comment-component dialog-container">
     <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
-        <h1>Tasks:</h1>
         <kendo-grid
                 *ngIf="dataGridTaskHelper"
                 class="task-comment-grid"
@@ -81,7 +80,6 @@
         </kendo-grid>
     </div>
     <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
-        <h1>Comments:</h1>
         <kendo-grid
                 *ngIf="dataGridCommentHelper"
                 class="task-comment-grid"
