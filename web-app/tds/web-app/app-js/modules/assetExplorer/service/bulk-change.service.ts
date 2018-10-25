@@ -66,4 +66,10 @@ export class BulkChangeService {
 			.map((res: Response) => res.json())
 			.catch((error: any) => error.json());
 	}
+
+	getAssetListOptions(assetClass: string): Observable<any> {
+		return this.http.get(`../ws/asset/defaultCreateModel/${assetClass}`)
+			.map((res: Response) => res.json())
+			.catch((error: any) => error.json());
+	}
 }
