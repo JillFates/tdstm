@@ -1,22 +1,26 @@
-import {Component, Input, Output, EventEmitter, ViewChild, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
-import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
-import { State } from '@progress/kendo-data-query';
-import {GridDataResult, DataStateChangeEvent, RowClassArgs} from '@progress/kendo-angular-grid';
-import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { Observable } from 'rxjs';
+import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
+import {State} from '@progress/kendo-data-query';
+import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {Observable} from 'rxjs';
 
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
-	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
-	DIALOG_SIZE, ModalType, DOMAIN
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	KEYSTROKE,
+	ModalType,
+	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
-import { AssetShowComponent } from '../asset/asset-show.component';
-import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
+import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
@@ -352,9 +356,9 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			modalType: 'TASK'
 		}
 
-		this.dialog.extra(TaskCommentDialogComponent, [
+		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel}
-		], false, false).then(result => {
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
 			}
