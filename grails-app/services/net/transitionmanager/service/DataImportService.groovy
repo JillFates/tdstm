@@ -987,7 +987,13 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// Take the complete list of field names in fieldsInfo and remove 'id' plus any passed to the method
-		Set<String> fieldNames = fieldsInfo.keySet()
+		List<String> fieldNames
+		if(fieldsInfo.values().first()?.containsKey('fieldOrder')){
+			fieldNames = fieldsInfo.sort{ it.value.fieldOrder }.collect{ it.key }
+		} else {
+			fieldNames = fieldsInfo.keySet() as List
+		}
+
 		log.debug 'bindFieldsInfoValuesToEntity() starting with fields to update of: {}', fieldNames.join(', ')
 		if (fieldsToIgnore == null) {
 			fieldsToIngnore = []
@@ -1429,7 +1435,7 @@ class DataImportService implements ServiceMethods {
 					// Create the domain and set any of the require properties that are required
 					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
 					fieldsValueMap.each { fieldName, value ->
-						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context, referenceFieldName)
 						if (errMsg) {
 							errorMsgs << errMsg
 						}
@@ -1512,7 +1518,7 @@ class DataImportService implements ServiceMethods {
 	 * @return null if successful otherwise a string containing the error message that occurred
 	 */
 	@Transactional(noRollbackFor=[Exception])
-	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context) {
+	String setDomainPropertyWithValue(Object entity, String fieldName, Map fieldsValueMap, Map context, String referenceFieldName = '') {
 		String errorMsg = null
 		log.debug 'setDomainPropertyWithValue() called with {}.{}',
 			entity.getClass().getName(), fieldName
@@ -1532,7 +1538,7 @@ class DataImportService implements ServiceMethods {
 					List<Object> entities
 
 					// Attempt to find the reference object
-					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context)
+					(entities, errorMsg) = SearchQueryHelper.fetchReferenceOfEntityField(entity, fieldName, fieldsValueMap, context, referenceFieldName)
 					if (! errorMsg) {
 						if (entities == null) {
 							errorMsg = "Reference field $fieldName does not support alternate key lookup"
