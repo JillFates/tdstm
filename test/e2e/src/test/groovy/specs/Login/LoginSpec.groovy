@@ -28,7 +28,7 @@ class LoginSpec extends GebReportingSpec {
         and: "Tries to Login twice with a valid username and a wrong random password"
             loginWrongPass(2)
         when: "The user tries to login with the valid username from above and the correct password"
-        //On the testDataFile.txt the 6th and 7th values are the login_e2e_test_user and its correct password
+            //On the testDataFile.txt the 6th and 7th values are the login_e2e_test_user and its correct password
             login(6,7)
         then: "The user is successfully logged in"
             at MenuPage
@@ -59,7 +59,7 @@ class LoginSpec extends GebReportingSpec {
             at LoginPage
     }
 
-    def "4. Verify with an admin that the login_e2e_test_user@dev.com user is locked"(){
+    def "5. Verify with an admin that the login_e2e_test_user@dev.com user is locked"(){
         given: "The User goes to Login page"
             to LoginPage
         and: "An admin logs in (we assume the e2e_test_user is being used)"
