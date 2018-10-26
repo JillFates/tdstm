@@ -187,10 +187,11 @@ export class TaskCommentComponent implements OnInit {
 		let taskCreateModel: TaskDetailModel = {
 			id: this.id.toString(),
 			modal: {
-				title: 'Create Task'
+				title: 'Create Task',
+				type: ModalType.CREATE
 			},
 			detail: {
-				assetClass: this.assetClass,
+				assetClass: this.assetType,
 				assetEntity: this.id,
 				assetName: this.assetName,
 				currentUserId: this.currentUserId

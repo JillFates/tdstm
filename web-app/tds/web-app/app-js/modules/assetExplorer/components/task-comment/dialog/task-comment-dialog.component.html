@@ -17,7 +17,8 @@
                               [can-edit-tasks]="true"
                               [asset-name]="assetModalModel.assetName"
                               [asset-type]="assetModalModel.assetType"
-                              [show-comment]="true">
+                              [show-comment]="true"
+                              [user-id]="currentUserId">
                 </task-comment>
                 <task-comment *ngIf="assetModalModel.modalType == 'TASK'"
                               [asset-id]="assetModalModel.assetId"
@@ -26,7 +27,8 @@
                               [can-edit-tasks]="true"
                               [asset-name]="assetModalModel.assetName"
                               [asset-type]="assetModalModel.assetType"
-                              [show-task]="true">
+                              [show-task]="true"
+                              [user-id]="currentUserId">
                 </task-comment>
             </td>
         </div>
