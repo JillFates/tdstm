@@ -184,11 +184,11 @@ class CustomValidators {
 					Date date = sdf.parse(value)
 					if (!value.equals(sdf.format(date))) {
 						// the date format is incorrect
-						addError('field.incorrect.dateFormat', [value, getLabel()])
+						addError('field.incorrect.dateFormat', [value, getLabel(), format])
 					}
 				} catch (ParseException e) {
 					// the date format is invalid
-					addError('field.invalid.dateFormat', [value, getLabel(), e.getMessage()])
+					addError('field.invalid.dateFormat', [value, getLabel(), format, e.getMessage()])
 				}
 			}
 		}
