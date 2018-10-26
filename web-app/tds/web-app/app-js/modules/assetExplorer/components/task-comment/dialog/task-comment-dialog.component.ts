@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {UIActiveDialogService} from '../../../../../shared/services/ui-dialog.service';
 import {AssetModalModel} from '../../../model/asset-modal.model';
 
@@ -8,7 +8,9 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 })
 export class TaskCommentDialogComponent {
 
-	constructor(protected assetModalModel: AssetModalModel, public activeDialog: UIActiveDialogService) {}
+	constructor(protected assetModalModel: AssetModalModel,
+	            public activeDialog: UIActiveDialogService,
+	            @Inject('currentUserId') private currentUserId: number) {}
 
 	/**
 	 * Close the Dialog

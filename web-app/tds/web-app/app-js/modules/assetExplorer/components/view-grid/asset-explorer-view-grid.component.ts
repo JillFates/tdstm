@@ -357,7 +357,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}
 
 		this.dialog.open(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel}
+			{provide: AssetModalModel, useValue: assetModalModel},
+			{provide: 'currentUserId', useValue: this.currentUser.id}
 		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
