@@ -10,6 +10,9 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.validation.Errors
 
+import java.text.ParseException
+import java.text.SimpleDateFormat
+
 @Slf4j
 class CustomValidators {
 
@@ -156,6 +159,36 @@ class CustomValidators {
 
 				if( ! hasErrors() && StringUtils.isNotBlank(value) && ! optValues.contains(value) ) {
 					addError ( 'field.invalid.notInList', [value, getLabel(), optValues.join(', ')] )
+				}
+			}
+		}
+	}
+
+	/**
+	 * Date Time Validator that Checks that the given <code>String</code> value
+	 * represents a date, and its format is the same date/time format that
+	 * the one in the constraints contained in the fieldSpec Map.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlDateTimeValidator ( String value, Map fieldSpec ) {
+		new Validator ( fieldSpec ) {
+			void validate() {
+				// get the date format to be used
+				def format = fieldSpec.constraints?.format ?: null
+				try {
+					SimpleDateFormat sdf = new SimpleDateFormat(format)
+					Date date = sdf.parse(value)
+					if (!value.equals(sdf.format(date))) {
+						// the date format is incorrect
+						addError('field.incorrect.dateFormat', [value, getLabel()])
+					}
+				} catch (ParseException e) {
+					// the date format is invalid
+					addError('field.invalid.dateFormat', [value, getLabel(), e.getMessage()])
 				}
 			}
 		}
