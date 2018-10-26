@@ -13,6 +13,7 @@ class DictionaryItem {
 	String name
 	String description=''
 	String endpointUrl
+	String httpMethod
 	String docUrl
 	String method
 	Integer producesData
