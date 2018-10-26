@@ -1,6 +1,8 @@
 package net.transitionmanager.service.dataview
 
 import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.command.DataviewApiFilterParam
+import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -59,7 +61,39 @@ class DataviewSpec {
     private Map<String, String> order
     private Boolean justPlanning
 
-    // Constructor
+    DataviewSpec(DataviewApiParamsCommand apiParamsCommand, Dataview dataview) {
+
+        spec = [
+                domains: [],
+                columns: [:],
+        ]
+        justPlanning = null
+        args = [
+                offset: apiParamsCommand.offset,
+                max: apiParamsCommand.limit
+        ]
+
+        JSONObject jsonDataview = JsonUtil.parseJson(dataview.reportSchema)
+        order = [property: jsonDataview.sort.property, sort: jsonDataview.sort.sortOrder == ASCENDING ? 'asc' : 'desc']
+        spec.domains = jsonDataview.domains.collect { it.toLowerCase() }
+        spec.columns = jsonDataview.columns
+
+        apiParamsCommand?.filterParams.each { DataviewApiFilterParam filter ->
+
+            List matchingColumns = spec.columns.findAll{ Map columnSpec ->
+                filter.matchWithDataviewColumnSpec(columnSpec)
+            }
+
+            if(matchingColumns.size() == 1){
+                matchingColumns[0].filter = filter.filter
+            } else if(matchingColumns.size() < 1) {
+                throw new RuntimeException("Column '${filter?.fieldName}' not specified in dataview.")
+            } else {
+                throw new RuntimeException('Non-unique field specified in filter parameter. Add domain prefix to uniquely identify field (e.g. device.custom1).')
+            }
+        }
+    }
+
     DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
         spec = command.filters
         justPlanning = command.justPlanning
