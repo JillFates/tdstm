@@ -50,13 +50,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			if (!this.model.asset.scale || this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: { value: '', text: ''}
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
-			}
 			this.model.asset.assetTypeSelectValue = {id: null};
 			this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};

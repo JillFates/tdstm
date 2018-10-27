@@ -135,7 +135,8 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			Object.keys(modelRequest.asset)
 				.filter((key: string) => key.startsWith('custom'))
 				.forEach((key: string) => {
-					modelRequest.asset[key] = modelRequest.asset[key].value ? modelRequest.asset[key].value : modelRequest.asset[key];
+					modelRequest.asset[key] = modelRequest.asset[key] && modelRequest.asset[key].value
+						? modelRequest.asset[key].value : modelRequest.asset[key];
 				});
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {

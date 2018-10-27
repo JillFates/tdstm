@@ -92,7 +92,7 @@ export class DeviceCommonComponent extends AssetCommonEdit {
 		}
 
 		// Scale Format
-		modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+		modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ? modelRequest.asset.scale.value : modelRequest.asset.scale;
 	}
 
 	/**
