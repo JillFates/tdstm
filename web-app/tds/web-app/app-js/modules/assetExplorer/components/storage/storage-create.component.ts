@@ -45,13 +45,6 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			if (!this.model.asset.scale || this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: { value: '', text: ''}
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
-			}
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
 			this.model.asset.environment = this.model.environmentOptions[0];
@@ -64,7 +57,8 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			let modelRequest = R.clone(this.model);
 
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ?
+				modelRequest.asset.scale.value : modelRequest.asset.scale;
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
