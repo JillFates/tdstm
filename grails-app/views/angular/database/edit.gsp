@@ -58,7 +58,7 @@
 														class="tm-input-control"
 														name="modelAssetScaleName"
 														[data]="${SizeScale.getAsJsonList() as JSON}"
-														[(ngModel)]="model.asset.scale.name"
+														[(ngModel)]="model.asset.scale"
 														[defaultItem]="''"
 														[textField]="'text'"
 														[valueField]="'value'">

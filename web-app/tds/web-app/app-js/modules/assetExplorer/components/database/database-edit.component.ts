@@ -44,12 +44,8 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 
-			if (this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: { value: '', text: ''}
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
+			if (this.model.asset.scale && this.model.asset.scale.name) {
+				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
 		}
 
@@ -59,7 +55,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 		public onUpdate(): void {
 			let modelRequest = R.clone(this.model);
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ? modelRequest.asset.scale.value : modelRequest.asset.scale;
 			this.model.customs.forEach((custom: any) => {
 				let customValue = modelRequest.asset[custom.field.toString()];
 				if (customValue && customValue.value) {
