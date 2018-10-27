@@ -66,7 +66,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = {};
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 

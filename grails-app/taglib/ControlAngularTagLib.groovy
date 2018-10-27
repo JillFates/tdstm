@@ -213,6 +213,7 @@ class ControlAngularTagLib {
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
+		sb.append(' [valuePrimitive]="true" ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 
 		List<Object> stringList = new ArrayList<Object>();
@@ -288,6 +289,7 @@ class ControlAngularTagLib {
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append(' style="width: 80px;"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
+		sb.append(' [valuePrimitive]="true" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
 
 		List<Object> stringList = new ArrayList<Object>();

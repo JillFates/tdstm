@@ -399,6 +399,26 @@ class WsAssetController implements ControllerMethods {
 	def getDefaultCreateModel(String assetClass) {
 		Project project = securityService.getUserCurrentProject()
         Map model = [:]
+		Map asset = [:]
+
+		switch (assetClass) {
+			case "APPLICATION":
+				asset << applicationService.getModelForCreate(params)
+				break
+			case "DEVICE":
+				asset << deviceService.getModelForCreate(params)
+				break
+			case "STORAGE":
+				asset << storageService.getModelForCreate(params)
+				break
+			case "DATABASE":
+				asset << databaseService.getModelForCreate(params)
+				break
+		}
+		// Set the default values on the custom properties
+		assetService.setCustomDefaultValues(asset['assetInstance'])
+		model.asset = asset['assetInstance']
+
         // Required for Supports On and Depends On
         model.dependencyMap = assetEntityService.dependencyCreateMap(project)
         model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;

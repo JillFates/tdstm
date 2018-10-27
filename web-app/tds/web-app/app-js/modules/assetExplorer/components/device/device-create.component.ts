@@ -50,7 +50,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = {}; // R.clone(editModel.asset);
 			if (!this.model.asset.scale || this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: { value: '', text: ''}
