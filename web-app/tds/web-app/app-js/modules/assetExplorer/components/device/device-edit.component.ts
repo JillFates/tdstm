@@ -6,7 +6,8 @@
  */
 
 import * as R from 'ramda';
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -31,7 +32,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DeviceEditComponent extends DeviceCommonComponent {
-
+		@ViewChild('form') form: NgForm;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -96,6 +97,9 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 * the endpoint.
 		 */
 		private onUpdate(): void {
+			if (!this.form.form.valid) {
+				return;
+			}
 			let modelRequest = R.clone(this.model);
 
 			this.prepareModelRequestToSave(modelRequest);
