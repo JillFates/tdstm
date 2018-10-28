@@ -6,8 +6,7 @@
  */
 
 import * as R from 'ramda';
-import {Component, Inject, ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {Component, Inject } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -28,7 +27,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			{ provide: 'model', useValue: model }
 		]
 	}) class DeviceCreateComponent extends DeviceCommonComponent {
-		@ViewChild('form') form: NgForm;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -64,7 +62,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 * the endpoint.
 		 */
 		private onCreate(): void {
-			if (!this.form.form.valid) {
+			if (!this.isValidForm()) {
 				return;
 			}
 

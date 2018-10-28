@@ -4,8 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject, ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {Component, Inject} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -28,8 +27,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DatabaseShowComponent extends AssetCommonEdit {
-		@ViewChild('form') form: NgForm;
-
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -55,7 +52,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 		 * Prepare te model and format all pending changes
 		 */
 		public onUpdate(): void {
-			if (!this.form.form.valid) {
+			if (!this.isValidForm()) {
 				return;
 			}
 

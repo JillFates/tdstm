@@ -4,10 +4,8 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, ViewChild} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {NgForm} from '@angular/forms';
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
@@ -30,7 +28,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		]
 	})
 	class ApplicationShowComponent extends AssetCommonEdit {
-		@ViewChild('form') form: NgForm;
 		defaultItem = {fullName: 'Please Select', personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
@@ -100,9 +97,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * the endpoint.
 		 */
 		public onUpdate(): void {
-			if (!this.form.form.valid) {
+			if (!this.isValidForm()) {
 				return;
 			}
+
 			const modelRequest   = R.clone(this.model);
 
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
