@@ -29,7 +29,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		]
 	}) class DeviceCreateComponent extends DeviceCommonComponent {
 		@ViewChild('form') form: NgForm;
-		nameValidation: boolean;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -71,10 +70,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 
 			let modelRequest = R.clone(this.model);
 
-			if (!this.validateAssetRequiredValues(modelRequest)) {
-				this.nameValidation = true;
-				return;
-			}
 			this.prepareModelRequestToSave(modelRequest);
 
 			// MoveBundle

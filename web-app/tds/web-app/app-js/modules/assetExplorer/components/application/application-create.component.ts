@@ -39,7 +39,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		moveBundleList = [];
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
-		haveMissingFields = false;
 		persons = {
 			sme: null,
 			sme2: null,
@@ -116,12 +115,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 */
 		public onCreate(): void {
 			if (!this.form.form.valid) {
-				return;
-			}
-
-			const assetName = this.model.asset.assetName && this.model.asset.assetName.trim() || '';
-			if (!assetName) {
-				this.haveMissingFields = true;
 				return;
 			}
 

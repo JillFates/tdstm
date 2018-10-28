@@ -24,7 +24,6 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}" />
 											<td colspan="3">
 												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${assetInstance.assetName}"  ngmodel="model.asset.assetName"  />
-												<div *ngIf="haveMissingFields"><label class="required-field">Field is required</label></div>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
 											<td colspan="3">

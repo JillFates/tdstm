@@ -26,7 +26,6 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
                                     <td colspan="3" class="top-align-field">
                                         <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetInstance.assetName}" ngmodel="model.asset.assetName"/>
-                                        <span *ngIf="nameValidation" class="required-field top-space-required-field"> Name Required</span>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
                                     <td colspan="3" class="top-align-field">
