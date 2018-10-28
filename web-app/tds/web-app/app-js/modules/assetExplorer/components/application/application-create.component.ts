@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
@@ -32,6 +32,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		]
 	})
 	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit {
+		@ViewChild('f') f: any;
 		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		moveBundleList = [];
@@ -113,6 +114,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
+			if (!this.f.form.valid) {
+				return;
+			}
+
 			const assetName = this.model.asset.assetName && this.model.asset.assetName.trim() || '';
 			if (!assetName) {
 				this.haveMissingFields = true;

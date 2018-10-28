@@ -266,7 +266,23 @@ class ControlAngularTagLib {
 	 * @return the INPUT Component HTML
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' +
+			attribute('type', 'text') + attribute('placeholder', placeholder) +
+			commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
+			renderRequiredLabel(fieldSpec)
+	}
+
+	/**
+	 * Generates a String HTML label used to show a required missing field warning
+	 * @param fieldSpec - the map of field specifications
+	 * @return the INPUT Component HTML
+	 */
+	private String renderRequiredLabel(Map fieldSpec) {
+		if (fieldSpec?.constraints?.required) {
+			return '<div class="error" *ngIf="f && f.submitted && ' + 'field' + fieldSpec.field +
+					' && !' + 'field' + fieldSpec.field + '.valid">' + fieldSpec.label  + ' is required</div>'
+		}
+		return ''
 	}
 
 	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
