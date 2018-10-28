@@ -14,7 +14,10 @@
     </div>
     <div class="modal-body">
         <div>
-            <form name="form" (ngSubmit)="form.form.valid && onUpdate()"  role="form" #form="ngForm" novalidate>
+            <form name="form" (ngSubmit)="form.form.valid && onUpdate()"
+                  class="asset-entry-form"
+                  [ngClass]="{'form-submitted': form && form.submitted}"
+                  role="form" #form="ngForm" novalidate>
                 <table>
                     <tr>
                         <td colspan="2" class="dialog-container">

@@ -13,7 +13,10 @@
 		<h4 class="modal-title">Application Create</h4>
 	</div>
 	<div class="modal-body">
-			<form name="form" (ngSubmit)="form.form.valid && onCreate()"  role="form" #form="ngForm" novalidate>
+			<form name="form" (ngSubmit)="form.form.valid && onCreate()"
+				class="asset-entry-form"
+				[ngClass]="{'form-submitted': form && form.submitted}"
+				role="form" #form="ngForm" novalidate>
 				<table>
 					<tr>
 						<td class="dialog-container">

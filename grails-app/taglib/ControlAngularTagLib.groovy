@@ -281,8 +281,10 @@ class ControlAngularTagLib {
 	 */
 	private String renderRequiredLabel(Map fieldSpec) {
 		if (fieldSpec?.constraints?.required) {
-			return '<div class="error" *ngIf="form && form.submitted && ' + 'field' + fieldSpec.field +
-					' && !' + 'field' + fieldSpec.field + '.valid">' + fieldSpec.label  + ' is required</div>'
+			def field = 'field' + fieldSpec.field
+
+			return "<div class=\"error\" *ngIf=\"form && (form.submitted && ${field} && !${field}.valid) || " +
+					" (${field}.dirty && !${field}.valid)\">${fieldSpec.label} is required</div>"
 		}
 		return ''
 	}
