@@ -14,7 +14,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <form name="storageCreateForm" role="form" #storageCreateForm="ngForm">
+            <form name="form" (ngSubmit)="form.form.valid && onCreate()"  role="form" #form="ngForm" novalidate>
                 <table>
                     <tr>
                         <td colspan="2" class="dialog-container">
@@ -127,7 +127,7 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onCreate()" [disabled]="!storageCreateForm.form.valid || !isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="form.onSubmit()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
         <button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

@@ -14,7 +14,7 @@
     </div>
     <div class="modal-body">
         <div>
-            <form name="storageEditForm" role="form" #storageEditForm="ngForm">
+            <form name="form" (ngSubmit)="form.form.valid && onUpdate()"  role="form" #form="ngForm" novalidate>
                 <table>
                     <tr>
                         <td colspan="2" class="dialog-container">
@@ -127,7 +127,7 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!storageEditForm.form.valid || !isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="form.onSubmit()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
