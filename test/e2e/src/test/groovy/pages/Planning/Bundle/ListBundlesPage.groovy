@@ -20,6 +20,7 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows {$("[role='rowgroup']")}
+        individualRows (required: false) {$("a.cell-url-element")}
         commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
@@ -28,10 +29,34 @@ class ListBundlesPage extends Page {
         filterRow {$("tr.k-filter-row")}
         namefilterKind {$("span.k-select")[2]}
         nameFilter {filterRow.find("[data-text-field='name']")}
+        isPlanningRadio {filterRow.find(("label>input"))[0]}
+        isNonPlanningRadio {filterRow.find(("label>input"))[1]}
+    }
+
+    def validateBundleIsListed(bName){
+        filterByName(bName)
+        numberOfRows()==1
+    }
+
+    def verifyRowsDisplayed(){
+        selectFilter()
+        numberOfRows()>0
+    }
+
+    def clickNonPlanningFilter(){
+        isNonPlanningRadio.click()
+    }
+
+    def clickPlanningFilter(){
+        isPlanningRadio.click()
     }
 
     def clickCreate(){
         createButton.click()
+    }
+
+    def numberOfRows(){
+        individualRows.size()
     }
 
     def filterByName(name){
@@ -43,11 +68,10 @@ class ListBundlesPage extends Page {
 
     def selectFilter(){
         namefilterKind.click()
-        $("li.k-item", text:"Contains").click()
+        waitFor{$("li.k-item", text:"Contains").click()}
     }
 
     def clickOnBundle(){
-        //firstBundleListed.click()
         def bundleLocator = "('tbody.tr')"
         $(".cell-url-element")[0].click()
     }

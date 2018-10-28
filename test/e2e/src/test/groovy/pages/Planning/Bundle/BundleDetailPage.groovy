@@ -27,10 +27,28 @@ class BundleDetailPage extends Page {
         menuModule {module MenuModule }
         planningCheck {$("input#useForPlanning")}
         listbundles {$("a.list")}
-        editButton {$("input.edit")[0]}
         message {$("div.message")}
         startTime {$(".name", text:"Start Time:")next()}
         completionTime {$(".name", text: "Completion Time:").next()}
+        //buttons section
+        btnsContainer {$("form")}
+        editBtn {$("input.edit")[0]}
+        deleteBtn {btnsContainer.find("[name='_action_Delete']")}
+    }
+
+    def cancelDeletion(){
+        withConfirm(false) {deleteBtn.click() }
+    }
+    def confirmDeletion(){
+        withConfirm(true) {deleteBtn.click() }
+    }
+
+    def clickDelete(){
+        delete.click()
+    }
+
+    def validateWarning(){
+
     }
 
     def goToListbundles(){
@@ -38,7 +56,7 @@ class BundleDetailPage extends Page {
     }
 
     def clickEdit(){
-        editButton.click()
+        editBtn.click()
     }
 
     def isPlanning(){
@@ -60,6 +78,7 @@ class BundleDetailPage extends Page {
         }
         allFieldsAsExpected
     }
+
 
     def bundleCreatedMsgIsDisplayed(data){
         creationMessage.text()== "MoveBundle "+data[0]+" created"
