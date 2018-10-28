@@ -13,7 +13,7 @@
 		<h4 class="modal-title">Application Create</h4>
 	</div>
 	<div class="modal-body">
-			<form name="form" (ngSubmit)="f.form.valid && onCreate()"  role="form" #f="ngForm" novalidate>
+			<form name="form" (ngSubmit)="form.form.valid && onCreate()"  role="form" #form="ngForm" novalidate>
 				<table>
 					<tr>
 						<td class="dialog-container">
@@ -285,7 +285,7 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="f.onSubmit()"  [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="form.onSubmit()"  [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
 		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>

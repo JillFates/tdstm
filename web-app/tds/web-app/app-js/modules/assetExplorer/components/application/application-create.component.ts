@@ -6,6 +6,7 @@
  */
 import { Component, Inject, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {NgForm} from'@angular/forms';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -32,7 +33,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		]
 	})
 	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit {
-		@ViewChild('f') f: any;
+		@ViewChild('form') form: NgForm;
 		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		moveBundleList = [];
@@ -114,7 +115,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
-			if (!this.f.form.valid) {
+			if (!this.form.form.valid) {
 				return;
 			}
 
