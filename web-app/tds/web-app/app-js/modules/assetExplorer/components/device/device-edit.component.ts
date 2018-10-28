@@ -95,10 +95,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 		 * the endpoint.
 		 */
 		private onUpdate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			let modelRequest = R.clone(this.model);
 
 			this.prepareModelRequestToSave(modelRequest);

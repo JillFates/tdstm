@@ -62,10 +62,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 		 * the endpoint.
 		 */
 		private onCreate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			let modelRequest = R.clone(this.model);
 
 			this.prepareModelRequestToSave(modelRequest);

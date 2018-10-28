@@ -53,10 +53,6 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		 * Prepare te model and format all pending changes
 		 */
 		public onCreate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			let modelRequest = R.clone(this.model);
 
 			// Scale Format

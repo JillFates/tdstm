@@ -52,10 +52,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 		 * Prepare te model and format all pending changes
 		 */
 		public onUpdate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			let modelRequest = R.clone(this.model);
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ? modelRequest.asset.scale.value : modelRequest.asset.scale;

@@ -155,10 +155,19 @@ export class AssetCommonEdit implements OnInit {
 	}
 
 	/**
-	 * Get the current valid form status
+	 * Submit the form in case errors select the first invalid field
 	 */
-	protected isValidForm(): boolean {
-		return this.form.form.valid
+	protected submitForm(event): void {
+		if (!this.form.onSubmit(event) ) {
+			this.focusFirstInvalidFieldInput();
+		}
+	}
+
+	/**
+	 * Focus the first control that belongs to the asset entry form and has an invalid status
+	 */
+	private focusFirstInvalidFieldInput(): void {
+		jQuery('form.asset-entry-form .tm-input-control.ng-invalid:first').focus();
 	}
 
 	/**

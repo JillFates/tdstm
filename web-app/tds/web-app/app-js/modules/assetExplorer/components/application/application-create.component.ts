@@ -111,10 +111,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			const modelRequest   = R.clone(this.model);
 
 			if (modelRequest && modelRequest.asset.moveBundle) {

@@ -97,10 +97,6 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * the endpoint.
 		 */
 		public onUpdate(): void {
-			if (!this.isValidForm()) {
-				return;
-			}
-
 			const modelRequest   = R.clone(this.model);
 
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;

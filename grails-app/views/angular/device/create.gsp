@@ -361,7 +361,7 @@
         </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="form.onSubmit()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
         <button class="btn btn-default pull-right component-action-delete" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
