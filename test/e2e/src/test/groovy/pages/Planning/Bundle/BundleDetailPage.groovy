@@ -47,10 +47,6 @@ class BundleDetailPage extends Page {
         delete.click()
     }
 
-    def validateWarning(){
-
-    }
-
     def goToListbundles(){
         listbundles.click()
     }
