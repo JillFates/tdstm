@@ -4,7 +4,8 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -26,6 +27,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			{ provide: 'model', useValue: model }
 		]
 	}) class DatabaseCreateComponent extends AssetCommonEdit {
+		@ViewChild('form') form: NgForm;
 
 		constructor(
 			@Inject('model') model: any,
@@ -50,6 +52,10 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 		 * Prepare te model and format all pending changes
 		 */
 		public onCreate(): void {
+			if (!this.form.form.valid) {
+				return;
+			}
+
 			let modelRequest = R.clone(this.model);
 
 			// Scale Format
