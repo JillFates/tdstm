@@ -211,6 +211,7 @@ class ControlAngularTagLib {
 		List options = fieldSpec.constraints?.values
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
+		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
 		sb.append(' [valuePrimitive]="true" ')
@@ -252,6 +253,7 @@ class ControlAngularTagLib {
 		sb.append('>')
 
 		sb.append('</kendo-dropdownlist>')
+		sb.append(renderRequiredLabel(fieldSpec))
 
 		sb.toString()
 	}
@@ -286,7 +288,10 @@ class ControlAngularTagLib {
 	}
 
 	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder, String min) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('min', min) +
+				attribute('placeholder', placeholder) +
+				commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
+				renderRequiredLabel(fieldSpec)
 	}
 
 	/**
@@ -303,7 +308,7 @@ class ControlAngularTagLib {
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append(' style="width: 80px;"')
+		sb.append(' #' + 'field' + fieldSpec.field + '="ngModel"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [valuePrimitive]="true" ')
 		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
@@ -344,6 +349,7 @@ class ControlAngularTagLib {
 		sb.append('>')
 
 		sb.append('</kendo-dropdownlist>')
+		sb.append(renderRequiredLabel(fieldSpec))
 
 		sb.toString()
 	}
