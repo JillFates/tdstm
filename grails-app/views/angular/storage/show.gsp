@@ -81,12 +81,12 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Close</button>
+		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span  class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button class="btn btn-danger" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>
-		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
-		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
+		<button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span class="glyphicon glyphicon-duplicate"></span> Clone </button>
 		<a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
 
 	</div>
