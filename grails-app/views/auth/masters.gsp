@@ -23,7 +23,6 @@ a:hover {
 	</thead>
 	<tbody>
 		<tr>
-			<td><g:link controller="partyType" style="color:black">Party Type</g:link></td>
 			<td><g:link controller="roleType" style="color:black">Role Type</g:link></td>
 		</tr>
 		<tr>
