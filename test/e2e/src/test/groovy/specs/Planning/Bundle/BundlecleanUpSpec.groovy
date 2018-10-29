@@ -18,7 +18,7 @@ class BundleCleanUpSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    static baseName = "QAE2Ea"
+    static baseName = "QAE2E"
     static randStr = CommonActions.getRandomString()
     static bundleData = [baseName + " " + randStr + " Planning", baseName + " bundle created by automated test",
                          "STD_PROCESS", "on"]
