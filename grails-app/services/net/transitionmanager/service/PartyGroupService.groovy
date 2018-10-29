@@ -235,7 +235,7 @@ class PartyGroupService implements ServiceMethods {
 	 *
 	 *  TODO : JPM 3/2016 : should take the company as a company instead of looking it up based on the user
 	 */
-	private boolean isAPartner(PartyGroup partyGroup) {
+	boolean isAPartner(PartyGroup partyGroup) {
 		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
 			PartyRelationship.executeQuery('''
@@ -258,7 +258,7 @@ class PartyGroupService implements ServiceMethods {
 	 *
 	 * @return true if the partyGroup is a project partner, and false otherwise.
 	 */
-	private boolean isAProjectPartner(PartyGroup partyGroup) {
+	boolean isAProjectPartner(PartyGroup partyGroup) {
 		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
 			PartyRelationship.executeQuery('''
