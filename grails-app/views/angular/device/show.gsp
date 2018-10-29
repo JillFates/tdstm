@@ -175,6 +175,6 @@
         </tds:hasPermission>
         <button class="btn btn-primary pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
         <button class="btn btn-default pull-left" (click)="onCloneAsset()" type="button"><span  class="glyphicon glyphicon-duplicate"></span> Clone </button>
-        <a [href]="getGraphUrl()" class="btn btn-default pull-left"> Arch Graph </a>
+        <a [href]="getGraphUrl()" class="btn btn-default pull-left"><i class="fa fa-fw fa-sitemap"></i> Arch Graph </a>
     </div>
 </div>
