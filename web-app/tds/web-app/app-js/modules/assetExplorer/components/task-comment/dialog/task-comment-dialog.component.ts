@@ -8,9 +8,11 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 })
 export class TaskCommentDialogComponent {
 
-	constructor(protected assetModalModel: AssetModalModel,
-	            public activeDialog: UIActiveDialogService,
-	            @Inject('currentUserId') private currentUserId: number) {}
+	constructor(
+		protected assetModalModel: AssetModalModel,
+		public activeDialog: UIActiveDialogService,
+		@Inject('currentUserId') private currentUserId: number) {
+	}
 
 	/**
 	 * Close the Dialog

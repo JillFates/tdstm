@@ -206,7 +206,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		return oldVal === column.filter;
 	}
 
-	onFilterKeyUp(e: KeyboardEvent, column?: any): void {
+	protected onFilterKeyUp(e: KeyboardEvent, column?: any): void {
 		if ( this.preventFilterSearch(column)) {
 			return; // prevent search
 		}
@@ -218,7 +218,15 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}
 	}
 
-	onFilterKeyDown(e: KeyboardEvent): void {
+	protected onPaste(column?: any): void {
+		if ( this.preventFilterSearch(column)) {
+			return; // prevent search
+		}
+		clearTimeout(this.typingTimeout);
+		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+	}
+
+	protected onFilterKeyDown(e: KeyboardEvent): void {
 		this.bulkCheckboxService.handleFiltering();
 
 		if (!this.notAllowedCharRegex.test(e.code)) {
