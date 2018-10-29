@@ -143,7 +143,7 @@
         <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
-                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
+                       [(ngModel)]="column.filter" (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)" input-paste (onPaste)="onPaste(column)">
                 <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
                       aria-hidden="true"></span>
             </div>
