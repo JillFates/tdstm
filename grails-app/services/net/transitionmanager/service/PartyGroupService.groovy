@@ -78,7 +78,7 @@ class PartyGroupService implements ServiceMethods {
 		int numberOfPages = Math.ceil(totalRows / maxRows)
 
 		if (totalRows > 0) {
-			companies = companies[rowOffset..Math.min(rowOffset + maxRows, totalRows - 1)]
+			companies = companies[rowOffset..Math.min(rowOffset + maxRows - 1, totalRows - 1)]
 		}
 
 		String showUrl = grailsLinkGenerator.link(controller: 'partyGroup', action: 'show')
@@ -89,6 +89,7 @@ class PartyGroupService implements ServiceMethods {
 					it.partner, it.dateCreated, it.lastUpdated],
 			 id  : it.companyId]
 		}
+
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 	}
 
