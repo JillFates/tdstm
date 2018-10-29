@@ -137,13 +137,6 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		return isTypeOfControl && !isClearAction;
 	}
 
-	/**
-	 * On List Control Value Selected
-	 */
-	onListValueChange(item: IdTextItem, rowIndex: number): void {
-		this.editRows.selectedValues[rowIndex].value = item && item.id ? item.id : null;
-	}
-
 	onTagFilterChange(column, rowIndex, event): void {
 		const tagAssets = event.tags || [];
 
@@ -271,8 +264,11 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 
 	private update(): Promise<BulkActionResult>  {
 		return new Promise((resolve, reject) =>  {
-			const edits = this.editRows.selectedValues.map((row) => {
-					const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
+			const edits = this.editRows.selectedValues.map((row: any) => {
+					let value = row.action.id === this.CLEAR_ACTION ? null : row.value;
+					if (this.isFieldControlOptionsList(row.field.control)) {
+						value = value.id;
+					}
 					return {
 						fieldName: row.field.id,
 						action: row.action.id,
