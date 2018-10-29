@@ -408,7 +408,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
 
 				if (!userLogin.save(failOnError: false)) {
-					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
+					logger.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
 					throw new DomainUpdateException('An error occured while trying to save your password')
 
 				} else {
@@ -425,7 +425,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			msg = "You are not allowed to change your password at this time."
 
 		} catch (e) {
-			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			logger.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			msg = 'An error occurred during the update process'
 		}
 
@@ -857,12 +857,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * Used to delete a UserLogin and clear out any references in other tables
 	 * @param userLogin - the UserLogin to be deleted
 	 */
+	@Transactional
 	void deleteUserLogin(UserLogin userLogin) {
 		auditService.logMessage("deleting user account $userLogin")
 		try {
 			GormUtil.deleteOrNullDomainReferences(userLogin, true)
 		} catch(e) {
-			log.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
+			logger.error ExceptionUtil.stackTraceToString('deleteUserLogin()',e)
 		}
 	}
 
@@ -879,7 +880,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	@Transactional
 	void mergePersonsUserLogin(UserLogin byWhom, Person fromPerson, Person toPerson) {
-logger.debug "mergePersonsUserLogin() entered"
+		logger.debug "mergePersonsUserLogin() entered"
 		UserLogin toUserLogin = toPerson.userLogin
 		UserLogin fromUserLogin = fromPerson.userLogin
 
@@ -1780,7 +1781,7 @@ logger.debug "mergePersonsUserLogin() entered"
 			throw new UnauthorizedException('Assuming User Identity is not allowed')
 		}
 
-		log.info "SECURITY: assumeUserIdentity called for user $username"
+		logger.info "SECURITY: assumeUserIdentity called for user $username"
 
 		UserDetailsService userDetailsService = ApplicationContextHolder.getBean("userDetailsService")
 		UserCache userCache = ApplicationContextHolder.getBean("userCache")
