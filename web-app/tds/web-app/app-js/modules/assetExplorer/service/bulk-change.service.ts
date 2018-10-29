@@ -46,7 +46,6 @@ export class BulkChangeService {
 			userParams: defaultUserParams,
 			type: type
 		}
-
 		return this.http.put(this.getURL(), JSON.stringify(payload))
 			.map((res: Response) => {
 				let result = res.json();
