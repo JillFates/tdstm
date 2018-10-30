@@ -7,7 +7,10 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/dialog/task-comment-dialog.component.html'
 })
 export class TaskCommentDialogComponent {
-	constructor(protected assetModalModel: AssetModalModel, public activeDialog: UIActiveDialogService, @Inject('currentUserId') private currentUserId: number) {}
+	constructor(
+		protected assetModalModel: AssetModalModel,
+		public activeDialog: UIActiveDialogService,
+		@Inject('currentUserId') private currentUserId: number) {}
 	/**
 	 * Close the Dialog
 	 */

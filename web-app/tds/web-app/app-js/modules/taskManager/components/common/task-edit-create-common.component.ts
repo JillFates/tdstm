@@ -22,10 +22,11 @@ import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 
 declare var jQuery: any;
 
-export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
+export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 
 	protected modalType = ModalType;
@@ -49,6 +50,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
 	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
 	protected isEventLocked: boolean;
+	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 
 	constructor(
