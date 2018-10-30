@@ -16,6 +16,9 @@ export class UserListComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+	}
+
+	public openPreferences(): void {
 		this.openProviderDialogViewEdit();
 	}
 
