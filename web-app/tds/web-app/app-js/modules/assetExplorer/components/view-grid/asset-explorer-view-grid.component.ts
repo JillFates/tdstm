@@ -110,7 +110,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		this.getPreferences().subscribe((preferences: any) => {
 			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 			this.bulkCheckboxService.setPageSize(this.state.take);
-			this.justPlanning = preferences[PREFERENCE_JUST_PLANNING].toString() === 'true';
+			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
 			this.onReload();
 		});
 
@@ -420,9 +420,10 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			modalType: 'COMMENT'
 		}
 
-		this.dialog.extra(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel}
-		], false, false).then(result => {
+		this.dialog.open(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel},
+			{provide: 'currentUserId', useValue: this.currentUser.id}
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
