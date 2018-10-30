@@ -23,10 +23,8 @@ export class UserListComponent implements OnInit {
 	}
 
 	private openProviderDialogViewEdit(): void {
-		this.dialogService.open(UserPreferencesComponent, []).then(result => {
-			console.log('result here');
-		}).catch(result => {
-			console.log('Dismissed Dialog');
+		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			console.error(result);
 		});
 	}
 }
