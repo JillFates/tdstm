@@ -186,7 +186,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {void}
 	 */
 	onAddTaskDependency(collection: any[], gridHelper: DataGridOperationsHelper): void {
-		const defaultText = 'Please Select';
+		const defaultText = '';
 		const task = {
 			id: '',
 			desc: defaultText,

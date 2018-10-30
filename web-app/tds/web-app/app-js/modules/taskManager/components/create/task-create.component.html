@@ -4,8 +4,8 @@
         <div class="modal-content resizable tds-angular-component-content task-create-component"
              tds-ui-modal-decorator=""
              [options]="modalOptions"
-             [style.width.px]="860"
-             [style.height.px]="706">
+             [style.width.px]="1118"
+             [style.height.px]="917">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -362,8 +362,8 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [defaultText]="'Please Select'"
                                                             [(metaParam)]="metaParam"
+                                                            [placeholder]="'Please Select'"
                                                             [innerTemplateFormat]="innerTemplateTaskItem"
                                                             [updateOnChanges]="true"
                                                             [serviceRequest]="getTasksForComboBox"
@@ -405,9 +405,9 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [defaultText]="'Please Select'"
                                                             [(metaParam)]="metaParam"
                                                             [innerTemplateFormat]="innerTemplateTaskItem"
+                                                            [placeholder]="'Please Select'"
                                                             [updateOnChanges]="true"
                                                             (filterChange)="onFilterChange($event,'successor', rowIndex)"
                                                             (valueChange)="onModelChange($event,'successor', rowIndex)"

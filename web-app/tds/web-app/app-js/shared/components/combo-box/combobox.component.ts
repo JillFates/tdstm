@@ -45,9 +45,8 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('reloadOnOpen') reloadOnOpen = false;
 	@Input('updateOnChanges') updateOnChanges = false;
 	@Input('innerTemplateFormat') innerTemplateFormat: Function;
-	@Input('defaultText') defaultText = '';
 	// Inner Params
-	private datasource: any[] = [];
+	private datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
@@ -63,9 +62,6 @@ export class TDSComboBoxComponent implements OnChanges {
 		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
 			this.firstChange = changes['model'].firstChange;
-			if (this.firstChange) {
-				this.datasource = [{id: '', text: this.defaultText || ''}];
-			}
 			if (this.firstChange || this.updateOnChanges) {
 				let model = changes['model'].currentValue;
 				this.addToDataSource(model);
@@ -78,7 +74,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @param model Item to add
 	 */
 	addToDataSource(model: any): void {
-		if (!this.datasource.find((item) => item.id === model.id)) {
+		if (model.id && !this.datasource.find((item) => item.id === model.id)) {
 			this.datasource.push(model);
 		}
 	}
