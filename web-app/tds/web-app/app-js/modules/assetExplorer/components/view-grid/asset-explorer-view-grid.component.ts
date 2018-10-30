@@ -420,10 +420,10 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			modalType: 'COMMENT'
 		}
 
-		this.dialog.extra(TaskCommentDialogComponent, [
+		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], false, false).then(result => {
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
