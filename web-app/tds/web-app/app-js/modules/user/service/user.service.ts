@@ -5,7 +5,6 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Observable} from 'rxjs';
 import {Response} from '@angular/http';
-import {UserPreferencesModel} from '../model/user-preferences.model';
 
 /**
  * @name UserService
@@ -21,7 +20,7 @@ export class UserService {
 	constructor(private http: HttpInterceptor) {
 	}
 
-	getUserPreferences(): Observable<UserPreferencesModel[]> {
+	getUserPreferences() {
 		return this.http.get(`${this.userPreferenceUrl}/preferences`)
 			.map((res: Response) => {
 				let result = res.json();

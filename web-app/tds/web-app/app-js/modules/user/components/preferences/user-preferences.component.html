@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body">
         <table>
-            <div *ngIf="!showPreferences">
+            <div *ngIf="!currentUserPreferences || currentUserPreferences.length === 0">
                 <tr>
                     <th>Preferences: Name / Value</th>
                 </tr>
@@ -13,7 +13,7 @@
                     <td>No preferences</td>
                 </tr>
             </div>
-            <div *ngIf="showPreferences && currentUserPreferences">
+            <div *ngIf="currentUserPreferences && currentUserPreferences.length !== 0">
                 <tr>
                     <th colspan="2">Preferences: Name / Value</th>
                 </tr>

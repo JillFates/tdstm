@@ -3,7 +3,6 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {UserResolveService} from './resolve/user-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
@@ -21,7 +20,7 @@ export const UserRoute: Routes = [
 		path: UserStates.USER_LIST.url,
 		data: {
 			page: {
-				title: 'WOWZERS',
+				title: 'User List',
 				instruction: ''
 			},
 			requiresAuth: true,

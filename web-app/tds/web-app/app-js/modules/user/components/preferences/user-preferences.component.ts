@@ -7,20 +7,18 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 	templateUrl: '../tds/web-app/app-js/modules/user/components/preferences/user-preferences.component.html'
 })
 export class UserPreferencesComponent implements OnInit {
-	public showPreferences: boolean;
 	public currentUserPreferences;
 	public currentUserName;
 
 	constructor(
 		private userService: UserService,
-		public activeDialog: UIActiveDialogService,
-		private cd: ChangeDetectorRef) {
+		public activeDialog: UIActiveDialogService) {
 		this.retrieveUserPreferences();
-		this.showPreferences = true;
 		this.retrieveUserName();
 	}
 
 	ngOnInit(): void {
+		//Resize modal window to fit content
 		let modal = document.getElementsByClassName('modal-dialog') as HTMLCollectionOf<HTMLElement>;
 
 		if (modal.length !== 0) {
@@ -34,10 +32,6 @@ export class UserPreferencesComponent implements OnInit {
 	protected cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 
-	}
-
-	protected printCurrentPrefs(): void {
-		console.log(this.currentUserPreferences);
 	}
 
 	/**

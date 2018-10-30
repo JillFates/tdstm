@@ -125,6 +125,9 @@ export class HeaderComponent {
 		}
 	}
 
+	/**
+	 * This is a hack to open the modal window properly before the user menu is angular.
+	 */
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			console.error(result);
