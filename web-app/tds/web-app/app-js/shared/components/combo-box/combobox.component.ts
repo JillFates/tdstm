@@ -45,8 +45,9 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('reloadOnOpen') reloadOnOpen = false;
 	@Input('updateOnChanges') updateOnChanges = false;
 	@Input('innerTemplateFormat') innerTemplateFormat: Function;
+	@Input('defaultText') defaultText = '';
 	// Inner Params
-	private datasource: any[] = [{id: '', text: ''}];
+	private datasource: any[] = [];
 	private firstChange = true;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
@@ -62,6 +63,9 @@ export class TDSComboBoxComponent implements OnChanges {
 		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
 			this.firstChange = changes['model'].firstChange;
+			if (this.firstChange) {
+				this.datasource = [{id: '', text: this.defaultText || ''}];
+			}
 			if (this.firstChange || this.updateOnChanges) {
 				let model = changes['model'].currentValue;
 				this.addToDataSource(model);
@@ -228,14 +232,11 @@ export class TDSComboBoxComponent implements OnChanges {
 		if (!dataItem.text) {
 			dataItem.text = '';
 		}
-		let transformedText = '';
 
-		if (!this.innerTemplateFormat) {
-			const regex = new RegExp(this.innerComboBox.text, 'i');
-			transformedText = dataItem.text.replace(regex, `<b>$&</b>`);
-		} else {
-			transformedText = this.innerTemplateFormat(dataItem);
-		}
+		const regex = new RegExp(this.innerComboBox.text, 'i');
+		const text =  (this.innerTemplateFormat) ? this.innerTemplateFormat(dataItem) : dataItem.text;
+
+		const transformedText = text.replace(regex, `<b>$&</b>`);
 
 		return this.sanitized.bypassSecurityTrustHtml(transformedText);
 	}
