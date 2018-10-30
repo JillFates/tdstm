@@ -363,8 +363,11 @@
                                                             class="status"
                                                             [(model)]="dataItem.model"
                                                             [(metaParam)]="metaParam"
-                                                            (valueChange)="onModelChange($event)"
+                                                            [innerTemplateFormat]="innerTemplateTaskItem"
+                                                            [updateOnChanges]="true"
                                                             [serviceRequest]="getTasksForComboBox"
+                                                            (filterChange)="onFilterChange($event,'predecessor', rowIndex)"
+                                                            (valueChange)="onModelChange($event,'predecessor', rowIndex)"
                                                             (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
                                                     </tds-combobox>
                                                 </ng-template>
@@ -402,7 +405,10 @@
                                                             class="status"
                                                             [(model)]="dataItem.model"
                                                             [(metaParam)]="metaParam"
-                                                            (valueChange)="onModelChange($event)"
+                                                            [innerTemplateFormat]="innerTemplateTaskItem"
+                                                            [updateOnChanges]="true"
+                                                            (filterChange)="onFilterChange($event,'successor', rowIndex)"
+                                                            (valueChange)="onModelChange($event,'successor', rowIndex)"
                                                             [serviceRequest]="getTasksForComboBox"
                                                             (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
                                                     </tds-combobox>
