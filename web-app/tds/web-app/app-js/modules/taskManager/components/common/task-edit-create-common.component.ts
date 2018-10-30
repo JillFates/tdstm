@@ -22,10 +22,11 @@ import {TaskNotesColumnsModel} from '../../model/task-notes-columns.model';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 
 declare var jQuery: any;
 
-export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
+export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 
 	protected modalType = ModalType;
@@ -49,6 +50,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
 	protected dataGridTaskNotesHelper: DataGridOperationsHelper;
 	protected isEventLocked: boolean;
+	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 
 	constructor(
@@ -161,25 +163,19 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {void}
 	 */
 	onDependencyTaskChange(dataItem: any, collectionType: string, gridHelper: DataGridOperationsHelper, rowIndex: number): void {
-		let addTask, removeTask, getCollection;
+		let addTask, getCollection;
 
 		if (collectionType === 'predecessor') {
 			addTask = this.modelHelper.addPredecessor;
-			removeTask = this.modelHelper.deletePredecessor;
 			getCollection = this.modelHelper.getPredecessor;
 		} else {
 			addTask = this.modelHelper.addSuccessor;
-			removeTask = this.modelHelper.deleteSuccessor;
 			getCollection = this.modelHelper.getSuccessor;
 		}
 
 		if (dataItem) {
 			const {id, text} = dataItem;
 			addTask.bind(this.modelHelper)(rowIndex, {id, text, ...dataItem.metaFields})
-		} else {
-			if (removeTask.bind(this.modelHelper)(rowIndex)) {
-				this.hasModelChanges = true;
-			}
 		}
 
 		gridHelper.reloadData(getCollection.bind(this.modelHelper)());
@@ -192,14 +188,14 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @returns {void}
 	 */
 	onAddTaskDependency(collection: any[], gridHelper: DataGridOperationsHelper): void {
-		const defaultText = 'Please Select';
-		const predecessorTask = {
+		const defaultText = '';
+		const task = {
 			id: '',
 			desc: defaultText,
-			model: {id: 0, text: defaultText}
+			model: {id: '', text: defaultText}
 		};
-		collection.unshift(predecessorTask);
-		gridHelper.addDataItem(predecessorTask);
+		collection.unshift(task);
+		gridHelper.addDataItem(task);
 	}
 
 	/**
@@ -221,15 +217,34 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 	/**
 	 * Set the flag to determine if some property handled outside [(ngModel)] has changed
+	 * On undefined value delete the record
 	 */
-	onModelChange(value: any): void {
+	onModelChange(value: any, collectionName: string, index: number): void {
 		if (value) {
+			value.text = this.modelHelper.removeTaskNumberFromDescription(value.text, value.metaFields.taskNumber);
+			this.hasModelChanges = true;
+			return;
+		}
+
+		// if value is undefined Clear X was clicked
+		if (value === undefined) {
+			if (collectionName === 'predecessor') {
+				this.modelHelper.deletePredecessor(index);
+				this.dataGridTaskPredecessorsHelper.reloadData(this.model.predecessorList);
+				this.hasModelChanges = true;
+			}
+
+			if (collectionName === 'successor') {
+				this.modelHelper.deleteSuccessor(index);
+				this.dataGridTaskSuccessorsHelper.reloadData(this.model.successorList);
+				this.hasModelChanges = true;
+			}
 			this.hasModelChanges = true;
 		}
 	}
 
 	/**
-	 * Set the reference to the asset entityt once combobox changed
+	 * Set the reference to the asset entity once combobox changed
 	 */
 	onAssetEntityChange(assetSelected: any): void {
 		this.model.asset = assetSelected;
@@ -333,7 +348,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Prompt confirm delete a task
 	 * delegate operation to host component
 	 */
-	deleteTask(): void {
+	protected deleteTask(): void {
 		this.promptService.open(
 			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
@@ -351,7 +366,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @param {DatePartUnit} unit
 	 * @returns {void}
 	 */
-	updateEstimatedFinish(value: string, unit: DatePartUnit): void {
+	protected updateEstimatedFinish(value: string, unit: DatePartUnit): void {
 		const originalParts = DateUtils.getDurationPartsAmongDates(this.model.estimatedStart, this.model.estimatedFinish);
 
 		if (value === '') {
@@ -368,7 +383,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	/**
 	 * Clear the values of start/finish estimated dates
 	 */
-	cleanEstimatedDates(): void {
+	protected cleanEstimatedDates(): void {
 		if (this.model.estimatedStart || this.model.estimatedFinish) {
 			this.model.estimatedFinish = '';
 			this.model.estimatedStart = '';
@@ -380,7 +395,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Determine if predecessor/successor collections contains invalid data, like duplicates or empty ids
 	 * @returns {boolean}
 	 */
-	hasInvalidFields(): boolean {
+	protected hasInvalidFields(): boolean {
 		if (!this.modelHelper.hasDependencyTasksChanges()) {
 			return false;
 		}
@@ -391,7 +406,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Determine whether the form should be disabled because of invalid fields
 	 * @returns {boolean}
 	 */
-	isFormInvalid(): boolean {
+	protected isFormInvalid(): boolean {
 		return !this.taskEditCreateForm.form.valid ||
 			this.hasInvalidFields() ||
 			!(this.taskEditCreateForm.form.dirty || this.hasModelChanges)
@@ -401,7 +416,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Determine if the form has changes based upon ngModel,external tds-checkbox or task grids changes
 	 * @returns {boolean}
 	 */
-	isFormDirty(): boolean {
+	protected isFormDirty(): boolean {
 		return this.modelHelper.hasDependencyTasksChanges() || this.taskEditCreateForm.dirty || this.hasModelChanges;
 	}
 
@@ -410,7 +425,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @param labelURL {string}
 	 * @returns {boolean}
 	 */
-	validateLabelURL(labelURL: string): void {
+	protected validateLabelURL(labelURL: string): void {
 		let isEmpty = false;
 
 		if (!labelURL) {
@@ -425,7 +440,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * On change selection on asset class reset asset entity value
 	 * @returns {void}
 	 */
-	onAssetClassChange(): void {
+	protected onAssetClassChange(): void {
 		this.model.asset = null;
 	}
 
@@ -434,7 +449,7 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * @eventId Event id number if it is selected
 	 * @returns {any}
 	*/
-	getMetaParam(eventId = ''): any {
+	protected getMetaParam(eventId = ''): any {
 		const commentId = this.taskDetailModel.modal.type === ModalType.CREATE ? '' : this.model.id;
 		return {commentId, eventId: eventId || this.model.event.id} ;
 	}
@@ -443,8 +458,21 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 * Whenever a event is selected update the metaParam object
 	 * @returns {any}
 	 */
-	onSelectedEvent(event): void {
+	protected onSelectedEvent(event): void {
 		this.metaParam = this.getMetaParam(event.id) ;
 	}
 
+	/**
+	 * Generate the item template for the task items to show in the format taskId : Description
+	 * @event dataItem contains the task item information
+	 * @returns {string}
+	 */
+	protected innerTemplateTaskItem(dataItem: any): string {
+		if (dataItem.metaFields) {
+			if (!dataItem.text.startsWith(dataItem.metaFields.taskNumber)) {
+				dataItem.text = `${dataItem.metaFields.taskNumber}: ${dataItem.text}`;
+			}
+		}
+		return dataItem.text;
+	}
 }

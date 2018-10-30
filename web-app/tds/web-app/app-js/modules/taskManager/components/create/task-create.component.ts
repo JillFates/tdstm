@@ -1,6 +1,6 @@
 import {Component, OnInit } from '@angular/core';
 
-import {TaskCommonComponent} from '../common/task-common.component';
+import {TaskEditCreateCommonComponent} from '../common/task-edit-create-common.component';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
@@ -16,7 +16,7 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html',
 	styles: []
 })
-export class TaskCreateComponent extends TaskCommonComponent  implements OnInit {
+export class TaskCreateComponent extends TaskEditCreateCommonComponent  implements OnInit {
 
 	constructor(
 		taskDetailModel: TaskDetailModel,
