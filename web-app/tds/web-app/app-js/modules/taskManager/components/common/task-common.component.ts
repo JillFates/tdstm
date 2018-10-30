@@ -215,10 +215,28 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 
 	/**
 	 * Set the flag to determine if some property handled outside [(ngModel)] has changed
+	 * On undefined value delete the record
 	 */
 	onModelChange(value: any, collectionName: string, index: number): void {
 		if (value) {
 			value.text = this.modelHelper.removeTaskNumberFromDescription(value.text, value.metaFields.taskNumber);
+			this.hasModelChanges = true;
+			return;
+		}
+
+		// if value is undefined Clear X was clicked
+		if (value === undefined) {
+			if (collectionName === 'predecessor') {
+				this.modelHelper.deletePredecessor(index);
+				this.dataGridTaskPredecessorsHelper.reloadData(this.model.predecessorList);
+				this.hasModelChanges = true;
+			}
+
+			if (collectionName === 'successor') {
+				this.modelHelper.deleteSuccessor(index);
+				this.dataGridTaskSuccessorsHelper.reloadData(this.model.successorList);
+				this.hasModelChanges = true;
+			}
 			this.hasModelChanges = true;
 		}
 	}
@@ -440,27 +458,6 @@ export class TaskCommonComponent extends UIExtraDialog  implements OnInit {
 	 */
 	protected onSelectedEvent(event): void {
 		this.metaParam = this.getMetaParam(event.id) ;
-	}
-
-	/**
-	 * On clear filter updated predecessor/successor collection
-	 * @event event clear filter result
-	 * @event collectionName collection predecessor/successor
-	 * @event index row index number
-	 * @returns {void}
-	 */
-	protected onFilterChange(event: any, collectionName: string, index: number): void {
-		if (!event && collectionName === 'predecessor') {
-			this.modelHelper.deletePredecessor(index);
-			this.dataGridTaskPredecessorsHelper.reloadData(this.model.predecessorList);
-			this.hasModelChanges = true;
-		}
-
-		if (!event && collectionName === 'successor') {
-			this.modelHelper.deleteSuccessor(index);
-			this.dataGridTaskSuccessorsHelper.reloadData(this.model.successorList);
-			this.hasModelChanges = true;
-		}
 	}
 
 	/**

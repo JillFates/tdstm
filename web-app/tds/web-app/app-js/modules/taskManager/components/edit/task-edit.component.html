@@ -379,7 +379,6 @@
                                                                     [innerTemplateFormat]="innerTemplateTaskItem"
                                                                     [updateOnChanges]="true"
                                                                     [(metaParam)]="metaParam"
-                                                                    (filterChange)="onFilterChange($event,'predecessor', rowIndex)"
                                                                     (valueChange)="onModelChange($event,'predecessor', rowIndex)"
                                                                     [serviceRequest]="getTasksForComboBox"
                                                                     (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
@@ -422,7 +421,6 @@
                                                                 [placeholder]="'Please Select'"
                                                                 [innerTemplateFormat]="innerTemplateTaskItem"
                                                                 [(metaParam)]="metaParam"
-                                                                (filterChange)="onFilterChange($event,'successor', rowIndex)"
                                                                 (valueChange)="onModelChange($event,'successor', rowIndex)"
                                                                 [serviceRequest]="getTasksForComboBox"
                                                                 (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">

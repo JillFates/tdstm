@@ -367,7 +367,6 @@
                                                             [innerTemplateFormat]="innerTemplateTaskItem"
                                                             [updateOnChanges]="true"
                                                             [serviceRequest]="getTasksForComboBox"
-                                                            (filterChange)="onFilterChange($event,'predecessor', rowIndex)"
                                                             (valueChange)="onModelChange($event,'predecessor', rowIndex)"
                                                             (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
                                                     </tds-combobox>
@@ -409,7 +408,6 @@
                                                             [innerTemplateFormat]="innerTemplateTaskItem"
                                                             [placeholder]="'Please Select'"
                                                             [updateOnChanges]="true"
-                                                            (filterChange)="onFilterChange($event,'successor', rowIndex)"
                                                             (valueChange)="onModelChange($event,'successor', rowIndex)"
                                                             [serviceRequest]="getTasksForComboBox"
                                                             (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
