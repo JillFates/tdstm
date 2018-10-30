@@ -14,7 +14,10 @@
     </div>
     <div class="modal-body">
         <div>
-            <form name="storageEditForm">
+            <form name="form" (ngSubmit)="form.form.valid && onUpdate()"
+                  class="asset-entry-form"
+                  [ngClass]="{'form-submitted': form && form.submitted}"
+                  role="form" #form="ngForm" novalidate>
                 <table>
                     <tr>
                         <td colspan="2" class="dialog-container">
@@ -85,7 +88,7 @@
                                                     class="tm-input-control"
                                                     name="modelAssetScaleName"
                                                     [data]="${SizeScale.getAsJsonList() as JSON}"
-                                                    [(ngModel)]="model.asset.scale.name"
+                                                    [(ngModel)]="model.asset.scale"
                                                     [defaultItem]="''"
                                                     [textField]="'text'"
                                                     [valueField]="'value'">
@@ -127,7 +130,7 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
