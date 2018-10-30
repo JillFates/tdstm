@@ -226,7 +226,7 @@ class DatabaseController implements ControllerMethods {
 		}
 		if (params.toValidate){
 			whereConditions.add ' dbs.validation = :validation '
-			queryParams.put 'validation', 'Discovery'
+			queryParams.put 'validation', 'Unknown'
 		}
 		if (params.plannedStatus){
 			whereConditions.add ' dbs.planStatus = :planStatus '

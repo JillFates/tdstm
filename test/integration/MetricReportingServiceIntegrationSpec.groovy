@@ -132,11 +132,11 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		context.record = new ImportBatchRecord(sourceRowId: 1)
 
 		device.assetType = 'Server'
-		device.validation = 'BundleReady'
+		device.validation = 'PlanReady'
 		device.save(flush: true, failOnError: true)
 
 		device2.assetType = 'Server'
-		device2.validation = 'Discovery'
+		device2.validation = 'Unknown'
 		device2.save(flush: true, failOnError: true)
 
 		moveBundle2.useForPlanning = 0
@@ -145,7 +145,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		// Create a second project with a device with the same name and type as device above
 		otherProjectDevice.assetName = device.assetName
 		otherProjectDevice.assetType = device.assetType
-		otherProjectDevice.validation = 'Discovery'
+		otherProjectDevice.validation = 'Unknown'
 		otherProjectDevice.save(flush: true, failOnError: true)
 
 		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
@@ -177,7 +177,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 					"where"      : [
 						[
 							"column"    : "validation",
-							"expression": "in ('Discovery', 'BundleReady')"
+							"expression": "in ('Unknown', 'PlanReady')"
 						]
 					]
 				]
@@ -343,7 +343,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 						count(*) as value
 					from asset_entity a
 					join move_bundle m on m.move_bundle_id=a.move_bundle_id
-					where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+					where a.project_id in (:projectIds) and a.validation in ('Unknown', 'PlanReady') and m.use_for_planning = true
 					group by a.plan_status, a.asset_type, a.project_id
 					order by a.project_id, a.plan_status, a.asset_type;
 					""".stripIndent().toString()
@@ -384,7 +384,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 									count(*) as value
 							from asset_entity a
 							join move_bundle m on m.move_bundle_id=a.move_bundle_id
-							where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+							where a.project_id in (:projectIds) and a.validation in ('Unknown', 'PlanReady') and m.use_for_planning = true
 							group by a.plan_status, a.asset_type, a.project_id;
 						""".stripIndent().toString()
 			]

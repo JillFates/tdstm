@@ -996,7 +996,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				}
 				break
 			case "validation":
-				setValueOrDefault(asset, property, value, 'Discovery')
+				setValueOrDefault(asset, property, value, 'Unknown')
 				break
 			case 'version':
 			case 'modifiedBy':

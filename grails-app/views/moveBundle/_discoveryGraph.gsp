@@ -1,6 +1,6 @@
 <%-- Determine what the link parameters are going to be --%>
 <g:set var="linkParams" value="${ [filter:filter] }" />
-<g:set var="validateLinkParams" value="${ linkParams + [toValidate:'Discovery'] }"/>
+<g:set var="validateLinkParams" value="${ linkParams + [toValidate:'Unknown'] }"/>
 
 <td class="dashboard_stat_icon_td">
 	<g:link controller="${assetType}" action="list" params="${linkParams}" class="links">

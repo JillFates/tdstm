@@ -234,7 +234,7 @@ class FilesController implements ControllerMethods {
 			}
 		}
 		if (params.toValidate) {
-			query.append(" WHERE files.validation='Discovery'")
+			query.append(" WHERE files.validation='Unknown'")
 		}
 		if (params.plannedStatus) {
 			query.append(" WHERE files.planStatus='$params.plannedStatus'")

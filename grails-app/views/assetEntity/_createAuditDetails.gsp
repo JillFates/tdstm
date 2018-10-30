@@ -157,7 +157,7 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery"
+			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="Uknown"
 			noSelection="${['':' Please Select']}" />
 		</td>
 	</tr>

@@ -1623,8 +1623,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM02,Production,C,1234.567,BundleReady,Confirmed
-				NGM03,Production,C,,BundleReady,Confirmed
+				NGM02,Production,C,1234.567,PlanReady,Confirmed
+				NGM03,Production,C,,PlanReady,Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
 
@@ -1729,8 +1729,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM02,Production,C,1234.567,BundleReady,Confirmed
-				NGM03,Production,C,,BundleReady,Confirmed
+				NGM02,Production,C,1234.567,PlanReady,Confirmed
+				NGM03,Production,C,,PlanReady,Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
 

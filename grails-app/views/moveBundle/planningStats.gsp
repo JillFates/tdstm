@@ -14,8 +14,8 @@ $(document).ready(function() {
 			$("#discoverybar").animate({width: percentageAppToValidate + "%"}, 1000);
 	$("#applicationbar").animate({width: percentageAppToValidate + "%"}, 1000);
 
-	var percentageBundleReady = "${percentageBundleReady}";
-	$("#analysisbar").animate({width: percentageBundleReady + "%"}, 1000);
+	var percentagePlanReady = "${percentagePlanReady}";
+	$("#analysisbar").animate({width: percentagePlanReady + "%"}, 1000);
 
 	$("#confirmedbar").animate({width: "${confirmedAppPerc}%"}, 1000);
 
@@ -89,7 +89,7 @@ $(document).ready(function() {
 									<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
 										<b> ${100 - percentageAppToValidate}%</b>
 										<g:link controller="application" action="list"
-                                                params="[filter:'application', toValidate:'Discovery']">
+                                                params="[filter:'application', toValidate:'Unknown']">
                                             Applications Validated
                                         </g:link>
 									</div>
@@ -99,13 +99,13 @@ $(document).ready(function() {
                         <!-- Applications Ready Progressbar --->
                         <tr>
                             <td class="dashboard_bar_base">
-                                <g:if test="${percentageBundleReady == 0}">
+                                <g:if test="${percentagePlanReady == 0}">
                                     <div class="dashboard_bar_graph0">
                                         <b>0% Applications Ready</b>
                                     </div>
 
                                 </g:if>
-                                <g:elseif test="${percentageBundleReady == 100}">
+                                <g:elseif test="${percentagePlanReady == 100}">
                                     <div class="task_completed"style="z-index: -1; height: 24px; width: 100%"></div>
                                     <div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
                                         <b>100% Applications Ready</b>
@@ -114,9 +114,9 @@ $(document).ready(function() {
                                 <g:else>
                                     <div class="dashboard_bar_graph" id="analysisbar"style="width: 0%;"></div>
                                     <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-                                        <b> ${percentageBundleReady}%</b>
+                                        <b> ${percentagePlanReady}%</b>
                                     <g:link controller="application" action="list"
-                                            params="[filter:'application', toValidate:'BundleReady']">Applications Ready</g:link>
+                                            params="[filter:'application', toValidate:'PlanReady']">Applications Ready</g:link>
                                     </div>
                                 </g:else>
                             </td>
@@ -262,34 +262,12 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_td"><g:link
 									controller="application" action="list"
-									params="[filter:'application', toValidate:'DependencyScan']"
+									params="[filter:'application', toValidate:'PlanReady']"
 									class="links">
-									${dependencyScan}
+									${planReady}
 								</g:link></td>
 							<td><g:link controller="application" action="list"
-									params="[filter:'application', toValidate:'DependencyScan']"
-									class="links">Dependency Scan</g:link></td>
-						</tr>
-						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="application" action="list"
-									params="[filter:'application', toValidate:'DependencyReview']"
-									class="links">
-									${dependencyReview}
-								</g:link></td>
-							<td><g:link controller="application" action="list"
-									params="[filter:'application', toValidate:'DependencyReview']"
-									class="links">Dependency Review</g:link></td>
-						</tr>
-						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="application" action="list"
-									params="[filter:'application', toValidate:'BundleReady']"
-									class="links">
-									${bundleReady}
-								</g:link></td>
-							<td><g:link controller="application" action="list"
-									params="[filter:'application', toValidate:'BundleReady']"
+									params="[filter:'application', toValidate:'PlanReady']"
 									class="links">Ready</g:link></td>
 						</tr>
 					</table>

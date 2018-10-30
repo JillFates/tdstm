@@ -176,13 +176,13 @@ class MetricReportingServiceSpec extends Specification {
 		setup: 'Given a list of where JSON structure'
 			List wheres = [
 					[column: 'moveBundle.useForPlanning', expression: '= true'],
-					[column: 'validation', expression: "in ('BundleReady', 'Confirmed')"],
+					[column: 'validation', expression: "in ('PlanReady', 'Confirmed')"],
 					[column: 'moveBundle.useForPlanning', expression: '= true']
 			]
 		when: 'getWhere is called with wheres'
 			String where = service.getWhere(wheres)
 		then: 'getWhere generates the hql for the wheres'
-			where == 'and moveBundle.useForPlanning = true and validation in (\'BundleReady\', \'Confirmed\') and moveBundle.useForPlanning = true'
+			where == 'and moveBundle.useForPlanning = true and validation in (\'PlanReady\', \'Confirmed\') and moveBundle.useForPlanning = true'
 	}
 
 	void 'Test getWhere one where in list'() {
@@ -224,7 +224,7 @@ class MetricReportingServiceSpec extends Specification {
 					"where"      : [
 							[
 									"column"    : "validation",
-									"expression": "in ('BundleReady', 'Confirmed')"
+									"expression": "in ('PlanReady', 'Confirmed')"
 							]
 					]
 			] as JSONObject
@@ -233,7 +233,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
+				where project.id in (:projectIds) and validation in ('PlanReady', 'Confirmed') and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 
@@ -548,7 +548,7 @@ class MetricReportingServiceSpec extends Specification {
 
 			WhereCommand whereCommand = new WhereCommand()
 			whereCommand.column = 'validation'
-			whereCommand.expression = "in ('BundleReady', 'Confirmed')"
+			whereCommand.expression = "in ('PlanReady', 'Confirmed')"
 
 			QueryCommand queryCommand = new QueryCommand()
 			queryCommand.with {
@@ -582,7 +582,7 @@ class MetricReportingServiceSpec extends Specification {
       "domain": "Device",
       "aggregation": "count(*)",
       "where": [{
-         "expression": "in ('BundleReady', 'Confirmed')",
+         "expression": "in ('PlanReady', 'Confirmed')",
          "column": "validation"
       }],
       "groupBy": [

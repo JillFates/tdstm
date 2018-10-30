@@ -636,7 +636,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange replace inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Discovery")
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Unknown")
 			bulkChangeCommand.edits = [editCommand]
 			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
 

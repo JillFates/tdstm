@@ -565,11 +565,9 @@ describe('Database', function(){
       it('should have the following list',function(){
         var createDBModal = new DBCreateModal();
         createDBModal.validationOptions.then(function(list){
-          expect(list[0].getText()).toEqual('Discovery');
+          expect(list[0].getText()).toEqual('Unknown');
           expect(list[1].getText()).toEqual('Validated');
-          expect(list[2].getText()).toEqual('DependencyReview');
-          expect(list[3].getText()).toEqual('DependencyScan');
-          expect(list[4].getText()).toEqual('BundleReady');
+          expect(list[4].getText()).toEqual('PlanReady');
         });
       });
 

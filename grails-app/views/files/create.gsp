@@ -88,7 +88,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" value="Discovery" tabindex="44"/>
+									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" value="Unknown" tabindex="44"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>
