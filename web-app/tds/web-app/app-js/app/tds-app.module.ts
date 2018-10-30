@@ -22,15 +22,7 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
 		TaskManagerModule,
-		SharedModule.forRoot(),
-		/* UIRouterModule.forRoot(<UIRouterModule>{
-			states: TdsAppRoute,
-			otherwise: '/pages/notfound',
-			config: (route) => {
-				AuthConfig(route);
-				MiscConfig(route);
-			},
-		}), */
+		SharedModule.forRoot()
 	],
 	declarations: [
 		TDSAppComponent,
