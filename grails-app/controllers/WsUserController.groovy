@@ -17,7 +17,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.UserPreferenceService
 import com.tdsops.common.security.spring.HasPermission
-//Dunno Which of these I need
 /**
  * Handles WS calls of the UserService.
  *
@@ -47,10 +46,9 @@ class WsUserController implements ControllerMethods {
 	}
 
 	/**
-	 * Display current logged user's Preferences with preference
-	 * code (converted to comprehensive words) with their corresponding value.
+	 * Update currentUserPreferences from the server (Copied from PersonController)
 	 *
-	 * @return : A Map containing key as preference code and value as map'svalue.
+	 * return: An array made up of objects containing a preference code and a value to display.
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def getPreferenceMap() {
@@ -158,6 +156,7 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+	//Copied from PersonController
 	@HasPermission(Permission.UserGeneralAccess)
 	def resetPreferences() {
 		try {
@@ -168,25 +167,14 @@ class WsUserController implements ControllerMethods {
 				sendNotFound()
 				return
 			}
-
-			// if dateTimezoneOnly is specified, only reset the timezone and date format preferences if they exist
-			if (params.dateTimezoneOnly) {
-				userPreferenceService.removePreference(PREF.CURR_TZ)
-				userPreferenceService.removePreference(PREF.CURR_DT_FORMAT)
-
-				// else reset all preferences
-			} else {
-				// TODO : JPM 5/2015 : Change the way that the delete is occurring
-				def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-				prePreference.each { preference ->
-					def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-					// When clearing preference, the RefreshMyTasks should be the same.
-					if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
-						preferenceInstance.delete()
-					}
+			// TODO : JPM 5/2015 : Change the way that the delete is occurring
+			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
+			prePreference.each { preference ->
+				def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference, userLogin)
+				// When clearing preference, the RefreshMyTasks should be the same.
+				if (preferenceInstance.preferenceCode != UserPreferenceEnum.MYTASKS_REFRESH.value()) {
+					preferenceInstance.delete()
 				}
-
-				//userPreferenceService.setPreference(PREF.START_PAGE, "Current Dashboard")
 			}
 			renderSuccessJson()
 		} catch (e) {
