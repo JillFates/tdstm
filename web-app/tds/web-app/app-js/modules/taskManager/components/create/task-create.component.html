@@ -335,11 +335,8 @@
                                                 *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
                                                 class="successor-predecessor-table create-table has-duplicated-predecessors"
                                                 [data]="dataGridTaskPredecessorsHelper.gridData"
-                                                [sort]="dataGridTaskPredecessorsHelper.state.sort"
-                                                [sortable]="{mode:'single'}"
                                                 [resizable]="false"
-                                                [rowClass]="modelHelper.rowStatusColor"
-                                                (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)">
+                                                [rowClass]="modelHelper.rowStatusColor">
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
@@ -382,11 +379,8 @@
                                                 *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
                                                 class="successor-predecessor-table create-table has-duplicated-successors"
                                                 [data]="dataGridTaskSuccessorsHelper.gridData"
-                                                [sort]="dataGridTaskSuccessorsHelper.state.sort"
-                                                [sortable]="{mode:'single'}"
                                                 [resizable]="false"
-                                                [rowClass]="modelHelper.rowStatusColor"
-                                                (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)">
+                                                [rowClass]="modelHelper.rowStatusColor">
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>

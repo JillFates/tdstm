@@ -43,6 +43,8 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('disabled') disabled: boolean;
 	@Input('searchOnScroll') searchOnScroll = true;
 	@Input('reloadOnOpen') reloadOnOpen = false;
+	@Input('updateOnChanges') updateOnChanges = false;
+	@Input('innerTemplateFormat') innerTemplateFormat: Function;
 	// Inner Params
 	private datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
@@ -60,10 +62,20 @@ export class TDSComboBoxComponent implements OnChanges {
 		// To avoid doing extra Rest Call, the initial set in the Combo will be the current value.
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue) {
 			this.firstChange = changes['model'].firstChange;
-			if (this.firstChange) {
+			if (this.firstChange || this.updateOnChanges) {
 				let model = changes['model'].currentValue;
-				this.datasource.push({id: model.id, text: model.text});
+				this.addToDataSource(model);
 			}
+		}
+	}
+
+	/**
+	 * Add the item to the datasource if this parameter doesn't exists on collection
+	 * @param model Item to add
+	 */
+	addToDataSource(model: any): void {
+		if (!this.datasource.find((item) => item.id === model.id)) {
+			this.datasource.push(model);
 		}
 	}
 
@@ -135,7 +147,9 @@ export class TDSComboBoxComponent implements OnChanges {
 		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
 			this.comboBoxSearchResultModel = res;
 			// If in the process the MetaParam is not the same, clean the datasource
-			this.datasource = R.concat(this.datasource, this.comboBoxSearchResultModel.result);
+			const result = (this.comboBoxSearchResultModel.result || []);
+			result.forEach((item: any) => this.addToDataSource(item));
+
 			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
 				this.calculateLastElementShow();
 			}
@@ -214,8 +228,15 @@ export class TDSComboBoxComponent implements OnChanges {
 		if (!dataItem.text) {
 			dataItem.text = '';
 		}
-		const regex = new RegExp(this.innerComboBox.text, 'i');
-		const transformedText = dataItem.text.replace(regex, `<b>$&</b>`);
+		let transformedText = '';
+
+		if (!this.innerTemplateFormat) {
+			const regex = new RegExp(this.innerComboBox.text, 'i');
+			transformedText = dataItem.text.replace(regex, `<b>$&</b>`);
+		} else {
+			transformedText = this.innerTemplateFormat(dataItem);
+		}
+
 		return this.sanitized.bypassSecurityTrustHtml(transformedText);
 	}
 }
