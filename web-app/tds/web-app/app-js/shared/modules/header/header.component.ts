@@ -124,7 +124,8 @@ export class HeaderComponent {
 			}
 		}
 	}
-	public openPrefModal() :void {
+
+	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			console.error(result);
 		});

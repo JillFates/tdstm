@@ -13,6 +13,7 @@ import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
+import {UserModule} from '../modules/user/user.module';
 
 @NgModule({
 	imports: [
@@ -22,6 +23,7 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
 		TaskManagerModule,
+		UserModule,
 		SharedModule.forRoot(),
 		/* UIRouterModule.forRoot(<UIRouterModule>{
 			states: TdsAppRoute,

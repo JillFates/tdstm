@@ -42,7 +42,7 @@ export class UserService {
 	}
 
 	removePreference(prefCode) {
-		return this.http.post(`${this.userPreferenceUrl}/removePreference/${prefCode}`,null)
+		return this.http.post(`${this.userPreferenceUrl}/removePreference/${prefCode}`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -51,7 +51,7 @@ export class UserService {
 	}
 
 	resetPreferences() {
-		return this.http.post(`${this.userPreferenceUrl}/resetPreferences`,null)
+		return this.http.post(`${this.userPreferenceUrl}/resetPreferences`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
