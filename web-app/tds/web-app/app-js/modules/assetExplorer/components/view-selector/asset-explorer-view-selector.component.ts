@@ -1,4 +1,14 @@
-import {Component, Inject, ViewChild, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
+import {
+	Component,
+	Inject,
+	ViewChild,
+	AfterViewInit,
+	Input,
+	Output,
+	ViewEncapsulation,
+	EventEmitter,
+	ElementRef
+} from '@angular/core';
 import {Observable} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 
@@ -29,6 +39,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@Input() isDisabled ? = false;
 	@Output() onSelectView = new EventEmitter<any>();
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
+	@ViewChild('viewSelectorFilter') viewSelectorFilter: ElementRef;
 	private reports: ViewGroupModel[];
 	public data: ViewGroupModel[];
 	private searchFilterSelector = '';
@@ -59,7 +70,14 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	}
 
 	protected onToggle() {
-		setTimeout(() => this.dropdown.toggle(!this.dropdown.isOpen));
+		setTimeout(() => {
+			this.dropdown.toggle(!this.dropdown.isOpen)
+			setTimeout( () => {
+				if (this.dropdown.isOpen && this.viewSelectorFilter) {
+					this.viewSelectorFilter.nativeElement.focus();
+				}
+			}, 300);
+		});
 	}
 
 	protected onSearch(): void {
@@ -121,5 +139,11 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 			.subscribe(result => {
 				this.data = result as ViewGroupModel[];
 			});
+	}
+
+	protected onFocusOut($event): void {
+		if (this.dropdown.isOpen) {
+			this.onToggle();
+		}
 	}
 }
