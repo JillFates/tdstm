@@ -14,14 +14,4 @@ export class UserListComponent {
 		private userService: UserService,
 		private dialogService: UIDialogService) {
 	}
-
-	public openPreferences(): void {
-		this.openProviderDialogViewEdit();
-	}
-
-	private openProviderDialogViewEdit(): void {
-		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
-			console.error(result);
-		});
-	}
 }
