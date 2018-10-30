@@ -469,27 +469,29 @@ class DataviewService implements ServiceMethods {
 			commentsAndTasksMap[assetId] = [issue: false, comment: false]
 		}
 
-		// Query for assets and the comment types associated with them.
-		String tasksAndCommentsQuery = """
-			SELECT assetEntity.id, commentType FROM AssetComment 
-			WHERE assetEntity.id IN (:assetIds) AND isPublished = true
-			GROUP BY assetEntity.id, commentType
-		"""
+		if (assetIds) {
+			// Query for assets and the comment types associated with them.
+			String tasksAndCommentsQuery = """
+				SELECT assetEntity.id, commentType FROM AssetComment 
+				WHERE assetEntity.id IN (:assetIds) AND isPublished = true
+				GROUP BY assetEntity.id, commentType
+			"""
 
-		// Execute the query.
-		List tasksAndComments = AssetComment.executeQuery(tasksAndCommentsQuery, [assetIds: assetIds])
+			// Execute the query.
+			List tasksAndComments = AssetComment.executeQuery(tasksAndCommentsQuery, [assetIds: assetIds])
 
-		// Iterate over the results from the database updating the flags map.
-		for (taskOrComment in tasksAndComments) {
-			Long assetId = taskOrComment[0]
-			String commentType = taskOrComment[1]
-			commentsAndTasksMap[assetId][commentType] = true
-		}
+			// Iterate over the results from the database updating the flags map.
+			for (taskOrComment in tasksAndComments) {
+				Long assetId = taskOrComment[0]
+				String commentType = taskOrComment[1]
+				commentsAndTasksMap[assetId][commentType] = true
+			}
 
-		// Iterate over the preview assets setting the flags map as an attribute.
-		assetResults.each { Map assetMap ->
-			Long assetId = NumberUtil.toLong(assetMap['common_id'])
-			assetMap['taskAndCommentFlags'] = commentsAndTasksMap[assetId]
+			// Iterate over the preview assets setting the flags map as an attribute.
+			assetResults.each { Map assetMap ->
+				Long assetId = NumberUtil.toLong(assetMap['common_id'])
+				assetMap['taskAndCommentFlags'] = commentsAndTasksMap[assetId]
+			}
 		}
 	}
 
