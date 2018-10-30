@@ -421,7 +421,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}
 
 		this.dialog.extra(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel}
+			{provide: AssetModalModel, useValue: assetModalModel},
+			{provide: 'currentUserId', useValue: this.currentUser.id}
 		], false, false).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
