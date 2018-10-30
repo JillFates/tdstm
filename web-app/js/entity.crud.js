@@ -1944,7 +1944,8 @@ function submitMoveForm() {
 		data: $('#changeBundle').serialize(),
 		url: $('#changeBundle').attr('action'),
 		complete: function (jqXHR) {
-			$('#moveBundleSelectId').dialog("close")
+			$('#changeBundle').children('input[name="assets"]').remove();
+			$('#moveBundleSelectId').dialog("close");
 			$('#items1').html(jqXHR.responseText);
 			$('#allBundles').attr('checked', 'false');
 			$('#planningBundle').attr('checked', 'true');
