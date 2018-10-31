@@ -63,7 +63,7 @@ class MoveEventController implements ControllerMethods {
 	                                                  'estFinish', 'actStart', 'actFinish', 'workflow']
 	private static final List<String> postMoveCols = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status',
 	                                                  'estFinish', 'dateResolved' , 'notes', 'taskDependencies', 'duration',
-	                                                  'estStart', ' estFinish', ' actStart', 'actFinish', 'workflow']
+	                                                  'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow']
 	private static final List<String> impactedCols = ['id', 'assetName', '', 'startupProc', 'description',
 	                                                  'sme', '' ,'' ,'' ,'' ,'' ,'' ]
 	private static final List<String> dbCols = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType',
