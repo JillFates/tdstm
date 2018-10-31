@@ -233,5 +233,7 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Invalid variable name specified for 'set' command. " +
                 "Variable names must end in 'Var' and can not be reassigned within iterate loop.")
     }
+
+
 }
 
