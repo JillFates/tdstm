@@ -63,7 +63,7 @@ export class ImportBatchColumnsModel {
 			},
 			{
 				label: 'Status',
-				property: 'status.label',
+				property: 'status',
 				type: 'text',
 				width: 130,
 				locked: false
