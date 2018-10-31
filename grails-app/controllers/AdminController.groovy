@@ -1122,7 +1122,6 @@ class AdminController implements ControllerMethods {
 			return
 		}
 
-		//List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
 		List<String> assetTypeOptions = assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 		List assetTypes = []
 		assetTypeOptions.remove('Blade') // TODO : temp fix to resolve the below issue

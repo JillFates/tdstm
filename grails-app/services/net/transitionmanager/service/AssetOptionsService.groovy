@@ -10,25 +10,45 @@ import net.transitionmanager.command.AssetOptionsCommand
 @Slf4j
 class AssetOptionsService {
 
+	/**
+	 * Find asset option by id
+	 * @param id - asset option id
+	 * @return
+	 */
 	AssetOptions findById(Long id) {
 		return AssetOptions.where {
 			id == id
 		}.get()
 	}
 
+	/**
+	 * Find asset option by value
+	 * @param value - asset option value
+	 * @return
+	 */
 	AssetOptions findByValue(String value) {
 		return AssetOptions.where {
 			value == value
 		}.get()
 	}
 
-	List<AssetOptions> findAllByType(AssetOptions.AssetOptionsType assetOptionsType) {
+	/**
+	 * Find all asset options by type
+	 * @param assetOptionsType - asset option type
+	 * @return
+	 */
+	List<AssetOptions> findAllByType(AssetOptionsType assetOptionsType) {
 		return AssetOptions.where {
 			type == assetOptionsType
 		}.order("value").list()
 	}
 
-	List<String> findAllValuesByType(AssetOptions.AssetOptionsType assetOptionsType) {
+	/**
+	 * Find all asset option values by type
+	 * @param assetOptionsType - asset option type
+	 * @return
+	 */
+	List<String> findAllValuesByType(AssetOptionsType assetOptionsType) {
 		List<AssetOptions> assetOptions = findAllByType(assetOptionsType)
 		if (assetOptions) {
 			return assetOptions.value
@@ -36,6 +56,11 @@ class AssetOptionsService {
 		return null
 	}
 
+	/**
+	 * Save an asset option
+	 * @param command
+	 * @return
+	 */
 	@Transactional
 	AssetOptions saveAssetOptions(AssetOptionsCommand command) {
 
@@ -49,6 +74,12 @@ class AssetOptionsService {
 		return assetOption
 	}
 
+	/**
+	 * Find or create an asset option
+	 * @param assetOptionsType
+	 * @param value
+	 * @return
+	 */
 	@Transactional
 	AssetOptions findOrCreate(AssetOptionsType assetOptionsType, String value) {
 		AssetOptions assetOptions = AssetOptions.where {
@@ -64,6 +95,10 @@ class AssetOptionsService {
 		return saveAssetOptions(new AssetOptionsCommand(type: assetOptionsType, value: value))
 	}
 
+	/**
+	 * Delete an asset option
+	 * @param id
+	 */
 	@Transactional
 	void deleteById(Long id) {
 		AssetOptions foundAssetOptions = findById(id)
@@ -71,6 +106,5 @@ class AssetOptionsService {
 			foundAssetOptions.delete(flush: true)
 		}
 	}
-
 
 }

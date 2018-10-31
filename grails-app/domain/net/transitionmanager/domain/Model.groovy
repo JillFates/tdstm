@@ -1,7 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
-//import com.tds.asset.AssetOptions
 import com.tdsops.commons.lang.exception.PersistenceException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -178,10 +177,6 @@ class Model {
 			executeUpdate('delete ModelAlias where model=?', [this])
 		}*/
 	}
-
-//	private List<String> getAssetTypeList() {
-//		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
-//	}
 
 	int getNoOfConnectors() {
 		ModelConnector.countByModel(this)
