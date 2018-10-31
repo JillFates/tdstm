@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
 
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
@@ -50,9 +50,13 @@ declare var jQuery: any;
 	exportAs: 'assetExplorerViewGrid',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
-export class AssetExplorerViewGridComponent implements OnInit {
+export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
+	@Input() data: any;
 	@Input() model: ViewSpec;
+	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<boolean>();
+	@Output() justPlanningChange = new EventEmitter<boolean>();
+	@Output() gridStateChange = new EventEmitter<State>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
@@ -81,12 +85,6 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	private maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
-
-	state: State = {
-		skip: 0,
-		take: this.maxDefault,
-		sort: []
-	};
 	gridData: GridDataResult;
 	selectAll = false;
 	private columnFiltersOldValues = [];
@@ -104,22 +102,25 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		private dialog: UIDialogService,
 		private permissionService: PermissionService,
 		private userService: UserService) {
+	}
+
+	ngOnInit(): void {
+		this.gridData = {
+			data: [],
+			total: 0
+		};
 
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
-			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-			this.bulkCheckboxService.setPageSize(this.state.take);
+			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
+
+			this.bulkCheckboxService.setPageSize(this.gridState.take);
 			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
+			this.justPlanningChange.emit(this.justPlanning);
 			this.onReload();
 		});
 
-		// Listen to any Changes outside the model, like Asset Edit Views
-		this.eventListeners();
-		this.getCurrentUser();
-	}
-
-	ngOnInit(): void {
 		// Iterate Fields to get reference for this context
 		this.currentFields = this.fields.reduce((p, c) => {
 			return p.concat(c.fields);
@@ -129,6 +130,21 @@ export class AssetExplorerViewGridComponent implements OnInit {
 				label: f.label
 			};
 		});
+
+		// Listen to any Changes outside the model, like Asset Edit Views
+		this.eventListeners();
+
+		this.getCurrentUser();
+
+	}
+
+	ngOnChanges(changes: SimpleChanges) {
+		const dataChange = changes['data'];
+
+		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
+			this.applyData(dataChange.currentValue)
+		}
+
 	}
 
 	private getPreferences(): Observable<any> {
@@ -182,7 +198,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		this.bulkCheckboxService.handleFiltering();
 		if (column.filter) {
 			column.filter = '';
-			this.state.skip = 0;
+			this.updateGridState({skip: 0});
 			if ( this.preventFilterSearch(column)) {
 				return; // prevent search
 			}
@@ -195,7 +211,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	}
 
 	onFilter(): void {
-		this.state.skip = 0;
+		this.updateGridState({skip: 0});
 		this.onReload();
 	}
 
@@ -234,16 +250,19 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		}
 	}
 
-	apply(data: any): void {
-		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+	private applyData(data: any): void {
+		const {assets = null, pagination = null} = data || {};
+		const total = pagination && pagination.total || 0;
 
-		this.bulkCheckboxService.initializeKeysBulkItems(data.assets);
+		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+		this.bulkCheckboxService.initializeKeysBulkItems(assets || []);
 
 		this.gridData = {
-			data: data.assets,
-			total: data.pagination.total
+			data: assets || [],
+			total
 		};
-		this.showMessage = data.pagination.total === 0;
+
+		this.showMessage = total === 0;
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
@@ -251,21 +270,20 @@ export class AssetExplorerViewGridComponent implements OnInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
-	clear(): void {
+	private clear(): void {
 		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		this.state = {
+		this.updateGridState({
 			skip: 0,
-			take: this.state.take,
+			take: this.gridState.take,
 			sort: []
-		};
+		});
 	}
 
 	protected dataStateChange(state: DataStateChangeEvent): void {
-		this.state = state;
 		if (state.sort[0]) {
 			// Invert the Order to remove the Natural/Default from the UI (no arrow)
 			if (!state.sort[0].dir) {
@@ -277,6 +295,7 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			this.model.sort.property = field[1];
 			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
 		}
+		this.updateGridState(state);
 		this.modelChange.emit();
 	}
 
@@ -594,6 +613,8 @@ export class AssetExplorerViewGridComponent implements OnInit {
 	}
 
 	onChangeJustPlanning(isChecked = false): void {
+		this.justPlanningChange.emit(isChecked);
+
 		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString()).subscribe(() => {
 			this.onReload();
 		});
@@ -635,5 +656,13 @@ export class AssetExplorerViewGridComponent implements OnInit {
 			.subscribe( (user: any) => {
 				this.currentUser = user;
 			}, (error: any) => console.log(error));
+	}
+
+	/**
+	 * Set the grid configuration and emit the event to the host component
+	 */
+	private updateGridState(state: State): void {
+		const newState = Object.assign({}, this.gridState, state) ;
+		this.gridStateChange.emit(newState);
 	}
 }
