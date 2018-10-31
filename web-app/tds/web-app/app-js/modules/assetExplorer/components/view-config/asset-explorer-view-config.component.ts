@@ -33,7 +33,6 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html'
 })
 export class AssetExplorerViewConfigComponent implements OnInit {
-	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	protected data: any;
@@ -453,7 +452,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
-			// this.grid.gridData = null;
+			this.data = null;
 		}
 	}
 
