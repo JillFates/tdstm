@@ -18,6 +18,7 @@ import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 
 @Component({
 	selector: `task-detail`,
@@ -43,6 +44,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected hasDeleteTaskPermission = false;
 	protected modalOptions: DecoratorOptions;
 	protected model: any = {};
+	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 
 	constructor(
@@ -139,6 +141,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 				// Convert the Duration into a Human Readable form
 				this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
+
+				// get the class corresponding to this asset
+				this.taskManagerService.getClassForAsset(this.model.asset.id)
+					.subscribe((result: any) => {
+						if (result) {
+							const assetClass = this.model.assetClasses.find((asset: any) => asset.id === result.assetClass)
+							if (assetClass) {
+								this.model.assetClass = assetClass;
+							}
+						}
+					})
 			});
 	}
 
@@ -187,24 +200,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 		this.dialogService.extra(TaskEditComponent,
 			[
-				{provide: UIDialogService, useValue: this.dialogService},
-				{provide: TaskService, useValue:  this.taskManagerService},
-				{provide: UIPromptService, useValue: this.promptService},
-				{provide: PreferenceService, useValue: this.userPreferenceService} ,
-				{provide: PermissionService, useValue: this.permissionService},
-			{provide: TaskDetailModel, useValue: clone(this.model)}
-		], false, false)
-		.then(result => {
-			if (result) {
-				if (result.isDeleted) {
-					this.close({id: this.taskDetailModel, isDeleted: true})
-					return;
-				}
+				{provide: TaskDetailModel, useValue: clone(this.model)}
+			], false, false)
+			.then(result => {
+				if (result) {
+					if (result.isDeleted) {
+						this.close({id: this.taskDetailModel, isDeleted: true})
+						return;
+					}
 
-				this.hasChanges = true;
-				this.loadTaskDetail();
-			}
-		}).catch(result => {
+					this.hasChanges = true;
+					this.loadTaskDetail();
+				}
+			}).catch(result => {
 			this.dismiss(this.hasChanges);
 		});
 	}

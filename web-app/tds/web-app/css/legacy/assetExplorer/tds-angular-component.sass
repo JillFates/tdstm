@@ -6,11 +6,23 @@
 
 .tds-angular-component-content
   display: table
+  form.asset-entry-form
+    .ng-dirty.ng-invalid
+      border: 1px solid $color-message-error--red
+  form.asset-entry-form.form-submitted
+    .ng-invalid
+      border: 1px solid $color-message-error--red
+
   .dialog-container
     border: 1px solid transparent
     padding: 0
     .required-field
       color: $color-message-error--red
+    .top-align-field
+      vertical-align: top
+    .top-space-required-field
+      display: block
+      margin-top: 5px
   .prop
     padding: 5px
   .prop .name

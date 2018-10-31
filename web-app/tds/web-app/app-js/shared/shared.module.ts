@@ -32,6 +32,7 @@ import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.direct
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 import { UIAutoCenterDirective } from './directives/autocenter-directive';
+import { InputPasteDirective } from './directives/input-paste.directive';
 // Shared Pipes
 import { UserDateTime } from './pipes/userDateTime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
@@ -101,6 +102,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateRangeSelectorComponent,
 		AssetTagSelectorComponent,
 		UIAutoCenterDirective,
+		InputPasteDirective,
 		AkaComponent,
 		ConnectorComponent,
 		FieldReferencePopupComponent
@@ -115,6 +117,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UserDateTime,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
+		InputPasteDirective,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,

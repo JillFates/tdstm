@@ -24,15 +24,7 @@ import {UserModule} from '../modules/user/user.module';
 		TDSAppRouteModule,
 		TaskManagerModule,
 		UserModule,
-		SharedModule.forRoot(),
-		/* UIRouterModule.forRoot(<UIRouterModule>{
-			states: TdsAppRoute,
-			otherwise: '/pages/notfound',
-			config: (route) => {
-				AuthConfig(route);
-				MiscConfig(route);
-			},
-		}), */
+		SharedModule.forRoot()
 	],
 	declarations: [
 		TDSAppComponent,

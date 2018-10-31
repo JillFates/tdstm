@@ -145,7 +145,7 @@ class GormUtil {
 					break
 
 				default:
-					log.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
+					logger.error "Called getDomainPropertiesWithConstraint() with unsupported constraint $constraintName"
 			}
 
 			if ( (value == null && constraint != null) || (value != null && constraint == value) )
@@ -986,7 +986,7 @@ class GormUtil {
 					params << (attribs.transform ? attribs.transform.call(domainObject) : domainObject)
 				}
 				String hqlStr = hql.toString()
-				log.debug "deleteOrNullUserLoginReferences() Delete statement: $hqlStr, params: $params"
+				logger.debug "deleteOrNullUserLoginReferences() Delete statement: $hqlStr, params: $params"
 				deletedCount += attribs.domain.executeUpdate(hqlStr, params)
 			} else {
 				// Null out the reference(s)
@@ -994,7 +994,7 @@ class GormUtil {
 				attribs.properties.each { propName ->
 					String hql = "UPDATE $domainName SET $propName=NULL WHERE $propName=:ref"
 					Map params = [ref:(attribs.transform ? attribs.transform.call(domainObject) : domainObject)]
-					log.debug "deleteOrNullUserLoginReferences() Delete statement: $hql, params: $params"
+					logger.debug "deleteOrNullUserLoginReferences() Delete statement: $hql, params: $params"
 					nulledCount += attribs.domain.executeUpdate(hql, params)
 				}
 			}
@@ -1060,13 +1060,13 @@ class GormUtil {
 					attribs.properties.each { propName ->
 						boolean canMerge = canMergeDomainProperty(attribs.domain, propName)
 						if (!canMerge) {
-							log.debug "***** mergeDomainReferences() skipping the merge for $domainName reference ${attribs.domain}.$propName"
+							logger.debug "***** mergeDomainReferences() skipping the merge for $domainName reference ${attribs.domain}.$propName"
 						} else {
 							// String hql = "update $updateTableName x set x.${propName}.id=:to WHERE x.${propName}.id=:from"
 							String hql = "update $updateTableName x set x.${propName}=:to WHERE x.${propName}=:from"
-							// log.debug "mergeDomainReferences() hql=$hql, params=$params"
+							// logger.debug "mergeDomainReferences() hql=$hql, params=$params"
 							int changes = attribs.domain.executeUpdate(hql, params)
-							//log.debug "mergeDomainReferences() reassigned $changes $updateTableName references"
+							//logger.debug "mergeDomainReferences() reassigned $changes $updateTableName references"
 						}
 					}
 					session.flush()
@@ -1082,7 +1082,7 @@ class GormUtil {
 				List rows = GormUtil.findAllByProperties(attribs.domain, findMap, GormUtil.Operator.OR)
 				int rowCount = rows.size()
 				if (rowCount) {
-					log.info "mergeDomainReferences() merging ${rowCount} $domainName row(s)"
+					logger.info "mergeDomainReferences() merging ${rowCount} $domainName row(s)"
 					rows.each { row ->
 						// println "mergeDomainReferences() calling cloneDomainIfNotExist for $row"
 						GormUtil.cloneDomainIfNotExist(row, refValuesToReplace, true)

@@ -63,7 +63,7 @@
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <kendo-dropdownlist
                                             name="field" class="form-control field"
-                                            [data]="editRows.options[rowIndex].fields"
+                                            [data]="editRows.fields[rowIndex].fields"
                                             [value]="editRows.selectedValues[rowIndex].field"
                                             (valueChange)="onFieldValueChange($event, rowIndex)"
                                             [valueField]="'id'"
@@ -77,7 +77,7 @@
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
                                     <kendo-dropdownlist
                                             name="action" class="form-control action"
-                                            [data]="editRows.options[rowIndex].actions"
+                                            [data]="editRows.fields[rowIndex].actions"
                                             [value]="editRows.selectedValues[rowIndex].action"
                                             (valueChange)="onActionValueChange($event, rowIndex)"
                                             [valueField]="'id'"
@@ -89,7 +89,6 @@
                             <!-- Value -->
                             <kendo-grid-column title="Value" [width]="100">
                                 <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-
                                     <!-- Text Fields -->
                                     <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
                                            type="text" name="actionValue" class="form-control"
@@ -101,11 +100,10 @@
                                            *ngIf="canShowControl('Number', rowIndex)"/>
 
                                     <!-- Datetime Fields -->
-                                    <kendo-datepicker [(ngModel)]="editRows.selectedValues[rowIndex].value"
-                                                      [ngModelOptions]="{standalone: true}"
-                                                      *ngIf="canShowControl('Date', rowIndex)"></kendo-datepicker>
+                                    <kendo-datepicker [(value)]="editRows.selectedValues[rowIndex].value"
+                                                      *ngIf="canShowControl('DateTime', rowIndex)"></kendo-datepicker>
 
-                                    <!-- Dropdown List Fields -->
+                                    <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist
                                             *ngIf="canShowControl('YesNo', rowIndex)"
                                             name="yeNoList"
@@ -113,6 +111,26 @@
                                             [valueField]="'id'"
                                             [textField]="'text'"
                                             [data]="yesNoList">
+                                    </kendo-dropdownlist>
+
+                                    <!-- Option List Fields -->
+                                    <kendo-dropdownlist
+                                            *ngIf="canShowControl('Options', rowIndex)"
+                                            name="optionList"
+                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [valueField]="'id'"
+                                            [textField]="'text'"
+                                            [data]="editRows.listOptions[rowIndex]">
+                                    </kendo-dropdownlist>
+
+                                    <!-- Custom Fields - List -->
+                                    <kendo-dropdownlist
+                                            *ngIf="canShowControl('List', rowIndex)"
+                                            name="optionList"
+                                            [(ngModel)]="editRows.selectedValues[rowIndex].value"
+                                            [valueField]="'id'"
+                                            [textField]="'text'"
+                                            [data]="editRows.listOptions[rowIndex]">
                                     </kendo-dropdownlist>
 
                                     <!-- Asset Tag Fields -->

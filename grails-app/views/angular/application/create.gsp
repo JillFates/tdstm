@@ -13,7 +13,10 @@
 		<h4 class="modal-title">Application Create</h4>
 	</div>
 	<div class="modal-body">
-			<form name="applicationCreateForm">
+			<form name="form" (ngSubmit)="form.form.valid && onCreate()"
+				class="asset-entry-form"
+				[ngClass]="{'form-submitted': form && form.submitted}"
+				role="form" #form="ngForm" novalidate>
 				<table>
 					<tr>
 						<td class="dialog-container">
@@ -24,7 +27,6 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}" />
 											<td colspan="3">
 												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${assetInstance.assetName}"  ngmodel="model.asset.assetName"  />
-												<div *ngIf="haveMissingFields"><label class="required-field">Field is required</label></div>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
 											<td colspan="3">
@@ -285,7 +287,7 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onCreate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)"  [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
 		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>

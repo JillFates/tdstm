@@ -196,9 +196,19 @@ export class TaskService {
 	getTasksForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
 		return this.searchTasks(searchParams)
 			.map(res => {
+				const result = res.result.filter((item) => item.id);
+
 				return {
-					result: res.result.map((item) =>
-						({id: item.id, text: item.desc, metaFields: {category: item.category, status: item.status, taskNumber: item.taskNumber}})),
+					result: result.map((item) =>
+						({
+							id: item.id,
+							text: item.desc,
+							metaFields: {
+								category: item.category,
+								status: item.status,
+								taskNumber: item.taskNumber
+							}
+						})),
 					total: res.total,
 					page: res.page
 				}
@@ -347,6 +357,20 @@ export class TaskService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result.data || [];
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the asset class that correspond to the provided asset
+	 * @param assetId  Id of the provided asset
+	 * @returns {Observable<any>}
+	 */
+	getClassForAsset(assetId: string): Observable<any> {
+		return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result.data || null;
 			})
 			.catch((error: any) => error.json());
 	}

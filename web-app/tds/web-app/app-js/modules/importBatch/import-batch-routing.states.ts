@@ -18,6 +18,9 @@ export class ImportBatchStates {
 	public static readonly IMPORT_BATCH_LIST = {
 		url: 'list'
 	};
+	public static readonly IMPORT_BATCH_VIEW = {
+		url: 'list/:id'
+	};
 	public static readonly IMPORT_ASSETS = {
 		url: 'assets'
 	};
@@ -53,6 +56,21 @@ export const ImportBatchRoute: Routes = [
 			hasPendingChanges: false
 		},
 		component: ImportAssetsComponent,
+		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
+	},
+	{
+		path: ImportBatchStates.IMPORT_BATCH_VIEW.url,
+		data: {
+			page: {
+				title: 'IMPORT_BATCH.MANAGE_LIST',
+				instruction: '',
+				menu: ['ASSETS.ASSETS', 'IMPORT_BATCH.MANAGE_LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-manage-dep-batches'}
+			},
+			requiresAuth: true,
+			requiresPermission: Permission.DataTransferBatchView
+		},
+		component: ImportBatchListComponent,
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
 ];
