@@ -26,7 +26,7 @@
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}" />
 											<td colspan="3">
-												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${assetInstance.assetName}"  ngmodel="model.asset.assetName"  />
+												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${assetInstance.assetName}"  ngmodel="model.asset.assetName"  />
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
 											<td colspan="3">
@@ -34,15 +34,15 @@
 											</td>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${assetInstance.appVendor}" ngmodel="model.asset.appVendor" tabindex="13"/>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}" ngmodel="model.asset.supportType" tabindex="22"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${assetInstance.appVendor}" ngmodel="model.asset.appVendor" tabindex="12"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}" ngmodel="model.asset.supportType" tabindex="19"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${assetInstance.appFunction}" ngmodel="model.asset.appFunction" tabindex="32"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userCount}" value="${assetInstance.userCount}"  ngmodel="model.asset.userCount" tabindex="42" tooltipDataPlacement="bottom"/>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${assetInstance.appVersion}" ngmodel="model.asset.appVersion" tabindex="14"/>
-											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${assetInstance.sme}"/>
-											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${assetInstance.appVersion}" ngmodel="model.asset.appVersion" tabindex="13"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${assetInstance.sme}" />
+											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}" tabindex="20">
 												<kendo-dropdownlist #controlSme
 														class="tm-input-control person-list"
 														name="modelAssetSme"
@@ -68,9 +68,9 @@
 										</tr>
 
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${assetInstance.appTech}" ngmodel="model.asset.appTech" tabindex="15"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${assetInstance.appTech}" ngmodel="model.asset.appTech" tabindex="14"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${assetInstance.sme2}"/>
-											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
+											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd"  tabindex="21">
 												<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 												<kendo-dropdownlist  #controlSme2
 													class="tm-input-control person-list"
@@ -96,10 +96,12 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${assetInstance.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="44" tooltipDataPlacement="bottom"/>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${assetInstance.appSource}" ngmodel="model.asset.appSource" tabindex="16"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${assetInstance.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${assetInstance.appOwner}"/>
 											<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
-												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
+												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')"
+													 tabindex="22"
+													 title="Swap Contacts"></div>
 												<kendo-dropdownlist
 														class="tm-input-control"
 														name="modelAssetappOwner"
@@ -126,7 +128,7 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${assetInstance.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="45" tooltipDataPlacement="bottom"/>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${assetInstance.license}" ngmodel="model.asset.license" tabindex="17"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${assetInstance.license}" ngmodel="model.asset.license" tabindex="16"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${assetInstance.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="26"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
 											<td data-for="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}">
@@ -211,7 +213,7 @@
 
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="18"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="17"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="28"/>
 											<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap">
 												<label for="shutdownBy">
@@ -239,8 +241,10 @@
 											</td>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${assetInstance.startupBy}"/>
-											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
+											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${assetInstance.startupBy}"  />
+											<td colspan="1" nowrap="nowrap" data-for="startupBy"
+												tabindex="18"
+												class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
 														(modelChange)="model.asset.startupBy.id = $event"
