@@ -26,6 +26,10 @@ class DataScriptTestHelper {
         if (etlData) {
             existingDs = DataScript.findWhere([name: etlData.name, project: project])
             if (existingDs) {
+                existingDs.etlSourceCode = ''
+                existingDs.dateCreated = new Date()
+                existingDs.lastUpdated = existingDs.dateCreated
+                existingDs.save(flush: true, failOnError: true)
                 return existingDs
             }
         }

@@ -4,6 +4,7 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.apache.commons.lang3.RandomStringUtils
 
@@ -29,4 +30,16 @@ class AssetCommentTestHelper {
 		return assetComment
 	}
 
+	AssetComment createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
+		AssetComment assetComment = new AssetComment(
+				project: project,
+				moveEvent: moveEvent,
+				createdBy: person,
+				comment: taskName,
+				status: AssetCommentStatus.READY,
+				commentType: AssetCommentType.TASK,
+				sendNotification: true
+		).save(flush: true)
+		return assetComment
+	}
 }

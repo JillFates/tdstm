@@ -104,13 +104,14 @@ class PersonTestHelper {
 	 * @param lastName
 	 * @return the person that was created and assigned to the company
 	 */
-	Person createPerson(String firstName=null, String middleName=null, String lastName=null, String email=null) {
+	Person createPerson(String firstName=null, String middleName=null, String lastName=null, String email=null, String username = null) {
 		if (firstName == null) firstName = RSU.randomAlphabetic(10)
 		if (middleName == null) middleName = RSU.randomAlphabetic(10)
 		if (lastName == null) lastName = RSU.randomAlphabetic(10)
+		if (username == null) username = RSU.randomAlphabetic(10)
 		if (email == null) email = "$firstName.$lastName@" + RSU.randomAlphabetic(10) + '.com'
 
-		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email] )
+		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email, username: username] )
 		person.save(flush: true, failOnError:true)
 
 		return person
@@ -128,8 +129,8 @@ class PersonTestHelper {
 	 * @return the person that was created and assigned to the company
 	 *
 	 */
-	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
-		Person staff = createPerson(firstName, middleName, lastName, email)
+	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null, String username = null) {
+		Person staff = createPerson(firstName, middleName, lastName, email, username)
 		staff.partyRelationshipService = partyRelationshipService
 		partyRelationshipService.addCompanyStaff(company, staff)
 		return staff

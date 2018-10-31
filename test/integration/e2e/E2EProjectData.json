@@ -7,12 +7,19 @@
     "projectClient": "E2E Project",
     "projectCompany": "E2E Project"
   },
-  "projectToBeDeletedData": { // Used by ProjectListCleanUpSpec
-    "projectName": "QAE2E Project to be deleted",
-    "projectCode": "projToDelete",
+  "projectToBeDeleted": { // Used by ProjectListCleanUpSpec
+    "projectName": "ProjectToBeDeleted",
+    "projectCode": "ToDelete",
     "projectDesc": "E2E Project for automation purposes",
     "projectClient": "E2E Project", // Make client main E2E project
     "projectCompany": "E2E Project" // Make company main E2E project
+  },
+  // Companies
+  "companyToBeEdited": {
+    "name": "CompanytoBeEdited"
+  },
+  "companyToBeDeleted": {
+    "name": "CompanytoBeDeleted"
   },
   // Person and User
   "userData1": { // Main E2E user test execution
@@ -55,6 +62,24 @@
     ],
     "email": "login_e2e_test_user@e2e.com"
   },
+  "staffFiltering": { // StaffSearchndFilteringSpec
+    "firstName": "StaffFirst",
+    "middleName": "Middle",
+    "lastName": "StaffLast",
+    "userName": "StaffTest",
+    "email": "staff@transitionaldata.com"
+  },
+  "userFiltering": { // UserSearchndFilteringSpec
+    "firstName": "userFirst",
+    "middleName": "userMiddle",
+    "lastName": "userLast",
+    "userName": "userTest",
+    "email": "user@transitionaldata.com",
+    "password": "e2e_password",
+    "roles": [
+      "ADMIN"
+    ]
+  },
   // Events
   "eventName1": "Buildout", // Used in several specs to create and edit
   "eventName2": "M1-Physical", // Used in several specs to create and edit
@@ -66,92 +91,43 @@
     "name": "E2E Project Provider"
   },
   "providerToBeDeleted1": { // Used by ProviderDeletionSpec
-    "name": "E2E Provider1 to be deleted"
+    "name": "ProviderToBeDeleted1"
   },
   "providerToBeDeleted2": { // Used by ProviderDeletionSpec
-    "name": "E2E Provider2 to be deleted"
+    "name": "ProviderToBeDeleted2"
   },
   "providerToBeEdited": { // Used by ProviderEditionSpec
-    "name": "E2E Provider to be edited"
+    "name": "ProviderToBeEdited"
   },
   // ETL Scripts, only name is required
   "etlToBeTransformedWithPastedData": { // Used by ETLScriptsDesignerTransformWithPastedDataSpec
-    "name": "E2E ETL Script to transform with pasted data"
+    "name": "Script To Transform With Pasted Data"
   },
   "etlToBeEdited": { // Used by ETLScriptsEditionSpec
-    "name": "E2E ETL Script to be edited"
+    "name": "etlToBeEdited"
   },
   "etlToBeSearched": { // Used by ETLScriptsListSpec
-    "name": "E2E ETL Script to be searched"
+    "name": "etlToBeSearched"
   },
   // Assets
-  "application1": {
-    "name": "QAE2E App 1",
-    "planStatus": "Confirmed"
+  "applications": { // will create bulk applications to use by All Assets specs
+    "name": "App",
+    "planStatus": "Confirmed",
+    "environment": "Production"
+  },
+  "applicationToBeEdited": {
+    "name": "AppToBeEdited",
+    "planStatus": "Confirmed",
+    "environment": "Production"
+  },
+  "applicationToBeDeleted": {
+    "name": "AppToBeDeleted",
+    "planStatus": "Confirmed",
+    "environment": "Production"
   },
   // Views
-  "customView1":{
-    "name": "QAE2E Custom View 1",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView2":{
-    "name": "QAE2E Custom View 2",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView3":{
-    "name": "QAE2E Custom View 3",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView4":{
-    "name": "QAE2E Custom View 4",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView5":{
-    "name": "QAE2E Custom View 5",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView6":{
-    "name": "QAE2E Custom View 6",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView7":{
-    "name": "QAE2E Custom View 7",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView8":{
-    "name": "QAE2E Custom View 8",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView9":{
-    "name": "QAE2E Custom View 9",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView10":{
-    "name": "QAE2E Custom View 10",
-    "isShared": false,
-    "isSystem": false,
-    "schema": null
-  },
-  "customView11":{
-    "name": "QAE2E Custom View 11",
+  "customViews":{ // will create bulk views to use by ViewManager specs
+    "name": "View",
     "isShared": false,
     "isSystem": false,
     "schema": null
@@ -175,17 +151,62 @@
   },
   // Tags
   "tagToBeEdited": {
-    "name": "QAE2E Tag to be edited",
+    "name": "TagToBeEdited",
     "description": "",
     "color": "White"
   },
   "tagToBeDeleted": {
-    "name": "QAE2E Tag to be deleted",
+    "name": "TagToBeDeleted",
+    "description": "",
+    "color": "White"
+  },
+  "tagsForAssets": {
+    "name": "CustomTag",
     "description": "",
     "color": "White"
   },
   // Recipes
-  "recipe1": "Recipe 4",
+  "recipePrincipal": "Principal Recipe",
+  "recipeToBeEdited": "RecipeToBeEdited",
+  "recipeToBeDeleted": "RecipeToBeDeleted",
+  "recipeTaskGeneration": "RecipeTaskGeneration",
+  "recipeHistory1": "RecipeHistory",
+  "recipeHistory2": "RecipeHistoryWithSourceCode",
   // Recipe SourceCode
   "commonRecipeSourceCode": "groups: [[name: 'QAE2E', filter: [class: 'application', asset: [planStatus: 'Confirmed']]]], tasks: [[id: 1100, filter: [group: 'QAE2E']]]",
+  // Tasks: for now Name is only required from E2E
+  "taskPrincipal": "Principal Task",
+  "taskToBeEdited": "TaskToBeEdited",
+  "taskToBeDeleted": "TaskToBeDeleted",
+  // Custom fields
+  "customFieldToBeDeleted1": {
+    "constraints": {
+      "required": 0
+    },
+    "control": "String",
+    "default":"ToBeDeleted",
+    "field": "",
+    "imp": "N",
+    "label": "ToBeDeleted",
+    "order": 180,
+    "shared": 0,
+    "show": 0,
+    "tip":"ToBeDeleted",
+    "udf": 1
+  },
+  "customFieldToBeDeleted2": {
+    "constraints": {
+      "required": 0
+    },
+    "control": "String",
+    "default":"ToBeDeleted",
+    "field": "",
+    "imp": "N",
+    "label": "ToBeDeleted",
+    "order": 180,
+    "shared": 0,
+    "show": 0,
+    "tip":"ToBeDeleted",
+    "udf": 1
+  }
 }

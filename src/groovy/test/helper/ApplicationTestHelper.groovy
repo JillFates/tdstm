@@ -39,7 +39,8 @@ class ApplicationTestHelper {
 						project: project,
 						moveBundle: moveBundle,
 						assetName: assetData.name,
-						planStatus: assetData.planStatus ? assetData.planStatus : 'Unassigned'
+						planStatus: assetData.planStatus ? assetData.planStatus : 'Unassigned',
+						environment: assetData.environment ? assetData.environment : 'Production'
 				)
 				application.save(flush: true)
 			}
