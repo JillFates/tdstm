@@ -2,10 +2,13 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import org.apache.commons.lang.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
+import test.helper.ApiCatalogTestHelper
 
 
 class AssetCommentSpec extends Specification {
@@ -15,22 +18,37 @@ class AssetCommentSpec extends Specification {
     @Shared
     ProjectTestHelper projectHelper
     @Shared
+    ProviderTestHelper providerHelper
+    @Shared
+    ApiCatalogTestHelper apiCatalogHelper
+    @Shared
     Project project1
+    @Shared
+    Provider provider
     @Shared
     ApiAction action1
     @Shared
     ApiAction action2
     @Shared
     Date date = new Date()
+    @Shared
+    ApiCatalog apiCatalog
 
     void setupSpec() {
         apiActionHelper = new ApiActionTestHelper()
         projectHelper = new ProjectTestHelper()
+        providerHelper = new ProviderTestHelper()
+        apiCatalogHelper = new ApiCatalogTestHelper()
 
         //Create a project and a couple of actions
         project1 = projectHelper.createProject()
-        action1 = apiActionHelper.createApiAction(project1)
-        action2 = apiActionHelper.createApiAction(project1)
+        provider = providerHelper.createProvider(project1)
+
+        provider = providerHelper.createProvider(project1)
+        apiCatalog = apiCatalogHelper.createApiCatalog(project1, provider)
+
+        action1 = apiActionHelper.createApiAction(project1, provider, apiCatalog)
+        action2 = apiActionHelper.createApiAction(project1, provider, apiCatalog)
     }
 
     def "01. Test AssetComment consistency when changing actions"() {

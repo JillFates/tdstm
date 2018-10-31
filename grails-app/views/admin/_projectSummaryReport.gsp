@@ -4,7 +4,7 @@
 		<thead>
 			<tr>
 				<th>Client</th>
-				<th>Partner</th>
+				<th>Partners</th>
 				<th>Project</th>
 				<th>Start</th>
 				<th>Finish</th>
@@ -29,7 +29,7 @@
 			<g:each in="${results}" var="project" status="i">
 				<tr class="${i%2==0 ? 'even' : 'odd' }">
 					<td>${project.clientName?:''}</td>
-					<td>${project.partnerName?:''}</td>
+					<td>${project.partnerNames?:''}</td>
 					<td>${project.projName?:''}</td>
 					<td><tds:convertDate  date="${project.startDate}" /></td>
 					<td><tds:convertDate  date="${project.completionDate}" /></td>

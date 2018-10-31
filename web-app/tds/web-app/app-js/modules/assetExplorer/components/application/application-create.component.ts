@@ -4,9 +4,8 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject} from '@angular/core';
+import { Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
@@ -31,12 +30,12 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class ApplicationCreateComponent extends AssetCommonEdit {
+	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit {
 		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
+		moveBundleList = [];
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
-		haveMissingFields = false;
 		persons = {
 			sme: null,
 			sme2: null,
@@ -55,29 +54,34 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			private prompt: UIPromptService,
 			) {
 				super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
-				this.initModel();
+		}
+
+		ngOnInit() {
+			this.initModel();
 		}
 
 		/**
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = {};
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
+			this.moveBundleList = this.model.dependencyMap.moveBundleList;
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
 			this.model.asset.assetClass = {
 				name: ASSET_ENTITY_DIALOG_TYPES.APPLICATION
 			};
 
-			this.model.asset.sme = this.model.asset.sme || { id: null };
-			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
-			this.model.asset.appOwner = this.model.asset.appOwner || { id: null };
+			this.model.asset.sme = {id: null };
+			this.model.asset.sme2 =  {id: null };
+			this.model.asset.appOwner = {id: null };
+			this.model.asset.shutdownBy = {id: null };
+			this.model.asset.startupBy = {id: null };
+			this.model.asset.testingBy = {id: null };
 
-			this.model.asset.scale = { name: '' };
-			this.model.asset.startUpBySelectedValue = { id: null, text: pleaseSelectMessage};
+			this.model.asset.scale = { name: { value: '', text: ''} };
 
 			this.persons.sme = { personId: null};
 			this.persons.sme2 = { personId: null };
@@ -107,12 +111,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
-			const assetName = this.model.asset.assetName && this.model.asset.assetName.trim() || '';
-			if (!assetName) {
-				this.haveMissingFields = true;
-				return;
-			}
-
 			const modelRequest   = R.clone(this.model);
 
 			if (modelRequest && modelRequest.asset.moveBundle) {
@@ -120,15 +118,17 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			}
 
 			// Scale Format
-			if (modelRequest.asset && modelRequest.asset.scale) {
-				modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
-			}
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.name && modelRequest.asset.scale.name.value || '');
+			modelRequest.asset.shutdownBy = modelRequest.asset.shutdownBy && modelRequest.asset.shutdownBy.id || '';
+			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
+			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
 
 			// Custom Fields
 			Object.keys(modelRequest.asset)
 				.filter((key: string) => key.startsWith('custom'))
 				.forEach((key: string) => {
-					modelRequest.asset[key] = modelRequest.asset[key].value ? modelRequest.asset[key].value : modelRequest.asset[key];
+					modelRequest.asset[key] = modelRequest.asset[key] && modelRequest.asset[key].value
+						? modelRequest.asset[key].value : modelRequest.asset[key];
 				});
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {

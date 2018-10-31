@@ -13,7 +13,10 @@
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
 	<div class="modal-body">
-			<form name="applicationEditForm">
+		<form name="form" (ngSubmit)="form.form.valid && onUpdate()"
+			  class="asset-entry-form"
+			  [ngClass]="{'form-submitted': form && form.submitted}"
+			  role="form" #form="ngForm" novalidate>
 				<table>
 					<tr>
 						<td class="dialog-container">
@@ -136,7 +139,6 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="46" tooltipDataPlacement="bottom"/>
 										</tr>
 										<tr>
-										<tr>
 											<td></td>
 											<td></td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
@@ -219,13 +221,14 @@
 											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
-														(modelChange)="model.asset.shutdownBy = $event"
+														(modelChange)="model.asset.shutdownBy.id = $event"
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${asset.shutdownFixed}"
 														[namedStaff]="${personList as JSON}"
 														[team]="${availableRoles as JSON}">
 												</tds-combobox-group>
 											</td>
+
 											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 											<td class="tm-input-control duration-container">
 												<input type="text" id="shutdownDuration" name="shutdownDuration"
@@ -234,12 +237,14 @@
 												<label>m</label>
 											</td>
 										</tr>
+
+
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
-														(modelChange)="model.asset.startupBy = $event"
+														(modelChange)="model.asset.startupBy.id = $event"
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${asset.startupFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -247,16 +252,18 @@
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
+
 											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
-														(modelChange)="model.asset.testingBy = $event"
+														(modelChange)="model.asset.testingBy.id = $event"
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${asset.testingFixed}"
 														[namedStaff]="${personList as JSON}"
 														[team]="${availableRoles as JSON}">
                                                 </tds-combobox-group>
 											</td>
+
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
 											<td class="tm-input-control duration-container">
 												<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
@@ -267,6 +274,7 @@
 
 										<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
                                         <g:render template="/angular/common/assetTagsEdit"></g:render>
+
                                     </tbody>
 								</table>
 							</div>
@@ -283,7 +291,7 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<button class="btn btn-danger component-action-delete" (click)="onDeleteAsset()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>

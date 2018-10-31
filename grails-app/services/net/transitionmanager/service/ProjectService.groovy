@@ -80,6 +80,9 @@ class ProjectService implements ServiceMethods {
 	ApiCatalogService apiCatalogService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	ApiActionService apiActionService
+	ProviderService providerService
+	CredentialService credentialService
+	DataScriptService dataScriptService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -317,16 +320,20 @@ class ProjectService implements ServiceMethods {
 					DATE(p.start_date) AS startDate,
 					DATE(p.completion_date) AS completionDate,
 					pg.name AS clientName,
-					pg2.name AS partnerName,
-					p.description AS description
+					p.description AS description,
+					(SELECT GROUP_CONCAT(pg2.name)
+						FROM party_relationship pr 
+						LEFT JOIN party_group pg2 ON pg2.party_group_id = pr.party_id_to_id
+                        WHERE (pr.party_relationship_type_id = 'PROJ_PARTNER' 
+							AND pr.party_id_from_id = p.project_id 
+							AND pr.role_type_code_from_id = 'PROJECT' 
+                            AND pr.role_type_code_to_id = 'PARTNER')
+					) AS partnerNames
 					FROM asset_entity ae
 					LEFT JOIN move_bundle mb ON (mb.move_bundle_id = ae.move_bundle_id)
 						AND ((ae.move_bundle_id = NULL) OR (mb.use_for_planning = true))
 					LEFT JOIN project p ON (p.project_id = ae.project_id)
-					LEFT JOIN party_group pg ON (pg.party_group_id = p.client_id)
-					LEFT JOIN party_relationship pr ON (pr.party_relationship_type_id = 'PROJ_PARTNER' AND pr.party_id_from_id = p.project_id
-						AND pr.role_type_code_from_id = 'PROJECT' AND pr.role_type_code_to_id = 'PARTNER')
-					LEFT JOIN party_group pg2 ON (pg2.party_group_id = pr.party_id_to_id) """)
+					LEFT JOIN party_group pg ON (pg.party_group_id = p.client_id) """)
 
 			// handle active/inactive project specification
 			if (params.inactive && !params.active)
@@ -337,6 +344,7 @@ class ProjectService implements ServiceMethods {
 			query.append(""" GROUP BY ae.project_id
 					) inside
 				ORDER BY inside.projName """)
+			
 			projects = jdbcTemplate.queryForList(query.toString())
 
 			// add the staff count to each project
@@ -537,7 +545,16 @@ class ProjectService implements ServiceMethods {
 		// Clone the Default Project Tags (if it has any) and add them to the new project
 		tagService.cloneProjectTags(defProject, project)
 
-		// Clone the Default Project Api Catalogs and Providers (if it has any) and add them to the new project
+		// Clone the Default Project Providers (if it has any) and add them to the new project
+		providerService.cloneProjectProviders(defProject, project)
+
+		// Clone the Default Project Credentials (if it has any) and add them to the new project
+		credentialService.cloneProjectCredentials(defProject, project)
+
+		// Clone the Default Project Data Scripts (if it has any) and add them to the new project
+		dataScriptService.cloneProjectDataScripts(defProject, project)
+
+		// Clone the Default Project Api Catalogs (if it has any) and add them to the new project
 		apiCatalogService.cloneProjectApiCatalogs(defProject, project)
 
 		// Clone the Default Project Api Actions (if it has any) and add them to the new project

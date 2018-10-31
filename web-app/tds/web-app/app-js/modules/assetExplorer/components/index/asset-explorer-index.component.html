@@ -70,7 +70,7 @@
 											</a>
 										</td>
 										<td>
-											<a uiSref="tds.assetexplorer_show" [uiParams]="{id:report.id}">{{report.name}}</a>
+											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>
 										</td>
 										<td>
 											{{report.createdBy}}

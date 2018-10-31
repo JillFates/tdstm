@@ -26,7 +26,6 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			{ provide: 'model', useValue: model }
 		]
 	}) class DatabaseCreateComponent extends AssetCommonEdit {
-
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -41,9 +40,6 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
-			this.model.asset.scale = {
-				name: ''
-			};
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
@@ -56,7 +52,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			let modelRequest = R.clone(this.model);
 
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ? modelRequest.asset.scale.value : modelRequest.asset.scale;
 
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;

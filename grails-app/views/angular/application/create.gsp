@@ -13,7 +13,10 @@
 		<h4 class="modal-title">Application Create</h4>
 	</div>
 	<div class="modal-body">
-			<form name="applicationCreateForm">
+			<form name="form" (ngSubmit)="form.form.valid && onCreate()"
+				class="asset-entry-form"
+				[ngClass]="{'form-submitted': form && form.submitted}"
+				role="form" #form="ngForm" novalidate>
 				<table>
 					<tr>
 						<td class="dialog-container">
@@ -24,7 +27,6 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}" />
 											<td colspan="3">
 												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${assetInstance.assetName}"  ngmodel="model.asset.assetName"  />
-												<div *ngIf="haveMissingFields"><label class="required-field">Field is required</label></div>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
 											<td colspan="3">
@@ -109,12 +111,13 @@
 														[data]="getPersonList(${personList as JSON})">
 												</kendo-dropdownlist>
 											</td>
+
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.id}"/>
 											<td data-for="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}">
 												<kendo-dropdownlist
 													class="tm-input-control"
 													name="modelAssetMoveBundle"
-													[data]="model.moveBundleList"
+													[data]="moveBundleList"
 													[(ngModel)]="model.asset.moveBundle"
 													[textField]="'name'"
 													[valueField]="'id'">
@@ -220,7 +223,7 @@
 											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
-														(modelChange)="model.asset.shutdownBy = $event"
+														(modelChange)="model.asset.shutdownBy.id = $event"
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${assetInstance.shutdownFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -240,7 +243,7 @@
 											<td colspan="1" nowrap="nowrap" data-for="startupBy" class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
-														(modelChange)="model.asset.startupBy = $event"
+														(modelChange)="model.asset.startupBy.id = $event"
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${assetInstance.startupFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -251,7 +254,7 @@
 											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
-														(modelChange)="model.asset.testingBy = $event"
+														(modelChange)="model.asset.testingBy.id = $event"
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${assetInstance.testingFixed}"
 														[namedStaff]="${personList as JSON}"
@@ -284,7 +287,7 @@
 			</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onCreate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)"  [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
 		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>

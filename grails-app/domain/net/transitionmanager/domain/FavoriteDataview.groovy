@@ -7,10 +7,6 @@ class FavoriteDataview implements Serializable {
 
     Dataview dataview
 
-    static constraints = {
-        dataview blank: false
-    }
-
     static belongsTo = [person: Person]
 
     static mapping = {

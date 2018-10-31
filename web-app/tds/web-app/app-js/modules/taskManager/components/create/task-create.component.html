@@ -4,13 +4,13 @@
         <div class="modal-content resizable tds-angular-component-content task-create-component"
              tds-ui-modal-decorator=""
              [options]="modalOptions"
-             [style.width.px]="860"
-             [style.height.px]="706">
+             [style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
+             [style.height.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_WIDTH">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">{{model.title}}</h4>
+                <h4 class="modal-title">Task Create</h4>
             </div>
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height create-form">
@@ -25,7 +25,7 @@
                                     <table>
                                         <tbody>
                                         <tr class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span class="required-field">Task # {{model.taskNumber}}</span></label>
                                             </td>
                                             <td class="valueNW description-container" colspan="5">
@@ -37,7 +37,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Person</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -47,10 +47,11 @@
                                                         [data]="model.personList"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
+                                                        [popupSettings]="{width: 300}"
                                                         [(ngModel)]="model.assignedTo">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Team</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -63,7 +64,7 @@
                                                         [(ngModel)]="model.assignedTeam">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Event</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -71,6 +72,7 @@
                                                         name="event"
                                                         class="form-control"
                                                         [data]="model.eventList"
+                                                        (selectionChange)="onSelectedEvent($event)"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
                                                         [(ngModel)]="model.event">
@@ -79,7 +81,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Fixed Assignment</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -89,7 +91,7 @@
                                                         [data]="yesNoList">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Send Notification</span></label>
                                             </td>
                                             <td  class="valueNW">
@@ -99,7 +101,7 @@
                                                         [data]="yesNoList">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Action</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -114,7 +116,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span class="required-field">Category</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -128,7 +130,7 @@
                                                     <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                 </div>
                                             </td>
-                                            <td class="label url U edge-cell" nowrap="nowrap">
+                                            <td class="label url N edge-cell" nowrap="nowrap">
                                                 <label><span>Asset Class</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -142,7 +144,7 @@
                                                         [(ngModel)]="model.assetClass">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Asset</span></label>
                                             </td>
                                             <td class="valueNW asset-entity">
@@ -157,7 +159,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Instruction Link</span></label>
                                             </td>
                                             <td class="valueNW instructions-link">
@@ -171,7 +173,7 @@
                                                 </div>
 
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Priority</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -182,7 +184,7 @@
                                                         [(ngModel)]="model.priority">
                                                 </kendo-dropdownlist>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Due Date</span></label>
                                             </td>
 
@@ -196,7 +198,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Duration</span></label>
                                             </td>
                                             <td class="valueNW duration-container">
@@ -232,7 +234,7 @@
                                                     </label>
                                                 </div>
                                             </td>
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Start</span></label>
                                             </td>
                                             <td class="valueNW">
@@ -245,7 +247,7 @@
                                                 </kendo-dateinput>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Estimated Finish</span></label>
                                             </td>
 
@@ -267,7 +269,7 @@
                                         </tr>
 
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Actual Start</span></label>
                                             </td>
 
@@ -275,7 +277,7 @@
                                                 <span class="read-only-dates">{{model.actualStart}}</span>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>Actual Finish</span></label>
                                             </td>
 
@@ -283,7 +285,7 @@
                                                 <span class="read-only-dates">{{model.actualFinish}}</span>
                                             </td>
 
-                                            <td class="label U edge-cell" nowrap="nowrap">
+                                            <td class="label N edge-cell" nowrap="nowrap">
                                                 <label><span>TaskSpec ID</span></label>
                                             </td>
 
@@ -292,7 +294,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                            <td class="label U status-cell" nowrap="nowrap">
+                                            <td class="label N status-cell" nowrap="nowrap">
                                                 <label><span>Status</span></label>
                                             </td>
                                             <td class="valueNW task-status vertical-note-status">
@@ -333,11 +335,8 @@
                                                 *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
                                                 class="successor-predecessor-table create-table has-duplicated-predecessors"
                                                 [data]="dataGridTaskPredecessorsHelper.gridData"
-                                                [sort]="dataGridTaskPredecessorsHelper.state.sort"
-                                                [sortable]="{mode:'single'}"
                                                 [resizable]="false"
-                                                [rowClass]="modelHelper.rowStatusColor"
-                                                (sortChange)="dataGridTaskPredecessorsHelper.sortChange($event)">
+                                                [rowClass]="modelHelper.rowStatusColor">
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
@@ -363,9 +362,12 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [(metaParam)]="model.id"
-                                                            (valueChange)="onModelChange($event)"
+                                                            [(metaParam)]="metaParam"
+                                                            [placeholder]="'Please Select'"
+                                                            [innerTemplateFormat]="innerTemplateTaskItem"
+                                                            [updateOnChanges]="true"
                                                             [serviceRequest]="getTasksForComboBox"
+                                                            (valueChange)="onModelChange($event,'predecessor', rowIndex)"
                                                             (selectionChange)="onDependencyTaskChange($event, 'predecessor', dataGridTaskPredecessorsHelper,  rowIndex)">
                                                     </tds-combobox>
                                                 </ng-template>
@@ -380,11 +382,8 @@
                                                 *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
                                                 class="successor-predecessor-table create-table has-duplicated-successors"
                                                 [data]="dataGridTaskSuccessorsHelper.gridData"
-                                                [sort]="dataGridTaskSuccessorsHelper.state.sort"
-                                                [sortable]="{mode:'single'}"
                                                 [resizable]="false"
-                                                [rowClass]="modelHelper.rowStatusColor"
-                                                (sortChange)="dataGridTaskSuccessorsHelper.sortChange($event)">
+                                                [rowClass]="modelHelper.rowStatusColor">
                                             <!-- Toolbar Template -->
                                             <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                 <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
@@ -405,8 +404,11 @@
                                                     <tds-combobox
                                                             class="status"
                                                             [(model)]="dataItem.model"
-                                                            [(metaParam)]="model.id"
-                                                            (valueChange)="onModelChange($event)"
+                                                            [(metaParam)]="metaParam"
+                                                            [innerTemplateFormat]="innerTemplateTaskItem"
+                                                            [placeholder]="'Please Select'"
+                                                            [updateOnChanges]="true"
+                                                            (valueChange)="onModelChange($event,'successor', rowIndex)"
                                                             [serviceRequest]="getTasksForComboBox"
                                                             (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
                                                     </tds-combobox>
@@ -448,11 +450,11 @@
             <div class="modal-footer form-group-center">
                 <button class="btn btn-primary pull-left"
                         [disabled]="isFormInvalid() || !hasEditTaskPermission" (click)="onCreate()" type="button">
-                    <span  class="fa fa-fw fa-floppy-o"></span>
+                    <i  class="fa fa-fw fa-floppy-o"></i>
                     <span>Update</span>
                 </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
                     <span>Cancel</span>
                 </button>
             </div>

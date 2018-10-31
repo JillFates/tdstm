@@ -133,7 +133,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		onDeleteAsset() {
 
 			this.prompt.open('Confirmation Required',
-				'You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
+				'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
 				'OK', 'Cancel')
 				.then( success => {
 					if (success) {
@@ -171,6 +171,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 
 					this.dialogService
 						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				} else if (!result.clonedAsset && result.showView) {
+					this.showAssetDetailView(DOMAIN.DEVICE, result.assetId);
 				}
 			})
 				.catch( error => console.log('error', error));

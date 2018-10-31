@@ -6,6 +6,7 @@
   border: 0;
   display: inline-flex
   outline-style: none
+  max-height: 27px!important;
   span.k-dropdown-wrap
     background: inherit
     color: inherit
@@ -13,6 +14,8 @@
       border-left: 0
       background: inherit
       color: inherit
+      span.k-i-arrow-s
+        margin-left: -35px
 
 .task-detail-component
   .tds-angular-component-content
@@ -30,6 +33,8 @@
       min-height: 890px
     .modal-body
       height: 86%
+      .k-grid-header.k-grid-dynamic-header
+        position: relative
       form.create-form
         td.description-container
           max-width: 100%
@@ -84,6 +89,13 @@
         kendo-grid.successor-predecessor-table
           .k-grid-content tr td
             font-weight: normal
+            padding-top: 0!important
+            padding-bottom: 0!important
+        kendo-grid.successor-predecessor-table.dependency-tasks
+          .k-grid-content tr
+            td:nth-child(1),
+            td:nth-child(2)
+              padding-left: 12px
         .error-message,
         .error-missing-field
           color: $color-message-error--red
@@ -104,7 +116,8 @@
           margin-left: 4px
         .duplicate-error,
         .dependency-error-section label.has-double-assignment
-          font-weight: normal
+          font-size: 14px
+          font-weight: bold
           color: $color-message-error--red
         label.has-double-assignment
           width: 100%
@@ -119,6 +132,12 @@
           @include combo-status
           span input
             padding-top: 1px
+            padding-left: 5px
+          span.k-i-close
+            display: block
+            color: inherit
+            opacity: 1
+            right: 0
         td.label.edge-cell
           height: 35px
         td.label.status-cell
@@ -222,6 +241,8 @@
             padding-right: 6px
     .modal-footer
       padding: 15px 18px
+      .action-button
+        padding-right: 5px
 
   .successor-predecessor-table
     .k-grid-content

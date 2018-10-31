@@ -5,5 +5,6 @@
 export class CloneCLoseModel {
 	clonedAsset: boolean;
 	showEditView: boolean;
-    assetId?: number;
+	assetId?: number;
+	showView?: boolean;
 }

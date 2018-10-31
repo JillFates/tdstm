@@ -11,6 +11,7 @@ export interface IdTextItem {
 export class BulkChangeModel {
 	public selectedItems: number[];
 	public affected: number;
+	selectedAssets: Array<any>;
 }
 
 export interface BulkActionResult {
@@ -20,7 +21,7 @@ export interface BulkActionResult {
 }
 
 export interface BulkEditAction {
-	domains: IdTextItem[];
+	// domains: IdTextItem[];
 	fields: IdTextItem[];
 	actions: IdTextItem[];
 }

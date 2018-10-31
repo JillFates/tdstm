@@ -30,6 +30,7 @@ export const en_DICTIONARY: Object = {
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
+		'PROJECT': 'Project',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
@@ -60,6 +61,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
 		'SHOW_COMMENTS': 'Show Comments',
+		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
@@ -82,7 +84,7 @@ export const en_DICTIONARY: Object = {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
 				'ADD_FIELD': 'Add Field',
-				'EFFECTED_ASSETS': 'This action will effect {param1} Asset(s)',
+				'EFFECTED_ASSETS': 'This action will affect {param1} Asset(s)',
 				'CONFIRM_UPDATE': 'You are about to update {param1} Asset(s). There is no undo for this action. Click confirm to update the assets, otherwise click Cancel'
 			},
 			'DELETE': {
@@ -96,6 +98,11 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
+	'API_ACTION': {
+		'CREATE_ACTION': 'Create Action',
+		'API_ACTION': 'API Action',
+		'API_ACTIONS': 'API Actions',
+	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
 		'MANAGE_TAGS': 'Manage Tags',
@@ -107,20 +114,25 @@ export const en_DICTIONARY: Object = {
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
 	},
+	'CREDENTIAL': {
+		'CREATE_CREDENTIAL': 'Create Credential',
+		'CREDENTIAL': 'Credential',
+		'CREDENTIALS': 'Credentials',
+	},
+	'PROVIDER': {
+		'CREATE_PROVIDER': 'Create Provider',
+		'PROVIDER': 'Provider',
+		'PROVIDERS': 'Providers',
+	},
 	'DATA_INGESTION': {
 		'ADD_PARAMETER': 'Add Parameter',
-		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
 		'ETL_SCRIPTS': 'ETL Scripts',
 		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
-		'PROVIDERS': 'Providers',
-		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREATE_DATA_SCRIPT': 'Create DataScript',
 		'CREATE_ETL_SCRIPT': 'Create ETL Script',
-		'CREATE_PROVIDER': 'Create Provider',
-		'CREATE_ACTION': 'Create Action',
 		'CREDENTIALS': 'Credentials',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
 		'ETL_BUILDER_TITLE': 'DataScript Designer',

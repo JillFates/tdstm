@@ -1,7 +1,20 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)" (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+<kendo-grid
+		class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component"
+		[filterable]="true"
+		[sortable]="{ mode:'single' }"
+		[data]="gridData"
+		[skip]="state.skip"
+		[sort]="state.sort"
+ 		[pageSize]="state.take"
+		[resizable]="true"
+		[pageable]="{ pageSizes: maxOptions, info: true}"
+		(dataStateChange)="dataStateChange($event)"
+		(columnResize)="onWidthChange($event)"
+		(cellClick)="cellClick($event)"
+		[rowClass]="rowCallbackClass"
+>
 
     <!-- Header Toolbar -->
     <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
@@ -38,7 +51,7 @@
 					</li>
 				</ul>
 			</div>
-			<tds-bulk-change-button [bulkItems]="bulkItems"
+			<tds-bulk-change-button [bulkData]="bulkData"
 			                        [enabled]="hasSelectedItems()"
 									(clickBulk)="onClickBulkButton()"
 			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
@@ -65,7 +78,7 @@
 	</ng-template>
 
     <!-- Select All column -->
-    <kendo-grid-column title="" [locked]="true" [width]="55" [filterable]="false">
+    <kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
 	    <ng-template kendoGridHeaderTemplate>
 		    <div class="row">
 			    <div class="col-md-12 text-center">
@@ -86,7 +99,7 @@
 	</kendo-grid-column>
 
 	<!-- Action -->
-	<kendo-grid-command-column [width]="150" [locked]="true" >
+	<kendo-grid-command-column [width]="200" [locked]="true" >
 		<ng-template kendoGridHeaderTemplate>
 			<div class="text-center">
 				<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -98,6 +111,16 @@
 						title="Edit Asset"
 						(click)="showAssetEditView(dataItem, rowIndex)">
 					<span class="fa fa-fw fa-edit"></span>
+				</button>
+				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.issue"
+						title="Create Task or Show Tasks"
+						(click)="showTask(dataItem, rowIndex)">
+					<span class="fa fa-fw fa-list-alt"></span>
+				</button>
+				<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
+						title="Create Task or Show Tasks"
+						(click)="createTask(dataItem, rowIndex)">
+					<span class="fa fa-fw fa-file-text-o"></span>
 				</button>
 				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
 						title="Create Comment or Show Comments"
@@ -119,8 +142,14 @@
 	</kendo-grid-command-column>
 
     <!-- Configured View Columns (*ngFor) -->
-	<kendo-grid-column *ngFor="let column of model.columns; let i = index" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
-	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
+	<kendo-grid-column
+			*ngFor="let column of model.columns; let i = index"
+			[locked]="column.locked"
+			field="{{column.domain}}_{{column.property}}"
+	 		[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH"
+			[width]="column.width"
+			[class]="column.domain"
+	>
 		<ng-template kendoGridHeaderTemplate>
 			<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
 				<div [ngClass]="{'field-not-found': column?.notFound }">
@@ -133,7 +162,7 @@
         <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
             <div class=" has-feedback" style="margin-bottom:0px;">
                 <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
-                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
+                       [(ngModel)]="column.filter" (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)" input-paste (onPaste)="onPaste(column)">
                 <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
                       aria-hidden="true"></span>
             </div>

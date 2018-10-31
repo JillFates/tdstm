@@ -1,26 +1,29 @@
-import {Component, Input, Output, EventEmitter, ViewEncapsulation, Inject, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
-import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
-import { State } from '@progress/kendo-data-query';
-import {GridDataResult, DataStateChangeEvent, RowClassArgs} from '@progress/kendo-angular-grid';
-import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { Observable } from 'rxjs/Observable';
+import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
+import {State} from '@progress/kendo-data-query';
+import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {Observable} from 'rxjs';
 
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
-	SEARCH_QUITE_PERIOD, GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, KEYSTROKE,
-	DIALOG_SIZE, ModalType, DOMAIN
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	KEYSTROKE,
+	ModalType,
+	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
-import { AssetShowComponent } from '../asset/asset-show.component';
-import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
+import {FIELD_NOT_FOUND, FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult, BulkActions} from '../bulk-change/model/bulk-change.model';
+import {BulkActionResult} from '../bulk-change/model/bulk-change.model';
 import {CheckboxState, CheckboxStates} from '../tds-checkbox/model/tds-checkbox.model';
 import {BulkCheckboxService} from '../../service/bulk-checkbox.service';
-import {ASSET_ENTITY_MENU} from '../../model/asset-menu.model';
+import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {AssetCreateComponent} from '../asset/asset-create.component';
@@ -32,6 +35,9 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 import {AssetEditComponent} from '../asset/asset-edit.component';
 import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
+import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {UserService} from '../../../../shared/services/user.service';
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -44,11 +50,12 @@ declare var jQuery: any;
 	exportAs: 'assetExplorerViewGrid',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
-export class AssetExplorerViewGridComponent {
+export class AssetExplorerViewGridComponent implements OnInit {
 	@Input() model: ViewSpec;
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
+	@Input() fields: any;
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@Input()
 	set viewId(viewId: number) {
@@ -58,12 +65,12 @@ export class AssetExplorerViewGridComponent {
 		this.setActionCreateButton(viewId);
 	}
 
-	fields = [];
-	justPlanning = false;
-	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
-	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
-	showMessage = true;
-	typingTimeout: any;
+	public currentFields = [];
+	public justPlanning = false;
+	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
+	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
+	public showMessage = true;
+	public typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 	public userTimeZone: string;
@@ -85,34 +92,43 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
+	protected selectedAssetsForBulk: Array<any>;
 	public createButtonState: ASSET_ENTITY_DIALOG_TYPES;
+	private bulkData: any;
+	private currentUser: any;
 
 	constructor(
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private userService: UserService) {
+
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
-				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
-				this.bulkCheckboxService.setPageSize(this.state.take);
-				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
-				this.onReload();
-			});
-		fields.subscribe((result: DomainModel[]) => {
-			this.fields = result.reduce((p, c) => {
-				return p.concat(c.fields);
-			}, []).map((f: FieldSettingsModel) => {
-				return {
-					key: `${f['domain']}_${f.field}`,
-					label: f.label
-				};
-			});
-		}, (err) => console.log(err));
+			this.state.take = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+			this.bulkCheckboxService.setPageSize(this.state.take);
+			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
+			this.onReload();
+		});
+
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
+		this.getCurrentUser();
+	}
+
+	ngOnInit(): void {
+		// Iterate Fields to get reference for this context
+		this.currentFields = this.fields.reduce((p, c) => {
+			return p.concat(c.fields);
+		}, []).map((f: FieldSettingsModel) => {
+			return {
+				key: `${f['domain']}_${f.field}`,
+				label: f.label
+			};
+		});
 	}
 
 	private getPreferences(): Observable<any> {
@@ -134,7 +150,7 @@ export class AssetExplorerViewGridComponent {
 	 * @returns {string}
 	 */
 	getPropertyLabel(column: ViewColumn): string {
-		let field = this.fields.find(f => f.key === `${column.domain}_${column.property}`);
+		let field = this.currentFields.find(f => f.key === `${column.domain}_${column.property}`);
 		if (field) {
 			return field.label;
 		}
@@ -190,7 +206,7 @@ export class AssetExplorerViewGridComponent {
 		return oldVal === column.filter;
 	}
 
-	onFilterKeyUp(e: KeyboardEvent, column?: any): void {
+	protected onFilterKeyUp(e: KeyboardEvent, column?: any): void {
 		if ( this.preventFilterSearch(column)) {
 			return; // prevent search
 		}
@@ -202,7 +218,15 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
-	onFilterKeyDown(e: KeyboardEvent): void {
+	protected onPaste(column?: any): void {
+		if ( this.preventFilterSearch(column)) {
+			return; // prevent search
+		}
+		clearTimeout(this.typingTimeout);
+		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+	}
+
+	protected onFilterKeyDown(e: KeyboardEvent): void {
 		this.bulkCheckboxService.handleFiltering();
 
 		if (!this.notAllowedCharRegex.test(e.code)) {
@@ -213,7 +237,7 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 
-		this.bulkCheckboxService.initializeKeysBulkItems(data.assets.map(asset => asset.common_id));
+		this.bulkCheckboxService.initializeKeysBulkItems(data.assets);
 
 		this.gridData = {
 			data: data.assets,
@@ -287,7 +311,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	/**
-	 *
+	 * display the create asset modal
 	 */
 	protected onCreateAsset(assetEntityType: string): void {
 		if (!assetEntityType) {
@@ -331,17 +355,75 @@ export class AssetExplorerViewGridComponent {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
+	protected showTask(dataItem: any, rowIndex: number) {
+		this.highlightGridRow(rowIndex);
+		const assetModalModel: AssetModalModel = {
+			assetId: dataItem.common_id,
+			assetName: dataItem.common_assetName,
+			assetType: dataItem.common_assetClass,
+			modalType: 'TASK'
+		}
+
+		this.dialog.open(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel},
+			{provide: 'currentUserId', useValue: this.currentUser.id}
+		], DIALOG_SIZE.LG, true).then(result => {
+			if (result) {
+				console.log('Show Task Result',  result);
+			}
+		}).catch(result => {
+			console.log(result);
+		});
+
+	}
+
+	/**
+	 * Open the Task Create
+	 * @param dataItem
+	 */
+	public createTask(dataItem: any, rowIndex: number): void {
+		this.highlightGridRow(rowIndex);
+		let taskCreateModel: TaskDetailModel = {
+			id: dataItem.common_id,
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: dataItem.common_assetClass,
+				assetEntity: dataItem.common_id,
+				assetName: dataItem.common_assetName,
+				currentUserId: this.currentUser.id
+			}
+		};
+
+		this.dialog.extra(TaskCreateComponent, [
+			{provide: TaskDetailModel, useValue: taskCreateModel}
+		], false, false)
+			.then(result => {
+				if (result) {
+					this.onReload();
+				}
+
+			}).catch(result => {
+			console.log('Cancel:', result);
+		});
+
+	}
+
 	protected showComment(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
 		const assetModalModel: AssetModalModel = {
 			assetId: dataItem.common_id,
 			assetName: dataItem.common_assetName,
-			assetType: dataItem.common_assetClass
+			assetType: dataItem.common_assetClass,
+			modalType: 'COMMENT'
 		}
 
-		this.dialog.extra(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel}
-		], true, false).then(result => {
+		this.dialog.open(TaskCommentDialogComponent, [
+			{provide: AssetModalModel, useValue: assetModalModel},
+			{provide: 'currentUserId', useValue: this.currentUser.id}
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -371,8 +453,9 @@ export class AssetExplorerViewGridComponent {
 
 		this.dialog.extra(SingleCommentComponent, [
 			{provide: SingleCommentModel, useValue: singleCommentModel}
-		], true, false).then(result => {
+		], false, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
+			this.onReload();
 		}).catch(result => {
 			console.log(result);
 		});
@@ -409,6 +492,13 @@ export class AssetExplorerViewGridComponent {
 				];
 
 				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+			} else if (!result.clonedAsset && result.showView) {
+				const data: any = {
+					common_id: result.assetId,
+					common_assetClass: dataItem.common_assetClass
+				};
+				this.onShow(data);
+
 			}
 		}).catch( error => console.log('error', error));
 	}
@@ -523,8 +613,10 @@ export class AssetExplorerViewGridComponent {
 
 	onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems(this._viewId, this.model, this.justPlanning)
-			.then((results: number[]) => {
-				this.bulkItems = [...results];
+			.then((results: any) => {
+				this.bulkItems = [...results.selectedAssetsIds];
+				this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.bulkData = {bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk};
 			})
 			.catch ((err) => console.log('Error:', err))
 	}
@@ -536,5 +628,12 @@ export class AssetExplorerViewGridComponent {
 	getSelectedItemsCount(): number {
 		const allCounter = (this.gridData && this.gridData.total) || 0;
 		return this.bulkCheckboxService.getSelectedItemsCount(allCounter)
+	}
+
+	private getCurrentUser() {
+		this.userService.getUserInfo()
+			.subscribe( (user: any) => {
+				this.currentUser = user;
+			}, (error: any) => console.log(error));
 	}
 }

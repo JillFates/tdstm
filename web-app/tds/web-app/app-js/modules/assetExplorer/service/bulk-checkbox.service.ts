@@ -12,10 +12,12 @@ export class BulkCheckboxService {
 	private pageSize: number = null;
 	bulkItems: any;
 	private excludedBag: ExcludedAssetsBag;
+	private availableAssets: Array<any>;
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.currentState = CheckboxStates.unchecked;
 		this.bulkItems = {};
+		this.availableAssets = [];
 		this.excludedBag = new ExcludedAssetsBag();
 	}
 
@@ -41,10 +43,10 @@ export class BulkCheckboxService {
 	}
 
 	// on init or page change
-	initializeKeysBulkItems(ids: string[]): void {
+	initializeKeysBulkItems(assets: Array<any>): void {
 		this.bulkItems = {};
-		ids.forEach((id: string) => this.bulkItems[id] = false);
-
+		this.availableAssets = [...assets];
+		assets.map(asset => asset.common_id).forEach((id: string) => this.bulkItems[id] = false);
 		this.handlePageChange();
 		this.setExcludedAssets();
 	}
@@ -83,21 +85,29 @@ export class BulkCheckboxService {
 
 	}
 
-	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<number[]> {
+	getBulkSelectedItems(viewId: number, model: ViewSpec, justPlanning: boolean): Promise<any> {
 		return new Promise((resolve, reject) => {
 			if (this.isIndeterminateState()) {
 				return this.getBulkAssetIds(viewId, model, justPlanning)
 					.then((result: any) => {
 						const assets = result && result.assets || [];
 						// TODO side effect
-						const selectedItems = assets.map((asset) => asset.common_id)
+						const selectedAssetsIds = assets.map((asset) => asset.common_id)
 							.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
-
-						return resolve(selectedItems);
+						const selectedAssets = assets.filter((asset) => this.excludedBag.getAssets().indexOf(asset) === -1);
+						return resolve({selectedAssetsIds: selectedAssetsIds, selectedAssets:  selectedAssets});
 					})
 					.catch((err) => reject(err))
 			}
-			return resolve(this.getBulkItemsSelectedAsArray());
+			let selectedAssetsIds = this.getBulkItemsSelectedAsArray();
+			let selectedAssets: Array<any> = [];
+			selectedAssetsIds.forEach( (id: number) => {
+				const match = this.availableAssets.find( asset => asset['common_id'] === id);
+				if (match) {
+					selectedAssets.push(match);
+				}
+			});
+			return resolve({selectedAssetsIds: selectedAssetsIds, selectedAssets: selectedAssets});
 		});
 	}
 
@@ -105,7 +115,7 @@ export class BulkCheckboxService {
 		this.setStateSubject.next({current: CheckboxStates.unchecked, affectItems: true});
 	}
 
-	private getBulkItemsSelectedAsArray(): number[] {
+	private getBulkItemsSelectedAsArray(): Array<number> {
 		return Object.keys(this.bulkItems)
 			.filter(key => this.bulkItems[key])
 			.map(value => parseInt(value, 10));
