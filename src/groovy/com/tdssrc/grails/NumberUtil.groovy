@@ -40,14 +40,11 @@ class NumberUtil {
 	static Long toLong(value, Long defVal = null) {
 		if (value instanceof Long) {
 			value
-		}
-		else if (value instanceof Integer) {
+		} else if (value instanceof Integer) {
 			value.longValue()
-		}
-		else if (value instanceof CharSequence) {
+		} else if (value instanceof CharSequence) {
 			value.isLong() ? value.toLong() : defVal
-		}
-		else {
+		} else {
 			defVal
 		}
 	}
