@@ -95,13 +95,17 @@
                                            *ngIf="canShowControl('String', rowIndex)"/>
 
                                     <!-- Number Fields -->
-                                    <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
-                                           type="number" name="actionValue" class="form-control"
-                                           *ngIf="canShowControl('Number', rowIndex)"/>
+                                    <number-control *ngIf="canShowControl('Number', rowIndex)"
+                                                    [(value)]="editRows.selectedValues[rowIndex].value"></number-control>
+                                    <!--<input [(ngModel)]="editRows.selectedValues[rowIndex].value"-->
+                                           <!--type="number" name="actionValue" class="form-control"-->
+                                           <!--*ngIf="canShowControl('Number', rowIndex)"/>-->
 
                                     <!-- Datetime Fields -->
-                                    <kendo-datepicker [(value)]="editRows.selectedValues[rowIndex].value"
-                                                      *ngIf="canShowControl('DateTime', rowIndex)"></kendo-datepicker>
+                                    <date-time-control *ngIf="canShowControl('DateTime', rowIndex)"
+                                                       [(value)]="editRows.selectedValues[rowIndex].value"></date-time-control>
+                                    <!--<kendo-datepicker [(value)]="editRows.selectedValues[rowIndex].value"-->
+                                                      <!--*ngIf="canShowControl('DateTime', rowIndex)"></kendo-datepicker>-->
 
                                     <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist
