@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
@@ -48,6 +48,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
 })
 export class AssetExplorerViewGridComponent implements OnInit, OnChanges {
