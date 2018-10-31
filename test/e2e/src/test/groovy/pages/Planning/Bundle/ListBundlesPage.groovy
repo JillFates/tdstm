@@ -29,8 +29,10 @@ class ListBundlesPage extends Page {
         filterRow {$("tr.k-filter-row")}
         namefilterKind {$("span.k-select")[2]}
         nameFilter {filterRow.find("[data-text-field='name']")}
+        planningFilterWrapper {$(".k-operator-hidden")}
         isPlanningRadio {filterRow.find(("label>input"))[0]}
         isNonPlanningRadio {filterRow.find(("label>input"))[1]}
+        clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
     }
 
     def validateBundleIsListed(bName){
@@ -44,11 +46,15 @@ class ListBundlesPage extends Page {
     }
 
     def clickNonPlanningFilter(){
-        isNonPlanningRadio.click()
+       isNonPlanningRadio.click()
     }
 
     def clickPlanningFilter(){
         isPlanningRadio.click()
+    }
+
+    def clearPlanningFilter(){
+        clearPlanningFilter.click()
     }
 
     def clickCreate(){

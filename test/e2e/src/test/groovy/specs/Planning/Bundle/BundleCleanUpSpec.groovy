@@ -87,6 +87,7 @@ class BundleCleanUpSpec extends GebReportingSpec {
         when: 'The user filters QAE2E NON planning bundles'
             filterByName baseName
             selectFilter()
+            clearPlanningFilter()
             clickNonPlanningFilter()
         then: 'If more than 2 non-planning bundles are listed, the excess bundles are deleted'
             deleteBundles(false)
