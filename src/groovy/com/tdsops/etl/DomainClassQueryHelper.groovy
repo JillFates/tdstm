@@ -453,10 +453,30 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 * Prepares Aliases
+	 * Prepares Aliases based on hqlWhere sentence.
+	 * If hqlWhere contains 'manufacturer.name' or 'model.modelName'
+	 * it is necessary to add {code ManufacturerAlias} and {@code ModelAlias}
+	 * in the hql sentence.
+	 * Given:
+	 * <pre>
+	 *	String manufacturerAliasName = 'Hewlett Packard custom'
+	 * 	String manufacturerName = 'HP custom'
+	 * 	String modelAliasName = 'BL460C G1 custom'
+	 * 	String modelName = 'ProLiant BL460c G1 custom'
+	 * </pre>
+	 * An ETL script can contains this find commands using names or aliases underneath
+	 * <pre>
+	 * 	find Model by 'modelName' eq 'BL460C G1 custom'
+	 * 	     	  and 'manufacturer' eq 'Hewlett Packard custom'
+	 * 	     	 into 'id'
+	 *
+	 * 	find Model by 'modelName' eq 'ProLiant BL460c G1' custom'
+	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'
+	 *       	 into 'id'
+	 * </pre>
 	 * @param clazz
 	 * @param hqlWhere HQL sentence
-	 * @return
+	 * @return hqlAlias to be added in a HQL sentence
 	 */
 	static String hqlAlias(Class clazz, String hqlWhere) {
 
@@ -475,10 +495,14 @@ class DomainClassQueryHelper {
 	}
 
 	/**
+	 * Creates select part in an HQL sentence.
+	 * It has 2 intents:
+	 * 1) Check if results should only contains IDs instead of Gorm domain instances
+	 * 2) Validate if It is necessary to add distinct in HQL sentence based on if it has Aliases added
 	 *
-	 * @param hqlAlias
-	 * @param returnIdOnly
-	 * @return
+	 * @param hqlAlias hql alias content
+	 * @param returnIdOnly boolean valu that define if select should return only IDs
+	 * @return a String with final HQL sentence content
 	 */
 	static String hqlSelect(String hqlAlias, Boolean returnIdOnly){
 
@@ -600,12 +624,25 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 *
+	 * <p>Add aliases query parameters for Manufacturer and Model domains</p>
+	 * <p>If a ETL find command contains a manufacturer name</p>
+	 * <pre>
+	 * 	find Device by 'manufacturer' eq '....' into 'id'
+	 * </pre>
+	 * <p>Then it adds the following hql content:</p>
+	 * <pre>
+	 * 	select D.id
+	 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
+	 * 	  left outer join D.manufacturer
+	 * 	 where D.project = :project
+	 * 	   and D.assetClass = :assetClass
+	 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
+	 * </pre>
 	 * @param clazz
 	 * @param property
 	 * @param namedParameter
 	 * @param sentence
-	 * @return
+	 * @return a String with ModelAlias and ManufacturerAlias applied in an HQL sentence
 	 */
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 

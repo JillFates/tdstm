@@ -921,7 +921,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			)
 
 		then: "There is not results with manufacturer name or alias as 'ProLiant BL460c G1 custom'"
-			results.size() == 0
+			results.isEmpty()
 	}
 
 	void '41. can find a Device by model id, model name or model alias'() {
@@ -950,18 +950,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			)
 
 		then:
-			/**
-			 * 	select D
-			 * 	  from AssetEntity D , ModelAlias MDL_ALIAS
-			 * 	  left outer join D.model
-			 * 	 where D.project = :project
-			 * 	   and D.assetClass = :assetClass
-			 * 	   and (
-			 * 	   	 D.model.modelName.id = :model_modelName
-			 * 	   		or
-			 * 	   	( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName )
-			 * 	   )
-			 */
 			results.size() == 1
 			results[0].id == device.id
 			results[0].model.id == model.id
@@ -1006,15 +994,25 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			/**
 			 *	select D
 			 *	  from AssetEntity D , ModelAlias MDL_ALIAS
-			 left outer join D.model
-			 where D.project = :project
-			 and D.assetClass = :assetClass
-			 and ( D.model.modelName = :model_modelName or ( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
-			 *
+			 *	  left outer join D.model
+			 *	 where D.project = :project
+			 *	   and D.assetClass = :assetClass
+			 *	   and ( D.model.modelName = :model_modelName or ( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
 			 */
 			results.size() == 1
 			results[0].model.id == model.id
 			results[0].model.modelName == model.modelName
+
+		when: "find Device by 'model' eq 'HP custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', manufacturerName)
+				]
+			)
+
+		then: "There is not results with model name or alias as 'HP custom'"
+			results.isEmpty()
 	}
 
 	void '42. can find a Manufacturer by manufacturer name or manufacturer alias'() {
@@ -1055,6 +1053,17 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results.size() == 1
 			results[0].id == manufacturer.id
 			results[0].name == manufacturer.name
+
+		when: "find Manufacturer by 'name' eq 'ProLiant BL460c G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Manufacturer,
+				project,
+				[
+					new FindCondition('name', modelName)
+				]
+			)
+
+		then: "There is not results with Manufacturer name or alias as 'ProLiant BL460c G1 custom'"
+			results.isEmpty()
 	}
 
 	void '43. can find a Model by model name or model alias'() {
@@ -1114,7 +1123,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 	 *
 	 * </pre>
 	 */
-
 	void '44. can find a Model by manufacturer and model Alias names'() {
 
 		given:
@@ -1126,70 +1134,46 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
 			Model model = initializeModel(modelName, modelAliasName, manufacturer)
 
-		when:
-			List results = DomainClassQueryHelper.where(ETLDomain.Manufacturer,
+			List results
+
+		when: "find Model by manufacturer eq 'HP custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Model,
 				project,
 				[
-					new FindCondition('name', manufacturerAliasName)
-				]
+					new FindCondition('manufacturer', manufacturerName)
+				],
+				false
 			)
-
 		then:
 			results.size() == 1
+			results[0].id == model.id
+			results[0].modelName == modelName
+
+		when: "find Model by manufacturer eq 'Hewlett Packard custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturerAliasName)
+				],
+				false
+			)
+		then:
+			results.size() == 1
+			results[0].id == model.id
+			results[0].modelName == modelName
+
+		when: "find Model by manufacturer eq 'ProLiant BL460c G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('manufacturer', modelName)
+				]
+			)
+		then:
+			results.isEmpty()
 	}
 
-	/**
-	 * <p>Find command created:</p>
-	 * <pre>
-	 *
-	 *
-	 * 	find Device by 'model' eq 'ProLiant BL460c G1' custom'\
-	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'\
-	 *       	 into 'id'
-	 * </pre>
-	 * <p>HQL generated:</p>
-	 * <pre>
-	 *    select D.id
-	 *      from AssetEntity D , ManufacturerAlias MFG_ALIAS, ModelAlias MODEL_ALIAS
-	 * 		left outer join D.manufacturer
-	 * 	   where D.project = :project
-	 *       and D.assetClass = :assetClass
-	 * 		  and (
-	 * 		   	D.manufacturer.name = :manufacturer_name
-	 * 			or (
-	 * 			  MFG_ALIAS.manufacturer = D.manufacturer AND MFG_ALIAS.name = :manufacturer_name
-	 * 			)
-	 * 		  )
-	 * 		  and (
-	 * 		   	D.model.modelName = :model_modelName
-	 * 			or (
-	 * 			  MODEL_ALIAS.model = D.model
-	 * 			    and
-	 * 			  MODEL_ALIAS.manufacturer = D.manufacturer
-	 * 			  	and
-	 * 			  MODEL_ALIAS.name = :model_modelName
-	 * 			)
-	 * 		  )
-	 *
-	 *
-	 *
-	 select D.id
-	 from AssetEntity D , ManufacturerAlias MFG_ALIAS, ModelAlias MDL_ALIAS
-	 left outer join D.manufacturer  left outer join D.model
-	 where D.project = :project
-	 and D.assetClass = :assetClass
-	 and (  D.manufacturer.name = :manufacturer_name
-	 or ( MFG_ALIAS.manufacturer.id = D.id and MFG_ALIAS.name = :manufacturer_name ))
-	 and
-	 (  D.model.modelName = :model_modelName
-	 or ( MDL_ALIAS.model.id = D.model.id and MDL_ALIAS.name = :model_modelName ))
-
-	 *
-	 *
-	 * </pre>
-	 */
-
-	void '45. can find a Device by manufacturer and model aliases'() {
+	void '45. can find a Device by manufacturer and model names or aliases'() {
 
 		given:
 			String manufacturerAliasName = 'Hewlett Packard custom'
