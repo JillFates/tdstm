@@ -5,6 +5,8 @@ import com.tds.asset.AssetComment
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.License
+import net.transitionmanager.domain.LicensedClient
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
@@ -15,6 +17,8 @@ import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.service.LicenseManagerService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -39,6 +43,10 @@ class E2EProjectSpec extends Specification {
 
 	// IOC
 	ProjectService projectService
+	PartyRelationshipService partyRelationshipService
+	LicenseAdminService licenseAdminService
+	LicenseManagerService licenseManagerService
+	LicensedClient licensedClient
 	private static List<String> browsersInParallel = ["chrome", "firefox"]
 	private ProjectTestHelper projectHelper = new ProjectTestHelper()
 	private PersonTestHelper personHelper = new PersonTestHelper()
@@ -87,11 +95,12 @@ class E2EProjectSpec extends Specification {
 	private List<JSONObject> customFieldToBeDeleted2 = []
 	JSONObject originalData
 	JSONObject dataFile
-	PartyRelationshipService partyRelationshipService
+	private Date now = new Date()
 
 	void setup(){
 		originalData = getJsonObjectFromFile()
 		project = projectHelper.createProject(originalData.e2eProjectData)
+		licenseProject(project)
 		userLogin1 = personHelper.createPersonWithLoginAndRoles(originalData.userData1, project)
 		personHelper.createPersonWithLoginAndRoles(originalData.userData2, project)
 		personHelper.createPersonWithLoginAndRoles(originalData.userData3, project)
@@ -153,6 +162,7 @@ class E2EProjectSpec extends Specification {
 	void "Setup E2E Project data"() {
 		expect:
 			Project.findWhere([projectCode: originalData.e2eProjectData.projectCode]) != null
+			License.findWhere([owner: project.owner, status: License.Status.ACTIVE]) != null
 			UserLogin.findWhere([username: originalData.userData1.email]) != null
 			UserLogin.findWhere([username: originalData.userData2.email]) != null
 			UserLogin.findWhere([username: originalData.userData3.email]) != null
@@ -198,6 +208,30 @@ class E2EProjectSpec extends Specification {
 				jsonMap = JsonUtil.convertJsonToMap(Setting.findWhere([project: project, key: "APPLICATION"]).json)
 				assert jsonMap.fields.find { it.label == customField.label } != null
 			}
+	}
+
+	private void licenseProject(Project project) {
+		def currentLicense = License.findWhere([owner: project.owner])
+		if (!currentLicense){
+			String testEmail = 'sample@sampleEmail.com'
+			String testRequestNote = 'Test request note'
+			License licenseRequest = licenseAdminService.generateRequest(null, project.owner, testEmail, License.Environment.ENGINEERING.toString(), project.id, testRequestNote)
+			String encodedMessage  = licenseRequest.toEncodedMessage()
+			licensedClient = licenseManagerService.loadRequest(encodedMessage)
+			licensedClient.type = License.Type.MULTI_PROJECT
+			licensedClient.max  = 100
+			licensedClient.activationDate = now
+			licensedClient.expirationDate = now + 30
+			licensedClient.save(flush: true)
+			licenseManagerService.activate(licensedClient.id)
+			String licenseKeyPending = licenseManagerService.getLicenseKey(licensedClient.id)
+			License licDomain = License.get(licensedClient.id)
+			licDomain.hash = licenseKeyPending
+			licenseAdminService.load(licDomain)
+		} else {
+			currentLicense.expirationDate = now + 30
+			currentLicense.save(flush: true)
+		}
 	}
 
 	private JSONObject getJsonObjectFromFile(){
