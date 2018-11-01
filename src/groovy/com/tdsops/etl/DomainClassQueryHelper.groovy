@@ -7,6 +7,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import groovy.json.internal.LazyMap
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 
@@ -35,6 +37,16 @@ class DomainClassQueryHelper {
 	 * Static variable to define alias in every hql query used in this class
 	 */
 	static final String DOMAIN_ALIAS = 'D'
+
+	/**
+	 * Static variable to define Manufacturer alias in every hql query used in this class
+	 */
+	static final String MANUFACTURER_ALIAS = 'MFG_ALIAS'
+
+	/**
+	 * Static variable to define Model alias in every hql query used in this class
+	 */
+	static final String MODEL_ALIAS = 'MDL_ALIAS'
 
 	/**
 	 * Executes the HQL query related to the domain defined.
@@ -106,10 +118,12 @@ class DomainClassQueryHelper {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
+		String hqlAlias = hqlAlias(clazz, hqlWhere)
+		String hqlSelect = hqlSelect(hqlAlias, returnIdOnly)
 
 		String hql = """
-            select ${DOMAIN_ALIAS}${returnIdOnly ? '.id' : ''}
-              from AssetEntity $DOMAIN_ALIAS
+            select $hqlSelect
+              from AssetEntity $DOMAIN_ALIAS $hqlAlias
 				   $hqlJoins
 			 where ${DOMAIN_ALIAS}.project = :project
                and ${DOMAIN_ALIAS}.assetClass = :assetClass
@@ -136,6 +150,8 @@ class DomainClassQueryHelper {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
+		String hqlAlias = hqlAlias(clazz, hqlWhere)
+		String hqlSelect = hqlSelect(hqlAlias, returnIdOnly)
 
 		if (GormUtil.isDomainProperty(clazz, 'project')) {
 			hqlWhere += " and ${DOMAIN_ALIAS}.project = :project \n".toString()
@@ -143,8 +159,8 @@ class DomainClassQueryHelper {
 		}
 
 		String hql = """
-			  select ${DOMAIN_ALIAS}${returnIdOnly ? '.id' : ''}
-              from ${clazz.simpleName} $DOMAIN_ALIAS
+			  select $hqlSelect
+              from ${clazz.simpleName} $DOMAIN_ALIAS ${hqlAlias}
 			       $hqlJoins
              where $hqlWhere
 		""".stripIndent()
@@ -380,7 +396,7 @@ class DomainClassQueryHelper {
 
 			if (shouldQueryByReferenceId(clazz, condition.propertyName, condition.value)) {
 
-				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				String where = buildSentenceAndHqlParam(clazz, condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
 				if (property.endsWith('.id') && NumberUtil.isaNumber(condition.value)) {
 					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
@@ -397,7 +413,7 @@ class DomainClassQueryHelper {
 
 			} else {
 
-				String where = buildSentenceAndHqlParam(condition, property, namedParameter, hqlParams)
+				String where = buildSentenceAndHqlParam(clazz, condition, property, namedParameter, hqlParams)
 				// If user is trying to use find command by id, automatically we convert that value to a long
 				if (condition.propertyName == 'id' && NumberUtil.isPositiveLong(condition.value)) {
 					hqlParams[namedParameter] = NumberUtil.toPositiveLong(hqlParams[namedParameter], 0)
@@ -437,18 +453,62 @@ class DomainClassQueryHelper {
 	}
 
 	/**
+	 * Prepares Aliases
+	 * @param clazz
+	 * @param hqlWhere HQL sentence
+	 * @return
+	 */
+	static String hqlAlias(Class clazz, String hqlWhere) {
+
+		String aliases = ""
+
+		if (hqlWhere.contains("${DOMAIN_ALIAS}.manufacturer.name") ||
+			(hqlWhere.contains("${DOMAIN_ALIAS}.name") && clazz in Manufacturer)) {
+			aliases += ", ManufacturerAlias ${MANUFACTURER_ALIAS}"
+		}
+		if (hqlWhere.contains("${DOMAIN_ALIAS}.model.modelName") ||
+			(hqlWhere.contains("${DOMAIN_ALIAS}.modelName") && clazz in Model)) {
+			aliases += ", ModelAlias ${MODEL_ALIAS}"
+		}
+
+		return aliases
+	}
+
+	/**
+	 *
+	 * @param hqlAlias
+	 * @param returnIdOnly
+	 * @return
+	 */
+	static String hqlSelect(String hqlAlias, Boolean returnIdOnly){
+
+		String select = DOMAIN_ALIAS
+
+		if(returnIdOnly){
+			select += '.id'
+		}
+
+		if(!hqlAlias.isEmpty()){
+			select = 'distinct(' + select + ')'
+		}
+
+		return select
+	}
+
+	/**
 	 * <p>It builds the final sentence for an HQL using property, namedParameter and the correct SQL operator</p>
 	 * <p>IT also calculate the necessary named parameters to complete the HQL sentnce</p>
 	 * <pre>
 	 *
-	 *
 	 * </pre>
+	 * @param clazz - domain class
 	 * @param condition a {@code FindCondition} parameter to be used in the HQl sentence
 	 * @param namedParameter a named parameter param for the HQL sentence
 	 * @param hqlParams
 	 * @return a HQL sentence defined by a property operator and named parameter
 	 */
 	static String buildSentenceAndHqlParam(
+		Class clazz,
 		FindCondition condition,
 		String property,
 		String namedParameter,
@@ -534,6 +594,29 @@ class DomainClassQueryHelper {
 			default:
 				throw new RuntimeException("Incorrect FindOperator. Use: ${FindOperator.values()}")
 
+		}
+
+		return checkAndAddAliases(clazz, property, namedParameter, sentence)
+	}
+
+	/**
+	 *
+	 * @param clazz
+	 * @param property
+	 * @param namedParameter
+	 * @param sentence
+	 * @return
+	 */
+	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
+
+		if (property.contains("${DOMAIN_ALIAS}.manufacturer.name")) {
+			return "\n( ${sentence} or ( ${MANUFACTURER_ALIAS}.manufacturer = ${DOMAIN_ALIAS}.manufacturer and ${MANUFACTURER_ALIAS}.name = :${namedParameter} )) ".toString()
+		} else if (property.contains("${DOMAIN_ALIAS}.name") && clazz in Manufacturer) {
+			return "\n( ${sentence} or ( ${MANUFACTURER_ALIAS}.manufacturer = ${DOMAIN_ALIAS} and ${MANUFACTURER_ALIAS}.name = :${namedParameter} )) ".toString()
+		} else if (property.contains("${DOMAIN_ALIAS}.model.modelName")) {
+			return "\n( ${sentence} or ( ${MODEL_ALIAS}.model = ${DOMAIN_ALIAS}.model and ${MODEL_ALIAS}.name = :${namedParameter} )) ".toString()
+		} else if ((property.contains("${DOMAIN_ALIAS}.modelName") && clazz in Model)) {
+			return "\n( ${sentence} or ( ${MODEL_ALIAS}.model = ${DOMAIN_ALIAS} and ${MODEL_ALIAS}.name = :${namedParameter} )) ".toString()
 		}
 
 		return sentence

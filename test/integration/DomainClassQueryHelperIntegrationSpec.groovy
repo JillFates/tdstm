@@ -8,7 +8,9 @@ import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -836,4 +838,461 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 		then: 'results are an empty list'
 			results.size() == 0
 	}
+
+	void '40. can find a Device by manufacturer id, manufacturer name or manufacturer alias'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+			List results
+
+		when: "find Device by 'manufacturer' eq 1122l into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturer.id)
+				]
+			)
+
+		then:
+			results.size() == 1
+
+		when: "find Device by 'manufacturer' eq 'HP custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturerName)
+				],
+				false
+			)
+
+		then:
+			/**
+			 * 	select D.id
+			 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
+			 * 	  left outer join D.manufacturer
+			 * 	 where D.project = :project
+			 * 	   and D.assetClass = :assetClass
+			 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
+			 */
+			results.size() == 1
+			results[0].id == device.id
+			results[0].manufacturer.id == manufacturer.id
+			results[0].manufacturer.name == manufacturer.name
+
+		when: "find Device by 'manufacturer' eq 'Hewlett Packard custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturerAliasName)
+				],
+				false
+			)
+
+		then:
+			/**
+			 * 	select D
+			 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
+			 * 	  left outer join D.manufacturer
+			 * 	 where D.project = :project
+			 * 	   and D.assetClass = :assetClass
+			 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
+			 */
+			results.size() == 1
+			results[0].id == device.id
+			results[0].manufacturer.id == manufacturer.id
+			results[0].manufacturer.name == manufacturer.name
+
+		when: "find Device by 'manufacturer' eq 'ProLiant BL460c G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', modelName)
+				]
+			)
+
+		then: "There is not results with manufacturer name or alias as 'ProLiant BL460c G1 custom'"
+			results.size() == 0
+	}
+
+	void '41. can find a Device by model id, model name or model alias'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.model = model
+			device.save(failOnError: true, flush: true)
+			List results
+
+		when: "find Device by 'model' eq model.id into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', model.id)
+				],
+				false
+			)
+
+		then:
+			/**
+			 * 	select D
+			 * 	  from AssetEntity D , ModelAlias MDL_ALIAS
+			 * 	  left outer join D.model
+			 * 	 where D.project = :project
+			 * 	   and D.assetClass = :assetClass
+			 * 	   and (
+			 * 	   	 D.model.modelName.id = :model_modelName
+			 * 	   		or
+			 * 	   	( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName )
+			 * 	   )
+			 */
+			results.size() == 1
+			results[0].id == device.id
+			results[0].model.id == model.id
+			results[0].model.modelName == model.modelName
+
+		when: "find Device by 'model' eq 'ProLiant BL460c G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', modelName)
+				],
+				false
+			)
+
+		then:
+			/**
+			 * 	select D.id
+			 * 	  from AssetEntity D , ModelAlias MDL_ALIAS
+			 * 	  left outer join D.model
+			 * 	 where D.project = :project
+			 * 	   and D.assetClass = :assetClass
+			 * 	   and (
+			 * 	   	D.model.modelName = :model_modelName
+			 * 	   		or
+			 * 	   	( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
+			 */
+			results.size() == 1
+			results[0].id == device.id
+			results[0].model.id == model.id
+			results[0].model.modelName == model.modelName
+
+		when: "find Device by 'model' eq 'BL460C G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', modelAliasName)
+				],
+				false
+			)
+
+		then:
+			/**
+			 *	select D
+			 *	  from AssetEntity D , ModelAlias MDL_ALIAS
+			 left outer join D.model
+			 where D.project = :project
+			 and D.assetClass = :assetClass
+			 and ( D.model.modelName = :model_modelName or ( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
+			 *
+			 */
+			results.size() == 1
+			results[0].model.id == model.id
+			results[0].model.modelName == model.modelName
+	}
+
+	void '42. can find a Manufacturer by manufacturer name or manufacturer alias'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+
+		when: "find Manufacturer by 'name' eq 'HP custom' into 'id'"
+			List results = DomainClassQueryHelper.where(ETLDomain.Manufacturer,
+				project,
+				[
+					new FindCondition('name', manufacturerName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == manufacturer.id
+			results[0].name == manufacturer.name
+
+		when: "find Manufacturer by 'name' eq 'Hewlett Packard custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Manufacturer,
+				project,
+				[
+					new FindCondition('name', manufacturerAliasName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == manufacturer.id
+			results[0].name == manufacturer.name
+	}
+
+	void '43. can find a Model by model name or model alias'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+			List results = []
+
+		when: "find Model by 'modelName' eq 'ProLiant BL460c G1' custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', modelName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == model.id
+			results[0].modelName == modelName
+
+		when: "find Model by 'modelName' eq 'BL460C G1 custom' into 'id'"
+			results = DomainClassQueryHelper.where(ETLDomain.Model,
+				project,
+				[
+					new FindCondition('modelName', modelAliasName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == model.id
+			results[0].modelName == modelName
+	}
+
+	/**
+	 * <p>Find command created:</p>
+	 * <pre>
+	 * 	find Model by 'modelName' eq 'BL460C G1 custom'
+	 * 	     	  and 'manufacturer' eq 'Hewlett Packard custom'
+	 * 	     	 into 'id'
+	 *
+	 * 	find Model by 'modelName' eq 'ProLiant BL460c G1' custom'
+	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'
+	 *       	 into 'id'
+	 * </pre>
+	 * <p>HQL generated:</p>
+	 * <pre>
+	 *
+	 * </pre>
+	 */
+
+	void '44. can find a Model by manufacturer and model Alias names'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Manufacturer,
+				project,
+				[
+					new FindCondition('name', manufacturerAliasName)
+				]
+			)
+
+		then:
+			results.size() == 1
+	}
+
+	/**
+	 * <p>Find command created:</p>
+	 * <pre>
+	 *
+	 *
+	 * 	find Device by 'model' eq 'ProLiant BL460c G1' custom'\
+	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'\
+	 *       	 into 'id'
+	 * </pre>
+	 * <p>HQL generated:</p>
+	 * <pre>
+	 *    select D.id
+	 *      from AssetEntity D , ManufacturerAlias MFG_ALIAS, ModelAlias MODEL_ALIAS
+	 * 		left outer join D.manufacturer
+	 * 	   where D.project = :project
+	 *       and D.assetClass = :assetClass
+	 * 		  and (
+	 * 		   	D.manufacturer.name = :manufacturer_name
+	 * 			or (
+	 * 			  MFG_ALIAS.manufacturer = D.manufacturer AND MFG_ALIAS.name = :manufacturer_name
+	 * 			)
+	 * 		  )
+	 * 		  and (
+	 * 		   	D.model.modelName = :model_modelName
+	 * 			or (
+	 * 			  MODEL_ALIAS.model = D.model
+	 * 			    and
+	 * 			  MODEL_ALIAS.manufacturer = D.manufacturer
+	 * 			  	and
+	 * 			  MODEL_ALIAS.name = :model_modelName
+	 * 			)
+	 * 		  )
+	 *
+	 *
+	 *
+	 select D.id
+	 from AssetEntity D , ManufacturerAlias MFG_ALIAS, ModelAlias MDL_ALIAS
+	 left outer join D.manufacturer  left outer join D.model
+	 where D.project = :project
+	 and D.assetClass = :assetClass
+	 and (  D.manufacturer.name = :manufacturer_name
+	 or ( MFG_ALIAS.manufacturer.id = D.id and MFG_ALIAS.name = :manufacturer_name ))
+	 and
+	 (  D.model.modelName = :model_modelName
+	 or ( MDL_ALIAS.model.id = D.model.id and MDL_ALIAS.name = :model_modelName ))
+
+	 *
+	 *
+	 * </pre>
+	 */
+
+	void '45. can find a Device by manufacturer and model aliases'() {
+
+		given:
+			String manufacturerAliasName = 'Hewlett Packard custom'
+			String manufacturerName = 'HP custom'
+			String modelAliasName = 'BL460C G1 custom'
+			String modelName = 'ProLiant BL460c G1 custom'
+
+			Manufacturer manufacturer = initializeManufacturer(manufacturerName, manufacturerAliasName)
+			Model model = initializeModel(modelName, modelAliasName, manufacturer)
+
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.model = model
+			device.manufacturer = manufacturer
+			device.save(failOnError: true, flush: true)
+
+			List results
+
+		when: """find Device by 'model' eq 'ProLiant BL460c G1 custom'\\
+					        and 'manufacturer' eq 'Hewlett Packard custom'\\
+					       into 'id'
+		"""
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturerName),
+					new FindCondition('model', modelName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == device.id
+			results[0].model.id == model.id
+			results[0].model.modelName == modelName
+			results[0].manufacturer.id == manufacturer.id
+			results[0].manufacturer.name == manufacturerName
+
+		when: """find Device by 'model' eq 'BL460C G1 custom'\\
+					        and 'manufacturer' eq 'Hewlett Packard custom'\\
+					       into 'id'
+		"""
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('manufacturer', manufacturerAliasName),
+					new FindCondition('model', modelAliasName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == device.id
+			results[0].model.id == model.id
+			results[0].model.modelName == modelName
+			results[0].manufacturer.id == manufacturer.id
+			results[0].manufacturer.name == manufacturerName
+	}
+
+	/**
+	 * Creates a Manufacturer and an alias in case that it doesn't exist for testing
+	 * @param manufacturerName
+	 * @param manufacturerAliasName
+	 * @return
+	 */
+	private Manufacturer initializeManufacturer(String manufacturerName, String manufacturerAliasName) {
+		ManufacturerAlias manufacturerAlias = ManufacturerAlias.findByName(manufacturerAliasName)
+
+		Manufacturer manufacturer
+		if (manufacturerAlias) {
+			manufacturer = manufacturerAlias.manufacturer
+		} else {
+			manufacturer = Manufacturer.findOrSaveWhere(name: manufacturerName)
+			new ManufacturerAlias(
+				name: manufacturerAliasName, manufacturer: manufacturer
+			).save(failOnError: true, flush: true)
+		}
+
+		return manufacturer
+	}
+
+	/**
+	 * Create a Model and alias linked to a Manufacturer in case that it doesn't exist for testing
+	 * @param modelName
+	 * @param modelAliasName
+	 * @param manufacturer
+	 * @return
+	 */
+	private Model initializeModel(String modelName, String modelAliasName, Manufacturer manufacturer) {
+		ModelAlias modelAlias = ModelAlias.findByName(modelAliasName)
+
+		Model model
+		if (modelAlias) {
+			model = modelAlias.model
+		} else {
+			model = Model.findOrSaveWhere(modelName: modelName, manufacturer: manufacturer)
+			new ModelAlias(
+				name: modelAliasName, model: model, manufacturer: manufacturer
+			).save(failOnError: true, flush: true)
+		}
+
+		return model
+	}
+
 }
