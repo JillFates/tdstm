@@ -18,7 +18,6 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveEventTestHelper
@@ -1107,23 +1106,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results[0].modelName == modelName
 	}
 
-	/**
-	 * <p>Find command created:</p>
-	 * <pre>
-	 * 	find Model by 'modelName' eq 'BL460C G1 custom'
-	 * 	     	  and 'manufacturer' eq 'Hewlett Packard custom'
-	 * 	     	 into 'id'
-	 *
-	 * 	find Model by 'modelName' eq 'ProLiant BL460c G1' custom'
-	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'
-	 *       	 into 'id'
-	 * </pre>
-	 * <p>HQL generated:</p>
-	 * <pre>
-	 *
-	 * </pre>
-	 */
-	void '44. can find a Model by manufacturer and model Alias names'() {
+	void '44. can find a Model by manufacturer by model name or alias'() {
 
 		given:
 			String manufacturerAliasName = 'Hewlett Packard custom'
@@ -1192,14 +1175,14 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			List results
 
 		when: """find Device by 'model' eq 'ProLiant BL460c G1 custom'\\
-					        and 'manufacturer' eq 'Hewlett Packard custom'\\
+					        and 'manufacturer' eq 'HP custom'\\
 					       into 'id'
 		"""
 			results = DomainClassQueryHelper.where(ETLDomain.Device,
 				project,
 				[
-					new FindCondition('manufacturer', manufacturerName),
-					new FindCondition('model', modelName)
+					new FindCondition('model', modelName),
+					new FindCondition('manufacturer', manufacturerName)
 				],
 				false
 			)
@@ -1219,8 +1202,29 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			results = DomainClassQueryHelper.where(ETLDomain.Device,
 				project,
 				[
-					new FindCondition('manufacturer', manufacturerAliasName),
-					new FindCondition('model', modelAliasName)
+					new FindCondition('model', modelAliasName),
+					new FindCondition('manufacturer', manufacturerAliasName)
+				],
+				false
+			)
+
+		then:
+			results.size() == 1
+			results[0].id == device.id
+			results[0].model.id == model.id
+			results[0].model.modelName == modelName
+			results[0].manufacturer.id == manufacturer.id
+			results[0].manufacturer.name == manufacturerName
+
+		when: """find Device by 'model' eq 'ProLiant BL460c G1 custom'\\
+					        and 'manufacturer' eq 'Hewlett Packard custom'\\
+					       into 'id'
+		"""
+			results = DomainClassQueryHelper.where(ETLDomain.Device,
+				project,
+				[
+					new FindCondition('model', modelName),
+					new FindCondition('manufacturer', manufacturerAliasName)
 				],
 				false
 			)
