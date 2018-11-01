@@ -1,8 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
 @Component({
-	selector: 'number-control',
-	// templateUrl: '../tds/web-app/app-js/shared/components/field-reference-popup/field-reference-popup.component.html'
+	selector: 'tds-number-control',
 	template: `
 		<div>
 			<!-- [min]="0" [max]="" -->

@@ -4,7 +4,7 @@ import {IntlService} from '@progress/kendo-angular-intl';
 import {DateControlCommons} from './date-control-commons';
 
 @Component({
-	selector: 'tds-date-time-control',
+	selector: 'tds-date-control',
 	template: `
 		<div>
             <kendo-datepicker [(value)]="dateValue"
@@ -14,14 +14,15 @@ import {DateControlCommons} from './date-control-commons';
 		</div>
 	`
 })
-export class DateTimeControlComponent extends DateControlCommons {
-
-	private readonly DEFAULT_FORMAT = 'yyyy-MM-dd hh:mm:ssZ';
+export class DateControlComponent extends DateControlCommons {
 
 	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
 		super(userPreferenceService, intl);
-		if (!this.format) {
-			this.format = this.DEFAULT_FORMAT;
-		}
+		this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((dateFormat) => {
+				// DateUtils.formatUserDateTime(userTimeZone, dateTimeString);
+				this.format = dateFormat;
+				console.log(this.format);
+			});
 	}
 }

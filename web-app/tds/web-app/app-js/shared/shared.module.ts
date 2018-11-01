@@ -56,8 +56,10 @@ import { AssetTagSelectorComponent } from './components/asset-tag-selector/asset
 import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
+import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { DateTimeControlComponent } from './components/custom-control/date-time/date-time-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
+
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -109,7 +111,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		ConnectorComponent,
 		FieldReferencePopupComponent,
 		DateTimeControlComponent,
-		NumberControlComponent
+		NumberControlComponent,
+		DateControlComponent,
 	],
 	exports: [
 		UILoaderDirective,
@@ -145,7 +148,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PopupModule,
 		FieldReferencePopupComponent,
 		DateTimeControlComponent,
-		NumberControlComponent
+		NumberControlComponent,
+		DateControlComponent,
 	],
 	entryComponents: [
 		DynamicComponent,

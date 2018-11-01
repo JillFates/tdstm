@@ -95,17 +95,16 @@
                                            *ngIf="canShowControl('String', rowIndex)"/>
 
                                     <!-- Number Fields -->
-                                    <number-control *ngIf="canShowControl('Number', rowIndex)"
-                                                    [(value)]="editRows.selectedValues[rowIndex].value"></number-control>
-                                    <!--<input [(ngModel)]="editRows.selectedValues[rowIndex].value"-->
-                                           <!--type="number" name="actionValue" class="form-control"-->
-                                           <!--*ngIf="canShowControl('Number', rowIndex)"/>-->
+                                    <tds-number-control *ngIf="canShowControl('Number', rowIndex)"
+                                                    [(value)]="editRows.selectedValues[rowIndex].value"></tds-number-control>
 
                                     <!-- Datetime Fields -->
-                                    <date-time-control *ngIf="canShowControl('DateTime', rowIndex)"
-                                                       [(value)]="editRows.selectedValues[rowIndex].value"></date-time-control>
-                                    <!--<kendo-datepicker [(value)]="editRows.selectedValues[rowIndex].value"-->
-                                                      <!--*ngIf="canShowControl('DateTime', rowIndex)"></kendo-datepicker>-->
+                                    {{editRows.selectedValues[rowIndex].value}}
+                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
+                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>
+                                    <!-- Datetime Fields -->
+                                    <tds-date-time-control *ngIf="canShowControl('DateTime', rowIndex)"
+                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-time-control>
 
                                     <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist
