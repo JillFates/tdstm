@@ -334,18 +334,18 @@ class DataviewService implements ServiceMethods {
 	 *
 	 * @return a map containing the hql query string, and the parameters needed to run the query.
 	 */
-	Map getAssetIdsHql (Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
-		Dataview dataview = get(Dataview,dataViewId, project)
+	Map getAssetIdsHql(Project project, Long dataViewId, DataviewUserParamsCommand userParams) {
+		Dataview dataview = get(Dataview, dataViewId, project)
 		DataviewSpec dataviewSpec = new DataviewSpec(userParams, dataview)
 		Map whereInfo = hqlWhere(dataviewSpec, project)
-	    String conditions = whereInfo.conditions
-	    String hqlJoins = hqlJoins(dataviewSpec)
+		String conditions = whereInfo.conditions
+		String hqlJoins = hqlJoins(dataviewSpec)
 
-	    String query = """
-	        SELECT AE.id
-	        FROM AssetEntity AE
-	        $hqlJoins
-	        WHERE AE.project = :project AND $conditions
+		String query = """
+			SELECT AE.id
+			FROM AssetEntity AE
+			$hqlJoins
+			WHERE AE.project = :project AND $conditions
 			group by AE.id
 	    """
 
