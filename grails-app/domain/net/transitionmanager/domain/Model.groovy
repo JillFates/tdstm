@@ -6,13 +6,14 @@ import com.tdsops.commons.lang.exception.PersistenceException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.ModelService
 import net.transitionmanager.service.SecurityService
 
 @Slf4j(value='logger')
 class Model {
 
-	transient SecurityService securityService
-	def modelService
+	SecurityService securityService
+	ModelService    modelService
 
 	// TODO - modelName should be renamed to name (as it is in the db - confusing)
 	String modelName
@@ -104,7 +105,7 @@ class Model {
 	}
 
 	static transients = ['aliases', 'assetsCount', 'manufacturerName',
-	                     'noOfConnectors', 'securityService', 'source', 'valid']
+	                     'noOfConnectors', 'securityService', 'modelService', 'source', 'valid']
 
 	static mapping = {
 		autoTimestamp false
