@@ -1,13 +1,16 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.SettingService
 import org.apache.commons.lang3.BooleanUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.json.JsonSlurper
@@ -143,6 +146,7 @@ class CustomDomainServiceTests extends Specification {
     void 'Scenario 6: Test fieldNamesAsMap for expected values'() {
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
 
@@ -161,6 +165,7 @@ class CustomDomainServiceTests extends Specification {
     void 'Scenario 7: Test distinctValues returns expected values'() {
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
         and: 'the project has assets with existing data values'
@@ -188,6 +193,7 @@ class CustomDomainServiceTests extends Specification {
 
         given: 'a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
         and: 'the project has field settings specifications'
             projectService.cloneDefaultSettings(project)
         and: 'the project has assets with existing data values'
