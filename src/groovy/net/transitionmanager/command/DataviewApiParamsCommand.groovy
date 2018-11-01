@@ -44,15 +44,15 @@ class DataviewApiParamsCommand implements CommandObject {
 /**
  * Used to represent Dataview API command filters structure:
  * <pre>
- *   common.environment=Production&filter=assetName=PDV*
+ *   common_environment=Production&filter=assetName=PDV*
  * </pre>
  */
 @grails.validation.Validateable
 class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
-	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '.'
-	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '\\.'
+	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '_'
+	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '_'
 
 	String content
 	String domain
@@ -66,7 +66,7 @@ class DataviewApiFilterParam {
 	 * <dl>
 	 * 	<dt>
 	 * 	    <pre>
-	 * 			common.environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
+	 * 			common_environment=Production ==  DataviewApiFilterParam(domain: 'common', fieldName: 'environment', filter: 'Production')
 	 * 			assetName=Production ==  DataviewApiFilterParam(domain: null, fieldName: 'assetName', filter: 'Production')
 	 * 	    </pre>
 	 * 	</dt>
