@@ -130,7 +130,7 @@ class ProjectTestHelper {
 	 * @param company  the client's owning company
 	 * @return the client
 	 */
-	PartyGroup createPartner(PartyGroup company, Project project=null) {
+	PartyGroup createPartner(PartyGroup company, Project project) {
 		PartyType pt = PartyType.get('COMPANY')
 
 		PartyGroup partner = createCompany('Partner')
