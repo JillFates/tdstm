@@ -1,0 +1,34 @@
+<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content user-preferences-component">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">{{currentUserName}} Preferences</h4>
+    </div>
+    <div class="modal-body">
+        <table>
+            <div *ngIf="!currentUserPreferences || currentUserPreferences.length === 0">
+                <tr>
+                    <th>Preferences: Name / Value</th>
+                </tr>
+                <tr>
+                    <td>No preferences</td>
+                </tr>
+            </div>
+            <div *ngIf="currentUserPreferences && currentUserPreferences.length !== 0">
+                <tr>
+                    <th colspan="2">Preferences: Name / Value</th>
+                </tr>
+                <tr *ngFor="let preference of currentUserPreferences" id="{{preference.prefCode}}">
+                        <td nowrap="nowrap"><span>{{preference.value}}</span></td><td><span class="clear_filter spanAnchor" (click)="removePreference($event)">X</span></td>
+                </tr>
+            </div>
+        </table>
+
+        <div class="buttons">
+            <span class="button"><input id="prefButton" type="button" class="delete" (click)="resetPreferences()" value="Reset All"/> </span>
+            <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+                <span class="glyphicon glyphicon-ban-circle"></span>
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+</div>

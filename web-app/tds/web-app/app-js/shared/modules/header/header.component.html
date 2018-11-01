@@ -1,6 +1,7 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <ng-container *ngIf="pageMetaData">
+        <span (click)="openPrefModal()" class="open-pref-modal"></span>
         <h1>
             {{pageMetaData.title | translate}}
             <small>{{pageMetaData.instruction | translate}}</small>

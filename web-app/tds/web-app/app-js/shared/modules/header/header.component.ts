@@ -6,6 +6,9 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
+import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
+import {UserService} from '../../../modules/user/service/user.service';
+import {UIDialogService} from '../../services/ui-dialog.service';
 
 declare var jQuery: any;
 
@@ -35,6 +38,7 @@ export class HeaderComponent {
 		private notifierService: NotifierService,
 		private titleService: Title,
 		promptService: UIPromptService,
+		private dialogService: UIDialogService,
 		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
@@ -119,5 +123,14 @@ export class HeaderComponent {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This is a hack to open the modal window properly before the user menu is angular.
+	 */
+	public openPrefModal(): void {
+		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			console.error(result);
+		});
 	}
 }
