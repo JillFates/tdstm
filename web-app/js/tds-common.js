@@ -587,21 +587,27 @@ var UserPreference = function () {
 
 	// opens the edit user date and timezone dialog
 	var editDateAndTimezone = function () {
-		jQuery.ajax({
-			url: '/tdstm/person/editTimezone',
-			success: function (e) {
-				var prefDialog = $("#userTimezoneDivId")
-				prefDialog.html(e);
-				prefDialog.dialog('option', 'width', 'auto');
-				prefDialog.dialog('option', 'modal', true);
-				prefDialog.dialog("open");
+        modalOpener = jQuery('.open-date-timezone-modal');
+        if(modalOpener.length) {
+            modalOpener.click();
+        }
+        else {
+            jQuery.ajax({
+                url: '/tdstm/person/editTimezone',
+                success: function (e) {
+                    var prefDialog = $("#userTimezoneDivId")
+                    prefDialog.html(e);
+                    prefDialog.dialog('option', 'width', 'auto');
+                    prefDialog.dialog('option', 'modal', true);
+                    prefDialog.dialog("open");
 
-                $('.ui-widget-overlay').addClass('old-legacy-content');
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while attempting to update task/comment")
-			}
-		})
+                    $('.ui-widget-overlay').addClass('old-legacy-content');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("An unexpected error occurred while attempting to update task/comment")
+                }
+            })
+        }
 		return false;
 	}
 

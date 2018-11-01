@@ -6,6 +6,7 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 import {ASSET_MENU_CSS_TREE} from './model/asset-menu.model';
 import {TaskService} from '../../../modules/taskManager/service/task.service';
 import {Title} from '@angular/platform-browser';
+import {UserDateTimezoneComponent} from '../../../modules/user/components/date-timezone/user-date-timezone.component';
 import {UserPreferencesComponent} from '../../../modules/user/components/preferences/user-preferences.component';
 import {UserService} from '../../../modules/user/service/user.service';
 import {UIDialogService} from '../../services/ui-dialog.service';
@@ -130,6 +131,11 @@ export class HeaderComponent {
 	 */
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+			console.error(result);
+		});
+	}
+	public openDateTimezoneModal(): void {
+		this.dialogService.open(UserDateTimezoneComponent, []).catch(result => {
 			console.error(result);
 		});
 	}

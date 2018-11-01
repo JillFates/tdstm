@@ -13,6 +13,7 @@ import {UserRouteModule} from './user-routing.states';
 // Components
 import {UserListComponent} from './components/list/user-list.component';
 import {UserPreferencesComponent} from './components/preferences/user-preferences.component';
+import {UserDateTimezoneComponent} from './components/date-timezone/user-date-timezone.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {UserResolveService} from './resolve/user-resolve.service';
@@ -36,14 +37,17 @@ import {UserService} from './service/user.service';
 		UserService
 	],
 	declarations: [
+		UserDateTimezoneComponent,
 		UserListComponent,
 		UserPreferencesComponent
 	],
 	exports: [
+		UserDateTimezoneComponent,
 		UserListComponent,
 		UserPreferencesComponent
 	],
 	entryComponents: [
+		UserDateTimezoneComponent,
 		UserPreferencesComponent
 	]
 })

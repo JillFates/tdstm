@@ -144,6 +144,11 @@ class WsUserController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
+	def getMapAreas() {
+		renderSuccessJson([areas: userPreferenceService.timezonePickerAreas()])
+	}
+
+	@HasPermission(Permission.UserGeneralAccess)
 	def getPerson() {
 		Person person = securityService.getUserLogin().person
 		renderSuccessJson([person:person])

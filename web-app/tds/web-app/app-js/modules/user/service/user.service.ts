@@ -13,7 +13,6 @@ import {Response} from '@angular/http';
 export class UserService {
 
 	// private instance variable to hold base url
-	private baseURL = '/tdstm';
 	private userPreferenceUrl = '../ws/user';
 
 	// Resolve HTTP using the constructor
@@ -26,6 +25,16 @@ export class UserService {
 				let result = res.json();
 				let providerModels = result && result.status === 'success' && result.data;
 				return providerModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getMapAreas() {
+		return this.http.get(`${this.userPreferenceUrl}/mapAreas`)
+			.map((res: Response) => {
+				let result = res.json();
+				let mapAreas = result && result.status === 'success' && result.data;
+				return mapAreas;
 			})
 			.catch((error: any) => error.json());
 	}

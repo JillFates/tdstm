@@ -422,6 +422,11 @@ class UrlMappings {
 			action = [GET: "getUser"]
 		}
 
+		"/ws/user/mapAreas" {
+			controller = "wsUser"
+			action = [GET: "getMapAreas"]
+		}
+
 		"/ws/user/preferences/$id" {
 			controller = "wsUser"
 			action = [GET:"preferences"]
