@@ -3,15 +3,22 @@ import {IntlService} from '@progress/kendo-angular-intl';
 import {PreferenceService} from '../../../services/preference.service';
 import {DateUtils} from '../../../utils/date.utils';
 
-export class DateControlCommons implements OnInit {
+export abstract class DateControlCommons implements OnInit {
 
 	@Input('value') value: any;
 	@Output() valueChange = new EventEmitter<any>();
-	protected format: any;
+	@Input('required') required = false;
+	protected outputFormat: string;
+	protected displayFormat: string;
 	protected dateValue: Date;
 
-	constructor(protected userPreferenceService: PreferenceService, protected intl: IntlService) {
-		// Silence is golden.
+	constructor(
+				protected userPreferenceService: PreferenceService,
+				protected intl: IntlService,
+				outputFormat: string,
+				displayFormat: string) {
+		this.outputFormat = outputFormat;
+		this.displayFormat = displayFormat;
 	}
 
 	ngOnInit(): void {
@@ -19,9 +26,5 @@ export class DateControlCommons implements OnInit {
 		this.onValueChange(this.dateValue);
 	}
 
-	protected onValueChange($event: Date): void {
-		this.value = this.intl.formatDate($event, this.format);
-		console.log(this.value)
-		this.valueChange.emit(this.value);
-	}
+	abstract onValueChange($event: Date);
 }

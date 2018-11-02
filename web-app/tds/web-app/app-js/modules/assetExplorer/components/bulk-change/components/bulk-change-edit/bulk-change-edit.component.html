@@ -99,12 +99,12 @@
                                                     [(value)]="editRows.selectedValues[rowIndex].value"></tds-number-control>
 
                                     <!-- Datetime Fields -->
-                                    {{editRows.selectedValues[rowIndex].value}}
+                                    {{editRows.selectedValues[rowIndex].value}}<br>
                                     <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
                                                        [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>
                                     <!-- Datetime Fields -->
-                                    <tds-date-time-control *ngIf="canShowControl('DateTime', rowIndex)"
-                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-time-control>
+                                    <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
+                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
 
                                     <!-- Yes/No List Fields -->
                                     <kendo-dropdownlist

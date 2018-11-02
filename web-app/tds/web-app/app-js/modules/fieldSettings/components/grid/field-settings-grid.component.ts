@@ -1,5 +1,5 @@
 import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
-import { FieldSettingsModel } from '../../model/field-settings.model';
+import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
 import { UILoaderService } from '../../../../shared/services/ui-loader.service';
@@ -60,14 +60,19 @@ export class FieldSettingsGridComponent implements OnInit {
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
 
-	private availableControls = [
-		{ text: 'List', value: 'List' },
-		{ text: 'String', value: 'String' },
-		{ text: 'YesNo', value: 'YesNo' }
+	private readonly availableControls = [
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.List, value: CUSTOM_FIELD_CONTROL_TYPE.List},
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.String, value: CUSTOM_FIELD_CONTROL_TYPE.String},
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.YesNo, value: CUSTOM_FIELD_CONTROL_TYPE.YesNo},
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.Date, value: CUSTOM_FIELD_CONTROL_TYPE.Date},
+		{ text: CUSTOM_FIELD_CONTROL_TYPE.DateTime, value: CUSTOM_FIELD_CONTROL_TYPE.DateTime}
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) {
+	constructor(
+		private loaderService: UILoaderService,
+		private prompt: UIPromptService,
+		private dialogService: UIDialogService) {
 	}
 
 	ngOnInit(): void {
@@ -189,7 +194,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			model.label = '';
 			model['isNew'] = true;
 			model['count'] = this.data.fields.length;
-			model.control = 'String';
+			model.control = CUSTOM_FIELD_CONTROL_TYPE.String;
 			model.show = true;
 			let availableOrder = this.fieldsSettings.map(f => f.order).sort((a, b) => a - b);
 			model.order = availableOrder[availableOrder.length - 1] + 1;
@@ -211,7 +216,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onRequired(field: FieldSettingsModel) {
 		if (field.constraints.values &&
-			(field.control === 'List' || field.control === 'YesNo')) {
+			(field.control === CUSTOM_FIELD_CONTROL_TYPE.List || field.control === CUSTOM_FIELD_CONTROL_TYPE.YesNo)) {
 			if (field.constraints.required) {
 				field.constraints.values.splice(field.constraints.values.indexOf(''), 1);
 			} else if (field.constraints.values.indexOf('') === -1) {
@@ -243,12 +248,9 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
-	protected onControlChange(
-		dataItem: FieldSettingsModel,
-		selectList: SelectListConfigurationPopupComponent,
-		minMax: MinMaxConfigurationPopupComponent): void {
+	protected onControlChange(dataItem: FieldSettingsModel): void {
 		switch (dataItem.control) {
-			case 'List':
+			case CUSTOM_FIELD_CONTROL_TYPE.List:
 
 				if (dataItem.constraints.values &&
 					dataItem.constraints.values.indexOf('Yes') !== -1 &&
@@ -262,7 +264,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					this.selectList.show = false;
 				}
 				break;
-			case 'String':
+			case CUSTOM_FIELD_CONTROL_TYPE.String:
 				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
@@ -271,7 +273,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					this.minMax.show = false;
 				}
 				break;
-			case 'YesNo':
+			case CUSTOM_FIELD_CONTROL_TYPE.YesNo:
 				dataItem.constraints.values = ['Yes', 'No'];
 				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
 					dataItem.default = null;
@@ -285,19 +287,15 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	}
 
-	protected onControlModelChange(
-		newValue: 'List' | 'String' | 'YesNo' | '',
-		dataItem: FieldSettingsModel,
-		selectList: SelectListConfigurationPopupComponent,
-		minMax: MinMaxConfigurationPopupComponent) {
-		if (dataItem.control === 'List') {
+	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
+		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.prompt.open(
 				'Confirmation Required',
 				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel',
 				'Ok', 'Cancel').then(result => {
 					if (result) {
 						dataItem.control = newValue;
-						this.onControlChange(dataItem, selectList, minMax);
+						this.onControlChange(dataItem);
 					} else {
 						setTimeout(() => {
 							jQuery('#control' + dataItem.field).val('List');
@@ -306,7 +304,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				});
 		} else {
 			dataItem.control = newValue;
-			this.onControlChange(dataItem, selectList, minMax);
+			this.onControlChange(dataItem);
 		}
 	}
 
@@ -330,7 +328,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @param {number} actionType
 	 */
 	private openFieldSettingsPopup(dataItem: FieldSettingsModel): void {
-		if (dataItem.control === 'String') {
+		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.String) {
 			this.dialogService.open(MinMaxConfigurationPopupComponent, [
 				{ provide: FieldSettingsModel, useValue: dataItem },
 				{ provide: 'domain', useValue: this.data.domain }
@@ -349,6 +347,33 @@ export class FieldSettingsGridComponent implements OnInit {
 				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
 			});
 		}
+	}
+
+	/**
+	 * Check if selected field control has configuration available.
+	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
+	 * @returns {boolean}
+	 */
+	protected isAllowedConfigurationForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
+		if (control === CUSTOM_FIELD_CONTROL_TYPE.List
+		|| control === CUSTOM_FIELD_CONTROL_TYPE.String) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the field is allowed to have a default value.
+	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
+	 * @returns {boolean}
+	 */
+	protected isAllowedDefaultValueForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
+		if (control && (control === CUSTOM_FIELD_CONTROL_TYPE.String
+		||	control === CUSTOM_FIELD_CONTROL_TYPE.YesNo
+		||	control === CUSTOM_FIELD_CONTROL_TYPE.List)) {
+			return true;
+		}
+		return false;
 	}
 
 }
