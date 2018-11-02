@@ -51,17 +51,6 @@ class TestCaseController implements ControllerMethods {
 		renderAsJson(apiCatalogService.listCatalogNames())
 	}
 
-	@Deprecated
-	def api() {
-		try {
-			ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
-			ApiAction apis = apiActionService.saveOrUpdateApiAction(apiActionCommand)
-			render "${apis.name} callbackMode=${apis.callbackMode}"
-		} catch (ServiceException se) {
-			render se.message
-		}
-	}
-
 	@HasPermission('ViewAdminTools')
 	def sendSedaMessage() {
 		String queue = 'seda:alert.queue'
