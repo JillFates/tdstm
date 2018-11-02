@@ -124,12 +124,14 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	 */
 
 	protected showAssetDetailView() {
-		this.dialogService.replace(AssetShowComponent, [
-				{ provide: 'ID', useValue: this.existAsset.assetId },
-				{ provide: 'ASSET', useValue: this.existAsset.assetClass }],
-			DIALOG_SIZE.XLG);
 
-		this.dismiss();
+		const cloneCloseModel: CloneCLoseModel = {
+			clonedAsset: false,
+			showEditView: false,
+			assetId: this.existAsset.assetId,
+			showView: true
+		}
+		this.close(cloneCloseModel);
 	}
 
 	/**

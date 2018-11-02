@@ -47,6 +47,7 @@ class AssetExportService {
 	ProjectService projectService
 	PartyRelationshipService partyRelationshipService
 	CustomDomainService customDomainService
+	AssetOptionsService assetOptionsService
 
 	/**
 	 * This is the actual method that will generate the Excel export which it typically called by a Quartz
@@ -1370,7 +1371,7 @@ class AssetExportService {
 	 * @return
 	 */
 	private List<Map<String, ?>> getFieldSpecsForAssetClass(AssetClass assetClass, Project project) {
-		Map fieldSpecs = customDomainService.allFieldSpecs(project, assetClass.toString(), true)
+		Map fieldSpecs = customDomainService.getFieldSpecsForAssetExport(project, assetClass.toString())
 		return fieldSpecs[assetClass.toString()]["fields"]
 	}
 
@@ -1392,40 +1393,40 @@ class AssetExportService {
 	 * Used to get the list of Type used to assign to AssetDependency.type
 	 * @return List of the types
 	 */
-	def getDependencyTypes() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)?.value
+	List<String> getDependencyTypes() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 	}
 
 	/**
 	 * Used to get the list of Status used to assign to AssetDependency.status
 	 * @return List of the types
 	 */
-	def getDependencyStatuses() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)?.value
+	List<String> getDependencyStatuses() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 	}
 
 	/**
 	 * Use to get the list of Asset Environment options
 	 * @return List of options
 	 */
-	def getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)?.value
+	List<String> getAssetEnvironmentOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 	}
 
 	/**
 	 * Use to get the list of Asset Environment options
 	 * @return List of options
 	 */
-	def getAssetPlanStatusOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)?.value
+	List<String> getAssetPlanStatusOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 	}
 
 	/**
 	 * Use to get the list of Priority Options
 	 * @return List of Priority values
 	 */
-	def getAssetPriorityOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)?.value
+	List<String> getAssetPriorityOptions() {
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 	}
 
 	/**

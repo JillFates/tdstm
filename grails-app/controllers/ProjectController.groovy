@@ -704,12 +704,7 @@ class ProjectController implements ControllerMethods {
 				// Find the accounts that could get the notice and filter only those that were checked in the form
 				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
-					String fromEmail = null
-					if (params.sendFrom == "DEFAULT") {
-						fromEmail = grailsApplication.config.grails.mail.default.from
-					} else {
-						fromEmail = securityService.userLoginPerson?.email
-					}
+					def fromEmail = grailsApplication.config.grails.mail.default.from
 					fromEmail = StringEscapeUtils.escapeHtml(fromEmail)
 					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params.customMessage, fromEmail, request.getRemoteAddr())
 					message = "The Account Activation Notification has been sent out to the users."

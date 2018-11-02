@@ -12,9 +12,8 @@
                            (onClose)="fieldReferencePopupHelper.popup.show = false">
     </field-reference-popup>
 
-    <kendo-grid
-            [data]="gridData"
-            [pageSize]="25">
+    <kendo-grid [data]="gridData"
+                [pageSize]="25">
         <ng-template kendoGridToolbarTemplate [position]="'top'">
             <label class="fieldsFilterLabel col-sm-1 text-left">Fields</label>
             <div class="fieldsFilter col-sm-2">

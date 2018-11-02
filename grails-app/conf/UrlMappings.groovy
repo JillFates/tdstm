@@ -417,6 +417,11 @@ class UrlMappings {
 			action = [GET:"demoFailed"]
 		}
 
+		"/ws/user" {
+			controller = "wsUser"
+			action = [GET: "getUser"]
+		}
+
 		"/ws/user/preferences/$id" {
 			controller = "wsUser"
 			action = [GET:"preferences"]
@@ -1090,8 +1095,9 @@ class UrlMappings {
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
-		// Angular 2 and future latest version
+		// Angular 6 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
+		"/module/**" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
 		// Angular Single Page App Named mappings

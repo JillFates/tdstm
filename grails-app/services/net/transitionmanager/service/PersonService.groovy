@@ -650,30 +650,6 @@ class PersonService implements ServiceMethods {
 
 	/**
 	 * This method deletes a person and other entities related to the instance such as partyRelationships,
-	 * UserLogin, etc.  This version of the method is only for legacy migration scripts and should NOT be used
-	 * and will throw an exception if used in the context of a user.
-	 * @param person - Person Instance to be deleted
-	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
-	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
-	 * 		be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
-	 * @return A map containing the following:
-	 *		messages: String[] containing errors and other messages
-	 *		cleared: the number of assets cleared
-	 *		deleted: a boolean indicating if the person was deleted
-	 * @deprecated This method is only to support legacy migration scripts. Please see other deletePerson methods.
-	 */
-	@Deprecated
-	@Transactional
-	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets) {
-		if (securityService.isLoggedIn()) {
-			throw new UnauthorizedException('This deletePerson is not supported')
-		}
-		return deletePersonSecure(person, deleteIfUserLogin, deleteIfAssocWithAssets)
-	}
-
-
-	/**
-	 * This method deletes a person and other entities related to the instance such as partyRelationships,
 	 * UserLogin, etc.  This version of the method is called from trusted/validated consumers of the service.
 	 * @param person - Person Instance to be deleted
 	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.

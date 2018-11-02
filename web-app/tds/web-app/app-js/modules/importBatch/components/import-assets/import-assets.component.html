@@ -74,7 +74,6 @@
                                 </a>
                             </span>
 
-
                         </div>
 
                         <!-- Transform Datascript Row -->
@@ -127,9 +126,7 @@
                                         [pageSize]="100">
                                     <kendo-grid-column title="Batch Id" field="batchId">
                                         <ng-template kendoGridCellTemplate let-dataItem>
-                                            <a (click)="goToBatch(dataItem.batchId)" href="javascript: void(0);">
-                                                {{dataItem.batchId}}
-                                            </a>
+                                            <a [routerLink]="['/importbatch','list', dataItem.batchId]">{{dataItem.batchId}}</a>
                                         </ng-template>
                                     </kendo-grid-column>
                                     <kendo-grid-column title="Domain" field="domainClass"></kendo-grid-column>
@@ -145,7 +142,7 @@
                                                'fa-thumbs-down red': importResult?.status === 'error'}"></i>
                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
                            </button>
-                           <a uiSref="{{IMPORT_BATCH_STATES.IMPORT_BATCH_LIST.name}}" class="control-label col-sm-{{uiConfig.urlColSize}}">
+                           <a [routerLink]="['/importbatch','list']" class="control-label col-sm-{{uiConfig.urlColSize}}">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
                            </a>
                         </div>

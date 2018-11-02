@@ -17,9 +17,6 @@
 		<div>
 			<g:form action="sendAccountActivationEmails">
 
-				<span>Email Sent From:</span><br/>
-	          	<input type="radio" name="sendFrom" value="DEFAULT" checked>&nbsp;<span>System Email (${defaultEmail})</span><br/>
-				<input type="radio" name="sendFrom" value="ADMIN">&nbsp;<span>Your Email (${adminEmail})</span><br/><br/>
 				<span>Custom Message:</span><br>
 				<textarea name="customMessage" rows="5" cols="80">Welcome to TransitionManager.</textarea><br/><br/>
 				<table class="user-activation-emails-table">

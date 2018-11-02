@@ -1582,30 +1582,13 @@ var GraphUtil = (function ($) {
     };
 
     public.restoreDependencyPanel = function(type) {
-        if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
-            $('#dependency' + type + 'Control_show_all').prop('checked', true);
-            $('#dependency' + type + 'Control_show_all').attr('state', 1);
-            if (!GraphUtil.dependencyPanelConfig['dependency' + type].dirty) {
-                $('.dependency' + type + 'ControlsShow').prop('checked', true);
-            } else {
-                $('.dependency' + type + 'ControlsShow').each(function () {
-                    $(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-                });
-            }
-        } else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
-            $('#dependency' + type + 'Control_show_all').prop('checked', false);
-            $('#dependency' + type + 'Control_show_all').attr('state', 3);
-            $('.dependency' + type + 'ControlsShow').each(function () {
-                $(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
-            });
-        } else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'indeterminate'){
-            $('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
-            $('#dependency' + type + 'Control_show_all').attr('state', 2);
-            $('.dependency' + type + 'ControlsShow').each(function(){
-                var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
-                $(this).prop('checked', selected);
-            });
-        }
+        GraphUtil.dependencyPanelConfig['dependency' + type].status = 'indeterminate';
+        $('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
+        $('#dependency' + type + 'Control_show_all').attr('state', 2);
+        $('.dependency' + type + 'ControlsShow').each(function(){
+            var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+            $(this).prop('checked', selected);
+        });
 
         if(GraphUtil.dependencyPanelConfig['dependency' + type].highlight.length > 0) {
             $('.dependency' + type + 'ControlsHighlight').each(function () {

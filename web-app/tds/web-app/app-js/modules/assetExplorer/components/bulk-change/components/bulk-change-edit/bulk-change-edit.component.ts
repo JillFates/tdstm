@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UIExtraDialog } from '../../../../../../shared/services/ui-dialog.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 import {BulkActions, BulkChangeModel} from '../../model/bulk-change.model';
 import {UIPromptService} from '../../../../../../shared/directives/ui-prompt.directive';
@@ -9,7 +9,6 @@ import {AssetExplorerService} from '../../../../service/asset-explorer.service';
 import {CustomDomainService} from '../../../../../fieldSettings/service/custom-domain.service';
 import {Permission} from '../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../shared/services/permission.service';
-import {BulkChangeEditColumnsModel} from '../../model/bulk-change-edit-columns.model';
 import {DataGridOperationsHelper} from '../../../../../../shared/utils/data-grid-operations.helper';
 import {BulkEditAction, IdTextItem} from '../../model/bulk-change.model';
 import {SortUtils} from '../../../../../../shared/utils/sort.utils';
@@ -26,37 +25,87 @@ import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
 })
 export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	COLUMN_MIN_WIDTH = 120;
-	CLEAR_ACTION = 'clear';
+	private readonly CLEAR_ACTION = 'clear';
+	protected readonly TYPE_OPTIONS_CONTROL = 'Options';
+	protected readonly TYPE_INLIST_CONTROL = 'InList';
+	protected readonly TYPE_CUSTOM_FIELD_LIST_CONTROL = 'List';
+
 	isLoaded: boolean;
-	defaultAssetClass: IdTextItem = {id: 'common', text: 'Common Fields'};
+	private defaultDomain: IdTextItem = {id: 'COMMON', text: 'Common Fields'};
 	tagList: TagModel[] = [];
-	yesNoList: IdTextItem[] = [{ id: '?', text: '?'}, { id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
-	actions: IdTextItem[] = [];
-	assetClassList: IdTextItem[] = [];
+	yesNoList: IdTextItem[] = [{ id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
+	protected domains: IdTextItem[];
 	selectedItems: string[] = [];
 	commonFieldSpecs: any[] = [];
-	gridColumns: BulkChangeEditColumnsModel;
 	gridSettings: DataGridOperationsHelper;
 	affectedAssets: number;
-	editRows: { actions: BulkEditAction[], selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
+	editRows: {listOptions: Array<any>, fields: Array<BulkEditAction>, selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
+	private listOptions: any;
 
 	constructor(
-		private bulkChangeModel: BulkChangeModel, private promptService: UIPromptService, private assetExplorerService: AssetExplorerService,
-		private permissionService: PermissionService, private customDomainService: CustomDomainService, private bulkChangeService: BulkChangeService,
-		private tagService: TagService, private translatePipe: TranslatePipe
-	) {
-		super('#bulk-change-edit-component');
-		this.affectedAssets = this.bulkChangeModel.affected;
+		private bulkChangeModel: BulkChangeModel,
+		private promptService: UIPromptService,
+		private assetExplorerService: AssetExplorerService,
+		private permissionService: PermissionService,
+		private customDomainService: CustomDomainService,
+		private bulkChangeService: BulkChangeService,
+		private tagService: TagService,
+		private translatePipe: TranslatePipe) {
+			super('#bulk-change-edit-component');
+			this.affectedAssets = this.bulkChangeModel.affected;
+			this.domains = [];
+			this.listOptions = {};
+			this.editRows = {listOptions: [], fields: [], selectedValues: [] };
+	}
+
+	ngOnInit() {
+		this.isLoaded = false;
+
+		Observable.forkJoin(this.customDomainService.getCommonFieldSpecs(), this.tagService.getTags()).subscribe((result: any[]) => {
+			const [fields, tags] = result;
+			this.commonFieldSpecs = result[0];
+			this.domains = this.getDomainList(this.commonFieldSpecs);
+			if (tags.status === ApiResponseModel.API_SUCCESS && tags.data) {
+				this.tagList = tags.data;
+			}
+			this.addRow();
+			this.gridSettings = new DataGridOperationsHelper(this.editRows.fields);
+			this.bulkChangeService.getAssetListOptions(this.domains[0].id).subscribe( result => {
+				this.listOptions['planStatus'] = result.planStatusOptions.map(item => { return {id: item, text: item} });
+				this.listOptions['validation'] = result.validationOptions.map(item => { return {id: item, text: item} });
+				if (this.domains[0].id === 'DEVICE') {
+					this.listOptions['railType'] = result.railTypeOption.map(item => { return {id: item, text: item} });
+				}
+				if (this.domains[0].id === 'APPLICATION') {
+					this.listOptions['criticality'] = result.criticalityOptions.map(item => { return {id: item, text: item} });
+				}
+			}, error => console.error(error));
+			this.isLoaded = true;
+		});
+	}
+
+	private addRow(): any {
+		let fields = [...this.getFieldsByDomain(this.defaultDomain)];
+		this.editRows.fields.push({fields: fields, actions: []});
+		this.editRows.selectedValues.push({domain: this.defaultDomain, field: null, action: null, value: null});
+	}
+
+	onDomainValueChange(domain: IdTextItem, index: number): void {
+		this.editRows.selectedValues[index].domain = domain;
+		this.editRows.selectedValues[index].field = null;
+		this.editRows.selectedValues[index].action = null;
+		this.editRows.selectedValues[index].value = null;
+		this.editRows.fields[index].fields = [...this.getFieldsByDomain(domain)];
+		this.editRows.fields[index].actions = [];
 	}
 
 	addHandler({sender}): void {
 		this.addRow();
-
 		this.gridSettings.loadPageData();
 	}
 
 	removeHandler({dataItem, rowIndex}): void {
-		this.editRows.actions.splice(rowIndex, 1);
+		this.editRows.fields.splice(rowIndex, 1);
 		this.editRows.selectedValues.splice(rowIndex, 1);
 		this.gridSettings.loadPageData();
 	}
@@ -65,45 +114,26 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			this.close(bulkActionResult);
 	}
 
-	ngOnInit() {
-		this.isLoaded = false;
-		this.editRows = { actions: [], selectedValues: [] };
-		this.gridColumns = new BulkChangeEditColumnsModel();
-
-		Observable.forkJoin(this.bulkChangeService.getActions(), this.customDomainService.getCommonFieldSpecs(), this.tagService.getTags())
-			.subscribe((result: any[]) => {
-				const [actions, fields, tagAssets] = result;
-
-				this.actions = Object.keys(actions.data['tagAssetService'] )
-					.map((action) => ({id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`) })) ;
-
-				this.commonFieldSpecs = fields;
-				this.assetClassList = this.getAssetClassList(this.commonFieldSpecs);
-
-				if (tagAssets.status === ApiResponseModel.API_SUCCESS && tagAssets.data) {
-					this.tagList = tagAssets.data;
-				}
-
-				this.addRow();
-				this.gridSettings = new DataGridOperationsHelper(this.editRows.actions,
-					[], // initial sort config.
-					{ mode: 'single', checkboxOnly: false},
-					{ useColumn: 'id' });
-				this.isLoaded = true;
-			});
-	}
-
 	cancelCloseDialog(bulkActionResult: BulkActionResult): void {
 		this.dismiss(bulkActionResult || {action: null, success: false});
 	}
 
-	// show control if this belongs to class and clear action is not selected
+	/**
+	 * Determine to show control if this belongs to class and clear action is not selected
+	 * @param {string} controlType
+	 * @param rowIndex
+	 * @returns {boolean}
+	 */
 	canShowControl(controlType: string, rowIndex): boolean {
 		const selectedValue = this.editRows.selectedValues[rowIndex];
-
-		const isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'] ===  controlType)
+		if (!selectedValue.field || !selectedValue.action) {
+			return;
+		}
+		let isTypeOfControl = (selectedValue && selectedValue.field && selectedValue.field['control'] ===  controlType);
+		if (!isTypeOfControl && this.isFieldControlOptionsList(controlType)) {
+			isTypeOfControl = (selectedValue && selectedValue.field && this.isFieldControlOptionsList(selectedValue.field['control']));
+		}
 		const isClearAction = (selectedValue.action === null  || selectedValue.action.id === this.CLEAR_ACTION);
-
 		return isTypeOfControl && !isClearAction;
 	}
 
@@ -124,40 +154,77 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			.catch((err) => console.log(err));
 	}
 
-	onDomainValueChange(domain: IdTextItem, index: number): void {
-		const {actions, selectedValues} = this.editRows;
-		selectedValues[index].domain = domain;
-
-		actions[index].fields =  this.getFieldsByDomain(domain);
-		selectedValues[index].field = null;
+	/**
+	 * On Field Selected from dropdown prepare it's control options/values.
+	 * List/Options/InList values are setted in here.
+	 * @param field
+	 * @param {number} index
+	 */
+	onFieldValueChange(field: any, index: number): void {
+		if (!field) {
+			return;
+		}
+		this.editRows.selectedValues[index].action = null;
+		this.editRows.selectedValues[index].value = null;
+		this.editRows.selectedValues[index].field = field;
+		let actions = field.actions.map( action => ({
+			id: action, text: this.translatePipe.transform(`ASSET_EXPLORER.BULK_CHANGE.ACTIONS.${action.toUpperCase()}`)
+		}));
+		this.editRows.fields[index].actions = actions;
+		if (this.isFieldControlOptionsList(field.control)) {
+			this.editRows.listOptions[index] = this.listOptions[field.id] ? this.listOptions[field.id] : [];
+		} else if (field.control === this.TYPE_CUSTOM_FIELD_LIST_CONTROL) {
+			let listOptions = field.constraints && field.constraints.values ? field.constraints.values : [];
+			listOptions = listOptions.map( item => { return {id: item, text: item} });
+			this.editRows.listOptions[index] = listOptions;
+		}
 	}
 
-	onFieldValueChange(field: IdTextItem, index: number): void {
-		const {selectedValues} = this.editRows;
-
-		selectedValues[index].field = field;
+	/**
+	 * Check if field control is any system Options or InList.
+	 * @param fieldControl
+	 * @returns {boolean}
+	 */
+	private isFieldControlOptionsList(fieldControl: any): boolean {
+		return fieldControl === this.TYPE_OPTIONS_CONTROL
+			|| fieldControl === this.TYPE_INLIST_CONTROL
+			|| fieldControl.startsWith(this.TYPE_OPTIONS_CONTROL);
 	}
 
 	onActionValueChange(action: IdTextItem, index: number): void {
-		const {selectedValues} = this.editRows;
-
-		selectedValues[index].action = action;
+		this.editRows.selectedValues[index].value = null;
+		this.editRows.selectedValues[index].action = action;
 	}
 
-	private addRow(): any {
-		this.editRows.actions.push({domains: this.assetClassList , actions: [...this.actions], fields: [] });
-		this.editRows.selectedValues.push({domain: this.defaultAssetClass, field: null, action: null, value: null});
-
-		//  get the fields for the default domain
-		this.editRows.actions[this.editRows.actions.length - 1].fields =  this.getFieldsByDomain(this.defaultAssetClass);
+	private getDomainList(fields: any[]): IdTextItem[] {
+		let domainList = [];
+		if (this.assetsDifferFromDomains()) {
+			domainList.push(this.defaultDomain);
+		} else {
+			const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass;
+			domainList.push({id: firstAssetClass, text: `${StringUtils.toCapitalCase(firstAssetClass, false)} Fields`});
+			domainList.push(this.defaultDomain);
+		}
+		return domainList;
 	}
 
-	private getAssetClassList(fields: any[]): IdTextItem[] {
-		const assetClassList = fields
-			.map((field) => field.domain.toLowerCase())
-			.map((domain): IdTextItem => ( {id: domain, text: `${StringUtils.toCapitalCase(domain, false)} Fields`}  ));
-
-		return assetClassList;
+	/**
+	 * Determines if Assets selected belong to differents domain.
+	 * @returns {boolean}
+	 */
+	private assetsDifferFromDomains(): boolean {
+		if (this.bulkChangeModel.selectedAssets.length <= 1) {
+			return false;
+		}
+		const firstAssetClass = this.bulkChangeModel.selectedAssets[0].common_assetClass;
+		let areDifferent = false;
+		this.bulkChangeModel.selectedAssets.forEach(asset => {
+			if (firstAssetClass !== asset.common_assetClass) {
+				areDifferent = true;
+				return;
+			}
+		});
+		return areDifferent;
 	}
 
 	private confirmUpdate(): Promise<boolean> {
@@ -176,28 +243,32 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		return this.permissionService.hasPermission(Permission.AssetEdit);
 	}
 
+	/**
+	 * Set the fields available for the domain to be displayed on the row Fields dropdown
+	 * @param {IdTextItem} domain
+	 * @returns {IdTextItem[]}
+	 */
 	private getFieldsByDomain(domain: IdTextItem): IdTextItem[] {
-		let fields: IdTextItem[] = [];
+		let fields: Array<any> = [];
 		if (!domain) {
 			return fields;
 		}
-
 		const domainFields =  this.commonFieldSpecs.find((field: any) => field.domain === domain.id.toUpperCase());
 		if (domainFields && domainFields.fields) {
 			fields = domainFields.fields
-				.filter((item) => item.control === 'asset-tag-selector') // REMOVE THIS LiNE WHEN EDITION SERVICES ARE IMPLEMENTED FOR ALL FIELDS
-				.map((item: any) => ({id: item.field, text: item.label, control: item.control}))
+				.filter((item) => item.bulkChangeActions && item.bulkChangeActions.length > 0)
+				.map((item: any) => ({id: item.field, text: item.label, control: item.control, actions: item.bulkChangeActions, constraints: item.constraints}))
 		}
-
 		return fields.sort((a, b) => SortUtils.compareByProperty(a, b, 'text'));
 	}
 
 	private update(): Promise<BulkActionResult>  {
 		return new Promise((resolve, reject) =>  {
-			const edits = this.editRows.selectedValues
-				.map((row) => {
-					const value = row.action.id === this.CLEAR_ACTION ? null : row.value;
-
+			const edits = this.editRows.selectedValues.map((row: any) => {
+					let value = row.action.id === this.CLEAR_ACTION ? null : row.value;
+					if (this.isFieldControlOptionsList(row.field.control)) {
+						value = value.id;
+					}
 					return {
 						fieldName: row.field.id,
 						action: row.action.id,
@@ -206,7 +277,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				});
 
 			if (this.hasAssetEditPermission()) {
-				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits)
+				this.bulkChangeService.bulkUpdate(this.bulkChangeModel.selectedItems , edits, this.domains[0].id)
 					.subscribe((result) => {
 						resolve({action: BulkActions.Edit, success: true, message: `${this.affectedAssets} Assets edited successfully`});
 					}, (err) => {

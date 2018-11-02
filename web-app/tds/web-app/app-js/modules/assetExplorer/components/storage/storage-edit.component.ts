@@ -26,7 +26,6 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		]
 	})
 	class StorageShowComponent extends AssetCommonEdit {
-
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -45,12 +44,8 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			if (this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: ''
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
+			if (this.model.asset.scale && this.model.asset.scale.name) {
+				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
 		}
 
@@ -60,7 +55,9 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		public onUpdate(): void {
 			let modelRequest = R.clone(this.model);
 			// Scale Format
-			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			modelRequest.asset.scale = (modelRequest.asset.scale && modelRequest.asset.scale.value) ?
+				modelRequest.asset.scale.value : modelRequest.asset.scale;
+
 			this.model.customs.forEach((custom: any) => {
 				let customValue = modelRequest.asset[custom.field.toString()];
 				if (customValue && customValue.value) {

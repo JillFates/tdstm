@@ -7,15 +7,14 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/task-comment/dialog/task-comment-dialog.component.html'
 })
 export class TaskCommentDialogComponent {
-
 	constructor(
-		private activeDialog: UIActiveDialogService,
-		protected assetModalModel: AssetModalModel) {}
-
+		protected assetModalModel: AssetModalModel,
+		public activeDialog: UIActiveDialogService,
+		@Inject('currentUserId') private currentUserId: number) {}
 	/**
-	 * Close the Dialog but first it verify is not Dirty
+	 * Close the Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.activeDialog.close(false);
+		this.activeDialog.dismiss();
 	}
 }
