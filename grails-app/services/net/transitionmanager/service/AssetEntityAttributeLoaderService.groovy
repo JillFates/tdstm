@@ -34,6 +34,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	MoveBundleService moveBundleService
+	AssetOptionsService assetOptionsService
 
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'
 	private static final String UNKNOWN_MFG_MODEL = 'Unknown'
@@ -280,7 +281,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  NumberUtil.toInteger(createUsize), userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
-					AssetOptions.findOrSaveWhere(type: AssetOptions.AssetOptionsType.ASSET_TYPE, value: createDeviceType)
+					assetOptionsService.findOrCreate(AssetOptions.AssetOptionsType.ASSET_TYPE, createDeviceType)
 					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
 				} catch (e) {
 					errorMsg = e.message

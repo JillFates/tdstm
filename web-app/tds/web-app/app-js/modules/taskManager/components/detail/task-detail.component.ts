@@ -18,6 +18,7 @@ import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 
 @Component({
 	selector: `task-detail`,
@@ -43,6 +44,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected hasDeleteTaskPermission = false;
 	protected modalOptions: DecoratorOptions;
 	protected model: any = {};
+	protected SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 
 	constructor(

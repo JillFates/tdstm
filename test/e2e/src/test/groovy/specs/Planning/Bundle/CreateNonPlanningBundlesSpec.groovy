@@ -21,7 +21,7 @@ class CreateNonPlanningBundlesSpec extends GebReportingSpec {
     static testCount
     static baseName = "QAE2E"
     static randStr = CommonActions.getRandomString()
-    static bundleData = [baseName+" "+randStr+" Planning", baseName+" bundle created by automated test",
+    static bundleData = [baseName+" "+randStr+" NON-Planning", baseName+" bundle created by automated test",
                          "STD_PROCESS",false]
 
     def setupSpec() {

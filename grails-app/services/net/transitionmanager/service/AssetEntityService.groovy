@@ -162,6 +162,7 @@ class AssetEntityService implements ServiceMethods {
     def assetService
     def commentService
 	def tagAssetService
+	AssetOptionsService assetOptionsService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1090,7 +1091,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyTypes() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE, [sort: "value", order: "asc"])*.value
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 	}
 
 	/**
@@ -1098,7 +1099,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getDependencyStatuses() {
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)*.value
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 	}
 
 	/**
@@ -1106,7 +1107,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION, [sort: "value", order: "asc"])*.value
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 	}
 
 	/**
@@ -1114,7 +1115,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetPlanStatusOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)*.value
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 	}
 
 	/**
@@ -1122,7 +1123,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the values
 	 */
 	List<String> getAssetPriorityOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)*.value
+		return assetOptionsService.findAllValuesByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 	}
 
 	/**

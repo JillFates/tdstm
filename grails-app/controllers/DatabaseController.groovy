@@ -14,6 +14,7 @@ import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetOptionsService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
@@ -41,6 +42,7 @@ class DatabaseController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	AssetService assetService
 	def customDomainService
+	AssetOptionsService assetOptionsService
 
 	@HasPermission(Permission.AssetView)
 	def list() {
@@ -299,8 +301,8 @@ class DatabaseController implements ControllerMethods {
 
 		assetService.setCustomDefaultValues(databaseInstance)
 
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		List<AssetOptions> environmentOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.DATABASE)
 		def customFields = assetEntityService.getCustomFieldsSettings(project, databaseInstance.assetClass.toString(), true)
