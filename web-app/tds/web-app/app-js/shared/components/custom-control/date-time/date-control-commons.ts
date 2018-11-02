@@ -15,14 +15,12 @@ export abstract class DateControlCommons implements OnInit {
 	constructor(
 				protected userPreferenceService: PreferenceService,
 				protected intl: IntlService,
-				outputFormat: string,
-				displayFormat: string) {
+				outputFormat: string) {
 		this.outputFormat = outputFormat;
-		this.displayFormat = displayFormat;
 	}
 
 	ngOnInit(): void {
-		this.dateValue = this.value ? DateUtils.compose(this.value) : new Date();
+		this.dateValue = this.value ? DateUtils.toDate(this.value) : new Date();
 		this.onValueChange(this.dateValue);
 	}
 

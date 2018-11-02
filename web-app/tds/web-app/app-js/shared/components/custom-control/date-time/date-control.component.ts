@@ -17,18 +17,13 @@ import {DateUtils} from '../../../utils/date.utils';
 })
 /**
  * input: yyyy-MM-dd
- * output: yyyy-MM-dd
+ * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class DateControlComponent extends DateControlCommons {
 
 	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
-		super(userPreferenceService, intl, 'yyyy-MM-dd',
-			DateUtils.translateDateFormatToKendoFormat(DateUtils.DEFAULT_FORMAT_DATE));
-		this.userPreferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				// DateUtils.formatUserDateTime(userTimeZone, dateTimeString);
-				this.displayFormat = dateFormat;
-			});
+		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATE_FORMAT);
+		this.displayFormat = this.userPreferenceService.getUserDateFormatForKendo();
 	}
 
 	onValueChange($event: Date): void {

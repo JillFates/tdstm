@@ -33,12 +33,15 @@ import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive'
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 import { UIAutoCenterDirective } from './directives/autocenter-directive';
 import { InputPasteDirective } from './directives/input-paste.directive';
+
 // Shared Pipes
 import { UserDateTime } from './pipes/userDateTime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 import { UtilsPipe } from './pipes/utils.pipe';
+import {DatePipe} from './pipes/date.pipe';
+
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -57,7 +60,7 @@ import { AkaComponent } from './components/aka/aka.component';
 import { ConnectorComponent } from './components/connector/connector.component';
 import { FieldReferencePopupComponent } from './components/field-reference-popup/field-reference-popup.component';
 import { DateControlComponent } from './components/custom-control/date-time/date-control.component';
-import { DateTimeControlComponent } from './components/custom-control/date-time/date-time-control.component';
+import { DateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { NumberControlComponent } from './components/custom-control/number/number-control.component';
 
 // Dictionary
@@ -87,6 +90,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
+		DatePipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -128,6 +132,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
+		DatePipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		DynamicComponent,

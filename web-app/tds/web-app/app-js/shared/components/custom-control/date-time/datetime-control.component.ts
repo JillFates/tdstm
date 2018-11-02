@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {PreferenceService} from '../../../services/preference.service';
 import {IntlService} from '@progress/kendo-angular-intl';
 import {DateControlCommons} from './date-control-commons';
+import {DateUtils} from '../../../utils/date.utils';
 
 @Component({
 	selector: 'tds-datetime-control',
@@ -15,13 +16,16 @@ import {DateControlCommons} from './date-control-commons';
 	`
 })
 /**
- * input: yyyy-MM-ddThh:mm:ssZ or yyyy-MM-dd hh:mm:ss
+ * input: yyyy-MM-dd hh:mm:ss
  * output: yyyy-MM-ddThh:mm:ssZ
  */
 export class DateTimeControlComponent extends DateControlCommons {
 
+	private readonly DISPLAY_FORMAT = 'yyyy-MM-dd hh:mm:ss';
+
 	constructor(userPreferenceService: PreferenceService, intl: IntlService) {
-		super(userPreferenceService, intl, 'yyyy-MM-ddThh:mm:ssZ', 'yyyy-MM-dd hh:mm:ss');
+		super(userPreferenceService, intl, DateUtils.TDS_OUTPUT_DATETIME_FORMAT);
+		this.displayFormat = this.DISPLAY_FORMAT;
 	}
 
 	onValueChange($event: Date): void {

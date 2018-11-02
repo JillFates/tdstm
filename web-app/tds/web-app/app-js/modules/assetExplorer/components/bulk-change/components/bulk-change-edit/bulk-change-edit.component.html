@@ -99,10 +99,13 @@
                                                     [(value)]="editRows.selectedValues[rowIndex].value"></tds-number-control>
 
                                     <!-- Datetime Fields -->
-                                    {{editRows.selectedValues[rowIndex].value}}<br>
-                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
-                                                       [(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>
+                                    <b>Output:</b> {{editRows.selectedValues[rowIndex].value}}<br>
+
+                                    <!--<b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | tdsDate: userDateFormat}}<br>-->
+                                    <!--<tds-date-control *ngIf="canShowControl('DateTime', rowIndex)"-->
+                                                       <!--[(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>-->
                                     <!-- Datetime Fields -->
+                                    <b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | userDateTime: userTimeZone}}<br>
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
                                                        [(value)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
 
