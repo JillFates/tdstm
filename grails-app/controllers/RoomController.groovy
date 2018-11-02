@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
+import net.transitionmanager.command.RoomCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
@@ -83,7 +84,8 @@ class RoomController implements ControllerMethods {
 
 	@HasPermission(Permission.RoomCreate)
 	def save() {
-		flash.message = roomService.save(params)
+		RoomCommand roomCommand = populateCommandObject(RoomCommand)
+		flash.message = roomService.save(roomCommand)
 		redirect(action: "list", params: [viewType: "list"])
 	}
 

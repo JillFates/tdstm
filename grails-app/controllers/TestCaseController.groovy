@@ -4,6 +4,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.PartyGroup
@@ -49,11 +50,13 @@ class TestCaseController implements ControllerMethods {
 	def agents() {
 		renderAsJson(apiCatalogService.listCatalogNames())
 	}
-		
+
+	@Deprecated
 	def api() {
 		try {
-			ApiAction apis = apiActionService.saveAndGet(params)
-			render "${apis.name} agentClass=${apis.agentClass} callbackMode=${apis.callbackMode}"
+			ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
+			ApiAction apis = apiActionService.saveOrUpdateApiAction(apiActionCommand)
+			render "${apis.name} callbackMode=${apis.callbackMode}"
 		} catch (ServiceException se) {
 			render se.message
 		}

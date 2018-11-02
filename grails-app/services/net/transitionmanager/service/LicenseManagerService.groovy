@@ -238,6 +238,7 @@ class LicenseManagerService extends LicenseCommonService {
 		}
 	}
 
+	@Transactional
 	void updateLicense(id, json) throws Exception{
 		LicensedClient lic
 		if(id) {
@@ -246,14 +247,14 @@ class LicenseManagerService extends LicenseCommonService {
 		}
 
 		if(lic) {
-			lic.save()
-			if(lic.hasErrors()){
-				def errors = ""
-				log.debug("da Error {}", lic.errors)
-				lic.errors.each {err->
-					errors << "${err}/n"
+			if(! lic.save() ){
+				if( log.isDebugEnabled() ) {
+					String errors = ""
+					lic.errors.each { err ->
+						errors << "${err}/n"
+					}
+					log.debug("Errors {}", errors)
 				}
-				log.debug("Errors {}", errors)
 				throw new ServiceException("${id} not found.")
 			}
 		}else{

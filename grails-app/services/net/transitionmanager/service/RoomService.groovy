@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
+import net.transitionmanager.command.RoomCommand
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
@@ -278,10 +279,11 @@ class RoomService implements ServiceMethods {
 		return skippedRooms
 	}
 
-	@Transactional
-	String save(def params) {
+	String save(RoomCommand roomCommand) {
+		Room room = new Room()
+		roomCommand.populateDomain(room, false)
+
 		String retMessage
-		Room room = new Room(params)
 		if (room.save(flush: true)) {
 			retMessage = "Room : $room.roomName is created"
 		}

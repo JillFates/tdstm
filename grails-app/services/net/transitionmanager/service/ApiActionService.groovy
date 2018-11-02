@@ -722,14 +722,4 @@ class ApiActionService implements ServiceMethods {
 			}
 		}
 	}
-
-	ApiAction saveAndGet(params) throw ServiceException {
-		log.debug "=====================\nAbout to save ApiAction\n====================="
-		ApiAction aa = new ApiAction(params)
-		if (! aa.save() ) {
-			throw new ServiceException('save failed:' + GormUtil.allErrorsString(aa))
-		}
-
-		return ApiAction.findAll()[0]
-	}
 }

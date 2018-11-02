@@ -87,7 +87,7 @@ class WsLicenseManagerController implements ControllerMethods {
 			render e.message
 		} catch (FileNotFoundException nfe) {
 			response.status = 404
-			render e.message
+			render nfe.message
 		}
 	}
 
