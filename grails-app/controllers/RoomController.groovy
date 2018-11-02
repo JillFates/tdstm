@@ -5,8 +5,9 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.RoomCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Model
@@ -14,7 +15,6 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
@@ -23,7 +23,6 @@ import net.transitionmanager.service.RoomService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoomController implements ControllerMethods {
 

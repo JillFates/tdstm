@@ -78,16 +78,21 @@ class WsLicenseManagerController implements ControllerMethods {
 		}
 	}
 
+	/**
+	 * Updates the license definition
+	 * In case of problems throws a REST response (using 40x messages)
+	 * @return
+	 */
 	def updateLicense(){
 		try {
 			licenseManagerService.updateLicense(params.id, request.JSON)
 			renderSuccessJson("saved")
 		} catch (ServiceException e) {
 			response.status = 400
-			render e.message
+			throw e
 		} catch (FileNotFoundException nfe) {
 			response.status = 404
-			render nfe.message
+			throw nfe
 		}
 	}
 
