@@ -1623,7 +1623,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM02,Production,C,1234.567,BundleReady,Confirmed
 				NGM03,Production,C,,BundleReady,Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
@@ -1635,12 +1634,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				console on
+				domain Storage
 				iterate {
-					// Create / Update the Host servers
-					domain Storage
 					extract 'Name' load 'Name'
-					extract 'Size' transform with toInteger() load 'size'   
+					extract 'Size' transform with toInteger() load 'size'
 				}
 			""".stripIndent())
 
@@ -1651,45 +1648,18 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
-					data.size() == 4
+					data.size() == 3
 					with(data[0], RowResult) {
-						rowNum == 1
-						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM01'
-							init == null
-							errors == []
-						}
+						errorCount == 1
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == '10.22'
 							init == null
-							errors == []
+							errors == ['Unable to transform value to Integer']
 						}
 					}
 					with(data[1], RowResult) {
-						rowNum == 2
 						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM02'
-							init == null
-							errors == []
-						}
-						with(fields.size, FieldResult) {
-							originalValue == '1234.567'
-							value == 1234
-							init == null
-							errors == []
-						}
-					}
-					with(data[2], RowResult) {
-						rowNum == 3
-						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM03'
-							init == null
-							errors == []
-						}
 						with(fields.size, FieldResult) {
 							originalValue == null
 							value == null
@@ -1697,14 +1667,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 							errors == []
 						}
 					}
-					with(data[3], RowResult) {
-						rowNum == 4
+					with(data[2], RowResult) {
 						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM04'
-							init == null
-							errors == []
-						}
 						with(fields.size, FieldResult) {
 							originalValue == '5'
 							value == 5
@@ -1729,7 +1693,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
-				NGM02,Production,C,1234.567,BundleReady,Confirmed
 				NGM03,Production,C,,BundleReady,Confirmed
 				NGM04,UAT,B,5,Validated,Unassigned
 			""".stripIndent())
@@ -1741,12 +1704,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				console on
+				domain Storage
 				iterate {
-					// Create / Update the Host servers
-					domain Storage
 					extract 'Name' load 'Name'
-					extract 'Size' transform with toLong() load 'size'   
+					extract 'Size' transform with toLong() load 'size'
 				}
 			""".stripIndent())
 
@@ -1757,10 +1718,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 				with(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
-					data.size() == 4
+					data.size() == 3
 					with(data[0], RowResult) {
-						rowNum == 1
-						errorCount == 0
+						errorCount == 1
 						with(fields.assetName, FieldResult) {
 							value == 'NGM01'
 							init == null
@@ -1768,28 +1728,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == '10.22'
 							init == null
-							errors == []
+							errors == ['Unable to transform value to Long']
 						}
 					}
 					with(data[1], RowResult) {
 						rowNum == 2
-						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM02'
-							init == null
-							errors == []
-						}
-						with(fields.size, FieldResult) {
-							originalValue == '1234.567'
-							value == 1234
-							init == null
-							errors == []
-						}
-					}
-					with(data[2], RowResult) {
-						rowNum == 3
 						errorCount == 0
 						with(fields.assetName, FieldResult) {
 							value == 'NGM03'
@@ -1803,8 +1748,22 @@ class ETLTransformSpec extends ETLBaseSpec {
 							errors == []
 						}
 					}
-					with(data[3], RowResult) {
-						rowNum == 4
+					with(data[2], RowResult) {
+						rowNum == 3
+						errorCount == 0
+						with(fields.assetName, FieldResult) {
+							value == 'NGM04'
+							init == null
+							errors == []
+						}
+						with(fields.size, FieldResult) {
+							originalValue == '5'
+							value == 5
+							init == null
+							errors == []
+						}
+					}
+					with(data[2], RowResult) {
 						errorCount == 0
 						with(fields.assetName, FieldResult) {
 							value == 'NGM04'
