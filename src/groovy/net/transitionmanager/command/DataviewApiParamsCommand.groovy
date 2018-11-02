@@ -52,7 +52,6 @@ class DataviewApiFilterParam {
 
 	static final String FILTER_PARAMETER_SEPARATOR_CHARACTER = '='
 	static final String FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER = '_'
-	static final String FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER = '_'
 
 	String content
 	String domain
@@ -91,7 +90,7 @@ class DataviewApiFilterParam {
 			obj.filter = filter[1]
 
 			if (obj.fieldName.contains(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER)) {
-				List<String> parts = obj.fieldName.split(FILTER_PARAMETER_FIELD_NAME_SPLITTER_CHARACTER) as List
+				List<String> parts = obj.fieldName.split(FILTER_PARAMETER_FIELD_NAME_SEPARATOR_CHARACTER) as List
 				if (parts?.size() != 2 || StringUtil.isBlank(parts[0]) || StringUtil.isBlank(parts[1])) {
 					return false
 				}
