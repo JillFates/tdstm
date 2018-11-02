@@ -1653,7 +1653,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						errorCount == 1
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Integer']
 						}
@@ -1661,8 +1661,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					with(data[1], RowResult) {
 						errorCount == 0
 						with(fields.size, FieldResult) {
-							originalValue == '1234.567'
-							value == 1234
+							originalValue == null
+							value == null
 							init == null
 							errors == []
 						}
@@ -1728,28 +1728,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						with(fields.size, FieldResult) {
 							originalValue == '10.22'
-							value == 10
+							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Long']
 						}
 					}
 					with(data[1], RowResult) {
 						rowNum == 2
-						errorCount == 0
-						with(fields.assetName, FieldResult) {
-							value == 'NGM02'
-							init == null
-							errors == []
-						}
-						with(fields.size, FieldResult) {
-							originalValue == '1234.567'
-							value == 1234
-							init == null
-							errors == []
-						}
-					}
-					with(data[2], RowResult) {
-						rowNum == 3
 						errorCount == 0
 						with(fields.assetName, FieldResult) {
 							value == 'NGM03'
@@ -1759,6 +1744,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 						with(fields.size, FieldResult) {
 							originalValue == null
 							value == null
+							init == null
+							errors == []
+						}
+					}
+					with(data[2], RowResult) {
+						rowNum == 3
+						errorCount == 0
+						with(fields.assetName, FieldResult) {
+							value == 'NGM04'
+							init == null
+							errors == []
+						}
+						with(fields.size, FieldResult) {
+							originalValue == '5'
+							value == 5
 							init == null
 							errors == []
 						}
