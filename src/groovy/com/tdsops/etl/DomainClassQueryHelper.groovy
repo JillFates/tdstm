@@ -118,18 +118,16 @@ class DomainClassQueryHelper {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
-		String hqlAlias = hqlAlias(clazz, hqlWhere)
-		String hqlSelect = hqlSelect(hqlAlias, returnIdOnly)
+		String hqlSelect = hqlSelect(returnIdOnly)
 
 		String hql = """
             select $hqlSelect
-              from AssetEntity $DOMAIN_ALIAS $hqlAlias
+              from AssetEntity $DOMAIN_ALIAS
 				   $hqlJoins
 			 where ${DOMAIN_ALIAS}.project = :project
                and ${DOMAIN_ALIAS}.assetClass = :assetClass
 			   and $hqlWhere
 		""".stripIndent()
-
 
 		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams
 
@@ -150,8 +148,7 @@ class DomainClassQueryHelper {
 
 		def (hqlWhere, hqlParams) = hqlWhereAndHqlParams(project, clazz, conditions)
 		String hqlJoins = hqlJoins(clazz, conditions)
-		String hqlAlias = hqlAlias(clazz, hqlWhere)
-		String hqlSelect = hqlSelect(hqlAlias, returnIdOnly)
+		String hqlSelect = hqlSelect(returnIdOnly)
 
 		if (GormUtil.isDomainProperty(clazz, 'project')) {
 			hqlWhere += " and ${DOMAIN_ALIAS}.project = :project \n".toString()
@@ -160,7 +157,7 @@ class DomainClassQueryHelper {
 
 		String hql = """
 			  select $hqlSelect
-              from ${clazz.simpleName} $DOMAIN_ALIAS ${hqlAlias}
+              from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
              where $hqlWhere
 		""".stripIndent()
@@ -453,67 +450,19 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 * Prepares Aliases based on hqlWhere sentence.
-	 * If hqlWhere contains 'manufacturer.name' or 'model.modelName'
-	 * it is necessary to add {code ManufacturerAlias} and {@code ModelAlias}
-	 * in the hql sentence.
-	 * Given:
-	 * <pre>
-	 *	String manufacturerAliasName = 'Hewlett Packard custom'
-	 * 	String manufacturerName = 'HP custom'
-	 * 	String modelAliasName = 'BL460C G1 custom'
-	 * 	String modelName = 'ProLiant BL460c G1 custom'
-	 * </pre>
-	 * An ETL script can contains this find commands using names or aliases underneath
-	 * <pre>
-	 * 	find Model by 'modelName' eq 'BL460C G1 custom'
-	 * 	     	  and 'manufacturer' eq 'Hewlett Packard custom'
-	 * 	     	 into 'id'
-	 *
-	 * 	find Model by 'modelName' eq 'ProLiant BL460c G1' custom'
-	 *       	  and 'manufacturer' eq 'ProLiant BL460c G1 custom'
-	 *       	 into 'id'
-	 * </pre>
-	 * @param clazz
-	 * @param hqlWhere HQL sentence
-	 * @return hqlAlias to be added in a HQL sentence
-	 */
-	static String hqlAlias(Class clazz, String hqlWhere) {
-
-		String aliases = ""
-
-		if (hqlWhere.contains("${DOMAIN_ALIAS}.manufacturer.name") ||
-			(hqlWhere.contains("${DOMAIN_ALIAS}.name") && clazz in Manufacturer)) {
-			aliases += ", ManufacturerAlias ${MANUFACTURER_ALIAS}"
-		}
-		if (hqlWhere.contains("${DOMAIN_ALIAS}.model.modelName") ||
-			(hqlWhere.contains("${DOMAIN_ALIAS}.modelName") && clazz in Model)) {
-			aliases += ", ModelAlias ${MODEL_ALIAS}"
-		}
-
-		return aliases
-	}
-
-	/**
 	 * Creates select part in an HQL sentence.
-	 * It has 2 intents:
-	 * 1) Check if results should only contains IDs instead of Gorm domain instances
-	 * 2) Validate if It is necessary to add distinct in HQL sentence based on if it has Aliases added
+	 * Check if results should only contains IDs instead of Gorm domain instances
+	 * Validate if It is necessary to add distinct in HQL sentence based on if it has Aliases added
 	 *
-	 * @param hqlAlias hql alias content
 	 * @param returnIdOnly boolean valu that define if select should return only IDs
 	 * @return a String with final HQL sentence content
 	 */
-	static String hqlSelect(String hqlAlias, Boolean returnIdOnly){
+	static String hqlSelect(Boolean returnIdOnly){
 
 		String select = DOMAIN_ALIAS
 
 		if(returnIdOnly){
 			select += '.id'
-		}
-
-		if(!hqlAlias.isEmpty()){
-			select = 'distinct(' + select + ')'
 		}
 
 		return select
@@ -631,12 +580,16 @@ class DomainClassQueryHelper {
 	 * </pre>
 	 * <p>Then it adds the following hql content:</p>
 	 * <pre>
-	 * 	select D.id
-	 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
-	 * 	  left outer join D.manufacturer
-	 * 	 where D.project = :project
-	 * 	   and D.assetClass = :assetClass
-	 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
+	 *   select D
+	 * 	   from AssetEntity D
+	 * 	   left outer join D.manufacturer
+	 * 	  where D.project = :project
+	 * 		and D.assetClass = :assetClass
+	 * 		and ( D.manufacturer.name = :manufacturer_name
+	 * 			or D.manufacturer in (
+	 * 		    	select MFG_ALIAS.manufacturer
+	 * 		      	  from ManufacturerAlias MFG_ALIAS
+	 * 		      	 where MFG_ALIAS.name = :manufacturer_name )
 	 * </pre>
 	 * @param clazz
 	 * @param property
@@ -647,13 +600,57 @@ class DomainClassQueryHelper {
 	static String checkAndAddAliases(Class clazz, String property, String namedParameter, String sentence) {
 
 		if (property.contains("${DOMAIN_ALIAS}.manufacturer.name")) {
-			return "\n( ${sentence} or ( ${MANUFACTURER_ALIAS}.manufacturer = ${DOMAIN_ALIAS}.manufacturer and ${MANUFACTURER_ALIAS}.name = :${namedParameter} )) ".toString()
+			/**
+			 * find Device by manufacturer eq '...' into '..'
+			 */
+			return """
+				( ${sentence} or 
+					D.manufacturer in ( 
+						select ${MANUFACTURER_ALIAS}.manufacturer
+                  		  from ManufacturerAlias ${MANUFACTURER_ALIAS}
+                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter} 
+                     )	
+				 )
+			"""
 		} else if (property.contains("${DOMAIN_ALIAS}.name") && clazz in Manufacturer) {
-			return "\n( ${sentence} or ( ${MANUFACTURER_ALIAS}.manufacturer = ${DOMAIN_ALIAS} and ${MANUFACTURER_ALIAS}.name = :${namedParameter} )) ".toString()
+			/**
+			 * find Manufacturer by name eq '...' into '..'
+			 */
+			return """
+				( ${sentence} or 
+					D in ( 
+						select ${MANUFACTURER_ALIAS}.manufacturer
+                  		  from ManufacturerAlias ${MANUFACTURER_ALIAS}
+                   	     where ${MANUFACTURER_ALIAS}.name = :${namedParameter} 
+                     )	
+				 )
+			"""
 		} else if (property.contains("${DOMAIN_ALIAS}.model.modelName")) {
-			return "\n( ${sentence} or ( ${MODEL_ALIAS}.model = ${DOMAIN_ALIAS}.model and ${MODEL_ALIAS}.name = :${namedParameter} )) ".toString()
+			/**
+			 * find Device by model eq '...' into '..'
+			 */
+			return """
+			( ${sentence} or 
+			  D.model in ( 
+				select ${MODEL_ALIAS}.model
+				  from ModelAlias ${MODEL_ALIAS}
+				 where ${MODEL_ALIAS}.name = :${namedParameter} 
+			  )	
+			)
+			"""
 		} else if ((property.contains("${DOMAIN_ALIAS}.modelName") && clazz in Model)) {
-			return "\n( ${sentence} or ( ${MODEL_ALIAS}.model = ${DOMAIN_ALIAS} and ${MODEL_ALIAS}.name = :${namedParameter} )) ".toString()
+			/**
+			 * find Model by modelName eq '...' into '..'
+			 */
+			return """
+			( ${sentence} or 
+			  D in ( 
+				select ${MODEL_ALIAS}.model
+				  from ModelAlias ${MODEL_ALIAS}
+				 where ${MODEL_ALIAS}.name = :${namedParameter} 
+			  )	
+			)
+			"""
 		}
 
 		return sentence

@@ -18,6 +18,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.MoveEventTestHelper
@@ -862,7 +863,13 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				]
 			)
 
-		then:
+		then: """select D.id
+                  from AssetEntity D
+                  left outer join D.manufacturer
+                 where D.project = :project
+                   and D.assetClass = :assetClass
+                   and D.manufacturer.id = :manufacturer_id
+			"""
 			results.size() == 1
 
 		when: "find Device by 'manufacturer' eq 'HP custom' into 'id'"
@@ -874,15 +881,17 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				false
 			)
 
-		then:
-			/**
-			 * 	select D.id
-			 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
-			 * 	  left outer join D.manufacturer
-			 * 	 where D.project = :project
-			 * 	   and D.assetClass = :assetClass
-			 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
-			 */
+		then: """select D
+		 	       from AssetEntity D
+		 	       left outer join D.manufacturer
+		 		  where D.project = :project
+		     		and D.assetClass = :assetClass
+		     		and ( D.manufacturer.name = :manufacturer_name
+		      		  		or D.manufacturer in (
+		      					select MFG_ALIAS.manufacturer
+		      			  		  from ManufacturerAlias MFG_ALIAS
+		      			 		 where MFG_ALIAS.name = :manufacturer_name )
+		    )"""
 			results.size() == 1
 			results[0].id == device.id
 			results[0].manufacturer.id == manufacturer.id
@@ -897,15 +906,17 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				false
 			)
 
-		then:
-			/**
-			 * 	select D
-			 * 	  from AssetEntity D , ManufacturerAlias MFG_ALIAS
-			 * 	  left outer join D.manufacturer
-			 * 	 where D.project = :project
-			 * 	   and D.assetClass = :assetClass
-			 * 	   and ( D.manufacturer.name = :manufacturer_name or ( MFG_ALIAS.manufacturer = D.manufacturer and MFG_ALIAS.name = :manufacturer_name ))
-			 */
+		then: """select D
+		 	       from AssetEntity D
+		 	       left outer join D.manufacturer
+		 		  where D.project = :project
+		     		and D.assetClass = :assetClass
+		     		and ( D.manufacturer.name = :manufacturer_name
+		      		  		or D.manufacturer in (
+		      					select MFG_ALIAS.manufacturer
+		      			  		  from ManufacturerAlias MFG_ALIAS
+		      			 		 where MFG_ALIAS.name = :manufacturer_name )
+		    )"""
 			results.size() == 1
 			results[0].id == device.id
 			results[0].manufacturer.id == manufacturer.id
@@ -948,7 +959,13 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				false
 			)
 
-		then:
+		then: """select D
+				   from AssetEntity D
+		   		   left outer join D.model
+				  where D.project = :project
+				    and D.assetClass = :assetClass
+		  			and D.model.id = :model_id
+		"""
 			results.size() == 1
 			results[0].id == device.id
 			results[0].model.id == model.id
@@ -963,18 +980,20 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 				false
 			)
 
-		then:
-			/**
-			 * 	select D.id
-			 * 	  from AssetEntity D , ModelAlias MDL_ALIAS
-			 * 	  left outer join D.model
-			 * 	 where D.project = :project
-			 * 	   and D.assetClass = :assetClass
-			 * 	   and (
-			 * 	   	D.model.modelName = :model_modelName
-			 * 	   		or
-			 * 	   	( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
-			 */
+		then: """select D
+                   from AssetEntity D
+                   left outer join D.model
+                  where D.project = :project
+                    and D.assetClass = :assetClass
+                    and ( D.model.modelName = :model_modelName	
+                    	or
+                    	  D.model in (
+                    	  	select MDL_ALIAS.model
+                    	  	  from ModelAlias MDL_ALIAS
+                    	  	 where MDL_ALIAS.name = :model_modelName
+                    	  )
+                  )
+			"""
 			results.size() == 1
 			results[0].id == device.id
 			results[0].model.id == model.id
@@ -990,14 +1009,6 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec {
 			)
 
 		then:
-			/**
-			 *	select D
-			 *	  from AssetEntity D , ModelAlias MDL_ALIAS
-			 *	  left outer join D.model
-			 *	 where D.project = :project
-			 *	   and D.assetClass = :assetClass
-			 *	   and ( D.model.modelName = :model_modelName or ( MDL_ALIAS.model = D.model and MDL_ALIAS.name = :model_modelName ))
-			 */
 			results.size() == 1
 			results[0].model.id == model.id
 			results[0].model.modelName == model.modelName
