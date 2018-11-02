@@ -25,9 +25,9 @@ class AssetDetailsPage extends Page{
         tags { assetDetailModal.find("span.tag")}
         commonsModule { module CommonsModule}
         commentsContent { assetDetailModal.find('.comment-content')}
-        addCommentsButton { commentsContent.find('button.btn-add')}
-        commentsSectionTitle { commentsContent.find('label.task')}
-        commentRows { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
+        addCommentsButton(wait: true) { commentsContent.find('button.btn-add')}
+        commentsSectionTitle(wait: true) { commentsContent.find('label.task')}
+        commentRows(wait: true) { commentsContent.find('kendo-grid-list tr[kendogridlogicalrow]')}
     }
 
     def validateDataIsPresent(List rowData, List dataDisplayed){
