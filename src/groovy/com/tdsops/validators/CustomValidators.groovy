@@ -75,6 +75,8 @@ class CustomValidators {
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
+			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeValidator
+			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeValidator
 
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
