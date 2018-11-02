@@ -4,9 +4,8 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';

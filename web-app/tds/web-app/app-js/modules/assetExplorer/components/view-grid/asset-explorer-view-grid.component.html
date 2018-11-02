@@ -1,195 +1,215 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
-<kendo-grid class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)" (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+<kendo-grid
+	            class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component"
+	            [filterable]="true"
+	            [sortable]="{ mode:'single' }"
+	            [data]="gridData"
+	            [skip]="gridState.skip"
+	            [sort]="gridState.sort"
+	            [pageSize]="gridState.take"
+	            [resizable]="true"
+	            [pageable]="{ pageSizes: maxOptions, info: true}"
+	            (dataStateChange)="dataStateChange($event)"
+	            (columnResize)="onWidthChange($event)"
+	            (cellClick)="cellClick($event)"
+	            [rowClass]="rowCallbackClass"
+	>
 
-    <!-- Header Toolbar -->
-    <ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
-		<div class="col-sm-6 bulkchange-section">
-			<div class="btn-group btn-between-space-5"
-				 *ngIf="displayCreateButton()">
-				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
-						data-toggle="dropdown"
-						*ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS">
-					{{ 'GLOBAL.CREATE' | translate }}
-				</button>
-				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
-						*ngIf="_viewId !== ASSET_ENTITY_MENU.All_ASSETS"
-						(click)="onCreateAsset(createButtonState)">
-					{{ 'GLOBAL.CREATE' | translate }}
-				</button>
-				<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
-						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="caret"></span>
-					<span class="sr-only">Toggle Dropdown</span>
-				</button>
-				<ul class="dropdown-menu">
-					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
-						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
-					</li>
-					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
-						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
-					</li>
-					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
-						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
-					</li>
-					<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
-						<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
-					</li>
-				</ul>
+		<!-- Header Toolbar -->
+		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
+			<div class="col-sm-6 bulkchange-section">
+				<div class="btn-group btn-between-space-5"
+				     *ngIf="displayCreateButton()">
+					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					        data-toggle="dropdown"
+					        *ngIf="_viewId === ASSET_ENTITY_MENU.All_ASSETS">
+						{{ 'GLOBAL.CREATE' | translate }}
+					</button>
+					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					        *ngIf="_viewId !== ASSET_ENTITY_MENU.All_ASSETS"
+					        (click)="onCreateAsset(createButtonState)">
+						{{ 'GLOBAL.CREATE' | translate }}
+					</button>
+					<button type="button" class="btn btn-default dropdown-toggle" [disabled]="!canCreateAssets()"
+					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
+							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
+							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
+							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
+							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
+						</li>
+					</ul>
+				</div>
+				<tds-bulk-change-button [bulkData]="bulkData"
+				                        [enabled]="hasSelectedItems()"
+				                        (clickBulk)="onClickBulkButton()"
+				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
+				<div *ngIf="hasSelectedItems()" class="selected-assets">
+					<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
+				</div>
+				<div class="checkbox just-planning">
+					<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
+					       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
+					<label>Just Planning</label>
+				</div>
 			</div>
-			<tds-bulk-change-button [bulkData]="bulkData"
-			                        [enabled]="hasSelectedItems()"
-									(clickBulk)="onClickBulkButton()"
-			                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-			<div *ngIf="hasSelectedItems()" class="selected-assets">
-				<span class="badge badge-light">{{getSelectedItemsCount()}}</span><label>Asset(s) selected</label>
-			</div>
-			<div class="checkbox just-planning">
-				<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
-				       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
-				<label>Just Planning</label>
-			</div>
-		</div>
-	    <div class="col-sm-6 filters-section">
-		    <div>
-			    <button type="button" class="btn btn-default component-action-clear-filters" id="btnClear"
-			            [disabled]="!hasFilterApplied()"
-			            (click)="onClearFilters()">
-				    <i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
-		    </div>
-		    <div (click)="onReload()" class="component-action-reload">
-			    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-		    </div>
-	    </div>
-	</ng-template>
-
-    <!-- Select All column -->
-    <kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
-	    <ng-template kendoGridHeaderTemplate>
-		    <div class="row">
-			    <div class="col-md-12 text-center">
-				    <tds-checkbox name="assetsSelector"
-				                  [hasThirdState]="true"
-				                  (changeState)="onChangeBulkCheckbox($event)"
-				                  id="assetSelector"
-				                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
-			    </div>
-		    </div>
-	    </ng-template>
-
-		<ng-template kendoGridCellTemplate let-dataItem>
-            <label class="selectall-checkbox-column text-center">
-	            <input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
-            </label>
-		</ng-template>
-	</kendo-grid-column>
-
-	<!-- Action -->
-	<kendo-grid-command-column [width]="200" [locked]="true" >
-		<ng-template kendoGridHeaderTemplate>
-			<div class="text-center">
-				<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
-			</div>
-		</ng-template>
-		<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-			<div class="text-center">
-				<button class="btn btn-action btn-default"
-						title="Edit Asset"
-						(click)="showAssetEditView(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-edit"></span>
-				</button>
-				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.issue"
-						title="Create Task or Show Tasks"
-						(click)="showTask(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-list-alt"></span>
-				</button>
-				<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
-						title="Create Task or Show Tasks"
-						(click)="createTask(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-file-text-o"></span>
-				</button>
-				<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
-						title="Create Comment or Show Comments"
-						(click)="showComment(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-comments"></span>
-				</button>
-				<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.comment"
-						title="Create Comment or Show Comments"
-						(click)="createComment(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-comment"></span>
-				</button>
-				<button class="btn btn-action btn-default"
-						title="Clone Asset"
-						(click)="showAssetCloneView(dataItem, rowIndex)">
-					<span class="fa fa-fw fa-clone"></span>
-				</button>
-			</div>
-		</ng-template>
-	</kendo-grid-command-column>
-
-    <!-- Configured View Columns (*ngFor) -->
-	<kendo-grid-column *ngFor="let column of model.columns; let i = index" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
-	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
-		<ng-template kendoGridHeaderTemplate>
-			<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
-				<div [ngClass]="{'field-not-found': column?.notFound }">
-					<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+			<div class="col-sm-6 filters-section">
+				<div>
+					<button type="button" class="btn btn-default component-action-clear-filters" id="btnClear"
+					        [disabled]="!hasFilterApplied()"
+					        (click)="onClearFilters()">
+						<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+				</div>
+				<div (click)="onReload()" class="component-action-reload">
+					<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
 				</div>
 			</div>
 		</ng-template>
 
-        <!-- Default Generic Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
-            <div class=" has-feedback" style="margin-bottom:0px;">
-                <input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
-                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
-                <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
-                      aria-hidden="true"></span>
-            </div>
-        </ng-template>
-        <!-- Asset Tags Filter Template -->
-        <ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tagAssets'">
-            <tds-asset-tag-selector #tagSelector
-                                    [tagList]="metadata.tagList"
-                                    [viewFilterModel]="column.filter"
-                                    (valueChange)="onTagFilterChange(column, $event)">
-            </tds-asset-tag-selector>
-        </ng-template>
+		<!-- Select All column -->
+		<kendo-grid-column title="" [locked]="model && model.columns && model.columns.length > 0" *ngIf="model && model.columns && model.columns.length > 0" [width]="55" [filterable]="false">
+			<ng-template kendoGridHeaderTemplate>
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<tds-checkbox name="assetsSelector"
+						              [hasThirdState]="true"
+						              (changeState)="onChangeBulkCheckbox($event)"
+						              id="assetSelector"
+						              [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+					</div>
+				</div>
+			</ng-template>
 
-        <!-- Default Generic Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && column.property !== 'lastUpdated'">
+			<ng-template kendoGridCellTemplate let-dataItem>
+				<label class="selectall-checkbox-column text-center">
+					<input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
+				</label>
+			</ng-template>
+		</kendo-grid-column>
+
+		<!-- Action -->
+		<kendo-grid-command-column [width]="200" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+			<ng-template kendoGridHeaderTemplate>
+				<div class="text-center">
+					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
+				</div>
+			</ng-template>
+			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+				<div class="text-center">
+					<button class="btn btn-action btn-default"
+					        title="Edit Asset"
+					        (click)="showAssetEditView(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-edit"></span>
+					</button>
+					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.issue"
+					        title="Create Task or Show Tasks"
+					        (click)="showTask(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-list-alt"></span>
+					</button>
+					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.issue"
+					        title="Create Task or Show Tasks"
+					        (click)="createTask(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-file-text-o"></span>
+					</button>
+					<button class="btn btn-action btn-default" *ngIf="dataItem?.taskAndCommentFlags?.comment"
+					        title="Create Comment or Show Comments"
+					        (click)="showComment(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-comments"></span>
+					</button>
+					<button class="btn btn-action btn-default" *ngIf="!dataItem?.taskAndCommentFlags?.comment"
+					        title="Create Comment or Show Comments"
+					        (click)="createComment(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-comment"></span>
+					</button>
+					<button class="btn btn-action btn-default"
+					        title="Clone Asset"
+					        (click)="showAssetCloneView(dataItem, rowIndex)">
+						<span class="fa fa-fw fa-clone"></span>
+					</button>
+				</div>
+			</ng-template>
+		</kendo-grid-command-column>
+
+		<!-- Configured View Columns (*ngFor) -->
+		<kendo-grid-column
+				*ngFor="let column of model.columns; let i = index"
+				[locked]="column.locked"
+				field="{{column.domain}}_{{column.property}}"
+				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH"
+				[width]="column.width"
+				[class]="column.domain"
+		>
+			<ng-template kendoGridHeaderTemplate>
+				<div class="sortable-column component-action-sort" (click)="onClickTemplate($event)">
+					<div [ngClass]="{'field-not-found': column?.notFound }">
+						<label class="text-delimited"> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NOT_LONGER_EXIST_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
+					</div>
+				</div>
+			</ng-template>
+
+			<!-- Default Generic Filter Template -->
+			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
+				<div class=" has-feedback" style="margin-bottom:0px;">
+					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
+					       [(ngModel)]="column.filter" (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)" input-paste (onPaste)="onPaste(column)">
+					<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback component-action-clear-filter"
+					      aria-hidden="true"></span>
+				</div>
+			</ng-template>
+			<!-- Asset Tags Filter Template -->
+			<ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tagAssets'">
+				<tds-asset-tag-selector #tagSelector
+				                        [tagList]="metadata.tagList"
+				                        [viewFilterModel]="column.filter"
+				                        (valueChange)="onTagFilterChange(column, $event)">
+				</tds-asset-tag-selector>
+			</ng-template>
+
+			<!-- Default Generic Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && column.property !== 'lastUpdated'">
            <span [ngClass]="getCellClass(column)">
                {{dataItem[column.domain+'_'+column.property]}}
            </span>
-        </ng-template>
-        <!-- Asset Tags Cell Template -->
-        <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
-            <div>
+			</ng-template>
+			<!-- Asset Tags Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
+				<div>
                <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
                      [ngClass]="tag.css">{{tag.name}}</span>
-            </div>
-        </ng-template>
-		<!-- Last Updated Cell Template -->
-		<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
-			<div>
-				{{dataItem[column.domain+'_'+column.property]| userDateTime : userTimeZone }}
-			</div>
+				</div>
+			</ng-template>
+			<!-- Last Updated Cell Template -->
+			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'lastUpdated'">
+				<div>
+					{{dataItem[column.domain+'_'+column.property]| userDateTime : userTimeZone }}
+				</div>
+			</ng-template>
+		</kendo-grid-column>
+
+		<!-- No Records -->
+		<ng-template kendoGridNoRecordsTemplate>
 		</ng-template>
-    </kendo-grid-column>
 
-    <!-- No Records -->
-	<ng-template kendoGridNoRecordsTemplate>
-	</ng-template>
+		<!-- Pagination Footer -->
+		<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+			<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+			<kendo-pager-next-buttons></kendo-pager-next-buttons>
+			<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
+			<div *ngIf="showMessage" class="grid-message">
+				<label>{{ gridMessage | translate }}</label>
+			</div>
+			<kendo-pager-info></kendo-pager-info>
+		</ng-template>
+	</kendo-grid>
 
-    <!-- Pagination Footer -->
-    <ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
-		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
-		<kendo-pager-next-buttons></kendo-pager-next-buttons>
-		<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
-		<div *ngIf="showMessage" class="grid-message">
-			<label>{{ gridMessage | translate }}</label>
-		</div>
-		<kendo-pager-info></kendo-pager-info>
-	</ng-template>
-</kendo-grid>

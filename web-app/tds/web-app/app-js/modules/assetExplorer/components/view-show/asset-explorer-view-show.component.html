@@ -48,8 +48,12 @@
         <div>
             <!-- /.box-header -->
             <div class="box-body">
-                <asset-explorer-view-grid #grid="assetExplorerViewGrid"
+                <asset-explorer-view-grid
+                                          [data]=data
                                           (modelChange)="onQuery()"
+                                          (justPlanningChange)="onJustPlanningChange($event)"
+                                          [gridState]="gridState"
+                                          (gridStateChange)="onGridStateChange($event)"
                                           [fields]="fields"
                                           [edit]="false"
                                           [model]="model.schema"

@@ -187,10 +187,11 @@ export class TaskCommentComponent implements OnInit {
 		let taskCreateModel: TaskDetailModel = {
 			id: this.id.toString(),
 			modal: {
-				title: 'Create Task'
+				title: 'Create Task',
+				type: ModalType.CREATE
 			},
 			detail: {
-				assetClass: this.assetClass,
+				assetClass: this.assetType,
 				assetEntity: this.id,
 				assetName: this.assetName,
 				currentUserId: this.currentUserId
@@ -309,7 +310,7 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	private getPreferences(): void {
 		this.preferenceService.getPreferences(PREFERENCES_LIST.VIEW_UNPUBLISHED).subscribe((preferences: any) => {
-			this.viewUnpublished =  preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() ===  'true';
+			this.viewUnpublished = (preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED]) ? preferences[PREFERENCES_LIST.VIEW_UNPUBLISHED].toString() === 'true' : false;
 		});
 	}
 

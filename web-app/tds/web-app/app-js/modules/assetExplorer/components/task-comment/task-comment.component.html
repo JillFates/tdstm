@@ -1,6 +1,5 @@
 <div class="task-comment-component dialog-container">
     <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
-        <h1>Tasks:</h1>
         <kendo-grid
                 *ngIf="dataGridTaskHelper"
                 class="task-comment-grid"
@@ -73,7 +72,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>
@@ -81,7 +80,6 @@
         </kendo-grid>
     </div>
     <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
-        <h1>Comments:</h1>
         <kendo-grid
                 *ngIf="dataGridCommentHelper"
                 class="task-comment-grid"
@@ -140,7 +138,7 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.category'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="pad-left-7 pad-top-8 text-capitalize">{{dataItem.commentInstance.category}}</div>
+                    <div class="pad-left-7 pad-top-8">{{dataItem.commentInstance.category}}</div>
                 </ng-template>
 
             </kendo-grid-column>

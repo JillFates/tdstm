@@ -4,7 +4,8 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {HostListener, Inject, OnInit} from '@angular/core';
+import {HostListener, Inject, OnInit, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
@@ -13,6 +14,7 @@ import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 declare var jQuery: any;
 
 export class AssetCommonEdit implements OnInit {
+	@ViewChild('form') protected form: NgForm;
 
 	private assetTagsDirty = false;
 	protected assetTagsModel: any = {tags: []};
@@ -150,6 +152,22 @@ export class AssetCommonEdit implements OnInit {
 		} else {
 			this.cancelCloseDialog();
 		}
+	}
+
+	/**
+	 * Submit the form in case errors select the first invalid field
+	 */
+	protected submitForm(event): void {
+		if (!this.form.onSubmit(event) ) {
+			this.focusFirstInvalidFieldInput();
+		}
+	}
+
+	/**
+	 * Focus the first control that belongs to the asset entry form and has an invalid status
+	 */
+	private focusFirstInvalidFieldInput(): void {
+		jQuery('form.asset-entry-form .tm-input-control.ng-invalid:first').focus();
 	}
 
 	/**

@@ -31,7 +31,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DeviceEditComponent extends DeviceCommonComponent {
-
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -56,13 +55,11 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-			if (this.model.asset.scale === null) {
-				this.model.asset.scale = {
-					name: { value: '', text: ''}
-				};
-			} else {
-				this.model.asset.scale.name = { value: this.model.asset.scale.name, text: ''}
+
+			if (this.model.asset.scale && this.model.asset.scale.name) {
+				this.model.asset.scale = { value: this.model.asset.scale.name, text: ''}
 			}
+
 			this.model.asset.assetTypeSelectValue = {id: null};
 			if (this.model.asset.assetType) {
 				this.model.asset.assetTypeSelectValue.id = this.model.asset.assetType;

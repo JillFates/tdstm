@@ -12,7 +12,10 @@
 	</div>
 	<div class="modal-body">
 		<div>
-			<form name="databaseEditForm">
+			<form name="form" (ngSubmit)="form.form.valid && onCreate()"
+				  class="asset-entry-form"
+				  [ngClass]="{'form-submitted': form && form.submitted}"
+				  role="form" #form="ngForm" novalidate>
 				<table style="border: 0">
 					<tr>
 						<td colspan="2" class="dialog-container">
@@ -57,7 +60,7 @@
 														class="tm-input-control"
 														name="modelAssetScaleName"
 														[data]="${SizeScale.getAsJsonList() as JSON}"
-														[(ngModel)]="model.asset.scale.name"
+														[(ngModel)]="model.asset.scale"
 														[defaultItem]="''"
 														[textField]="'text'"
 														[valueField]="'value'"
@@ -151,7 +154,7 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="onCreate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
+		<button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
 
 		<button class="btn btn-default pull-right component-action-cancel" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>

@@ -14,20 +14,24 @@
         <h4 class="modal-title">Device Create</h4>
     </div>
     <div class="modal-body">
-        <table style="border: 0" class="ui-widget">
-            <!-- Fields -->
-            <tr>
-                <td colspan="2" class="dialog-container">
-                    <div class="dialog">
-                        <table class="asset-create-view">
-                            <tbody>
+        <form name="form" (ngSubmit)="form.form.valid && onCreate()"
+              class="asset-entry-form"
+              [ngClass]="{'form-submitted': form && form.submitted}"
+              role="form" #form="ngForm" novalidate>
+            <table style="border: 0" class="ui-widget">
+                <!-- Fields -->
+                <tr>
+                    <td colspan="2" class="dialog-container">
+                        <div class="dialog">
+                            <table class="asset-create-view">
+                                <tbody>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
-                                    <td colspan="3">
+                                    <td colspan="3" class="top-align-field">
                                         <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetInstance.assetName}" ngmodel="model.asset.assetName"/>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
-                                    <td colspan="3">
+                                    <td colspan="3" class="top-align-field">
                                         <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetInstance.description}" ngmodel="model.asset.description"/>
                                     </td>
                                 </tr>
@@ -98,8 +102,8 @@
                                         </kendo-dropdownlist>
                                         <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                         <span *ngIf="model.asset.roomSource && model.asset.roomSource.id === -1" class="newRoomS">
-                                                <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" size="10" tabindex="301" placeholder="Location" ngmodel="model.asset.locationSource"> </tdsAngular:inputControl>
-                                                <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" size="10" tabindex="302" placeholder="Room Name" ngmodel="model.asset.newRoomSource"> </tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" size="10" tabindex="301" placeholder="Location" ngmodel="model.asset.locationSource"> </tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" size="10" tabindex="302" placeholder="Room Name" ngmodel="model.asset.newRoomSource"> </tdsAngular:inputControl>
                                         </span>
                                     </td>
                                     <td class="${standardFieldSpecs.roomTarget.imp ?: ''}" data-for="roomTarget" style="vertical-align: text-top;">
@@ -113,7 +117,7 @@
                                                 [valueField]="'id'"
                                                 (valueChange)="onRoomTargetValueChange($event)">
                                         </kendo-dropdownlist>
-                                    <%-- Theses fields are used to allow user to create a source room on the fly --%>
+                                        <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                         <span *ngIf="model.asset.roomTarget && model.asset.roomTarget.id === -1" class="newRoomT">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.locationTarget}" size="10" tabindex="331" placeholder="Location" ngmodel="model.asset.locationTarget"></tdsAngular:inputControl>
                                             <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" size="10" tabindex="332" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
@@ -255,14 +259,15 @@
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${assetInstance.size}"/>
                                     <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
-										<kendo-numerictextbox
-											name="deviceSize"
-											[format]="'n'"
-											[min]="0"
-											[autoCorrect]=true
-											tabindex="410"
-											[(ngModel)]="model.asset.size">
-										</kendo-numerictextbox>
+                                        <kendo-numerictextbox
+                                                name="deviceSize"
+                                                [format]="'n'"
+                                                [format]="'n'"
+                                                [min]="0"
+                                                [autoCorrect]=true
+                                                tabindex="410"
+                                                [(ngModel)]="model.asset.size">
+                                        </kendo-numerictextbox>
                                     </td>
                                 </tr>
                                 <tr>
@@ -270,10 +275,10 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <kendo-datepicker
-                                            class="tm-input-control"
-                                            name="modelAssetRetireDate"
-                                            [format]="dateFormat"
-                                            [(value)]="model.asset.retireDate">
+                                                class="tm-input-control"
+                                                name="modelAssetRetireDate"
+                                                [format]="dateFormat"
+                                                [(value)]="model.asset.retireDate">
                                         </kendo-datepicker>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
@@ -285,13 +290,13 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-									<td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
-									<td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
+                                    <td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
+                                    <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                         <kendo-dropdownlist
                                                 class="tm-input-control"
                                                 name="modelAssetScaleName"
                                                 [data]="${SizeScale.getAsJsonList() as JSON}"
-                                                [(ngModel)]="model.asset.scale.name"
+                                                [(ngModel)]="model.asset.scale"
                                                 [defaultItem]="''"
                                                 [textField]="'text'"
                                                 [valueField]="'value'">
@@ -311,7 +316,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
                                     <td data-for="maintExpDate" valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')} ${standardFieldSpecs.maintExpDate.imp ?: ''}">
                                         <kendo-datepicker
-												class="tm-input-control"
+                                                class="tm-input-control"
                                                 name="modelAssetMaintExpDate"
                                                 [format]="dateFormat"
                                                 [(value)]="model.asset.maintExpDate">
@@ -340,22 +345,23 @@
                                 </tr>
                                 <g:render template="/angular/common/customEdit" model="[assetEntityInstance: assetInstance]"></g:render>
                                 <g:render template="/angular/common/assetTagsEdit"></g:render>
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr><td colspan="2">&nbsp;</td></tr>
-            <!-- Dependencies -->
-            <tr id="deps">
-                <td valign="top" colspan="2">
-                    <tds-supports-depends (initDone)="onInitDependenciesDone($event)" [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
-                </td>
-            </tr>
-        </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+                <!-- Dependencies -->
+                <tr id="deps">
+                    <td valign="top" colspan="2">
+                        <tds-supports-depends (initDone)="onInitDependenciesDone($event)" [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
+                    </td>
+                </tr>
+            </table>
+        </form>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="onCreate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
+        <button class="btn btn-primary pull-left component-action-update" type="button" (click)="submitForm($event)" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
 
         <button class="btn btn-default pull-right component-action-delete" (click)="onCancelEdit()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>

@@ -126,9 +126,7 @@
                                         [pageSize]="100">
                                     <kendo-grid-column title="Batch Id" field="batchId">
                                         <ng-template kendoGridCellTemplate let-dataItem>
-                                            <a (click)="goToBatch(dataItem.batchId)" href="javascript: void(0);">
-                                                {{dataItem.batchId}}
-                                            </a>
+                                            <a [routerLink]="['/importbatch','list', dataItem.batchId]">{{dataItem.batchId}}</a>
                                         </ng-template>
                                     </kendo-grid-column>
                                     <kendo-grid-column title="Domain" field="domainClass"></kendo-grid-column>

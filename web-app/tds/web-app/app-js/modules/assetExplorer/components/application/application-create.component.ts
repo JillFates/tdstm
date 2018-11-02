@@ -6,7 +6,6 @@
  */
 import { Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
@@ -37,7 +36,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		moveBundleList = [];
 		yesNoList = ['Y', 'N'];
 		personList: any[] = null;
-		haveMissingFields = false;
 		persons = {
 			sme: null,
 			sme2: null,
@@ -66,7 +64,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset = {};
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 
@@ -114,12 +111,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * the endpoint.
 		 */
 		public onCreate(): void {
-			const assetName = this.model.asset.assetName && this.model.asset.assetName.trim() || '';
-			if (!assetName) {
-				this.haveMissingFields = true;
-				return;
-			}
-
 			const modelRequest   = R.clone(this.model);
 
 			if (modelRequest && modelRequest.asset.moveBundle) {
@@ -136,7 +127,8 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			Object.keys(modelRequest.asset)
 				.filter((key: string) => key.startsWith('custom'))
 				.forEach((key: string) => {
-					modelRequest.asset[key] = modelRequest.asset[key].value ? modelRequest.asset[key].value : modelRequest.asset[key];
+					modelRequest.asset[key] = modelRequest.asset[key] && modelRequest.asset[key].value
+						? modelRequest.asset[key].value : modelRequest.asset[key];
 				});
 
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
