@@ -22,6 +22,7 @@ export class AssetCommonEdit implements OnInit {
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
 	protected isDependenciesValidForm = true;
+	protected defaultSelectOption = 'Please Select';
 	private initialModel: any = null;
 
 	constructor(

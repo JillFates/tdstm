@@ -112,6 +112,12 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
 			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
 
+			modelRequest.asset.environment  = modelRequest.asset.environment === this.defaultSelectOption ?
+												'' : modelRequest.asset.environment;
+
+			modelRequest.asset.criticality  = modelRequest.asset.criticality === this.defaultSelectOption ?
+				'' : modelRequest.asset.criticality;
+
 			// Custom Fields
 			this.model.customs.forEach((custom: any) => {
 				let customValue = modelRequest.asset[custom.field.toString()];

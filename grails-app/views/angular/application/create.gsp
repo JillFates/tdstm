@@ -62,7 +62,7 @@
 														class="tm-input-control person-list"
 														name="modelAssetEnvironment"
 														[(ngModel)]="model.asset.environment"
-														[defaultItem]="'Please Select'"
+														[defaultItem]="defaultSelectOption"
 														[data]="model.environmentOptions">
 												</kendo-dropdownlist>
 											</td>
@@ -93,7 +93,7 @@
 													class="tm-input-control"
 													name="modelAssetCriticality"
 													[(ngModel)]="model.asset.criticality"
-													[defaultItem]="'Please Select'"
+													[defaultItem]="defaultSelectOption"
 													[data]="${assetInstance.constraints.criticality.inList as JSON}">
 												</kendo-dropdownlist>
 											</td>

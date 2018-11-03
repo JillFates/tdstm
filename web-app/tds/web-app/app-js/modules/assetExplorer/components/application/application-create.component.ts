@@ -124,6 +124,12 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			modelRequest.asset.startupBy = modelRequest.asset.startupBy && modelRequest.asset.startupBy.id || '';
 			modelRequest.asset.testingBy = modelRequest.asset.testingBy && modelRequest.asset.testingBy.id || '';
 
+			modelRequest.asset.environment  = modelRequest.asset.environment === this.defaultSelectOption ?
+				'' : modelRequest.asset.environment;
+
+			modelRequest.asset.criticality  = modelRequest.asset.criticality === this.defaultSelectOption ?
+				'' : modelRequest.asset.criticality;
+
 			// Custom Fields
 			Object.keys(modelRequest.asset)
 				.filter((key: string) => key.startsWith('custom'))
