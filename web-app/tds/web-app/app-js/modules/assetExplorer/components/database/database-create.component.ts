@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -25,7 +25,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 		providers: [
 			{ provide: 'model', useValue: model }
 		]
-	}) class DatabaseCreateComponent extends AssetCommonEdit {
+	}) class DatabaseCreateComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -37,12 +37,15 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
 
+		ngOnInit() {
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.focusControlByName('assetName')
 		}
 
 		/**

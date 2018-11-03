@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -58,6 +58,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 		ngOnInit() {
 			this.initModel();
+			this.focusControlByName('assetName');
 		}
 
 		/**
