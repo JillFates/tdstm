@@ -37,15 +37,19 @@ class AssetCommentTestHelper {
 	 * @returm the task
 	 */
 	AssetComment createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
-		AssetComment assetComment = new AssetComment(
-				project: project,
-				moveEvent: moveEvent,
-				createdBy: person,
-				comment: taskName,
-				status: AssetCommentStatus.READY,
-				commentType: AssetCommentType.TASK,
-				sendNotification: true
-		).save(flush: true)
-		return assetComment
+		AssetComment existingTask = AssetComment.findWhere([comment: taskName, project: project])
+		if (!existingTask) {
+			AssetComment assetComment = new AssetComment(
+					project: project,
+					moveEvent: moveEvent,
+					createdBy: person,
+					comment: taskName,
+					status: AssetCommentStatus.READY,
+					commentType: AssetCommentType.TASK,
+					sendNotification: true
+			).save(flush: true)
+			return assetComment
+		}
+		return existingTask
 	}
 }
