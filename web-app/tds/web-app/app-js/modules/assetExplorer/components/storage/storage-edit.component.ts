@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -25,7 +25,7 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			{ provide: 'model', useValue: editModel }
 		]
 	})
-	class StorageShowComponent extends AssetCommonEdit {
+	class StorageShowComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -37,7 +37,11 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			promptService: UIPromptService) {
 
 			super(model, activeDialog, preference, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+		}
+
+		ngOnInit() {
 			this.initModel();
+			this.focusControlByName('assetName');
 		}
 
 		/**
