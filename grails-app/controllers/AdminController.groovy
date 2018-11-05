@@ -172,17 +172,6 @@ class AdminController implements ControllerMethods {
 			WHERE a.totalCount > 0
 
 			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_ENTITY_VARCHAR-------------------------------------------*/
-			SELECT * FROM (	SELECT 'asset_entity_varchar' as mainTable,'asset_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )
-				UNION
-				SELECT 'asset_entity_varchar' as mainTable,'asset_entity_id' as refId,'Null' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.asset_entity_id is null
-				UNION
-				SELECT 'asset_entity_varchar' as mainTable,'attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.attribute_id not in (select ea.attribute_id from eav_attribute ea )
-				UNION
-				SELECT 'asset_entity_varchar' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.attribute_id is null ) aev
-			WHERE aev.totalCount > 0
-
-			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL-------------------------------------------*/
 			SELECT * FROM (	SELECT 'model' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM model m where m.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn) OR m.manufacturer_id is null OR m.manufacturer_id = '' ) aev
 			WHERE aev.totalCount > 0
@@ -210,11 +199,7 @@ class AdminController implements ControllerMethods {
 
 		def dataTransferSummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR DATA_TRANSFER_ATTRIBUTE_MAP-------------------------------------------*/
-			SELECT * FROM ( SELECT 'data_transfer_attribute_map' as mainTable,'eav_attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)
-				UNION
-				SELECT 'data_transfer_attribute_map' as mainTable,'eav_attribute_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.eav_attribute_id is null
-				UNION
-				SELECT 'data_transfer_attribute_map' as mainTable,'data_transfer_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)
+			SELECT * FROM (SELECT 'data_transfer_attribute_map' as mainTable,'data_transfer_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)
 				UNION
 				SELECT 'data_transfer_attribute_map' as mainTable,'data_transfer_set_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_attribute_map dam where dam.data_transfer_set_id is null) dam
 			WHERE dam.totalCount > 0
@@ -246,64 +231,12 @@ class AdminController implements ControllerMethods {
 			SELECT * FROM ( SELECT 'data_transfer_value' as mainTable,'data_transfer_batch_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.data_transfer_batch_id not in (select dtb.batch_id from data_transfer_batch dtb)
 				UNION
 				SELECT 'data_transfer_value' as mainTable,'data_transfer_batch_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.data_transfer_batch_id is null
-				UNION
-				SELECT 'data_transfer_value' as mainTable,'eav_attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)
-				UNION
-				SELECT 'data_transfer_value' as mainTable,'eav_attribute_id' as refId,'Null' as type,count(*) as totalCount FROM data_transfer_value dtv where dtv.eav_attribute_id is null	) dtv
+					) dtv
 			WHERE dtv.totalCount > 0"""
 
 		summaryRecords << jdbcTemplate.queryForList(dataTransferSummaryQuery)
 
-		def eavSummaryQuery = '''
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_attribute' as mainTable,'entity_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)
-				UNION
-				SELECT 'eav_attribute' as mainTable,'entity_type_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute ea where ea.entity_type_id is null) ea
-			WHERE ea.totalCount > 0
 
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE_OPTION-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_attribute_option' as mainTable,'attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)
-				UNION
-				SELECT 'eav_attribute_option' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute_option eao where eao.attribute_id is null) eao
-			WHERE eao.totalCount > 0
-
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ATTRIBUTE_SET-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_attribute_set' as mainTable,'entity_type_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)
-				UNION
-				SELECT 'eav_attribute_set' as mainTable,'entity_type_id' as refId,'Null' as type,count(*) as totalCount FROM eav_attribute_set eas where eas.entity_type_id is null) eas
-			WHERE eas.totalCount > 0
-
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ENTITY-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_entity' as mainTable,'attribute_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)
-				UNION
-				SELECT 'eav_entity' as mainTable,'attribute_set_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity ee where ee.attribute_set_id is null) ee
-			WHERE ee.totalCount > 0
-
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ENTITY_ATTRIBUTE-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_entity_attribute' as mainTable,'eav_attribute_set_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.eav_attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)
-				UNION
-				SELECT 'eav_entity_attribute' as mainTable,'eav_attribute_set_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.eav_attribute_set_id is null
-				UNION
-				SELECT 'eav_entity_attribute' as mainTable,'attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.attribute_id not in (select ea.attribute_id from eav_attribute ea)
-				UNION
-				SELECT 'eav_entity_attribute' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.attribute_id is null
-				UNION
-				SELECT 'eav_entity_attribute' as mainTable,'eav_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity_attribute eea where eea.eav_entity_id not in (select ee.entity_id from eav_entity ee)) eea
-			WHERE eea.totalCount > 0
-
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR EAV_ENTITY_DATATYPE-------------------------------------------*/
-			SELECT * FROM ( SELECT 'eav_entity_datatype' as mainTable,'attribute_id' as refId,'Orphan' as type,count(*) as totalCount FROM eav_entity_datatype eed where eed.attribute_id not in (select ea.attribute_id from eav_attribute ea)
-				UNION
-				SELECT 'eav_entity_datatype' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM eav_entity_datatype eed where eed.attribute_id is null ) eed
-			WHERE eed.totalCount > 0
-			'''
-
-		summaryRecords << jdbcTemplate.queryForList( eavSummaryQuery )
 
 		def moveSummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_BUNDLE-------------------------------------------*/
@@ -587,26 +520,16 @@ class AdminController implements ControllerMethods {
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break
 					case 'attribute_id':
-						if (type != 'Null') {
-							query = 'SELECT * FROM asset_entity_varchar aev where aev.attribute_id not in (select ea.attribute_id from eav_attribute ea )'
-						} else {
+						if (type == 'Null') {
 							query = 'SELECT * FROM asset_entity_varchar aev where aev.attribute_id is null'
+							orphanDeatils = jdbcTemplate.queryForList(query)
 						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
 					break
 				}
 			break
 
 			case 'data_transfer_attribute_map':
 				switch (column) {
-					case 'eav_attribute_id':
-						if (type != 'Null') {
-							query = 'SELECT * FROM data_transfer_attribute_map dam where dam.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)'
-						} else {
-							query = 'SELECT * FROM data_transfer_attribute_map dam where dam.eav_attribute_id is null'
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break
 					case 'data_transfer_set_id':
 						if (type != 'Null') {
 							query = 'SELECT * FROM data_transfer_attribute_map dam where dam.data_transfer_set_id not in (select dts.data_transfer_id from data_transfer_set dts)'
@@ -666,85 +589,7 @@ class AdminController implements ControllerMethods {
 						}
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break
-					case 'eav_attribute_id':
-						if (type != 'Null') {
-							query = 'SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id not in (select ea.attribute_id from eav_attribute ea)'
-						} else {
-							query = 'SELECT * FROM data_transfer_value dtv where dtv.eav_attribute_id is null'
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break
 				}
-			break
-
-			case 'eav_attribute':
-				if (type != 'Null') {
-					query = 'SELECT * FROM eav_attribute ea where ea.entity_type_id not in (select et.entity_type_id from eav_entity_type et)'
-				} else {
-					query = 'SELECT * FROM eav_attribute ea where ea.entity_type_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
-			case 'eav_attribute_option':
-				if (type != 'Null') {
-					query = 'SELECT * FROM eav_attribute_option eao where eao.attribute_id not in (select ea.attribute_id from eav_attribute ea)'
-				} else {
-					query = 'SELECT * FROM eav_attribute_option eao where eao.attribute_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
-			case 'eav_attribute_set':
-				if (type != 'Null') {
-					query = 'SELECT * FROM eav_attribute_set eas where eas.entity_type_id not in (select et.entity_type_id from eav_entity_type et)'
-				} else {
-					query = 'SELECT * FROM eav_attribute_set eas where eas.entity_type_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
-			case 'eav_entity':
-				if (type != 'Null') {
-					query = 'SELECT * FROM eav_entity ee where ee.attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)'
-				} else {
-					query = 'SELECT * FROM eav_entity ee where ee.attribute_set_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
-			case 'eav_entity_attribute':
-				switch (column) {
-					case 'eav_attribute_set_id':
-						if (type != 'Null') {
-							query = 'SELECT * FROM eav_entity_attribute eea where eea.eav_attribute_set_id not in (select eas.attribute_set_id from eav_attribute_set eas)'
-						} else {
-							query = 'SELECT * FROM eav_entity_attribute eea where eea.eav_attribute_set_id is null'
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break
-					case 'attribute_id':
-						if (type != 'Null') {
-							query = 'SELECT * FROM eav_entity_attribute eea where eea.attribute_id not in (select ea.attribute_id from eav_attribute ea)'
-						} else {
-							query = 'SELECT * FROM eav_entity_attribute eea where eea.attribute_id is null'
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break
-					case 'eav_entity_id':
-						query = 'SELECT * FROM eav_entity_attribute eea where eea.eav_entity_id not in (select ee.entity_id from eav_entity ee)'
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break
-				}
-			break
-
-			case 'eav_entity_datatype':
-				if (type != 'Null') {
-					query = 'SELECT * FROM eav_entity_datatype eed where eed.attribute_id not in (select ea.attribute_id from eav_attribute ea)'
-				} else {
-					query = 'SELECT * FROM eav_entity_datatype eed where eed.attribute_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
 			break
 			case 'manufacturer':
 				switch (column) {
