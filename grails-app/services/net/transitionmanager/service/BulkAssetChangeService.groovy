@@ -86,6 +86,7 @@ class BulkAssetChangeService implements ServiceMethods {
 		'YesNo'                : BulkChangeYesNo.class,
 		'List'                 : BulkChangeList.class,
 		'InList'               : BulkChangeList.class,
+		'Options.PlanStatus'   : BulkChangeList.class,
 		(MoveBundle.class.name): BulkChangeMoveBundle.class
 	].asImmutable()
 
