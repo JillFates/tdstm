@@ -11,9 +11,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  */
 class DataviewTestHelper {
 
-    DataviewTestHelper() {
-    }
-
     Dataview createDataview(Project project) {
         Dataview dataview = new Dataview()
         dataview.project = project
