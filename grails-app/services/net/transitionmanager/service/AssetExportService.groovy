@@ -774,7 +774,7 @@ class AssetExportService {
 							case ~/retireDate|maintExpDate/:
 								colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
 								break
-							case ~/modifiedDate/:
+							case ~/lastUpdated/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
 							case ~/tagAssets/:

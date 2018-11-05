@@ -158,7 +158,8 @@ class CustomDomainService implements ServiceMethods {
 
     /**
      * Return a map with the field specs for the asset export. This include all the standard fields marked
-     * to be displayed, plus all custom fields regardless of them being marked for display.
+     * to be displayed (and special cases such as lastUpdated), plus all custom fields regardless of them
+     * being marked for display.
      *
      * @param project - user's current project
      * @param domain - used to filter the fields for a particular domain.
@@ -167,11 +168,12 @@ class CustomDomainService implements ServiceMethods {
     Map getFieldSpecsForAssetExport(Project project, String domain) {
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
-
+        // List of special standard fields which are not displayed in the UI but need to be exported.
+        List<String> requiredHiddenFields = ['lastUpdated']
         for (String assetClassType : assetClassTypes) {
             Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
             if (fieldSpecMap) {
-                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1})
+                fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1 || field.udf == 1 || field.field in requiredHiddenFields})
                 fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
             } else {
                 throw new ConfigurationException("No Field Specification found for project ${project.id} and asset class ${assetClassType}")
