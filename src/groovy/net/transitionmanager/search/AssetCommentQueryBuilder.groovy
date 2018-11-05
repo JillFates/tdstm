@@ -176,7 +176,7 @@ class AssetCommentQueryBuilder {
 			Map<String, String> references = [
 				"assetName": "assetEntity.assetName",
 				"assetType": "assetEntity.assetType",
-				"bundle": "moveBundle.name",
+				"bundle": "assetEntity.moveBundle.name",
 				"event": "moveEvent.name"
 			]
 			if (references[sortIndex]) {
@@ -388,7 +388,7 @@ class AssetCommentQueryBuilder {
 		'justMyTasks':          [property: 'ac.assignedTo', builder: justMyTasksBuilder],
 		'justRemaining':        [property: 'ac.status', builder: justRemainingBuilder],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
-		'priority':             [property: 'ac.priority', builder: eqBuilder, type: Integer],
+		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
 		'resolvedBy':           [property: SqlUtil.personFullName('resolvedBy', 'ac'), builder: likeBuilder],
 		'role':                 [property: 'ac.role', builder: likeBuilder],
