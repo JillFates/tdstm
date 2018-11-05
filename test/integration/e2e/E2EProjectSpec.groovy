@@ -29,8 +29,6 @@ import test.helper.DataScriptTestHelper
 import test.helper.DataviewTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.MoveEventTestHelper
-import test.helper.ProjectTestHelper
-import test.helper.PersonTestHelper
 import test.helper.ProviderTestHelper
 import test.helper.RecipeTestHelper
 import test.helper.SettingTestHelper
@@ -117,24 +115,24 @@ class E2EProjectSpec extends Specification {
 		browsersInParallel.each { browser ->
 			projectsToBeDeleted.add(projectHelper.createProject(sanitizeProject(dataFile.projectToBeDeleted)))
 			// create company and associate to current project
-			PartyGroup company = projectHelper.createCompany("", "${formatToRandomValue(dataFile.companyToBeEdited.name, browser, false)}")
+			PartyGroup company = projectHelper.createCompany( "${formatToRandomValue(dataFile.companyToBeEdited.name, browser, false)}")
 			companiesToBeDeleted.add(company)
 			partyRelationshipService.assignClientToCompany(company, project.owner)
 			// create company and associate to current project
-			company = projectHelper.createCompany("", "${formatToRandomValue(dataFile.companyToBeDeleted.name, browser, false)}")
+			company = projectHelper.createCompany("${formatToRandomValue(dataFile.companyToBeDeleted.name, browser, false)}")
 			companiesToBeEdited.add(company)
 			partyRelationshipService.assignClientToCompany(company, project.owner)
 
-			JSONObject sanitizedStaff = sanitizeStaffUserData(browser, dataFile.staffFiltering)
-			staffsFiltering.add(personHelper.createStaff(project.owner, sanitizedStaff.firstName, sanitizedStaff.middleName, sanitizedStaff.lastName, sanitizedStaff.email, sanitizedStaff.userName))
+			Map sanitizedStaff = sanitizeStaffUserData(browser, dataFile.staffFiltering)
+			staffsFiltering.add(personHelper.createStaff(project.owner, sanitizedStaff))
 			usersFiltering.add(personHelper.createPersonWithLoginAndRoles(sanitizeStaffUserData(browser, dataFile.userFiltering), project))
 			createApplications(dataFile.applications, project, buildoutBundle)
 			applicationsToBeEdited.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeEdited, browser), project, buildoutBundle))
 			applicationsToBeDeleted.add(appHelper.createApplication(sanitizeJsonObjectName(dataFile.applicationToBeDeleted, browser), project, buildoutBundle))
 			createCustomViews(project, userLogin1.person, getSanitizedViewObject(dataFile.customViews, dataFile.commonViewSchema, browser))
-			etlToBeTransformedWithPastedData.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", sanitizeJsonObjectName(dataFile.etlToBeTransformedWithPastedData, browser)))
-			etlToBeEdited.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", sanitizeJsonObjectName(dataFile.etlToBeEdited, browser)))
-			etlToBeSearched.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, "", sanitizeJsonObjectName(dataFile.etlToBeSearched, browser)))
+			etlToBeTransformedWithPastedData.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, sanitizeJsonObjectName(dataFile.etlToBeTransformedWithPastedData, browser), ""))
+			etlToBeEdited.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, sanitizeJsonObjectName(dataFile.etlToBeEdited, browser), ""))
+			etlToBeSearched.add(etlScriptHelper.createDataScript(project, projectProvider, userLogin1.person, sanitizeJsonObjectName(dataFile.etlToBeSearched, browser), ""))
 			tagToBeEdited.add(tagHelper.createTag(project, sanitizeJsonObjectName(dataFile.tagToBeEdited, browser)))
 			tagToBeDeleted.add(tagHelper.createTag(project, sanitizeJsonObjectName(dataFile.tagToBeDeleted, browser)))
 			tagsForAssets.add(tagHelper.createTag(project, sanitizeJsonObjectName(dataFile.tagsForAssets, browser)))
@@ -142,8 +140,8 @@ class E2EProjectSpec extends Specification {
 			providersToBeDeleted2.add(providerHelper.createProvider(project, sanitizeJsonObjectName(dataFile.providerToBeDeleted2, browser)))
 			providersToBeEdited.add(providerHelper.createProvider(project, sanitizeJsonObjectName(dataFile.providerToBeEdited, browser)))
 			recipesHistory1.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeHistory1, browser, false), project, userLogin1.person))
-			recipesHistory2.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeHistory2, browser, false), project, userLogin1.person))
-			recipesTaskGeneration.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeTaskGeneration, browser, false), project, userLogin1.person))
+			recipesHistory2.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeHistory2, browser, false), project, userLogin1.person, dataFile.commonRecipeSourceCode))
+			recipesTaskGeneration.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeTaskGeneration, browser, false), project, userLogin1.person, dataFile.commonRecipeSourceCode))
 			recipesToBeDeleted.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeToBeDeleted, browser, false), project, userLogin1.person))
 			recipesToBeEdited.add(recipeHelper.createRecipe(formatToRandomValue(dataFile.recipeToBeEdited, browser, false), project, userLogin1.person))
 			tasksToBeEdited.add(taskHelper.createTask(formatToRandomValue(dataFile.taskToBeEdited, browser, false), project, userLogin1.person, buildoutEvent))
@@ -210,6 +208,10 @@ class E2EProjectSpec extends Specification {
 			}
 	}
 
+	/**
+	 * Generate, process and activate a new license for a given project to persist at server DB, if exists just update expiration date
+	 * @param: project
+	 */
 	private void licenseProject(Project project) {
 		def currentLicense = License.findWhere([owner: project.owner])
 		if (!currentLicense){
@@ -234,28 +236,54 @@ class E2EProjectSpec extends Specification {
 		}
 	}
 
+	/**
+	 * Gets a Json file from resources and returns a JSON Object
+	 * @return: JSON object
+	 */
 	private JSONObject getJsonObjectFromFile(){
 		String jsonText = this.getClass().getResource("E2EProjectData.json").text
 		return new JSONObject(jsonText)
 	}
 
+	/**
+	 * Sanitize a dataview name by given name to Random name + browser name and set schema property from given object
+	 * @return: JSON object
+	 */
 	private JSONObject getSanitizedViewObject(JSONObject dataViewJson, JSONObject customViewSchemaJson, String browser){
 		dataViewJson.name = formatToRandomValue(browser, dataViewJson.name)
 		dataViewJson.schema = customViewSchemaJson
 		return dataViewJson
 	}
 
+	/**
+	 * Returns random alphanumeric string with 5 characters
+	 * @return: string
+	 */
 	private String getRandomString(){
 		return RandomStringUtils.randomAlphabetic(5)
 	}
 
+	/**
+	 * Format given name setting it with random and static values depending on given values
+	 * @param value
+	 * @param browser not required
+	 * @param randomRequired not required
+	 * @param isEmail not required
+	 * @return: string
+	 */
 	private String formatToRandomValue(String value, String browser = "", boolean randomRequired = true, boolean isEmail = false){
 		if (isEmail) return "QAE2E${browser + getRandomString() + value}"
-		else if (!randomRequired) "QAE2E ${browser} ${value}"
+		else if (!randomRequired) return "QAE2E ${browser} ${value}"
 		else return "QAE2E ${browser} ${getRandomString()} ${value}"
 	}
 
-	private JSONObject sanitizeStaffUserData(String browser, JSONObject personInfo){
+	/**
+	 * Sanitize a staff user data by given Json object
+	 * @param browser
+	 * @param personInfo [firstName: String, middleName: String, lastName: String, email: String, userName: String]
+	 * @return: JSON object
+	 */
+	private Map sanitizeStaffUserData(String browser, JSONObject personInfo){
 		personInfo.firstName = browser + " " + personInfo.firstName
 		personInfo.middleName = browser + " " + personInfo.middleName
 		personInfo.lastName = browser + " " + personInfo.lastName
@@ -264,6 +292,13 @@ class E2EProjectSpec extends Specification {
 		return personInfo
 	}
 
+	/**
+	 * Create views is existing are less than required to persist at server DB
+	 * @param: project
+	 * @param: person
+	 * @param: viewData
+	 * @param: toBeCreated int number not required, default value is static at class level
+	 */
 	private void createCustomViews(Project project, Person person, JSONObject viewData, int toBeCreated = numberOfViews){
 		int existingViews = Dataview.findAllWhere([project: project, isSystem: false]).size()
 		if (existingViews < toBeCreated){
@@ -277,6 +312,13 @@ class E2EProjectSpec extends Specification {
 		}
 	}
 
+	/**
+	 * Create applications is existing are less than required to persist at server DB
+	 * @param: appData
+	 * @param: bundle
+	 * @param: project
+	 * @param: toBeCreated int number not required, default value is static at class level
+	 */
 	private void createApplications(JSONObject appData, Project project, MoveBundle bundle, int toBeCreated = numberOfAllAssetsApplications){
 		int existingApps = Application.findAllWhere([project: project]).size()
 		if (existingApps < toBeCreated){
@@ -290,17 +332,34 @@ class E2EProjectSpec extends Specification {
 		}
 	}
 
-	private JSONObject sanitizeJsonObjectName(JSONObject data, String browser = "", boolean randomRequired = false){
+	/**
+	 * Sanitize a name property of a object
+	 * @param: browser not required
+	 * @param: randomRequired not required
+	 * @return: JSON object
+	 */
+	private Map sanitizeJsonObjectName(JSONObject data, String browser = "", boolean randomRequired = false){
 		data.name = formatToRandomValue(data.name, browser, randomRequired)
 		return data
 	}
 
+	/**
+	 * Sanitize a project data by given Json object
+	 * @param data
+	 * @return: JSON object
+	 */
 	private JSONObject sanitizeProject(JSONObject data){
 		data.projectName = formatToRandomValue(data.projectName)
 		data.projectCode = getRandomString() + data.projectCode
 		return data
 	}
 
+	/**
+	 * Sanitize a custom field setting data by given Json object
+	 * @param browser
+	 * @param data
+	 * @return: JSON object
+	 */
 	private JSONObject sanitizeCustomField(JSONObject data, String browser){
 		data.label = formatToRandomValue(data.label, browser)
 		data.default = data.label

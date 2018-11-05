@@ -7,14 +7,22 @@ import net.transitionmanager.domain.RecipeVersion
 
 class RecipeTestHelper {
 
+    /**
+     * Create a recipe if not exists from given name for E2EProjectSpec to persist at server DB
+     * @param: name
+     * @param: project
+     * @param: person
+     * @param: sourceCode not required
+     * @returm the recipe
+     */
     Recipe createRecipe(String name, Project project, Person person, String sourceCode = null){
         Recipe existingRecipe = Recipe.findWhere([name: name, project: project])
         if (!existingRecipe) {
-            Recipe recipe = new Recipe(name: name, context: '{}', project: project)
-            recipe.save(flush: true)
+            Recipe recipe = new Recipe(name: name, description: '', context: '{}', project: project).save(flush: true)
             if (sourceCode) {
-                RecipeVersion version = new RecipeVersion(recipe: recipe, sourceCode: sourceCode, createdBy: person)
-                version.save(flush: true)
+                new RecipeVersion(recipe: recipe, sourceCode: sourceCode, versionNumber: 0, createdBy: person).save(flush: true)
+            } else {
+                new RecipeVersion(recipe: recipe, createdBy: person).save(flush: true)
             }
             return recipe
         }

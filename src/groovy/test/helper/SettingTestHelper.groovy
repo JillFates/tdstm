@@ -7,6 +7,12 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class SettingTestHelper {
 
+    /**
+     * Create a custom application field setting if not exists from given field object for E2EProjectSpec to persist at server DB
+     * Review integration/e2e/E2EProjectData.json "customFieldToBeDeleted1" object
+     * @param: field = custom field setting object
+     * @param: project
+     */
     void createCustomApplicationFieldSetting(Project project, JSONObject field){
         Setting setting = Setting.findWhere([project: project, key: "APPLICATION"])
         Map jsonMap = JsonUtil.convertJsonToMap(setting.json)

@@ -5,6 +5,12 @@ import net.transitionmanager.domain.Tag
 
 class TagTestHelper {
 
+    /**
+     * Create a tag if not exists from given Map for E2EProjectSpec to persist at server DB
+     * @param: [REQUIRED] etlData = [name: String, description: String, color: String]
+     * @param: project
+     * @returm the tag
+     */
     Tag createTag(Project project, Map tagData) {
         Tag existingTag = Tag.findWhere([name: tagData.name, project: project])
         if (!existingTag) {

@@ -15,6 +15,12 @@ class MoveEventTestHelper {
 		return moveEvent
 	}
 
+	/**
+	 * Create a move event if not exists from given name for E2EProjectSpec to persist at server DB
+	 * @param: project
+	 * @param: name
+	 * @returm the event
+	 */
 	MoveEvent createMoveEvent(Project project, String name) {
 		MoveEvent event = MoveEvent.findWhere([name: name, project: project])
 		if (!event) {

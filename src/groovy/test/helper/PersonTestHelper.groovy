@@ -104,15 +104,14 @@ class PersonTestHelper {
 	 * @param lastName
 	 * @return the person that was created and assigned to the company
 	 */
-	Person createPerson(String firstName=null, String middleName=null, String lastName=null, String email=null, String username = null) {
+	Person createPerson(String firstName=null, String middleName=null, String lastName=null, String email=null) {
 		if (firstName == null) firstName = RSU.randomAlphabetic(10)
 		if (middleName == null) middleName = RSU.randomAlphabetic(10)
 		if (lastName == null) lastName = RSU.randomAlphabetic(10)
-		if (username == null) username = RSU.randomAlphabetic(10)
 		if (email == null) email = "$firstName.$lastName@" + RSU.randomAlphabetic(10) + '.com'
 
-		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email, username: username] )
-		person.save(flush: true, failOnError:true)
+		Person person = new Person([firstName:firstName, middleName: middleName, lastName: lastName, email:email] )
+		person.save(failOnError:true)
 
 		return person
 	}
@@ -129,8 +128,8 @@ class PersonTestHelper {
 	 * @return the person that was created and assigned to the company
 	 *
 	 */
-	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null, String username = null) {
-		Person staff = createPerson(firstName, middleName, lastName, email, username)
+	Person createStaff(PartyGroup company, String firstName=null, String middleName=null, String lastName=null, String email=null) {
+		Person staff = createPerson(firstName, middleName, lastName, email)
 		staff.partyRelationshipService = partyRelationshipService
 		partyRelationshipService.addCompanyStaff(company, staff)
 		return staff
@@ -142,11 +141,11 @@ class PersonTestHelper {
 	 * @param roles - a list of role codes to create (optionally)
 	 * @return the newly created UserLogin
 	 */
-	UserLogin createUserLoginWithRoles(Person person, List roles=[], Project project=null, Boolean signIn=false, String userPassword = null) {
+	UserLogin createUserLoginWithRoles(Person person, List roles=[], Project project=null, Boolean signIn=false) {
 
 		UserLogin u
 		if (project) {
-			u = createUserLogin(person, [:], project, signIn, userPassword)
+			u = createUserLogin(person, [:], project, signIn)
 		} else {
 			u = createUserLogin(person, [:], signIn)
 		}
@@ -167,8 +166,8 @@ class PersonTestHelper {
 	 * @param signIn - a flag to control if the user will be logged (default false)
 	 * @return a newly minted UserLogin object
 	 */
-	UserLogin createUserLogin(Person person, Map props=null, Project project, Boolean signIn=false, String userPassword = null) {
-		UserLogin user = createUserLogin(person, props, signIn, userPassword)
+	UserLogin createUserLogin(Person person, Map props=null, Project project, Boolean signIn=false) {
+		UserLogin user = createUserLogin(person, props, signIn)
 		userPreferenceService.setCurrentProjectId(user, project.id)
 		return user
 	}
@@ -180,10 +179,9 @@ class PersonTestHelper {
 	 * @param signIn - a flag to control if the user will be logged (default false)
 	 * @return a newly minted UserLogin object
 	 */
-	UserLogin createUserLogin(Person person, Map props=null, Boolean signIn=false, String userPassword = null) {
+	UserLogin createUserLogin(Person person, Map props=null, Boolean signIn=false) {
 		UserLogin user = new UserLogin(person:person)
-		user.username = person.email
-		user.password = userPassword ? user.applyPassword(userPassword) : user.applyPassword(RandomStringUtils.randomAlphabetic(12))
+		user.username = RandomStringUtils.randomAlphabetic(12)
 		if (props) {
 			props.each { prop, value -> user[prop]=value}
 		}
@@ -226,18 +224,4 @@ class PersonTestHelper {
 		return admin
 	}
 
-	UserLogin createPersonWithLoginAndRoles(Map personData, Project project){
-		UserLogin user = UserLogin.findWhere([username: personData.email])
-		if (!user){
-			Person person = createPerson(personData.firstName, personData.middleName, personData.lastName, personData.email)
-			person.partyRelationshipService = partyRelationshipService
-			partyRelationshipService.addCompanyStaff(project.owner, person)
-			user = createUserLoginWithRoles(person, personData.roles, project, false, personData.password)
-		}
-		user.passwordNeverExpires = true
-		user.expiryDate = new Date() + 30
-		user.save(flush: true)
-
-		return user
-	}
 }

@@ -95,71 +95,21 @@ class ProjectTestHelper {
 	}
 
 	/**
-	 * Create a project from given data in map, if exists update completion date adding 30 days
-	 * @param projectData = [projectName: string, projectCode: string, projectDesc: string, projectClient: string,
-	 * projectCompany: string]
-	 * @return the project
-	 */
-	Project createProject(Map projectData) {
-		Project project = Project.findWhere([name: projectData.projectName])
-		Date nowDate = new Date()
-		if (!project){
-			PartyGroup company = createCompany(null, projectData.projectCompany)
-			project = new Project()
-			project.with {
-				client = createClient(company, projectData.projectClient)
-				projectCode = projectData.projectCode
-				name = projectData.projectName
-				description = projectData.projectDesc
-				startDate = nowDate
-				completionDate = nowDate + 30
-				guid = StringUtil.generateGuid()
-				workflowCode = 'STD_PROCESS'
-				timezone = Timezone.findByCode('GMT')
-			}
-			project.save(flush: true)
-
-			project.projectService = projectService
-			// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
-			project.owner = company
-			project.save(flush: true)
-
-			projectService.cloneDefaultSettings(project)
-		} else {
-			project.completionDate = nowDate + 30
-			project.save(flush: true)
-		}
-
-		return project
-	}
-
-	/**
 	 * Create a company.
 	 *
 	 * @param prefix  the prefix of the company name if provided
 	 * @return the company
 	 */
-	PartyGroup createCompany(String prefix, String companyName = null) {
-		if (!companyName){
-			return createCompanyByName((prefix ? "$prefix " : '') + RSU.randomAlphabetic(10))
-		} else {
-			PartyGroup existingCompany = PartyGroup.findWhere([name: companyName])
-			if (!existingCompany){
-				return createCompanyByName(companyName)
-			} else {
-				return existingCompany
-			}
-		}
-	}
-
-	private PartyGroup createCompanyByName(String companyName){
-		def pt = PartyType.get('COMPANY')
-		def companyToCreate = new PartyGroup()
-		companyToCreate.with {
+	PartyGroup createCompany(String prefix) {
+		PartyType pt = PartyType.get('COMPANY')
+		assert pt
+		PartyGroup company = new PartyGroup()
+		company.with {
 			partyType = pt
-			name = companyName
+			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
 		}
-		return companyToCreate.save(flush:true)
+
+		company.save(failOnError:true, flush:true)
 	}
 
 	/**
@@ -172,20 +122,6 @@ class ProjectTestHelper {
 
 		PartyGroup client = createCompany('Client')
 		partyRelationshipService.assignClientToCompany(client, company)
-		return client
-	}
-
-	/**
-	 * Create a company as a client and assign them as a client of the specified company.
-	 * @param company  the client's owning company
-	 * @param clientName
-	 * @return the client
-	 */
-	PartyGroup createClient(PartyGroup company, String clientName) {
-		PartyGroup client = createCompany(null, clientName)
-		if (client != company) {
-			partyRelationshipService.assignClientToCompany(client, company)
-		}
 		return client
 	}
 

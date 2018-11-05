@@ -23,6 +23,14 @@ class MoveBundleTestHelper {
 
     }
 
+    /**
+     * Create a bundle if not exists from given name for E2EProjectSpec to persist at server DB
+     * @param: name
+     * @param: project
+     * @param: event
+     * @param: useForPlanning defaulted true
+     * @returm the bundle
+     */
     MoveBundle createBundle(String name, Project project, MoveEvent event, Boolean useForPlanning = true) {
         MoveBundle bundle = MoveBundle.findWhere([name: name, project: project])
         if (!bundle){

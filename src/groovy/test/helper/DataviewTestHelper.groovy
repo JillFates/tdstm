@@ -25,6 +25,13 @@ class DataviewTestHelper {
         return dataview
     }
 
+    /**
+     * Create a custom View if not exists from given Map for E2EProjectSpec to persist at server DB
+     * @param: [REQUIRED] assetData = [name: String, isShared: boolean, isSystem: boolean, schema: JSONObject]
+     * @param: project
+     * @param: person
+     * @returm the view
+     */
     Dataview createDataview(Project currentProject, Person currentPerson, JSONObject dataviewJson) {
         Dataview existingDataview = Dataview.findWhere([name: dataviewJson.name, project: currentProject])
         if (!existingDataview){

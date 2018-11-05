@@ -30,6 +30,12 @@ class AssetCommentTestHelper {
 		return assetComment
 	}
 
+	/**
+	 * Create a task if not exists from given name for E2EProjectSpec to persist at server DB
+	 * @param: name
+	 * @param: project
+	 * @returm the task
+	 */
 	AssetComment createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
 		AssetComment assetComment = new AssetComment(
 				project: project,

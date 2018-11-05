@@ -171,7 +171,7 @@
   "recipeToBeDeleted": "RecipeToBeDeleted",
   "recipeTaskGeneration": "RecipeTaskGeneration",
   "recipeHistory1": "RecipeHistory",
-  "recipeHistory2": "RecipeHistoryWithSourceCode",
+  "recipeHistory2": "RecipeHistory_SourceCode",
   // Recipe SourceCode
   "commonRecipeSourceCode": "groups: [[name: 'QAE2E', filter: [class: 'application', asset: [planStatus: 'Confirmed']]]], tasks: [[id: 1100, filter: [group: 'QAE2E']]]",
   // Tasks: for now Name is only required from E2E

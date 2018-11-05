@@ -15,24 +15,36 @@ class ProviderTestHelper {
      * @param project
      * @return
      */
-    Provider createProvider(Project project, Map providerData = null) {
-        Provider existingProvider
-        // Because E2E project use to insert or update at database and BE integrations just rollback
-        // first from E2E we need to check if it exists to avoid a broken integration test on creation
-        if (providerData) {
-            existingProvider = Provider.findWhere([name: providerData.name, project: project])
-            if (existingProvider) {
-                return existingProvider
-            }
-        }
-
+    Provider createProvider(Project project) {
         Provider provider = new Provider(
-                name: providerData.name ? providerData.name : RSU.randomAlphabetic(10),
-                comment: providerData.comment ? providerData.comment :'Test comment',
-                description: providerData.description ? providerData.description : 'Test description',
+                name: RSU.randomAlphabetic(10),
+                comment: 'Test comment',
+                description: 'Test description',
                 project: project
         ).save(flush: true, failOnError: true)
         return provider
+    }
+
+    /**
+     * Create a provider if not exists from given name for E2EProjectSpec to persist at server DB
+     * @param: name
+     * @param: project
+     * @param: event
+     * @param: useForPlanning defaulted true
+     * @returm the provider
+     */
+    Provider createProvider(Project project, Map providerData) {
+        Provider existingProvider = Provider.findWhere([name: providerData.name, project: project])
+        if (!existingProvider) {
+            Provider provider = new Provider(
+                    name: providerData.name,
+                    comment: providerData.comment ? providerData.comment :'Test comment',
+                    description: providerData.description ? providerData.description : 'Test description',
+                    project: project
+            ).save(flush: true, failOnError: true)
+            return provider
+        }
+        return existingProvider
     }
 
 }

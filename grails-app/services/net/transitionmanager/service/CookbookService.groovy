@@ -91,7 +91,8 @@ class CookbookService implements ServiceMethods {
 
 		if (cloneFrom != null) {
 			clonedVersion = Recipe.get(cloneFrom)
-		} else {
+		}
+		else {
 			Recipe defaultRecipe = Recipe.findByNameAndProject('Default', Project.getDefaultProject())
 
 			if (defaultRecipe?.releasedVersion != null) {

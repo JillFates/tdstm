@@ -26,9 +26,11 @@ class ApplicationTestHelper {
 	}
 
 	/**
-	 * Create Assets by class from given Map containing required name and planStatus
-	 * @param: [REQUIRED] String name
-	 * @param: [REQUIRED] String planStatus if null then 'Unassigned'
+	 * Create Application Asset if not exists from given Map for E2EProjectSpec to persist at server DB
+	 * @param: [REQUIRED] assetData = [name: String, planStatus: String, environment: String]
+	 * @param: project
+	 * @param: moveBundle
+	 * @returm the application
 	 */
 	Application createApplication(Map assetData, Project project, MoveBundle moveBundle) {
 		Application existingApplication = Application.findWhere([assetName: assetData.name, project: project])
