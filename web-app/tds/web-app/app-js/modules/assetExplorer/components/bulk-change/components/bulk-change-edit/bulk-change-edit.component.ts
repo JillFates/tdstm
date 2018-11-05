@@ -18,6 +18,7 @@ import {TagService} from '../../../../../assetTags/service/tag.service';
 import {TagModel} from '../../../../../assetTags/model/tag.model';
 import {ApiResponseModel} from '../../../../../../shared/model/ApiResponseModel';
 import {TranslatePipe} from '../../../../../../shared/pipes/translate.pipe';
+import {PreferenceService} from '../../../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'tds-bulk-change-edit',
@@ -41,6 +42,8 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	affectedAssets: number;
 	editRows: {listOptions: Array<any>, fields: Array<BulkEditAction>, selectedValues: {domain: IdTextItem, field: IdTextItem, action: IdTextItem, value: any}[] };
 	private listOptions: any;
+	protected userDateFormat: string;
+	protected userTimeZone: string;
 
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
@@ -50,12 +53,15 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 		private customDomainService: CustomDomainService,
 		private bulkChangeService: BulkChangeService,
 		private tagService: TagService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private preferenceService: PreferenceService) {
 			super('#bulk-change-edit-component');
 			this.affectedAssets = this.bulkChangeModel.affected;
 			this.domains = [];
 			this.listOptions = {};
 			this.editRows = {listOptions: [], fields: [], selectedValues: [] };
+			this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
+			this.userTimeZone = this.preferenceService.getUserTimeZone();
 	}
 
 	ngOnInit() {

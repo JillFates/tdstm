@@ -78,6 +78,14 @@ export class PreferenceService {
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
+	getUserDateFormatForMomentJS(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return currentUserDateFormat
+	}
+	getUserDateFormatForKendo(): string {
+		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		return DateUtils.translateDateFormatToKendoFormat(currentUserDateFormat);
+	}
 
 	/**
 	 * Used to retrieve the user's preferred TimeZone that which is used to display date times
