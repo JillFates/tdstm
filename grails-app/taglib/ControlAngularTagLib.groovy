@@ -160,18 +160,23 @@ class ControlAngularTagLib {
 		String min = (attrs.min ?: (attrs.min ?: "" ))
 
 		String placeholder = attrs.placeholder ?: ''
+		boolean isRequired = fieldSpec.constraints?.required
 
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
 				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
-
 			case ControlType.YES_NO.toString():
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null)
 				break
-
 			case ControlType.NUMBER.toString():
 				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder, min)
+				break
+			case ControlType.DATE.toString():
+				out << "<tds-date-control [(value)]=\"" + value + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				break
+			case ControlType.DATETIME.toString():
+				out << "<tds-datetime-control [(value)]=\"" + value + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
 				break
 			case ControlType.STRING.toString():
 			default:
@@ -351,6 +356,31 @@ class ControlAngularTagLib {
 		sb.append('>')
 
 		sb.append('</kendo-dropdownlist>')
+		sb.append(renderRequiredLabel(fieldSpec))
+
+		sb.toString()
+	}
+
+	/**
+	 * Generates a {@code kendo-datepicker} control.
+	 *
+	 * @param fieldSpec - the map of field specifications
+	 * @param value - the value to set the control to
+	 * @param tabIndex - the tab order used to override the fieldSpec.order (optional)
+	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
+	 * @return the {@code kendo-datepicker} Component HTML
+	 */
+	private String renderDateInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+		StringBuilder sb = new StringBuilder('<kendo-datepicker ')
+		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
+		sb.append(' #' + 'field' + fieldSpec.field + '="ngModel"')
+		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
+		sb.append(' [(value)]="'+ value +'" ')
+		sb.append(' [format]="'+ fieldSpec.constraints?.format +'" ')
+
+		sb.append('>')
+
+		sb.append('</kendo-datepicker>')
 		sb.append(renderRequiredLabel(fieldSpec))
 
 		sb.toString()
