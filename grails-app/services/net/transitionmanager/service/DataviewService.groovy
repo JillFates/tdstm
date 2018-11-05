@@ -36,6 +36,7 @@ class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
 	UserPreferenceService userPreferenceService
+	CustomDomainService customDomainService
 
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
@@ -391,6 +392,8 @@ class DataviewService implements ServiceMethods {
      */
     // TODO : Annotate READONLY
     Map previewQuery(Project project, DataviewSpec dataviewSpec) {
+
+		FieldSpecMapper fieldSpecMapper = new FieldSpecMapper(customDomainService.fieldSpecsWithCommon(project))
 
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 
@@ -1179,4 +1182,40 @@ class DataviewService implements ServiceMethods {
 		}
 		return isUnique
 	}
+}
+
+
+
+class FieldSpecMapper {
+
+	Map<AssetClass, Map> fieldSpecMap = [:]
+
+	/**
+	 * Creates an instance of FieldSpecMapper using results from
+	 * {@code CustomDomainService#fieldSpecsWithCommon} results.
+	 * It defines common fields and manages field specs type during a {@code DataviewService#query}
+	 */
+	FieldSpecMapper(Map<String, ?> fieldsSpecMap){
+		Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
+
+		addKeyValue(AssetClass.APPLICATION.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.APPLICATION.name()])
+		addKeyValue(AssetClass.DEVICE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.DEVICE.name()])
+		addKeyValue(AssetClass.STORAGE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.STORAGE.name()])
+		addKeyValue(AssetClass.DATABASE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.DATABASE.name()])
+
+	}
+	/**
+	 * Adds a new key with field spec values in {@code FieldSpecMapper#fieldSpecMap} map field.
+	 * @param key
+	 * @param fieldsSpec
+	 * @return
+	 */
+	private void addKeyValue(String key, Map<String, ?> fieldsSpec){
+		fieldSpecMap.put(key, fieldsSpec)
+	}
+
+	String getType(String assetClass, String fieldName) {
+		return fieldSpecMap[assetClass][fieldName].type
+	}
+
 }
