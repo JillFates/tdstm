@@ -173,10 +173,10 @@ class ControlAngularTagLib {
 				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, placeholder, min)
 				break
 			case ControlType.DATE.toString():
-				out << "<tds-date-control [(value)]=\"" + value + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
+				out << "<tds-date-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-date-control>"
 				break
 			case ControlType.DATETIME.toString():
-				out << "<tds-datetime-control [(value)]=\"" + value + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
+				out << "<tds-datetime-control [(value)]=\"" + attrs.ngmodel + "\" [required]=\""  + isRequired + "\"></tds-datetime-control>"
 				break
 			case ControlType.STRING.toString():
 			default:
