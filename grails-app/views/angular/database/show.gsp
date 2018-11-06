@@ -31,11 +31,7 @@
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                     </tr>
                                     <tr class="prop">
-                                        <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
-                                            <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
-                                                ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
-                                            </label>
-                                        </td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset?.size}"/>
                                         <td class="valueNW ${standardFieldSpecs.size.imp?:''}">${asset?.size}&nbsp;${asset.scale?.value()}</td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}"><tds:convertDate date="${asset?.retireDate}" endian = "${dateFormat}" /></td>

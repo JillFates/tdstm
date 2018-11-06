@@ -51,11 +51,7 @@
 											</td>
 										</tr>
 										<tr>
-											<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
-												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
-													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
-												</label>
-											</td>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset?.size}"/>
 											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
 												<kendo-dropdownlist
@@ -81,7 +77,7 @@
 												</kendo-datepicker>
 											</td>
 
-											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.dependencyBundle?.value}"/>
 											<td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
 												<kendo-dropdownlist
 														[tabIndex]="22"
