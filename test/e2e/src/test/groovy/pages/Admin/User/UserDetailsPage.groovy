@@ -13,7 +13,7 @@ class UserDetailsPage extends Page {
     }
 
     static content = {
-        udPageTitle             { $("section", class:"content-header").find("h1")}
+        udPageTitle { $("section", class:"content-header").find("h1")}
         pageMessage (required: false, wait:true) { $("div", class:"message")}
         adminModule { module AdminModule}
         udButtonsForm { $("form", action:"/tdstm/userLogin/list")}
@@ -27,8 +27,10 @@ class UserDetailsPage extends Page {
         email {$(".value")[3].text()}
         createdDate {$(".value")[18].text()}
         lastModified {$(".value")[19].text()}
-
-
+        lockedOutUntil {$(".value")[9]}
+        unlockUserLoginUsername {$("#unlockUserDialog").find("ul").find("li")[0]}
+        unlockUserLoginConfirmBtn {$(class:"ui-dialog-buttonset").find("button")[0]}
+        unlockUserLoginCancelBtn {$(class:"ui-dialog-buttonset").find("button")[1]}
     }
 
     def clickOnDeleteButtonAndConfirm(){
@@ -57,4 +59,13 @@ class UserDetailsPage extends Page {
     def verifyUnlockButtonDisplayed(){
         unlockButtonID.displayed
     }
+
+    def verifyUsernameLocked(username){
+        unlockUserLoginUsername.text().contains(username)
+    }
+
+    def verifyNotLockedOut(){
+        lockedOutUntil.text().contains("Not Locked Out")
+    }
+
 }
