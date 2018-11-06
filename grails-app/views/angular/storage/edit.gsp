@@ -52,14 +52,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">
-                                            <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip ?: standardFieldSpecs.size.label}">
-                                                ${standardFieldSpecs.size.label}
-                                            </label>
-                                        </td>
-                                        <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
-                                        </td>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.size}" tabindex="14" value="${asset.size}" ngmodel="model.asset.size" />
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="17" ngmodel="model.asset.externalRefId"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
                                         <td class="${standardFieldSpecs.environment.imp ?: ''}" data-for="environment" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
@@ -84,8 +77,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">Scale</td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset?.scale}"/>
                                         <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                             <kendo-dropdownlist
 												    [tabIndex]="15"

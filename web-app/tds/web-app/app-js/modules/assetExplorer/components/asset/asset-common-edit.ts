@@ -23,6 +23,8 @@ export class AssetCommonEdit implements OnInit {
 	protected dateFormat: string;
 	protected isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
+	protected defaultPlanStatus = 'Unassigned';
+	protected defaultValidation = 'Discovery';
 	private initialModel: any = null;
 
 	constructor(
