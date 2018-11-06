@@ -18,7 +18,7 @@ export class UserPreferencesComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		//Resize modal window to fit content
+		// Resize modal window to fit content
 		let modal = document.getElementsByClassName('modal-dialog') as HTMLCollectionOf<HTMLElement>;
 
 		if (modal.length !== 0) {
