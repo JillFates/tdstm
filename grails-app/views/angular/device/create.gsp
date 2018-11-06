@@ -62,7 +62,12 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetInstance.manufacturer}"/>
+                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''} highField" nowrap="nowrap">
+                                        <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
+                                            <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${assetInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
+                                            <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
+                                        </label>
+                                    </td>
                                     <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="14">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"

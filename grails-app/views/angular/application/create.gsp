@@ -227,7 +227,13 @@
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="17"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="26"/>
-											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${assetInstance.shutdownBy}"/>
+											<td class="label ${standardFieldSpecs.shutdownBy.imp?:''} highField" nowrap="nowrap">
+												<label for="shutdownBy">
+													<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
+														${standardFieldSpecs.shutdownBy.label}
+													</tdsAngular:tooltipSpan>
+												</label>
+											</td>
 											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap" tabindex="35">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"

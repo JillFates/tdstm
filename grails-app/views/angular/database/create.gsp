@@ -50,7 +50,11 @@
 											</td>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${assetInstance?.size}"/>
+											<td class="label ${standardFieldSpecs.size.imp?:''} highField" nowrap="nowrap">
+												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+												</label>
+											</td>
 											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
 												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${assetInstance.size}" ngmodel="model.asset.size"/>
 												<kendo-dropdownlist
