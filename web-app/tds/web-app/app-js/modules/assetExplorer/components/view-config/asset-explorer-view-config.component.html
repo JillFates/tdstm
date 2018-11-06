@@ -157,6 +157,7 @@
 										</div>
 									</ng-template>
 								</kendo-sortable>
+								<label class="invalid-columns-selection" *ngIf="!hasAtLeastOneNonLockedColumnOrEmpty()">Must have at least one not locked column</label>
 							</div>
 						</div>
 					</div>
