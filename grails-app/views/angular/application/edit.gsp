@@ -169,7 +169,7 @@
 												</kendo-dropdownlist>
 											</td>
 
-											<tdsAngular:inputLabel field="${standardFieldSpecs.testProc}" value="${asset.testProc}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.testProc}" value="${asset.testProc == '?' ? '' : asset.testProc}"/>
 											<td data-for="testProc" class="${standardFieldSpecs.testProc.imp?:''}">
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.testProc}">
 												<kendo-dropdownlist
@@ -196,7 +196,7 @@
 														[(value)]="model.asset.maintExpDate">
 												</kendo-datepicker>
 											</td>
-											<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${asset.latency == '?' ? '' : asset.latency}"/>
 											<td data-for="latency" class="${standardFieldSpecs.latency.imp?:''}">
 												<kendo-dropdownlist
 														[tabIndex]="34"
@@ -208,7 +208,7 @@
 												</kendo-dropdownlist>
 											</td>
 
-											<tdsAngular:inputLabel field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}"/>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.startupProc}" value="${asset.startupProc == '?' ? '' : asset.startupProc}"/>
 											<td data-for="startupProc" class="${standardFieldSpecs.startupProc.imp?:''}">
 												<kendo-dropdownlist
 														[tabIndex]="43"
@@ -224,13 +224,7 @@
 										<tr>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${asset.url}" ngmodel="model.asset.url" tabindex="17"/>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="26"/>
-											<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap">
-												<label for="shutdownBy">
-													<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
-														${standardFieldSpecs.shutdownBy.label}
-													</tdsAngular:tooltipSpan>
-												</label>
-											</td>
+											<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
 											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap" tabindex="35">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
