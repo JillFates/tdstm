@@ -1,4 +1,6 @@
 import { Component, Inject, ViewChild, OnInit } from '@angular/core';
+import {State} from '@progress/kendo-data-query';
+
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -22,6 +24,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
+import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
 
 declare var jQuery: any;
@@ -30,10 +33,16 @@ declare var jQuery: any;
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html'
 })
 export class AssetExplorerViewConfigComponent implements OnInit {
-	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
+	protected data: any;
 	private dataSignature: string;
+	protected justPlanning: boolean;
+	protected gridState: State = {
+		skip: 0,
+		take: GRID_DEFAULT_PAGE_SIZE,
+		sort: []
+	};
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
@@ -79,6 +88,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = {...this.route.snapshot.data['report']};
 		this.dataSignature = JSON.stringify(this.model);
+		this.draggableColumns = [];
 		if (this.model.id) {
 			this.updateFilterbyModel();
 			this.currentTab = 1;
@@ -87,6 +97,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.justPlanning = false;
 		if (this.model.id) {
 			this.notifier.broadcast({
 				name: 'notificationHeaderTitleChange',
@@ -94,11 +105,6 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			});
 			this.previewButtonClicked = true;
 			this.onPreview();
-		} else {
-			this.grid.gridData = {
-				data: [],
-				total: 0
-			};
 		}
 	}
 
@@ -127,7 +133,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
-		this.grid.clear();
+		this.data = null;
 		this.previewButtonClicked = false;
 	}
 
@@ -248,7 +254,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected isValid(): boolean {
-		return this.isAssetSelected() && this.isColumnSelected();
+		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
 	protected isDirty(): boolean {
@@ -362,7 +368,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 					property: field.field,
 					order: 'a'
 				};
-				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }];
+				this.gridState = Object.assign({}, this.gridState,
+					{
+						sort: [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }]
+					});
 			}
 		} else {
 			let index = this.model.schema.columns
@@ -371,10 +380,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			if (index !== -1) {
 				this.model.schema.columns.splice(index, 1);
 			}
-			if (this.grid.state.sort.length > 0
-				&& this.grid.state.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
+			if (this.gridState.sort.length > 0
+				&& this.gridState.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
 				&& this.model.schema.columns.length > 0) {
-				this.grid.state.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
+				this.gridState.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
 				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
@@ -385,7 +394,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
-		this.grid.clear();
+		this.data = null;
 		this.previewButtonClicked = false;
 	}
 
@@ -439,11 +448,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			let params = this.getQueryParams();
 			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
-					this.grid.apply(result);
+					this.data = result;
 					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
-			this.grid.gridData = null;
+			this.data = null;
 		}
 	}
 
@@ -466,8 +475,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	 */
 	private getQueryParams(): AssetQueryParams {
 		let assetQueryParams = {
-			offset: this.grid.state.skip,
-			limit: this.grid.state.take,
+			offset: this.gridState.skip,
+			limit: this.gridState.take,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
@@ -477,8 +486,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
-			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		if (this.justPlanning) {
+			assetQueryParams['justPlanning'] = this.justPlanning;
 		}
 		return assetQueryParams;
 	}
@@ -510,7 +519,45 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	private clearSorting() {
-		this.grid.state.sort = [];
+		this.gridState.sort = [];
 		delete this.model.schema.sort;
 	}
+
+	/**
+	 -
+	 * Whenever the just planning change, grab the new value
+	 * @param justPlanning New value
+	 */
+	protected onJustPlanningChange(justPlanning: boolean): void {
+		this.justPlanning = justPlanning;
+	}
+
+	/**
+	 -
+	 * Whenever the grid state change, grab the new value
+	 * @param state New state
+	 */
+	protected onGridStateChange(state: State): void {
+		this.gridState = state;
+	}
+
+	/**
+	 -
+	 * Determine if exists at least one non locked column
+	 * or if the collection is empty
+	 * @returns {boolean}
+	 */
+	private hasAtLeastOneNonLockedColumnOrEmpty(): boolean {
+		const columns = this.model.schema && this.model.schema.columns || [];
+
+		if (columns.length === 0) {
+			return true;
+		}
+
+		const nonLocked =  columns
+			.filter((column: ViewColumn) => !column.locked);
+
+		return Boolean(nonLocked.length);
+	}
+
 }

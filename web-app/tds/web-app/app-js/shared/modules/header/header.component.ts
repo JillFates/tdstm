@@ -71,6 +71,8 @@ export class HeaderComponent {
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
 				this.pageMetaData = event.route.snapshot.data.page;
+				const {report} = event.route.snapshot.data;
+				this.pageMetaData.id = report && report.id;
 				// Set Title
 				this.titleService.setTitle(this.translatePipe.transform(this.pageMetaData.title || '', []));
 				this.selectTopMenuSections();
@@ -111,8 +113,9 @@ export class HeaderComponent {
 				jQuery('li.menu-child-item').removeClass('active');
 				let elements: any = document.getElementsByClassName(ASSET_MENU_CSS_TREE.CHILD_CLASS);
 				if (elements && elements.length > 0) {
+					const targetMenuId = selectedMenu.id && selectedMenu.id.toString();
 					for (let i = 0; i < elements.length; i++) {
-						if (elements[i].firstElementChild.id === selectedMenu.id) {
+						if (elements[i].firstElementChild.id === targetMenuId) {
 							this.renderer.addClass(elements[i], 'active');
 						}
 					}

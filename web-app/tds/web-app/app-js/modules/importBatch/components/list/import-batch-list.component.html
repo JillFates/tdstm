@@ -173,7 +173,7 @@
                                 </ng-template>
                                 <ng-template #statusTemplate>
                                     <div [ngClass]="{ 'status-with-errors' : dataItem.recordsSummary.erred > 0 }" class="status-text">
-                                        {{ dataItem.status.label }}
+                                        {{ dataItem.status.label | titlecase }}
                                     </div>
                                 </ng-template>
                             </ng-template>

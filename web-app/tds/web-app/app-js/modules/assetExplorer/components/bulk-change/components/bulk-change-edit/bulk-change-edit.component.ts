@@ -30,11 +30,12 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	protected readonly TYPE_OPTIONS_CONTROL = 'Options';
 	protected readonly TYPE_INLIST_CONTROL = 'InList';
 	protected readonly TYPE_CUSTOM_FIELD_LIST_CONTROL = 'List';
+	protected readonly TYPE_CUSTOM_FIELD_YES_NO = 'YesNo';
 
 	isLoaded: boolean;
 	private defaultDomain: IdTextItem = {id: 'COMMON', text: 'Common Fields'};
 	tagList: TagModel[] = [];
-	yesNoList: IdTextItem[] = [{ id: 'Y', text: 'Yes'}, { id: 'N', text: 'No'}];
+	yesNoList: IdTextItem[] = [{ id: 'Yes', text: 'Yes'}, { id: 'No', text: 'No'}];
 	protected domains: IdTextItem[];
 	selectedItems: string[] = [];
 	commonFieldSpecs: any[] = [];
@@ -76,7 +77,7 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 			}
 			this.addRow();
 			this.gridSettings = new DataGridOperationsHelper(this.editRows.fields);
-			this.bulkChangeService.getAssetListOptions(this.domains[0].id).subscribe( result => {
+			this.bulkChangeService.getAssetListOptions(this.domains[0].id === 'COMMON' ? 'DEVICE' : this.domains[0].id).subscribe( result => {
 				this.listOptions['planStatus'] = result.planStatusOptions.map(item => { return {id: item, text: item} });
 				this.listOptions['validation'] = result.validationOptions.map(item => { return {id: item, text: item} });
 				if (this.domains[0].id === 'DEVICE') {
@@ -271,14 +272,11 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 	private update(): Promise<BulkActionResult>  {
 		return new Promise((resolve, reject) =>  {
 			const edits = this.editRows.selectedValues.map((row: any) => {
-					let value = row.action.id === this.CLEAR_ACTION ? null : row.value;
-					if (this.isFieldControlOptionsList(row.field.control)) {
-						value = value.id;
-					}
+					let value = this.getUpdateValueForBulkAction(row.field.id, row.value, row.action.id, row.field.control);
 					return {
 						fieldName: row.field.id,
 						action: row.action.id,
-						value: value || '[]'
+						value: value
 					}
 				});
 
@@ -293,5 +291,35 @@ export class BulkChangeEditComponent extends UIExtraDialog implements OnInit {
 				reject({action: BulkActions.Edit, success: false, message: 'Forbidden operation' });
 			}
 		})
+	}
+
+	/**
+	 * Determines the ouput value that should go in the request payload for the bulkupdate of a particular type of field.
+	 * @param {string} fieldName
+	 * @param originalValue
+	 * @param {string} action
+	 * @param {string} control
+	 * @returns {string}
+	 */
+	private getUpdateValueForBulkAction(fieldName: string, originalValue: any, action: string, control: string): string {
+			// let value = action === this.CLEAR_ACTION ? null : originalValue;
+			if (this.isFieldControlOptionsList(control)
+				|| control === this.TYPE_CUSTOM_FIELD_LIST_CONTROL
+				|| control === this.TYPE_CUSTOM_FIELD_YES_NO) {
+				if (action === this.CLEAR_ACTION) {
+					return null;
+				}
+				return originalValue.id;
+			} else if (fieldName === 'tagAssets') {
+				if (action === this.CLEAR_ACTION) {
+					return '[]';
+				} else {
+					return originalValue;
+				}
+			} else if (action === this.CLEAR_ACTION) {
+				return null;
+			} else {
+				return originalValue;
+			}
 	}
 }
