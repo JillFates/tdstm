@@ -66,6 +66,9 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			};
 			this.model.asset.assetClass = modelRequest.asset.assetClass;
 
+			modelRequest.asset.environment = modelRequest.asset.environment === this.defaultSelectOption ?
+				''	 : modelRequest.asset.environment;
+
 			this.assetExplorerService.createAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'

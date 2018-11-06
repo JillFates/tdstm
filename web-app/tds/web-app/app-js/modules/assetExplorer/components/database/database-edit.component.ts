@@ -68,6 +68,9 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
 
+			modelRequest.asset.environment = modelRequest.asset.environment === this.defaultSelectOption ?
+				''	 : modelRequest.asset.environment;
+
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
