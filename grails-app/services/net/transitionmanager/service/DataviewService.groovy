@@ -5,14 +5,13 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.command.DataviewApiParamsCommand
 import grails.transaction.Transactional
-import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.command.DataviewApiParamsCommand
 import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
@@ -25,8 +24,6 @@ import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
-import groovy.transform.CompileStatic
-import java.text.DateFormat
 
 /**
  * Service class with main database operations for Dataview.
@@ -36,7 +33,8 @@ class DataviewService implements ServiceMethods {
 
 	static ProjectService projectService
 	UserPreferenceService userPreferenceService
-	CustomDomainService customDomainService
+	@Lazy
+	private static CustomDomainService customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
 
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
@@ -397,7 +395,7 @@ class DataviewService implements ServiceMethods {
 
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 
-		String hqlColumns = hqlColumns(dataviewSpec)
+		String hqlColumns = hqlColumns(dataviewSpec, fieldSpecMapper)
 		Map whereInfo = hqlWhere(dataviewSpec, project)
 		String conditions = whereInfo.conditions
 		Map whereParams = whereInfo.params
@@ -630,12 +628,13 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Creates a String with all the columns correctly set for select clause
-	 * @param dataviewSpec
+	 * @param dataviewSpec an instance of {@code DataviewSpec}
+	 * @param fieldSpecMapper an instance of {@code FieldSpecMapper}
 	 * @return
 	 */
-	private String hqlColumns(DataviewSpec dataviewSpec){
+	private String hqlColumns(DataviewSpec dataviewSpec, FieldSpecMapper fieldSpecMapper){
 		dataviewSpec.columns.collect { Map column ->
-			"${projectionPropertyFor(column)}"
+			"${projectionPropertyFor(column, fieldSpecMapper)}"
 		}.join(", ")
 	}
 
@@ -769,9 +768,35 @@ class DataviewService implements ServiceMethods {
         transformations[column.property].namedParameter
     }
 
-    private static String propertyFor(Map column) {
+	/**
+	 * https://docs.jboss.org/hibernate/orm/3.5/reference/en/html/queryhql.html#queryhql-expressions
+	 * @param column
+	 * @param fieldSpecMapper
+	 * @return
+	 */
+	private static String propertyFor(Map column, FieldSpecMapper fieldSpecMapper) {
+
+		String property = transformations[column.property].property
+
+		if(column.property.startsWith('custom')){
+
+			switch (fieldSpecMapper.getType(column.domain, column.property)) {
+				case 'Number':
+					property = "cast($property as integer)"
+					break
+				case 'DateTime':
+					property = "cast($property as time)"
+					break
+			}
+
+		}
+
+		return property
+	}
+
+	private static String propertyFor(Map column) {
 		transformations[column.property].property
-    }
+	}
 
     private static String joinFor(Map column) {
         transformations[column.property].join
@@ -802,12 +827,13 @@ class DataviewService implements ServiceMethods {
 	/**
 	 * Build the projection for the given column.
 	 *
-	 * @param column
+	 * @param column a Map with column definitions
+	 * @param fieldSpecMapper an instance of {@code FieldSpecMapper}
 	 * @return
 	 */
-	private static String projectionPropertyFor(Map column) {
+	private static String projectionPropertyFor(Map column, FieldSpecMapper fieldSpecMapper) {
 		String projection
-		String property = propertyFor(column)
+		String property = propertyFor(column, fieldSpecMapper)
 		String alias = aliasFor(column)
 		if (alias) {
 			projection = "$property AS $alias"
@@ -1184,38 +1210,57 @@ class DataviewService implements ServiceMethods {
 	}
 }
 
-
-
+/**
+ * This class converts {@code customDomainService.fieldSpecsWithCommon(project)}
+ * in a fieldsSpecMap like this:
+ * <pre>
+ *	[
+ *		id: [
+ *			field: 'id',
+ *			label: 'Id',
+ *			control: Number
+ *		],
+ *		assetName: [
+ *			field: 'assetName',
+ *			label: 'Name',
+ *			control: String
+ *		]
+ *	]
+ * </pre>
+ */
 class FieldSpecMapper {
 
-	Map<AssetClass, Map> fieldSpecMap = [:]
+	Map<AssetClass, Map> fieldsSpecMap = [
+		(CustomDomainService.COMMON): [:],
+		(AssetClass.APPLICATION.name()): [:],
+		(AssetClass.DEVICE.name())     : [:],
+		(AssetClass.STORAGE.name())    : [:],
+		(AssetClass.DATABASE.name())   : [:]
+	]
 
 	/**
 	 * Creates an instance of FieldSpecMapper using results from
-	 * {@code CustomDomainService#fieldSpecsWithCommon} results.
-	 * It defines common fields and manages field specs type during a {@code DataviewService#query}
+	 * {@code CustomDomainService # fieldSpecsWithCommon} results.
+	 * It defines common fields and manages field specs type during a {@code DataviewService # query}
 	 */
-	FieldSpecMapper(Map<String, ?> fieldsSpecMap){
-		Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
-
-		addKeyValue(AssetClass.APPLICATION.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.APPLICATION.name()])
-		addKeyValue(AssetClass.DEVICE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.DEVICE.name()])
-		addKeyValue(AssetClass.STORAGE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.STORAGE.name()])
-		addKeyValue(AssetClass.DATABASE.name(), commonFieldsSpec + fieldsSpecMap[AssetClass.DATABASE.name()])
-
+	FieldSpecMapper(Map<String, ?> fieldsSpec) {
+		addFieldSpecs(CustomDomainService.COMMON, fieldsSpec)
+		addFieldSpecs(AssetClass.APPLICATION.name(), fieldsSpec)
+		addFieldSpecs(AssetClass.DEVICE.name(), fieldsSpec)
+		addFieldSpecs(AssetClass.STORAGE.name(), fieldsSpec)
+		addFieldSpecs(AssetClass.DATABASE.name(), fieldsSpec)
 	}
-	/**
-	 * Adds a new key with field spec values in {@code FieldSpecMapper#fieldSpecMap} map field.
-	 * @param key
-	 * @param fieldsSpec
-	 * @return
-	 */
-	private void addKeyValue(String key, Map<String, ?> fieldsSpec){
-		fieldSpecMap.put(key, fieldsSpec)
+
+	private void addFieldSpecs(String key, Map<String, ?> fieldsSpec) {
+		List<Map<String, ?>> fieldsSpecList = fieldsSpec[key].fields
+
+		fieldsSpecMap[key] = fieldsSpecList.collectEntries {
+			[(it.field): [field: it.field, label: it.label, control: it.control]]
+		}
 	}
 
 	String getType(String assetClass, String fieldName) {
-		return fieldSpecMap[assetClass][fieldName].type
+		return fieldsSpecMap[assetClass.toUpperCase()][fieldName].control
 	}
 
 }
