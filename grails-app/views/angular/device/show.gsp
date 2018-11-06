@@ -112,7 +112,7 @@
                                         ${assetEntity?.moveBundle}
                                         <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.size.imp?:''} ${assetEntity.size ? '' : 'highField'}" nowrap="nowrap">
                                         <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
                                             Size/Scale
                                         </label>
