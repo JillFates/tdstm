@@ -21,6 +21,7 @@ import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveBundleStep
 import net.transitionmanager.domain.MoveEvent
@@ -49,7 +50,6 @@ class MoveBundleService implements ServiceMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	TagService tagService
-	TagAssetService tagAssetService
 	AssetOptionsService assetOptionsService
 
 	private static final Map<String, Number> defaultsSmall =  [force: -500, linkSize:  90, friction: 0.7, theta: 1, maxCutAttempts: 200]
@@ -889,8 +889,8 @@ class MoveBundleService implements ServiceMethods {
 			asset.save(failOnError: true)
 		}
 
-		tagAssetService.validateBulkValues(currentProject, tagIds)
-		tagAssetService.bulkReplace(tagIds, assets)
+		BulkChangeTag.validateBulkValues(currentProject, tagIds)
+		BulkChangeTag.replace(null, tagIds, 'tagAssets', assets)
 
 		session.ASSIGN_BUNDLE = moveBundle
 		session.SELECTED_TAG_IDS = tagIds ?: []
