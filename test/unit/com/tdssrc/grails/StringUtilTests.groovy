@@ -433,4 +433,53 @@ class StringUtilTests extends Specification {
 			guid != guid2
 	}
 
+
+	def 'test sanitizeHTML' () {
+		given: 'an External HTML with potential XSS malicious code'
+			String maliciousHTML = '''
+				<div>
+				  <b>Lorem</b> <i>Ipsum</i>
+				  <div style="border: 1px solid green; padding: 5px">
+				    <a href="http://quaxio.com/html_white_listed_sanitizer/">a link</a> and an image:
+				    <p><img src="http://quaxio.com/files/2015/html_white_listed_sanitizer/success.jpeg"></p>
+				  </div>
+				  <!-- self-closing tags work --> <br/>
+				  <div style="border: 1px solid red; padding: 5px">
+				    <a href="javascript:alert(1)">this won't run</a>
+				    and neither will this: <script>alert(1);</script>
+				  </div>
+				<h2>Da <span style="font-family:Arial, Helvetica, sans-serif;">new</span> Notice</h2>
+				<p style="text-align:center;">BAda dum</p>
+				<p style="text-align:justify;">Toroto</p>
+				<p>Ya <strong>aqui</strong></p>
+				<p><em>vamos</em></p>
+				<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQEAAA=" /></p>
+				</div>
+			'''.trim()
+
+			String cleaneddHTML = '''
+				<div>
+				  <b>Lorem</b> <i>Ipsum</i>
+				  <div>
+				    a link and an image:
+				    <p></p>
+				  </div>
+				   <br />
+				  <div>
+				    this won&#39;t run
+				    and neither will this: 
+				  </div>
+				<h2>Da new Notice</h2>
+				<p>BAda dum</p>
+				<p>Toroto</p>
+				<p>Ya <strong>aqui</strong></p>
+				<p><em>vamos</em></p>
+				<p></p>
+				</div>
+			'''.trim()
+
+		expect: 'that the potential exploitable elements are removed'
+			 cleaneddHTML == StringUtil.sanitizeHTML(maliciousHTML)
+	}
+
 }

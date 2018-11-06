@@ -32,6 +32,8 @@ grails.project.dependency.resolution = {
 		compile 'org.apache.poi:poi:3.14'
 		compile 'xml-apis:xml-apis:1.4.01'
 
+		compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20180219.1'
+
 		// LIB JARS
 		compile 'net.sourceforge.barbecue:barbecue:jar:1.5-beta1'
 		compile 'org.codelibs:jcifs:1.3.18.3'

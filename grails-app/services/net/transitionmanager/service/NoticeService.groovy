@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.NoticeAcknowledgment
@@ -90,7 +91,14 @@ class NoticeService implements ServiceMethods {
 	private Map<String, ?> saveUpdate(json, Notice notice) {
 		TYPES.each { String propertyName, Class type ->
 			def val = json[propertyName]
+
 			if (val != null) {
+
+				// Sanitize the 3rd Party HTML
+				if (propertyName == 'htmlText') {
+					val = StringUtil.sanitizeHTML(val as String)
+				}
+
 				switch (type) {
 					case Date:
 						val = DatatypeConverter.parseDateTime(val).time

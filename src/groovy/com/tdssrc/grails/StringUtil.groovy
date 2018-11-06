@@ -6,6 +6,8 @@ import groovy.json.StringEscapeUtils
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.codec.digest.DigestUtils
+import org.owasp.html.HtmlPolicyBuilder
+import org.owasp.html.PolicyFactory
 
 import java.util.regex.Matcher
 
@@ -540,6 +542,20 @@ class StringUtil {
 	 */
 	static String generateGuid() {
 		return UUID.randomUUID()
+	}
+
+	/**
+	 * Sanitize Unsafe HTML String, removing Javascript, images and allowing only certain format tags
+	 * @param unsafeHtmlString
+	 * @return
+	 */
+	static String sanitizeHTML(String unsafeHtmlString) {
+		PolicyFactory policy = new HtmlPolicyBuilder()
+				  .allowCommonBlockElements()
+				  .allowCommonInlineFormattingElements()
+				  .toFactory()
+
+		return policy.sanitize(unsafeHtmlString)
 	}
 
 }
