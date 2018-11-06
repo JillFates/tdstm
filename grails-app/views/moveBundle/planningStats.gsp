@@ -1,3 +1,4 @@
+<%@ page import="com.tdsops.tm.enums.domain.ValidationType" %>
 <html>
 <head>
 	<title>Transition Planning Dashboard</title>
@@ -116,7 +117,7 @@ $(document).ready(function() {
                                     <div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
                                         <b> ${percentagePlanReady}%</b>
                                     <g:link controller="application" action="list"
-                                            params="[filter:'application', toValidate:'PlanReady']">Applications Ready</g:link>
+                                            params="[filter:'application', toValidate:ValidationType.PLAN_READY]">Applications Ready</g:link>
                                     </div>
                                 </g:else>
                             </td>
@@ -262,12 +263,12 @@ $(document).ready(function() {
 						<tr>
 							<td class="dashboard_stat_td"><g:link
 									controller="application" action="list"
-									params="[filter:'application', toValidate:'PlanReady']"
+									params="[filter:'application', toValidate: ValidationType.PLAN_READY]"
 									class="links">
 									${planReady}
 								</g:link></td>
 							<td><g:link controller="application" action="list"
-									params="[filter:'application', toValidate:'PlanReady']"
+									params="[filter:'application', toValidate:ValidationType.PLAN_READY]"
 									class="links">Ready</g:link></td>
 						</tr>
 					</table>

@@ -1,3 +1,4 @@
+<%@ page import="com.tdsops.tm.enums.domain.ValidationType" %>
 <script type="text/javascript">
 $(document).ready(function() { 
 	var assetType = $("#assetTypeCreateId").val()
@@ -157,7 +158,7 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Validation</td>
 		<td class="label">
-			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="Uknown"
+			<g:select from="${assetEntityInstance.constraints.validation.inList}" id="validation" name="validation" value="${ValidationType.UNKNOWN}"
 			noSelection="${['':' Please Select']}" />
 		</td>
 	</tr>

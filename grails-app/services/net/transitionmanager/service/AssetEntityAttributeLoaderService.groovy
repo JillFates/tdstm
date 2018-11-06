@@ -7,6 +7,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -997,7 +998,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				}
 				break
 			case "validation":
-				setValueOrDefault(asset, property, value, 'Unknown')
+				setValueOrDefault(asset, property, value, ValidationType.UNKNOWN)
 				break
 			case 'version':
 			case 'modifiedBy':

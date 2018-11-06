@@ -11,6 +11,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -293,7 +294,7 @@ class MoveBundleService implements ServiceMethods {
 			COUNT(distinct adb.asset_id) AS assetCnt,
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
 			SUM(if(a.plan_status='$AssetEntityPlanStatus.UNASSIGNED',1,0)) AS statusUnassigned,
-			SUM(if(a.validation<>'PlanReady',1,0)) AS notBundleReady,
+			SUM(if(a.validation<>'${ValidationType.PLAN_READY}',1,0)) AS notBundleReady,
 			SUM(if(a.asset_class = '$AssetClass.DEVICE'
 				AND if(m.model_id > -1, m.asset_type in ($physicalTypes), a.asset_type in ($physicalTypes)), 1, 0)) AS serverCount,
 			SUM(if(a.asset_class = '$AssetClass.DEVICE'

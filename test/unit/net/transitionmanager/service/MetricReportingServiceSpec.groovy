@@ -5,6 +5,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.ValidationType
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -175,14 +176,14 @@ class MetricReportingServiceSpec extends Specification {
 	void 'Test getWhere'() {
 		setup: 'Given a list of where JSON structure'
 			List wheres = [
-					[column: 'moveBundle.useForPlanning', expression: '= true'],
-					[column: 'validation', expression: "in ('PlanReady', 'Confirmed')"],
-					[column: 'moveBundle.useForPlanning', expression: '= true']
+				[column: 'moveBundle.useForPlanning', expression: '= true'],
+				[column: 'validation', expression: "in ('${ValidationType.PLAN_READY}', 'Confirmed')"],
+				[column: 'moveBundle.useForPlanning', expression: '= true']
 			]
 		when: 'getWhere is called with wheres'
 			String where = service.getWhere(wheres)
 		then: 'getWhere generates the hql for the wheres'
-			where == 'and moveBundle.useForPlanning = true and validation in (\'PlanReady\', \'Confirmed\') and moveBundle.useForPlanning = true'
+			where == "and moveBundle.useForPlanning = true and validation in (\'${ValidationType.PLAN_READY}\', \'Confirmed\') and moveBundle.useForPlanning = true"
 	}
 
 	void 'Test getWhere one where in list'() {
@@ -224,7 +225,7 @@ class MetricReportingServiceSpec extends Specification {
 					"where"      : [
 							[
 									"column"    : "validation",
-									"expression": "in ('PlanReady', 'Confirmed')"
+									"expression": "in ('${ValidationType.PLAN_READY}', 'Confirmed')"
 							]
 					]
 			] as JSONObject
@@ -233,7 +234,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and validation in ('PlanReady', 'Confirmed') and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
+				where project.id in (:projectIds) and validation in ('${ValidationType.PLAN_READY}', 'Confirmed') and assetClass = 'DEVICE' and moveBundle.useForPlanning = 1
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 
@@ -548,7 +549,7 @@ class MetricReportingServiceSpec extends Specification {
 
 			WhereCommand whereCommand = new WhereCommand()
 			whereCommand.column = 'validation'
-			whereCommand.expression = "in ('PlanReady', 'Confirmed')"
+			whereCommand.expression = "in ('${ValidationType.PLAN_READY}', 'Confirmed')"
 
 			QueryCommand queryCommand = new QueryCommand()
 			queryCommand.with {
@@ -575,14 +576,14 @@ class MetricReportingServiceSpec extends Specification {
 			Map definitions = service.saveDefinitions(metricDefinitions, 0)
 
 		then: 'The definition returned is the query definition, as JSON.'
-			definitions.definitions == '''[{
+			definitions.definitions == """[{
    "mode": "query",
    "function": null,
    "query": {
       "domain": "Device",
       "aggregation": "count(*)",
       "where": [{
-         "expression": "in ('PlanReady', 'Confirmed')",
+         "expression": "in ('${ValidationType.PLAN_READY}', 'Confirmed')",
          "column": "validation"
       }],
       "groupBy": [
@@ -594,7 +595,7 @@ class MetricReportingServiceSpec extends Specification {
    "enabled": 1,
    "metricCode": "The code...",
    "sql": null
-}]'''
+}]"""
 	}
 
 

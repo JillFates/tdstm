@@ -567,7 +567,7 @@ describe('Database', function(){
         createDBModal.validationOptions.then(function(list){
           expect(list[0].getText()).toEqual('Unknown');
           expect(list[1].getText()).toEqual('Validated');
-          expect(list[4].getText()).toEqual('PlanReady');
+          expect(list[2].getText()).toEqual('PlanReady');
         });
       });
 

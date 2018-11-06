@@ -2755,7 +2755,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (params.type && params.type == 'toValidate') {
-			query.append(whereAnd() + " assets.validation='Unknown' ") //eq ('validation','Discovery')
+			query.append(whereAnd() + " assets.validation='${ValidationType.UNKNOWN}' ") //eq ('validation','Discovery')
 		}
 
 		// Allow filtering on the Validate

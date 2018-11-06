@@ -13,6 +13,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
@@ -773,10 +774,10 @@ class MoveBundleController implements ControllerMethods {
 		def filesValidateCountQuery = filesCountQuery + validationQuery
 
 		// This section could be consolidated to a simple query instead of a bunch
-		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Unknown'])[0]
-		def planReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'PlanReady'])[0]
+		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.UNKNOWN])[0]
+		def planReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.PLAN_READY])[0]
 
-		countArgs.validation = 'Unknown'
+		countArgs.validation = ValidationType.UNKNOWN
 		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
 		def dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
 		def fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]

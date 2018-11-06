@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.bulk.change.BulkChangeList
@@ -636,7 +637,7 @@ class BulkAssetChangeServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'Test bulkChange replace inList'() {
 		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: "Unknown")
+			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'replace', value: ValidationType.UNKNOWN)
 			bulkChangeCommand.edits = [editCommand]
 			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
 
