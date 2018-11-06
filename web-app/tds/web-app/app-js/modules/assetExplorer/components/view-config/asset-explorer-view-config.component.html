@@ -163,9 +163,12 @@
 				</div>
 			</div>
 		</div>
-		<asset-explorer-view-grid #grid="assetExplorerViewGrid"
+		<asset-explorer-view-grid [data]="data"
                                   (modelChange)="onPreview()"
-								  [fields]="allFields"
+                                  (justPlanningChange)="onJustPlanningChange($event)"
+                                  [gridState]="gridState"
+                                  (gridStateChange)="onGridStateChange($event)"
+		                          [fields]="allFields"
                                   [edit]="true"
                                   [model]="model.schema"
 		                          [viewId]="model.id"

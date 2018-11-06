@@ -1,6 +1,7 @@
 import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 import { Observable } from 'rxjs';
+import {State} from '@progress/kendo-data-query';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -9,6 +10,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
 
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
@@ -34,8 +36,14 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	protected metadata: any = {};
 	private lastSnapshot;
 	protected navigationSubscription;
+	protected justPlanning: boolean;
+	protected data: any;
+	protected gridState: State = {
+		skip: 0,
+		take: GRID_DEFAULT_PAGE_SIZE,
+		sort: []
+	};
 
-	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	constructor(
@@ -96,24 +104,25 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	 * Calls every time the Component is recreated by calling same URL
 	 */
 	private initialiseComponent(): void {
+		this.justPlanning = false;
 		this.currentId = this.model.id;
 		this.notifier.broadcast({
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
 		});
 
-		this.grid.state.sort = [
-			{
-				field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
-				dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
-			}
-		];
+		this.gridState = Object.assign({}, this.gridState, {sort: [
+				{
+					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
+					dir: this.model.schema.sort.order === 'a' ? 'asc' : 'desc'
+				}
+			]});
 	}
 
 	protected onQuery(): void {
 		let params = {
-			offset: this.grid.state.skip,
-			limit: this.grid.state.take,
+			offset: this.gridState.skip,
+			limit: this.gridState.take,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
@@ -122,11 +131,11 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
+		if (this.justPlanning) {
 			params['justPlanning'] = true;
 		}
 		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
-			this.grid.apply(result);
+			this.data = result;
 			jQuery('[data-toggle="popover"]').popover();
 		}, err => console.log(err));
 	}
@@ -217,8 +226,8 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private getQueryParamsForExport(): AssetQueryParams {
 		let assetQueryParams: AssetQueryParams = {
-			offset: this.grid.gridData ? 0 : this.grid.state.skip,
-			limit: this.grid.gridData ? this.grid.gridData.total : this.grid.state.take,
+			offset: this.data ? 0 : this.gridState.skip,
+			limit: this.data ? this.data.pagination.total : this.gridState.take,
 			forExport: true,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
@@ -228,8 +237,8 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 				columns: this.model.schema.columns
 			}
 		};
-		if (this.grid.justPlanning) {
-			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		if (this.justPlanning) {
+			assetQueryParams['justPlanning'] = this.justPlanning;
 		}
 
 		return assetQueryParams;
@@ -257,4 +266,20 @@ export class AssetExplorerViewShowComponent implements OnInit, OnDestroy {
 			this.permissionService.hasPermission(Permission.AssetExplorerEdit);
 	}
 
+	/**
+	 * Whenever the just planning change, grab the new value
+	 * @param justPlanning
+	 */
+	protected onJustPlanningChange(justPlanning: boolean): void {
+		this.justPlanning = justPlanning;
+	}
+
+	/**
+	 -
+	 * Whenever the grid state change, grab the new value
+	 * @param state New state
+	 */
+	protected onGridStateChange(state: State): void {
+		this.gridState = state;
+	}
 }

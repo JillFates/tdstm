@@ -47,8 +47,8 @@
 									</div>
 								</ng-template>
 								<ng-template #stringFilter>
-									<div class="sortable-column" (click)="onClickTemplate($event)">
-										<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+									<div class="sortable-column with-filter" (click)="onClickTemplate($event)">
+										<input type="text" (keyup)="onFilter(column)" class="form-control column-filter-input" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
 										<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 									</div>
 								</ng-template>
