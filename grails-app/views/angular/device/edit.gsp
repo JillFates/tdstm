@@ -62,12 +62,22 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
-                                        <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
-                                            <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${asset.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
-                                            <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
-                                        </label>
-                                    </td>
+                                    <g:if test="${asset.manufacturer == null }">
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="" />
+                                    </g:if>
+
+                                    <g:if test="${asset.manufacturer != null }">
+                                        <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
+                                            <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
+                                                <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${asset.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
+                                                <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
+                                            </label>
+                                        </td>
+                                    </g:if>
+
+
+
+
                                     <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="14">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"
@@ -88,7 +98,7 @@
                                                 [data]="model.priorityOption">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''} ${asset.roomSource ? '' : 'highField'}" nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
@@ -299,7 +309,7 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset.scale}"/>
                                     <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                         <kendo-dropdownlist
                                                 [tabIndex]="50"

@@ -36,7 +36,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value="${assetInstance.assetType}"/>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value=""/>
                                     <td class="tm-input-control-container  ${standardFieldSpecs.assetType.imp ?: ''}" data-for="model" tabindex="13">
                                         <tds-combobox
                                                 [(model)]="model.asset.assetTypeSelectValue"
@@ -62,12 +62,7 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
-                                        <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
-                                            <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${assetInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
-                                            <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
-                                        </label>
-                                    </td>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetInstance.manufacturer}"/>
                                     <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="14">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"
@@ -88,7 +83,7 @@
                                                 [data]="model.priorityOption">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''} highField" nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
@@ -252,7 +247,7 @@
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetInstance.serialNumber}" tabindex="17" ngmodel="model.asset.serialNumber"/>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}" tabindex="25" ngmodel="model.asset.supportType"/>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.id}"/>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
                                     <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                         <kendo-dropdownlist
                                                 [tabIndex]="38"
@@ -299,8 +294,8 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
-                                    <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${assetInstance.scale}"/>
+                                    <td data-for="sizeScale" class="${standardFieldSpecs.scale.imp ?: ''}">
                                         <kendo-dropdownlist
                                                 [tabIndex]="50"
                                                 class="tm-input-control"
@@ -334,7 +329,7 @@
                                                 [(value)]="model.asset.maintExpDate">
                                         </kendo-datepicker>
                                     </td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"/>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.constraints.validation.inList as JSON}[0]" />
                                     <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
 											    [tabIndex]="40"
