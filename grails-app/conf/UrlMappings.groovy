@@ -432,6 +432,11 @@ class UrlMappings {
 			action = [POST:"savePreference"]
 		}
 
+		"/ws/user/preference/$code&$value" {
+			controller = "wsUser"
+			action = [POST:"savePreference"]
+		}
+
 		"/ws/user/preferences" {
 			controller = "wsUser"
 			action = [GET:"getPreferenceMap"]
@@ -440,6 +445,11 @@ class UrlMappings {
 		"/ws/user/person" {
 			controller = "wsUser"
 			action = [GET:"getPerson"]
+		}
+
+		"/ws/user/startPageOptions" {
+			controller = "wsUser"
+			action = [GET:"getStartPageOptions"]
 		}
 
         "/ws/user/removePreference/$prefCode" {

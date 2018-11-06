@@ -1,5 +1,6 @@
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.enums.domain.StartPageEnum as STARTPAGE
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -126,11 +127,21 @@ class WsUserController implements ControllerMethods {
 		renderSuccessJson(prefMap: prefArray)
 	}
 
+    @HasPermission(Permission.UserGeneralAccess)
+    def getStartPageOptions() {
+        def pageList = [STARTPAGE.PROJECT_SETTINGS.value,
+            STARTPAGE.PLANNING_DASHBOARD.value,
+            STARTPAGE.ADMIN_PORTAL.value,
+            STARTPAGE.USER_DASHBOARD.value]
+
+        renderSuccessJson(pages: pageList)
+    }
+
 	/**
-	 * Sets a user preference through an AJAX call
-	 * @param code - the preference code for the preference that is being set
-	 * @param value - the value to set the preference to
-	 */
+	* Sets a user preference through an AJAX call
+	* @param code - the preference code for the preference that is being set
+	* @param value - the value to set the preference to
+	*/
 	@HasPermission(Permission.UserGeneralAccess)
 	def savePreference() {
 		userPreferenceService.setPreference(params.code?.toString() ?: '', params.value ?: '')
