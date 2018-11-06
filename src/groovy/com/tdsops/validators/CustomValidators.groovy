@@ -177,33 +177,50 @@ class CustomValidators {
 	static  controlNumberValidator ( String value, Map fieldSpec ) {
 		new Validator ( fieldSpec ) {
 			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError ('field.invalid.notEmpty', [value, getLabel()])
+					}
+					return // with or without error, as the value is empty, just return
+				}
                 // try to convert to numeric
 				Long number
 				try {
 					NumberFormat nf = NumberFormat.getInstance()
+					// For some reason a value of the form 'n-' is parsed to 'n' by NumberFormat.parse(). That is not a valid
+					// value format (it should be -n) so if that is the case, consider the value as a wrong format value.
+					if(value.charAt(value.size()-1) == '-') {
+						throw new ParseException('The number format is incorrect', 0)
+					}
 					number = nf.parse(value)
 				} catch (ParseException e) {
 					// If it's not a number there is not much to do, so return
-					addError ( 'field.invalid.NaN', [value, getLabel(), e.getMessage()])
+					addError ('typeMismatch.java.lang.Long', [getLabel()])
 					return
 				}
 			    // finally, validate the constraints in the fieldSpec
 				def minRange = fieldSpec.constraints?.minRange ?: null
 				def maxRange = fieldSpec.constraints?.maxRange ?: null
-				def decimalPlaces = fieldSpec.constraints?.decimalPlaces ?: null
-				def allowNegatives = fieldSpec.constraints?.allowNegatives
+				def precision = fieldSpec.constraints?.precision ?: null
+				def allowNegative = fieldSpec.constraints?.allowNegative
 
+				// if 'minRange' or 'maxRange' fields are present, validate the value range
 				if ((minRange && number < minRange) || (maxRange && number > maxRange)) {
-					addError ('field.invalid.valueOutOfRange', [value, getLabel(), minRange, maxRange])
+					addError ('default.invalid.range.message', [getLabel(), null, value, minRange, maxRange])
 				}
-				if (decimalPlaces && value.contains('.')){
+				// if 'precision' field is present and the value has a fractional part, we should check
+				// that the count of fractional digits does not exceed the 'precision' value
+				if (precision && value.contains('.')){
 					def fractionalPart = value.substring(value.indexOf('.') + 1, value.size())
-					if (!fractionalPart.size() > decimalPlaces) {
-						addError ('field.invalid.decimalPlacesExceeded', [value, getLabel(), decimalPlaces])
+					if (!fractionalPart.size() > precision) {
+						addError ('field.invalid.precisionExceeded', [value, getLabel(), precision])
 					}
 				}
-				if (number < 0 && !allowNegatives) {
-					addError ('field.invalid.negativesNotAllowed', [value, getLabel()] )
+				// if 'allowNegative' field is not present and the number is negative, it should error
+				if (number < 0 && !allowNegative) {
+					addError ('field.invalid.negativeNotAllowed', [value, getLabel()] )
 				}
 			}
 		}

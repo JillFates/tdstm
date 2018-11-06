@@ -44,8 +44,9 @@ class CustomValidatorsSpec extends Specification{
 					constraints: [
 							maxRange : 100,
 							minRange : 1,
-							decimalPlaces:2,
-							allowNegatives: true
+							precision:2,
+							allowNegative: true,
+							required: 0
 					]
 
 			]
@@ -67,34 +68,35 @@ class CustomValidatorsSpec extends Specification{
 		when: 'the max allowed value is exceeded'
 			validator = CustomValidators.controlNumberValidator('101', fieldSpec)
 			errors = validator.apply()
-		then: 'a valueOutOfRange error should be reported'
+		then: 'a "default.invalid.range.message" error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.valueOutOfRange' == errors[0].i18nMessageId
+			'default.invalid.range.message' == errors[0].i18nMessageId
 		when: 'the min allowed value is not reached'
 			validator = CustomValidators.controlNumberValidator('0', fieldSpec)
 			errors = validator.apply()
-		then: 'a valueOutOfRange error should be reported'
+		then: 'a "default.invalid.range.message" error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.valueOutOfRange' == errors[0].i18nMessageId
+			'default.invalid.range.message' == errors[0].i18nMessageId
         when: 'a non-numeric value is passed'
             validator = CustomValidators.controlNumberValidator('NaN', fieldSpec)
             errors = validator.apply()
-        then: 'a NaN error should be reported'
+        then: 'a "typeMismatch.java.lang.Long" error should be reported'
             validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.NaN' == errors[0].i18nMessageId
+			'typeMismatch.java.lang.Long' == errors[0].i18nMessageId
 	}
 
-	void '03. Test controlNumberValidator validator negatives and decimal places'() {
+	void '03. Test controlNumberValidator validator for negatives and precision'() {
 		setup: 'setting the Field Specification Map'
 		Map<String, Object> fieldSpec = [
 				constraints: [
 						maxRange : 1500,
 						minRange : -20,
-						decimalPlaces:2,
-						allowNegatives: true
+						precision: 2,
+						allowNegative: true,
+						required: 0
 				]
 
 		]
@@ -103,13 +105,72 @@ class CustomValidatorsSpec extends Specification{
 			validator.apply()
 		then: 'no error should be reported'
 			!validator.hasErrors()
-		when: 'we restrict only to positive numbers and call that again'
-			fieldSpec.constraints.allowNegatives = false
-			validator = CustomValidators.controlNumberValidator('-10', fieldSpec)
+		when: 'the minus (-) sign is passed as a suffix and not a prefix'
+			validator = CustomValidators.controlNumberValidator('10-', fieldSpec)
 			errors = validator.apply()
-		then: 'a negativesNotAllowed error should be reported'
+		then: 'that is not even a valid number format, so a typeMismatch.java.lang.Long error should be reported'
 			validator.hasErrors()
 			1 == errors.size()
-			'field.invalid.negativesNotAllowed' == errors[0].i18nMessageId
+			'typeMismatch.java.lang.Long' == errors[0].i18nMessageId
+		when: 'we restrict only to positive numbers and call again with a negative value'
+			fieldSpec.constraints.allowNegative = false
+			validator = CustomValidators.controlNumberValidator('-10', fieldSpec)
+			errors = validator.apply()
+		then: 'a negativeNotAllowed error should be reported'
+			validator.hasErrors()
+			1 == errors.size()
+			'field.invalid.negativeNotAllowed' == errors[0].i18nMessageId
+	}
+
+	void '04. Test controlNumberValidator validator with a blank and null value and a required:0 (field not required) constraint'() {
+		setup: 'setting the Field Specification Map with a required:0 constraint'
+		Map<String, Object> fieldSpec = [
+				constraints: [
+						maxRange : 100,
+						minRange : 1,
+						precision:2,
+						allowNegative: true,
+						required: 0
+				]
+
+		]
+		when: 'a blank is passed'
+		def validator = CustomValidators.controlNumberValidator('', fieldSpec)
+		validator.apply()
+		then: 'no error should be reported'
+		!validator.hasErrors()
+		when: 'a null is passed'
+		validator = CustomValidators.controlNumberValidator(null, fieldSpec)
+		validator.apply()
+		then: 'no error should be reported'
+		!validator.hasErrors()
+	}
+
+	void '05. Test controlNumberValidator validator with a blank and null value and a required:1 (field required) constraint'() {
+		setup: 'setting the Field Specification Map with a required:1 constraint'
+		Map<String, Object> fieldSpec = [
+				constraints: [
+						maxRange : 100,
+						minRange : 1,
+						precision:2,
+						allowNegative: true,
+						required: 1
+				]
+
+		]
+		when: 'a blank is passed'
+		def validator = CustomValidators.controlNumberValidator('', fieldSpec)
+		errors = validator.apply()
+		then: 'a notEmpty error should be reported'
+		validator.hasErrors()
+		1 == errors.size()
+		'field.invalid.notEmpty' == errors[0].i18nMessageId
+		when: 'a null is passed'
+		validator = CustomValidators.controlNumberValidator(null, fieldSpec)
+		errors = validator.apply()
+		then: 'a notEmpty error should be reported'
+		validator.hasErrors()
+		1 == errors.size()
+		'field.invalid.notEmpty' == errors[0].i18nMessageId
 	}
 }
