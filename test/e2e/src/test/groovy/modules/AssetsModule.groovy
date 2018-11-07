@@ -14,7 +14,7 @@ class AssetsModule extends Module {
         assetsSections { assetsMenu.find("li",class:"menu-parent-item")}
         assetsSummaryItem { assetsMenu.find("li.menu-parent-assets-summary-table")}
         assetsAllAssetsItem { assetsMenu.find("li.menu-parent-assets-asset-explorer")}
-        assetsApplicationsItem { assetsMenu.find("li.menu-parent-assets-application-list a[onclick*=hideMegaMenu]")}
+        assetsApplicationsItem { assetsMenu.find("li.menu-parent-assets-application-list a")}
         assetsDevicesItem { assetsMenu.find("li.menu-parent-assets-all-list a[onclick*=hideMegaMenu]")}
         assetsServersItem { assetsMenu.find("li.menu-parent-assets-server-list a[onclick*=hideMegaMenu]")}
         assetsDatabasesItem { assetsMenu.find("li.menu-parent-assets-database-list a[onclick*=hideMegaMenu]")}
