@@ -80,7 +80,7 @@ export class AssetExplorerViewGridComponent {
 		this.getPreferences().subscribe((preferences: any) => {
 				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
 				this.bulkCheckboxService.setPageSize(this.state.take);
-				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
+				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
 				this.onReload();
 			});
 		fields.subscribe((result: DomainModel[]) => {
