@@ -1,25 +1,80 @@
 package net.transitionmanager.service
 
+import com.tds.asset.Application
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
+import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.MoveEventStaff
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Sheet
 import org.springframework.jdbc.core.JdbcTemplate
 
+@Slf4j
 @Transactional
 class MoveEventService implements ServiceMethods {
+
+	private static final List<String> preMoveCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'assignedTo',
+													 'status', 'estStart', '', '', 'notes', 'duration', 'estStart',
+													 'estFinish', 'actStart', 'actFinish', 'workflow']
+	private static final List<String> serverCols = ['id', 'application', 'assetName', '','serialNumber', 'assetTag',
+													'manufacturer', 'model', 'assetType', '', '', '']
+	private static final List<String> scheduleCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role',
+													  'assignedTo', 'instructionsLink' , '', 'duration', 'estStart',
+													  'estFinish', 'actStart', 'actFinish', 'workflow']
+	private static final List<String> postMoveCols = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status',
+													  'estFinish', 'dateResolved' , 'notes', 'taskDependencies', 'duration',
+													  'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow']
+	private static final List<String> impactedCols = ['id', 'assetName', '', 'startupProc', 'description',
+													  'sme', '' ,'' ,'' ,'' ,'' ,'' ]
+	private static final List<String> dbCols = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType',
+												'retireDate', 'maintExpDate', 'environment', 'ipAddress', 'planStatus',
+												'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6',
+												'custom7', 'custom8']
+	private static final List<String> fileCols = ['id', 'assetName', 'fileFormat', 'size', 'description', 'supportType',
+												  'retireDate', 'maintExpDate', 'environment', 'ipAddress', 'planStatus',
+												  'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6',
+												  'custom7', 'custom8']
+
+	private static final List<String> otherCols = ['id', 'application', 'assetName', 'shortName', 'serialNumber',
+												   'assetTag', 'manufacturer', 'model', 'assetType', 'ipAddress', 'os',
+												   'sourceLocationName', 'sourceRoomName', 'sourceRackName', 'sourceRackPosition',
+												   'sourceChassis', 'sourceBladePosition', 'targetLocationName', 'targetRoomName',
+												   'targetRackName', 'targetRackPosition', 'targetChassis',
+												   'targetBladePosition', 'custom1', 'custom2', 'custom3', 'custom4',
+												   'custom5', 'custom6', 'custom7', 'custom8', 'moveBundle', 'truck',
+												   'cart', 'shelf', 'railType', 'priority', 'planStatus', 'usize']
+
+	private static final List<String> unresolvedCols = ['id', 'comment', 'commentType', 'commentAssetEntity',
+														'resolution', 'resolvedBy', 'createdBy', 'dueDate', 'assignedTo',
+														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
+														'taskDependencies', 'duration', 'estStart', 'estFinish',
+														'actStart', 'actFinish', 'workflow']
 
 	JdbcTemplate jdbcTemplate
 	MoveBundleService moveBundleService
 	TagEventService tagEventService
+	UserPreferenceService userPreferenceService
+	ProjectService projectService
+	ReportsService reportsService
 
 	MoveEvent create(Project project, String name) {
 		MoveEvent me = new MoveEvent([project:project, name:name])
@@ -263,5 +318,168 @@ class MoveEventService implements ServiceMethods {
 		return MoveEvent.where {
 			project == project
 		}.list()
+	}
+
+	/**
+	 * Find move event by id
+	 * @param id - move event id
+	 * @param throwException  - whether to throw an exception if move event is not found
+	 * @return
+	 */
+	MoveEvent findById(Long id, boolean throwException = false) {
+		Project currentProject = securityService.getUserCurrentProject()
+		return GormUtil.findInProject(currentProject, MoveEvent, id, throwException)
+	}
+
+	/**
+	 * Update a move event
+	 * @param id - move event id to update
+	 * @param command - move event command object
+	 * @return
+	 */
+	MoveEvent update(Long id, CreateEventCommand command) {
+		MoveEvent moveEvent = findById(id, true)
+		moveEvent.properties = command
+		if (!moveEvent.hasErrors() && moveEvent.save()) {
+			return moveEvent
+		} else {
+			log.info("Error updating MoveEvent. {}", GormUtil.allErrorsString(moveEvent))
+			throw new DomainUpdateException("Error updating move event.")
+		}
+	}
+
+	/**
+	 * Export run book to MS Excel
+	 * @param moveEvent - move event to export
+	 * @param updateRunbookVersion - whether to update
+	 * @return
+	 */
+	Map<String, ?> exportRunbookToExcel(MoveEvent moveEvent, boolean updateRunbookVersion) {
+		Project currentProject = securityService.getUserCurrentProject()
+		Integer currentVersion = moveEvent.runbookVersion
+		String tzId = userPreferenceService.timeZone
+		String userDTFormat = userPreferenceService.dateFormat
+
+		if (updateRunbookVersion) {
+			if (moveEvent.runbookVersion) {
+				moveEvent.runbookVersion = currentVersion + 1
+				currentVersion = currentVersion + 1
+			} else {
+				moveEvent.runbookVersion = 1
+				currentVersion = 1
+			}
+			moveEvent.save(flush:true)
+		}
+
+		def bundles = moveEvent.moveBundles
+		def today = TimeUtil.formatDateTime(new Date(), TimeUtil.FORMAT_DATE_TIME_6)
+		def applications = []
+		def assets = []
+		def databases = []
+		def files = []
+		def others = []
+		def unresolvedIssues = []
+		def preMoveIssue = []
+		def postMoveIssue = []
+
+		boolean viewUnpublished = securityService.viewUnpublished()
+		List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
+
+		if (bundles) {
+			List bundlesList = bundles as List
+			applications = Application.findAllByMoveBundleInListAndProject(bundlesList, currentProject)
+			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(
+					bundlesList, ['Application','Database','Logical Storage'])
+			databases = Database.findAllByMoveBundleInListAndProject(bundlesList, currentProject)
+			files = Files.findAllByMoveBundleInListAndProject(bundlesList, currentProject)
+			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(
+					['Server','VM','Blade','Application','Logical Storage','Database'], bundlesList)
+			List<Long> allAssetIds = AssetEntity.findAllByMoveBundleInListAndProject(bundlesList, currentProject).id
+
+			unresolvedIssues = AssetComment.executeQuery("""
+				from AssetComment
+				where assetEntity.id in (:assetIds)
+				  and dateResolved = null
+				  and commentType=:commentType
+				  and category in ('general', 'discovery', 'planning', 'walkthru')
+				  AND isPublished IN (:publishedValues)
+			""", [assetIds: allAssetIds, commentType: AssetCommentType.ISSUE,
+				  publishedValues: publishedValues])
+		}
+
+		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(
+				moveEvent, 'premove', publishedValues)
+		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(
+				moveEvent, ['shutdown','physical','moveday','startup'], publishedValues)
+		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(
+				moveEvent, 'postmove', publishedValues)
+
+		def preMoveCheckListError = reportsService.generatePreMoveCheckList(currentProject.id, moveEvent, viewUnpublished).allErrors.size()
+
+		try {
+			def book = ExportUtil.loadSpreadsheetTemplate("/templates/Runbook.xlsx")
+
+			Sheet personelSheet = book.getSheet('Staff')
+			Sheet postMoveSheet = book.getSheet('Post-move')
+			Sheet summarySheet = book.getSheet('Index')
+			Sheet scheduleSheet = book.getSheet('Schedule')
+
+			List projManagers = projectService.getProjectManagers(currentProject)
+
+			Font projectNameFont = book.createFont()
+			projectNameFont.fontHeightInPoints = (short)14
+			projectNameFont.fontName = 'Arial'
+			projectNameFont.boldweight = Font.BOLDWEIGHT_BOLD
+
+			CellStyle projectNameCellStyle = book.createCellStyle()
+			projectNameCellStyle.font = projectNameFont
+			projectNameCellStyle.fillBackgroundColor = IndexedColors.SEA_GREEN.index
+			projectNameCellStyle.fillPattern = CellStyle.SOLID_FOREGROUND
+
+			WorkbookUtil.addCell(summarySheet, 1, 1, currentProject.name)
+			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
+			WorkbookUtil.addCell(summarySheet, 2, 3, currentProject.name)
+			WorkbookUtil.addCell(summarySheet, 2, 6, projManagers.join(','))
+			WorkbookUtil.addCell(summarySheet, 4, 6, '')
+			WorkbookUtil.addCell(summarySheet, 2, 4, moveEvent.name)
+			WorkbookUtil.addCell(summarySheet, 2, 10, moveEvent.name)
+
+			moveBundleService.issueExport(assets,           serverCols,     book.getSheet('Servers'),      tzId, userDTFormat, 5, viewUnpublished)
+			moveBundleService.issueExport(applications,     impactedCols,   book.getSheet('Applications'), tzId, userDTFormat, 5, viewUnpublished)
+			moveBundleService.issueExport(databases,        dbCols,         book.getSheet('Database'),     tzId, userDTFormat, 4, viewUnpublished)
+			moveBundleService.issueExport(files,            fileCols,       book.getSheet('Storage'),      tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(others,           otherCols,      book.getSheet('Other'),        tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(unresolvedIssues, unresolvedCols, book.getSheet('Issues'),       tzId, userDTFormat, 1, viewUnpublished)
+			moveBundleService.issueExport(sheduleIssue,     scheduleCols,   scheduleSheet,                    tzId, userDTFormat, 7, viewUnpublished)
+			moveBundleService.issueExport(preMoveIssue,     preMoveCols,    book.getSheet('Pre-move'),     tzId, userDTFormat, 7, viewUnpublished)
+			moveBundleService.issueExport(postMoveIssue,    postMoveCols,   postMoveSheet,                    tzId, userDTFormat, 7, viewUnpublished)
+
+			// Update the Schedule/Tasks Sheet with the correct start/end times
+			Map<String, Date> times = moveEvent.getEventTimes()
+			WorkbookUtil.addCell(scheduleSheet, 5, 1, TimeUtil.formatDateTime(times.start))
+			WorkbookUtil.addCell(scheduleSheet, 5, 3, TimeUtil.formatDateTime(times.completion))
+
+			// Update the project staff
+			// TODO : JPM 11/2015 : Project staff should get list from ProjectService instead of querying PartyRelationship
+			def projectStaff = PartyRelationship.executeQuery('''
+					from PartyRelationship
+					where partyRelationshipType='PROJ_STAFF'
+					  and partyIdFrom=:project
+					  and roleTypeCodeFrom='PROJECT'
+			''', [project: currentProject])
+
+			for (int r = 8; r <= projectStaff.size() + 7; r++) {
+				WorkbookUtil.addCell(personelSheet, 1, r, projectStaff[r - 8].partyIdTo?.toString())
+				WorkbookUtil.addCell(personelSheet, 2, r, projectStaff[r-8].roleTypeCodeTo.toString())
+				WorkbookUtil.addCell(personelSheet, 5, r, projectStaff[r-8].partyIdTo?.email ?: '')
+			}
+
+			String filename = currentProject.name + ' - ' + moveEvent.name + ' Runbook v' + currentVersion + ' -' + today +
+					'.' + ExportUtil.getWorkbookExtension(book)
+			return ['book': book, 'filename': filename]
+		} catch(e) {
+			log.info 'Exception occurred while exporting data: {}', e.message, e
+			throw new ServiceException('Exception occurred while exporting data: ' + e.message)
+		}
 	}
 }
