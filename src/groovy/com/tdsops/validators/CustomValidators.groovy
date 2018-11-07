@@ -75,6 +75,8 @@ class CustomValidators {
 			validatorHandlers[ControlType.YES_NO.toString()] = CustomValidators.&controlYesNoControlValidator
 			validatorHandlers[ControlType.LIST.toString()] = CustomValidators.&controlListValidator
 			validatorHandlers[ControlType.STRING.toString()] = CustomValidators.&controlDefaultValidator
+			validatorHandlers[ControlType.DATE.toString()] = CustomValidators.&controlDateTimeMockValidator
+			validatorHandlers[ControlType.DATETIME.toString()] = CustomValidators.&controlDateTimeMockValidator
 
 			// check all the custom fields against the validators
 			for ( Map fieldSpec : customFieldSpecs ) {
@@ -162,6 +164,21 @@ class CustomValidators {
 				}
 			}
 		}
+	}
+
+	/**
+	 * THIS IS JUST A MOCK VALIDATOR FOR DATE/DATETIME TO MAKE WORK THE FE LOGIC FOR
+	 * TM-12545 (otherwise it will throw an exception). THE REAL VALIDATOR IS IN CODE REVIEW
+	 * FOR TICKET TM-11723, AND WILL BE MERGED ONCE IT'S APPROVED.
+	 * THIS VALIDATOR SHOULD BE OVERWRITTEN IN 4.6.0 ONCE
+	 * TM-12545 IS MERGED.
+	 * See TM-11723
+	 *
+	 * @param value
+	 * @param fieldSpec
+	 * @return
+	 */
+	static  controlDateTimeMockValidator( String value, Map fieldSpec ) {
 	}
 
 	/**
