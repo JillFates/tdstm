@@ -146,7 +146,9 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetInstance.ipAddress}" tabindex="23" ngmodel="model.asset.ipAddress"/>
 
                                     <!-- Rack Source/Target Select & New Fields -->
-                                    <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}" nowrap="nowrap" id="rackId">
+                                    <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${assetInstance.rackSource}')}"
+                                        nowrap="nowrap" id="rackId">
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover"  data-content="Rack/Cabinet">Rack/Cabinet</label>
                                     </td>
                                     <td  *ngIf="showRackFields"  data-for="rackSource"  class="rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}">
@@ -227,7 +229,9 @@
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetInstance.shortName}" tabindex="16" ngmodel="model.asset.shortName"/>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetInstance.os}" tabindex="24" ngmodel="model.asset.os" />
-                                    <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}" nowrap="nowrap">
+                                    <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${assetInstance.sourceRackPosition}')}"
+                                        nowrap="nowrap">
                                         <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
                                     </td>
                                     <%-- Rack Source/Target Position Fields --%>
