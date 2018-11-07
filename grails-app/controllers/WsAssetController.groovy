@@ -341,6 +341,8 @@ class WsAssetController implements ControllerMethods {
 				model.dependencyMap = assetEntityService.dependencyEditMap(asset.project, asset)
 				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 			}
+
+			model.priorityOption = assetEntityService.getAssetPriorityOptions()
 			renderAsJson(model)
 		}
 	}

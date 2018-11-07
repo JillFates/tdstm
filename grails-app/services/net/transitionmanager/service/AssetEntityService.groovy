@@ -1334,6 +1334,7 @@ class AssetEntityService implements ServiceMethods {
 			assetEntityInstance: device,
 			assetType: assetType,
 			manufacturer: device.manufacturer,
+			priorityOption: getAssetPriorityOptions(),
 			manufacturers: getManufacturers(assetType),
 			models: getModelSortedByStatus(device.manufacturer),
 			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
