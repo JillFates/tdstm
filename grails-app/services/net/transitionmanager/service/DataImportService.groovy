@@ -988,7 +988,10 @@ class DataImportService implements ServiceMethods {
 
 		// Take the complete list of field names in fieldsInfo and remove 'id' plus any passed to the method
 		List<String> fieldNames
-		if(fieldsInfo.values().first()?.containsKey('fieldOrder')){
+		if (fieldsInfo.values().first()?.containsKey('fieldOrder')) {
+			// When we have the field order we'll sort them so that the fields are processed in a logical order that solves issues
+			// with hierarchical fields (Manufacturer/Model or Room/Rack). Without the sorting the first past of import processing sometimes
+			// processes Model before Mfg a not found error occurs.
 			fieldNames = fieldsInfo.sort{ it.value.fieldOrder }.collect{ it.key }
 		} else {
 			fieldNames = fieldsInfo.keySet() as List
