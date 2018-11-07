@@ -52,7 +52,8 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">
+                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${asset.size}')}">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip ?: standardFieldSpecs.size.label}">
                                                 ${standardFieldSpecs.size.label}
                                             </label>
@@ -84,8 +85,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}">Scale</td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset?.scale}"/>
                                         <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                             <kendo-dropdownlist
 												    [tabIndex]="15"

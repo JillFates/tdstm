@@ -62,7 +62,9 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.manufacturer.imp}','${asset.manufacturer}')}"
+                                        nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
                                             <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${asset.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
                                             <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
@@ -88,7 +90,9 @@
                                                 [data]="model.priorityOption">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${asset.roomSource}')}"
+                                        nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
@@ -142,7 +146,9 @@
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" tabindex="23" ngmodel="model.asset.ipAddress"/>
 
                                     <!-- Rack Source/Target Select & New Fields -->
-                                    <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}" nowrap="nowrap" id="rackId">
+                                    <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.rackSource.imp}','${asset.rackSource}')}"
+                                        nowrap="nowrap" id="rackId">
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover"  data-content="Rack/Cabinet">Rack/Cabinet</label>
                                     </td>
                                     <td  *ngIf="showRackFields"  data-for="rackSource"  class="rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}">
@@ -223,7 +229,9 @@
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${asset.shortName}" tabindex="16" ngmodel="model.asset.shortName"/>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${asset.os}" tabindex="24" ngmodel="model.asset.os" />
-                                    <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}" nowrap="nowrap">
+                                    <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.sourceRackPosition.imp}','${asset.sourceRackPosition}')}"
+                                        nowrap="nowrap">
                                         <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
                                     </td>
                                     <%-- Rack Source/Target Position Fields --%>
@@ -299,7 +307,7 @@
                                                 [(ngModel)]="model.asset.planStatus">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.size.imp ?: ''}">Size units</td>
+                                    <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset.scale}"/>
                                     <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                         <kendo-dropdownlist
                                                 [tabIndex]="50"
