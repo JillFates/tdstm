@@ -52,7 +52,8 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="label ${standardFieldSpecs.size.imp ?: ''} highField">
+                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}"
+                                            [ngClass]="{'highField': isHighField('${standardFieldSpecs.size.imp}','${assetInstance.size}')}">
                                             <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip ?: standardFieldSpecs.size.label}">
                                                 ${standardFieldSpecs.size.label}
                                             </label>

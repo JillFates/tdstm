@@ -62,7 +62,9 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''} highField" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.manufacturer.imp}','${assetInstance.manufacturer}')}"
+                                        nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
                                             <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${assetInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
                                             <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
@@ -88,7 +90,9 @@
                                                 [data]="model.priorityOption">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''} highField" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
+                                        [ngClass]="{'highField': isHighField('${standardFieldSpecs.roomSource.imp}','${assetInstance.roomSource}')}"
+                                        nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
