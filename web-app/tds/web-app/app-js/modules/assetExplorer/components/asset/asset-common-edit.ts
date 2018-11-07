@@ -4,10 +4,10 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {HostListener, Inject, OnInit, ViewChild} from '@angular/core';
+import {OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {AssetShowComponent} from './asset-show.component';
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 

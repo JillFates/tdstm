@@ -105,7 +105,7 @@
                                     <!--<tds-date-control *ngIf="canShowControl('DateTime', rowIndex)"-->
                                                        <!--[(value)]="editRows.selectedValues[rowIndex].value"></tds-date-control>-->
                                     <!-- Datetime Fields -->
-                                    <b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | userDateTime: userTimeZone}}<br>
+                                    <b>Pipe:</b> {{editRows.selectedValues[rowIndex].value | tdsDateTime: userTimeZone}}<br>
                                     <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
                                                        [(value)]="editRows.selectedValues[rowIndex].value"></tds-datetime-control>
 

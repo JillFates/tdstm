@@ -133,7 +133,7 @@
 
                             <!-- Cell Templates -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'datetime'" let-dataItem>
-                                {{dataItem[column.property] | userDateTime: userTimeZone }}
+                                {{dataItem[column.property] | tdsDateTime: userTimeZone }}
                             </ng-template>
 
                             <!-- Action -->

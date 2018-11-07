@@ -35,7 +35,7 @@ import { UIAutoCenterDirective } from './directives/autocenter-directive';
 import { InputPasteDirective } from './directives/input-paste.directive';
 
 // Shared Pipes
-import { UserDateTime } from './pipes/userDateTime.pipe';
+import { DateTimePipe } from './pipes/datetime.pipe';
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
@@ -86,7 +86,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
-		UserDateTime,
+		DateTimePipe,
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
@@ -125,7 +125,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
-		UserDateTime,
+		DateTimePipe,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
 		InputPasteDirective,
