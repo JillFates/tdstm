@@ -182,10 +182,6 @@ export class DataGridOperationsHelper {
 	 * @param sort
 	 */
 	public sortChange(sort): void {
-		// In case the datatype can't be sorted on its own
-		if (this.resultSet.length && this.resultSet[0][sort[0].field] && this.resultSet[0][sort[0].field].hasOwnProperty('label')) {
-			sort[0].field += '.label';
-		}
 		this.state.sort = sort;
 		this.loadPageData();
 	}
